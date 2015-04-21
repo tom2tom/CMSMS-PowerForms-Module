@@ -216,9 +216,9 @@ submitted ".CMS_ADODB_DT;
 		$this->RemovePreference('mle_version');
 		/* move sub-templates */
 		$inc_dir = cms_join_path (dirname(__FILE__),'includes');
-		//			$templ_dir = cms_join_path (dirname(__FILE__),'templates');
-		//			foreach(array('new_form_header.tpl','new_form_footer.tpl') as $tpl)
-		//				rename(cms_join_path($inc_dir,$tpl),cms_join_path($templ_dir,$tpl));
+//		$templ_dir = cms_join_path (dirname(__FILE__),'templates');
+//		foreach(array('new_form_header.tpl','new_form_footer.tpl') as $tpl)
+//			rename(cms_join_path($inc_dir,$tpl),cms_join_path($templ_dir,$tpl));
 		/* remove now-renamed includes directory */
 		unlink ($inc_dir);
 		/* replace stored data used for sending emails as cc or bcc */
@@ -241,7 +241,7 @@ submitted ".CMS_ADODB_DT;
 		'module_fb_field_opt WHERE field_id=?';
 		$sql3 = 'DELETE FROM ' .$pref. 'module_fb_field_opt WHERE option_id=?';
 		while ($row = $set->FetchRow())
-		  {
+		{
 			$cc = false;
 			$bcc = false;
 			$sendtype = false;
@@ -249,81 +249,93 @@ submitted ".CMS_ADODB_DT;
 			$fid = $row['field_id'];
 			$set2 = $db->Execute($sql2, array($fid));
 			if ($set2)
-			  {
+			{
 				$rows = $set2->GetAssoc();
 				foreach ($rows as $id=>$row2)
-				  {
-				  if ($row2['name'] == 'email_cc_address')
+				{
+					if ($row2['name'] == 'email_cc_address')
 					{
-					$cc = $row2['value'];
-					if ($clear)
-						$db->Execute ($sql3, array($id));
+						$cc = $row2['value'];
+						if ($clear)
+							$db->Execute ($sql3, array($id));
 					}
-				  elseif ($row2['name'] == 'use_bcc')
+					elseif ($row2['name'] == 'use_bcc')
 					{
-					$bcc = $row2['value'];
-					if ($clear)
-						$db->Execute ($sql3, array($id));
+						$bcc = $row2['value'];
+						if ($clear)
+							$db->Execute ($sql3, array($id));
 					}
-				  elseif ($row2['name'] == 'send_using')
+					elseif ($row2['name'] == 'send_using')
 					{
-					$sendtype = $row2['value'];
-					if ($clear)
-						$db->Execute ($sql3, array($id));
+						$sendtype = $row2['value'];
+						if ($clear)
+							$db->Execute ($sql3, array($id));
 					}
 				  }
 			  }
 			$catter = false;
 			switch ($sendtype)
-			  {
+			{
 				case 'cc':
 				$catter = '"|cc|"';
 				break;
 				case 'bcc':
 				$catter = '"|bc|"';
 				break;
-			  }
+			}
 			if ($catter)
-			  {
+			{
 				$sql4 = 'UPDATE ' .$pref. 'module_fb_field_opt SET value='.
 				  $db->Concat($catter,'value'). ' WHERE field_id=? AND name=?';
 				$db->Execute ($sql4, array ($fid,'destination_address'));
-			  }
+			}
 
 			if ($cc !== false)
-			  {
-			  if ($row['type'] != 'DispositionEmail')
+			{
+				if ($row['type'] != 'DispositionEmail')
 				{
-				  $sql5 = 'INSERT INTO ' .$pref.
-				   'module_fb_field (field_id,form_id,name,type,required,hide_label,order_by) VALUES (?,?,?,?,?,?,?)';
-				  $fid = $db->GenID($pref.'module_fb_field_seq');
-				  $db->Execute ($sql5, array($fid, $row['form_id'],'AutoAdded','DispositionEmail',0,1,100));
+					$sql5 = 'INSERT INTO ' .$pref.
+					 'module_fb_field (field_id,form_id,name,type,required,hide_label,order_by) VALUES (?,?,?,?,?,?,?)';
+					$fid = $db->GenID($pref.'module_fb_field_seq');
+					$db->Execute ($sql5, array($fid, $row['form_id'],'AutoAdded','DispositionEmail',0,1,100));
 				}
-			  $sendtype = ($bcc) ? '|bc|':'|cc|';
-			  $sql5 = 'INSERT INTO ' .$pref.
-			   'module_fb_field_opt (option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
-			  $sub_ads = explode(',',$cc);
-			  foreach ($sub_ads as $this_ad)
+				$sendtype = ($bcc) ? '|bc|':'|cc|';
+				$sql5 = 'INSERT INTO ' .$pref.
+				'module_fb_field_opt (option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
+				$sub_ads = explode(',',$cc);
+				foreach ($sub_ads as $this_ad)
 				{
-				$bare = trim($this_ad);
-				if ($bare)
-				  $db->Execute ($sql5, array($db->GenID($pref.'module_fb_field_opt_seq'),
-					$fid,$row['form_id'],'destination_address',$sendtype.$bare));
+					$bare = trim($this_ad);
+					if ($bare)
+						$db->Execute ($sql5, array($db->GenID($pref.'module_fb_field_opt_seq'),
+						$fid,$row['form_id'],'destination_address',$sendtype.$bare));
 				}
-			  }
-		  }
-	  }
+			}
+		}
+	}
 	case "0.7.3":			  
 		$sql1 = "UPDATE ".$pref."module_fb_form_attr SET name='submission_template' WHERE name='submit_response'";
 		$db->Execute ($sql1);
 	case "0.7.4":
 		$sqlarray = $dict->AlterColumnSQL($pref."module_fb_ip_log", "src_ip C(40)");
 		$dict->ExecuteSQLArray ($sqlarray);
-		$fn = cms_join_path(dirname(__FILE__),'classes');
-		if(is_dir($fn))
+		//renamed subdir
+		$dir = cms_join_path(dirname(__FILE__),'classes');
+		if(is_dir($dir))
 		{
-			//TODO recursive delete
-		}		
+			$files = array_diff(scandir($dir),array('.','..'));
+			if($files)
+			{
+				foreach($files as $file)
+				{
+					$fp = cms_join_path($dir,$file);
+					unlink($fp);
+				}
+				unset($files);
+			}
+			rmdir($dir);
+		}
+
 }
 
 ?>
