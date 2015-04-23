@@ -1,29 +1,26 @@
 <?php
-/*
-   FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-   More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-   A Module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-  This project's homepage is: http://www.cmsmadesimple.org
-*/
-
-if (!isset($params['fbrp_f']) || !isset($params['fbrp_r']) || !isset($params['fbrp_c']))
-	{
+if(!isset($params['fbrp_f']) || !isset($params['fbrp_r']) || !isset($params['fbrp_c']))
+{
 	echo $this->Lang('validation_param_error');
 	return false;
-	}
+}
 
 $params['response_id']=$params['fbrp_r'];
 $params['form_id']=$params['fbrp_f'];
 $params['fbrp_user_form_validate']=true;
-$aeform = new fbForm($this, $params, true);
+$aeform = new pwfForm($this, $params, true);
 
-if (!$aeform->CheckResponse($params['fbrp_f'], $params['fbrp_r'], $params['fbrp_c']))
+if(!$aeform->CheckResponse($params['fbrp_f'], $params['fbrp_r'], $params['fbrp_c']))
 {
 	echo $this->Lang('validation_response_error');
 	return false;
 }
-
 
 /* Stikki removed: Old stuff, should be removed from Form.class.php aswell
 else
@@ -34,35 +31,35 @@ else
 */
 
 $confirmationField = false;
-foreach ($aeform->GetFields() as &$thisField)
+foreach($aeform->GetFields() as &$thisField)
+{
+	if($thisField->GetFieldType() == 'DispositionEmailConfirmation')
 	{
-	if ($thisField->GetFieldType() == 'DispositionEmailConfirmation')
-		{
 		$thisField->ApproveToGo($params['fbrp_r']);
 		$results = $aeform->Dispose($returnid);
-		if ($results[0] == true)
-			{
+		if($results[0] == true)
+		{
 			$ret = $thisField->GetOption('redirect_page','-1');
-			if ($ret != -1)
-				{
+			if($ret != -1)
+			{
 				unset ($thisfield);
 				$this->RedirectContent($ret);
-				}
 			}
+		}
 		else
-			{
+		{
 			echo 'Error!: '; //TODO translate
-			foreach ($results[1] as $thisRes)
-				{
+			foreach($results[1] as $thisRes)
+			{
 				echo $thisRes . '<br />';
-				}
 			}
+		}
 		$confirmationField = true;
 		break;
-		}
 	}
+}
 unset ($thisfield);
 
-if (!$confirmationField)
+if(!$confirmationField)
 	echo $this->Lang('validation_no_field_error');
 ?>
