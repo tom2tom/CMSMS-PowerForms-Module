@@ -15,27 +15,27 @@ if(!$this->CheckAccess()) exit;
 
 $this->initialize();
 
-$aeform = new pwfForm($this, $params,true);
+$funcs = new pwfUtils($this, $params,true);
 
 if(isset($params['fbrp_aef_cancel']))
 {
 	$tab = $this->GetActiveTab($params);
-	echo $aeform->AddEditForm($id, $returnid, $tab);
+	echo $funcs->AddEditForm($id, $returnid, $tab);
 	return;
 }
 
 if(isset($params['fbrp_opt_destination_address']))
 {
 	//store the 'blended' address details
-	$aeform->MergeEmails($params);
+	$funcs->MergeEmails($params);
 }
-$aefield = $aeform->NewField($params);
+$obfield = $funcs->NewField($params);
 
 if(isset($params['fbrp_aef_upd']) ||
-	(isset($params['fbrp_aef_add']) && $aefield->GetFieldType() != ''))
+	(isset($params['fbrp_aef_add']) && $obfield->GetFieldType() != ''))
 {
 	// save the field. DO NOT ->Redirect - that flattens any $params[] that's an array
-	$this->DoAction('admin_store_field', $id, $params);
+	$this->DoAction('store_field', $id, $params);
 	return;
 }
 elseif(isset($params['fbrp_aef_add']))
@@ -46,18 +46,18 @@ elseif(isset($params['fbrp_aef_add']))
 elseif(isset($params['fbrp_aef_optadd']))
 {
 	// call the field's option add method, with all available parameters
-	$aefield->DoOptionAdd($params);
+	$obfield->DoOptionAdd($params);
 }
 elseif(isset($params['fbrp_aef_optdel']))
 {
 	// call the field's option delete method, with all available parameters
-	$aefield->DoOptionDelete($params);
+	$obfield->DoOptionDelete($params);
 }
 else
 {
 	// new field, or implicit aef_add
 }
 
-echo $aeform->AddEditField($id, $aefield, (isset($params['fbrp_dispose_only'])?$params['fbrp_dispose_only']:0), $returnid, isset($params['fbrp_message'])?$this->ShowMessage($params['fbrp_message']):'');
+echo $funcs->AddEditField($id, $obfield, (isset($params['fbrp_dispose_only'])?$params['fbrp_dispose_only']:0), $returnid, isset($params['fbrp_message'])?$this->ShowMessage($params['fbrp_message']):'');
 
 ?>

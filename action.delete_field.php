@@ -7,9 +7,9 @@
 
 if(!$this->CheckAccess()) exit;
 
-$aeform = new pwfForm($this, $params, true);
-$aeform->DeleteField($params['field_id']);
+$funcs = new pwfUtils($this, $params, true);
+$funcs->DeleteField($params['field_id']);
 $tab = $this->GetActiveTab($params);
-echo $aeform->AddEditForm($id, $returnid, $tab, $this->Lang('field_deleted'));
+echo $funcs->AddEditForm($id, $returnid, $tab, $this->Lang('field_deleted'));
 
 ?>

@@ -7,8 +7,8 @@
 
 if(!$this->CheckAccess()) exit;
 
-$aeform = new pwfForm($this, $params, true);
-$aeform->Delete();
+$funcs = new pwfUtils($this, $params, true);
+$funcs->Delete();
 
 $params['fbrp_message'] = $this->Lang('form_deleted');
 $this->Redirect($id, 'defaultadmin', '', $params);

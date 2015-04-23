@@ -11,10 +11,10 @@ if(!isset($params['form_id']) && isset($params['form']))
 	$params['form_id'] = $this->GetFormIDFromAlias($params['form']);
 }
 
-$aeform = new pwfForm($this,$params,true);
-$spec = $aeform->GetName().".xml";
+$funcs = new pwfUtils($this,$params,true);
+$spec = $funcs->GetName().".xml";
 $spec = preg_replace('/[^\w\d\.\-\_]/','_',$spec);
-$xmlstr = $aeform->ExportXML(isset($params['fbrp_export_values'])?true:false);
+$xmlstr = $funcs->ExportXML(isset($params['fbrp_export_values'])?true:false);
 
 @ob_clean();
 @ob_clean();

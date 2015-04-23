@@ -7,18 +7,18 @@
 
 if(!$this->CheckAccess()) exit;
 
-$aeform = new pwfForm($this, $params, true);
-$aefield = $aeform->Replicate($params);
-if($aefield)
+$funcs = new pwfUtils($this, $params, true);
+$obfield = $funcs->Replicate($params);
+if($obfield)
 {
-	$aefield->Store(true);
-	$aeform->Fields[] = $aefield;
-	echo $aeform->AddEditField ($id, $aefield, 0, $returnid);
+	$obfield->Store(true);
+	$funcs->Fields[] = $obfield;
+	echo $funcs->AddEditField ($id, $obfield, 0, $returnid);
 }
 else
 {
 	$tab = $this->GetActiveTab($params);
-	echo $aeform->AddEditForm($id, $returnid, $tab, $this->Lang('error_copy'));
+	echo $funcs->AddEditForm($id, $returnid, $tab, $this->Lang('error_copy'));
 }
 
 ?>

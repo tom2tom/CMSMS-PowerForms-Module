@@ -7,8 +7,8 @@
 
 if(!$this->CheckAccess()) exit;
 
-$aeform = new pwfForm($this, $params, true);
-$srcIndex = $aeform->GetFieldIndexFromId($params['field_id']);
+$funcs = new pwfUtils($this, $params, true);
+$srcIndex = $funcs->GetFieldIndexFromId($params['field_id']);
 if($params['fbrp_dir'] == 'up')
 {
 	$destIndex = $srcIndex - 1;
@@ -17,11 +17,11 @@ else
 {
 	$destIndex = $srcIndex + 1;
 }
-$aeform->SwapFieldsByIndex($srcIndex,$destIndex);
+$funcs->SwapFieldsByIndex($srcIndex,$destIndex);
 
 // force reload of form, this is kinda hackish but can't think of anything else ;)
-$aeform = new pwfForm($this, $params, true);
+$funcs = new pwfUtils($this, $params, true);
 $tab = $this->GetActiveTab($params);
 
-echo $aeform->AddEditForm($id, $returnid, $tab, $this->Lang('field_order_updated'));
+echo $funcs->AddEditForm($id, $returnid, $tab, $this->Lang('field_order_updated'));
 ?>

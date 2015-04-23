@@ -7,8 +7,8 @@
 
 if(!$this->CheckAccess()) exit;
 
-$aeform = new pwfForm($this, $params, true);
-$aeform->Copy();
+$funcs = new pwfUtils($this, $params, true);
+$funcs->Copy();
 
 $this->Redirect($id, 'defaultadmin', '', $params);
 

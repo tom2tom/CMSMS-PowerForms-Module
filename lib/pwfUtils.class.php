@@ -2060,7 +2060,7 @@ EOS;
 
 	function &Replicate(&$params)
 	{
-		$aefield = false;//need ref to this
+		$obfield = false;//need ref to this
 		if(isset($params['field_id']) && $params['field_id'] != -1)
 		{
 			$last = -1;
@@ -2069,28 +2069,27 @@ EOS;
 			{
 				if($fld->GetId() == $orig)
 				{
-					$aefield = clone($fld);
-					$aefield->Id = -1;
-					$name = $aefield->GetName();
-					$aefield->SetName($name.' '.$this->module_ptr->Lang('copy'));
+					$obfield = clone($fld);
+					$obfield->Id = -1;
+					$name = $obfield->GetName();
+					$obfield->SetName($name.' '.$this->module_ptr->Lang('copy'));
 				}
 				if($fld->GetOrder() > $last)
 					$last = $fld->GetOrder();
 			}
 			unset ($fld);
-			if($aefield)
+			if($obfield)
 			{
-				$aefield->SetOrder($last+1);
+				$obfield->SetOrder($last+1);
 			}
 		}
-		return $aefield;
+		return $obfield;
 	}
 
 	// Add new field
 	function &NewField(&$params)
 	{
-		//$aefield = new fbFieldBase($this,$params);
-		$aefield = false;
+		$obfield = false;
 		if(isset($params['field_id']) && $params['field_id'] != -1)
 		{
 			// we're loading an extant field
@@ -2099,29 +2098,29 @@ EOS;
 			if($type != '')
 			{
 				$className = $this->MakeClassName($type, '');
-				$aefield = new $className($this, $params);
-				$aefield->LoadField($params);
+				$obfield = new $className($this, $params);
+				$obfield->LoadField($params);
 			}
 		}
-		if($aefield === false)
+		if($obfield === false)
 		{
 			// new field
 			if(!isset($params['fbrp_field_type']))
 			{
 				// unknown field type
-				$aefield = new fbFieldBase($this,$params);
+				$obfield = new pwfFieldBase($this,$params);
 			}
 			else
 			{
 				// specified field type via params
 				$className = $this->MakeClassName($params['fbrp_field_type'], '');
-				$aefield = new $className($this, $params);
+				$obfield = new $className($this, $params);
 			}
 		}
-		return $aefield;
+		return $obfield;
 	}
 
-	function AddEditField($id, &$aefield, $dispose_only, $returnid, $message='')
+	function AddEditField($id, &$obfield, $dispose_only, $returnid, $message='')
 	{
 		$mod = $this->module_ptr;
 		$smarty = cmsms()->GetSmarty();
@@ -2135,8 +2134,8 @@ EOS;
 
 		$mainList = array();
 		$advList = array();
-		$baseList = $aefield->PrePopulateBaseAdminForm($id, $dispose_only);
-		if($aefield->GetFieldType() == '')
+		$baseList = $obfield->PrePopulateBaseAdminForm($id, $dispose_only);
+		if($obfield->GetFieldType() == '')
 		{
 			// still need type
 			$fieldList = array();
@@ -2144,7 +2143,7 @@ EOS;
 		else
 		{
 			// we have our type
-			$fieldList = $aefield->PrePopulateAdminForm($id);
+			$fieldList = $obfield->PrePopulateAdminForm($id);
 		}
 
 		$hasmain = isset($baseList['main']) || isset($fieldList['main']);
@@ -2167,29 +2166,29 @@ EOS;
 			$smarty->assign('advancedtab_start',$mod->StartTab('advancedtab'));
 		$smarty->assign('notice_select_type',$mod->Lang('notice_select_type'));
 
-		if($aefield->GetId() != -1)
+		if($obfield->GetId() != -1)
 		{
 			$smarty->assign('op',$mod->CreateInputHidden($id, 'fbrp_op',$mod->Lang('updated')));
 			$smarty->assign('submit',$mod->CreateInputSubmit($id, 'fbrp_aef_upd', $mod->Lang('update')));
 		}
-		elseif($aefield->GetFieldType() != '')
+		elseif($obfield->GetFieldType() != '')
 		{
 			$smarty->assign('op',$mod->CreateInputHidden($id, 'fbrp_op', $mod->Lang('added')));
 			$smarty->assign('submit',$mod->CreateInputSubmit($id, 'fbrp_aef_add', $mod->Lang('add')));
 		}
 		$smarty->assign('cancel',$mod->CreateInputSubmit($id, 'fbrp_aef_cancel', $mod->Lang('cancel')));
 
-		if($aefield->HasAddOp())
+		if($obfield->HasAddOp())
 		{
-			$smarty->assign('add',$mod->CreateInputSubmit($id,'fbrp_aef_optadd',$aefield->GetOptionAddButton()));
+			$smarty->assign('add',$mod->CreateInputSubmit($id,'fbrp_aef_optadd',$obfield->GetOptionAddButton()));
 		}
 		else
 		{
 			$smarty->assign('add','');
 		}
-		if($aefield->HasDeleteOp())
+		if($obfield->HasDeleteOp())
 		{
-			$smarty->assign('del',$mod->CreateInputSubmit($id,'fbrp_aef_optdel',$aefield->GetOptionDeleteButton()));
+			$smarty->assign('del',$mod->CreateInputSubmit($id,'fbrp_aef_optdel',$obfield->GetOptionDeleteButton()));
 		}
 		else
 		{
@@ -2197,11 +2196,11 @@ EOS;
 		}
 
 		$smarty->assign('fb_hidden', $mod->CreateInputHidden($id, 'form_id', $this->Id) .
-			$mod->CreateInputHidden($id, 'field_id', $aefield->GetId()) .
-			$mod->CreateInputHidden($id, 'fbrp_order_by', $aefield->GetOrder()) .
+			$mod->CreateInputHidden($id, 'field_id', $obfield->GetId()) .
+			$mod->CreateInputHidden($id, 'fbrp_order_by', $obfield->GetOrder()) .
 			$mod->CreateInputHidden($id, 'fbrp_set_from_form','1'));
 
-		if(/*!$aefield->IsDisposition() && */ !$aefield->IsNonRequirableField())
+		if(/*!$obfield->IsDisposition() && */ !$obfield->IsNonRequirableField())
 		{
 			$smarty->assign('requirable',1);
 		}
@@ -2258,7 +2257,7 @@ EOS;
 				$advList[] = $oneset;
 			}
 		}
-		$aefield->PostPopulateAdminForm($mainList, $advList);
+		$obfield->PostPopulateAdminForm($mainList, $advList);
 
 		$smarty->assign('mainList',$mainList);
 		$smarty->assign('advList',$advList);

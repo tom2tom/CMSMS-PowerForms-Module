@@ -14,8 +14,8 @@ if(isset ($params['fbrp_cancel']))
 if(!$this->CheckAccess()) exit;
 
 // Store data
-$aeform = new pwfForm($this, $params, true);
-if($aeform->Store())
+$funcs = new pwfUtils($this, $params, true);
+if($funcs->Store())
 {
 	if($params['fbrp_submit'] == $this->Lang('save')) //submit
 	{
@@ -27,7 +27,7 @@ if($aeform->Store())
 	else //apply
 	{
 		$tab = $this->GetActiveTab($params);
-		echo $aeform->AddEditForm($id, $returnid, $tab, $this->Lang('form',$params['fbrp_form_op']));
+		echo $funcs->AddEditForm($id, $returnid, $tab, $this->Lang('form',$params['fbrp_form_op']));
 	}
 }
 else

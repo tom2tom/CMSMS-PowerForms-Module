@@ -7,17 +7,17 @@
 
 if(!$this->CheckAccess()) exit;
 
-$aeform = new pwfForm($this, $params, true);
+$funcs = new pwfUtils($this, $params, true);
+$obfield = $funcs->GetFieldById($params['field_id']);
 
-$aefield = $aeform->GetFieldById($params['field_id']);
-if($aefield !== false)
+if($obfield !== false)
 {
-//	$aefield->SetRequired($params['fbrp_active']=='on'?true:false);
-	$aefield->ToggleRequired();
-	$aefield->Store();
-	$aeform = new pwfForm($this, $params, true);
+//	$obfield->SetRequired($params['fbrp_active']=='on'?true:false);
+	$obfield->ToggleRequired();
+	$obfield->Store();
+	$funcs = new pwfUtils($this, $params, true);
 }
 $tab = $this->GetActiveTab($params);
 
-echo $aeform->AddEditForm($id, $returnid, $tab, $this->Lang('field_requirement_updated'));
+echo $funcs->AddEditForm($id, $returnid, $tab, $this->Lang('field_requirement_updated'));
 ?>

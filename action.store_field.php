@@ -7,23 +7,23 @@
 
 if(!$this->CheckAccess()) exit;
 
-$aeform = new pwfForm($this, $params, true);
-$aefield = $aeform->NewField($params);
-$val = $aefield->AdminValidate();
+$funcs = new pwfUtils($this, $params, true);
+$obfield = $funcs->NewField($params);
+$val = $obfield->AdminValidate();
 if($val[0])
 {
-	$aefield->PostAdminSubmitCleanup();
-	$aefield->Store(true);
-	$aefield->PostFieldSaveProcess($params);
+	$obfield->PostAdminSubmitCleanup();
+	$obfield->Store(true);
+	$obfield->PostFieldSaveProcess($params);
 	$params['fbrp_message']=$params['fbrp_op'];
 	//DO NOT ->Redirect - that flattens any $params[] that's an array
-	$this->DoAction('admin_add_edit_form', $id, $params);
+	$this->DoAction('add_edit_form', $id, $params);
 }
 else
 {
-	$aefield->LoadField($params);
+	$obfield->LoadField($params);
 	$params['fbrp_message'] = $val[1];
-	echo $aeform->AddEditField($id, $aefield, (isset($params['fbrp_dispose_only'])?$params['fbrp_dispose_only']:0), $returnid);
+	echo $funcs->AddEditField($id, $obfield, (isset($params['fbrp_dispose_only'])?$params['fbrp_dispose_only']:0), $returnid);
 }
 
 ?>

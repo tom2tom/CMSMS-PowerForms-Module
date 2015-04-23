@@ -18,9 +18,9 @@ if((isset($params['inline'])) && preg_match('/t(rue)*|y(yes)*|1/i',$params['inli
 }
 
 $fbrp_callcount = 0;
-$aeform = new pwfForm($this,$params,true,true);
+$funcs = new pwfUtils($this,$params,true,true);
 
-$fld = $aeform->GetFormBrowserField();
+$fld = $funcs->GetFormBrowserField();
 if($fld !== false && $fld->GetOption('feu_bind','0')=='1')
 {
 	$feu = $this->GetModuleInstance('FrontEndUsers');
@@ -36,12 +36,12 @@ if($fld !== false && $fld->GetOption('feu_bind','0')=='1')
 	}
 }
 
-if(!($inline || ($aeform->GetAttr('inline','0')== '1'))) $id = 'cntnt01';
+if(!($inline || ($funcs->GetAttr('inline','0')== '1'))) $id = 'cntnt01';
 
 $smarty->assign('fb_form_has_validation_errors',0);
 $smarty->assign('fb_show_submission_errors',0);
-$smarty->assign('fb_form_header', $aeform->RenderFormHeader());
-$smarty->assign('fb_form_footer',$aeform->RenderFormFooter());
+$smarty->assign('fb_form_header', $funcs->RenderFormHeader());
+$smarty->assign('fb_form_footer',$funcs->RenderFormFooter());
 
 $finished = false;
 $fieldExpandOp = false;
@@ -60,10 +60,10 @@ foreach($params as $pKey=>$pVal)
 	}
 }
 
-if(!$fieldExpandOp && (($aeform->GetPageCount() > 1 && $aeform->GetPageNumber() > 0) || (isset($params['fbrp_done'])&& $params['fbrp_done']==1)))
+if(!$fieldExpandOp && (($funcs->GetPageCount() > 1 && $funcs->GetPageNumber() > 0) || (isset($params['fbrp_done'])&& $params['fbrp_done']==1)))
 {
 	// Validate form
-	$res = $aeform->Validate();
+	$res = $funcs->Validate();
 
 	// We have validate errors
     if($res[0] === false)
@@ -71,22 +71,22 @@ if(!$fieldExpandOp && (($aeform->GetPageCount() > 1 && $aeform->GetPageNumber() 
 		$smarty->assign('fb_form_validation_errors',$res[1]);
 		$smarty->assign('fb_form_has_validation_errors',1);
 
-		$aeform->PageBack();
+		$funcs->PageBack();
 
-	// No validate errors, proceed
+		// No validate errors, proceed
 	}
 	else if(isset($params['fbrp_done']) && $params['fbrp_done']==1)
 	{
 		// Check captcha, if installed
 		$ok = true;
 		$captcha = $this->getModuleInstance('Captcha');
-		if($aeform->GetAttr('use_captcha','0')== '1' && $captcha != null)
+		if($funcs->GetAttr('use_captcha','0') == '1' && $captcha != null)
 		{
 			if(!$captcha->CheckCaptcha($params['fbrp_captcha_phrase']))
 			{
-				$smarty->assign('captcha_error',$aeform->GetAttr('captcha_wrong',$this->Lang('wrong_captcha')));
+				$smarty->assign('captcha_error',$funcs->GetAttr('captcha_wrong',$this->Lang('wrong_captcha')));
 
-				$aeform->PageBack();
+				$funcs->PageBack();
 				$ok = false;
 			}
 		}
@@ -95,8 +95,8 @@ if(!$fieldExpandOp && (($aeform->GetPageCount() > 1 && $aeform->GetPageNumber() 
 		if($ok)
 		{
 			$finished = true;
-			$aeform->manageFileUploads();
-			$results = $aeform->Dispose($returnid);
+			$funcs->manageFileUploads();
+			$results = $funcs->Dispose($returnid);
 		}
 	}
 }
@@ -104,25 +104,25 @@ if(!$fieldExpandOp && (($aeform->GetPageCount() > 1 && $aeform->GetPageNumber() 
 if(!$finished)
 {
 	$parms = array();
-	$parms['form_name'] = $aeform->GetName();
-	$parms['form_id'] = $aeform->GetId();
+	$parms['form_name'] = $funcs->GetName();
+	$parms['form_id'] = $funcs->GetId();
 	$this->SendEvent('OnFormBuilderFormDisplay',$parms);
 
-    if(isset($params['fb_from_fb']))
+    if(isset($params['fb_from_fb'])) //CHECKME never used
 	{
 		$smarty->assign('fb_form_start',
-			$this->CreateFormStart($id, 'user_edit_resp', $returnid, 'post',
+			$this->CreateFormStart($id, 'user_edit_resp', $returnid, 'POST',
 				'multipart/form-data',
-				($aeform->GetAttr('inline','0')== '1'), '',
+				($funcs->GetAttr('inline','0') == '1'), '',
 				array('fbrp_callcount'=>$fbrp_callcount+1)).
 				$this->CreateInputHidden($id,'response_id',isset($params['response_id'])?$params['response_id']:'-1'));
 	}
 	else
 	{
      	$smarty->assign('fb_form_start',
-			   $this->CreateFormStart($id, 'default', $returnid, 'post',
+			   $this->CreateFormStart($id, 'default', $returnid, 'POST',
 				'multipart/form-data',
-				($aeform->GetAttr('inline','0')== '1'), '',
+				($funcs->GetAttr('inline','0') == '1'), '',
 				array('fbrp_callcount'=>$fbrp_callcount+1)));
 	}
 
@@ -135,22 +135,22 @@ else
 	if($results[0] == true)
 	{
 		$parms = array();
-		$parms['form_name'] = $aeform->GetName();
-		$parms['form_id'] = $aeform->GetId();
+		$parms['form_name'] = $funcs->GetName();
+		$parms['form_id'] = $funcs->GetId();
 		$this->SendEvent('OnFormBuilderFormSubmit',$parms);
 
-		$act = $aeform->GetAttr('submit_action','text');
+		$act = $funcs->GetAttr('submit_action','text');
 		if($act == 'text')
 		{
-			$message = $aeform->GetAttr('submission_template','');
-			$aeform->setFinishedFormSmarty(true);
+			$message = $funcs->GetAttr('submission_template','');
+			$funcs->setFinishedFormSmarty(true);
 			//process via smarty without cacheing (smarty->fetch() fails)
 			echo $this->ProcessTemplateFromData($message);
 			return;
 		}
 		else if($act == 'redir')
 		{
-			$ret = $aeform->GetAttr('redirect_page','-1');
+			$ret = $funcs->GetAttr('redirect_page','-1');
 			if($ret != -1)
 			{
 				$this->RedirectContent($ret);
@@ -167,21 +167,21 @@ else
 		$smarty->assign('fb_submission_error_list',$results[1]);
 		$smarty->assign('fb_show_submission_errors',$show);
 
-		$parms['form_name'] = $aeform->GetName();
-		$parms['form_id'] = $aeform->GetId();
+		$parms['form_name'] = $funcs->GetName();
+		$parms['form_id'] = $funcs->GetId();
 		$this->SendEvent('OnFormBuilderFormSubmitError',$parms);
 	}
 }
 
-$udtonce = $aeform->GetAttr('predisplay_udt','');
-$udtevery = $aeform->GetAttr('predisplay_each_udt','');
+$udtonce = $funcs->GetAttr('predisplay_udt','');
+$udtevery = $funcs->GetAttr('predisplay_each_udt','');
 if(!$finished &&
    ((!empty($udtonce) && $udtonce != '-1') ||
     (!empty($udtevery) && $udtevery != '-1')))
 {
 	$usertagops = $gCms->GetUserTagOperations();
 	$parms = $params;
-	$parms['FORM'] =& $aeform;
+	$parms['FORM'] =& $funcs;
 
 	if(isset($fbrp_callcount) && $fbrp_callcount == 0 &&
 		!empty($udtonce) && "-1" != $udtonce)
@@ -193,5 +193,5 @@ if(!$finished &&
 		$tmp = $usertagops->CallUserTag($udtevery,$parms);
 	}
 }
-echo $aeform->RenderForm($id, $params, $returnid);
+echo $funcs->RenderForm($id, $params, $returnid);
 ?>

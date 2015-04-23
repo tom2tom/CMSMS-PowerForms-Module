@@ -16,9 +16,9 @@ if(!isset($params['fbrp_f']) || !isset($params['fbrp_r']) || !isset($params['fbr
 $params['response_id']=$params['fbrp_r'];
 $params['form_id']=$params['fbrp_f'];
 $params['fbrp_user_form_validate']=true;
-$aeform = new pwfForm($this, $params, true);
+$funcs = new pwfUtils($this, $params, true);
 
-if(!$aeform->CheckResponse($params['fbrp_f'], $params['fbrp_r'], $params['fbrp_c']))
+if(!$funcs->CheckResponse($params['fbrp_f'], $params['fbrp_r'], $params['fbrp_c']))
 {
 	echo $this->Lang('validation_response_error');
 	return false;
@@ -28,17 +28,17 @@ if(!$aeform->CheckResponse($params['fbrp_f'], $params['fbrp_r'], $params['fbrp_c
 else
 {
 	//[#2792] DeleteResponse is never called on validation;
-	//$aeform->DeleteResponse($params['fbrp_r']);
+	//$funcs->DeleteResponse($params['fbrp_r']);
 }
 */
 
 $confirmationField = false;
-foreach($aeform->GetFields() as &$thisField)
+foreach($funcs->GetFields() as &$thisField)
 {
 	if($thisField->GetFieldType() == 'DispositionEmailConfirmation')
 	{
 		$thisField->ApproveToGo($params['fbrp_r']);
-		$results = $aeform->Dispose($returnid);
+		$results = $funcs->Dispose($returnid);
 		if($results[0] == true)
 		{
 			$ret = $thisField->GetOption('redirect_page','-1');
