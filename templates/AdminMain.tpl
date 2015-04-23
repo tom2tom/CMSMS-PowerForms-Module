@@ -2,10 +2,10 @@
 
 {$tabheaders}
 {$start_formtab}
-<table cellspacing="0" class="pagetable" width="80%">
+<table class="pagetable module_fb_table">
  <thead><tr>
   <th>{$title_form_name}</th>
-  <th>{$title_form_alias}</th>
+  <th>{$title_page_tag}</th>
   <th class="pageicon">&nbsp;</th>
   <th class="pageicon">&nbsp;</th>
   <th class="pageicon">&nbsp;</th>
@@ -13,9 +13,10 @@
  </tr></thead>
  <tbody>
 {foreach from=$forms item=entry}
- <tr class="{$entry->rowclass}" onmouseover="this.className='{$entry->rowclass}hover';" onmouseout="this.className='{$entry->rowclass}';">
+ {cycle values='odd,even' assign=rowclass}
+ <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
   <td>{$entry->name}</td>
-  <td>{ldelim}FormBuilder form='{$entry->usage}'{rdelim}</td>
+  <td>{ldelim}PowerForms form='{$entry->usage}'{rdelim}</td>
   <td>{$entry->editlink}</td>
   <td>{$entry->copylink}</td>
   <td>{$entry->deletelink}</td>
@@ -25,7 +26,7 @@
 </tbody>
 </table>
 {if $addlink != ''}
-<br />{$addlink}&nbsp;{$addform}<br />
+<br /><p class="pageinput">{$addlink}&nbsp;{$addform}</p>
 {/if}
 <br />
 <fieldset>
