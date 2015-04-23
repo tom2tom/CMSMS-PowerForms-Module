@@ -1,23 +1,34 @@
-jQuery(document).ready(function($) {
+$(document).ready(function() {
+    $('.updown').hide();
+	$('.reordermsg').show()
+	$('.tabledrag').tableDnD({
+		dragClass: 'row1hover',
+		onDrop: function(table,droprows) {
+				var odd = true;
+				var oddclass = 'row1';
+				var evenclass = 'row2';
+				var droprow = $(droprows)[0];
+				var rowids = [];
+				$(table).find('tbody tr').each(function() {
+					rowids[rowids.length] = this.id;
+					var name = odd ? oddclass : evenclass;
+					if (this === droprow) {
+						name = name+'hover';
+					}
+					$(this).removeClass().addClass(name);
+					odd = !odd;
+				});
 
-	$(".module_fb_table").tableDnD({
-
-		onDragClass: "row1hover",
-		onDrop: function(table, row) {
-				jQuery(".module_fb_table").find("tbody tr").removeClass();
-				jQuery(".module_fb_table").find("tbody tr:nth-child(2n+1)").addClass("row1");
-				jQuery(".module_fb_table").find("tbody tr:nth-child(2n)").addClass("row2");
-
-				var rows = table.tBodies[0].rows;
-				var sortstr = rows[0].id;
-				for (var i=1; i<rows.length; i++) {
-					sortstr += ","+rows[i].id;
-				}
-
+				var sortstr = rowids.join(",");;
 				$('.fbrp_sort').val(sortstr);
 				$('.saveordermsg').show();
 		}
+	}).find('tbody tr').removeAttr('onmouseover').removeAttr('onmouseout').mouseover(function() {
+		var now = $(this).attr('class');
+		$(this).attr('class', now+'hover');
+	}).mouseout(function() {
+		var now = $(this).attr('class');
+		var to = now.indexOf('hover');
+		$(this).attr('class', now.substring(0,to));
 	});
-    $(".updown").hide();
-	$(".reordermsg").show()
 });
