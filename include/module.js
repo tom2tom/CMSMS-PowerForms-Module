@@ -20,7 +20,7 @@ $(document).ready(function() {
 				});
 
 				var sortstr = rowids.join(",");;
-				$('.fbrp_sort').val(sortstr);
+				$('.pwfp_sort').val(sortstr);
 				$('.saveordermsg').show();
 		}
 	}).find('tbody tr').removeAttr('onmouseover').removeAttr('onmouseout').mouseover(function() {
