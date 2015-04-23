@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfForm
+class pwfUtils
 {
 	var $module_ptr = NULL;
 	var $module_params = -1;
@@ -1631,7 +1631,7 @@ EOS;
 
 		$smarty->assign('backtomod_nav', $mod->CreateLink($id, 'defaultadmin', '', $mod->Lang('back_top'), array()));
 
-		$smarty->assign('formstart', $mod->CreateFormStart($id, 'admin_store_form', $returnid));
+		$smarty->assign('formstart', $mod->CreateFormStart($id, 'store_form', $returnid));
 		$smarty->assign('formid', $mod->CreateInputHidden($id, 'form_id', $this->Id));
 		$smarty->assign('tab_start',$mod->StartTabHeaders().
 			$mod->SetTabHeader('maintab',$mod->Lang('tab_main'),($tab == 'maintab')).
@@ -1657,7 +1657,7 @@ EOS;
 		$smarty->assign('input_form_name', $mod->CreateInputText($id, 'fbrp_form_name', $this->Name, 50));
 
 		$smarty->assign('title_load_template',$mod->Lang('title_load_template'));
-		$modLink = $mod->CreateLink($id, 'admin_get_template', $returnid, '', array(), '', true);
+		$modLink = $mod->CreateLink($id, 'get_template', $returnid, '', array(), '', true);
 		$smarty->assign('security_key',CMS_SECURE_PARAM_NAME.'='.$_SESSION[CMS_USER_KEY]);
 
 		$templateList = array(''=>'',$mod->Lang('default_template')=>'RenderFormDefault.tpl',
@@ -1837,10 +1837,10 @@ EOS;
 			foreach($this->Fields as &$fld)
 			{
 				$oneset = new stdClass();
-				$oneset->name = $mod->CreateLink($id, 'admin_add_edit_field', '', $fld->GetName(), array('field_id'=>$fld->GetId(),'form_id'=>$this->Id));
+				$oneset->name = $mod->CreateLink($id,'add_edit_field','',$fld->GetName(),array('field_id'=>$fld->GetId(),'form_id'=>$this->Id));
 				if($mod->GetPreference('show_fieldids',0) != 0)
 				{
-					$oneset->id = $mod->CreateLink($id, 'admin_add_edit_field', '', $fld->GetId(), array('field_id'=>$fld->GetId(),'form_id'=>$this->Id));
+					$oneset->id = $mod->CreateLink($id,'add_edit_field','',$fld->GetId(),array('field_id'=>$fld->GetId(),'form_id'=>$this->Id));
 				}
 				$oneset->type = $fld->GetDisplayType();
 				$oneset->alias = $fld->GetAlias();
@@ -1853,23 +1853,26 @@ EOS;
 				}
 				else if($fld->IsRequired())
 				{
-					$oneset->disposition = $mod->CreateLink($id, 'admin_update_field_required', '',
-					$icontrue, array('form_id'=>$this->Id,'fbrp_active'=>'off','field_id'=>$fld->GetId()),'', '', '', 'class="true" onclick="jQuery(this).fb_admin_update_field_required(); return false;"');
+					$oneset->disposition = $mod->CreateLink($id,'update_field_required','',
+						$icontrue, array('form_id'=>$this->Id,'fbrp_active'=>'off','field_id'=>$fld->GetId()),'','','',
+						'class="true" onclick="jQuery(this).fb_admin_update_field_required(); return false;"');
 				}
 				else
 				{
-					$oneset->disposition = $mod->CreateLink($id, 'admin_update_field_required', '',
-					$iconfalse, array('form_id'=>$this->Id,'fbrp_active'=>'on','field_id'=>$fld->GetId()),'', '', '', 'class="false" onclick="jQuery(this).fb_admin_update_field_required(); return false;"');
+					$oneset->disposition = $mod->CreateLink($id,'update_field_required','',
+						$iconfalse, array('form_id'=>$this->Id,'fbrp_active'=>'on','field_id'=>$fld->GetId()),'','','',
+						'class="false" onclick="jQuery(this).fb_admin_update_field_required(); return false;"');
 				}
 
 				$oneset->field_status = $fld->StatusInfo();
-				$oneset->editlink = $mod->CreateLink($id, 'admin_add_edit_field', '', $iconedit, array('field_id'=>$fld->GetId(),'form_id'=>$this->Id));
-				$oneset->copylink = $mod->CreateLink($id, 'admin_copy_field', '', $iconcopy, array('field_id'=>$fld->GetId(),'form_id'=>$this->Id));
-				$oneset->deletelink = $mod->CreateLink($id, 'admin_delete_field', '', $icondelete, array('field_id'=>$fld->GetId(),'form_id'=>$this->Id),'', '', '', 'onclick="jQuery(this).fb_delete_field(\''.$mod->Lang('are_you_sure_delete_field',htmlspecialchars($fld->GetName())).'\'); return false;"');
+				$oneset->editlink = $mod->CreateLink($id,'add_edit_field','',$iconedit,array('field_id'=>$fld->GetId(),'form_id'=>$this->Id));
+				$oneset->copylink = $mod->CreateLink($id,'copy_field','',$iconcopy,array('field_id'=>$fld->GetId(),'form_id'=>$this->Id));
+				$oneset->deletelink = $mod->CreateLink($id,'delete_field','',$icondelete,array('field_id'=>$fld->GetId(),'form_id'=>$this->Id),'','','',
+					'onclick="jQuery(this).fb_delete_field(\''.$mod->Lang('are_you_sure_delete_field',htmlspecialchars($fld->GetName())).'\'); return false;"');
 
 				if($count > 1)
 				{
-					$oneset->up = $mod->CreateLink($id, 'admin_update_field_order', '', $iconup, array('form_id'=>$this->Id,'fbrp_dir'=>'up','field_id'=>$fld->GetId()));
+					$oneset->up = $mod->CreateLink($id,'update_field_order','',$iconup,array('form_id'=>$this->Id,'fbrp_dir'=>'up','field_id'=>$fld->GetId()));
 				}
 				else
 				{
@@ -1877,7 +1880,7 @@ EOS;
 				}
 				if($count < $last)
 				{
-					$oneset->down=$mod->CreateLink($id, 'admin_update_field_order', '', $icondown, array('form_id'=>$this->Id,'fbrp_dir'=>'down','field_id'=>$fld->GetId()));
+					$oneset->down=$mod->CreateLink($id,'update_field_order','',$icondown,array('form_id'=>$this->Id,'fbrp_dir'=>'down','field_id'=>$fld->GetId()));
 				}
 				else
 				{
@@ -1895,13 +1898,16 @@ EOS;
 
 			$smarty->assign('fields',$fieldList);
 			$smarty->assign('add_field_link',
-				 $mod->CreateLink($id, 'admin_add_edit_field', $returnid, $theme->DisplayImage('icons/system/newobject.gif',$mod->Lang('title_add_new_field'),'','','systemicon'),array('form_id'=>$this->Id, 'fbrp_order_by'=>$maxOrder), '', false) . ' ' .$mod->CreateLink($id, 'admin_add_edit_field', $returnid,$mod->Lang('title_add_new_field'),array('form_id'=>$this->Id, 'fbrp_order_by'=>$maxOrder), '', false));
+				$mod->CreateLink($id, 'add_edit_field', $returnid,
+					$theme->DisplayImage('icons/system/newobject.gif',$mod->Lang('title_add_new_field'),'','','systemicon'),
+					array('form_id'=>$this->Id, 'fbrp_order_by'=>$maxOrder), '', false).' '.
+					$mod->CreateLink($id, 'add_edit_field', $returnid,$mod->Lang('title_add_new_field'),array('form_id'=>$this->Id, 'fbrp_order_by'=>$maxOrder), '', false));
 
 			if($mod->GetPreference('enable_fastadd',1) == 1)
 			{
 				$smarty->assign('fastadd',1);
 				$smarty->assign('title_fastadd',$mod->Lang('title_fastadd'));
-				$link = $mod->CreateLink($id,'admin_add_edit_field',$returnid,'',
+				$link = $mod->CreateLink($id,'add_edit_field',$returnid,'',
 					array('form_id'=>$this->Id, 'fbrp_order_by'=>$maxOrder),'',true,true);
 				$link = str_replace('&amp;','&',$link);
 				$typeFunc = <<<EOS
@@ -1919,7 +1925,7 @@ EOS;
 					$smarty->assign('input_fastadd',$mod->CreateInputDropdown($id, 'fbrp_field_type',
 					array_merge(array($mod->Lang('select_type')=>''),$mod->std_field_types), -1,'', 'onchange="fast_add(this)"').
 						$mod->Lang('title_switch_advanced').
-						$mod->CreateLink($id, 'admin_add_edit_form', $returnid,$mod->Lang('title_switch_advanced_link'),
+						$mod->CreateLink($id,'add_edit_form',$returnid,$mod->Lang('title_switch_advanced_link'),
 						array('form_id'=>$this->Id, 'fbrp_set_field_level'=>'advanced')));
 				}
 				else
@@ -1927,7 +1933,7 @@ EOS;
 					$smarty->assign('input_fastadd',$mod->CreateInputDropdown($id, 'fbrp_field_type',
 					array_merge(array($mod->Lang('select_type')=>''),$mod->field_types), -1,'', 'onchange="fast_add(this)"').
 						$mod->Lang('title_switch_basic').
-						$mod->CreateLink($id, 'admin_add_edit_form', $returnid,$mod->Lang('title_switch_basic_link'),
+						$mod->CreateLink($id,'add_edit_form',$returnid,$mod->Lang('title_switch_basic_link'),
 						array('form_id'=>$this->Id, 'fbrp_set_field_level'=>'basic')));
 				}
 			}
@@ -1943,7 +1949,8 @@ EOS;
 		}
 		$smarty->assign('cancel', $mod->CreateInputSubmit($id, 'fbrp_cancel', $mod->Lang('cancel')));
 
-		$smarty->assign('link_notready',"<strong>".$mod->Lang('title_not_ready1')."</strong> ".$mod->Lang('title_not_ready2')." ".$mod->CreateLink($id, 'admin_add_edit_field', $returnid,$mod->Lang('title_not_ready_link'),array('form_id'=>$this->Id, 'fbrp_order_by'=>$maxOrder,'fbrp_dispose_only'=>1), '', false, false,'class="module_fb_link"')." ".$mod->Lang('title_not_ready3')
+		$smarty->assign('link_notready','<strong>'.$mod->Lang('title_not_ready1').'</strong> '.
+			$mod->Lang('title_not_ready2')." ".$mod->CreateLink($id, 'add_edit_field', $returnid,$mod->Lang('title_not_ready_link'),array('form_id'=>$this->Id, 'fbrp_order_by'=>$maxOrder,'fbrp_dispose_only'=>1), '', false, false,'class="module_fb_link"')." ".$mod->Lang('title_not_ready3')
 		);
 
 		$smarty->assign('input_inline_form',$mod->CreateInputHidden($id,'fbrp_forma_inline','0').
@@ -2123,8 +2130,8 @@ EOS;
 			$smarty->assign('message',$mod->ShowMessage($message)); //success message
 		elseif(isset($params['fbrp_message']))
 			$smarty->assign('message',$params['fbrp_message']); //probably an error message
-		$smarty->assign('backtomod_nav', $mod->CreateLink($id, 'defaultadmin', '', $mod->Lang('back_top'), array()));
-		$smarty->assign('backtoform_nav',$mod->CreateLink($id, 'admin_add_edit_form', $returnid, $mod->Lang('link_back_to_form'), array('form_id'=>$this->Id)));
+		$smarty->assign('backtomod_nav', $mod->CreateLink($id,'defaultadmin','',$mod->Lang('back_top'), array()));
+		$smarty->assign('backtoform_nav',$mod->CreateLink($id,'add_edit_form',$returnid, $mod->Lang('link_back_to_form'), array('form_id'=>$this->Id)));
 
 		$mainList = array();
 		$advList = array();
@@ -2143,7 +2150,7 @@ EOS;
 		$hasmain = isset($baseList['main']) || isset($fieldList['main']);
 		$hasadvanced = isset($baseList['adv']) || isset($fieldList['adv']);
 
-		$smarty->assign('start_form',$mod->CreateFormStart($id, 'admin_add_edit_field', $returnid));
+		$smarty->assign('start_form',$mod->CreateFormStart($id,'add_edit_field',$returnid));
 		$smarty->assign('end_form', $mod->CreateFormEnd());
 		$tmp = $mod->StartTabHeaders();
 		if($hasmain)
@@ -2604,7 +2611,7 @@ EOS;
 		return false;
 	}
 
-	// Validation stuff action.validate.php
+	// Validation stuff action.validate_form.php
 	function CheckResponse($form_id, $response_id, $code)
 	{
 		$db = $this->module_ptr->dbHandle;
