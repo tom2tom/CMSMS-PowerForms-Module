@@ -1,20 +1,17 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
-
-class fbDispositionFormBrowser extends fbFieldBase {
-
+class fbDispositionFormBrowser extends fbFieldBase
+{
 	var $approvedBy;
 
 	function __construct(&$form_ptr, &$params)
 	{
 		parent::__construct($form_ptr, $params);
-//		$mod = $form_ptr->module_ptr;
 		$this->Type = 'DispositionFormBrowser';
 		$this->IsDisposition = true;
 		$this->NonRequirableField = true;
@@ -29,10 +26,10 @@ class fbDispositionFormBrowser extends fbFieldBase {
 	function GetFieldInput($id, &$params, $returnid)
 	{
 		$mod = $this->form_ptr->module_ptr;
-		if ($this->Value === false)
-			{
+		if($this->Value === false)
+		{
 			return '';
-			}
+		}
 		return $mod->CreateInputHidden($id, 'fbrp__'.$this->Id,
 			$this->EncodeReqId($this->Value));
 	}
@@ -54,14 +51,14 @@ class fbDispositionFormBrowser extends fbFieldBase {
 	{
 		$tmp = base64_decode($theVal);
 		$tmp2 = str_replace(session_id(),'',$tmp);
-		if (substr($tmp2,0,1) == '_')
-			{
+		if(substr($tmp2,0,1) == '_')
+		{
 			return substr($tmp2,1);
-			}
+		}
 		else
-			{
+		{
 			return -1;
-			}
+		}
 	}
 
 	function EncodeReqId($req_id)
@@ -74,20 +71,20 @@ class fbDispositionFormBrowser extends fbFieldBase {
 	{
 		$decval = base64_decode($val);
 
-		if ($val === false)
-			{
+		if($val === false)
+		{
 			// no value set, so we'll leave value as false
-			}
-		elseif (strpos($decval,'_') === false)
-			{
+		}
+		elseif(strpos($decval,'_') === false)
+		{
 			// unencrypted value, coming in from previous response
 			$this->Value = $val;
-			}
+		}
 		else
-			{
+		{
 			// encrypted value coming in from a form, so we'll update.
 			$this->Value = $this->DecodeReqId($val);
-			}
+		}
 	}
 
 	function PrePopulateAdminForm($formDescriptor)
@@ -100,99 +97,99 @@ class fbDispositionFormBrowser extends fbFieldBase {
 		$main = array();
 		$adv = array();
 		for ($i=0;$i<count($fields);$i++)
+		{
+			if($fields[$i]->DisplayInSubmission())
 			{
-			if ($fields[$i]->DisplayInSubmission())
-				{
 				$fieldlist[$fields[$i]->GetName()] = $fields[$i]->GetId();
-				}
 			}
+		}
 		$current_indexes = array();
 		for ($i=1;$i<6;$i++)
-			{
+		{
 			$fname = array_search($this->GetOption('sortfield'.$i),$fieldlist);
 			$main[] = array($mod->Lang('title_sortable_field',array($i)),
 						$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_sortfield'.$i, $fieldlist, -1,
 					$this->GetOption('sortfield'.$i,-1))
 					);
 			$current_indexes[] = $this->GetOption('sortfield'.$i,-1);
+		}
+		$main[] = array($mod->Lang('title_note'),$mod->Lang('title_changing_triggers_reindex').
+			$mod->CreateInputHidden($formDescriptor,'fbrp_previous_indices',implode(':',$current_indexes))
+			);
+
+		$adv[] = array($mod->Lang('title_searchable'),
+			$mod->CreateInputHidden($formDescriptor, 'fbrp_opt_searchable','0').
+			$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_searchable',
+			'1',$this->GetOption('searchable','0')).
+			$mod->Lang('title_searchable_help'));
+
+		$feu = cmsms()->GetModuleInstance('FrontEndUsers');
+		if($feu === null)
+		{
+			$adv[] = array($mod->Lang('title_feu_binding'),
+				$mod->Lang('title_install_feu'));
+		}
+		else
+		{
+			$adv[] = array($mod->Lang('title_feu_binding'),
+				$mod->CreateInputHidden($formDescriptor, 'fbrp_opt_feu_bind','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_feu_bind',
+					'1',$this->GetOption('feu_bind','0')),
+				$mod->Lang('title_feu_bind_help'));
+		}
+
+		$openssl = cmsms()->GetModuleInstance('OpenSSL');
+		if($openssl === null && !function_exists('mcrypt_encrypt'))
+		{
+			$adv[] = array($mod->Lang('title_encryption_functions'),
+				$mod->Lang('title_install_crypto'));
+		}
+		else
+		{
+			if($openssl !== null)
+			{
+				$keys = $openssl->getKeyList();
+				$certs = $openssl->getCertList();
 			}
-	  $main[] = array($mod->Lang('title_note'),$mod->Lang('title_changing_triggers_reindex').
-		$mod->CreateInputHidden($formDescriptor,'fbrp_previous_indices',implode(':',$current_indexes))
-		);
+			$adv[] = array($mod->Lang('title_encrypt_database_data'),
+				   $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_crypt','0').
+						$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_crypt',
+						'1',$this->GetOption('crypt','0')).
+						$mod->Lang('title_encrypt_database_long'));
+			$adv[] = array($mod->Lang('title_encrypt_sortfields'),
+				   $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_hash_sort','0').
+						$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_hash_sort',
+						'1',$this->GetOption('hash_sort','0')).
+					  $mod->Lang('title_encrypt_sortfields_help'));
+			$adv[] = array($mod->Lang('title_encryption_keyfile'),
+				$mod->CreateInputText($formDescriptor, 'fbrp_opt_keyfile',
+						$this->GetOption('keyfile',''),40,255));
 
-	$adv[] = array($mod->Lang('title_searchable'),
-		$mod->CreateInputHidden($formDescriptor, 'fbrp_opt_searchable','0').
-		$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_searchable',
-		'1',$this->GetOption('searchable','0')).
-		$mod->Lang('title_searchable_help'));
+			$cryptlibs = array();
+			if($openssl !== null)
+			{
+				$cryptlibs[$mod->Lang('openssl')]='openssl';
+			}
+			if(function_exists('mcrypt_encrypt'))
+			{
+				$cryptlibs[$mod->Lang('mcrypt')]='mcrypt';
+			}
 
-	  $feu = cmsms()->GetModuleInstance('FrontEndUsers');
-	  if ($feu === null)
-		{
-		$adv[] = array($mod->Lang('title_feu_binding'),
-			$mod->Lang('title_install_feu'));
-		}
-	else
-		{
-		$adv[] = array($mod->Lang('title_feu_binding'),
-			$mod->CreateInputHidden($formDescriptor, 'fbrp_opt_feu_bind','0').
-			$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_feu_bind',
-				'1',$this->GetOption('feu_bind','0')),
-			$mod->Lang('title_feu_bind_help'));
-		}
+			$adv[] = array($mod->Lang('title_crypt_lib'),
+				$mod->CreateInputDropdown($formDescriptor,'fbrp_opt_crypt_lib',
+				$cryptlibs,-1,$this->GetOption('crypt_lib')));
 
-	  $openssl = cmsms()->GetModuleInstance('OpenSSL');
-	  if ($openssl === null && !function_exists('mcrypt_encrypt'))
-		{
-		$adv[] = array($mod->Lang('title_encryption_functions'),
-            $mod->Lang('title_install_crypto'));
-		}
-	else
-		{
-		if ($openssl !== null)
-         {
-		    $keys = $openssl->getKeyList();
-		    $certs = $openssl->getCertList();
-		    }
-		$adv[] = array($mod->Lang('title_encrypt_database_data'),
-			   $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_crypt','0').
-            		$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_crypt',
-            		'1',$this->GetOption('crypt','0')).
-					$mod->Lang('title_encrypt_database_long'));
-		$adv[] = array($mod->Lang('title_encrypt_sortfields'),
-			   $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_hash_sort','0').
-            		$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_hash_sort',
-            		'1',$this->GetOption('hash_sort','0')).
-                  $mod->Lang('title_encrypt_sortfields_help'));
-		$adv[] = array($mod->Lang('title_encryption_keyfile'),
-            $mod->CreateInputText($formDescriptor, 'fbrp_opt_keyfile',
-            		$this->GetOption('keyfile',''),40,255));
+			if($openssl !== null)
+			{
+				$adv[] = array($mod->Lang('choose_crypt'),$mod->Lang('choose_crypt_long'));
 
-      $cryptlibs = array();
-      if ($openssl !== null)
-         {
-         $cryptlibs[$mod->Lang('openssl')]='openssl';
-         }
-      if (function_exists('mcrypt_encrypt'))
-         {
-         $cryptlibs[$mod->Lang('mcrypt')]='mcrypt';
-         }
-
-		$adv[] = array($mod->Lang('title_crypt_lib'),
-            $mod->CreateInputDropdown($formDescriptor,'fbrp_opt_crypt_lib',
-            $cryptlibs,-1,$this->GetOption('crypt_lib')));
-
-      if ($openssl !== null)
-         {
-		$adv[] = array($mod->Lang('choose_crypt'),$mod->Lang('choose_crypt_long'));
-
-		$adv[] = array($mod->Lang('title_crypt_cert'),
-				$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_crypt_cert', $certs,
+				$adv[] = array($mod->Lang('title_crypt_cert'),
+					$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_crypt_cert', $certs,
 					-1,$this->GetOption('crypt_cert')));
-		$adv[] = array($mod->Lang('title_private_key'),
-			$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_private_key', $keys,
-				-1,$this->GetOption('private_key')).$mod->Lang('title_ensure_cert_key_match'));
-         }
+				$adv[] = array($mod->Lang('title_private_key'),
+					$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_private_key', $keys,
+					-1,$this->GetOption('private_key')).$mod->Lang('title_ensure_cert_key_match'));
+			}
 		}
 
 		return array('main'=>$main,'adv'=>$adv);
@@ -209,59 +206,59 @@ class fbDispositionFormBrowser extends fbFieldBase {
 	{
 		$form = $this->form_ptr;
 		list($res,$msg) = $form->StoreResponse(($this->Value?$this->Value:-1),$this->approvedBy,$this);
-		if ($this->GetOption('searchable','0') == '1')
-			{
+		if($this->GetOption('searchable','0') == '1')
+		{
 			$form->AddToSearchIndex($this->Value);
-			}
+		}
 		return array($res, $msg);
 	}
 
 
-  function PostFieldSaveProcess(&$params)
-  {
-	$reindex = false;
-	$prev_indices = explode(':',$params['fbrp_previous_indices']);
-	for ($i=1;$i<6;$i++)
+	function PostFieldSaveProcess(&$params)
+	{
+		$reindex = false;
+		$prev_indices = explode(':',$params['fbrp_previous_indices']);
+		for ($i=1;$i<6;$i++)
 		{
-		if ($this->GetOption('sortfield'.$i) != $prev_indices[$i-1])
+			if($this->GetOption('sortfield'.$i) != $prev_indices[$i-1])
 			{
-			$reindex = true;
+				$reindex = true;
 			}
 		}
-	if (! $reindex)
+		if(!$reindex)
 		{
-		return;
+			return;
 		}
-	$form = $this->form_ptr;
-	$form->ReindexResponses();
-  }
+		$form = $this->form_ptr;
+		$form->ReindexResponses();
+	}
 
 
 	function getHashedSortFieldVal($sortFieldNumber)
-   {
-      $v = $this->getSortFieldVal($sortFieldNumber);
-      if (strlen($v) > 4)
-         {
-         $v = substr($v,0,4). md5(substr($v,4));
-         }
-      return $v;
-   }
+	{
+		$v = $this->getSortFieldVal($sortFieldNumber);
+		if(strlen($v) > 4)
+		{
+			$v = substr($v,0,4). md5(substr($v,4));
+		}
+		return $v;
+	}
 
 	function getSortFieldList()
 	{
 		$form = $this->form_ptr;
 		$ret = array();
 		for ($i=1;$i<6;$i++)
+		{
+			if($this->GetOption('sortfield'.$i,'-1') != '-1')
 			{
-			if ($this->GetOption('sortfield'.$i,'-1') != '-1')
-				{
 				$afield = $form->GetFieldById($this->GetOption('sortfield'.$i));
-				if ($afield !== false)
-               {
-				   $ret[$i] = $afield->GetName();
-               }
+				if($afield !== false)
+				{
+					$ret[$i] = $afield->GetName();
 				}
 			}
+		}
 		return $ret;
 	}
 
@@ -269,21 +266,20 @@ class fbDispositionFormBrowser extends fbFieldBase {
 	{
 		$form = $this->form_ptr;
 		$val = "";
-		if ($this->GetOption('sortfield'.$sortFieldNumber,'-1') != '-1')
-			{
+		if($this->GetOption('sortfield'.$sortFieldNumber,'-1') != '-1')
+		{
 			$afield = $form->GetFieldById($this->GetOption('sortfield'.$sortFieldNumber));
-         if ($afield !== false)
-            {
-            $val = $afield->GetHumanReadableValue();
-            }
-			}
-		if (strlen($val) > 80)
+			if($afield !== false)
 			{
-			$val = substr($val,0,80);
+				$val = $afield->GetHumanReadableValue();
 			}
+		}
+		if(strlen($val) > 80)
+		{
+			$val = substr($val,0,80);
+		}
 		return $val;
 	}
-
 }
 
 ?>

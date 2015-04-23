@@ -1,25 +1,20 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2010 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
-
-A Module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 class fbDispositionUniqueFile extends fbFieldBase
 {
-
 	function __construct(&$form_ptr, &$params)
 	{
 		parent::__construct($form_ptr, $params);
-//		$mod = $form_ptr->module_ptr;
 		$this->Type = 'DispositionUniqueFile';
 		$this->IsDisposition = true;
 		$this->NonRequirableField = true;
 		$this->DisplayInForm = false;
 		$this->sortable = false;
-
 		$this->IsComputedOnSubmission = true;
 	}
 
@@ -37,14 +32,14 @@ class fbDispositionUniqueFile extends fbFieldBase
 		$form->setFinishedFormSmarty();
 
 		$filespec = $this->GetOption('filespec','');
-		if ($filespec == '')
+		if($filespec == '')
 		{
 			$filespec = 'form_submission_'.date("Y-m-d_His").'.txt';
 		}
 		//all smarty processing done without cacheing (smarty->fetch() fails)
 		$evald_filename = preg_replace("/[^\w\d\.]|\.\./", "_", $mod->ProcessTemplateFromData($filespec));
 		$filespec = $this->GetOption('fileroot',$config['uploads_path']).DIRECTORY_SEPARATOR.$evald_filename;
-		if (strpos($filespec,$config['root_path']) !== FALSE)
+		if(strpos($filespec,$config['root_path']) !== FALSE)
 		{
 			$relurl = str_replace($config['root_path'],'',$filespec);
 		}
@@ -71,7 +66,7 @@ class fbDispositionUniqueFile extends fbFieldBase
 			$count++;
 			usleep(500);
 		}
-		if ($count == 200)
+		if($count == 200)
 		{
 			return array(false, $mod->Lang('submission_error_file_lock'));
 		}
@@ -79,7 +74,7 @@ class fbDispositionUniqueFile extends fbFieldBase
 		$form->setFinishedFormSmarty();
 
 		$filespec = $this->GetOption('filespec','');
-		if ($filespec == '')
+		if($filespec == '')
 		{
 			$filespec = 'form_submission_'.date("Y-m-d_His").'.txt';
 		}
@@ -88,10 +83,10 @@ class fbDispositionUniqueFile extends fbFieldBase
 		$filespec = $this->GetOption('fileroot',$config['uploads_path']).DIRECTORY_SEPARATOR.$evald_filename;
 
 		$line = '';
-		if ($this->GetOption('file_type','false') == 0)
+		if($this->GetOption('file_type','false') == 0)
 		{ // If File Type is "TXT"
 			// Check if first time, write header
-			if (! file_exists($filespec))
+			if(!file_exists($filespec))
 			{
 				$header = $this->GetOption('file_header','');
 
@@ -103,7 +98,7 @@ class fbDispositionUniqueFile extends fbFieldBase
 
 			// Make newline
 			$template = $this->GetOption('file_template','');
-			if ($template == '')
+			if($template == '')
 			{
 				$template = $form->createSampleTemplate();
 			}
@@ -111,12 +106,12 @@ class fbDispositionUniqueFile extends fbFieldBase
 
 			$newline = $mod->ProcessTemplateFromData($line);
 			$replchar = $this->GetOption('newlinechar','');
-			if ($replchar != '')
+			if($replchar != '')
 			{
 				$newline = rtrim($newline,"\r\n");
 				$newline = preg_replace('/[\n\r]/',$replchar,$newline);
 			}
-			if (substr($newline,-1,1) != "\n")
+			if(substr($newline,-1,1) != "\n")
 			{
 				$newline .= "\n";
 			}
@@ -152,25 +147,25 @@ class fbDispositionUniqueFile extends fbFieldBase
 			fwrite($fp,$header.$newline.$footer);
 			fclose($fp);
 		}
-		else if ($this->GetOption('file_type','false') == 1)
+		else if($this->GetOption('file_type','false') == 1)
 		{ // If File Type is "RTF"
 			$header = $this->GetOption('file_header','');
-			if ($header != '')
+			if($header != '')
 			{
 				$header = $mod->ProcessTemplateFromData($header);
 			}
 			$header = preg_replace('/(\r\n)/', '\par$1', $header);
-			if ($this->GetOption('rtf_template_type') == 0)
+			if($this->GetOption('rtf_template_type') == 0)
 			{ // If the RTF Template Type is Basic
 				$template = $this->GetOption('file_template','');
-				if ($template == '')
+				if($template == '')
 				{
 					$template = $form->createSampleTemplate();
 				}
 				$template = $mod->ProcessTemplateFromData($template);
 				$template = preg_replace('/(\r\n)/', '\par$1', $template);
 			}
-			else if ($this->GetOption('rtf_template_type') == 1)
+			else if($this->GetOption('rtf_template_type') == 1)
 			{ // If the RTF Template Type is Advanced
 				$template = file_get_contents(cms_join_path(dirname(dirname(__FILE__)),'templates',$this->GetOption('rtf_file_template','RTF_TemplateAdvanced.rtf')));
 
@@ -186,20 +181,20 @@ class fbDispositionUniqueFile extends fbFieldBase
 				$template = str_replace($search, $replace, $template);
 			}
 			$footer = $this->GetOption('file_footer','');
-			if ($footer != '')
+			if($footer != '')
 			{
 				$footer = $mod->ProcessTemplateFromData($footer);
 			}
 			$footer = preg_replace('/(\r\n)/', '\par$1', $footer);
 
-			if ($this->GetOption('rtf_template_type') == 0)
+			if($this->GetOption('rtf_template_type') == 0)
 			{ // Basic
 				$rtf_template = file_get_contents(cms_join_path(dirname(dirname(__FILE__)),'templates',$this->GetOption('rtf_file_template','RTF_TemplateBasic.rtf')));
 				$search = array("%%HEADER%%", "%%FIELDS%%", "%%FOOTER%%");
 				$replace = array($header, $template, $footer);
 				$rtf_content = str_replace($search, $replace, $rtf_template);
 			}
-			else if ($this->GetOption('rtf_template_type') == 1)
+			else if($this->GetOption('rtf_template_type') == 1)
 			{ // Advanced
 				$search = array("%%HEADER%%", "%%FOOTER%%");
 				$replace = array($header, $footer);
@@ -209,7 +204,7 @@ class fbDispositionUniqueFile extends fbFieldBase
 			$put = file_put_contents($filespec, $rtf_content);
 		}
 
-		if (strpos($filespec,$config['root_path']) !== FALSE)
+		if(strpos($filespec,$config['root_path']) !== FALSE)
 		{
 			$relurl = str_replace($config['root_path'],'',$filespec);
 		}
@@ -226,9 +221,9 @@ class fbDispositionUniqueFile extends fbFieldBase
 	{
 		//error_log($this->GetName().':'.print_r($valStr,true));
 		$fm = $this->form_ptr;
-		if ($this->Value === false)
+		if($this->Value === false)
 		{
-			if (is_array($valStr))
+			if(is_array($valStr))
 			{
 				$this->Value = $valStr;
 				for ($i=0;$i<count($this->Value);$i++)
@@ -249,7 +244,7 @@ class fbDispositionUniqueFile extends fbFieldBase
 		}
 		else
 		{
-			if (is_array($valStr))
+			if(is_array($valStr))
 			{
 				for ($i=0;$i<count($valStr);$i++)
 				{
@@ -266,7 +261,7 @@ class fbDispositionUniqueFile extends fbFieldBase
 				{
 					$valStr = $fm->unmy_htmlentities($valStr);
 				}
-				if (! is_array($this->Value))
+				if(!is_array($this->Value))
 				{
 					$this->Value = array($this->Value);
 				}
@@ -278,7 +273,7 @@ class fbDispositionUniqueFile extends fbFieldBase
 	function GetHumanReadableValue($as_string=true)
 	{
 		$mod = $this->form_ptr->module_ptr;
-		if ($as_string && is_array($this->Value) && isset($this->Value[1]))
+		if($as_string && is_array($this->Value) && isset($this->Value[1]))
 		{
 			return $this->Value[1];
 		}
@@ -300,11 +295,11 @@ class fbDispositionUniqueFile extends fbFieldBase
 			array($mod->CreateInputText($formDescriptor, 'fbrp_opt_fileroot',
 				$this->GetOption('fileroot',$config['uploads_path']),80,255),
 				$mod->Lang('title_file_root_help')));
-//$mod->CreateInputFile($formDescriptor, 'fbrp_opt_fileroot', '', 60)
+//		$mod->CreateInputFile($formDescriptor, 'fbrp_opt_fileroot', '', 60)
 		$main[] = array($mod->Lang('title_file_name'),
 			$mod->CreateInputText($formDescriptor, 'fbrp_opt_filespec',
 					$this->GetOption('filespec',''),80,255));
-//$mod->CreateInputFile($formDescriptor, 'fbrp_opt_filespec', '', 60)
+//		$mod->CreateInputFile($formDescriptor, 'fbrp_opt_filespec', '', 60)
 		$main[] = array($mod->Lang('title_newline_replacement'),
 			$mod->CreateInputText($formDescriptor, 'fbrp_opt_newlinechar',
 				$this->GetOption('newlinechar',''),5,15),
@@ -321,7 +316,7 @@ class fbDispositionUniqueFile extends fbFieldBase
 			array($mod->CreateInputText($formDescriptor, 'fbrp_opt_rtf_file_template',
 				$this->GetOption('rtf_file_template','RTF_TemplateBasic.rtf'), 50, 255),
 				$mod->Lang('help_rtf_file_template')));
-//$mod->CreateInputFile($formDescriptor, 'fbrp_opt_rtf_file_template', '', 60)
+//		$mod->CreateInputFile($formDescriptor, 'fbrp_opt_rtf_file_template', '', 60)
 
 		$rtf_template_type_list = array($mod->Lang('basic')=>0, $mod->Lang('advanced')=>1);
 		$adv[] = array($mod->Lang('title_rtf_template_type'),

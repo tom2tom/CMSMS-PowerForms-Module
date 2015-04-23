@@ -1,14 +1,12 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
-
-class fbDispositionPageRedirector extends fbFieldBase {
-
+class fbDispositionPageRedirector extends fbFieldBase
+{
 	var $addressCount;
 	var $addressAdd;
 
@@ -45,32 +43,32 @@ class fbDispositionPageRedirector extends fbFieldBase {
 	function DoOptionDelete(&$params)
 	{
 		$delcount = 0;
-		foreach ($params as $thisKey=>$thisVal)
+		foreach($params as $thisKey=>$thisVal)
+		{
+			if(substr($thisKey,0,9) == 'fbrp_sel_')
 			{
-			if (substr($thisKey,0,9) == 'fbrp_sel_')
-				{
 				$this->RemoveOptionElement('destination_page', $thisVal - $delcount);
 				$this->RemoveOptionElement('destination_subject', $thisVal - $delcount);
 				$delcount++;
-				}
 			}
+		}
 	}
 
 	function countAddresses()
 	{
-			$tmp = $this->GetOptionRef('destination_page');
-			if (is_array($tmp))
-				{
-	        	$this->addressCount = count($tmp);
-	        	}
-	        elseif ($tmp !== false)
-	        	{
-	        	$this->addressCount = 1;
-	        	}
-	        else
-	        	{
-	        	$this->addressCount = 0;
-	        	}
+		$tmp = $this->GetOptionRef('destination_page');
+		if(is_array($tmp))
+		{
+			$this->addressCount = count($tmp);
+		}
+		elseif($tmp !== false)
+		{
+			$this->addressCount = 1;
+		}
+		else
+		{
+			$this->addressCount = 0;
+		}
 	}
 
 	function GetFieldInput($id, &$params, $returnid)
@@ -81,47 +79,47 @@ class fbDispositionPageRedirector extends fbFieldBase {
 		// why all this? Associative arrays are not guaranteed to preserve
 		// order, except in "chronological" creation order.
 		$sorted =array();
-		if ($this->GetOption('select_one','') != '')
-			{
+		if($this->GetOption('select_one','') != '')
+		{
 			$sorted[' '.$this->GetOption('select_one','')]='';
-			}
+		}
 		else
-			{
+		{
 			$sorted[' '.$mod->Lang('select_one')]='';
-			}
+		}
 		$subjects = $this->GetOptionRef('destination_subject');
 
-		if (count($subjects) > 1)
-			{
+		if(count($subjects) > 1)
+		{
 			for($i=0;$i<count($subjects);$i++)
-				{
-				$sorted[$subjects[$i]]=($i+1);
-				}
-			}
-		else
 			{
-			$sorted[$subjects] = '1';
+				$sorted[$subjects[$i]]=($i+1);
 			}
+		}
+		else
+		{
+			$sorted[$subjects] = '1';
+		}
 		return $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id, $sorted, -1, $this->Value, $js.$this->GetCSSIdTag());
 	}
 
-    function StatusInfo()
+	function StatusInfo()
 	{
 		$mod = $this->form_ptr->module_ptr;
 		$opt = $this->GetOption('destination_page','');
 
-		if (is_array($opt))
-		  {
-		      $num = count($opt);
-		  }
-		elseif ($opt != '')
-			{
+		if(is_array($opt))
+		{
+			$num = count($opt);
+		}
+		elseif($opt != '')
+		{
 			$num = 1;
-			}
+		}
 		else
-		  {
+		{
           $num = 0;
-          }
+        }
          $ret= $mod->Lang('destination_count',$num);
         return $ret;
 	}
@@ -133,11 +131,11 @@ class fbDispositionPageRedirector extends fbFieldBase {
 		$mod = $this->form_ptr->module_ptr;
 
 		$this->countAddresses();
-		if ($this->addressAdd > 0)
-			{
+		if($this->addressAdd > 0)
+		{
 			$this->addressCount += $this->addressAdd;
 			$this->addressAdd = 0;
-			}
+		}
 //		$ret = $this->PrePopulateAdminFormBase($formDescriptor);
 		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
@@ -152,41 +150,40 @@ class fbDispositionPageRedirector extends fbFieldBase {
 			);
 		$num = ($this->addressCount>1) ? $this->addressCount:1;
 		for ($i=0;$i<$num;$i++)
-		  {
+		{
 			$dests[] = array(
 			$mod->CreateInputText($formDescriptor, 'fbrp_opt_destination_subject[]',$this->GetOptionElement('destination_subject',$i),30,128),
 			$contentops->CreateHierarchyDropdown('',$this->GetOptionElement('destination_page',$i), $id.'fbrp_opt_destination_page[]'),
 			$mod->CreateInputCheckbox($formDescriptor, 'fbrp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
 			);
-		  }
+		}
 		return array('main'=>$main,'table'=>$dests);
 	}
 
 	function PostPopulateAdminForm(&$mainArray, &$advArray)
 	{
-      $this->HiddenDispositionFields($mainArray, $advArray);
+		$this->HiddenDispositionFields($mainArray, $advArray);
 	}
 
 	function GetHumanReadableValue($as_string)
 	{
 		$mod = $this->form_ptr->module_ptr;
-		if ($this->HasValue())
-			{
+		if($this->HasValue())
+		{
 			$ret = $this->GetOptionElement('destination_page',($this->Value - 1));
-			}
+		}
 		else
-			{
+		{
 			$ret = $mod->Lang('unspecified');
-			}
-		if ($as_string)
-			{
+		}
+		if($as_string)
+		{
 			return $ret;
-			}
+		}
 		else
-			{
+		{
 			return array($ret);
-			}
-
+		}
 	}
 
 	function DisposeForm($returnid)
@@ -197,23 +194,22 @@ class fbDispositionPageRedirector extends fbFieldBase {
 		return array(true, 'everything worked');
 	}
 
-
 	function AdminValidate()
 	{
 		$mod = $this->form_ptr->module_ptr;
-    		$opt = $this->GetOption('destination_page');
+		$opt = $this->GetOption('destination_page');
   		list($ret, $message) = $this->DoesFieldHaveName();
-		if ($ret)
-			{
+		if($ret)
+		{
 			list($ret, $message) = $this->DoesFieldNameExist();
-			}
-		if (count($opt) == 0)
-			{
+		}
+		if(count($opt) == 0)
+		{
 			$ret = false;
 			$message .= $mod->Lang('must_specify_one_destination').'<br />';
-			}
-	        return array($ret,$message);
-    }
-
+		}
+	    return array($ret,$message);
+	}
 }
+
 ?>

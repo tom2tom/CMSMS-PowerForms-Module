@@ -1,120 +1,117 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
-
-A module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 class fbComputedField extends fbFieldBase
 {
 
-  function __construct(&$form_ptr, &$params)
-  {
-    parent::__construct($form_ptr, $params);
-//    $mod = $form_ptr->module_ptr;
-    $this->Type = 'ComputedField';
-    $this->DisplayInForm = false;
-    $this->DisplayInSubmission = true;
-    $this->NonRequirableField = true;
-    $this->ValidationTypes = array();
-    $this->HasLabel = 1;
-    $this->NeedsDiv = 0;
-    $this->sortable = false;
-    $this->IsComputedOnSubmission = true;
-  }
+	function __construct(&$form_ptr, &$params)
+	{
+		parent::__construct($form_ptr, $params);
+		$this->Type = 'ComputedField';
+		$this->DisplayInForm = false;
+		$this->DisplayInSubmission = true;
+		$this->NonRequirableField = true;
+		$this->ValidationTypes = array();
+		$this->HasLabel = 1;
+		$this->NeedsDiv = 0;
+		$this->sortable = false;
+		$this->IsComputedOnSubmission = true;
+	}
 
-    function ComputeOrder()
-    {
-        return $this->GetOption('order','1');
-    }
+	function ComputeOrder()
+	{
+		return $this->GetOption('order','1');
+	}
 
-    function Compute()
-    {
+	function Compute()
+	{
 		$mod = $this->form_ptr->module_ptr;
-        $others = $this->form_ptr->GetFields();
+		$others = $this->form_ptr->GetFields();
 
-        $mapId = array();
+		$mapId = array();
 		$eval_string = false;
 
-        for($i=0;$i<count($others);$i++)
-            {
-	        $mapId[$others[$i]->GetId()] = $i;
-            }
+		for($i=0;$i<count($others);$i++)
+		{
+			$mapId[$others[$i]->GetId()] = $i;
+		}
 
-        $flds = array();
-        $procstr = $this->GetOption('value','');
-        preg_match_all('/\$fld_(\d+)/', $procstr, $flds);
+		$flds = array();
+		$procstr = $this->GetOption('value','');
+		preg_match_all('/\$fld_(\d+)/', $procstr, $flds);
 
-        if ($this->GetOption('string_or_number_eval','numeric') == 'numeric')
-            {
-            foreach ($flds[1] as $tF)
-                {
-                if (isset($mapId[$tF]))
-                    {
-                    $ref = $mapId[$tF];
-                    if (is_numeric($others[$ref]->GetHumanReadableValue()))
-                        {
-                        $procstr = str_replace('$fld_'.$tF,
-                            $others[$ref]->GetHumanReadableValue(),$procstr);
-                        }
-                    else
-                        {
-                        $procstr = str_replace('$fld_'.$tF,
-                            '0',$procstr);
-                        }
-                    }
-                }
-            $eval_string = true;
-            }
-        else if ($this->GetOption('string_or_number_eval','numeric') == 'compute')
-            {
-            foreach ($flds[1] as $tF)
-                {
-                if (isset($mapId[$tF]))
-                    {
-                    $ref = $mapId[$tF];
-                    $procstr = str_replace('$fld_'.$tF,
-                         $this->sanitizeValue($others[$ref]->GetHumanReadableValue()),$procstr);
-                    }
-                }
-			$eval_string = true;
-            }
-		else
+		if($this->GetOption('string_or_number_eval','numeric') == 'numeric')
+		{
+			foreach($flds[1] as $tF)
 			{
-			$thisValue = '';
-			foreach ($flds[1] as $tF)
+				if(isset($mapId[$tF]))
 				{
-				if (isset($mapId[$tF]))
-					{
 					$ref = $mapId[$tF];
-					$this->Value .= $others[$ref]->GetValue();
-					if ($this->GetOption('string_or_number_eval','numeric') != 'unstring')
-						{
-						$this->Value .= ' ';
-						}
+					if(is_numeric($others[$ref]->GetHumanReadableValue()))
+					{
+						$procstr = str_replace('$fld_'.$tF,
+							$others[$ref]->GetHumanReadableValue(),$procstr);
+					}
+					else
+					{
+						$procstr = str_replace('$fld_'.$tF,
+							'0',$procstr);
 					}
 				}
 			}
-		if ($eval_string)
+			$eval_string = true;
+		}
+		else if($this->GetOption('string_or_number_eval','numeric') == 'compute')
+		{
+			foreach($flds[1] as $tF)
 			{
+				if(isset($mapId[$tF]))
+				{
+					$ref = $mapId[$tF];
+					$procstr = str_replace('$fld_'.$tF,
+					 $this->sanitizeValue($others[$ref]->GetHumanReadableValue()),$procstr);
+				}
+			}
+			$eval_string = true;
+		}
+		else
+		{
+			$thisValue = '';
+			foreach($flds[1] as $tF)
+			{
+				if(isset($mapId[$tF]))
+				{
+					$ref = $mapId[$tF];
+					$this->Value .= $others[$ref]->GetValue();
+					if($this->GetOption('string_or_number_eval','numeric') != 'unstring')
+					{
+						$this->Value .= ' ';
+					}
+				}
+			}
+		}
+		if($eval_string)
+		{
 			$strToEval = "\$this->Value=$procstr;";
 			// see if we can trap an error
 			// this is all vulnerable to an evil form designer, but
 			// not an evil form user.
 			ob_start();
-			if (eval('function testcfield'.rand().'() {'.$strToEval.'}') === FALSE)
-				{
+			if(eval('function testcfield'.rand().'() {'.$strToEval.'}') === FALSE)
+			{
 				$this->Value = $mod->Lang('title_bad_function',$procstr);
-				}
-			else
-				{
-				eval($strToEval);
-				}
-			ob_end_clean();
 			}
-    }
+			else
+			{
+				eval($strToEval);
+			}
+			ob_end_clean();
+		}
+	}
 
 	// strip any possible PHP function from submitted string
 	function sanitizeValue($val)

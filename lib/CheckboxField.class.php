@@ -1,25 +1,22 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
-
-class fbCheckboxField extends fbFieldBase {
-
+class fbCheckboxField extends fbFieldBase
+{
 	function __construct(&$form_ptr, &$params)
 	{
 		parent::__construct($form_ptr, $params);
-		$mod = $form_ptr->module_ptr;
 		$this->Type =  'CheckboxField';
 		$this->DisplayInForm = true;
 		$this->NonRequirableField = false;
+		$mod = $form_ptr->module_ptr;
 		$this->ValidationTypes = array(
             $mod->Lang('validation_none')=>'none',
-            $mod->Lang('validation_must_check')=>'checked'
-            );
+            $mod->Lang('validation_must_check')=>'checked');
 		$this->sortable = false;
 	}
 
@@ -27,14 +24,14 @@ class fbCheckboxField extends fbFieldBase {
 	{
 		$mod = $this->form_ptr->module_ptr;
 		$label = '';
-		if (strlen($this->GetOption('label','')) > 0)
-			{
+		if(strlen($this->GetOption('label','')) > 0)
+		{
 			$label = '&nbsp;<label for="'.$this->GetCSSId().'">'.$this->GetOption('label').'</label>';
-			}
-		if ($this->Value === false && $this->GetOption('is_checked','0')=='1')
-			{
+		}
+		if($this->Value === false && $this->GetOption('is_checked','0')=='1')
+		{
 			$this->Value = 't';
-			}
+		}
 		$js = $this->GetOption('javascript','');
 		return $mod->CreateInputCheckbox($id, 'fbrp__'.$this->Id, 't',$this->Value,$js.$this->GetCSSIdTag()).$label;
 	}
@@ -42,33 +39,32 @@ class fbCheckboxField extends fbFieldBase {
 	function GetHumanReadableValue($as_string=true)
 	{
 		$mod = $this->form_ptr->module_ptr;
-		if ($this->Value === false)
-			{
+		if($this->Value === false)
+		{
 			$ret = $this->GetOption('unchecked_value',$mod->Lang('value_unchecked'));
-			}
+		}
 		else
-			{
+		{
 			$ret = $this->GetOption('checked_value',$mod->Lang('value_checked'));
-			}
-		if ($as_string)
-			{
+		}
+		if($as_string)
+		{
 			return $ret;
-			}
+		}
 		else
-			{
+		{
 			return array($ret);
-			}
+		}
 	}
-
 
 	function StatusInfo()
 	{
 		$mod = $this->form_ptr->module_ptr;
 		$ret =  ($this->GetOption('is_checked','0')=='1'?$mod->Lang('checked_by_default'):$mod->Lang('unchecked_by_default'));
-		if (strlen($this->ValidationType)>0)
-		  {
+		if(strlen($this->ValidationType)>0)
+		{
 		  	$ret .= ", ".array_search($this->ValidationType,$this->ValidationTypes);
-		  }
+		}
 		return $ret;
 	}
 
@@ -99,17 +95,17 @@ class fbCheckboxField extends fbFieldBase {
 		$this->validationErrorText = '';
 
 		switch ($this->ValidationType)
-		  {
-		  	   case 'none':
-		  	       break;
-		  	   case 'checked':
-		  	       if ($this->Value === false)
-		  	           {
-		  	           $this->validated = false;
-		  	           $this->validationErrorText = $mod->Lang('you_must_check',$this->GetOption('label',''));
-		  	           }
-		  	       break;
-		  }
+		{
+		 case 'none':
+			break;
+		 case 'checked':
+			if($this->Value === false)
+			{
+				$this->validated = false;
+				$this->validationErrorText = $mod->Lang('you_must_check',$this->GetOption('label',''));
+			}
+			break;
+		}
 		return array($this->validated, $this->validationErrorText);
 	}
 

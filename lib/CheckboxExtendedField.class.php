@@ -1,16 +1,12 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-
-This class written by Tapio "Stikki" Löytty <tapsa@blackmilk.fi>
-*/
-
-class fbCheckboxExtendedField extends fbFieldBase {
-
+class fbCheckboxExtendedField extends fbFieldBase
+{
 	function __construct(&$form_ptr, &$params)
 	{
 		parent::__construct($form_ptr, $params);
@@ -21,8 +17,7 @@ class fbCheckboxExtendedField extends fbFieldBase {
 		$this->ValidationTypes = array(
             $mod->Lang('validation_none')=>'none',
             $mod->Lang('validation_must_check')=>'checked',
-            $mod->Lang('validation_empty')=>'empty'
-            );
+            $mod->Lang('validation_empty')=>'empty');
 		$this->sortable = false;
 		$this->hasMultipleFormComponents = true;
 	}
@@ -36,16 +31,18 @@ class fbCheckboxExtendedField extends fbFieldBase {
 		$box_label = '';
 		$text_label = '';
 
-		if (!$this->Value['box'] && $this->GetOption('is_checked','0')=='1') {
-
+		if(!$this->Value['box'] && $this->GetOption('is_checked','0')=='1')
+		{
 			$this->Value['box'] = 't';
 		}
 
-		if (strlen($this->GetOption('box_label','')) > 0) {
+		if(strlen($this->GetOption('box_label','')) > 0)
+		{
 			$box_label = '<label for="'.$this->GetCSSId('_0').'">'.$this->GetOption('box_label').'</label>';
 		}
 
-		if (strlen($this->GetOption('text_label','')) > 0) {
+		if(strlen($this->GetOption('text_label','')) > 0)
+		{
 			$text_label = '<label for="'.$this->GetCSSId('_1').'">'.$this->GetOption('text_label').'</label>';
 		}
 
@@ -55,14 +52,13 @@ class fbCheckboxExtendedField extends fbFieldBase {
 
 		$output[] = $obj;
 
-		if($this->GetOption('show_textfield')) {
-
+		if($this->GetOption('show_textfield'))
+		{
 			$obj = new stdClass();
 			$obj->name = $text_label;
 			$obj->input = $mod->fbCreateInputText($id, 'fbrp__'.$this->Id.'[text]',_($check_value['text']?$this->Value['text']:''),25,25,$js.$this->GetCSSIdTag('_1'));
 
 			$output[] = $obj;
-
 		}
 
 		return $output;
@@ -75,28 +71,28 @@ class fbCheckboxExtendedField extends fbFieldBase {
 		$val = $this->Value;
 		$ret = '';
 
-		if (!$val['box']) {
-
+		if(!$val['box'])
+		{
 			$ret .= $this->GetOption('unchecked_value',$mod->Lang('value_unchecked'));
-		} else {
-
+		}
+		else
+		{
 			$ret .= $this->GetOption('checked_value',$mod->Lang('value_checked'));
 		}
 
-		if ($val['text'] && !empty($val['text'])) {
-
+		if($val['text'] && !empty($val['text']))
+		{
 			$ret .= $form->GetAttr('list_delimiter',',').$val['text'];
-
 		}
 
-		if ($as_string)
-			{
+		if($as_string)
+		{
 			return $ret;
-			}
+		}
 		else
-			{
+		{
 			return array($ret);
-			}
+		}
 	}
 
 
@@ -104,10 +100,10 @@ class fbCheckboxExtendedField extends fbFieldBase {
 	{
 		$mod = $this->form_ptr->module_ptr;
 		$ret =  ($this->GetOption('is_checked','0')=='1'?$mod->Lang('checked_by_default'):$mod->Lang('unchecked_by_default'));
-		if (strlen($this->ValidationType)>0)
-		  {
+		if(strlen($this->ValidationType)>0)
+		{
 		  	$ret .= ", ".array_search($this->ValidationType,$this->ValidationTypes);
-		  }
+		}
 		return $ret;
 	}
 
@@ -145,54 +141,51 @@ class fbCheckboxExtendedField extends fbFieldBase {
 		$this->validationErrorText = '';
 
 		switch ($this->ValidationType)
-		  {
-		  	   case 'none':
-		  	       break;
-		  	   case 'checked':
-		  	       if ($this->Value['box'] == false)
-		  	           {
-		  	           $this->validated = false;
-		  	           $this->validationErrorText = $mod->Lang('you_must_check',$this->GetOption('box_label',''));
-		  	           }
-		  	       break;
-		  	   case 'empty':
-		  	       if (empty($this->Value['text']))
-		  	           {
-		  	           $this->validated = false;
-		  	           $this->validationErrorText = $mod->Lang('please_enter_a_value',$this->GetOption('text_label',''));
-		  	           }
-		  	       break;
-
-
-		  }
+		{
+		 case 'none':
+			break;
+		 case 'checked':
+			if($this->Value['box'] == false)
+			{
+				$this->validated = false;
+				$this->validationErrorText = $mod->Lang('you_must_check',$this->GetOption('box_label',''));
+			}
+			break;
+			case 'empty':
+			if(empty($this->Value['text']))
+			{
+				$this->validated = false;
+				$this->validationErrorText = $mod->Lang('please_enter_a_value',$this->GetOption('text_label',''));
+			}
+			break;
+		}
 		return array($this->validated, $this->validationErrorText);
 	}
 
 
-	private function _check_value() {
-
+	private function _check_value()
+	{
 		$val = $this->Value;
 		$valid = array('box'=>false, 'text'=>false);
 
-		if($val === false) {
-
+		if($val === false)
+		{
 			return false;
 		}
 
-		if(isset($val['box'])) {
-
+		if(isset($val['box']))
+		{
 			$valid['box'] = true;
 		}
 
-		if(isset($val['text']) && !empty($val['text'])) {
-
+		if(isset($val['text']) && !empty($val['text']))
+		{
 			$valid['text'] = true;
 		}
 
 		return valid;
-
 	}
 
-} // end of class
+}
 
 ?>

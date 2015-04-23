@@ -1,78 +1,52 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
-
-A Module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 class fbDispositionEmailBase extends fbFieldBase
 {
+	function __construct(&$form_ptr, &$params)
+	{
+		parent::__construct($form_ptr, $params);
+		$this->IsDisposition = true;
+		$this->IsEmailDisposition = true;
+		$this->ValidationTypes = array();
+	}
 
-  function __construct(&$form_ptr, &$params)
-  {
-    parent::__construct($form_ptr, $params);
-    $this->IsDisposition = true;
-    $this->IsEmailDisposition = true;
-    $this->ValidationTypes = array();
-  }
+	//override this
+	function StatusInfo()
+	{
+		return '';
+	}
 
-  // override me!
-  function StatusInfo()
-  {
-  }
+	//override this
+	function DisposeForm($returnid)
+	{
+		return array(true,'');
+	}
 
-  function TemplateStatus()
-  {
-    if ($this->GetOption('email_template','') == '')
-      {
-	    $mod = $this->form_ptr->module_ptr;
-  		return $mod->Lang('email_template_not_set');
-      }
-  }
+	function TemplateStatus()
+	{
+		if($this->GetOption('email_template','') == '')
+		{
+			$mod = $this->form_ptr->module_ptr;
+			return $mod->Lang('email_template_not_set');
+		}
+	}
 
-  // override me!
-  function DisposeForm($returnid)
-  {
-    return array(true,'');
-  }
-
-  // override me as necessary
-  function SetFromAddress()
-  {
-    return true;
-  }
-
-  // override me as necessary
-  function SetFromName()
-  {
-    return true;
-  }
-
-  // override me as necessary
-  function SetReplyToName()
-  {
-    return true;
-  }
-
-  // override me as necessary
-  function SetReplyToAddress()
-  {
-    return true;
-  }
-
-	// Send off those emails
+	// send emails
 	function SendForm($destination_array, $subject)
 	{
-		if ($destination_array == false || $subject == false)
+		if($destination_array == false || $subject == false)
 			return array(false,'');
 
 		$form = $this->form_ptr;
 		$mod = $form->module_ptr;
 		$db =$mod->dbHandle;
 
-		if ($mod->GetPreference('enable_antispam',1))
+		if($mod->GetPreference('enable_antispam',1))
 		{
 			if(!empty($_SERVER['REMOTE_ADDR']))
 			{
@@ -82,7 +56,7 @@ class fbDispositionEmailBase extends fbFieldBase
 				$dbresult = $db->GetOne($query, array($_SERVER['REMOTE_ADDR'],
 					   trim($db->DBTimeStamp(time() - 3600),"'")));
 
-				if ($dbresult && isset($dbresult['sent']) && $dbresult['sent'] > 9)
+				if($dbresult && isset($dbresult['sent']) && $dbresult['sent'] > 9)
 				{
 					// too many from this IP address. Kill it.
 					$msg = '<hr />'.$mod->Lang('suspected_spam').'<hr />';
@@ -93,10 +67,10 @@ class fbDispositionEmailBase extends fbFieldBase
 		}
 
 		$mail = $mod->GetModuleInstance('CMSMailer');
-		if ($mail == FALSE)
+		if($mail == FALSE)
 		{
 			$msg = '';
-			if (! $mod->GetPreference('hide_errors',0))
+			if(!$mod->GetPreference('hide_errors',0))
 			{
 				$msg = '<hr />'.$mod->Lang('missing_cms_mailer'). '<hr />';
 			}
@@ -107,20 +81,20 @@ class fbDispositionEmailBase extends fbFieldBase
 
 		$rt = $this->GetOption('email_reply_to_address','');
 		$rn = $this->GetOption('email_reply_to_name','');
-		if (empty($rn))
+		if(empty($rn))
 		{
 			$rn = $this->GetOption('email_from_name','');
 		}
-		if ($this->SetReplyToAddress() && !empty($rt))
+		if($this->SetReplyToAddress() && !empty($rt))
 		{
 			$mail->AddReplyTo($rt,$this->SetFromName()?$rn:'');
 		}
 
-		if ($this->SetFromAddress())
+		if($this->SetFromAddress())
 		{
 			$mail->SetFrom($this->GetOption('email_from_address'));
 		}
-		if ($this->SetFromName())
+		if($this->SetFromName())
 		{
 			$mail->SetFromName($this->GetOption('email_from_name'));
 		}
@@ -129,23 +103,23 @@ class fbDispositionEmailBase extends fbFieldBase
 
 		$message = $this->GetOption('email_template','');
 		$htmlemail = ($this->GetOption('html_email','0') == '1');
-		if ($this->GetFieldType() == 'DispositionEmailConfirmation')
+		if($this->GetFieldType() == 'DispositionEmailConfirmation')
 		{
 			$form->AddTemplateVariable('confirm_url',$mod->Lang('title_confirmation_url'));
 		}
-		if ($htmlemail)
+		if($htmlemail)
 		{
 			$mail->IsHTML(true);
 		}
-		if (strlen($message) < 1)
+		if(strlen($message) < 1)
 		{
 			$message = $form->createSampleTemplate(false);
-			if ($htmlemail)
+			if($htmlemail)
 			{
 				$message2 = $form->createSampleTemplate(true);
 			}
 		}
-		elseif ($htmlemail)
+		elseif($htmlemail)
 		{
 			$message2 = $message;
 		}
@@ -155,24 +129,24 @@ class fbDispositionEmailBase extends fbFieldBase
 
 		for($i=0;$i<count($theFields);$i++)
 		{
-	 		if (strtolower(get_class($theFields[$i])) == 'fbfileuploadfield' )
+	 		if(strtolower(get_class($theFields[$i])) == 'fbfileuploadfield')
     		{
-				if( !$theFields[$i]->GetOption('suppress_attachment') )
+				if(!$theFields[$i]->GetOption('suppress_attachment'))
 				{
-					if( !$theFields[$i]->GetOption('sendto_uploads') )
+					if(!$theFields[$i]->GetOption('sendto_uploads'))
 					{
 						// we have a file we wish to attach
 						$thisAtt = $theFields[$i]->GetHumanReadableValue(false);
 
-						if (is_array($thisAtt))
+						if(is_array($thisAtt))
 						{
-							if (function_exists('finfo_open'))
+							if(function_exists('finfo_open'))
 							{
 								$finfo = finfo_open(FILEINFO_MIME); // return mime type ala mimetype extension
 								$thisType = finfo_file($finfo, $thisAtt[0]);
 								finfo_close($finfo);
 							}
-							else if (function_exists('mime_content_type'))
+							else if(function_exists('mime_content_type'))
 							{
 								$thisType = mime_content_type($thisAtt[0]);
 							}
@@ -182,7 +156,7 @@ class fbDispositionEmailBase extends fbFieldBase
 							}
 							$thisNames = split('[/:\\]',$thisAtt[0]);
 							$thisName = array_pop($thisNames);
-							if (! $mail->AddAttachment($thisAtt[0], $thisName, "base64", $thisType))
+							if(!$mail->AddAttachment($thisAtt[0], $thisName, "base64", $thisType))
 							{
 								// failed upload kills the send.
 								audit(-1, $mod->GetName(), $mod->Lang('submit_error',$mail->GetErrorInfo()));
@@ -190,19 +164,19 @@ class fbDispositionEmailBase extends fbFieldBase
 										array($thisAtt[0],$thisAtt[0] ,$thisType)));
 							}
 						}
-						else if (strlen($thisAtt) > 0)
+						else if(strlen($thisAtt) > 0)
 						{	// Fix for Bug 4307
 							//Filepath can't be relative to CWD dir
 							$filepath = $theFields[$i]->GetOption('file_destination');
 							$filepath = cms_join_path($filepath, $thisAtt);
 
-							if (function_exists('finfo_open'))
+							if(function_exists('finfo_open'))
 							{
 								$finfo = finfo_open(FILEINFO_MIME); // return mime type ala mimetype extension
 								$thisType = finfo_file($finfo, $filepath);
 								finfo_close($finfo);
 							}
-							else if (function_exists('mime_content_type'))
+							else if(function_exists('mime_content_type'))
 							{
 								$thisType = mime_content_type($filepath);
 							}
@@ -214,7 +188,7 @@ class fbDispositionEmailBase extends fbFieldBase
 							$thisNames = split('[/:\\]',$filepath);
 							$thisName = array_pop($thisNames);
 
-							if (! $mail->AddAttachment($filepath, $thisName, "base64", $thisType))
+							if(!$mail->AddAttachment($filepath, $thisName, "base64", $thisType))
 							{
 								// failed upload kills the send.
 								audit(-1, $mod->GetName(), $mod->Lang('submit_error',$mail->GetErrorInfo()));
@@ -226,38 +200,38 @@ class fbDispositionEmailBase extends fbFieldBase
 				}
      		}
     	}
-		//process without cacheing (->fetch() fails)
+		//process without cacheing
 		$message = $mod->ProcessTemplateFromData($message);
 		$subject = $mod->ProcessTemplateFromData($subject);
 		$mail->SetSubject($subject);
-		if ($htmlemail)
-			{
+		if($htmlemail)
+		{
 			$message2 = $mod->ProcessTemplateFromData($message2);
 			$mail->SetAltBody(strip_tags(html_entity_decode($message)));
 			$mail->SetBody($message2);
-			}
+		}
 		else
-			{
+		{
 			$mail->SetBody(html_entity_decode($message));
-			}
+		}
 
 //		$haveto = false;
 		$defto = $this->GetOption('send_using','to');
-		if (! is_array($destination_array))
+		if(!is_array($destination_array))
 		{
 			$destination_array = array($destination_array);
 		}
 
-		foreach ($destination_array as $thisDest)
+		foreach($destination_array as $thisDest)
 		{
-			if (strpos($thisDest,',') !== false)
+			if(strpos($thisDest,',') !== false)
 			{
 				$res = false;
 				$sub_ads = explode(',',$thisDest);
-				foreach ($sub_ads as $this_ad)
+				foreach($sub_ads as $this_ad)
 				{
 					$bare = trim($this_ad);
-					if ($bare)
+					if($bare)
 					{
 						$totype = substr($bare,0,4);
 						switch ($totype)
@@ -288,7 +262,7 @@ class fbDispositionEmailBase extends fbFieldBase
 						$res = true;
 					}
 				}
-				if ($res == false)
+				if($res == false)
 				{
 					audit(-1, $mod->GetName(), $mod->Lang('error_address', $this_ad));
 					$toReturn = array(false, $mod->Lang('error_address', $this_ad));
@@ -297,7 +271,7 @@ class fbDispositionEmailBase extends fbFieldBase
 			else
 			{
 				$bare = trim($thisDest);
-				if ($bare)
+				if($bare)
 				{
 					$totype = substr($bare,0,4);
 					switch ($totype)
@@ -336,124 +310,124 @@ class fbDispositionEmailBase extends fbFieldBase
 			}
 		}
 
-		if ($res != false)
-			{
-//			if ($haveto == false)
+		if($res != false)
+		{
+//			if($haveto == false)
 //			$res = $mail->AddAddress(''); adding '' or null generates error
 			// send the message...
 			$res = $mail->Send();
-			if ($res === false)
-				{
+			if($res === false)
+			{
 				audit(-1, $mod->GetName(), $mod->Lang('submit_error',$mail->GetErrorInfo()));
 				$toReturn = array(false, $mail->GetErrorInfo());
-				}
+			}
 			else
+			{
+				if($mod->GetPreference('enable_antispam',1))
 				{
-				if ($mod->GetPreference('enable_antispam',1))
-					{
 					if(!empty($_SERVER['REMOTE_ADDR']))
-						{
+					{
 						$rec_id = $db->GenID(cms_db_prefix().'module_fb_ip_log_seq');
 						$query = 'INSERT INTO '.cms_db_prefix().
 						'module_fb_ip_log (sent_id, src_ip, sent_time) VALUES (?, ?, ?)';
 
 						$dbresult = $db->Execute($query, array($rec_id, $_SERVER['REMOTE_ADDR'],
 						   trim($db->DBTimeStamp(time()),"'")));
-						}
 					}
-				$toReturn = array(true, '');
 				}
+				$toReturn = array(true, '');
 			}
+		}
 
 		$mail->reset();
 		return $toReturn;
 	}
 
-  function PrePopulateAdminFormBase($formDescriptor, $totype = false)
-  {
-    $mod = $this->form_ptr->module_ptr;
-    $message = $this->GetOption('email_template','');
-
-	if ($this->GetFieldType() == 'DispositionEmailConfirmation')
-		{
-		$this->form_ptr->AddTemplateVariable('confirm_url',$mod->Lang('title_confirmation_url'));
-		}
-	/* main-tab items */
-	$main = array(
-			array($mod->Lang('title_email_subject'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_email_subject',
-					$this->GetOption('email_subject',''),50),$mod->Lang('canuse_smarty')),
-
-			array($mod->Lang('title_email_from_name'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_email_from_name',
-					$this->GetOption('email_from_name',$mod->Lang('friendlyname')),40,128)),
-
-			array($mod->Lang('title_email_from_address'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_email_from_address',
-					$this->GetOption('email_from_address',''),50,128),
-					$mod->Lang('email_from_addr_help',$_SERVER['SERVER_NAME']))
-           );
-//abandoned here: 'fbrp_opt_email_cc_address', 'fbrp_opt_use_bcc'
-//code elsewhere assumes this is last in $main[]
-	if ($totype)
-	 $main[] = array(
-	 		$mod->Lang('title_send_using'),
-	 		$mod->CreateInputRadioGroup($formDescriptor,'fbrp_opt_send_using',
-				array($mod->Lang('to')=>'to',$mod->Lang('cc')=>'cc',$mod->Lang('bcc')=>'bc'),
-				$this->getOption('send_using','to'),'','&nbsp;&nbsp;'),
-				$mod->Lang('email_to_help'));
-
-	$parm = array();
-	$parm['opt_email_template']['html_button'] = true;
-	$parm['opt_email_template']['text_button'] = true;
-	$parm['opt_email_template']['is_email'] = true;
-	list ($funcs, $buttons) = $this->form_ptr->AdminTemplateActions($formDescriptor,$parm);
-
-	/* advanced-tab items */
-	$adv = array(
-			array($mod->Lang('title_html_email'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_html_email','0').
-				$mod->CreateInputCheckbox($formDescriptor,'fbrp_opt_html_email','1',
-					$this->GetOption('html_email','0'))),
-
-			array($mod->Lang('title_email_encoding'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_email_encoding',
-				$this->GetOption('email_encoding','utf-8'),15,128)),
-
-			array($mod->Lang('title_email_template'),
-				$mod->CreateTextArea(false, $formDescriptor,
-				/*($this->GetOption('html_email','0')=='1'?$message:htmlspecialchars($message))*/
-			 	$message,'fbrp_opt_email_template', 'module_fb_area_wide', '','','',80,15,'','html').
-				'<br /><br />'.$buttons[0].'&nbsp'.$buttons[1])
-           );
-	/*show variables-help on advanced tab*/
-	return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>'varshelpadv');
-  }
-
-  function validateEmailAddr($email)
+	function PrePopulateAdminFormBase($formDescriptor, $totype = false)
 	{
-	$mod = $this->form_ptr->module_ptr;
-	$ret = true;
-	$message = '';
-	if (strpos($email,',') !== false)
-		{
-		$ta = explode(',',$email);
-		}
-	else
-		{
-		$ta = array($email);
-		}
-	foreach($ta as $to)
-		{
-		$to = trim($to);
+		$mod = $this->form_ptr->module_ptr;
+		$message = $this->GetOption('email_template','');
 
-		$totype = substr($to,0,4);
-		if ($totype == '|cc|' || $totype == '|bc|')
-			$to = substr($to,4);
-
-		if (! preg_match(($mod->GetPreference('relaxed_email_regex','0')==0?$mod->email_regex:$mod->email_regex_relaxed), $to))
-	       {
-	       	$ret = false;
-            $message .= $mod->Lang('not_valid_email',$to).'<br />';
-	       }
+		if($this->GetFieldType() == 'DispositionEmailConfirmation')
+		{
+			$this->form_ptr->AddTemplateVariable('confirm_url',$mod->Lang('title_confirmation_url'));
 		}
-	return array($ret, $message);
+		/* main-tab items */
+		$main = array(
+				array($mod->Lang('title_email_subject'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_email_subject',
+						$this->GetOption('email_subject',''),50),$mod->Lang('canuse_smarty')),
+
+				array($mod->Lang('title_email_from_name'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_email_from_name',
+						$this->GetOption('email_from_name',$mod->Lang('friendlyname')),40,128)),
+
+				array($mod->Lang('title_email_from_address'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_email_from_address',
+						$this->GetOption('email_from_address',''),50,128),
+						$mod->Lang('email_from_addr_help',$_SERVER['SERVER_NAME']))
+			  );
+		//abandoned here: 'fbrp_opt_email_cc_address', 'fbrp_opt_use_bcc'
+		//code elsewhere assumes this is last in $main[]
+		if($totype)
+			$main[] = array(
+				$mod->Lang('title_send_using'),
+				$mod->CreateInputRadioGroup($formDescriptor,'fbrp_opt_send_using',
+					array($mod->Lang('to')=>'to',$mod->Lang('cc')=>'cc',$mod->Lang('bcc')=>'bc'),
+					$this->getOption('send_using','to'),'','&nbsp;&nbsp;'),
+					$mod->Lang('email_to_help'));
+
+		$parm = array();
+		$parm['opt_email_template']['html_button'] = true;
+		$parm['opt_email_template']['text_button'] = true;
+		$parm['opt_email_template']['is_email'] = true;
+		list ($funcs, $buttons) = $this->form_ptr->AdminTemplateActions($formDescriptor,$parm);
+
+		/* advanced-tab items */
+		$adv = array(
+				array($mod->Lang('title_html_email'),
+					$mod->CreateInputHidden($formDescriptor,'fbrp_opt_html_email','0').
+					$mod->CreateInputCheckbox($formDescriptor,'fbrp_opt_html_email','1',
+						$this->GetOption('html_email','0'))),
+
+				array($mod->Lang('title_email_encoding'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_email_encoding',
+					$this->GetOption('email_encoding','utf-8'),15,128)),
+
+				array($mod->Lang('title_email_template'),
+					$mod->CreateTextArea(false, $formDescriptor,
+					/*($this->GetOption('html_email','0')=='1'?$message:htmlspecialchars($message))*/
+					$message,'fbrp_opt_email_template', 'module_fb_area_wide', '','','',80,15,'','html').
+					'<br /><br />'.$buttons[0].'&nbsp'.$buttons[1])
+			  );
+		/*show variables-help on advanced tab*/
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>'varshelpadv');
+	}
+
+	function validateEmailAddr($email)
+	{
+		$mod = $this->form_ptr->module_ptr;
+		$ret = true;
+		$message = '';
+		if(strpos($email,',') !== false)
+		{
+			$ta = explode(',',$email);
+		}
+		else
+		{
+			$ta = array($email);
+		}
+		foreach($ta as $to)
+		{
+			$to = trim($to);
+
+			$totype = substr($to,0,4);
+			if($totype == '|cc|' || $totype == '|bc|')
+				$to = substr($to,4);
+
+			if(!preg_match(($mod->GetPreference('relaxed_email_regex','0')==0?$mod->email_regex:$mod->email_regex_relaxed), $to))
+			{
+				$ret = false;
+				$message .= $mod->Lang('not_valid_email',$to).'<br />';
+			}
+		}
+		return array($ret, $message);
 	}
 
 }

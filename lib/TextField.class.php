@@ -1,14 +1,12 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A Module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
-
-class fbTextField extends fbFieldBase {
-
+class fbTextField extends fbFieldBase
+{
 	function __construct(&$form_ptr, &$params)
 	{
 		parent::__construct($form_ptr, $params);
@@ -23,8 +21,7 @@ class fbTextField extends fbFieldBase {
             $mod->Lang('validation_email_address')=>'email',
             $mod->Lang('validation_regex_match')=>'regex_match',
             $mod->Lang('validation_regex_nomatch')=>'regex_nomatch'
-            );
-
+           );
 	}
 
 	function GetFieldInput($id, &$params, $returnid)
@@ -33,21 +30,22 @@ class fbTextField extends fbFieldBase {
 		$js = $this->GetOption('javascript','');
 		$ro = '';
 
-		if ($this->GetOption('readonly','0') == '1') {
+		if($this->GetOption('readonly','0') == '1')
+		{
 			$ro = ' readonly="readonly"';
-        }
+		}
 
-		if ($this->GetOption('html5','0') == '1')
-			{
+		if($this->GetOption('html5','0') == '1')
+		{
 			return $mod->fbCreateInputText($id, 'fbrp__'.$this->Id,$this->Value,$this->GetOption('length')<25?$this->GetOption('length'):25,
 				$this->GetOption('length'),
 					' placeholder="'.$this->GetOption('default').'"'.$js.$ro.$this->GetCSSIdTag());
-			}
+		}
 		else
-			{
+		{
 			return $mod->fbCreateInputText($id, 'fbrp__'.$this->Id,($this->HasValue()?$this->Value:$this->GetOption('default')),$this->GetOption('length')<25?$this->GetOption('length'):25, $this->GetOption('length'),
 				($this->GetOption('clear_default','0')==1?(' onfocus="if(this.value==this.defaultValue) this.value=\'\';" onblur="if(this.value==\'\') this.value=this.defaultValue;"'):' ').$js.$ro.$this->GetCSSIdTag());
-			}
+		}
 	}
 
 	function StatusInfo()
@@ -55,19 +53,18 @@ class fbTextField extends fbFieldBase {
 		$mod = $this->form_ptr->module_ptr;
 		$ret = $mod->Lang('abbreviation_length',$this->GetOption('length','80'));
 
-		if (strlen($this->ValidationType)>0) {
-
+		if(strlen($this->ValidationType)>0)
+		{
 		  	$ret .= ", ".array_search($this->ValidationType,$this->ValidationTypes);
 		}
 
-		if ($this->GetOption('readonly','0') == '1') {
-
+		if($this->GetOption('readonly','0') == '1')
+		{
 			$ret .= ", ".$mod->Lang('title_read_only');
-        }
+		}
 
 		return $ret;
 	}
-
 
 	function PrePopulateAdminForm($formDescriptor)
 	{
@@ -99,77 +96,76 @@ class fbTextField extends fbFieldBase {
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-
 	function Validate()
 	{
 		$this->validated = true;
 		$this->validationErrorText = '';
 		$mod = $this->form_ptr->module_ptr;
 		switch ($this->ValidationType)
-		  {
-		  	   case 'none':
-		  	       break;
-		  	   case 'numeric':
-				  if ($this->Value !== false) $this->Value = trim($this->Value);
-                  if ($this->Value !== false &&
-                      ! preg_match("/^([\d\.\,])+$/i", $this->Value))
-                      {
-                      $this->validated = false;
-                      $this->validationErrorText = $mod->Lang('please_enter_a_number',$this->Name);
-                      }
-		  	       break;
-		  	   case 'integer':
-				  if ($this->Value !== false) $this->Value = trim($this->Value);
-                  if ($this->Value !== false &&
-                  	! preg_match("/^([\d])+$/i", $this->Value) ||
-                      intval($this->Value) != $this->Value)
-                    {
-                    $this->validated = false;
-                    $this->validationErrorText = $mod->Lang('please_enter_an_integer',$this->Name);
-                    }
-		  	       break;
-		  	   case 'email':
-				  if ($this->Value !== false) $this->Value = trim($this->Value);
-                  if ($this->Value !== false &&
-                      ! preg_match(($mod->GetPreference('relaxed_email_regex','0')==0?$mod->email_regex:$mod->email_regex_relaxed), $this->Value))
-                    {
-                    $this->validated = false;
-                    $this->validationErrorText = $mod->Lang('please_enter_an_email',$this->Name);
-                    }
-		  	       break;
-		  	   case 'usphone':
-				  if ($this->Value !== false) $this->Value = trim($this->Value);
-                  if ($this->Value !== false &&
-                      ! preg_match('/^([0-9][\s\.-]?)?(\(?[0-9]{3}\)?|[0-9]{3})[\s\.-]?([0-9]{3}[\s\.-]?[0-9]{4}|[a-zA-Z0-9]{7})(\s?(x|ext|ext.)\s?[a-zA-Z0-9]+)?$/',
-                       $this->Value))
-                    {
-                    $this->validated = false;
-                    $this->validationErrorText = $mod->Lang('please_enter_a_phone',$this->Name);
-                    }
-		  	       break;
-		  	   case 'regex_match':
-                  if ($this->Value !== false &&
-                      ! preg_match($this->GetOption('regex','/.*/'), $this->Value))
-                    {
-                    $this->validated = false;
-                    $this->validationErrorText = $mod->Lang('please_enter_valid',$this->Name);
-                    }
-		  	   	   break;
-		  	   case 'regex_nomatch':
-                  if ($this->Value !== false &&
-                       preg_match($this->GetOption('regex','/.*/'), $this->Value))
-                    {
-                    $this->validated = false;
-                    $this->validationErrorText = $mod->Lang('please_enter_valid',$this->Name);
-                    }
-		  	   	   break;
-		  }
-
-		if ($this->GetOption('length',0) > 0 && strlen($this->Value) > $this->GetOption('length',0))
+		{
+		 case 'none':
+			break;
+		 case 'numeric':
+			if($this->Value !== false) $this->Value = trim($this->Value);
+			if($this->Value !== false &&
+				!preg_match("/^([\d\.\,])+$/i", $this->Value))
 			{
+				$this->validated = false;
+				$this->validationErrorText = $mod->Lang('please_enter_a_number',$this->Name);
+			}
+			break;
+		 case 'integer':
+			if($this->Value !== false) $this->Value = trim($this->Value);
+			if($this->Value !== false &&
+				!preg_match("/^([\d])+$/i", $this->Value) ||
+				intval($this->Value) != $this->Value)
+			{
+				$this->validated = false;
+				$this->validationErrorText = $mod->Lang('please_enter_an_integer',$this->Name);
+			}
+			break;
+		 case 'email':
+			if($this->Value !== false) $this->Value = trim($this->Value);
+			if($this->Value !== false &&
+				!preg_match(($mod->GetPreference('relaxed_email_regex','0')==0?$mod->email_regex:$mod->email_regex_relaxed), $this->Value))
+			{
+				$this->validated = false;
+				$this->validationErrorText = $mod->Lang('please_enter_an_email',$this->Name);
+			}
+			break;
+		 case 'usphone':
+			if($this->Value !== false) $this->Value = trim($this->Value);
+			if($this->Value !== false &&
+				!preg_match('/^([0-9][\s\.-]?)?(\(?[0-9]{3}\)?|[0-9]{3})[\s\.-]?([0-9]{3}[\s\.-]?[0-9]{4}|[a-zA-Z0-9]{7})(\s?(x|ext|ext.)\s?[a-zA-Z0-9]+)?$/',
+			$this->Value))
+			{
+				$this->validated = false;
+				$this->validationErrorText = $mod->Lang('please_enter_a_phone',$this->Name);
+			}
+			break;
+		 case 'regex_match':
+			if($this->Value !== false &&
+				!preg_match($this->GetOption('regex','/.*/'), $this->Value))
+			{
+				$this->validated = false;
+				$this->validationErrorText = $mod->Lang('please_enter_valid',$this->Name);
+			}
+			break;
+		 case 'regex_nomatch':
+			if($this->Value !== false &&
+				preg_match($this->GetOption('regex','/.*/'), $this->Value))
+			{
+				$this->validated = false;
+				$this->validationErrorText = $mod->Lang('please_enter_valid',$this->Name);
+			}
+			break;
+		}
+
+		if($this->GetOption('length',0) > 0 && strlen($this->Value) > $this->GetOption('length',0))
+		{
 			$this->validated = false;
 			$this->validationErrorText = $mod->Lang('please_enter_no_longer',$this->GetOption('length',0));
-			}
+		}
 
 		return array($this->validated, $this->validationErrorText);
 	}

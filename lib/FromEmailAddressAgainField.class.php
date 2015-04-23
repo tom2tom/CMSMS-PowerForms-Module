@@ -1,23 +1,19 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
-
-class fbFromEmailAddressAgainField extends fbFieldBase {
-
+class fbFromEmailAddressAgainField extends fbFieldBase
+{
 	function __construct(&$form_ptr, &$params)
 	{
 		parent::__construct($form_ptr, $params);
-		$mod = $form_ptr->module_ptr;
 		$this->Type = 'FromEmailAddressAgainField';
 		$this->DisplayInForm = true;
-		$this->ValidationTypes = array(
-			$mod->Lang('validation_email_address')=>'email',
-			);
+		$mod = $form_ptr->module_ptr;
+		$this->ValidationTypes = array($mod->Lang('validation_email_address')=>'email');
 		$this->modifiesOtherFields = false;
 	}
 
@@ -44,10 +40,10 @@ class fbFromEmailAddressAgainField extends fbFieldBase {
 		$mod = $this->form_ptr->module_ptr;
 		$flds = $this->form_ptr->GetFields();
 		$opts = array();
-		foreach ($flds as $tf)
-			{
+		foreach($flds as $tf)
+		{
 			$opts[$tf->GetName()]=$tf->GetName();
-			}
+		}
 		$main = array(
 			array(
 				$mod->Lang('title_field_to_validate'),
@@ -73,7 +69,6 @@ class fbFromEmailAddressAgainField extends fbFieldBase {
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-
 	function Validate()
 	{
 		$this->validated = true;
@@ -81,15 +76,15 @@ class fbFromEmailAddressAgainField extends fbFieldBase {
 
 		$field_to_validate = $this->GetOption('field_to_validate','');
 
-		if ($field_to_validate != '')
+		if($field_to_validate != '')
 		{
 			$mod = $this->form_ptr->module_ptr;
-			foreach ($this->form_ptr->Fields as &$one_field)
+			foreach($this->form_ptr->Fields as &$one_field)
 			{
-				if ($one_field->Name == $field_to_validate)
+				if($one_field->Name == $field_to_validate)
 				{
 					$value = $one_field->GetValue();
-					if ($value != $this->Value)
+					if($value != $this->Value)
 					{
 						$this->validated = false;
 						$this->validationErrorText = $mod->Lang('email_address_does_not_match', $field_to_validate);

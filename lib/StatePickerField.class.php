@@ -1,14 +1,12 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
-
-class fbStatePickerField extends fbFieldBase {
-
+class fbStatePickerField extends fbFieldBase
+{
 	var $States;
 
 	function __construct(&$form_ptr, &$params)
@@ -36,11 +34,9 @@ class fbStatePickerField extends fbFieldBase {
         "Vermont"=>"VT", "Virginia"=>"VA", "Washington"=>"WA",
         "District of Columbia"=>"DC", "West Virginia"=>"WV", "Wisconsin"=>"WI",
         "Wyoming"=>"WY");
-
 	}
 
-
-    function StatusInfo()
+	function StatusInfo()
 	{
 		return '';
 	}
@@ -48,14 +44,14 @@ class fbStatePickerField extends fbFieldBase {
 	function GetHumanReadableValue($as_string=true)
 	{
 		$ret = array_search($this->Value,$this->States);
-		if ($as_string)
-			{
+		if($as_string)
+		{
 			return $ret;
-			}
+		}
 		else
-			{
+		{
 			return array($ret);
-			}
+		}
 	}
 
 	function GetFieldInput($id, &$params, $returnid)
@@ -64,20 +60,19 @@ class fbStatePickerField extends fbFieldBase {
 		$js = $this->GetOption('javascript','');
 
 		unset($this->States[$mod->Lang('no_default')]);
-		if ($this->GetOption('select_one','') != '')
-			{
+		if($this->GetOption('select_one','') != '')
+		{
 			$this->States = array_merge(array($this->GetOption('select_one','')=>''),$this->States);
-			}
+		}
 		else
-			{
+		{
 			$this->States = array_merge(array($mod->Lang('select_one')=>''),$this->States);
-			}
+		}
 
-
-		if (! $this->HasValue() && $this->GetOption('default_state','') != '')
-		  {
-		  $this->SetValue($this->GetOption('default_state',''));
-		  }
+		if(!$this->HasValue() && $this->GetOption('default_state','') != '')
+		{
+			$this->SetValue($this->GetOption('default_state',''));
+		}
 
 		return $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id, $this->States, -1, $this->Value, $js.$this->GetCSSIdTag());
 	}

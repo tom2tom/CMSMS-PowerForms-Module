@@ -1,14 +1,12 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A Module for CMS Made Simple, Copyrigth (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
-
-class fbTextAreaField extends fbFieldBase {
-
+class fbTextAreaField extends fbFieldBase
+{
 	function __construct(&$form_ptr, &$params)
 	{
 		parent::__construct($form_ptr, $params);
@@ -18,39 +16,47 @@ class fbTextAreaField extends fbFieldBase {
 		$this->ValidationTypes = array(
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_length')=>'length'
-			);
+		);
 	}
 
 	function GetFieldInput($id, &$params, $returnid)
 	{
 		$mod = $this->form_ptr->module_ptr;
-		if ($this->GetOption('html5','0') == '1'){
+		if($this->GetOption('html5','0') == '1')
+		{
 			$ret = $mod->CreateTextArea(($this->GetOption('wysiwyg','0') == '1'?true:false),$id,$this->Value,
 					'fbrp__'.$this->Id,'',$this->GetCSSId(),'','',$this->GetOption('cols','80'),$this->GetOption('rows','15'),
 					'', '', ' placeholder="'.$this->GetOption('default').'"');
-		} else {
+		}
+		else
+		{
 			$ret = $mod->CreateTextArea(($this->GetOption('wysiwyg','0') == '1'?true:false),$id,($this->Value?$this->Value:$this->GetOption('default')),
 					'fbrp__'.$this->Id,'',$this->GetCSSId(),'','',$this->GetOption('cols','80'),$this->GetOption('rows','15'));
 		}
 
-		if ($this->GetOption('clear_default','0')=='1') {
+		if($this->GetOption('clear_default','0')=='1')
+		{
 			$ret .= '<script type="text/javascript">';
 			$ret .= "\nvar f = document.getElementById('".$this->GetCSSId()."');\n";
-			$ret .= "if (f)\n{\nf.onfocus=function(){\nif (this.value==this.defaultValue) {this.value='';}\n}\n";
-			$ret .= "f.onblur=function(){\nif (this.value=='') {this.value=this.defaultValue;}\n}\n";
+			$ret .= "if(f)\n{\nf.onfocus=function(){\nif(this.value==this.defaultValue) {this.value='';}\n}\n";
+			$ret .= "f.onblur=function(){\nif(this.value=='') {this.value=this.defaultValue;}\n}\n";
 			$ret .= "}\n;";
 			$ret .= "</script>\n";
 		}
 
 		return $ret;
-   }
-	function Validate(){
+	}
+
+	function Validate()
+	{
 		$this->validated = true;
 		$this->validationErrorText = '';
 		$mod = $this->form_ptr->module_ptr;
 		$length = $this->GetOption('length','');
-		if(is_numeric($length) && $length > 0){
-			if((strlen($this->Value)-1) > $length){
+		if(is_numeric($length) && $length > 0)
+		{
+			if((strlen($this->Value)-1) > $length)
+			{
 				$this->validated = false;
 				$this->validationErrorText = $mod->Lang('please_enter_no_longer', $length);
 			}
@@ -64,16 +70,17 @@ class fbTextAreaField extends fbFieldBase {
 		$mod = $this->form_ptr->module_ptr;
 		$ret = '';
 
-		if (strlen($this->ValidationType)>0) {
-
+		if(strlen($this->ValidationType)>0)
+		{
 			$ret = array_search($this->ValidationType,$this->ValidationTypes);
 		}
 
-		if ($this->GetOption('wysiwyg','0') == '1') {
-
+		if($this->GetOption('wysiwyg','0') == '1')
+		{
 			$ret .= ' wysiwyg';
-		} else {
-
+		}
+		else
+		{
 			$ret .= ' non-wysiwyg';
 		}
 
@@ -94,7 +101,7 @@ class fbTextAreaField extends fbFieldBase {
 			array($mod->Lang('title_textarea_rows'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_rows',$this->GetOption('rows','15'),5,5)),
 			array($mod->Lang('title_textarea_cols'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_cols',$this->GetOption('cols','80'),5,5)),
 			array($mod->Lang('title_textarea_length'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_length',$this->GetOption('length',''), 5, 5))
-            );
+           );
 
 	   $adv = array(
 			array($mod->Lang('title_field_default_value'),
@@ -114,11 +121,9 @@ class fbTextAreaField extends fbFieldBase {
 	function PostPopulateAdminForm(&$mainArray, &$advArray)
 	{
 		$mod = $this->form_ptr->module_ptr;
-
 		// hide "javascript"
 		$this->RemoveAdminField($advArray, $mod->Lang('title_field_javascript'));
 	}
-
 
 }
 

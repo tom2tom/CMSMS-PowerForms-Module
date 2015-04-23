@@ -1,14 +1,12 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
-
-class fbPasswordField extends fbFieldBase {
-
+class fbPasswordField extends fbFieldBase
+{
 	function __construct(&$form_ptr, &$params)
 	{
 		parent::__construct($form_ptr, $params);
@@ -19,51 +17,48 @@ class fbPasswordField extends fbFieldBase {
             $mod->Lang('validation_none')=>'none',
             $mod->Lang('validation_regex_match')=>'regex_match',
             $mod->Lang('validation_regex_nomatch')=>'regex_nomatch'
-            );
-
+           );
 	}
-
 
 	function GetFieldInput($id, &$params, $returnid)
 	{
-	  $mod = $this->form_ptr->module_ptr;
-	  $js = $this->GetOption('javascript','');
-	  $ro = '';
-     if ($this->GetOption('readonly','0') == '1')
-         {
-         $ro = ' readonly="readonly"';
-         }
-     if ($this->GetOption('hide','1') == '0')
-       {
-	     return $mod->CreateInputText($id, 'fbrp__'.$this->Id,
-				    ($this->Value?$this->Value:''),
-            $this->GetOption('length'),
-            255,
-			$js.$ro.$this->GetCSSIdTag());
-        }
-      else
-         {
-         return $mod->CreateInputPassword($id, 'fbrp__'.$this->Id,
-            ($this->Value?$this->Value:''), $this->GetOption('length'),
-            255, $js.$ro.$this->GetCSSIdTag());
-         }
+		$mod = $this->form_ptr->module_ptr;
+		$js = $this->GetOption('javascript','');
+		$ro = '';
+		if($this->GetOption('readonly','0') == '1')
+		{
+			$ro = ' readonly="readonly"';
+		}
+		if($this->GetOption('hide','1') == '0')
+		{
+			return $mod->CreateInputText($id, 'fbrp__'.$this->Id,
+					($this->Value?$this->Value:''),
+					$this->GetOption('length'),
+					255,
+					$js.$ro.$this->GetCSSIdTag());
+		}
+		else
+		{
+			return $mod->CreateInputPassword($id, 'fbrp__'.$this->Id,
+					($this->Value?$this->Value:''), $this->GetOption('length'),
+					255, $js.$ro.$this->GetCSSIdTag());
+		}
 	}
 
 	function StatusInfo()
 	{
-	  $mod = $this->form_ptr->module_ptr;
-	  $ret = $mod->Lang('abbreviation_length',$this->GetOption('length','80'));
-		if (strlen($this->ValidationType)>0)
-		  {
-		  	$ret .= ", ".array_search($this->ValidationType,$this->ValidationTypes);
-		  }
-      if ($this->GetOption('readonly','0') == '1')
-         {
-         $ret .= ", ".$mod->Lang('title_read_only');
-         }
-		 return $ret;
+		$mod = $this->form_ptr->module_ptr;
+		$ret = $mod->Lang('abbreviation_length',$this->GetOption('length','80'));
+		if(strlen($this->ValidationType)>0)
+		{
+			$ret .= ", ".array_search($this->ValidationType,$this->ValidationTypes);
+		}
+		if($this->GetOption('readonly','0') == '1')
+		{
+			$ret .= ", ".$mod->Lang('title_read_only');
+		}
+		return $ret;
 	}
-
 
 	function PrePopulateAdminForm($formDescriptor)
 	{
@@ -103,31 +98,31 @@ class fbPasswordField extends fbFieldBase {
 		$this->validationErrorText = '';
 		$mod = $this->form_ptr->module_ptr;
 		switch ($this->ValidationType)
-		  {
-		  	   case 'none':
-		  	       break;
-		  	   case 'regex_match':
-                  if ($this->Value !== false &&
-                      ! preg_match($this->GetOption('regex','/.*/'), $this->Value))
-                    {
-                    $this->validated = false;
-                    $this->validationErrorText = $mod->Lang('please_enter_valid',$this->Name);
-                    }
-		  	   	   break;
-		  	   case 'regex_nomatch':
-                  if ($this->Value !== false &&
-                       preg_match($this->GetOption('regex','/.*/'), $this->Value))
-                    {
-                    $this->validated = false;
-                    $this->validationErrorText = $mod->Lang('please_enter_valid',$this->Name);
-                    }
-		  	   	   break;
-		  }
-		if ($this->GetOption('min_length',0) > 0 && strlen($this->Value) < $this->GetOption('min_length',0))
+		{
+		 case 'none':
+			break;
+		 case 'regex_match':
+			if($this->Value !== false &&
+				!preg_match($this->GetOption('regex','/.*/'), $this->Value))
 			{
+				$this->validated = false;
+				$this->validationErrorText = $mod->Lang('please_enter_valid',$this->Name);
+			}
+			break;
+		 case 'regex_nomatch':
+			if($this->Value !== false &&
+				preg_match($this->GetOption('regex','/.*/'), $this->Value))
+			{
+				$this->validated = false;
+				$this->validationErrorText = $mod->Lang('please_enter_valid',$this->Name);
+			}
+			break;
+		}
+		if($this->GetOption('min_length',0) > 0 && strlen($this->Value) < $this->GetOption('min_length',0))
+		{
 			$this->validated = false;
 			$this->validationErrorText = $mod->Lang('please_enter_at_least',$this->GetOption('min_length',0));
-			}
+		}
 		return array($this->validated, $this->validationErrorText);
 	}
 }

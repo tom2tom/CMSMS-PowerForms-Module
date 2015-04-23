@@ -1,15 +1,14 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A Module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
 require_once (cms_join_path(dirname(__FILE__),'DispositionEmailBase.class.php'));
 
-class fbDispositionDeliverToEmailAddressField extends fbDispositionEmailBase {
-
+class fbDispositionDeliverToEmailAddressField extends fbDispositionEmailBase
+{
 	function __construct(&$form_ptr, &$params)
 	{
 		parent::__construct($form_ptr, $params);
@@ -17,9 +16,7 @@ class fbDispositionDeliverToEmailAddressField extends fbDispositionEmailBase {
 		$this->Type = 'DispositionDeliverToEmailAddressField';
 		$this->IsDisposition = true;
 		$this->DisplayInForm = true;
-		$this->ValidationTypes = array(
-            $mod->Lang('validation_email_address')=>'email',
-            );
+		$this->ValidationTypes = array($mod->Lang('validation_email_address')=>'email');
 		$this->ValidationType = 'email';
 		$this->modifiesOtherFields = false;
 		$this->Required = 1;
@@ -36,16 +33,15 @@ class fbDispositionDeliverToEmailAddressField extends fbDispositionEmailBase {
 
 	function DisposeForm($returnid)
 	{
-      if ($this->HasValue() != false)
-         {
-		   return $this->SendForm($this->Value,$this->GetOption('email_subject'));
-		   }
+		if($this->HasValue() != false)
+		{
+			return $this->SendForm($this->Value,$this->GetOption('email_subject'));
+		}
 		else
-		   {
-         return array(true,'');
-         }
+		{
+			return array(true,'');
+		}
 	}
-
 
 	function StatusInfo()
 	{
@@ -59,18 +55,17 @@ class fbDispositionDeliverToEmailAddressField extends fbDispositionEmailBase {
 
 	function Validate()
 	{
-
   		$this->validated = true;
   		$this->validationErrorText = '';
 		$result = true;
 		$message = '';
 		$mod = $this->form_ptr->module_ptr;
-      if ($this->Value !== false &&
-            ! preg_match(($mod->GetPreference('relaxed_email_regex','0')==0?$mod->email_regex:$mod->email_regex_relaxed), $this->Value))
-         {
-         $this->validated = false;
-         $this->validationErrorText = $mod->Lang('please_enter_an_email',$this->Name);
-         }
+		if($this->Value !== false &&
+        	!preg_match(($mod->GetPreference('relaxed_email_regex','0')==0?$mod->email_regex:$mod->email_regex_relaxed), $this->Value))
+		{
+			$this->validated = false;
+			$this->validationErrorText = $mod->Lang('please_enter_an_email',$this->Name);
+		}
 
 		return array($this->validated, $this->validationErrorText);
 	}

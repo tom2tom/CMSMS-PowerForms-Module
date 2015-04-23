@@ -1,14 +1,12 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
-
-class fbSiteAdminField extends fbFieldBase {
-
+class fbSiteAdminField extends fbFieldBase
+{
 	function __construct(&$form_ptr, &$params)
 	{
 		parent::__construct($form_ptr, $params);
@@ -30,46 +28,46 @@ class fbSiteAdminField extends fbFieldBase {
 		// why all this? Associative arrays are not guaranteed to preserve
 		// order, except in "chronological" creation order.
 		$sorted =array();
-		if ($this->GetOption('select_one','') != '')
-			{
+		if($this->GetOption('select_one','') != '')
+		{
 			$sorted[' '.$this->GetOption('select_one','')]='';
-			}
+		}
 		else
-			{
+		{
 			$sorted[' '.$mod->Lang('select_one')]='';
-			}
+		}
 
-		if ($this->GetOption('restrict_to_group','0')=='1')
-			{
+		if($this->GetOption('restrict_to_group','0')=='1')
+		{
 			$userlist = $userops->LoadUsersInGroup($this->GetOption('group'));
-			}
+		}
 		else
-			{
+		{
 			$userlist = $userops->LoadUsers();
-			}
+		}
 		$ind = 1;
 		for($i=0;$i<count($userlist);$i++)
-			{
+		{
 			$name = array();
-			if ($this->GetOption('show_userfirstname','0')=='1')
-				{
+			if($this->GetOption('show_userfirstname','0')=='1')
+			{
 				$name[] = $userlist[$i]->firstname;
-				}
-			if ($this->GetOption('show_userlastname','0')=='1')
-				{
+			}
+			if($this->GetOption('show_userlastname','0')=='1')
+			{
 				$name[] = $userlist[$i]->lastname;
-				}
-			if ($this->GetOption('show_username','0')=='1')
-				{
+			}
+			if($this->GetOption('show_username','0')=='1')
+			{
 				$name[] = ' ('.$userlist[$i]->username.')';
-				}
+			}
 			$sname = implode(' ',$name);
-			if ($userlist[$i]->active || $this->GetOption('active_only','1')=='0')
-				{
+			if($userlist[$i]->active || $this->GetOption('active_only','1')=='0')
+			{
 				$sorted[$sname]=$ind;
 				$ind += 1;
-				}
 			}
+		}
 		return $sorted;
 	}
 
@@ -83,16 +81,16 @@ class fbSiteAdminField extends fbFieldBase {
 	function StatusInfo()
 	{
 		$ret = '';
-		if ($this->GetOption('restrict_to_group','0')=='1')
-			{
+		if($this->GetOption('restrict_to_group','0')=='1')
+		{
 			$groupops = cmsms()->GetGroupOperations();
 			$group = $groupops->LoadGroupByID($this->GetOption('group'));
-			if ($group && isset($group->name))
-				{
+			if($group && isset($group->name))
+			{
 				$mod = $this->form_ptr->module_ptr;
 				$ret .= $mod->Lang('restricted_to_group',$group->name);
-				}
 			}
+		}
         return $ret;
 	}
 
@@ -124,10 +122,10 @@ class fbSiteAdminField extends fbFieldBase {
 				$this->GetOption('active_only','1')));
 
 		$items = array();
-		foreach ($groups as $thisGroup)
-			{
+		foreach($groups as $thisGroup)
+		{
 			$items[$thisGroup->name]=$thisGroup->id;
-			}
+		}
 
 		$main[] = array($mod->Lang('title_restrict_to_group'),
 				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_restrict_to_group','0').
@@ -144,39 +142,38 @@ class fbSiteAdminField extends fbFieldBase {
 		$mod = $this->form_ptr->module_ptr;
 		$userlist = array_flip($this->buildList());
 
-		if (isset($userlist[$this->Value]))
-			{
+		if(isset($userlist[$this->Value]))
+		{
 			$ret = $userlist[$this->Value];
-			}
+		}
 		else
-			{
+		{
 			$ret = $mod->Lang('unspecified');
-			}
-		if ($as_string)
-			{
+		}
+		if($as_string)
+		{
 			return $ret;
-			}
+		}
 		else
-			{
+		{
 			return array($ret);
-			}
-
+		}
 	}
 
-    function Validate()
-    {
-         $mod = $this->form_ptr->module_ptr;
-         $result = true;
-         $message = '';
+	function Validate()
+	{
+		$result = true;
+		$message = '';
 
-         if ($this->Value == false)
-            {
-            $result = false;
-            $message .=
-$mod->Lang('must_specify_one_admin').'<br />';
-            }
-        return array($result,$message);
-    }
+		if($this->Value == false)
+		{
+			$result = false;
+			$mod = $this->form_ptr->module_ptr;
+			$message .= $mod->Lang('must_specify_one_admin').'<br />';
+		}
+		return array($result,$message);
+	}
 
 }
+
 ?>

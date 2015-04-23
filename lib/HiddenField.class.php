@@ -1,63 +1,58 @@
 <?php
-/*
-   FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-   More info at http://dev.cmsmadesimple.org/projects/formbuilder
-
-   A Module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-  This project's homepage is: http://www.cmsmadesimple.org
-*/
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 class fbHiddenField extends fbFieldBase
 {
+	function __construct(&$form_ptr, &$params)
+	{
+		parent::__construct($form_ptr, $params);
+		$this->Type = 'HiddenField';
+		$this->DisplayInForm = true;
+		$this->NonRequirableField = true;
+		$this->ValidationTypes = array();
+		$this->HasLabel = false;
+		$this->NeedsDiv = false;
+		$this->sortable = false;
+	}
 
-  function __construct(&$form_ptr, &$params)
-  {
-    parent::__construct($form_ptr, $params);
-//    $mod = &$form_ptr->module_ptr;
-    $this->Type = 'HiddenField';
-    $this->DisplayInForm = true;
-    $this->NonRequirableField = true;
-    $this->ValidationTypes = array();
-    $this->HasLabel = 0;
-    $this->NeedsDiv = 0;
-    $this->sortable = false;
-  }
+	function GetFieldInput($id, &$params, $returnid)
+	{
+		$mod = $this->form_ptr->module_ptr;
 
+		if($this->Value !== false)
+		{
+			$v = $this->Value;
+		}
+		else
+		{
+			$v = $this->GetOption('value','');
+		}
 
-  function GetFieldInput($id, &$params, $returnid)
-  {
-    $mod = &$this->form_ptr->module_ptr;
+		if($this->GetOption('smarty_eval','0') == '1')
+		{
+			//process without cacheing
+			$v = $mod->ProcessTemplateFromData($v);
+		}
 
-	if ($this->Value !== false)
-      {
-		$v = $this->Value;
-  	  }
-	else
-	  {
-		$v = $this->GetOption('value','');
-	  }
+		if($this->GetOption('fbr_edit','0') == '1' && $params['in_admin'] == 1)
+		{
+			$type = "text";
+		}
+		else
+		{
+			$type = "hidden";
+		}
 
-    if ($this->GetOption('smarty_eval','0') == '1')
-      {
-		//process without cacheing (->fetch() fails)
-		$v = $mod->ProcessTemplateFromData($v);
-      }
-
-	if ($this->GetOption('fbr_edit','0') == '1' && $params['in_admin'] == 1)
-	  {
-		$type = "text";
-	  }
-	else
-	  {
-		$type = "hidden";
-	  }
-
-    return '<input type="'.$type.'" name="'.$id.'fbrp__'.$this->Id.'" value="'.$v.'"'.$this->GetCSSIdTag().' />';
-  }
+		return '<input type="'.$type.'" name="'.$id.'fbrp__'.$this->Id.'" value="'.$v.'"'.$this->GetCSSIdTag().' />';
+	}
 
 	function PrePopulateAdminForm($formDescriptor)
 	{
-		$mod = &$this->form_ptr->module_ptr;
+		$mod = $this->form_ptr->module_ptr;
 		$main = array(
 				array($mod->Lang('title_value'),
             		$mod->CreateInputText($formDescriptor, 'fbrp_opt_value',$this->GetOption('value',''),25,1024))
@@ -74,8 +69,6 @@ class fbHiddenField extends fbFieldBase
 		);
 		return array('main'=>$main,'adv'=>$adv);
 	}
-
-
 }
 
 ?>

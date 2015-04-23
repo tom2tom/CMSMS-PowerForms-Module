@@ -1,16 +1,14 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
+/* This class written by Tapio "Stikki" Löytty <tapsa@blackmilk.fi> */
 
-This class written by Tapio "Stikki" Löytty <tapsa@blackmilk.fi>
-*/
-
-class fbYearPulldownField extends fbFieldBase {
-
+class fbYearPulldownField extends fbFieldBase
+{
 	function __construct(&$form_ptr, &$params)
 	{
 		parent::__construct($form_ptr, $params);
@@ -25,23 +23,31 @@ class fbYearPulldownField extends fbFieldBase {
 		$js = $this->GetOption('javascript','');
 		$sorted =array();
 
-		if ($this->GetOption('year_start','') != '') {
+		if($this->GetOption('year_start','') != '')
+		{
 			$count_from = $this->GetOption('year_start','');
-		} else {
+		}
+		else
+		{
 			$count_from = 1900;
 		}
 
-		for ($i=date("Y"); $i>=$count_from; $i--) {
+		for ($i=date("Y"); $i>=$count_from; $i--)
+		{
 			$sorted[$i]=$i;
 		}
 
-		if( $this->GetOption('sort') == '1' ) {
+		if($this->GetOption('sort') == '1')
+		{
 			ksort($sorted);
 		}
 
-		if ($this->GetOption('select_one','') != '') {
+		if($this->GetOption('select_one','') != '')
+		{
 			$sorted = array(' '.$this->GetOption('select_one','')=>'') + $sorted;
-		} else {
+		}
+		else
+		{
 			$sorted = array(' '.$mod->Lang('select_one')=>'') + $sorted;
 		}
 		return $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id, $sorted, -1, $this->Value,$js.$this->GetCSSIdTag());
@@ -68,27 +74,26 @@ class fbYearPulldownField extends fbFieldBase {
 		return array('main'=>$main);
 	}
 
-
 	function GetHumanReadableValue($as_string=true)
 	{
 		$mod = $this->form_ptr->module_ptr;
-		if ($this->HasValue())
-			{
+		if($this->HasValue())
+		{
 			$ret = $this->Value;
-			}
+		}
 		else
-			{
+		{
 			$ret = $this->form_ptr->GetAttr('unspecified',$mod->Lang('unspecified'));
-			}
-		if ($as_string)
-			{
+		}
+		if($as_string)
+		{
 			return $ret;
-			}
+		}
 		else
-			{
+		{
 			return array($ret);
-			}
+		}
 	}
-
 }
+
 ?>

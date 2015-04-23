@@ -1,14 +1,12 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
-
-class fbProvincePickerField extends fbFieldBase {
-
+class fbProvincePickerField extends fbFieldBase
+{
 	var $Provinces;
 
 	function __construct(&$form_ptr, &$params)
@@ -22,9 +20,7 @@ class fbProvincePickerField extends fbFieldBase {
         "No Default"=>'',"Alberta"=>"AB", "British Columbia"=>"BC", "Manitoba"=>"MB", "New Brunswick"=>"NB",
         "Newfoundland and Labrador"=>"NL", "Northwest Territories"=>"NT", "Nova Scotia"=>"NS", "Nunavut"=>"NU",
         "Ontario"=>"ON", "Prince Edward Island"=>"PE", "Quebec"=>"QC", "Saskatchewan"=>"SK", "Yukon"=>"YT");
-
 	}
-
 
 	function StatusInfo()
 	{
@@ -34,16 +30,15 @@ class fbProvincePickerField extends fbFieldBase {
 	function GetHumanReadableValue($as_string=true)
 	{
 		$ret = array_search($this->Value,$this->Provinces);
-		if ($as_string)
-			{
+		if($as_string)
+		{
 			return $ret;
-			}
+		}
 		else
-			{
+		{
 			return array($ret);
-			}
+		}
 	}
-
 
 	function GetFieldInput($id, &$params, $returnid)
 	{
@@ -51,20 +46,19 @@ class fbProvincePickerField extends fbFieldBase {
 		$js = $this->GetOption('javascript','');
 
 		unset($this->Provinces[$mod->Lang('no_default')]);
-		if ($this->GetOption('select_one','') != '')
-			{
+		if($this->GetOption('select_one','') != '')
+		{
 			$this->Provinces = array_merge(array($this->GetOption('select_one','')=>''),$this->Provinces);
-			}
+		}
 		else
-			{
+		{
 			$this->Provinces = array_merge(array($mod->Lang('select_one')=>''),$this->Provinces);
-			}
+		}
 
-
-		if (! $this->HasValue() && $this->GetOption('default_province','') != '')
-		  {
+		if(!$this->HasValue() && $this->GetOption('default_province','') != '')
+		{
 		  $this->SetValue($this->GetOption('default_province',''));
-		  }
+		}
 
 		return $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id, $this->Provinces, -1, $this->Value,$js.$this->GetCSSIdTag());
 	}
@@ -84,8 +78,6 @@ class fbProvincePickerField extends fbFieldBase {
 		);
 		return array('main'=>$main);
 	}
-
-
 }
 
 ?>

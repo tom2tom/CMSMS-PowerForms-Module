@@ -1,23 +1,21 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
-
-class fbTextFieldExpandable extends fbFieldBase {
-
+class fbTextFieldExpandable extends fbFieldBase
+{
 	function __construct(&$form_ptr, &$params)
 	{
 		parent::__construct($form_ptr, $params);
-		$mod = $form_ptr->module_ptr;
 		$this->Type = 'TextFieldExpandable';
 		$this->DisplayInForm = true;
 		$this->HasUserAddOp = true;
 		$this->HasUserDeleteOp = true;
 		$this->NonRequirableField = false;
+		$mod = $form_ptr->module_ptr;
 		$this->ValidationTypes = array(
             $mod->Lang('validation_none')=>'none',
             $mod->Lang('validation_numeric')=>'numeric',
@@ -25,7 +23,7 @@ class fbTextFieldExpandable extends fbFieldBase {
             $mod->Lang('validation_email_address')=>'email',
             $mod->Lang('validation_regex_match')=>'regex_match',
             $mod->Lang('validation_regex_nomatch')=>'regex_nomatch'
-            );
+           );
 		$this->hasMultipleFormComponents = true;
 	}
 
@@ -36,46 +34,46 @@ class fbTextFieldExpandable extends fbFieldBase {
 		$sibling_id = $this->GetOption('siblings','');
 		$hidebuttons = $this->GetOption('hidebuttons','');
 
-		if (! is_array($this->Value)) {
-
+		if(!is_array($this->Value))
+		{
 			$vals = 1;
-	    } else {
-
+		}
+		else
+		{
 			$vals = count($this->Value);
-	    }
+		}
 
-		foreach ($params as $pKey=>$pVal) {
-
-			if (substr($pKey,0,9) == 'fbrp_FeX_') {
-
+		foreach($params as $pKey=>$pVal)
+		{
+			if(substr($pKey,0,9) == 'fbrp_FeX_')
+			{
 				$pts = explode('_',$pKey);
-				if ($pts[2] == $this->Id || $pts[2] == $sibling_id) {
-
+				if($pts[2] == $this->Id || $pts[2] == $sibling_id)
+				{
 					// add row
 					$this->Value[$vals]='';
 					$vals++;
 				}
-            }
-
-			else if (substr($pKey,0,9) == 'fbrp_FeD_') {
-
+        	}
+			else if(substr($pKey,0,9) == 'fbrp_FeD_')
+			{
 				$pts = explode('_',$pKey);
-				if ($pts[2] == $this->Id || $pts[2] == $sibling_id) {
-
+				if($pts[2] == $this->Id || $pts[2] == $sibling_id)
+				{
 					// delete row
-					if (isset($this->Value[$pts[2]])) {
-
+					if(isset($this->Value[$pts[2]]))
+					{
 						array_splice($this->Value, $pts[2], 1);
 					}
 					$vals--;
 				}
-            }
-        }
+        	}
+		}
 
 		// Input fields
 		$ret = array();
-		for ($i=0;$i<$vals;$i++) {
-
+		for ($i=0;$i<$vals;$i++)
+		{
 			$thisRow = new stdClass();
 
 			//$thisRow->name = '';
@@ -86,7 +84,7 @@ class fbTextFieldExpandable extends fbFieldBase {
 			if(!$hidebuttons) $thisRow->op = $mod->fbCreateInputSubmit($id, 'fbrp_FeD_'.$this->Id.'_'.$i, $this->GetOption('del_button','X'), $this->GetCSSIdTag('_del_'.$i).($vals==1?' disabled="disabled"':''));
 
 			$ret[] = $thisRow;
-        }
+		}
 
 		// Add button
 		$thisRow = new stdClass();
@@ -104,8 +102,8 @@ class fbTextFieldExpandable extends fbFieldBase {
 	{
 		$mod = $this->form_ptr->module_ptr;
 		$ret = $mod->Lang('abbreviation_length',$this->GetOption('length','80'));
-		if (strlen($this->ValidationType)>0) {
-
+		if(strlen($this->ValidationType)>0)
+		{
 			$ret .= ", ".array_search($this->ValidationType,$this->ValidationTypes);
 		}
 
@@ -115,16 +113,17 @@ class fbTextFieldExpandable extends fbFieldBase {
 	function GetHumanReadableValue($as_string = true)
 	{
 		$form = $this->form_ptr;
-		if (! is_array($this->Value)) {
-
+		if(!is_array($this->Value))
+		{
 			$this->Value = array($this->Value);
-	    }
+		}
 
-		if ($as_string) {
-
+		if($as_string)
+		{
 			return join($form->GetAttr('list_delimiter',','),$this->Value);
-		} else {
-
+		}
+		else
+		{
 			return array($ret);
 		}
 	}
@@ -161,63 +160,62 @@ class fbTextFieldExpandable extends fbFieldBase {
 		$this->validated = true;
 		$this->validationErrorText = '';
 		$mod = $this->form_ptr->module_ptr;
-		if (! is_array($this->Value))
-		    {
+		if(!is_array($this->Value))
+		{
 		    $this->Value = array($this->Value);
-		    }
-		foreach ($this->Value as $thisVal)
-		    {
+		}
+		foreach($this->Value as $thisVal)
+		{
 		    switch ($this->ValidationType)
-		    {
-		  	   case 'none':
-		  	       break;
-		  	   case 'numeric':
-                  if ($thisVal !== false &&
-                      ! preg_match("/^([\d\.\,])+$/i", $thisVal))
-                      {
-                      $this->validated = false;
-                      $this->validationErrorText = $mod->Lang('please_enter_a_number',$this->Name);
-                      }
-		  	       break;
-		  	   case 'integer':
-                  if ($thisVal !== false &&
-                  	! preg_match("/^([\d])+$/i", $thisVal) ||
-                      intval($thisVal) != $thisVal)
-                    {
-                    $this->validated = false;
-                    $this->validationErrorText = $mod->Lang('please_enter_an_integer',$this->Name);
-                    }
-		  	       break;
-		  	   case 'email':
-                  if ($thisVal !== false &&
-                      ! preg_match(($mod->GetPreference('relaxed_email_regex','0')==0?$mod->email_regex:$mod->email_regex_relaxed), $thisVal))
-                    {
-                    $this->validated = false;
-                    $this->validationErrorText = $mod->Lang('please_enter_an_email',$this->Name);
-                    }
-		  	       break;
-		  	   case 'regex_match':
-                  if ($thisVal !== false &&
-                      ! preg_match($this->GetOption('regex','/.*/'), $thisVal))
-                    {
-                    $this->validated = false;
-                    $this->validationErrorText = $mod->Lang('please_enter_valid',$this->Name);
-                    }
-		  	   	   break;
-		  	   case 'regex_nomatch':
-                  if ($thisVal !== false &&
-                       preg_match($this->GetOption('regex','/.*/'), $thisVal))
-                    {
-                    $this->validated = false;
-                    $this->validationErrorText = $mod->Lang('please_enter_valid',$this->Name);
-                    }
-		  	   	   break;
-		  }
-
-		if ($this->GetOption('length',0) > 0 && strlen($thisVal) > $this->GetOption('length',0))
 			{
-			$this->validated = false;
-			$this->validationErrorText = $mod->Lang('please_enter_no_longer',$this->GetOption('length',0));
+			 case 'none':
+				break;
+			 case 'numeric':
+				if($thisVal !== false &&
+					!preg_match("/^([\d\.\,])+$/i", $thisVal))
+				{
+					$this->validated = false;
+					$this->validationErrorText = $mod->Lang('please_enter_a_number',$this->Name);
+				}
+				break;
+			 case 'integer':
+				if($thisVal !== false &&
+					!preg_match("/^([\d])+$/i", $thisVal) || intval($thisVal) != $thisVal)
+				{
+					$this->validated = false;
+					$this->validationErrorText = $mod->Lang('please_enter_an_integer',$this->Name);
+				}
+				break;
+			 case 'email':
+				if($thisVal !== false &&
+					!preg_match(($mod->GetPreference('relaxed_email_regex','0')==0?$mod->email_regex:$mod->email_regex_relaxed), $thisVal))
+				{
+					$this->validated = false;
+					$this->validationErrorText = $mod->Lang('please_enter_an_email',$this->Name);
+				}
+				break;
+			 case 'regex_match':
+				if($thisVal !== false &&
+					!preg_match($this->GetOption('regex','/.*/'), $thisVal))
+				{
+					$this->validated = false;
+					$this->validationErrorText = $mod->Lang('please_enter_valid',$this->Name);
+				}
+				break;
+			 case 'regex_nomatch':
+				if($thisVal !== false &&
+				   preg_match($this->GetOption('regex','/.*/'), $thisVal))
+				{
+					$this->validated = false;
+					$this->validationErrorText = $mod->Lang('please_enter_valid',$this->Name);
+				}
+				break;
+			}
+
+			if($this->GetOption('length',0) > 0 && strlen($thisVal) > $this->GetOption('length',0))
+			{
+				$this->validated = false;
+				$this->validationErrorText = $mod->Lang('please_enter_no_longer',$this->GetOption('length',0));
 			}
 		}
 
@@ -231,19 +229,18 @@ class fbTextFieldExpandable extends fbFieldBase {
 
 		$siblings[$this->form_ptr->module_ptr->Lang('select_one')] = '';
 
-		foreach ($this->form_ptr->Fields as &$thisField)
+		foreach($this->form_ptr->Fields as &$thisField)
 		{
-			if ($thisField->GetFieldType() == 'TextFieldExpandable')
+			if($thisField->GetFieldType() == 'TextFieldExpandable')
 			{
 				$fid = $thisField->GetId();
- 				if ($fid != $this->GetId())
+ 				if($fid != $this->GetId())
 					$siblings[$thisField->GetName()] = $fid;
 			}
 		}
 		unset ($thisField);
 		return $siblings;
 	}
-
 }
 
 ?>

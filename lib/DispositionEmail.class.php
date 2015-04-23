@@ -1,16 +1,14 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
-
-A Module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-*/
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 require_once(cms_join_path(dirname(__FILE__),'DispositionEmailBase.class.php'));
 
-class fbDispositionEmail extends fbDispositionEmailBase {
-
+class fbDispositionEmail extends fbDispositionEmailBase
+{
 	var $addressCount;
 	var $addressAdd;
 
@@ -25,7 +23,7 @@ class fbDispositionEmail extends fbDispositionEmailBase {
 		$this->HasAddOp = true;
 		$this->HasDeleteOp = true;
 		$this->ValidationTypes = array();
-    }
+	}
 
 	function GetOptionAddButton()
 	{
@@ -47,78 +45,76 @@ class fbDispositionEmail extends fbDispositionEmailBase {
 	function DoOptionDelete(&$params)
 	{
 		$delcount = 0;
-		foreach ($params as $thisKey=>$thisVal)
+		foreach($params as $thisKey=>$thisVal)
+		{
+			if(substr($thisKey,0,9) == 'fbrp_sel_')
 			{
-			if (substr($thisKey,0,9) == 'fbrp_sel_')
-				{
 				$this->RemoveOptionElement('destination_address', $thisVal - $delcount);
 				$delcount++;
-				}
 			}
+		}
 	}
 
-
-
-    function StatusInfo()
+	function StatusInfo()
 	{
 		$mod = $this->form_ptr->module_ptr;
 		$ret= $mod->Lang('to').': ';
 		$opt = $this->GetOption('destination_address','');
-		if (is_array($opt))
-		  {
-		  if (count($opt)>1)
-		    {
-		    $ret.= count($opt).' '.$mod->Lang('recipients');
-		    }
-		  else
-		    {
-			  $pref = substr($opt[0],0,4);
-			  if ($pref == '|cc|')
+		if(is_array($opt))
+		{
+			if(count($opt)>1)
+			{
+				$ret.= count($opt).' '.$mod->Lang('recipients');
+			}
+			else
+			{
+				$pref = substr($opt[0],0,4);
+				if($pref == '|cc|')
 					$ret = $mod->Lang('cc').': '.substr($opt[0],4);
-			  elseif ($pref == '|bc|')
+				elseif($pref == '|bc|')
 					$ret = $mod->Lang('bcc').': '.substr($opt[0],4);
-			  else
-		 			$ret.= $opt[0];
-		    }
-		  }
-		elseif ($opt != '')
-		  {
-		  $pref = substr($opt,0,4);
-		  if ($pref == '|cc|')
-		  	$ret = $mod->Lang('cc').': '.substr($opt,4);
-		  elseif ($pref == '|bc|')
-		  	$ret = $mod->Lang('bcc').': '.substr($opt,4);
-		  else
-		    $ret .= $opt;
-		  }
+				else
+					$ret.= $opt[0];
+			}
+		}
+		elseif($opt != '')
+		{
+			$pref = substr($opt,0,4);
+			if($pref == '|cc|')
+				$ret = $mod->Lang('cc').': '.substr($opt,4);
+			elseif($pref == '|bc|')
+				$ret = $mod->Lang('bcc').': '.substr($opt,4);
+			else
+				$ret .= $opt;
+		}
 		else
-		  {
-      $ret.= $mod->Lang('unspecified');
-		  }
+		{
+			$ret.= $mod->Lang('unspecified');
+		}
 		$status = $this->TemplateStatus();
-		if ($status) $ret.='<br />'.$status;
+		if($status)
+			$ret.='<br />'.$status;
         return $ret;
 	}
 
 	function countAddresses()
 	{
-			$tmp = $this->GetOptionRef('destination_address');
-			if (is_array($tmp))
-				{
-	        	$this->addressCount = count($tmp);
-	        	}
-	        elseif ($tmp !== false)
-	        	{
-	        	$this->addressCount = 1;
-	        	}
-	        else
-	        	{
-	        	$this->addressCount = 0;
-	        	}
+		$tmp = $this->GetOptionRef('destination_address');
+		if(is_array($tmp))
+		{
+			$this->addressCount = count($tmp);
+		}
+		elseif($tmp !== false)
+		{
+			$this->addressCount = 1;
+		}
+		else
+		{
+			$this->addressCount = 0;
+		}
 	}
 
-
-    // Send off those emails
+    // send emails
 	function DisposeForm($returnid)
 	{
 		$tmp = $this->GetOptionRef('destination_address');
@@ -134,7 +130,7 @@ class fbDispositionEmail extends fbDispositionEmailBase {
 		for ($i=0;$i<3;$i++)
 		{
 			$text = '<input class="cms_radio" style="margin-left:5px;" type="radio" name="'.$name.'" id="'.$id.'fbrp_aef_to" value="'.$totypes[$i].'"';
-			if ($sel == $totypes[$i])
+			if($sel == $totypes[$i])
 				$text .= ' checked="checked"';
 			$text .= ' />';
 			$btns[] = $text;
@@ -148,11 +144,11 @@ class fbDispositionEmail extends fbDispositionEmailBase {
 
 		$this->countAddresses();
 
-		if ($this->addressAdd > 0)
-			{
+		if($this->addressAdd > 0)
+		{
 			$this->addressCount += $this->addressAdd;
 			$this->addressAdd = 0;
-			}
+		}
 
 		$ret = $this->PrePopulateAdminFormBase($formDescriptor);
 //		$main[] = array($mod->Lang('title_destination_address'),$dests);
@@ -166,9 +162,9 @@ class fbDispositionEmail extends fbDispositionEmailBase {
 			);
 		$num = ($this->addressCount>1) ? $this->addressCount:1;
 		for ($i=0;$i<$num;$i++)
-		  {
+		{
 			$addr = $this->GetOptionElement('destination_address',$i);
-			if ($addr != '')
+			if($addr != '')
 			{
 				switch (substr($addr,0,4))
 				{
@@ -196,7 +192,7 @@ class fbDispositionEmail extends fbDispositionEmailBase {
 			array_shift ($btns),
 			$mod->CreateInputCheckbox($formDescriptor, 'fbrp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
 			);
-		  }
+		}
 		$ret['table']= $dests;
 		return $ret;
 	}
@@ -207,43 +203,43 @@ class fbDispositionEmail extends fbDispositionEmailBase {
 	}
 
 	function AdminValidate()
-    {
+	{
 		$mod = $this->form_ptr->module_ptr;
 
   		list($ret, $message) = $this->DoesFieldHaveName();
-		if ($ret)
-			{
+		if($ret)
+		{
 			list($ret, $message) = $this->DoesFieldNameExist();
-			}
+		}
 		list($rv,$mess) = $this->validateEmailAddr($this->GetOption('email_from_address'));
-		if (!$rv)
-			{
+		if(!$rv)
+		{
 			$ret = false;
 			$message .= $mess;
-			}
+		}
     	$opt = $this->GetOptionRef('destination_address');
-		if ($opt == false || count($opt) == 0)
-			{
+		if($opt == false || count($opt) == 0)
+		{
 			$ret = false;
 			$message .= $mod->Lang('must_specify_one_destination').'<br />';
-			}
+		}
 		else
-			{
-			if (!is_array($opt))
+		{
+			if(!is_array($opt))
 				$opt = array($opt);
 			$num = count($opt);
 			for($i=0;$i<$num;$i++)
-			   {
-			   list($rv,$mess) = $this->validateEmailAddr($opt[$i]);
-			   if (!$rv)
-					{
+			{
+				list($rv,$mess) = $this->validateEmailAddr($opt[$i]);
+			 	if(!$rv)
+				{
 					$ret = false;
 					$message .= $mess;
-					}
 				}
 			}
-        return array($ret,$message);
-    }
+		}
+    	return array($ret,$message);
+	}
 
 }
 

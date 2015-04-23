@@ -1,21 +1,17 @@
 <?php
-/*
-FormBuilder. Copyright (c) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-More info at http://dev.cmsmadesimple.org/projects/formbuilder
+# This file is part of CMS Made Simple module: PowerForms
+# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Refer to licence and other details at the top of file PowerForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-A module for CMS Made Simple, Copyright (c) 2004-2012 by Ted Kulp (wishy@cmsmadesimple.org)
-This project's homepage is: http://www.cmsmadesimple.org
-
-This class written by Jeremy Bass <jeremyBass@cableone.net>
-*/
+/* This class written by Jeremy Bass <jeremyBass@cableone.net> */
 
 class fbModuleInterfaceField extends fbFieldBase
 {
-
 	function __construct(&$form_ptr, &$params)
 	{
 		parent::__construct($form_ptr, $params);
-//		$mod = &$form_ptr->module_ptr;
 		$this->Type = 'ModuleInterfaceField';
 		$this->DisplayInForm = true;
 		$this->ValidationTypes = array();
@@ -24,7 +20,6 @@ class fbModuleInterfaceField extends fbFieldBase
 		$this->sortable = false;
 		$this->DisplayInSubmission = true;
 	}
-
 
 	function GetFieldInput($id, &$params, $returnid)
 	{
@@ -42,7 +37,7 @@ class fbModuleInterfaceField extends fbFieldBase
 
 	function PrePopulateAdminForm($formDescriptor)
 	{
-		$mod = &$this->form_ptr->module_ptr;
+		$mod = $this->form_ptr->module_ptr;
 		$main = array(
 				array($mod->Lang('help_module_interface'),
             		$mod->Lang('help_module_interface_long')),
@@ -57,30 +52,35 @@ class fbModuleInterfaceField extends fbFieldBase
 		$mod = $this->form_ptr->module_ptr;
 		$form = $this->form_ptr;
 
-		if ($this->HasValue()) {
-
+		if($this->HasValue())
+		{
 			$fieldRet = array();
-			if (!is_array($this->Value)) {
-
+			if(!is_array($this->Value))
+			{
 				$this->Value = array($this->Value);
 			}
 
-			if ($as_string) {
+			if($as_string)
+			{
 				return join($form->GetAttr('list_delimiter',','),$this->Value);
-			} else {
+			}
+			else
+			{
 				return array($this->Value);
 			}
 
-		} else {
-
-			if ($as_string) {
+		}
+		else
+		{
+			if($as_string)
+			{
 				return $mod->Lang('unspecified');
-			} else {
-
+			}
+			else
+			{
 				return array($mod->Lang('unspecified'));
 			}
 		}
-
 	}
 
 }
