@@ -44,7 +44,7 @@ class pwfDispositionMultiselectFileDirector extends pwfFieldBase
 		$delcount = 0;
 		foreach($params as $thisKey=>$thisVal)
 		{
-			if(substr($thisKey,0,9) == 'fbrp_sel_')
+			if(substr($thisKey,0,9) == 'pwfp_sel_')
 			{
 				$this->RemoveOptionElement('destination_filename', $thisVal - $delcount);
 				$this->RemoveOptionElement('destination_displayname', $thisVal - $delcount);
@@ -89,7 +89,7 @@ class pwfDispositionMultiselectFileDirector extends pwfFieldBase
 			$ctrl->name = '<label for="'.$this->GetCSSId('_'.$i).'">'.$displaynames[$i].'</label>';
 			$ctrl->title = $displaynames[$i];
 			$ctrl->input = $mod->CreateInputCheckbox($id,
-							 'fbrp__'.$this->Id.'[]',
+							 'pwfp__'.$this->Id.'[]',
 							 $displayvalues[$i],
 							 (is_array($this->Value) && in_array($displayvalues[$i],$this->Value))?$displayvalues[$i]:'-1',
 							 $this->GetCSSIdTag('_'.$i).$js);
@@ -209,7 +209,7 @@ class pwfDispositionMultiselectFileDirector extends pwfFieldBase
 		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
 			$mod->CreateInputText($formDescriptor,
-			'fbrp_opt_select_one',
+			'pwfp_opt_select_one',
 			$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
 //	    $main[] = array($mod->Lang('title_director_details'),$dests);
 		$dests = array();
@@ -223,16 +223,16 @@ class pwfDispositionMultiselectFileDirector extends pwfFieldBase
 		for ($i=0;$i<$num;$i++)
 		{
 			$dests[] = array(
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_destination_displayname[]',$this->GetOptionElement('destination_displayname',$i),30,128),
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_destination_value[]',$this->GetOptionElement('destination_value',$i),30,128),
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_destination_filename[]',$this->GetOptionElement('destination_filename',$i),30,128),
-			$mod->CreateInputCheckbox($formDescriptor, 'fbrp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_destination_displayname[]',$this->GetOptionElement('destination_displayname',$i),30,128),
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_destination_value[]',$this->GetOptionElement('destination_value',$i),30,128),
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_destination_filename[]',$this->GetOptionElement('destination_filename',$i),30,128),
+			$mod->CreateInputCheckbox($formDescriptor, 'pwfp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
 			);
 		}
 		$adv = array();
 		$adv[] = array($mod->Lang('title_file_path'),
 			$mod->CreateInputText($formDescriptor,
-			'fbrp_opt_file_path',
+			'pwfp_opt_file_path',
 			$this->GetOption('file_path',$this->dflt_filepath),40,128));
 
 		$parmMain = array();
@@ -246,17 +246,17 @@ class pwfDispositionMultiselectFileDirector extends pwfFieldBase
 		$adv[] = array($mod->Lang('title_file_template'),
 			$mod->CreateTextArea(false, $formDescriptor,
 			htmlspecialchars($this->GetOption('file_template','')),
-			'fbrp_opt_file_template', 'module_fb_area_wide', '','',80,15).
+			'pwfp_opt_file_template', 'pwf_area_wide', '','',80,15).
 			'<br /><br />'.$buttons[0]);
 		$adv[] = array($mod->Lang('title_file_header'),
 			$mod->CreateTextArea(false, $formDescriptor,
 			htmlspecialchars($this->GetOption('file_header','')),
-			'fbrp_opt_file_header', 'module_fb_area_short', '','',80,8).
+			'pwfp_opt_file_header', 'pwf_area_short', '','',80,8).
 			'<br /><br />'.$buttons[1]);
 		$adv[] = array($mod->Lang('title_file_footer'),
 			$mod->CreateTextArea(false, $formDescriptor,
 			htmlspecialchars($this->GetOption('file_footer','')),
-			'fbrp_opt_file_footer', 'module_fb_area_short', '','',80,8).
+			'pwfp_opt_file_footer', 'pwf_area_short', '','',80,8).
 			'<br /><br />'.$buttons[2]);
 		/*show variables-help on advanced tab*/
 		return array('main'=>$main,'table'=>$dests,'adv'=>$adv,'funcs'=>$funcs,'extra'=>'varshelpadv');

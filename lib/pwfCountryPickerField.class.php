@@ -140,7 +140,7 @@ class pwfCountryPickerField extends pwfFieldBase
 		  $this->SetValue($this->GetOption('default_country',''));
 		}
 
-		return $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id, $this->Countries, -1,
+		return $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id, $this->Countries, -1,
          $this->Value, $js.$this->GetCSSIdTag());
 	}
 
@@ -151,10 +151,10 @@ class pwfCountryPickerField extends pwfFieldBase
 
 		$main = array(
 			array($mod->Lang('title_select_default_country'),
-            		$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_default_country',
+            		$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_default_country',
             		$this->Countries, -1, $this->GetOption('default_country',''))),
 			array($mod->Lang('title_select_one_message'),
-            		$mod->CreateInputText($formDescriptor, 'fbrp_opt_select_one',
+            		$mod->CreateInputText($formDescriptor, 'pwfp_opt_select_one',
             		$this->GetOption('select_one',$mod->Lang('select_one'))))
 		);
 		return array('main'=>$main);

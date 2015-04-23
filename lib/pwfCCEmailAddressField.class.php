@@ -23,7 +23,7 @@ class pwfCCEmailAddressField extends pwfFieldBase
 		$mod = $this->form_ptr->module_ptr;
 		$js = $this->GetOption('javascript','');
 
-		return $mod->fbCreateInputText($id, 'fbrp__'.$this->Id,
+		return $mod->fbCreateInputText($id, 'pwfp__'.$this->Id,
 			htmlspecialchars($this->Value, ENT_QUOTES),
            25,128,$js.$this->GetCSSIdTag(),'text');
 	}
@@ -51,7 +51,7 @@ class pwfCCEmailAddressField extends pwfFieldBase
 
 		unset ($thisField);
 		$main[] = array($mod->Lang('title_field_to_modify'),
-			$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_field_to_modify', $fieldlist, -1, $this->GetOption('field_to_modify')));
+			$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_field_to_modify', $fieldlist, -1, $this->GetOption('field_to_modify')));
 
 		return array('main'=>$main);
 	}

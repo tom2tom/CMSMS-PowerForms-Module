@@ -69,7 +69,7 @@ class pwfOzStatePickerField extends pwfFieldBase
 			$this->SetValue($this->GetOption('default_state',''));
 		}
 
-		return $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id, $this->states, -1, $this->Value,$js.$this->GetCSSIdTag());
+		return $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id, $this->states, -1, $this->Value,$js.$this->GetCSSIdTag());
 	}
 
 	function PrePopulateAdminForm($formDescriptor)
@@ -79,10 +79,10 @@ class pwfOzStatePickerField extends pwfFieldBase
 
 		$main = array(
 			array($mod->Lang('title_select_default_state'),
-            		$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_default_state',
+            		$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_default_state',
             		$this->states, -1, $this->GetOption('default_state',''))),
 			array($mod->Lang('title_select_one_message'),
-            		$mod->CreateInputText($formDescriptor, 'fbrp_opt_select_one',
+            		$mod->CreateInputText($formDescriptor, 'pwfp_opt_select_one',
             		$this->GetOption('select_one',$mod->Lang('select_one'))))
 		);
 		return array('main'=>$main);

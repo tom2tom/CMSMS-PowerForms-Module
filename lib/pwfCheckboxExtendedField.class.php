@@ -48,7 +48,7 @@ class pwfCheckboxExtendedField extends pwfFieldBase
 
 		$obj = new stdClass();
 		$obj->name = $box_label;
-		$obj->input = $mod->CreateInputCheckbox($id, 'fbrp__'.$this->Id.'[box]', 't',$this->Value['box'],$js.$this->GetCSSIdTag('_0'));
+		$obj->input = $mod->CreateInputCheckbox($id, 'pwfp__'.$this->Id.'[box]', 't',$this->Value['box'],$js.$this->GetCSSIdTag('_0'));
 
 		$output[] = $obj;
 
@@ -56,7 +56,7 @@ class pwfCheckboxExtendedField extends pwfFieldBase
 		{
 			$obj = new stdClass();
 			$obj->name = $text_label;
-			$obj->input = $mod->fbCreateInputText($id, 'fbrp__'.$this->Id.'[text]',_($check_value['text']?$this->Value['text']:''),25,25,$js.$this->GetCSSIdTag('_1'));
+			$obj->input = $mod->fbCreateInputText($id, 'pwfp__'.$this->Id.'[text]',_($check_value['text']?$this->Value['text']:''),25,25,$js.$this->GetCSSIdTag('_1'));
 
 			$output[] = $obj;
 		}
@@ -112,23 +112,23 @@ class pwfCheckboxExtendedField extends pwfFieldBase
 		$mod = $this->form_ptr->module_ptr;
 		$main = array(
 			array($mod->Lang('title_checkbox_label'),
-            		$mod->CreateInputText($formDescriptor, 'fbrp_opt_box_label',
+            		$mod->CreateInputText($formDescriptor, 'pwfp_opt_box_label',
             		$this->GetOption('box_label',''),25,255)),
             array($mod->Lang('title_checked_value'),
-            		$mod->CreateInputText($formDescriptor, 'fbrp_opt_checked_value',
+            		$mod->CreateInputText($formDescriptor, 'pwfp_opt_checked_value',
             		$this->GetOption('checked_value',$mod->Lang('yes')),25,255)),
             array($mod->Lang('title_unchecked_value'),
-            		$mod->CreateInputText($formDescriptor, 'fbrp_opt_unchecked_value',
+            		$mod->CreateInputText($formDescriptor, 'pwfp_opt_unchecked_value',
             		$this->GetOption('unchecked_value',$mod->Lang('no')),25,255)),
 			array($mod->Lang('title_default_set'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_is_checked','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_is_checked', '1', $this->GetOption('is_checked','0'))),
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_is_checked','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_is_checked', '1', $this->GetOption('is_checked','0'))),
 			array($mod->Lang('title_textfield_label'),
-            		$mod->CreateInputText($formDescriptor, 'fbrp_opt_text_label',
+            		$mod->CreateInputText($formDescriptor, 'pwfp_opt_text_label',
             		$this->GetOption('text_label',''),25,255)),
 			array($mod->Lang('title_show_textfield'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_show_textfield','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_show_textfield', '1', $this->GetOption('show_textfield','0')))
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_show_textfield','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_show_textfield', '1', $this->GetOption('show_textfield','0')))
 		);
 
 		return array('main'=>$main);

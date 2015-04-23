@@ -34,14 +34,14 @@ class pwfLinkField extends pwfFieldBase
 		}
 		$fieldDisp = array();
 		$thisBox = new stdClass();
-		$thisBox->name = '<label for="'.$id.'fbrp__'.$this->Id.'_1">'.$mod->Lang('link_destination').'</label>';
+		$thisBox->name = '<label for="'.$id.'pwfp__'.$this->Id.'_1">'.$mod->Lang('link_destination').'</label>';
 		$thisBox->title = $mod->Lang('link_destination');
-		$thisBox->input = $this->TextField($id, 'fbrp__'.$this->Id.'[]', $val[0],'','',$js.$this->GetCSSIdTag('_1'));
+		$thisBox->input = $this->TextField($id, 'pwfp__'.$this->Id.'[]', $val[0],'','',$js.$this->GetCSSIdTag('_1'));
 		$fieldDisp[] = $thisBox;
 		$thisBox = new stdClass();
-		$thisBox->name = '<label for="'.$id.'fbrp__'.$this->Id.'_2">'.$mod->Lang('link_label').'</label>';
+		$thisBox->name = '<label for="'.$id.'pwfp__'.$this->Id.'_2">'.$mod->Lang('link_label').'</label>';
 		$thisBox->title = $mod->Lang('link_label');
-		$thisBox->input = $this->TextField($id, 'fbrp__'.$this->Id.'[]', $val[1],'','',$js.$this->GetCSSIdTag('_2'));
+		$thisBox->input = $this->TextField($id, 'pwfp__'.$this->Id.'[]', $val[1],'','',$js.$this->GetCSSIdTag('_2'));
 		$fieldDisp[] = $thisBox;
 		return $fieldDisp;
 	}
@@ -77,8 +77,8 @@ class pwfLinkField extends pwfFieldBase
 	{
 		$mod = $this->form_ptr->module_ptr;
 		$main = array(
-			array($mod->Lang('title_default_link'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_default_link',$this->GetOption('default_link',''),25,128)),
-			array($mod->Lang('title_default_link_title'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_default_link_title',$this->GetOption('default_link_title',''),25,128))
+			array($mod->Lang('title_default_link'),$mod->CreateInputText($formDescriptor, 'pwfp_opt_default_link',$this->GetOption('default_link',''),25,128)),
+			array($mod->Lang('title_default_link_title'),$mod->CreateInputText($formDescriptor, 'pwfp_opt_default_link_title',$this->GetOption('default_link_title',''),25,128))
 		);
 		return array('main'=>$main);
 	}

@@ -67,7 +67,7 @@ class pwfFieldsetStart extends pwfFieldBase
 		$mod = $this->form_ptr->module_ptr;
 		$main = array(
 			  array($mod->Lang('title_legend'),
-					$mod->CreateInputText($formDescriptor,'fbrp_opt_legend',
+					$mod->CreateInputText($formDescriptor,'pwfp_opt_legend',
 					  $this->GetOption('legend',''), 50)));
 		return array('main'=>$main);
 	}

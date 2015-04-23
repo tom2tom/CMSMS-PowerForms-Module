@@ -7,15 +7,15 @@
 
 if(!$this->CheckAccess()) exit;
 
-if(isset($params['fbrp_set_field_level']))
+if(isset($params['pwfp_set_field_level']))
 {
-	$this->SetPreference('show_field_level',$params['fbrp_set_field_level']);
+	$this->SetPreference('show_field_level',$params['pwfp_set_field_level']);
 }
 
 $tab = $this->GetActiveTab($params);
 
 $funcs = new pwfUtils($this, $params, true);
 
-echo $funcs->AddEditForm($id, $returnid, $tab, isset($params['fbrp_message'])?$params['fbrp_message']:'');
+echo $funcs->AddEditForm($id, $returnid, $tab, isset($params['pwfp_message'])?$params['pwfp_message']:'');
 
 ?>

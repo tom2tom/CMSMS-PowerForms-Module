@@ -22,7 +22,7 @@ class pwfUniqueIntegerField extends pwfFieldBase
 		$mod = $this->form_ptr->module_ptr;
 		if($this->Value !== false)
 		{
-			$ret = $mod->CreateInputHidden($id, 'fbrp__'.$this->Id, $this->Value);
+			$ret = $mod->CreateInputHidden($id, 'pwfp__'.$this->Id, $this->Value);
 			if($this->GetOption('show_to_user','0') == '1')
 			{
 				$ret .= $this->Value;
@@ -32,7 +32,7 @@ class pwfUniqueIntegerField extends pwfFieldBase
 		{
 			$times = $this->GetOption('numbers_to_generate','5') ? $this->GetOption('numbers_to_generate','5') : 5;
 			$number = $this->generate_numbers(0,9,$times);
-			$ret = $mod->CreateInputHidden($id, 'fbrp__'.$this->Id,$number);
+			$ret = $mod->CreateInputHidden($id, 'pwfp__'.$this->Id,$number);
 			if($this->GetOption('show_to_user','0') == '1')
 			{
 				$ret .= $number;
@@ -42,7 +42,7 @@ class pwfUniqueIntegerField extends pwfFieldBase
 		{
 			$db = $mod->dbHandle;
 			$seq = $db->GenID(cms_db_prefix(). 'module_fb_uniquefield_seq');
-			$ret = $mod->CreateInputHidden($id, 'fbrp__'.$this->Id,$seq);
+			$ret = $mod->CreateInputHidden($id, 'pwfp__'.$this->Id,$seq);
 			if($this->GetOption('show_to_user','0') == '1')
 			{
 				$ret .= $seq;
@@ -57,11 +57,11 @@ class pwfUniqueIntegerField extends pwfFieldBase
 		$mod = $this->form_ptr->module_ptr;
 
 		$main = array(
-			array($mod->Lang('title_show_to_user'), $mod->CreateInputHidden($formDescriptor,'fbrp_opt_show_to_user','0').
-					$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_show_to_user', '1',$this->GetOption('show_to_user','0'))),
-			array($mod->Lang('title_use_random_generator'), $mod->CreateInputHidden($formDescriptor,'fbrp_opt_use_random_generator','0').
-					$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_use_random_generator', '1',$this->GetOption('use_random_generator','0'))),
-			array($mod->Lang('title_numbers_to_generate'),$mod->CreateInputText($formDescriptor,'fbrp_opt_numbers_to_generate',$this->GetOption('numbers_to_generate','5'),25,25))
+			array($mod->Lang('title_show_to_user'), $mod->CreateInputHidden($formDescriptor,'pwfp_opt_show_to_user','0').
+					$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_show_to_user', '1',$this->GetOption('show_to_user','0'))),
+			array($mod->Lang('title_use_random_generator'), $mod->CreateInputHidden($formDescriptor,'pwfp_opt_use_random_generator','0').
+					$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_use_random_generator', '1',$this->GetOption('use_random_generator','0'))),
+			array($mod->Lang('title_numbers_to_generate'),$mod->CreateInputText($formDescriptor,'pwfp_opt_numbers_to_generate',$this->GetOption('numbers_to_generate','5'),25,25))
 		);
 
 		return array('main'=>$main);

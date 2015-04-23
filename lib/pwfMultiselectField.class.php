@@ -45,7 +45,7 @@ class pwfMultiselectField extends pwfFieldBase
 		$delcount = 0;
 		foreach($params as $thisKey=>$thisVal)
 		{
-			if(substr($thisKey,0,9) == 'fbrp_sel_')
+			if(substr($thisKey,0,9) == 'pwfp_sel_')
 			{
 				$this->RemoveOptionElement('option_name', $thisVal - $delcount);
 				$this->RemoveOptionElement('option_value', $thisVal - $delcount);
@@ -104,7 +104,7 @@ class pwfMultiselectField extends pwfFieldBase
 		{
 			$val = $this->Value;
 		}
-		return $mod->CreateInputSelectList($id, 'fbrp__'.$this->Id.'[]', $sorted,$val, $this->GetOption('lines','3'),
+		return $mod->CreateInputSelectList($id, 'pwfp__'.$this->Id.'[]', $sorted,$val, $this->GetOption('lines','3'),
          $js.$this->GetCSSIdTag());
 	}
 
@@ -140,7 +140,7 @@ class pwfMultiselectField extends pwfFieldBase
 			$this->optionAdd = 0;
 		}
 		$main = array();
-		$main[] = array($mod->Lang('title_lines_to_show'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_lines',$this->GetOption('lines','3'),10,10));
+		$main[] = array($mod->Lang('title_lines_to_show'),$mod->CreateInputText($formDescriptor, 'pwfp_opt_lines',$this->GetOption('lines','3'),10,10));
 //		$main[] = array($mod->Lang('title_multiselect_details'),$dests);
 		$dests = array();
 		$dests[] = array(
@@ -152,9 +152,9 @@ class pwfMultiselectField extends pwfFieldBase
 		for ($i=0;$i<$num;$i++)
 		{
 			$dests[] = array(
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_option_name[]',$this->GetOptionElement('option_name',$i),30,128),
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_option_value[]',$this->GetOptionElement('option_value',$i),30,128),
-			$mod->CreateInputCheckbox($formDescriptor, 'fbrp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_option_name[]',$this->GetOptionElement('option_name',$i),30,128),
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_option_value[]',$this->GetOptionElement('option_value',$i),30,128),
+			$mod->CreateInputCheckbox($formDescriptor, 'pwfp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
 			);
 		}
 		return array('main'=>$main,'table'=>$dests);

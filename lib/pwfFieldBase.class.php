@@ -73,47 +73,47 @@ class pwfFieldBase
 		{
 			$this->Id = $params['field_id'];
 		}
-		if(isset($params['fbrp_field_name']))
+		if(isset($params['pwfp_field_name']))
 		{
-			$this->Name = $params['fbrp_field_name'];
+			$this->Name = $params['pwfp_field_name'];
 		}
-		if(isset($params['fbrp_field_type']))
+		if(isset($params['pwfp_field_type']))
 		{
 
-			$this->Type = $params['fbrp_field_type'];
+			$this->Type = $params['pwfp_field_type'];
 		}
 		else
 		{
 			$this->Type = '';
 		}
-		if(isset($params['fbrp_order_by']))
+		if(isset($params['pwfp_order_by']))
 		{
-			$this->OrderBy = $params['fbrp_order_by'];
+			$this->OrderBy = $params['pwfp_order_by'];
 		}
-		if(isset($params['fbrp_hide_label']))
+		if(isset($params['pwfp_hide_label']))
 		{
-			$this->HideLabel = $params['fbrp_hide_label'];
+			$this->HideLabel = $params['pwfp_hide_label'];
 		}
-		elseif(isset($params['fbrp_set_from_form']))
+		elseif(isset($params['pwfp_set_from_form']))
 		{
 			$this->HideLabel = 0;
 		}
-		if(isset($params['fbrp_required']))
+		if(isset($params['pwfp_required']))
 		{
-			$this->Required = $params['fbrp_required'];
+			$this->Required = $params['pwfp_required'];
 		}
-		elseif(isset($params['fbrp_set_from_form']))
+		elseif(isset($params['pwfp_set_from_form']))
 		{
 			$this->Required = 0;
 		}
-		if(isset($params['fbrp_validation_type']))
+		if(isset($params['pwfp_validation_type']))
 		{
-			$this->ValidationType = $params['fbrp_validation_type'];
+			$this->ValidationType = $params['pwfp_validation_type'];
 		}
 
 		foreach($params as $thisParamKey=>$thisParamVal)
 		{
-			if(substr($thisParamKey,0,9) == 'fbrp_opt_')
+			if(substr($thisParamKey,0,9) == 'pwfp_opt_')
 			{
 				$thisParamKey = substr($thisParamKey,9);
 				$this->Options[$thisParamKey] = $thisParamVal;
@@ -121,9 +121,9 @@ class pwfFieldBase
 		}
 
 		// Check value setup against $params
-		if(isset($params['fbrp__'.$this->Id]) && (is_array($params['fbrp__'.$this->Id]) || strlen($params['fbrp__'.$this->Id]) > 0))
+		if(isset($params['pwfp__'.$this->Id]) && (is_array($params['pwfp__'.$this->Id]) || strlen($params['pwfp__'.$this->Id]) > 0))
 		{
-			$this->SetValue($params['fbrp__'.$this->Id]);
+			$this->SetValue($params['pwfp__'.$this->Id]);
 		}
 	}
 
@@ -155,7 +155,7 @@ class pwfFieldBase
 
 	function GetFieldInputId($id, &$params, $returnid)
 	{
-		return $id.'fbrp__'.$this->Id;
+		return $id.'pwfp__'.$this->Id;
 	}
 
 	function ModifiesOtherFields()
@@ -301,7 +301,7 @@ class pwfFieldBase
 		$alias = $this->GetAlias();
 		if(empty($alias))
 		{
-			$cssid = 'fbrp__'.$this->Id;
+			$cssid = 'pwfp__'.$this->Id;
 			if($this->HasMultipleFormComponents())
 			{
 				$cssid .= '_1';
@@ -460,21 +460,21 @@ class pwfFieldBase
 		{
 			if($disposeOnly == 1)
 			{
-				$typeInput = $mod->CreateInputDropdown($formDescriptor, 'fbrp_field_type',array_merge(array($mod->Lang('select_type')=>''),$mod->disp_field_types), -1,'', 'onchange="this.form.submit()"');
+				$typeInput = $mod->CreateInputDropdown($formDescriptor, 'pwfp_field_type',array_merge(array($mod->Lang('select_type')=>''),$mod->disp_field_types), -1,'', 'onchange="this.form.submit()"');
 			}
 			else
 			{
-				$typeInput = $mod->CreateInputDropdown($formDescriptor, 'fbrp_field_type',array_merge(array($mod->Lang('select_type')=>''),$mod->field_types), -1,'', 'onchange="this.form.submit()"');
+				$typeInput = $mod->CreateInputDropdown($formDescriptor, 'pwfp_field_type',array_merge(array($mod->Lang('select_type')=>''),$mod->field_types), -1,'', 'onchange="this.form.submit()"');
 			}
 		}
 		else
 		{
-			$typeInput = $this->GetDisplayType().$mod->CreateInputHidden($formDescriptor, 'fbrp_field_type', $this->Type);
+			$typeInput = $this->GetDisplayType().$mod->CreateInputHidden($formDescriptor, 'pwfp_field_type', $this->Type);
 		}
 
 		// Init main tab
 		$main = array(
-			array($mod->Lang('title_field_name'),$mod->CreateInputText($formDescriptor, 'fbrp_field_name', $this->GetName(), 50)),
+			array($mod->Lang('title_field_name'),$mod->CreateInputText($formDescriptor, 'pwfp_field_name', $this->GetName(), 50)),
 			array($mod->Lang('title_field_type'),$typeInput)
 			);
 
@@ -487,7 +487,7 @@ class pwfFieldBase
 			// validation types?
 			if(count($this->GetValidationTypes()) > 1)
 			{
-				$validInput = $mod->CreateInputDropdown($formDescriptor, 'fbrp_validation_type', $this->GetValidationTypes(), -1, $this->GetValidationType());
+				$validInput = $mod->CreateInputDropdown($formDescriptor, 'pwfp_validation_type', $this->GetValidationTypes(), -1, $this->GetValidationType());
 			}
 			else
 			{
@@ -497,7 +497,7 @@ class pwfFieldBase
 			if(!$this->IsNonRequirableField())
 			{
 				$main[] = array($mod->Lang('title_field_required'),
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_required', 1, $this->IsRequired()),
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_required', 1, $this->IsRequired()),
 				$mod->Lang('title_field_required_long'));
 			}
 
@@ -506,7 +506,7 @@ class pwfFieldBase
 			if($this->HasLabel == 1)
 			{
 				$adv[] = array($mod->Lang('title_hide_label'),
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_hide_label', 1, $this->HideLabel()),
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_hide_label', 1, $this->HideLabel()),
 				$mod->Lang('title_hide_label_long'));
 			}
 
@@ -516,16 +516,16 @@ class pwfFieldBase
 				$alias = 'fld'.$this->GetId();
 			}
 
-			$adv[] = array($mod->Lang('title_field_alias'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_field_alias', $this->GetOption('field_alias'), 50));
+			$adv[] = array($mod->Lang('title_field_alias'),$mod->CreateInputText($formDescriptor, 'pwfp_opt_field_alias', $this->GetOption('field_alias'), 50));
 
 			if($this->DisplayInForm())
 			{
-				$adv[] = array($mod->Lang('title_field_css_class'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_css_class', $this->GetOption('css_class'), 50));
-				$adv[] = array($mod->Lang('title_field_helptext'),$mod->CreateTextArea(false, $formDescriptor, $this->GetOption('helptext',''), 'fbrp_opt_helptext','module_fb_area_short'));
+				$adv[] = array($mod->Lang('title_field_css_class'),$mod->CreateInputText($formDescriptor, 'pwfp_opt_css_class', $this->GetOption('css_class'), 50));
+				$adv[] = array($mod->Lang('title_field_helptext'),$mod->CreateTextArea(false, $formDescriptor, $this->GetOption('helptext',''), 'pwfp_opt_helptext','pwf_area_short'));
 				$adv[] = array($mod->Lang('title_field_javascript'),$mod->CreateTextArea(false, $formDescriptor, $this->GetOption('javascript',''),
-					'fbrp_opt_javascript','module_fb_area_short','','', '', '80', '15','','js'),$mod->Lang('title_field_javascript_long'));
+					'pwfp_opt_javascript','pwf_area_short','','', '', '80', '15','','js'),$mod->Lang('title_field_javascript_long'));
 				$adv[] = array($mod->Lang('title_field_logic'),$mod->CreateTextArea(false, $formDescriptor, $this->GetOption('field_logic',''),
-					'fbrp_opt_field_logic','module_fb_area_short','','', '', '80', '15'),$mod->Lang('title_field_logic_long'));
+					'pwfp_opt_field_logic','pwf_area_short','','', '', '80', '15'),$mod->Lang('title_field_logic_long'));
 			}
 		}
 		else

@@ -22,7 +22,7 @@ class pwfPasswordAgainField extends pwfFieldBase
 		$js = $this->GetOption('javascript','');
 		if($this->GetOption('hide','1') == '0')
 		{
-			return $mod->fbCreateInputText($id, 'fbrp__'.$this->Id,
+			return $mod->fbCreateInputText($id, 'pwfp__'.$this->Id,
 				($this->Value?$this->Value:''),
 				$this->GetOption('length'),
 				255,
@@ -30,7 +30,7 @@ class pwfPasswordAgainField extends pwfFieldBase
 		}
 		else
 		{
-			return $mod->CreateInputPassword($id, 'fbrp__'.$this->Id,
+			return $mod->CreateInputPassword($id, 'pwfp__'.$this->Id,
 				($this->Value?$this->Value:''), $this->GetOption('length'),
 				255, $js.$this->GetCSSIdTag());
 		}
@@ -58,19 +58,19 @@ class pwfPasswordAgainField extends pwfFieldBase
 			array(
 				$mod->Lang('title_field_to_validate'),
 					$mod->CreateInputDropdown($formDescriptor,
-					'fbrp_opt_field_to_validate', $opts, -1, $this->GetOption('field_to_validate'))
+					'pwfp_opt_field_to_validate', $opts, -1, $this->GetOption('field_to_validate'))
 			),
 			array($mod->Lang('title_display_length'),
 				$mod->CreateInputText($formDescriptor,
-				'fbrp_opt_length',
+				'pwfp_opt_length',
 				$this->GetOption('length','12'),25,25)),
 			array($mod->Lang('title_minimum_length'),
 				$mod->CreateInputText($formDescriptor,
-				'fbrp_opt_min_length',
+				'pwfp_opt_min_length',
 				$this->GetOption('min_length','8'),25,25)),
 			array($mod->Lang('title_hide'),
-				$mod->CreateInputHidden($formDescriptor, 'fbrp_opt_hide','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_hide',
+				$mod->CreateInputHidden($formDescriptor, 'pwfp_opt_hide','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_hide',
 				'1',$this->GetOption('hide','1')),
 				$mod->Lang('title_hide_help')),
 		);

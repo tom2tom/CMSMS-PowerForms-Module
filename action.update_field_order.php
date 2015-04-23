@@ -9,7 +9,7 @@ if(!$this->CheckAccess()) exit;
 
 $funcs = new pwfUtils($this, $params, true);
 $srcIndex = $funcs->GetFieldIndexFromId($params['field_id']);
-if($params['fbrp_dir'] == 'up')
+if($params['pwfp_dir'] == 'up')
 {
 	$destIndex = $srcIndex - 1;
 }

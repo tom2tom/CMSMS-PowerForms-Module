@@ -103,7 +103,7 @@ class pwfCheckboxGroupField extends pwfFieldBase
 					$check_val = true;
 				}
 			}
-			$thisBox->input = $mod->CreateInputCheckbox($id, 'fbrp__'.$this->Id.'[]', ($i+1),
+			$thisBox->input = $mod->CreateInputCheckbox($id, 'pwfp__'.$this->Id.'[]', ($i+1),
 				$check_val !== false?($i+1):'-1',$js.$this->GetCSSIdTag('_'.$i));
 
 			$fieldDisp[] = $thisBox;
@@ -190,7 +190,7 @@ class pwfCheckboxGroupField extends pwfFieldBase
 		$delcount = 0;
 		foreach($params as $thisKey=>$thisVal)
 		{
-			if(substr($thisKey,0,9) == 'fbrp_sel_')
+			if(substr($thisKey,0,9) == 'pwfp_sel_')
 			{
 				$this->RemoveOptionElement('box_name', $thisVal - $delcount);
 				$this->RemoveOptionElement('box_checked', $thisVal - $delcount);
@@ -215,8 +215,8 @@ class pwfCheckboxGroupField extends pwfFieldBase
 		}
 		$main = array();
 		$main[] = array($mod->Lang('title_dont_submit_unchecked'),
-			$mod->CreateInputHidden($formDescriptor,'fbrp_opt_no_empty','0').
-			$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_no_empty','1',$this->GetOption('no_empty','0')),
+			$mod->CreateInputHidden($formDescriptor,'pwfp_opt_no_empty','0').
+			$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_no_empty','1',$this->GetOption('no_empty','0')),
 			$mod->Lang('title_dont_submit_unchecked_help'));
 //		$main[] = array($mod->Lang('title_checkbox_details'),$boxes);
 		$boxes = array();
@@ -231,17 +231,17 @@ class pwfCheckboxGroupField extends pwfFieldBase
 		for ($i=0;$i<$num;$i++)
 		{
 			$boxes[] = array(
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_box_name[]',$this->GetOptionElement('box_name',$i),30,128),
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_box_checked[]',$this->GetOptionElement('box_checked',$i),30,128),
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_box_unchecked[]',$this->GetOptionElement('box_unchecked',$i),30,128),
-				$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_box_is_set[]', $yesNo, -1, $this->GetOptionElement('box_is_set',$i)),
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_box_name[]',$this->GetOptionElement('box_name',$i),30,128),
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_box_checked[]',$this->GetOptionElement('box_checked',$i),30,128),
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_box_unchecked[]',$this->GetOptionElement('box_unchecked',$i),30,128),
+				$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_box_is_set[]', $yesNo, -1, $this->GetOptionElement('box_is_set',$i)),
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
 			);
 		}
 		$adv = array(
 			array($mod->Lang('title_field_includelabels'),
-					$mod->CreateInputHidden($formDescriptor,'fbrp_opt_include_labels','0').
-					$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_include_labels','1',$this->GetOption('include_labels','0')),
+					$mod->CreateInputHidden($formDescriptor,'pwfp_opt_include_labels','0').
+					$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_include_labels','1',$this->GetOption('include_labels','0')),
 					$mod->Lang('title_field_includelabels_help'))
 		);
 

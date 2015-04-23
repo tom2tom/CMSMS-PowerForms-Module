@@ -7,23 +7,23 @@
 
 if(!$this->CheckAccess()) exit;
 
-$this->SetPreference('hide_errors',isset($params['fbrp_hide_errors'])?$params['fbrp_hide_errors']:0);
-$this->SetPreference('show_version',isset($params['fbrp_show_version'])?$params['fbrp_show_version']:0);
-$this->SetPreference('relaxed_email_regex',isset($params['fbrp_relaxed_email_regex'])?$params['fbrp_relaxed_email_regex']:0);
+$this->SetPreference('hide_errors',isset($params['pwfp_hide_errors'])?$params['pwfp_hide_errors']:0);
+$this->SetPreference('show_version',isset($params['pwfp_show_version'])?$params['pwfp_show_version']:0);
+$this->SetPreference('relaxed_email_regex',isset($params['pwfp_relaxed_email_regex'])?$params['pwfp_relaxed_email_regex']:0);
 
-$this->SetPreference('require_fieldnames',isset($params['fbrp_require_fieldnames'])?$params['fbrp_require_fieldnames']:0);
+$this->SetPreference('require_fieldnames',isset($params['pwfp_require_fieldnames'])?$params['pwfp_require_fieldnames']:0);
 
-$this->SetPreference('unique_fieldnames',isset($params['fbrp_unique_fieldnames'])?$params['fbrp_unique_fieldnames']:0);
+$this->SetPreference('unique_fieldnames',isset($params['pwfp_unique_fieldnames'])?$params['pwfp_unique_fieldnames']:0);
 
-$this->SetPreference('enable_fastadd',isset($params['fbrp_enable_fastadd'])?$params['fbrp_enable_fastadd']:0);
-$this->SetPreference('enable_antispam',isset($params['fbrp_enable_antispam'])?$params['fbrp_enable_antispam']:0);
+$this->SetPreference('enable_fastadd',isset($params['pwfp_enable_fastadd'])?$params['pwfp_enable_fastadd']:0);
+$this->SetPreference('enable_antispam',isset($params['pwfp_enable_antispam'])?$params['pwfp_enable_antispam']:0);
 
-$this->SetPreference('show_fieldids',isset($params['fbrp_show_fieldids'])?$params['fbrp_show_fieldids']:0);
-$this->SetPreference('show_fieldaliases',isset($params['fbrp_show_fieldaliases'])?$params['fbrp_show_fieldaliases']:0);
+$this->SetPreference('show_fieldids',isset($params['pwfp_show_fieldids'])?$params['pwfp_show_fieldids']:0);
+$this->SetPreference('show_fieldaliases',isset($params['pwfp_show_fieldaliases'])?$params['pwfp_show_fieldaliases']:0);
 
-$this->SetPreference('blank_invalid',isset($params['fbrp_blank_invalid'])?$params['fbrp_blank_invalid']:0);
+$this->SetPreference('blank_invalid',isset($params['pwfp_blank_invalid'])?$params['pwfp_blank_invalid']:0);
 
-$params['fbrp_message'] = $this->Lang('configuration_updated');
+$params['pwfp_message'] = $this->Lang('configuration_updated');
 $this->Redirect($id, 'defaultadmin', '', $params);
 
 ?>

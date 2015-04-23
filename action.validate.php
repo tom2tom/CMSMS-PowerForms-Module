@@ -5,6 +5,8 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
+$this->DoNothing();
+
 if(!isset($params['fbrp_f']) || !isset($params['fbrp_r']) || !isset($params['fbrp_c']))
 {
 	echo $this->Lang('validation_param_error');

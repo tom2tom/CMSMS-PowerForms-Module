@@ -50,7 +50,7 @@ class pwfYearPulldownField extends pwfFieldBase
 		{
 			$sorted = array(' '.$mod->Lang('select_one')=>'') + $sorted;
 		}
-		return $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id, $sorted, -1, $this->Value,$js.$this->GetCSSIdTag());
+		return $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id, $sorted, -1, $this->Value,$js.$this->GetCSSIdTag());
 	}
 
 	function PrePopulateAdminForm($formDescriptor)
@@ -59,15 +59,15 @@ class pwfYearPulldownField extends pwfFieldBase
 
 		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
-					$mod->CreateInputText($formDescriptor, 'fbrp_opt_select_one',
+					$mod->CreateInputText($formDescriptor, 'pwfp_opt_select_one',
 						  $this->GetOption('select_one',$mod->Lang('select_one')),25,128));
 
 		$main[] = array($mod->Lang('title_year_end_message'),
-					$mod->CreateInputText($formDescriptor, 'fbrp_opt_year_start',
+					$mod->CreateInputText($formDescriptor, 'pwfp_opt_year_start',
 						  $this->GetOption('year_start',1900),25,128));
 
 		$main[] = array($mod->Lang('sort_options'),
-					$mod->CreateInputDropdown($formDescriptor,'fbrp_opt_sort',
+					$mod->CreateInputDropdown($formDescriptor,'pwfp_opt_sort',
 						  array('Yes'=>1,'No'=>0),-1,
 						  $this->GetOption('sort',0)));
 

@@ -12,7 +12,7 @@ $obfield = $funcs->GetFieldById($params['field_id']);
 
 if($obfield !== false)
 {
-//	$obfield->SetRequired($params['fbrp_active']=='on'?true:false);
+//	$obfield->SetRequired($params['pwfp_active']=='on'?true:false);
 	$obfield->ToggleRequired();
 	$obfield->Store();
 	$funcs = new pwfUtils($this, $params, true);

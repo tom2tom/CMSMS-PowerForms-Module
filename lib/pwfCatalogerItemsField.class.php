@@ -176,7 +176,7 @@ class pwfCatalogerItemsField extends pwfFieldBase
 				}
 			}
 			$cssid = $this->GetCSSIdTag();
-			return $mod->CreateInputSelectList($id,'fbrp__'.$this->Id.'[]', $results, $val,
+			return $mod->CreateInputSelectList($id,'pwfp__'.$this->Id.'[]', $results, $val,
 						   $size, $cssid);
 		}
 
@@ -209,7 +209,7 @@ class pwfCatalogerItemsField extends pwfFieldBase
 		{
 			$main[] = array($mod->Lang('title_field_height'),
 					 $mod->CreateInputText($formDescriptor,
-							 'fbrp_opt_lines', $this->GetOption('lines','5'),3,3),
+							 'pwfp_opt_lines', $this->GetOption('lines','5'),3,3),
 					 $mod->Lang('help_field_height'));
 
 			$main[] = array($mod->Lang('title_name_regex'),
@@ -226,7 +226,7 @@ class pwfCatalogerItemsField extends pwfFieldBase
 				$safeattr = strtolower(preg_replace('/\W/','',$one->attr));
 				$main[] = array($one->attr,
 					 $mod->CreateInputText($formDescriptor,
-							'fbrp_opt_attr_'.$safeattr,
+							'pwfp_opt_attr_'.$safeattr,
 								   $this->GetOption('attr_'.$safeattr,''),30,80));
 			}
 		}

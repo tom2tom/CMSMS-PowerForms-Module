@@ -37,13 +37,13 @@ class pwfTextField extends pwfFieldBase
 
 		if($this->GetOption('html5','0') == '1')
 		{
-			return $mod->fbCreateInputText($id, 'fbrp__'.$this->Id,$this->Value,$this->GetOption('length')<25?$this->GetOption('length'):25,
+			return $mod->fbCreateInputText($id, 'pwfp__'.$this->Id,$this->Value,$this->GetOption('length')<25?$this->GetOption('length'):25,
 				$this->GetOption('length'),
 					' placeholder="'.$this->GetOption('default').'"'.$js.$ro.$this->GetCSSIdTag());
 		}
 		else
 		{
-			return $mod->fbCreateInputText($id, 'fbrp__'.$this->Id,($this->HasValue()?$this->Value:$this->GetOption('default')),$this->GetOption('length')<25?$this->GetOption('length'):25, $this->GetOption('length'),
+			return $mod->fbCreateInputText($id, 'pwfp__'.$this->Id,($this->HasValue()?$this->Value:$this->GetOption('default')),$this->GetOption('length')<25?$this->GetOption('length'):25, $this->GetOption('length'),
 				($this->GetOption('clear_default','0')==1?(' onfocus="if(this.value==this.defaultValue) this.value=\'\';" onblur="if(this.value==\'\') this.value=this.defaultValue;"'):' ').$js.$ro.$this->GetCSSIdTag());
 		}
 	}
@@ -72,24 +72,24 @@ class pwfTextField extends pwfFieldBase
 
 		$main = array(
 			array($mod->Lang('title_maximum_length'),
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_length',$this->GetOption('length','80'),25,25)),
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_length',$this->GetOption('length','80'),25,25)),
 			array($mod->Lang('title_read_only'),
-				$mod->CreateInputHidden($formDescriptor, 'fbrp_opt_readonly','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_readonly','1',$this->GetOption('readonly','0')))
+				$mod->CreateInputHidden($formDescriptor, 'pwfp_opt_readonly','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_readonly','1',$this->GetOption('readonly','0')))
 		);
 
 		$adv = array(
 			array($mod->Lang('title_field_regex'),
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_regex',$this->GetOption('regex'),25,1024),
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_regex',$this->GetOption('regex'),25,1024),
 				$mod->Lang('title_regex_help')),
 			array($mod->Lang('title_field_default_value'),
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_default',$this->GetOption('default'),25,1024)),
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_default',$this->GetOption('default'),25,1024)),
 			array($mod->Lang('title_html5'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_html5','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_html5','1',$this->GetOption('html5','0'))),
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_html5','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_html5','1',$this->GetOption('html5','0'))),
 			array($mod->Lang('title_clear_default'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_clear_default','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_clear_default','1',$this->GetOption('clear_default','0')),
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_clear_default','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_clear_default','1',$this->GetOption('clear_default','0')),
 				$mod->Lang('title_clear_default_help'))
 		);
 

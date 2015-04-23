@@ -45,7 +45,7 @@ class pwfTextFieldExpandable extends pwfFieldBase
 
 		foreach($params as $pKey=>$pVal)
 		{
-			if(substr($pKey,0,9) == 'fbrp_FeX_')
+			if(substr($pKey,0,9) == 'pwfp_FeX_')
 			{
 				$pts = explode('_',$pKey);
 				if($pts[2] == $this->Id || $pts[2] == $sibling_id)
@@ -55,7 +55,7 @@ class pwfTextFieldExpandable extends pwfFieldBase
 					$vals++;
 				}
         	}
-			else if(substr($pKey,0,9) == 'fbrp_FeD_')
+			else if(substr($pKey,0,9) == 'pwfp_FeD_')
 			{
 				$pts = explode('_',$pKey);
 				if($pts[2] == $this->Id || $pts[2] == $sibling_id)
@@ -78,10 +78,10 @@ class pwfTextFieldExpandable extends pwfFieldBase
 
 			//$thisRow->name = '';
 			//$thisRow->title = '';
-			$thisRow->input = $mod->fbCreateInputText($id, 'fbrp__'.$this->Id.'[]',$this->Value[$i],$this->GetOption('length')<25?$this->GetOption('length'):25,
+			$thisRow->input = $mod->fbCreateInputText($id, 'pwfp__'.$this->Id.'[]',$this->Value[$i],$this->GetOption('length')<25?$this->GetOption('length'):25,
 							$this->GetOption('length'),$js.$this->GetCSSIdTag('_'.$i));
 
-			if(!$hidebuttons) $thisRow->op = $mod->fbCreateInputSubmit($id, 'fbrp_FeD_'.$this->Id.'_'.$i, $this->GetOption('del_button','X'), $this->GetCSSIdTag('_del_'.$i).($vals==1?' disabled="disabled"':''));
+			if(!$hidebuttons) $thisRow->op = $mod->fbCreateInputSubmit($id, 'pwfp_FeD_'.$this->Id.'_'.$i, $this->GetOption('del_button','X'), $this->GetCSSIdTag('_del_'.$i).($vals==1?' disabled="disabled"':''));
 
 			$ret[] = $thisRow;
 		}
@@ -91,7 +91,7 @@ class pwfTextFieldExpandable extends pwfFieldBase
 		//$thisRow->name = '';
 		//$thisRow->title = '';
 		//$thisRow->input = '';
-		if(!$hidebuttons) $thisRow->op = $mod->fbCreateInputSubmit($id, 'fbrp_FeX_'.$this->Id.'_'.$i, $this->GetOption('add_button','+'), $this->GetCSSIdTag('_add_'.$i));
+		if(!$hidebuttons) $thisRow->op = $mod->fbCreateInputSubmit($id, 'pwfp_FeX_'.$this->Id.'_'.$i, $this->GetOption('add_button','+'), $this->GetCSSIdTag('_add_'.$i));
 
 		$ret[] = $thisRow;
 
@@ -133,17 +133,17 @@ class pwfTextFieldExpandable extends pwfFieldBase
 		$mod = $this->form_ptr->module_ptr;
 
 		$main = array(
-			array($mod->Lang('title_maximum_length'),$mod->CreateInputText($formDescriptor,'fbrp_opt_length',$this->GetOption('length','80'),25,25)),
-			array($mod->Lang('title_add_button_text'),$mod->CreateInputText($formDescriptor,'fbrp_opt_add_button',$this->GetOption('add_button','+'),15,25)),
-			array($mod->Lang('title_del_button_text'),$mod->CreateInputText($formDescriptor,'fbrp_opt_del_button',$this->GetOption('del_button','X'),15,25))
+			array($mod->Lang('title_maximum_length'),$mod->CreateInputText($formDescriptor,'pwfp_opt_length',$this->GetOption('length','80'),25,25)),
+			array($mod->Lang('title_add_button_text'),$mod->CreateInputText($formDescriptor,'pwfp_opt_add_button',$this->GetOption('add_button','+'),15,25)),
+			array($mod->Lang('title_del_button_text'),$mod->CreateInputText($formDescriptor,'pwfp_opt_del_button',$this->GetOption('del_button','X'),15,25))
 		);
 
 		$adv = array(
-			array($mod->Lang('title_field_regex'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_regex',$this->GetOption('regex'),25,255),$mod->Lang('title_regex_help')),
-			array($mod->Lang('title_field_siblings'),$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_siblings',$this->GetFieldSiblings(),-1,$this->GetOption('siblings','')),$mod->Lang('title_field_siblings_help')),
+			array($mod->Lang('title_field_regex'),$mod->CreateInputText($formDescriptor, 'pwfp_opt_regex',$this->GetOption('regex'),25,255),$mod->Lang('title_regex_help')),
+			array($mod->Lang('title_field_siblings'),$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_siblings',$this->GetFieldSiblings(),-1,$this->GetOption('siblings','')),$mod->Lang('title_field_siblings_help')),
 			array($mod->Lang('title_field_hidebuttons'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_hidebuttons',0).
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_hidebuttons',1,$this->GetOption('hidebuttons',0)),
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_hidebuttons',0).
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_hidebuttons',1,$this->GetOption('hidebuttons',0)),
 				$mod->Lang('title_field_hidebuttons_help'))
 		);
 

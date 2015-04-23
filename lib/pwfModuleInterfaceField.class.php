@@ -24,7 +24,7 @@ class pwfModuleInterfaceField extends pwfFieldBase
 	function GetFieldInput($id, &$params, $returnid)
 	{
 		$smarty = cmsms()->GetSmarty();
-		$smarty->assign('FBid',$id.'fbrp__'.$this->Id);
+		$smarty->assign('FBid',$id.'pwfp__'.$this->Id);
 		// for selected... what to do here
 		// for things like checked="checked" on the back page
 		$smarty->assign('FBvalue',$this->Value);
@@ -42,7 +42,7 @@ class pwfModuleInterfaceField extends pwfFieldBase
 				array($mod->Lang('help_module_interface'),
             		$mod->Lang('help_module_interface_long')),
 				array($mod->Lang('title_add_tag'),
-            		$mod->CreateInputText($formDescriptor, 'fbrp_opt_value',$this->GetOption('value',''),100,1024))
+            		$mod->CreateInputText($formDescriptor, 'pwfp_opt_value',$this->GetOption('value',''),100,1024))
 		);
 		return array('main'=>$main);
 	}

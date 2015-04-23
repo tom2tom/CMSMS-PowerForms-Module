@@ -100,10 +100,10 @@ class pwfDispositionForm extends  fbFieldBase
 		else
 		{
 			$main[] = array($mod->Lang('title_method'),
-					$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_method', $methods, -1,
+					$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_method', $methods, -1,
 				   $this->GetOption('method')));
 			$main[] = array($mod->Lang('title_url'),
-				   $mod->CreateInputText($formDescriptor, 'fbrp_opt_url',
+				   $mod->CreateInputText($formDescriptor, 'pwfp_opt_url',
 							 $this->GetOption('url',''),40,255),
 				   $mod->Lang('title_url_help'));
 			$fields = $fpt->GetFields();
@@ -115,16 +115,16 @@ class pwfDispositionForm extends  fbFieldBase
 					$al = $tf->GetVariableName();
 				}
 				$adv[] = array($mod->Lang('title_maps_to',$tf->GetName()),
-					$mod->CreateInputText($formDescriptor, 'fbrp_opt_fld_'.$tf->GetId(),
+					$mod->CreateInputText($formDescriptor, 'pwfp_opt_fld_'.$tf->GetId(),
 						 $this->GetOption('fld_'.$tf->GetId(),$al),40,255).
-					$mod->CreateInputHidden($formDescriptor,'fbrp_opt_sub_'.$tf->GetId(),'0').
-					$mod->CreateInputCheckbox($formDescriptor,'fbrp_opt_sub_'.$tf->GetId(),'1',
+					$mod->CreateInputHidden($formDescriptor,'pwfp_opt_sub_'.$tf->GetId(),'0').
+					$mod->CreateInputCheckbox($formDescriptor,'pwfp_opt_sub_'.$tf->GetId(),'1',
 						$this->GetOption('sub_'.$tf->GetId(),($tf->DisplayInSubmission()?'1':'0'))),
 					$mod->Lang('title_include_in_submission'));
 			}
 			unset ($tf);
 			$adv[] = array($mod->Lang('title_additional'),
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_additional',
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_additional',
 					$this->GetOption('additional'),40,255),
 				$mod->Lang('title_additional_help'));
 		}

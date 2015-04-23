@@ -81,11 +81,11 @@ class pwfUserTagField extends  fbFieldBase
 		}
 		$main[] = array($mod->Lang('title_udt_name'),
 			$mod->CreateInputDropdown($formDescriptor,
-			  'fbrp_opt_udtname',$usertaglist,-1,
+			  'pwfp_opt_udtname',$usertaglist,-1,
 			  $this->GetOption('udtname')));
 		$main[] = array($mod->Lang('title_export_form_to_udt'),
-			$mod->CreateInputHidden($formDescriptor, 'fbrp_opt_export_form','0').
-			$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_export_form',
+			$mod->CreateInputHidden($formDescriptor, 'pwfp_opt_export_form','0').
+			$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_export_form',
 			'1',$this->GetOption('export_form','0')));
 		return array('main'=>$main);
 	}

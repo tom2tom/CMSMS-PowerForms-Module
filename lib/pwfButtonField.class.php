@@ -24,7 +24,7 @@ class pwfButtonField extends pwfFieldBase
 		$js = $this->GetOption('javascript','');
 		$cssid = $this->GetCSSIdTag();
 
-		$ret = '<input type="button" name="'.$id.'fbrp__'.$this->Id.'" value="' .
+		$ret = '<input type="button" name="'.$id.'pwfp__'.$this->Id.'" value="' .
 		   $this->GetOption('text','').'" '.$js.$cssid.'/>';
 
 		return $ret;
@@ -35,7 +35,7 @@ class pwfButtonField extends pwfFieldBase
 		$mod = $this->form_ptr->module_ptr;
 		$main = array(
 			  array($mod->Lang('title_button_text'),
-					$mod->CreateInputText($formDescriptor,'fbrp_opt_text',
+					$mod->CreateInputText($formDescriptor,'pwfp_opt_text',
 							  $this->GetOption('text',''), 40)));
 		return array('main'=>$main);
 	}

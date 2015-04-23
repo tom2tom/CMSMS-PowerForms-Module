@@ -23,8 +23,8 @@ class pwfFileUploadField extends pwfFieldBase
 		$js = $this->GetOption('javascript','');
 		$txt = '';
 		if($this->Value != '') $txt .= $this->GetHumanReadableValue()."<br />";	// Value line
-		$txt .= $mod->CreateFileUploadInput($id,'fbrp__'.$this->Id,$js.$this->GetCSSIdTag()); // Input line
-		if($this->Value != '') $txt .= $mod->CreateInputCheckbox($id, 'fbrp_delete__'.$this->Id, -1).'&nbsp;'.$mod->Lang('delete')."<br />"; // Delete line
+		$txt .= $mod->CreateFileUploadInput($id,'pwfp__'.$this->Id,$js.$this->GetCSSIdTag()); // Input line
+		if($this->Value != '') $txt .= $mod->CreateInputCheckbox($id, 'pwfp_delete__'.$this->Id, -1).'&nbsp;'.$mod->Lang('delete')."<br />"; // Delete line
 
 		// Extras
 		if($this->GetOption('show_details','0') == '1')
@@ -48,10 +48,10 @@ class pwfFileUploadField extends pwfFieldBase
 		$mod = $this->form_ptr->module_ptr;
 		parent::Load($id,$params,$loadDeep);
 
-		if(isset($_FILES) && isset($_FILES[$mod->module_id.'fbrp__'.$this->Id]) && $_FILES[$mod->module_id.'fbrp__'.$this->Id]['size'] > 0)
+		if(isset($_FILES) && isset($_FILES[$mod->module_id.'pwfp__'.$this->Id]) && $_FILES[$mod->module_id.'pwfp__'.$this->Id]['size'] > 0)
 		{
 			// Okay, a file was uploaded
-			$this->SetValue($_FILES[$mod->module_id.'fbrp__'.$this->Id]['name']);
+			$this->SetValue($_FILES[$mod->module_id.'pwfp__'.$this->Id]['name']);
 		}
 	}
 
@@ -113,20 +113,20 @@ class pwfFileUploadField extends pwfFieldBase
 
 		$main = array(
 			array($mod->Lang('title_maximum_size'),
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_max_size', $ms, 5, 5),
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_max_size', $ms, 5, 5),
 				$mod->Lang('title_maximum_size_long')),
 			array($mod->Lang('title_permitted_extensions'),
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_permitted_extensions', $exts, 25, 80),
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_permitted_extensions', $exts, 25, 80),
 				$mod->Lang('title_permitted_extensions_long')),
 			array($mod->Lang('title_show_limitations'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_show_details','0').
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_show_details','0').
 				$mod->CreateInputCheckbox($formDescriptor,
-					'fbrp_opt_show_details', '1', $show),
+					'pwfp_opt_show_details', '1', $show),
 				$mod->Lang('title_show_limitations_long')),
 			array($mod->Lang('title_allow_overwrite'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_allow_overwrite','0').
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_allow_overwrite','0').
 				$mod->CreateInputCheckbox($formDescriptor,
-					'fbrp_opt_allow_overwrite', '1', $this->GetOption('allow_overwrite','0')),
+					'pwfp_opt_allow_overwrite', '1', $this->GetOption('allow_overwrite','0')),
 				$mod->Lang('title_allow_overwrite_long'))
 			);
 
@@ -138,27 +138,27 @@ class pwfFileUploadField extends pwfFieldBase
 		'<tr><td>$ext</td><td>'.$mod->Lang('original_file_extension').'</td></tr></table>';
 
 		$adv[] = array($mod->Lang('title_file_rename'),
-			$mod->CreateInputText($formDescriptor,'fbrp_opt_file_rename',
+			$mod->CreateInputText($formDescriptor,'pwfp_opt_file_rename',
 				$this->GetOption('file_rename',''),60,255),
 			$file_rename_help);
 		$adv[] = array($mod->Lang('title_suppress_filename'),
-			$mod->CreateInputHidden($formDescriptor,'fbrp_opt_suppress_filename','0').
+			$mod->CreateInputHidden($formDescriptor,'pwfp_opt_suppress_filename','0').
 			$mod->CreateInputCheckbox($formDescriptor,
-				'fbrp_opt_suppress_filename', '1',
+				'pwfp_opt_suppress_filename', '1',
 				$this->GetOption('suppress_filename','0')));
 
 		$adv[] = array($mod->Lang('title_suppress_attachment'),
-			$mod->CreateInputHidden($formDescriptor,'fbrp_opt_suppress_attachment',0).
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_suppress_attachment', 1, $this->GetOption('suppress_attachment',1)));
+			$mod->CreateInputHidden($formDescriptor,'pwfp_opt_suppress_attachment',0).
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_suppress_attachment', 1, $this->GetOption('suppress_attachment',1)));
 
 		$main[] = array($mod->Lang('title_remove_file_from_server'),
-			$mod->CreateInputHidden($formDescriptor,'fbrp_opt_remove_file','0').
+			$mod->CreateInputHidden($formDescriptor,'pwfp_opt_remove_file','0').
 				$mod->CreateInputCheckbox($formDescriptor,
-				'fbrp_opt_remove_file', '1',
+				'pwfp_opt_remove_file', '1',
 				$this->GetOption('remove_file','0')),
 				$mod->Lang('help_ignored_if_upload'));
 		$main[] = array($mod->Lang('title_file_destination'),
-			$mod->CreateInputText($formDescriptor,'fbrp_opt_file_destination',
+			$mod->CreateInputText($formDescriptor,'pwfp_opt_file_destination',
 				$this->GetOption('file_destination',$config['uploads_path']),60,255),
 				$mod->Lang('help_ignored_if_upload'));
 
@@ -167,11 +167,11 @@ class pwfFileUploadField extends pwfFieldBase
 			$categorylist = $uploads->getCategoryList();
 			$adv[] = array($mod->Lang('title_sendto_uploads'),
 				 $mod->CreateInputDropdown($formDescriptor,
-					'fbrp_opt_sendto_uploads',$sendto_uploads_list,
+					'pwfp_opt_sendto_uploads',$sendto_uploads_list,
 					 $sendto_uploads));
 			$adv[] = array($mod->Lang('title_uploads_category'),
 				$mod->CreateInputDropdown($formDescriptor,
-					'fbrp_opt_uploads_category',$categorylist,'',
+					'pwfp_opt_uploads_category',$categorylist,'',
 					$uploads_category));
 			$adv[] = array($mod->Lang('title_uploads_destpage'),
 				$mod->CreatePageDropdown($formDescriptor,
@@ -204,7 +204,7 @@ class pwfFileUploadField extends pwfFieldBase
 		$exts = $this->GetOption('permitted_extensions','');
 		$mod = $this->form_ptr->module_ptr;
 		//$fullAlias = $this->GetValue(); -- Stikki modifys: Now gets correct alias
-		$fullAlias = $mod->module_id.'fbrp__'.$this->Id;
+		$fullAlias = $mod->module_id.'pwfp__'.$this->Id;
 		if($_FILES[$fullAlias]['size'] < 1 && ! $this->Required)
 		{
 			return array(true,'');

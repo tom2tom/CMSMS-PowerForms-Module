@@ -47,7 +47,7 @@ class pwfHiddenField extends pwfFieldBase
 			$type = "hidden";
 		}
 
-		return '<input type="'.$type.'" name="'.$id.'fbrp__'.$this->Id.'" value="'.$v.'"'.$this->GetCSSIdTag().' />';
+		return '<input type="'.$type.'" name="'.$id.'pwfp__'.$this->Id.'" value="'.$v.'"'.$this->GetCSSIdTag().' />';
 	}
 
 	function PrePopulateAdminForm($formDescriptor)
@@ -55,16 +55,16 @@ class pwfHiddenField extends pwfFieldBase
 		$mod = $this->form_ptr->module_ptr;
 		$main = array(
 				array($mod->Lang('title_value'),
-            		$mod->CreateInputText($formDescriptor, 'fbrp_opt_value',$this->GetOption('value',''),25,1024))
+            		$mod->CreateInputText($formDescriptor, 'pwfp_opt_value',$this->GetOption('value',''),25,1024))
 		);
 		$adv = array(
 				array($mod->Lang('title_smarty_eval'),
-				$mod->CreateInputHidden($formDescriptor, 'fbrp_opt_smarty_eval','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_smarty_eval',
+				$mod->CreateInputHidden($formDescriptor, 'pwfp_opt_smarty_eval','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_smarty_eval',
             		'1',$this->GetOption('smarty_eval','0'))),
 				array($mod->Lang('title_fbr_edit'),
-				$mod->CreateInputHidden($formDescriptor, 'fbrp_opt_fbr_edit','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_fbr_edit',
+				$mod->CreateInputHidden($formDescriptor, 'pwfp_opt_fbr_edit','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_fbr_edit',
 					'1', $this->GetOption('fbr_edit','0')))
 		);
 		return array('main'=>$main,'adv'=>$adv);

@@ -17,7 +17,7 @@ if((isset($params['inline'])) && preg_match('/t(rue)*|y(yes)*|1/i',$params['inli
 	$inline = true;
 }
 
-$fbrp_callcount = 0;
+$pwfp_callcount = 0;
 $funcs = new pwfUtils($this,$params,true,true);
 
 $fld = $funcs->GetFormBrowserField();
@@ -46,21 +46,21 @@ $smarty->assign('fb_form_footer',$funcs->RenderFormFooter());
 $finished = false;
 $fieldExpandOp = false;
 
-if(isset($params['fbrp_callcount']))
+if(isset($params['pwfp_callcount']))
 {
-    $fbrp_callcount = (int)$params['fbrp_callcount'];
+    $pwfp_callcount = (int)$params['pwfp_callcount'];
 }
 
 foreach($params as $pKey=>$pVal)
 {
-	if(substr($pKey,0,9) == 'fbrp_FeX_' || substr($pKey,0,9) == 'fbrp_FeD_')
+	if(substr($pKey,0,9) == 'pwfp_FeX_' || substr($pKey,0,9) == 'pwfp_FeD_')
 	{
 		// expanding or shrinking a field
 		$fieldExpandOp = true;
 	}
 }
 
-if(!$fieldExpandOp && (($funcs->GetPageCount() > 1 && $funcs->GetPageNumber() > 0) || (isset($params['fbrp_done'])&& $params['fbrp_done']==1)))
+if(!$fieldExpandOp && (($funcs->GetPageCount() > 1 && $funcs->GetPageNumber() > 0) || (isset($params['pwfp_done'])&& $params['pwfp_done']==1)))
 {
 	// Validate form
 	$res = $funcs->Validate();
@@ -75,14 +75,14 @@ if(!$fieldExpandOp && (($funcs->GetPageCount() > 1 && $funcs->GetPageNumber() > 
 
 		// No validate errors, proceed
 	}
-	else if(isset($params['fbrp_done']) && $params['fbrp_done']==1)
+	else if(isset($params['pwfp_done']) && $params['pwfp_done']==1)
 	{
 		// Check captcha, if installed
 		$ok = true;
 		$captcha = $this->getModuleInstance('Captcha');
 		if($funcs->GetAttr('use_captcha','0') == '1' && $captcha != null)
 		{
-			if(!$captcha->CheckCaptcha($params['fbrp_captcha_phrase']))
+			if(!$captcha->CheckCaptcha($params['pwfp_captcha_phrase']))
 			{
 				$smarty->assign('captcha_error',$funcs->GetAttr('captcha_wrong',$this->Lang('wrong_captcha')));
 
@@ -114,7 +114,7 @@ if(!$finished)
 			$this->CreateFormStart($id, 'user_edit_resp', $returnid, 'POST',
 				'multipart/form-data',
 				($funcs->GetAttr('inline','0') == '1'), '',
-				array('fbrp_callcount'=>$fbrp_callcount+1)).
+				array('pwfp_callcount'=>$pwfp_callcount+1)).
 				$this->CreateInputHidden($id,'response_id',isset($params['response_id'])?$params['response_id']:'-1'));
 	}
 	else
@@ -123,7 +123,7 @@ if(!$finished)
 			   $this->CreateFormStart($id, 'default', $returnid, 'POST',
 				'multipart/form-data',
 				($funcs->GetAttr('inline','0') == '1'), '',
-				array('fbrp_callcount'=>$fbrp_callcount+1)));
+				array('pwfp_callcount'=>$pwfp_callcount+1)));
 	}
 
 	$smarty->assign('fb_form_end',$this->CreateFormEnd());
@@ -160,7 +160,7 @@ else
 	else
 	{
 		$parms = array();
-		$params['fbrp_error']='';
+		$params['pwfp_error']='';
 		$smarty->assign('fb_submission_error',$this->Lang('submission_error'));
 
 		$show = $this->GetPreference('hide_errors','1');
@@ -183,7 +183,7 @@ if(!$finished &&
 	$parms = $params;
 	$parms['FORM'] =& $funcs;
 
-	if(isset($fbrp_callcount) && $fbrp_callcount == 0 &&
+	if(isset($pwfp_callcount) && $pwfp_callcount == 0 &&
 		!empty($udtonce) && "-1" != $udtonce)
 	{
 		$tmp = $usertagops->CallUserTag($udtonce,$parms);

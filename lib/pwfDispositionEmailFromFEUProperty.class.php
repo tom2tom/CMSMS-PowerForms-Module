@@ -74,7 +74,7 @@ class pwfDispositionEmailFromFEUProperty extends pwfDispositionEmailBase
 		$waslast = array_pop($main); //keep the email to-type selector for last
 		$keys = array_keys($opts);
 		$main[] = array($mod->Lang('title_feu_property'),
-				$mod->CreateInputDropdown($formDescriptor,'fbrp_opt_feu_property',
+				$mod->CreateInputDropdown($formDescriptor,'pwfp_opt_feu_property',
 						   array_flip($opts),-1,
 						   $this->GetOption('feu_property',$keys[0])),
 				$mod->Lang('info_feu_property'));
@@ -104,7 +104,7 @@ class pwfDispositionEmailFromFEUProperty extends pwfDispositionEmailBase
 		 case 5: // multiselect
 		 case 7: // radio button group
 			// rendered all as a dropdown field.
-			$res = $mod->CreateInputDropdown($id,'fbrp__'.$this->Id,$options,-1,$this->GetCSSIdTag());
+			$res = $mod->CreateInputDropdown($id,'pwfp__'.$this->Id,$options,-1,$this->GetCSSIdTag());
 			break;
 		 default:
 			$res = FALSE;

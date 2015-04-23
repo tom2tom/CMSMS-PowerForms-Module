@@ -86,19 +86,19 @@ class pwfDatePickerField extends pwfFieldBase
 		$day = new stdClass();
 		$js = $this->GetOption('javascript','');
 
-		$day->input = $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id.'[]', $Days, -1,
+		$day->input = $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id.'[]', $Days, -1,
 			$today['mday'], $js.$this->GetCSSIdTag('_day'));
 		$day->title = $mod->Lang('day');
 		$day->name = '<label for="'.$this->GetCSSId('_day').'">'.$mod->Lang('day').'</label>';
 
 		$mon = new stdClass();
-		$mon->input = $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id.'[]', $this->Months, -1,
+		$mon->input = $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id.'[]', $this->Months, -1,
 			$today['mon'], $js.$this->GetCSSIdTag('_month'));
 		$mon->title = $mod->Lang('mon');
 		$mon->name = '<label for="'.$this->GetCSSId('_month').'">'.$mod->Lang('mon').'</label>';
 
 		$yr = new stdClass();
-		$yr->input = $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id.'[]', $Year, -1,
+		$yr->input = $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id.'[]', $Year, -1,
 			$today['year'],$js.$this->GetCSSIdTag('_year'));
 		$yr->name = '<label for="'.$this->GetCSSId('_year').'">'.$mod->Lang('year').'</label>';
 		$yr->title = $mod->Lang('year');
@@ -170,26 +170,26 @@ class pwfDatePickerField extends pwfFieldBase
 		$today = getdate();
 		$main = array(
 			array($mod->Lang('title_date_format'),
-					$mod->CreateInputText($formDescriptor, 'fbrp_opt_date_format',
+					$mod->CreateInputText($formDescriptor, 'pwfp_opt_date_format',
           	$this->GetOption('date_format','j F Y'),25,25),
 					$mod->Lang('help_date_format')),
 			array($mod->Lang('title_date_order'),
-					$mod->CreateInputText($formDescriptor, 'fbrp_opt_date_order',
+					$mod->CreateInputText($formDescriptor, 'pwfp_opt_date_order',
 						$this->GetOption('date_order','d-m-y'),5,5),
 					$mod->Lang('help_date_order')),
 		   array($mod->Lang('title_default_blank'),
-					$mod->CreateInputHidden($formDescriptor,'fbrp_opt_default_blank','0').
-					$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_default_blank',
+					$mod->CreateInputHidden($formDescriptor,'pwfp_opt_default_blank','0').
+					$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_default_blank',
             		'1',$this->GetOption('default_blank','0')),
 					$mod->Lang('title_default_blank_help')),
 		   array($mod->Lang('title_start_year'),
-					$mod->CreateInputText($formDescriptor, 'fbrp_opt_start_year',
+					$mod->CreateInputText($formDescriptor, 'pwfp_opt_start_year',
 						$this->GetOption('start_year',($today['year']-10)),10,10)),
 		   array($mod->Lang('title_end_year'),
-					$mod->CreateInputText($formDescriptor, 'fbrp_opt_end_year',
+					$mod->CreateInputText($formDescriptor, 'pwfp_opt_end_year',
 						$this->GetOption('end_year',($today['year']+10)),10,10)),
 		   array($mod->Lang('title_default_year'),
-					$mod->CreateInputText($formDescriptor, 'fbrp_opt_default_year',
+					$mod->CreateInputText($formDescriptor, 'pwfp_opt_default_year',
 						$this->GetOption('default_year','-1'),10,10),
 					$mod->Lang('title_default_year_help'))
 		);

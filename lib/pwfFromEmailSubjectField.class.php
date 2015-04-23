@@ -22,7 +22,7 @@ class pwfFromEmailSubjectField extends pwfFieldBase {
 		$mod = $this->form_ptr->module_ptr;
 		$js = $this->GetOption('javascript','');
 
-		return $mod->fbCreateInputText($id, 'fbrp__'.$this->Id,
+		return $mod->fbCreateInputText($id, 'pwfp__'.$this->Id,
 			htmlspecialchars($this->Value, ENT_QUOTES),
            25,128,$js.$this->GetCSSIdTag());
 	}

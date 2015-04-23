@@ -7,18 +7,18 @@
 
 $this->DoNothing();
 
-if(!isset($params['fbrp_f']) || !isset($params['fbrp_r']) || !isset($params['fbrp_c']))
+if(!isset($params['pwfp_f']) || !isset($params['pwfp_r']) || !isset($params['pwfp_c']))
 {
 	echo $this->Lang('validation_param_error');
 	return false;
 }
 
-$params['response_id']=$params['fbrp_r'];
-$params['form_id']=$params['fbrp_f'];
-$params['fbrp_user_form_validate']=true;
+$params['response_id']=$params['pwfp_r'];
+$params['form_id']=$params['pwfp_f'];
+$params['pwfp_user_form_validate']=true;
 $funcs = new pwfUtils($this, $params, true);
 
-if(!$funcs->CheckResponse($params['fbrp_f'], $params['fbrp_r'], $params['fbrp_c']))
+if(!$funcs->CheckResponse($params['pwfp_f'], $params['pwfp_r'], $params['pwfp_c']))
 {
 	echo $this->Lang('validation_response_error');
 	return false;
@@ -28,7 +28,7 @@ if(!$funcs->CheckResponse($params['fbrp_f'], $params['fbrp_r'], $params['fbrp_c'
 else
 {
 	//[#2792] DeleteResponse is never called on validation;
-	//$funcs->DeleteResponse($params['fbrp_r']);
+	//$funcs->DeleteResponse($params['pwfp_r']);
 }
 */
 
@@ -37,7 +37,7 @@ foreach($funcs->GetFields() as &$thisField)
 {
 	if($thisField->GetFieldType() == 'DispositionEmailConfirmation')
 	{
-		$thisField->ApproveToGo($params['fbrp_r']);
+		$thisField->ApproveToGo($params['pwfp_r']);
 		$results = $funcs->Dispose($returnid);
 		if($results[0] == true)
 		{

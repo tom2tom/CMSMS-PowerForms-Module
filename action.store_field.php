@@ -15,15 +15,15 @@ if($val[0])
 	$obfield->PostAdminSubmitCleanup();
 	$obfield->Store(true);
 	$obfield->PostFieldSaveProcess($params);
-	$params['fbrp_message']=$params['fbrp_op'];
+	$params['pwfp_message']=$params['pwfp_op'];
 	//DO NOT ->Redirect - that flattens any $params[] that's an array
 	$this->DoAction('add_edit_form', $id, $params);
 }
 else
 {
 	$obfield->LoadField($params);
-	$params['fbrp_message'] = $val[1];
-	echo $funcs->AddEditField($id, $obfield, (isset($params['fbrp_dispose_only'])?$params['fbrp_dispose_only']:0), $returnid);
+	$params['pwfp_message'] = $val[1];
+	echo $funcs->AddEditField($id, $obfield, (isset($params['pwfp_dispose_only'])?$params['pwfp_dispose_only']:0), $returnid);
 }
 
 ?>

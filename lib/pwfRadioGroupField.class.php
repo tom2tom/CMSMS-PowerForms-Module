@@ -94,7 +94,7 @@ class pwfRadioGroupField extends pwfFieldBase
 					$check_val = true;
 				}
 			}
-			$thisBox->input = '<input type="radio" name="'.$id.'fbrp__'.$this->Id.'" value="'.($i+1).'"';
+			$thisBox->input = '<input type="radio" name="'.$id.'pwfp__'.$this->Id.'" value="'.($i+1).'"';
 			if($check_val)
 			{
 				$thisBox->input .= ' checked="checked"';
@@ -136,7 +136,7 @@ class pwfRadioGroupField extends pwfFieldBase
 		$delcount = 0;
 		foreach($params as $thisKey=>$thisVal)
 		{
-			if(substr($thisKey,0,9) == 'fbrp_sel_')
+			if(substr($thisKey,0,9) == 'pwfp_sel_')
 			{
 				$this->RemoveOptionElement('button_name', $thisVal - $delcount);
 				$this->RemoveOptionElement('button_checked', $thisVal - $delcount);
@@ -170,10 +170,10 @@ class pwfRadioGroupField extends pwfFieldBase
 		for ($i=0;$i<$num;$i++)
 		{
 			$boxes = array(
-			  $mod->CreateInputText($formDescriptor, 'fbrp_opt_button_name[]',$this->GetOptionElement('button_name',$i),25,128),
-			  $mod->CreateInputText($formDescriptor, 'fbrp_opt_button_checked[]',$this->GetOptionElement('button_checked',$i),25,128),
-			  $mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_button_is_set[]', $yesNo, -1, $this->GetOptionElement('button_is_set',$i)),
-			  $mod->CreateInputCheckbox($formDescriptor, 'fbrp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
+			  $mod->CreateInputText($formDescriptor, 'pwfp_opt_button_name[]',$this->GetOptionElement('button_name',$i),25,128),
+			  $mod->CreateInputText($formDescriptor, 'pwfp_opt_button_checked[]',$this->GetOptionElement('button_checked',$i),25,128),
+			  $mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_button_is_set[]', $yesNo, -1, $this->GetOptionElement('button_is_set',$i)),
+			  $mod->CreateInputCheckbox($formDescriptor, 'pwfp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
 			 );
 		}
 

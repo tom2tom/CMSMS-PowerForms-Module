@@ -71,21 +71,21 @@ class pwfTimePickerField extends pwfFieldBase
 			}
 
 			$hr = new stdClass();
-			$hr->input = $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id.'[]',
+			$hr->input = $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id.'[]',
 				$Hours, -1, $now['tm_hour'],$js.$this->GetCSSIdTag('_hour'));
 			$hr->title = $mod->Lang('hour');
 			$hr->name = '<label for="'.$this->GetCSSId('_hour').'">'.$mod->Lang('hour').'</label>';
 			$ret[] = $hr;
 
 			$min = new stdClass();
-			$min->input = $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id.'[]',
+			$min->input = $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id.'[]',
 				$Mins, -1, $now['tm_min'],$js.$this->GetCSSIdTag('_min'));
 			$min->title = $mod->Lang('min');
 			$min->name = '<label for="'.$this->GetCSSId('_min').'">'.$mod->Lang('min').'</label>';
 			$ret[] = $min;
 
 			$mer = new stdClass();
-			$mer->input = $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id.'[]',
+			$mer->input = $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id.'[]',
 				$this->flag12hour, -1, $now['merid'], $js.$this->GetCSSIdTag('_meridian'));
 			$mer->name = '<label for="'.$this->GetCSSId('_meridian').'">'.$mod->Lang('merid').'</label>';
 			$mer->title = $mod->Lang('merid');
@@ -106,14 +106,14 @@ class pwfTimePickerField extends pwfFieldBase
 				$now['tm_min'] = $this->GetArrayValue(1);
 			}
 			$hr = new stdClass();
-			$hr->input = $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id.'[]',
+			$hr->input = $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id.'[]',
 				$Hours, -1, $now['tm_hour'],$js.$this->GetCSSIdTag('_hour'));
 			$hr->title = $mod->Lang('hour');
 			$hr->name = '<label for="'.$this->GetCSSId('_hour').'">'.$mod->Lang('hour').'</label>';
 			$ret[] = $hr;
 
 			$min = new stdClass();
-			$min->input = $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id.'[]',
+			$min->input = $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id.'[]',
 				$Mins, -1, $now['tm_min'],$js.$this->GetCSSIdTag('_min'));
 			$min->title = $mod->Lang('min');
 			$min->name = '<label for="'.$this->GetCSSId('_min').'">'.$mod->Lang('min').'</label>';
@@ -159,7 +159,7 @@ class pwfTimePickerField extends pwfFieldBase
 		$mod = $this->form_ptr->module_ptr;
 		$main = array(
 			array($mod->Lang('title_24_hour'),
-            		$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_24_hour',
+            		$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_24_hour',
             		'1',$this->GetOption('24_hour','0'))));
 		return array('main'=>$main);
 	}

@@ -142,19 +142,19 @@ class pwfCompanyDirectoryField extends pwfFieldBase
 			$UserInput = $this->GetOption('UserInput','Dropdown');
 			if($UserInput=='Select List-single')
 			{
-				return $mod->CreateInputSelectList($id,'fbrp__'.$this->Id.'[]', $companies, $val, $size, $cssid);
+				return $mod->CreateInputSelectList($id,'pwfp__'.$this->Id.'[]', $companies, $val, $size, $cssid);
 			}
 			elseif($UserInput=='Select List-multiple')
 			{
-				return $mod->CreateInputSelectList($id,'fbrp__'.$this->Id.'[]', $companies, $val, $size, $cssid, true);
+				return $mod->CreateInputSelectList($id,'pwfp__'.$this->Id.'[]', $companies, $val, $size, $cssid, true);
 			}
 			elseif($UserInput=='Dropdown')
 			{
-				return $mod->CreateInputDropdown($id,'fbrp__'.$this->Id.'', $companies, '-1', $val);
+				return $mod->CreateInputDropdown($id,'pwfp__'.$this->Id.'', $companies, '-1', $val);
 			}
 			elseif($UserInput=='Radio Group')
 			{
-				return $mod->CreateInputRadioGroup($id,'fbrp__'.$this->Id.'', $companies, $val,'','&nbsp;&nbsp;');
+				return $mod->CreateInputRadioGroup($id,'pwfp__'.$this->Id.'', $companies, $val,'','&nbsp;&nbsp;');
 			}
 		}
 
@@ -212,15 +212,15 @@ class pwfCompanyDirectoryField extends pwfFieldBase
 		$main = array(
 				array($mod->Lang('title_company_field_note'),''),
 				array($mod->Lang('title_pick_categories'),
-					$mod->CreateInputSelectList($formDescriptor,'fbrp_opt_Category[]', $Categories, $CategorySelected, 5,'',true)
+					$mod->CreateInputSelectList($formDescriptor,'pwfp_opt_Category[]', $Categories, $CategorySelected, 5,'',true)
 				),
 				array($mod->Lang('title_pick_fielddef'),
-					$mod->CreateInputSelectList($formDescriptor,'fbrp_opt_FieldDefs', $FieldDefs, $FieldDefsSelected, 5,'',false)
+					$mod->CreateInputSelectList($formDescriptor,'pwfp_opt_FieldDefs', $FieldDefs, $FieldDefsSelected, 5,'',false)
 				)
 		);
 		$adv = array(
 				array($mod->Lang('title_choose_user_input'),
-					$mod->CreateInputDropdown ($formDescriptor,'fbrp_opt_UserInput', $Useinput, '-1', $this->GetOption('UserInput',''))
+					$mod->CreateInputDropdown ($formDescriptor,'pwfp_opt_UserInput', $Useinput, '-1', $this->GetOption('UserInput',''))
 				)
 		);
 		return array('main'=>$main,'adv'=>$adv);

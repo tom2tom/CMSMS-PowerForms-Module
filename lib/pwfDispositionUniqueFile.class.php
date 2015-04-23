@@ -292,16 +292,16 @@ class pwfDispositionUniqueFile extends pwfFieldBase
 
 		$main = array();
 		$main[] = array($mod->Lang('title_file_root'),
-			array($mod->CreateInputText($formDescriptor, 'fbrp_opt_fileroot',
+			array($mod->CreateInputText($formDescriptor, 'pwfp_opt_fileroot',
 				$this->GetOption('fileroot',$config['uploads_path']),80,255),
 				$mod->Lang('title_file_root_help')));
-//		$mod->CreateInputFile($formDescriptor, 'fbrp_opt_fileroot', '', 60)
+//		$mod->CreateInputFile($formDescriptor, 'pwfp_opt_fileroot', '', 60)
 		$main[] = array($mod->Lang('title_file_name'),
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_filespec',
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_filespec',
 					$this->GetOption('filespec',''),80,255));
-//		$mod->CreateInputFile($formDescriptor, 'fbrp_opt_filespec', '', 60)
+//		$mod->CreateInputFile($formDescriptor, 'pwfp_opt_filespec', '', 60)
 		$main[] = array($mod->Lang('title_newline_replacement'),
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_newlinechar',
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_newlinechar',
 				$this->GetOption('newlinechar',''),5,15),
 			$mod->Lang('title_newline_replacement_help'));
 
@@ -310,18 +310,18 @@ class pwfDispositionUniqueFile extends pwfFieldBase
 		$file_type_list = array('TXT'=>0, 'RTF'=>1);
 		$adv[] = array($mod->Lang('title_file_type'),
 			$mod->CreateInputDropdown($formDescriptor,
-			'fbrp_opt_file_type',$file_type_list,$file_type));
+			'pwfp_opt_file_type',$file_type_list,$file_type));
 
 		$adv[] = array($mod->Lang('title_rtf_file_template'),
-			array($mod->CreateInputText($formDescriptor, 'fbrp_opt_rtf_file_template',
+			array($mod->CreateInputText($formDescriptor, 'pwfp_opt_rtf_file_template',
 				$this->GetOption('rtf_file_template','RTF_TemplateBasic.rtf'), 50, 255),
 				$mod->Lang('help_rtf_file_template')));
-//		$mod->CreateInputFile($formDescriptor, 'fbrp_opt_rtf_file_template', '', 60)
+//		$mod->CreateInputFile($formDescriptor, 'pwfp_opt_rtf_file_template', '', 60)
 
 		$rtf_template_type_list = array($mod->Lang('basic')=>0, $mod->Lang('advanced')=>1);
 		$adv[] = array($mod->Lang('title_rtf_template_type'),
 			$mod->CreateInputDropdown($formDescriptor,
-				'fbrp_opt_rtf_template_type',$rtf_template_type_list,$rtf_template_type),
+				'pwfp_opt_rtf_template_type',$rtf_template_type_list,$rtf_template_type),
 			$mod->Lang('help_rtf_template_type'));
 
 		$parmMain = array();
@@ -334,17 +334,17 @@ class pwfDispositionUniqueFile extends pwfFieldBase
 
 		$adv[] = array($mod->Lang('title_unique_file_template'),
 			$mod->CreateTextArea(false, $formDescriptor, $this->GetOption('file_template',''),
-			'fbrp_opt_file_template', 'module_fb_area_wide', '','','',80,15),
+			'pwfp_opt_file_template', 'pwf_area_wide', '','','',80,15),
 			$mod->Lang('help_unique_file_template').'<br /><br />'.$buttons[0]);
 
 		$adv[] = array($mod->Lang('title_file_header'),
 			$mod->CreateTextArea(false, $formDescriptor, $this->GetOption('file_header',''),
-				'fbrp_opt_file_header', 'module_fb_area_short', '','','',80,8),
+				'pwfp_opt_file_header', 'pwf_area_short', '','','',80,8),
 			$mod->Lang('help_file_header_template').'<br /><br />'.$buttons[1]);
 
 		$adv[] = array($mod->Lang('title_file_footer'),
 			$mod->CreateTextArea(false, $formDescriptor, $this->GetOption('file_footer',''),
-				'fbrp_opt_file_footer', 'module_fb_area_short', '','','',80,8),
+				'pwfp_opt_file_footer', 'pwf_area_short', '','','',80,8),
 			$mod->Lang('help_file_footer_template').'<br /><br />'.$buttons[2]);
 		/*show variables-help on advanced tab*/
 		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>'varshelpadv');

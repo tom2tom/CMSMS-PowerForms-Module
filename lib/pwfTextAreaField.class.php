@@ -25,13 +25,13 @@ class pwfTextAreaField extends pwfFieldBase
 		if($this->GetOption('html5','0') == '1')
 		{
 			$ret = $mod->CreateTextArea(($this->GetOption('wysiwyg','0') == '1'?true:false),$id,$this->Value,
-					'fbrp__'.$this->Id,'',$this->GetCSSId(),'','',$this->GetOption('cols','80'),$this->GetOption('rows','15'),
+					'pwfp__'.$this->Id,'',$this->GetCSSId(),'','',$this->GetOption('cols','80'),$this->GetOption('rows','15'),
 					'', '', ' placeholder="'.$this->GetOption('default').'"');
 		}
 		else
 		{
 			$ret = $mod->CreateTextArea(($this->GetOption('wysiwyg','0') == '1'?true:false),$id,($this->Value?$this->Value:$this->GetOption('default')),
-					'fbrp__'.$this->Id,'',$this->GetCSSId(),'','',$this->GetOption('cols','80'),$this->GetOption('rows','15'));
+					'pwfp__'.$this->Id,'',$this->GetCSSId(),'','',$this->GetOption('cols','80'),$this->GetOption('rows','15'));
 		}
 
 		if($this->GetOption('clear_default','0')=='1')
@@ -96,22 +96,22 @@ class pwfTextAreaField extends pwfFieldBase
 	   $mod = $this->form_ptr->module_ptr;
 	   $main = array(
 			array($mod->Lang('title_use_wysiwyg'),
-						$mod->CreateInputHidden($formDescriptor, 'fbrp_opt_wysiwyg','0').
-						$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_wysiwyg','1',$this->GetOption('wysiwyg','0'))),
-			array($mod->Lang('title_textarea_rows'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_rows',$this->GetOption('rows','15'),5,5)),
-			array($mod->Lang('title_textarea_cols'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_cols',$this->GetOption('cols','80'),5,5)),
-			array($mod->Lang('title_textarea_length'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_length',$this->GetOption('length',''), 5, 5))
+						$mod->CreateInputHidden($formDescriptor, 'pwfp_opt_wysiwyg','0').
+						$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_wysiwyg','1',$this->GetOption('wysiwyg','0'))),
+			array($mod->Lang('title_textarea_rows'),$mod->CreateInputText($formDescriptor, 'pwfp_opt_rows',$this->GetOption('rows','15'),5,5)),
+			array($mod->Lang('title_textarea_cols'),$mod->CreateInputText($formDescriptor, 'pwfp_opt_cols',$this->GetOption('cols','80'),5,5)),
+			array($mod->Lang('title_textarea_length'),$mod->CreateInputText($formDescriptor, 'pwfp_opt_length',$this->GetOption('length',''), 5, 5))
            );
 
 	   $adv = array(
 			array($mod->Lang('title_field_default_value'),
-				$mod->CreateTextArea(false, $formDescriptor, $this->GetOption('default'), 'fbrp_opt_default')),
+				$mod->CreateTextArea(false, $formDescriptor, $this->GetOption('default'), 'pwfp_opt_default')),
 			array($mod->Lang('title_html5'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_html5','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_html5','1',$this->GetOption('html5','0'))),
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_html5','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_html5','1',$this->GetOption('html5','0'))),
 			array($mod->Lang('title_clear_default'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_clear_default','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_clear_default','1',$this->GetOption('clear_default','0')),
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_clear_default','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_clear_default','1',$this->GetOption('clear_default','0')),
 				$mod->Lang('title_clear_default_help'))
 		);
 

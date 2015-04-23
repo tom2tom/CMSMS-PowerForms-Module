@@ -111,13 +111,13 @@ class pwfDispositionEmailBasedFrontendFields extends pwfDispositionEmailBase
 		$ret = $this->PrePopulateAdminFormBase($formDescriptor, true);
 		$ret['main'] = array(
 			   array($mod->Lang('title_subject_field'),
-			   	$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_email_subject',$this->GetFieldList(true),-1,$this->GetOption('email_subject',''))),
+			   	$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_email_subject',$this->GetFieldList(true),-1,$this->GetOption('email_subject',''))),
 			   array($mod->Lang('title_from_field'),
-			   	$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_email_from_name',$this->GetFieldList(true),-1,$this->GetOption('email_from_name',$mod->Lang('friendlyname')))),
+			   	$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_email_from_name',$this->GetFieldList(true),-1,$this->GetOption('email_from_name',$mod->Lang('friendlyname')))),
 			   array($mod->Lang('title_from_address_field'),
-			   	$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_email_from_address',$this->GetFieldList(true),-1,$this->GetOption('email_from_address',''))),
+			   	$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_email_from_address',$this->GetFieldList(true),-1,$this->GetOption('email_from_address',''))),
 			   array($mod->Lang('title_destination_field'),
-			   	$mod->CreateInputSelectList($formDescriptor, 'fbrp_opt_destination_address[]',$destadd_all,$destadd_sel,5)),
+			   	$mod->CreateInputSelectList($formDescriptor, 'pwfp_opt_destination_address[]',$destadd_all,$destadd_sel,5)),
 			   array_pop($tmp) //keep only the default to-type selector
 			  );
 

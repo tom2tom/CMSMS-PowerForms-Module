@@ -33,7 +33,7 @@ class pwfCheckboxField extends pwfFieldBase
 			$this->Value = 't';
 		}
 		$js = $this->GetOption('javascript','');
-		return $mod->CreateInputCheckbox($id, 'fbrp__'.$this->Id, 't',$this->Value,$js.$this->GetCSSIdTag()).$label;
+		return $mod->CreateInputCheckbox($id, 'pwfp__'.$this->Id, 't',$this->Value,$js.$this->GetCSSIdTag()).$label;
 	}
 
 	function GetHumanReadableValue($as_string=true)
@@ -73,17 +73,17 @@ class pwfCheckboxField extends pwfFieldBase
 		$mod = $this->form_ptr->module_ptr;
 		$main = array(
 			array($mod->Lang('title_checkbox_label'),
-					$mod->CreateInputText($formDescriptor, 'fbrp_opt_label',
+					$mod->CreateInputText($formDescriptor, 'pwfp_opt_label',
 						$this->GetOption('label',''),25,255)),
 			array($mod->Lang('title_checked_value'),
-					$mod->CreateInputText($formDescriptor, 'fbrp_opt_checked_value',
+					$mod->CreateInputText($formDescriptor, 'pwfp_opt_checked_value',
          		$this->GetOption('checked_value',$mod->Lang('value_checked')),25,255)),
 			array($mod->Lang('title_unchecked_value'),
-					$mod->CreateInputText($formDescriptor, 'fbrp_opt_unchecked_value',
+					$mod->CreateInputText($formDescriptor, 'pwfp_opt_unchecked_value',
           	$this->GetOption('unchecked_value',$mod->Lang('value_unchecked')),25,255)),
 			array($mod->Lang('title_default_set'),
-					$mod->CreateInputHidden($formDescriptor,'fbrp_opt_is_checked','0').
-					$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_is_checked', '1', $this->GetOption('is_checked','0')))
+					$mod->CreateInputHidden($formDescriptor,'pwfp_opt_is_checked','0').
+					$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_is_checked', '1', $this->GetOption('is_checked','0')))
 			);
 		return array('main'=>$main);
 	}

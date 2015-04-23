@@ -30,7 +30,7 @@ class pwfDispositionDatabase extends pwfFieldBase
 		{
 			return '';
 		}
-		return $mod->CreateInputHidden($id, 'fbrp__'.$this->Id,
+		return $mod->CreateInputHidden($id, 'pwfp__'.$this->Id,
 			$this->EncodeReqId($this->Value));
 	}
 
@@ -93,14 +93,14 @@ class pwfDispositionDatabase extends pwfFieldBase
 		$mod = $this->form_ptr->module_ptr;
 		$main = array(
 		array($mod->Lang('title_data_stored_in_fbr'),
-		 $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_feu_bnd','0').
-		 $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_crypt','0').
-		 $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_hash_sort','0').
-		 $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_sortfield1','').
-		 $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_sortfield2','').
-		 $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_sortfield3','').
-		 $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_sortfield4','').
-		 $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_sortfield5','')));
+		 $mod->CreateInputHidden($formDescriptor, 'pwfp_opt_feu_bnd','0').
+		 $mod->CreateInputHidden($formDescriptor, 'pwfp_opt_crypt','0').
+		 $mod->CreateInputHidden($formDescriptor, 'pwfp_opt_hash_sort','0').
+		 $mod->CreateInputHidden($formDescriptor, 'pwfp_opt_sortfield1','').
+		 $mod->CreateInputHidden($formDescriptor, 'pwfp_opt_sortfield2','').
+		 $mod->CreateInputHidden($formDescriptor, 'pwfp_opt_sortfield3','').
+		 $mod->CreateInputHidden($formDescriptor, 'pwfp_opt_sortfield4','').
+		 $mod->CreateInputHidden($formDescriptor, 'pwfp_opt_sortfield5','')));
 		return array('main'=>$main);
 	}
 

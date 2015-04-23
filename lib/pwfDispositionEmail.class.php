@@ -47,7 +47,7 @@ class pwfDispositionEmail extends pwfDispositionEmailBase
 		$delcount = 0;
 		foreach($params as $thisKey=>$thisVal)
 		{
-			if(substr($thisKey,0,9) == 'fbrp_sel_')
+			if(substr($thisKey,0,9) == 'pwfp_sel_')
 			{
 				$this->RemoveOptionElement('destination_address', $thisVal - $delcount);
 				$delcount++;
@@ -124,12 +124,12 @@ class pwfDispositionEmail extends pwfDispositionEmailBase
 	function GetDests ($formDescriptor, $row, $sel)
 	{
 		$id = cms_htmlentities($formDescriptor);
-		$name = $id.'fbrp_aef_to_'.$row; //must be distinct for each address
+		$name = $id.'pwfp_aef_to_'.$row; //must be distinct for each address
 		$totypes = array ('to','cc','bc');
 		$btns = array();
 		for ($i=0;$i<3;$i++)
 		{
-			$text = '<input class="cms_radio" style="margin-left:5px;" type="radio" name="'.$name.'" id="'.$id.'fbrp_aef_to" value="'.$totypes[$i].'"';
+			$text = '<input class="cms_radio" style="margin-left:5px;" type="radio" name="'.$name.'" id="'.$id.'pwfp_aef_to" value="'.$totypes[$i].'"';
 			if($sel == $totypes[$i])
 				$text .= ' checked="checked"';
 			$text .= ' />';
@@ -186,11 +186,11 @@ class pwfDispositionEmail extends pwfDispositionEmailBase
 			$btns = self::GetDests($formDescriptor, $i, $totype);
 
 			$dests[] = array(
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_destination_address[]',$addr,50,128),
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_destination_address[]',$addr,50,128),
 			array_shift ($btns),
 			array_shift ($btns),
 			array_shift ($btns),
-			$mod->CreateInputCheckbox($formDescriptor, 'fbrp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
+			$mod->CreateInputCheckbox($formDescriptor, 'pwfp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
 			);
 		}
 		$ret['table']= $dests;

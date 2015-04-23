@@ -67,7 +67,7 @@ class pwfDispositionEmailSiteAdmin extends pwfDispositionEmailBase
 			$sname = implode(' ',$name);
 			$sorted[$sname]=($i+1);
 		}
-		return $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id, $sorted, -1, $this->Value, $js.$this->GetCSSIdTag());
+		return $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id, $sorted, -1, $this->Value, $js.$this->GetCSSIdTag());
 	}
 
 	function StatusInfo()
@@ -102,19 +102,19 @@ class pwfDispositionEmailSiteAdmin extends pwfDispositionEmailBase
 		$main = $ret['main']; //assume it's there
 		$waslast = array_pop($main); //keep the email to-type selector for last
 		$main[] = array($mod->Lang('title_select_one_message'),
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_select_one',
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_select_one',
 				$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
 		$main[] = array($mod->Lang('title_show_userfirstname'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_show_userfirstname','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_show_userfirstname', '1',
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_show_userfirstname','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_show_userfirstname', '1',
 				$this->GetOption('show_userfirstname','1')));
 		$main[] = array($mod->Lang('title_show_userlastname'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_show_userlastname','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_show_userlastname', '1',
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_show_userlastname','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_show_userlastname', '1',
 				$this->GetOption('show_userlastname','1')));
 		$main[] = array($mod->Lang('title_show_username'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_show_username','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_show_username', '1',
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_show_username','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_show_username', '1',
 				$this->GetOption('show_username','0')));
 		$main[] = $waslast;
 
@@ -125,10 +125,10 @@ class pwfDispositionEmailSiteAdmin extends pwfDispositionEmailBase
 		}
 
 		$main[] = array($mod->Lang('title_restrict_to_group'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_restrict_to_group','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_restrict_to_group', '1',
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_restrict_to_group','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_restrict_to_group', '1',
 				$this->GetOption('restrict_to_group','0')).
-				$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_group', $items, -1, $this->GetOption('group',''))
+				$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_group', $items, -1, $this->GetOption('group',''))
 				);
 		$ret['main'] = $main;
 		return $ret;

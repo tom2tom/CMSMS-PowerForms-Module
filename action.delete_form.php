@@ -10,7 +10,7 @@ if(!$this->CheckAccess()) exit;
 $funcs = new pwfUtils($this, $params, true);
 $funcs->Delete();
 
-$params['fbrp_message'] = $this->Lang('form_deleted');
+$params['pwfp_message'] = $this->Lang('form_deleted');
 $this->Redirect($id, 'defaultadmin', '', $params);
 
 ?>

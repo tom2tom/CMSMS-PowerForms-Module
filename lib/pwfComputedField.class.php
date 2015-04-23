@@ -135,16 +135,16 @@ class pwfComputedField extends pwfFieldBase
 		$main = array(
 				 array(
 					$mod->Lang('title_compute_value'),
-					$mod->CreateInputText($formDescriptor, 'fbrp_opt_value',$this->GetOption('value',''),35,1024),
+					$mod->CreateInputText($formDescriptor, 'pwfp_opt_value',$this->GetOption('value',''),35,1024),
 					$help),
 				 array(
 					$mod->Lang('title_string_or_number_eval'),
-					$mod->CreateInputRadioGroup($formDescriptor, 'fbrp_opt_string_or_number_eval',
+					$mod->CreateInputRadioGroup($formDescriptor, 'pwfp_opt_string_or_number_eval',
 				    	$processType,
 				    	$this->GetOption('string_or_number_eval','numeric'),'','&nbsp;&nbsp;')),
 				 array(
 					$mod->Lang('title_order'),
-					$mod->CreateInputText($formDescriptor, 'fbrp_opt_order',$this->GetOption('order','1'),5,10),
+					$mod->CreateInputText($formDescriptor, 'pwfp_opt_order',$this->GetOption('order','1'),5,10),
 					$mod->Lang('title_order_help'))
 		);
 		return array('main'=>$main);

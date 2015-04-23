@@ -354,22 +354,22 @@ class pwfDispositionEmailBase extends pwfFieldBase
 		}
 		/* main-tab items */
 		$main = array(
-				array($mod->Lang('title_email_subject'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_email_subject',
+				array($mod->Lang('title_email_subject'),$mod->CreateInputText($formDescriptor, 'pwfp_opt_email_subject',
 						$this->GetOption('email_subject',''),50),$mod->Lang('canuse_smarty')),
 
-				array($mod->Lang('title_email_from_name'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_email_from_name',
+				array($mod->Lang('title_email_from_name'),$mod->CreateInputText($formDescriptor, 'pwfp_opt_email_from_name',
 						$this->GetOption('email_from_name',$mod->Lang('friendlyname')),40,128)),
 
-				array($mod->Lang('title_email_from_address'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_email_from_address',
+				array($mod->Lang('title_email_from_address'),$mod->CreateInputText($formDescriptor, 'pwfp_opt_email_from_address',
 						$this->GetOption('email_from_address',''),50,128),
 						$mod->Lang('email_from_addr_help',$_SERVER['SERVER_NAME']))
 			  );
-		//abandoned here: 'fbrp_opt_email_cc_address', 'fbrp_opt_use_bcc'
+		//abandoned here: 'pwfp_opt_email_cc_address', 'pwfp_opt_use_bcc'
 		//code elsewhere assumes this is last in $main[]
 		if($totype)
 			$main[] = array(
 				$mod->Lang('title_send_using'),
-				$mod->CreateInputRadioGroup($formDescriptor,'fbrp_opt_send_using',
+				$mod->CreateInputRadioGroup($formDescriptor,'pwfp_opt_send_using',
 					array($mod->Lang('to')=>'to',$mod->Lang('cc')=>'cc',$mod->Lang('bcc')=>'bc'),
 					$this->getOption('send_using','to'),'','&nbsp;&nbsp;'),
 					$mod->Lang('email_to_help'));
@@ -383,17 +383,17 @@ class pwfDispositionEmailBase extends pwfFieldBase
 		/* advanced-tab items */
 		$adv = array(
 				array($mod->Lang('title_html_email'),
-					$mod->CreateInputHidden($formDescriptor,'fbrp_opt_html_email','0').
-					$mod->CreateInputCheckbox($formDescriptor,'fbrp_opt_html_email','1',
+					$mod->CreateInputHidden($formDescriptor,'pwfp_opt_html_email','0').
+					$mod->CreateInputCheckbox($formDescriptor,'pwfp_opt_html_email','1',
 						$this->GetOption('html_email','0'))),
 
-				array($mod->Lang('title_email_encoding'),$mod->CreateInputText($formDescriptor, 'fbrp_opt_email_encoding',
+				array($mod->Lang('title_email_encoding'),$mod->CreateInputText($formDescriptor, 'pwfp_opt_email_encoding',
 					$this->GetOption('email_encoding','utf-8'),15,128)),
 
 				array($mod->Lang('title_email_template'),
 					$mod->CreateTextArea(false, $formDescriptor,
 					/*($this->GetOption('html_email','0')=='1'?$message:htmlspecialchars($message))*/
-					$message,'fbrp_opt_email_template', 'module_fb_area_wide', '','','',80,15,'','html').
+					$message,'pwfp_opt_email_template', 'pwf_area_wide', '','','',80,15,'','html').
 					'<br /><br />'.$buttons[0].'&nbsp'.$buttons[1])
 			  );
 		/*show variables-help on advanced tab*/

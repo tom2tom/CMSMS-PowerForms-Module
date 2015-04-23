@@ -131,16 +131,16 @@ class pwfDispositionFile extends pwfFieldBase
 
 		$main = array();
 		$main[] = array($mod->Lang('title_file_root'),
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_fileroot',
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_fileroot',
 						$this->GetOption('fileroot',$config['uploads_path']),45,255),
 				$mod->Lang('title_file_root_help'));
-//		$mod->CreateInputFile($formDescriptor, 'fbrp_opt_fileroot', '', 60)
+//		$mod->CreateInputFile($formDescriptor, 'pwfp_opt_fileroot', '', 60)
 		$main[] = array($mod->Lang('title_file_name'),
-				   $mod->CreateInputText($formDescriptor, 'fbrp_opt_filespec',
+				   $mod->CreateInputText($formDescriptor, 'pwfp_opt_filespec',
 						$this->GetOption('filespec','form_submissions.txt'),25,128));
 
 		$main[] = array($mod->Lang('title_newline_replacement'),
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_newlinechar',
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_newlinechar',
 						$this->GetOption('newlinechar',''),5,15),
 				$mod->Lang('title_newline_replacement_help'));
 
@@ -156,19 +156,19 @@ class pwfDispositionFile extends pwfFieldBase
 		$adv[] = array($mod->Lang('title_file_template'),
 				  $mod->CreateTextArea(false, $formDescriptor,
 						htmlspecialchars($this->GetOption('file_template','')),
-						'fbrp_opt_file_template', 'module_fb_area_wide', '','',80,15).
+						'pwfp_opt_file_template', 'pwf_area_wide', '','',80,15).
 						'<br /><br />'.$buttons[0]);
 
 		$adv[] = array($mod->Lang('title_file_header'),
 				  $mod->CreateTextArea(false, $formDescriptor,
 						htmlspecialchars($this->GetOption('file_header','')),
-						'fbrp_opt_file_header', 'module_fb_area_short', '','',80,8).
+						'pwfp_opt_file_header', 'pwf_area_short', '','',80,8).
 						'<br /><br />'.$buttons[1]);
 
 		$adv[] = array($mod->Lang('title_file_footer'),
 				  $mod->CreateTextArea(false, $formDescriptor,
 						htmlspecialchars($this->GetOption('file_footer','')),
-						'fbrp_opt_file_footer', 'module_fb_area_short', '','',80,8).
+						'pwfp_opt_file_footer', 'pwf_area_short', '','',80,8).
 						'<br /><br />'.$buttons[2]);
 		/*show variables-help on advanced tab*/
 		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>'varshelpadv');

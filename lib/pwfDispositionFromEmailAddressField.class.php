@@ -28,12 +28,12 @@ class pwfDispositionFromEmailAddressField extends pwfDispositionEmailBase
 	{
 		$mod = $this->form_ptr->module_ptr;
 		$js = $this->GetOption('javascript','');
-		$retstr = '<input type="text" name="'.$id.'fbrp__'.$this->Id.'[]" '.
+		$retstr = '<input type="text" name="'.$id.'pwfp__'.$this->Id.'[]" '.
 			$this->GetCSSIdTag('_1').' value="'.htmlspecialchars($this->Value[0], ENT_QUOTES).
 			'" size="25" maxlength="128" '.$js.'/>';
  		if($this->GetOption('send_user_copy','n') == 'c')
 		{
-			$retstr .= $mod->CreateInputCheckbox($id, 'fbrp__'.$this->Id.'[]', 1,
+			$retstr .= $mod->CreateInputCheckbox($id, 'pwfp__'.$this->Id.'[]', 1,
 					0,$this->GetCSSIdTag('_2'),'email');
 			$retstr .= '<label for="'.$this->GetCSSId('_2').'" class="label">'.$this->GetOption('send_user_label',
 				$mod->Lang('title_send_me_a_copy')).'</label>';
@@ -46,7 +46,7 @@ class pwfDispositionFromEmailAddressField extends pwfDispositionEmailBase
 		$alias = $this->GetAlias();
 		if(empty($alias))
 		{
-			$cssid = 'fbrp__'.$this->Id;
+			$cssid = 'pwfp__'.$this->Id;
 		}
 		else
 		{
@@ -125,13 +125,13 @@ class pwfDispositionFromEmailAddressField extends pwfDispositionEmailBase
 		$main = (isset($ret['main'])) ? $ret['main'] : array();
 		$opts = array($mod->Lang('option_never')=>'n',$mod->Lang('option_user_choice')=>'c',$mod->Lang('option_always')=>'a');
 		$main[] = array($mod->Lang('title_send_usercopy'),
-			$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_send_user_copy', $opts, -1, $this->GetOption('send_user_copy','n')));
+			$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_send_user_copy', $opts, -1, $this->GetOption('send_user_copy','n')));
 		$main[] = array($mod->Lang('title_send_usercopy_label'),
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_send_user_label', $this->GetOption('send_user_label',
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_send_user_label', $this->GetOption('send_user_label',
 				$mod->Lang('title_send_me_a_copy')),25,125));
 		$hopts = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
 		$main[] = array($mod->Lang('title_headers_to_modify'),
-			$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_headers_to_modify', $hopts, -1, $this->GetOption('headers_to_modify','f')));
+			$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_headers_to_modify', $hopts, -1, $this->GetOption('headers_to_modify','f')));
 		$ret['main'] = $main;
 		return $ret;
 	}

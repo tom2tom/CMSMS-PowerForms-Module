@@ -2,7 +2,7 @@
 
 {$tabheaders}
 {$start_formtab}
-<table class="pagetable module_fb_table">
+<table class="pagetable pwf_table">
  <thead><tr>
   <th>{$title_form_name}</th>
   <th>{$title_page_tag}</th>

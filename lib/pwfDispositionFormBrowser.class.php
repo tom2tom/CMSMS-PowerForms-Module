@@ -30,7 +30,7 @@ class pwfDispositionFormBrowser extends pwfFieldBase
 		{
 			return '';
 		}
-		return $mod->CreateInputHidden($id, 'fbrp__'.$this->Id,
+		return $mod->CreateInputHidden($id, 'pwfp__'.$this->Id,
 			$this->EncodeReqId($this->Value));
 	}
 
@@ -108,18 +108,18 @@ class pwfDispositionFormBrowser extends pwfFieldBase
 		{
 			$fname = array_search($this->GetOption('sortfield'.$i),$fieldlist);
 			$main[] = array($mod->Lang('title_sortable_field',array($i)),
-						$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_sortfield'.$i, $fieldlist, -1,
+						$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_sortfield'.$i, $fieldlist, -1,
 					$this->GetOption('sortfield'.$i,-1))
 					);
 			$current_indexes[] = $this->GetOption('sortfield'.$i,-1);
 		}
 		$main[] = array($mod->Lang('title_note'),$mod->Lang('title_changing_triggers_reindex').
-			$mod->CreateInputHidden($formDescriptor,'fbrp_previous_indices',implode(':',$current_indexes))
+			$mod->CreateInputHidden($formDescriptor,'pwfp_previous_indices',implode(':',$current_indexes))
 			);
 
 		$adv[] = array($mod->Lang('title_searchable'),
-			$mod->CreateInputHidden($formDescriptor, 'fbrp_opt_searchable','0').
-			$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_searchable',
+			$mod->CreateInputHidden($formDescriptor, 'pwfp_opt_searchable','0').
+			$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_searchable',
 			'1',$this->GetOption('searchable','0')).
 			$mod->Lang('title_searchable_help'));
 
@@ -132,8 +132,8 @@ class pwfDispositionFormBrowser extends pwfFieldBase
 		else
 		{
 			$adv[] = array($mod->Lang('title_feu_binding'),
-				$mod->CreateInputHidden($formDescriptor, 'fbrp_opt_feu_bind','0').
-				$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_feu_bind',
+				$mod->CreateInputHidden($formDescriptor, 'pwfp_opt_feu_bind','0').
+				$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_feu_bind',
 					'1',$this->GetOption('feu_bind','0')),
 				$mod->Lang('title_feu_bind_help'));
 		}
@@ -152,17 +152,17 @@ class pwfDispositionFormBrowser extends pwfFieldBase
 				$certs = $openssl->getCertList();
 			}
 			$adv[] = array($mod->Lang('title_encrypt_database_data'),
-				   $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_crypt','0').
-						$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_crypt',
+				   $mod->CreateInputHidden($formDescriptor, 'pwfp_opt_crypt','0').
+						$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_crypt',
 						'1',$this->GetOption('crypt','0')).
 						$mod->Lang('title_encrypt_database_long'));
 			$adv[] = array($mod->Lang('title_encrypt_sortfields'),
-				   $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_hash_sort','0').
-						$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_hash_sort',
+				   $mod->CreateInputHidden($formDescriptor, 'pwfp_opt_hash_sort','0').
+						$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_hash_sort',
 						'1',$this->GetOption('hash_sort','0')).
 					  $mod->Lang('title_encrypt_sortfields_help'));
 			$adv[] = array($mod->Lang('title_encryption_keyfile'),
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_keyfile',
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_keyfile',
 						$this->GetOption('keyfile',''),40,255));
 
 			$cryptlibs = array();
@@ -176,7 +176,7 @@ class pwfDispositionFormBrowser extends pwfFieldBase
 			}
 
 			$adv[] = array($mod->Lang('title_crypt_lib'),
-				$mod->CreateInputDropdown($formDescriptor,'fbrp_opt_crypt_lib',
+				$mod->CreateInputDropdown($formDescriptor,'pwfp_opt_crypt_lib',
 				$cryptlibs,-1,$this->GetOption('crypt_lib')));
 
 			if($openssl !== null)
@@ -184,10 +184,10 @@ class pwfDispositionFormBrowser extends pwfFieldBase
 				$adv[] = array($mod->Lang('choose_crypt'),$mod->Lang('choose_crypt_long'));
 
 				$adv[] = array($mod->Lang('title_crypt_cert'),
-					$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_crypt_cert', $certs,
+					$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_crypt_cert', $certs,
 					-1,$this->GetOption('crypt_cert')));
 				$adv[] = array($mod->Lang('title_private_key'),
-					$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_private_key', $keys,
+					$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_private_key', $keys,
 					-1,$this->GetOption('private_key')).$mod->Lang('title_ensure_cert_key_match'));
 			}
 		}
@@ -217,7 +217,7 @@ class pwfDispositionFormBrowser extends pwfFieldBase
 	function PostFieldSaveProcess(&$params)
 	{
 		$reindex = false;
-		$prev_indices = explode(':',$params['fbrp_previous_indices']);
+		$prev_indices = explode(':',$params['pwfp_previous_indices']);
 		for ($i=1;$i<6;$i++)
 		{
 			if($this->GetOption('sortfield'.$i) != $prev_indices[$i-1])

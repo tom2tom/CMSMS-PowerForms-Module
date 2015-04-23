@@ -66,7 +66,7 @@ class pwfDispositionEmailConfirmation extends pwfDispositionEmailBase
 	function GetFieldInput($id, &$params, $returnid)
 	{
 		$mod = $this->form_ptr->module_ptr;
-		return $mod->fbCreateInputText($id, 'fbrp__'.$this->Id,
+		return $mod->fbCreateInputText($id, 'pwfp__'.$this->Id,
 			htmlspecialchars($this->Value, ENT_QUOTES),25,80,$this->GetCSSIdTag(),'email');
 	}
 
@@ -82,7 +82,7 @@ class pwfDispositionEmailConfirmation extends pwfDispositionEmailBase
 			$smarty = cmsms()->GetSmarty();
 			$mod = $this->form_ptr->module_ptr;
 			$smarty->assign('confirm_url',$mod->CreateFrontendLink('', $returnid,
-				'validate', '', array('fbrp_f'=>$this->form_ptr->GetId(),'fbrp_r'=>$rid,'fbrp_c'=>$code), '',
+				'validate', '', array('pwfp_f'=>$this->form_ptr->GetId(),'pwfp_r'=>$rid,'pwfp_c'=>$code), '',
 				true,false,'',true));
 			return $this->SendForm($this->GetValue(),$this->GetOption('email_subject'));
 		}
@@ -100,7 +100,7 @@ class pwfDispositionEmailConfirmation extends pwfDispositionEmailBase
 		$ret = $this->PrePopulateAdminFormBase($formDescriptor);
 		$main = (isset($ret['main'])) ? $ret['main'] : array();
 		$main[] = array($mod->Lang('redirect_after_approval'),
-				@$contentops->CreateHierarchyDropdown('',$this->GetOption('redirect_page','0'), $formDescriptor.'fbrp_opt_redirect_page'));
+				@$contentops->CreateHierarchyDropdown('',$this->GetOption('redirect_page','0'), $formDescriptor.'pwfp_opt_redirect_page'));
 		$ret['main'] = $main;
 		return $ret;
 	}

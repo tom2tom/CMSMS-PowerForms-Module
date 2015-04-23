@@ -31,7 +31,7 @@ class pwfPasswordField extends pwfFieldBase
 		}
 		if($this->GetOption('hide','1') == '0')
 		{
-			return $mod->CreateInputText($id, 'fbrp__'.$this->Id,
+			return $mod->CreateInputText($id, 'pwfp__'.$this->Id,
 					($this->Value?$this->Value:''),
 					$this->GetOption('length'),
 					255,
@@ -39,7 +39,7 @@ class pwfPasswordField extends pwfFieldBase
 		}
 		else
 		{
-			return $mod->CreateInputPassword($id, 'fbrp__'.$this->Id,
+			return $mod->CreateInputPassword($id, 'pwfp__'.$this->Id,
 					($this->Value?$this->Value:''), $this->GetOption('length'),
 					255, $js.$ro.$this->GetCSSIdTag());
 		}
@@ -66,25 +66,25 @@ class pwfPasswordField extends pwfFieldBase
 		$main = array(
 			array($mod->Lang('title_display_length'),
 			      $mod->CreateInputText($formDescriptor,
-						    'fbrp_opt_length',
+						    'pwfp_opt_length',
 			         $this->GetOption('length','12'),25,25)),
 			array($mod->Lang('title_minimum_length'),
 			      $mod->CreateInputText($formDescriptor,
-						    'fbrp_opt_min_length',
+						    'pwfp_opt_min_length',
 			         $this->GetOption('min_length','8'),25,25)),
 			array($mod->Lang('title_hide'),
-			      $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_hide','0').
-            $mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_hide',
+			      $mod->CreateInputHidden($formDescriptor, 'pwfp_opt_hide','0').
+            $mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_hide',
             		'1',$this->GetOption('hide','1')),
 				  $mod->Lang('title_hide_help')),
 			array($mod->Lang('title_read_only'),
-			      $mod->CreateInputHidden($formDescriptor, 'fbrp_opt_readonly','0').
-            $mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_readonly',
+			      $mod->CreateInputHidden($formDescriptor, 'pwfp_opt_readonly','0').
+            $mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_readonly',
             		'1',$this->GetOption('readonly','0')))
 		);
 		$adv = array(
 			array($mod->Lang('title_field_regex'),
-			      $mod->CreateInputText($formDescriptor, 'fbrp_opt_regex',
+			      $mod->CreateInputText($formDescriptor, 'pwfp_opt_regex',
 							  $this->GetOption('regex'),25,1024),
 			      $mod->Lang('title_regex_help')),
 		);

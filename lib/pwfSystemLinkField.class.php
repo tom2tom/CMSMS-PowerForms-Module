@@ -73,11 +73,11 @@ class pwfSystemLinkField extends pwfFieldBase
 
 		$main = array(
 				array($mod->Lang('title_link_autopopulate'),
-					 $mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_auto_link',
+					 $mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_auto_link',
             		'1',$this->GetOption('auto_link','0')),
 					 $mod->Lang('title_link_autopopulate_help')),
              array($mod->Lang('title_link_to_sitepage'),
-				 	$contentops->CreateHierarchyDropdown('',$this->GetOption('target_page',''), $formDescriptor.'fbrp_opt_target_page'))
+				 	$contentops->CreateHierarchyDropdown('',$this->GetOption('target_page',''), $formDescriptor.'pwfp_opt_target_page'))
 		);
 		return array('main'=>$main);
 	}

@@ -14,7 +14,7 @@ if(!isset($params['form_id']) && isset($params['form']))
 $funcs = new pwfUtils($this,$params,true);
 $spec = $funcs->GetName().".xml";
 $spec = preg_replace('/[^\w\d\.\-\_]/','_',$spec);
-$xmlstr = $funcs->ExportXML(isset($params['fbrp_export_values'])?true:false);
+$xmlstr = $funcs->ExportXML(isset($params['pwfp_export_values'])?true:false);
 
 @ob_clean();
 @ob_clean();

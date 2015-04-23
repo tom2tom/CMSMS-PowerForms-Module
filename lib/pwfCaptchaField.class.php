@@ -12,7 +12,9 @@ class pwfCaptchaField extends pwfFieldBase
 		parent::__construct($form_ptr, $params);
 		$this->Type = 'CaptchaField';
 		$this->DisplayInForm = true;
+		$this->DisplayInSubmission = false;
 		$this->NonRequirableField = true;
+		$this->ValidationTypes = array();
 		$this->sortable = false;
 	}
 
@@ -34,6 +36,15 @@ class pwfCaptchaField extends pwfFieldBase
 
 	function Validate()
 	{
+		$this->validated = true;
+		$this->validationErrorText = '';
+		$captcha = $this->getModuleInstance('Captcha');
+		if($captcha != null && !$captcha->CheckCaptcha($this->Value))
+		{
+			$this->validated = false;
+			$this->validationErrorText = 'FIELD ERROR MESSAGE';
+		}
+		return array($this->validated, $this->validationErrorText);
 	}
 }
 

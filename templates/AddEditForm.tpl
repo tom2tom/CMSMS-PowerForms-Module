@@ -21,7 +21,7 @@
 {if $adding==0}
  <div class="pageoverflow">
   <p class="pagetext">{$title_form_fields}</p>
-  <table class="module_fb_table pagetable tabledrag">
+  <table class="pwf_table pagetable tabledrag">
    <thead><tr>
   {if isset($title_field_id)}<th>{$title_field_id}</th>{/if}
     <th style="width:15em;">{$title_field_name}</th>
@@ -38,7 +38,7 @@
    <tbody>
   {foreach from=$fields item=entry}
    {cycle name=fields values='odd,even' assign=rowclass}
-  	 <tr id="fbrp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
+  	 <tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
    {if isset($title_field_id)}<td>{$entry->id}</td>{/if}
      <td>{$entry->name}</td>
    {if isset($title_field_alias)}<td>{$entry->alias}</td>{/if}
@@ -107,7 +107,7 @@
   <p style="font-weight:bold;">{$title_form_template}:</p>
   <p>{$input_form_template}</p>
   <p style="font-weight:bold;">{$title_form_vars}:</p>
-<table class="module_fb_legend">
+<table class="pwf_legend">
 <tr><th>{$variable}</th><th>{$description}</th></tr>
 {foreach from=$globalfields item=entry}
 {cycle name=globals values='odd,even' assign=rowclass}
@@ -117,7 +117,7 @@
 </table><br />
   <p>{$globals_help1}</p>
   <p>{$attrs_help1}</p>
-<table class="module_fb_legend">
+<table class="pwf_legend">
 <tr><th>{$attribute}</th><th>{$description}</th></tr>
 {foreach from=$attrs item=entry}
 {cycle name=attrs values='odd,even' assign=rowclass}

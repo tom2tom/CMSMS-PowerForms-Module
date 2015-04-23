@@ -45,7 +45,7 @@ class pwfDispositionPageRedirector extends pwfFieldBase
 		$delcount = 0;
 		foreach($params as $thisKey=>$thisVal)
 		{
-			if(substr($thisKey,0,9) == 'fbrp_sel_')
+			if(substr($thisKey,0,9) == 'pwfp_sel_')
 			{
 				$this->RemoveOptionElement('destination_page', $thisVal - $delcount);
 				$this->RemoveOptionElement('destination_subject', $thisVal - $delcount);
@@ -100,7 +100,7 @@ class pwfDispositionPageRedirector extends pwfFieldBase
 		{
 			$sorted[$subjects] = '1';
 		}
-		return $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id, $sorted, -1, $this->Value, $js.$this->GetCSSIdTag());
+		return $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id, $sorted, -1, $this->Value, $js.$this->GetCSSIdTag());
 	}
 
 	function StatusInfo()
@@ -139,7 +139,7 @@ class pwfDispositionPageRedirector extends pwfFieldBase
 //		$ret = $this->PrePopulateAdminFormBase($formDescriptor);
 		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_select_one',
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_select_one',
 			$this->GetOption('select_one',$mod->Lang('select_one')),30,128));
 //		$main[] = array($mod->Lang('title_director_details'),$dests);
 		$dests = array();
@@ -152,9 +152,9 @@ class pwfDispositionPageRedirector extends pwfFieldBase
 		for ($i=0;$i<$num;$i++)
 		{
 			$dests[] = array(
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_destination_subject[]',$this->GetOptionElement('destination_subject',$i),30,128),
-			$contentops->CreateHierarchyDropdown('',$this->GetOptionElement('destination_page',$i), $id.'fbrp_opt_destination_page[]'),
-			$mod->CreateInputCheckbox($formDescriptor, 'fbrp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_destination_subject[]',$this->GetOptionElement('destination_subject',$i),30,128),
+			$contentops->CreateHierarchyDropdown('',$this->GetOptionElement('destination_page',$i), $id.'pwfp_opt_destination_page[]'),
+			$mod->CreateInputCheckbox($formDescriptor, 'pwfp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
 			);
 		}
 		return array('main'=>$main,'table'=>$dests);

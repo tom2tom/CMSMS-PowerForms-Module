@@ -60,7 +60,7 @@ class pwfProvincePickerField extends pwfFieldBase
 		  $this->SetValue($this->GetOption('default_province',''));
 		}
 
-		return $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id, $this->Provinces, -1, $this->Value,$js.$this->GetCSSIdTag());
+		return $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id, $this->Provinces, -1, $this->Value,$js.$this->GetCSSIdTag());
 	}
 
 	function PrePopulateAdminForm($formDescriptor)
@@ -70,10 +70,10 @@ class pwfProvincePickerField extends pwfFieldBase
 
 		$main = array(
 			array($mod->Lang('title_select_default_province'),
-            		$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_default_province',
+            		$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_default_province',
             		$this->Provinces, -1, $this->GetOption('default_province',''))),
 			array($mod->Lang('title_select_one_message'),
-            		$mod->CreateInputText($formDescriptor, 'fbrp_opt_select_one',
+            		$mod->CreateInputText($formDescriptor, 'pwfp_opt_select_one',
             		$this->GetOption('select_one',$mod->Lang('select_one'))))
 		);
 		return array('main'=>$main);

@@ -5,15 +5,15 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if(preg_match('/\.tpl$/',$params['fbrp_tid']))
+if(preg_match('/\.tpl$/',$params['pwfp_tid']))
 {
-    $tplstr = file_get_contents(cms_join_path(dirname(__FILE__),'templates',$params['fbrp_tid']));
+    $tplstr = file_get_contents(cms_join_path(dirname(__FILE__),'templates',$params['pwfp_tid']));
 }
 else
 {
     $query = "SELECT value FROM ".cms_db_prefix().
 		"module_fb_form_attr WHERE form_id=? AND name='form_template'";
-	$rs = $db->Execute($query,array($params['fbrp_tid']));
+	$rs = $db->Execute($query,array($params['pwfp_tid']));
 	if($rs)
 	{
 		$row = $rs->FetchRow();

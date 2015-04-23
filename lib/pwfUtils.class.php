@@ -40,20 +40,20 @@ class pwfUtils
 			$this->Id = $params['form_id'];
 		}
 
-		if(isset($params['fbrp_form_alias']))
+		if(isset($params['pwfp_form_alias']))
 		{
-			$this->Alias = $params['fbrp_form_alias'];
+			$this->Alias = $params['pwfp_form_alias'];
 		}
 
-		if(isset($params['fbrp_form_name']))
+		if(isset($params['pwfp_form_name']))
 		{
-			$this->Name = $params['fbrp_form_name'];
+			$this->Name = $params['pwfp_form_name'];
 		}
 
 		$fieldExpandOp = false;
 		foreach($params as $pKey=>$pVal)
 		{
-			if(substr($pKey,0,9) == 'fbrp_FeX_' || substr($pKey,0,9) == 'fbrp_FeD_')
+			if(substr($pKey,0,9) == 'pwfp_FeX_' || substr($pKey,0,9) == 'pwfp_FeD_')
 			{
 				// expanding or shrinking a field
 				$fieldExpandOp = true;
@@ -62,10 +62,10 @@ class pwfUtils
 
 		if($fieldExpandOp)
 		{
-			$params['fbrp_done'] = 0;
-			if(isset($params['fbrp_continue']))
+			$params['pwfp_done'] = 0;
+			if(isset($params['pwfp_continue']))
 			{
-				$this->Page = $params['fbrp_continue'] - 1;
+				$this->Page = $params['pwfp_continue'] - 1;
 			}
 			else
 			{
@@ -74,29 +74,29 @@ class pwfUtils
 		}
 		else
 		{
-			if(isset($params['fbrp_continue']))
+			if(isset($params['pwfp_continue']))
 			{
-				$this->Page = $params['fbrp_continue'];
+				$this->Page = $params['pwfp_continue'];
 			}
 			else
 			{
 				$this->Page = 1;
 			}
 
-			if(isset($params['fbrp_prev']) && isset($params['fbrp_previous']))
+			if(isset($params['pwfp_prev']) && isset($params['pwfp_previous']))
 			{
-				$this->Page = $params['fbrp_previous'];
-				$params['fbrp_done'] = 0;
+				$this->Page = $params['pwfp_previous'];
+				$params['pwfp_done'] = 0;
 			}
 		}
 
 		$this->formTotalPages = 1;
-		if(isset($params['fbrp_done'])&& $params['fbrp_done'] == 1)
+		if(isset($params['pwfp_done'])&& $params['pwfp_done'] == 1)
 		{
 			$this->formState = 'submit';
 		}
 
-		if(isset($params['fbrp_user_form_validate']) && $params['fbrp_user_form_validate'] == true)
+		if(isset($params['pwfp_user_form_validate']) && $params['pwfp_user_form_validate'] == true)
 		{
 			$this->formState = 'confirm';
 		}
@@ -113,12 +113,12 @@ class pwfUtils
 
 		foreach($params as $thisParamKey=>$thisParamVal)
 		{
-			if(substr($thisParamKey,0,11) == 'fbrp_forma_')
+			if(substr($thisParamKey,0,11) == 'pwfp_forma_')
 			{
 				$thisParamKey = substr($thisParamKey,11);
 				$this->Attrs[$thisParamKey] = $thisParamVal;
 			}
-			else if($thisParamKey == 'fbrp_form_template' && $this->Id != -1)
+			else if($thisParamKey == 'pwfp_form_template' && $this->Id != -1)
 			{
 				$this->module_ptr->SetTemplate('fb_'.$this->Id,$thisParamVal);
 			}
@@ -130,7 +130,7 @@ class pwfUtils
 			'{$sub_host}'=>$this->module_ptr->Lang('help_server_name'),
 			'{$sub_source_ip}'=>$this->module_ptr->Lang('help_sub_source_ip'),
 			'{$sub_url}'=>$this->module_ptr->Lang('help_sub_url'),
-			'{$fb_version}'=>$this->module_ptr->Lang('help_fb_version'),
+			'{$fb_version}'=>$this->module_ptr->Lang('help_module_version'),
 			'{$TAB}'=>$this->module_ptr->Lang('help_tab')
 		);
 	}
@@ -274,7 +274,7 @@ class pwfUtils
 //<![CDATA[
 function populate_{$fldAlias}(formname)
 {
- var fname = 'IDfbrp_{$fieldName}';
+ var fname = 'IDpwfp_{$fieldName}';
  $(formname[fname]).val(|TEMPLATE|).change();
 }
 //]]>
@@ -288,7 +288,7 @@ EOS;
 	function fieldValueTemplate()
 	{
 		$mod = $this->module_ptr;
-		$ret = '<table class="module_fb_legend"><tr><th colspan="2">'.$mod->Lang('help_variables_for_computation').'</th></tr>';
+		$ret = '<table class="pwf_legend"><tr><th colspan="2">'.$mod->Lang('help_variables_for_computation').'</th></tr>';
 		$ret .= '<tr><th>'.$mod->Lang('help_php_variable_name').'</th><th>'.$mod->Lang('help_form_field').'</th></tr>';
 		$odd = false;
 		foreach($this->Fields as &$fld)
@@ -401,7 +401,7 @@ EOS;
 	{
 		$mod = $this->module_ptr;
 
-		$ret = '<table class="module_fb_legend"><tr><th colspan="2">'.$mod->Lang('help_variables_for_template').'</th></tr>';
+		$ret = '<table class="pwf_legend"><tr><th colspan="2">'.$mod->Lang('help_variables_for_template').'</th></tr>';
 		$ret .= '<tr><th>'.$mod->Lang('help_variable_name').'</th><th>'.$mod->Lang('help_form_field').'</th></tr>';
 		$odd = false;
 		foreach($this->templateVariables as $thisKey=>$thisVal)
@@ -489,7 +489,7 @@ EOS;
 		$func = <<<EOS  
 function populate_{$fldAlias}(formname) {
  if(confirm ('{$msg}')) {
-  formname['{$id}fbrp_{$fieldName}'].value=|TEMPLATE|;
+  formname['{$id}pwfp_{$fieldName}'].value=|TEMPLATE|;
  }
 }
 EOS;
@@ -797,10 +797,10 @@ EOS;
 		{
 			$hidden .= $mod->CreateInputHidden($id, 'lang', $params['lang']);
 		}
-		$hidden .= $mod->CreateInputHidden($id, 'fbrp_continue', ($this->Page + 1));
-		if(isset($params['fbrp_browser_id']))
+		$hidden .= $mod->CreateInputHidden($id, 'pwfp_continue', ($this->Page + 1));
+		if(isset($params['pwfp_browser_id']))
 		{
-			$hidden .= $mod->CreateInputHidden($id,'fbrp_browser_id',$params['fbrp_browser_id']);
+			$hidden .= $mod->CreateInputHidden($id,'pwfp_browser_id',$params['pwfp_browser_id']);
 		}
 		if(isset($params['response_id']))
 		{
@@ -808,11 +808,11 @@ EOS;
 		}
 		if($this->Page > 1)
 		{
-			$hidden .= $mod->CreateInputHidden($id, 'fbrp_previous', ($this->Page - 1));
+			$hidden .= $mod->CreateInputHidden($id, 'pwfp_previous', ($this->Page - 1));
 		}
 		if($this->Page == $this->formTotalPages)
 		{
-			$hidden .= $mod->CreateInputHidden($id, 'fbrp_done', 1);
+			$hidden .= $mod->CreateInputHidden($id, 'pwfp_done', 1);
 		}
 
 		// Start building fields
@@ -828,7 +828,7 @@ EOS;
 			}
 			if($formPageCount != $this->Page)
 			{
-				$testIndex = 'fbrp__'.$fld->GetId();
+				$testIndex = 'pwfp__'.$fld->GetId();
 
 				// Ryan's ugly fix for Bug 4307
 				// We should figure out why this field wasn't populating its Smarty variable
@@ -885,7 +885,7 @@ EOS;
 			$oneset->required_symbol = $fld->IsRequired()?$reqSymbol:'';
 			$oneset->css_class = $fld->GetOption('css_class');
 			$oneset->helptext = $fld->GetOption('helptext');
-			$oneset->field_helptext_id = 'fbrp_ht_'.$fld->GetID();
+			$oneset->field_helptext_id = 'pwfp_ht_'.$fld->GetID();
 		//	$oneset->valid = $fld->GetOption('is_valid',true)?1:0;
 			$oneset->valid = $fld->validated?1:0;
 			$oneset->error = $fld->GetOption('is_valid',true)?'':$fld->validationErrorText;
@@ -947,7 +947,7 @@ var submitted = 0;
 function LockButton () {
  var ret = false;
  if(!submitted) {
-  var item = document.getElementById("{$id}fbrp_submit");
+  var item = document.getElementById("{$id}pwfp_submit");
   if(item != null) {
    setTimeout(function() {item.disabled = true}, 0);
   }
@@ -966,7 +966,7 @@ EOS;
 
 		if($this->Page > 1)
 		{
-			$smarty->assign('prev','<input class="cms_submit fbsubmit_prev" name="'.$id.'fbrp_prev" id="'.$id.'fbrp_prev" value="'.$this->GetAttr('prev_button_text').'" type="submit" '.$js.' />');
+			$smarty->assign('prev','<input class="cms_submit fbsubmit_prev" name="'.$id.'pwfp_prev" id="'.$id.'pwfp_prev" value="'.$this->GetAttr('prev_button_text').'" type="submit" '.$js.' />');
 		}
 		else
 		{
@@ -976,7 +976,7 @@ EOS;
 		$smarty->assign('has_captcha',0);
 		if($this->Page < $formPageCount)
 		{
-			$smarty->assign('submit','<input class="cms_submit fbsubmit_next" name="'.$id.'fbrp_submit" id="'.$id.'fbrp_submit" value="'.$this->GetAttr('next_button_text').'" type="submit" '.$js.' />');
+			$smarty->assign('submit','<input class="cms_submit fbsubmit_next" name="'.$id.'pwfp_submit" id="'.$id.'pwfp_submit" value="'.$this->GetAttr('next_button_text').'" type="submit" '.$js.' />');
 		}
 		else
 		{
@@ -985,11 +985,11 @@ EOS;
 			{
 				$smarty->assign('graphic_captcha',$captcha->getCaptcha());
 				$smarty->assign('title_captcha',$this->GetAttr('title_user_captcha',$mod->Lang('title_user_captcha')));
-				$smarty->assign('input_captcha',$mod->CreateInputText($id, 'fbrp_captcha_phrase',''));
+				$smarty->assign('input_captcha',$mod->CreateInputText($id, 'pwfp_captcha_phrase',''));
 				$smarty->assign('has_captcha',1);
 			}
 
-			$smarty->assign('submit','<input class="cms_submit fbsubmit" name="'.$id.'fbrp_submit" id="'.$id.'fbrp_submit" value="'.$this->GetAttr('submit_button_text').'" type="submit" '.$js.' />');
+			$smarty->assign('submit','<input class="cms_submit fbsubmit" name="'.$id.'pwfp_submit" id="'.$id.'pwfp_submit" value="'.$this->GetAttr('submit_button_text').'" type="submit" '.$js.' />');
 		}
 		return $mod->ProcessTemplateFromDatabase('fb_'.$this->Id);
 	}
@@ -1033,11 +1033,11 @@ EOS;
 		if($result)
 		{
 			$this->Id = $result['form_id'];
-			if(!isset($params['fbrp_form_name']) || empty($params['fbrp_form_name']))
+			if(!isset($params['pwfp_form_name']) || empty($params['pwfp_form_name']))
 			{
 				$this->Name = $result['name'];
 			}
-			if(!isset($params['fbrp_form_alias']) || empty($params['fbrp_form_alias']))
+			if(!isset($params['pwfp_form_alias']) || empty($params['pwfp_form_alias']))
 			{
 				$this->Alias = $result['alias'];
 			}
@@ -1128,7 +1128,7 @@ EOS;
 					//error_log("Instantiating Field. usage ".memory_get_usage());
 					$className = $this->MakeClassName($fldArray['type'], '');
 					// create the field object
-					if((isset($fldArray['field_id']) && (isset($params['fbrp__'.$fldArray['field_id']]) || isset($params['fbrp___'.$fldArray['field_id']]))) ||
+					if((isset($fldArray['field_id']) && (isset($params['pwfp__'.$fldArray['field_id']]) || isset($params['pwfp___'.$fldArray['field_id']]))) ||
 						(isset($fldArray['field_id']) && isset($params['value_'.$fldArray['name']])) || (isset($fldArray['field_id']) && isset($params['value_fld'.$fldArray['field_id']])) ||
 						(isset($params['field_id']) && isset($fldArray['field_id']) && $params['field_id'] == $fldArray['field_id']))
 					{
@@ -1151,7 +1151,7 @@ EOS;
 	}
 
 	/* notable params:
-	  fbrp_xml_file -- source file for the XML
+	  pwfp_xml_file -- source file for the XML
 	  xml_string -- source string for the XML
 	*/
 	function ImportXML(&$params)
@@ -1160,9 +1160,9 @@ EOS;
 		$parser = xml_parser_create('');
 		xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
 		xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 0); // was 1
-		if(isset($params['fbrp_xml_file']) && ! empty($params['fbrp_xml_file']))
+		if(isset($params['pwfp_xml_file']) && ! empty($params['pwfp_xml_file']))
 		{
-			xml_parse_into_struct($parser, file_get_contents($params['fbrp_xml_file']), $values);
+			xml_parse_into_struct($parser, file_get_contents($params['pwfp_xml_file']), $values);
 		}
 		elseif(isset($params['xml_string']) && ! empty($params['xml_string']))
 		{
@@ -1208,17 +1208,17 @@ EOS;
 		$params['form_id'] = -1; // override any form_id values that may be around
 		$formAttrs = &$elements[0]['attributes'];
 
-		if(isset($params['fbrp_import_formalias']) && !empty($params['fbrp_import_formalias']))
+		if(isset($params['pwfp_import_formalias']) && !empty($params['pwfp_import_formalias']))
 		{
-			$this->SetAlias($params['fbrp_import_formalias']);
+			$this->SetAlias($params['pwfp_import_formalias']);
 		}
 		else if($this->inXML($formAttrs['alias']))
 		{
 			$this->SetAlias($formAttrs['alias']);
 		}
-		if(isset($params['fbrp_import_formname']) && !empty($params['fbrp_import_formname']))
+		if(isset($params['pwfp_import_formname']) && !empty($params['pwfp_import_formname']))
 		{
-			$this->SetName($params['fbrp_import_formname']);
+			$this->SetName($params['pwfp_import_formname']);
 		}
 		$foundfields = false;
 		// populate the attributes and field name first. When we see a field, we save the form and then start adding the fields to it.
@@ -1244,15 +1244,15 @@ EOS;
 				{
 					// first field
 					$foundfields = true;
-					if(isset($params['fbrp_import_formname']) &&
-						trim($params['fbrp_import_formname']) != '')
+					if(isset($params['pwfp_import_formname']) &&
+						trim($params['pwfp_import_formname']) != '')
 					{
-						$this->SetName(trim($params['fbrp_import_formname']));
+						$this->SetName(trim($params['pwfp_import_formname']));
 					}
-					if(isset($params['fbrp_import_formalias']) &&
-						trim($params['fbrp_import_formname']) != '')
+					if(isset($params['pwfp_import_formalias']) &&
+						trim($params['pwfp_import_formname']) != '')
 					{
-						$this->SetAlias(trim($params['fbrp_import_formalias']));
+						$this->SetAlias(trim($params['pwfp_import_formalias']));
 					}
 					$this->Store();
 					$params['form_id'] = $this->GetId();
@@ -1303,7 +1303,7 @@ EOS;
 
 		// clean up references
 
-		if(isset($params['fbrp_xml_file']) && ! empty($params['fbrp_xml_file']))
+		if(isset($params['pwfp_xml_file']) && ! empty($params['pwfp_xml_file']))
 		{
 			// need to update mappings in templates.
 			$tmp = $this->updateRefs($this->GetAttr('form_template',''), $fieldMap);
@@ -1397,9 +1397,9 @@ EOS;
 	{
 		$params = $this->module_params;
 		// For new form, check for duplicate name and/or alias
-		if($this->Id == -1 && !$this->newID ($params['fbrp_form_name'],$params['fbrp_form_alias']))
+		if($this->Id == -1 && !$this->newID ($params['pwfp_form_name'],$params['pwfp_form_alias']))
 		{
-			$params['fbrp_message'] = $this->module_ptr->Lang('duplicate_identifier');
+			$params['pwfp_message'] = $this->module_ptr->Lang('duplicate_identifier');
 			return false;
 		}
 
@@ -1419,7 +1419,7 @@ EOS;
 		}
 		if($res == false)
 		{
-			$params['fbrp_message'] = $this->module_ptr->Lang('database_error');
+			$params['pwfp_message'] = $this->module_ptr->Lang('database_error');
 			return false;
 		}
 
@@ -1427,7 +1427,7 @@ EOS;
 		$sql = 'DELETE FROM '.$pref.'module_fb_form_attr WHERE form_id=?';
 		if($db->Execute($sql, array($this->Id)) == false)
 		{
-			$params['fbrp_message'] = $this->module_ptr->Lang('database_error');
+			$params['pwfp_message'] = $this->module_ptr->Lang('database_error');
 			return false;
 		}
 
@@ -1444,16 +1444,16 @@ EOS;
 			}
 			else
 			{
-				$params['fbrp_message'] = $this->module_ptr->Lang('database_error');
+				$params['pwfp_message'] = $this->module_ptr->Lang('database_error');
 				return false;
 			}
 		}
 
 		// Update field position
 		$order_list = false;
-		if(isset($params['fbrp_sort']))
+		if(isset($params['pwfp_sort']))
 		{
-			$order_list = explode(',',$params['fbrp_sort']);
+			$order_list = explode(',',$params['pwfp_sort']);
 		}
 
 		if(is_array($order_list) && count($order_list) > 0)
@@ -1468,7 +1468,7 @@ EOS;
 					$count++;
 				else
 				{
-					$params['fbrp_message'] = $this->module_ptr->Lang('database_error');
+					$params['pwfp_message'] = $this->module_ptr->Lang('database_error');
 					return false;
 				}
 			}
@@ -1654,7 +1654,7 @@ EOS;
 		$smarty->assign('tab_end',$mod->EndTab());
 		$smarty->assign('form_end',$mod->CreateFormEnd());
 		$smarty->assign('title_form_name',$mod->Lang('title_form_name'));
-		$smarty->assign('input_form_name', $mod->CreateInputText($id, 'fbrp_form_name', $this->Name, 50));
+		$smarty->assign('input_form_name', $mod->CreateInputText($id, 'pwfp_form_name', $this->Name, 50));
 
 		$smarty->assign('title_load_template',$mod->Lang('title_load_template'));
 		$modLink = $mod->CreateLink($id, 'get_template', $returnid, '', array(), '', true);
@@ -1675,7 +1675,7 @@ EOS;
 		}
 
 		$smarty->assign('input_load_template',$mod->CreateInputDropdown($id,
-			'fbrp_fb_template_load', $templateList, -1, '', 'id="fb_template_load" onchange="jQuery(this).fb_get_template(\''.$mod->Lang('template_are_you_sure').'\',\''.$modLink.'\');"'));
+			'pwfp_fb_template_load', $templateList, -1, '', 'id="fb_template_load" onchange="jQuery(this).fb_get_template(\''.$mod->Lang('template_are_you_sure').'\',\''.$modLink.'\');"'));
 
 		$globalfields = array();
 		foreach(array(
@@ -1742,16 +1742,16 @@ EOS;
 
 		$smarty->assign('title_form_unspecified',$mod->Lang('title_form_unspecified'));
 		$smarty->assign('input_form_unspecified',
-			$mod->CreateInputText($id, 'fbrp_forma_unspecified',
+			$mod->CreateInputText($id, 'pwfp_forma_unspecified',
 				$this->GetAttr('unspecified',$mod->Lang('unspecified')),30));
 		$smarty->assign('title_form_status', $mod->Lang('title_form_status'));
 		$smarty->assign('text_ready', $mod->Lang('title_ready_for_deployment'));
 		$smarty->assign('title_form_alias',$mod->Lang('title_form_alias'));
 		$smarty->assign('input_form_alias',
-			$mod->CreateInputText($id,'fbrp_form_alias',$this->Alias,50));
+			$mod->CreateInputText($id,'pwfp_form_alias',$this->Alias,50));
 		$smarty->assign('title_form_css_class',$mod->Lang('title_form_css_class'));
 		$smarty->assign('input_form_css_class',
-				 $mod->CreateInputText($id, 'fbrp_forma_css_class',
+				 $mod->CreateInputText($id, 'pwfp_forma_css_class',
 							   $this->GetAttr('css_class','formbuilderform'),50,50));
 		$smarty->assign('title_form_fields', $mod->Lang('title_form_fields'));
 		$smarty->assign('title_form_main', $mod->Lang('title_form_main'));
@@ -1790,7 +1790,7 @@ EOS;
 		$submitActions = array($mod->Lang('display_text')=>'text',
 			 $mod->Lang('redirect_to_page')=>'redir');
 		$smarty->assign('input_submit_action',
-			  $mod->CreateInputRadioGroup($id, 'fbrp_forma_submit_action', $submitActions, $this->GetAttr('submit_action','text'), '', '&nbsp;&nbsp;'));
+			  $mod->CreateInputRadioGroup($id, 'pwfp_forma_submit_action', $submitActions, $this->GetAttr('submit_action','text'), '', '&nbsp;&nbsp;'));
 
 		$captcha = $mod->getModuleInstance('Captcha');
 		if($captcha == null)
@@ -1803,8 +1803,8 @@ EOS;
 			 $smarty->assign('title_use_captcha',$mod->Lang('title_use_captcha'));
 			 $smarty->assign('captcha_installed',1);
 
-			 $smarty->assign('input_use_captcha',$mod->CreateInputHidden($id,'fbrp_forma_use_captcha','0').
-				   $mod->CreateInputCheckbox($id,'fbrp_forma_use_captcha','1',$this->GetAttr('use_captcha','0')).
+			 $smarty->assign('input_use_captcha',$mod->CreateInputHidden($id,'pwfp_forma_use_captcha','0').
+				   $mod->CreateInputCheckbox($id,'pwfp_forma_use_captcha','1',$this->GetAttr('use_captcha','0')).
 					$mod->Lang('title_use_captcha_help'));
 		}
 		$smarty->assign('title_information',$mod->Lang('information'));
@@ -1814,12 +1814,12 @@ EOS;
 		$maxOrder = 1;
 		if($this->Id > 0)
 		{
-			$smarty->assign('fb_hidden', $mod->CreateInputHidden($id, 'fbrp_form_op',$mod->Lang('updated')).
-				$mod->CreateInputHidden($id, 'fbrp_sort','','class="fbrp_sort"').
+			$smarty->assign('fb_hidden', $mod->CreateInputHidden($id, 'pwfp_form_op',$mod->Lang('updated')).
+				$mod->CreateInputHidden($id, 'pwfp_sort','','class="pwfp_sort"').
 				$mod->CreateInputHidden($id, 'fbr_atab'));
 			$smarty->assign('adding',0);
-			$smarty->assign('save', $mod->CreateInputSubmit($id, 'fbrp_submit', $mod->Lang('save')));
-			$smarty->assign('apply', $mod->CreateInputSubmit($id, 'fbrp_submit', $mod->Lang('apply'),
+			$smarty->assign('save', $mod->CreateInputSubmit($id, 'pwfp_submit', $mod->Lang('save')));
+			$smarty->assign('apply', $mod->CreateInputSubmit($id, 'pwfp_submit', $mod->Lang('apply'),
 					'title = "'.$mod->Lang('save_and_continue').'" onclick="jQuery(this).fb_set_tab()"'));
 			$fieldList = array();
 			$jsfuncs = array();
@@ -1854,13 +1854,13 @@ EOS;
 				else if($fld->IsRequired())
 				{
 					$oneset->disposition = $mod->CreateLink($id,'update_field_required','',
-						$icontrue, array('form_id'=>$this->Id,'fbrp_active'=>'off','field_id'=>$fld->GetId()),'','','',
+						$icontrue, array('form_id'=>$this->Id,'pwfp_active'=>'off','field_id'=>$fld->GetId()),'','','',
 						'class="true" onclick="jQuery(this).fb_admin_update_field_required(); return false;"');
 				}
 				else
 				{
 					$oneset->disposition = $mod->CreateLink($id,'update_field_required','',
-						$iconfalse, array('form_id'=>$this->Id,'fbrp_active'=>'on','field_id'=>$fld->GetId()),'','','',
+						$iconfalse, array('form_id'=>$this->Id,'pwfp_active'=>'on','field_id'=>$fld->GetId()),'','','',
 						'class="false" onclick="jQuery(this).fb_admin_update_field_required(); return false;"');
 				}
 
@@ -1872,7 +1872,7 @@ EOS;
 
 				if($count > 1)
 				{
-					$oneset->up = $mod->CreateLink($id,'update_field_order','',$iconup,array('form_id'=>$this->Id,'fbrp_dir'=>'up','field_id'=>$fld->GetId()));
+					$oneset->up = $mod->CreateLink($id,'update_field_order','',$iconup,array('form_id'=>$this->Id,'pwfp_dir'=>'up','field_id'=>$fld->GetId()));
 				}
 				else
 				{
@@ -1880,7 +1880,7 @@ EOS;
 				}
 				if($count < $last)
 				{
-					$oneset->down=$mod->CreateLink($id,'update_field_order','',$icondown,array('form_id'=>$this->Id,'fbrp_dir'=>'down','field_id'=>$fld->GetId()));
+					$oneset->down=$mod->CreateLink($id,'update_field_order','',$icondown,array('form_id'=>$this->Id,'pwfp_dir'=>'down','field_id'=>$fld->GetId()));
 				}
 				else
 				{
@@ -1900,21 +1900,21 @@ EOS;
 			$smarty->assign('add_field_link',
 				$mod->CreateLink($id, 'add_edit_field', $returnid,
 					$theme->DisplayImage('icons/system/newobject.gif',$mod->Lang('title_add_new_field'),'','','systemicon'),
-					array('form_id'=>$this->Id, 'fbrp_order_by'=>$maxOrder), '', false).' '.
-					$mod->CreateLink($id, 'add_edit_field', $returnid,$mod->Lang('title_add_new_field'),array('form_id'=>$this->Id, 'fbrp_order_by'=>$maxOrder), '', false));
+					array('form_id'=>$this->Id, 'pwfp_order_by'=>$maxOrder), '', false).' '.
+					$mod->CreateLink($id, 'add_edit_field', $returnid,$mod->Lang('title_add_new_field'),array('form_id'=>$this->Id, 'pwfp_order_by'=>$maxOrder), '', false));
 
 			if($mod->GetPreference('enable_fastadd',1) == 1)
 			{
 				$smarty->assign('fastadd',1);
 				$smarty->assign('title_fastadd',$mod->Lang('title_fastadd'));
 				$link = $mod->CreateLink($id,'add_edit_field',$returnid,'',
-					array('form_id'=>$this->Id, 'fbrp_order_by'=>$maxOrder),'',true,true);
+					array('form_id'=>$this->Id, 'pwfp_order_by'=>$maxOrder),'',true,true);
 				$link = str_replace('&amp;','&',$link);
 				$typeFunc = <<<EOS
 function fast_add(field_type)
 {
  var type=field_type.options[field_type.selectedIndex].value;
- this.location='{$link}&{$id}fbrp_field_type='+type;
+ this.location='{$link}&{$id}pwfp_field_type='+type;
  return true;
 }
 EOS;
@@ -1922,19 +1922,19 @@ EOS;
 				$mod->initialize();
 				if($mod->GetPreference('show_field_level','basic') == 'basic')
 				{
-					$smarty->assign('input_fastadd',$mod->CreateInputDropdown($id, 'fbrp_field_type',
+					$smarty->assign('input_fastadd',$mod->CreateInputDropdown($id, 'pwfp_field_type',
 					array_merge(array($mod->Lang('select_type')=>''),$mod->std_field_types), -1,'', 'onchange="fast_add(this)"').
 						$mod->Lang('title_switch_advanced').
 						$mod->CreateLink($id,'add_edit_form',$returnid,$mod->Lang('title_switch_advanced_link'),
-						array('form_id'=>$this->Id, 'fbrp_set_field_level'=>'advanced')));
+						array('form_id'=>$this->Id, 'pwfp_set_field_level'=>'advanced')));
 				}
 				else
 				{
-					$smarty->assign('input_fastadd',$mod->CreateInputDropdown($id, 'fbrp_field_type',
+					$smarty->assign('input_fastadd',$mod->CreateInputDropdown($id, 'pwfp_field_type',
 					array_merge(array($mod->Lang('select_type')=>''),$mod->field_types), -1,'', 'onchange="fast_add(this)"').
 						$mod->Lang('title_switch_basic').
 						$mod->CreateLink($id,'add_edit_form',$returnid,$mod->Lang('title_switch_basic_link'),
-						array('form_id'=>$this->Id, 'fbrp_set_field_level'=>'basic')));
+						array('form_id'=>$this->Id, 'pwfp_set_field_level'=>'basic')));
 				}
 			}
 		}
@@ -1942,48 +1942,48 @@ EOS;
 		{
 			$smarty->assign('save','');
 			$smarty->assign('apply',
-					 $mod->CreateInputSubmit($id, 'fbrp_submit', $mod->Lang('add')));
+					 $mod->CreateInputSubmit($id, 'pwfp_submit', $mod->Lang('add')));
 			$smarty->assign('fb_hidden',
-					 $mod->CreateInputHidden($id, 'fbrp_form_op',$mod->Lang('added')).$mod->CreateInputHidden($id, 'fbrp_sort','','id="fbrp_sort"'));
+					 $mod->CreateInputHidden($id, 'pwfp_form_op',$mod->Lang('added')).$mod->CreateInputHidden($id, 'pwfp_sort','','id="pwfp_sort"'));
 			$smarty->assign('adding',1);
 		}
-		$smarty->assign('cancel', $mod->CreateInputSubmit($id, 'fbrp_cancel', $mod->Lang('cancel')));
+		$smarty->assign('cancel', $mod->CreateInputSubmit($id, 'pwfp_cancel', $mod->Lang('cancel')));
 
 		$smarty->assign('link_notready','<strong>'.$mod->Lang('title_not_ready1').'</strong> '.
-			$mod->Lang('title_not_ready2')." ".$mod->CreateLink($id, 'add_edit_field', $returnid,$mod->Lang('title_not_ready_link'),array('form_id'=>$this->Id, 'fbrp_order_by'=>$maxOrder,'fbrp_dispose_only'=>1), '', false, false,'class="module_fb_link"')." ".$mod->Lang('title_not_ready3')
+			$mod->Lang('title_not_ready2')." ".$mod->CreateLink($id, 'add_edit_field', $returnid,$mod->Lang('title_not_ready_link'),array('form_id'=>$this->Id, 'pwfp_order_by'=>$maxOrder,'pwfp_dispose_only'=>1), '', false, false,'class="pwf_link"')." ".$mod->Lang('title_not_ready3')
 		);
 
-		$smarty->assign('input_inline_form',$mod->CreateInputHidden($id,'fbrp_forma_inline','0').
-			$mod->CreateInputCheckbox($id,'fbrp_forma_inline','1',$this->GetAttr('inline','0')).
+		$smarty->assign('input_inline_form',$mod->CreateInputHidden($id,'pwfp_forma_inline','0').
+			$mod->CreateInputCheckbox($id,'pwfp_forma_inline','1',$this->GetAttr('inline','0')).
 				$mod->Lang('title_inline_form_help'));
 
 		$smarty->assign('title_form_submit_button',$mod->Lang('title_form_submit_button'));
 		$smarty->assign('input_form_submit_button',
-			$mod->CreateInputText($id, 'fbrp_forma_submit_button_text',
+			$mod->CreateInputText($id, 'pwfp_forma_submit_button_text',
 				$this->GetAttr('submit_button_text',$mod->Lang('button_submit')), 35, 35));
 		$smarty->assign('title_submit_button_safety',$mod->Lang('title_submit_button_safety_help'));
 		$smarty->assign('input_submit_button_safety',
-			$mod->CreateInputHidden($id,'fbrp_forma_input_button_safety','0').
-			$mod->CreateInputCheckbox($id,'fbrp_forma_input_button_safety','1',$this->GetAttr('input_button_safety','0')).
+			$mod->CreateInputHidden($id,'pwfp_forma_input_button_safety','0').
+			$mod->CreateInputCheckbox($id,'pwfp_forma_input_button_safety','1',$this->GetAttr('input_button_safety','0')).
 			$mod->Lang('title_submit_button_safety'));
 		$smarty->assign('title_form_prev_button',$mod->Lang('title_form_prev_button'));
 		$smarty->assign('input_form_prev_button',
-			$mod->CreateInputText($id, 'fbrp_forma_prev_button_text',
+			$mod->CreateInputText($id, 'pwfp_forma_prev_button_text',
 				$this->GetAttr('prev_button_text',$mod->Lang('button_previous')), 35, 35));
 
 		$smarty->assign('input_title_user_captcha',
-			$mod->CreateInputText($id, 'fbrp_forma_title_user_captcha',
+			$mod->CreateInputText($id, 'pwfp_forma_title_user_captcha',
 				$this->GetAttr('title_user_captcha',$mod->Lang('title_user_captcha')),50,80));
 		$smarty->assign('title_title_user_captcha',$mod->Lang('title_title_user_captcha'));
 
 		$smarty->assign('input_title_user_captcha_error',
-			$mod->CreateInputText($id, 'fbrp_forma_captcha_wrong',
+			$mod->CreateInputText($id, 'pwfp_forma_captcha_wrong',
 				$this->GetAttr('captcha_wrong',$mod->Lang('wrong_captcha')),50,80));
 		$smarty->assign('title_user_captcha_error',$mod->Lang('title_user_captcha_error'));
 
 		$smarty->assign('title_form_next_button', $mod->Lang('title_form_next_button'));
 		$smarty->assign('input_form_next_button',
-			$mod->CreateInputText($id, 'fbrp_forma_next_button_text',
+			$mod->CreateInputText($id, 'pwfp_forma_next_button_text',
 				$this->GetAttr('next_button_text',$mod->Lang('button_continue')), 35, 35));
 		$smarty->assign('title_form_predisplay_udt',$mod->Lang('title_form_predisplay_udt'));
 		$smarty->assign('title_form_predisplay_each_udt',$mod->Lang('title_form_predisplay_each_udt'));
@@ -1995,10 +1995,10 @@ EOS;
 		foreach($usertags as $key => $value)
 			$usertaglist[$value] = $key;
 		$smarty->assign('input_form_predisplay_udt',
-			$mod->CreateInputDropdown($id,'fbrp_forma_predisplay_udt',$usertaglist,-1,
+			$mod->CreateInputDropdown($id,'pwfp_forma_predisplay_udt',$usertaglist,-1,
 				$this->GetAttr('predisplay_udt',-1)));
 		$smarty->assign('input_form_predisplay_each_udt',
-			$mod->CreateInputDropdown($id,'fbrp_forma_predisplay_each_udt',$usertaglist,-1,
+			$mod->CreateInputDropdown($id,'pwfp_forma_predisplay_each_udt',$usertaglist,-1,
 				$this->GetAttr('predisplay_each_udt',-1)));
 
 		$smarty->assign('title_form_validate_udt',$mod->Lang('title_form_validate_udt'));
@@ -2009,31 +2009,31 @@ EOS;
 		foreach($usertags as $key => $value)
 			$usertaglist[$value] = $key;
 		$smarty->assign('input_form_validate_udt',
-			$mod->CreateInputDropdown($id,'fbrp_forma_validate_udt',$usertaglist,-1,
+			$mod->CreateInputDropdown($id,'pwfp_forma_validate_udt',$usertaglist,-1,
 				$this->GetAttr('validate_udt',-1)));
 
 		$smarty->assign('title_form_required_symbol',$mod->Lang('title_form_required_symbol'));
 		$smarty->assign('input_form_required_symbol',
-			 $mod->CreateInputText($id, 'fbrp_forma_required_field_symbol',
+			 $mod->CreateInputText($id, 'pwfp_forma_required_field_symbol',
 				$this->GetAttr('required_field_symbol','*'), 5));
 		$smarty->assign('input_list_delimiter',
-			$mod->CreateInputText($id, 'fbrp_forma_list_delimiter',
+			$mod->CreateInputText($id, 'pwfp_forma_list_delimiter',
 				$this->GetAttr('list_delimiter',','), 5));
 
 		$contentops = $gCms->GetContentOperations();
-		$smarty->assign('input_redirect_page',$contentops->CreateHierarchyDropdown('',$this->GetAttr('redirect_page','0'), $id.'fbrp_forma_redirect_page'));
+		$smarty->assign('input_redirect_page',$contentops->CreateHierarchyDropdown('',$this->GetAttr('redirect_page','0'), $id.'pwfp_forma_redirect_page'));
 
 		$smarty->assign('input_form_template',
 			$mod->CreateTextArea(false, $id,
 				$this->GetAttr('form_template',$this->DefaultTemplate()),
-				'fbrp_forma_form_template',
-				'module_fb_area_wide',
+				'pwfp_forma_form_template',
+				'pwf_area_wide',
 				'fb_form_template',
 				'', '', 80, 15));
 
 		$smarty->assign('input_submit_javascript',
 			$mod->CreateTextArea(false, $id,
-				$this->GetAttr('submit_javascript',''), 'fbrp_forma_submit_javascript','module_fb_area_short','fb_submit_javascript',
+				$this->GetAttr('submit_javascript',''), 'pwfp_forma_submit_javascript','pwf_area_short','fb_submit_javascript',
 				'', '', 80, 15,'','').
 				'<br />'.$mod->Lang('title_submit_javascript_long'));
 
@@ -2041,8 +2041,8 @@ EOS;
 		$smarty->assign('input_submit_template',
 			 $mod->CreateTextArea(false, $id,
 				$this->GetAttr($attr_name,$this->createSampleTemplate(true,false)),
-				'fbrp_forma_'.$attr_name,
-				'module_fb_area_wide',
+				'pwfp_forma_'.$attr_name,
+				'pwf_area_wide',
 				'', '', '', 80, 15));
 
 		self::SetupVarsHelp($mod,$smarty);
@@ -2105,7 +2105,7 @@ EOS;
 		if($obfield === false)
 		{
 			// new field
-			if(!isset($params['fbrp_field_type']))
+			if(!isset($params['pwfp_field_type']))
 			{
 				// unknown field type
 				$obfield = new pwfFieldBase($this,$params);
@@ -2113,7 +2113,7 @@ EOS;
 			else
 			{
 				// specified field type via params
-				$className = $this->MakeClassName($params['fbrp_field_type'], '');
+				$className = $this->MakeClassName($params['pwfp_field_type'], '');
 				$obfield = new $className($this, $params);
 			}
 		}
@@ -2127,8 +2127,8 @@ EOS;
 
 		if(!empty($message))
 			$smarty->assign('message',$mod->ShowMessage($message)); //success message
-		elseif(isset($params['fbrp_message']))
-			$smarty->assign('message',$params['fbrp_message']); //probably an error message
+		elseif(isset($params['pwfp_message']))
+			$smarty->assign('message',$params['pwfp_message']); //probably an error message
 		$smarty->assign('backtomod_nav', $mod->CreateLink($id,'defaultadmin','',$mod->Lang('back_top'), array()));
 		$smarty->assign('backtoform_nav',$mod->CreateLink($id,'add_edit_form',$returnid, $mod->Lang('link_back_to_form'), array('form_id'=>$this->Id)));
 
@@ -2168,19 +2168,19 @@ EOS;
 
 		if($obfield->GetId() != -1)
 		{
-			$smarty->assign('op',$mod->CreateInputHidden($id, 'fbrp_op',$mod->Lang('updated')));
-			$smarty->assign('submit',$mod->CreateInputSubmit($id, 'fbrp_aef_upd', $mod->Lang('update')));
+			$smarty->assign('op',$mod->CreateInputHidden($id, 'pwfp_op',$mod->Lang('updated')));
+			$smarty->assign('submit',$mod->CreateInputSubmit($id, 'pwfp_aef_upd', $mod->Lang('update')));
 		}
 		elseif($obfield->GetFieldType() != '')
 		{
-			$smarty->assign('op',$mod->CreateInputHidden($id, 'fbrp_op', $mod->Lang('added')));
-			$smarty->assign('submit',$mod->CreateInputSubmit($id, 'fbrp_aef_add', $mod->Lang('add')));
+			$smarty->assign('op',$mod->CreateInputHidden($id, 'pwfp_op', $mod->Lang('added')));
+			$smarty->assign('submit',$mod->CreateInputSubmit($id, 'pwfp_aef_add', $mod->Lang('add')));
 		}
-		$smarty->assign('cancel',$mod->CreateInputSubmit($id, 'fbrp_aef_cancel', $mod->Lang('cancel')));
+		$smarty->assign('cancel',$mod->CreateInputSubmit($id, 'pwfp_aef_cancel', $mod->Lang('cancel')));
 
 		if($obfield->HasAddOp())
 		{
-			$smarty->assign('add',$mod->CreateInputSubmit($id,'fbrp_aef_optadd',$obfield->GetOptionAddButton()));
+			$smarty->assign('add',$mod->CreateInputSubmit($id,'pwfp_aef_optadd',$obfield->GetOptionAddButton()));
 		}
 		else
 		{
@@ -2188,7 +2188,7 @@ EOS;
 		}
 		if($obfield->HasDeleteOp())
 		{
-			$smarty->assign('del',$mod->CreateInputSubmit($id,'fbrp_aef_optdel',$obfield->GetOptionDeleteButton()));
+			$smarty->assign('del',$mod->CreateInputSubmit($id,'pwfp_aef_optdel',$obfield->GetOptionDeleteButton()));
 		}
 		else
 		{
@@ -2197,8 +2197,8 @@ EOS;
 
 		$smarty->assign('fb_hidden', $mod->CreateInputHidden($id, 'form_id', $this->Id) .
 			$mod->CreateInputHidden($id, 'field_id', $obfield->GetId()) .
-			$mod->CreateInputHidden($id, 'fbrp_order_by', $obfield->GetOrder()) .
-			$mod->CreateInputHidden($id, 'fbrp_set_from_form','1'));
+			$mod->CreateInputHidden($id, 'pwfp_order_by', $obfield->GetOrder()) .
+			$mod->CreateInputHidden($id, 'pwfp_set_from_form','1'));
 
 		if(/*!$obfield->IsDisposition() && */ !$obfield->IsNonRequirableField())
 		{
@@ -2396,26 +2396,26 @@ EOS;
 
 	function MergeEmails(&$params)
 	{
-		if($params['fbrp_opt_destination_address'])
+		if($params['pwfp_opt_destination_address'])
 		{
-			if(!is_array($params['fbrp_opt_destination_address']))
-				$params['fbrp_opt_destination_address'] = array($params['fbrp_opt_destination_address']);
+			if(!is_array($params['pwfp_opt_destination_address']))
+				$params['pwfp_opt_destination_address'] = array($params['pwfp_opt_destination_address']);
 
-			foreach($params['fbrp_opt_destination_address'] as $i => $to)
+			foreach($params['pwfp_opt_destination_address'] as $i => $to)
 			{
-				if(isset($params['fbrp_aef_to_'.$i]))
+				if(isset($params['pwfp_aef_to_'.$i]))
 				{
-					$totype = $params['fbrp_aef_to_'.$i];
+					$totype = $params['pwfp_aef_to_'.$i];
 					switch ($totype)
 					{
 					 case 'cc';
-						$params['fbrp_opt_destination_address'][$i] = '|cc|'.$to;
+						$params['pwfp_opt_destination_address'][$i] = '|cc|'.$to;
 						break;
 					 case 'bc':
-						$params['fbrp_opt_destination_address'][$i] = '|bc|'.$to;
+						$params['pwfp_opt_destination_address'][$i] = '|bc|'.$to;
 						break;
 					}
-					unset($params['fbrp_aef_to_'.$i]);
+					unset($params['pwfp_aef_to_'.$i]);
 				}
 			}
 		}
@@ -2473,7 +2473,7 @@ EOS;
 		if($fbField == false)
 		{
 			// error handling goes here.
-			echo($mod->Lang('error_has_no_fb_field'));
+			echo($mod->Lang('error_no_browser_field'));
 		}
 		$mod->HandleResponseFromXML($fbField, $oneset);
 
@@ -2551,26 +2551,26 @@ EOS;
 		if($fbField == false)
 		{
 			// error handling goes here.
-			echo($mod->Lang('error_has_no_fb_field'));
+			echo($mod->Lang('error_no_browser_field'));
 		}
 		$mod->HandleResponseFromXML($fbField, $oneset);
 		list($fnames, $aliases, $vals) = $mod->ParseResponseXML($oneset->xml, false);
 		$types = $mod->ParseResponseXMLType($oneset->xml);
 		foreach($vals as $id=>$val)
 		{
-			if(isset($params['fbrp__'.$id]) &&
-			! is_array($params['fbrp__'.$id]))
+			if(isset($params['pwfp__'.$id]) &&
+			! is_array($params['pwfp__'.$id]))
 			{
-				$params['fbrp__'.$id] = array($params['fbrp__'.$id]);
-				array_push($params['fbrp__'.$id], $val);
+				$params['pwfp__'.$id] = array($params['pwfp__'.$id]);
+				array_push($params['pwfp__'.$id], $val);
 			}
-			elseif(isset($params['fbrp__'.$id]))
+			elseif(isset($params['pwfp__'.$id]))
 			{
-				array_push($params['fbrp__'.$id], $val);
+				array_push($params['pwfp__'.$id], $val);
 			}
 			else
 			{
-				$params['fbrp__'.$id] = $val;
+				$params['pwfp__'.$id] = $val;
 			}
 		}
 		return true;
@@ -2593,7 +2593,7 @@ EOS;
 				$allrows = $db->GetAll($sql, array($params['response_id']));
 				foreach($allrows as &$row)
 				{ // was '__'
-					$fid = 'fbrp__'.$row['field_id'];
+					$fid = 'pwfp__'.$row['field_id'];
 					if(isset($params[$fid]))
 					{
 						if(!is_array($params[$fid]))
@@ -2762,14 +2762,15 @@ EOS;
 	   $sortfield2,$sortfield3,$sortfield4,$sortfield5, $feu_id,$xml)
 	{
 		$db = $this->module_ptr->dbHandle;
+		$pref = cms_db_prefix();
 		$secret_code = '';
 
 		if($newrec)
 		{
 			// saving a new response
 			$secret_code = substr(md5(session_id().'_'.time()),0,7);
-			//$response_id = $db->GenID(cms_db_prefix(). 'module_fb_formbrowser_seq');
-			$sql = 'INSERT INTO ' . cms_db_prefix().
+//			$response_id = $db->GenID($pref.'module_fb_formbrowser_seq');
+			$sql = 'INSERT INTO '.$pref.
 				'module_fb_formbrowser (fbr_id, form_id, submitted, secret_code, index_key_1, index_key_2, index_key_3, index_key_4, index_key_5, feuid, response) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
 			$res = $db->Execute($sql,
 				array($response_id,
@@ -2783,7 +2784,7 @@ EOS;
 		}
 		else if($approver != '')
 		{
-			$sql = 'UPDATE ' . cms_db_prefix().
+			$sql = 'UPDATE '.$pref.
 				'module_fb_formbrowser set user_approved=? where fbr_id=?';
 			$res = $db->Execute($sql,
 				array($this->clean_datetime($db->DBTimeStamp(time())),$response_id));
@@ -2791,7 +2792,7 @@ EOS;
 		}
 		if(!$newrec)
 		{
-			$sql = 'UPDATE ' . cms_db_prefix().
+			$sql = 'UPDATE '.$pref.
 				'module_fb_formbrowser set index_key_1=?, index_key_2=?, index_key_3=?, index_key_4=?, index_key_5=?, response=? where fbr_id=?';
 			$res = $db->Execute($sql,
 				array($sortfield1,$sortfield2,$sortfield3,$sortfield4,$sortfield5,$xml,$response_id));
@@ -2949,7 +2950,7 @@ EOS;
 			  // and a link is added to the results
 			  // if the option is not checked, then the file is merely uploaded to
 			  // the "uploads" directory
-				$_id = $mod->module_id.'fbrp__'.$fld->GetId();
+				$_id = $mod->module_id.'pwfp__'.$fld->GetId();
 				if(isset($_FILES[$_id]) && $_FILES[$_id]['size'] > 0)
 				{
 					$thisFile =& $_FILES[$_id];

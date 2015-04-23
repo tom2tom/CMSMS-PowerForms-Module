@@ -48,7 +48,7 @@ class pwfDispositionDirector extends pwfDispositionEmailBase
 		$delcount = 0;
 		foreach($params as $thisKey=>$thisVal)
 		{
-			if(substr($thisKey,0,9) == 'fbrp_sel_')
+			if(substr($thisKey,0,9) == 'pwfp_sel_')
 			{
 				$this->RemoveOptionElement('destination_address', $thisVal - $delcount);
 				$this->RemoveOptionElement('destination_subject', $thisVal - $delcount);
@@ -103,7 +103,7 @@ class pwfDispositionDirector extends pwfDispositionEmailBase
 		{
 			$sorted[$subjects] = '1';
 		}
-		return $mod->CreateInputDropdown($id, 'fbrp__'.$this->Id, $sorted, -1, $this->Value, $js.$this->GetCSSIdTag());
+		return $mod->CreateInputDropdown($id, 'pwfp__'.$this->Id, $sorted, -1, $this->Value, $js.$this->GetCSSIdTag());
 	}
 
 
@@ -145,11 +145,11 @@ class pwfDispositionDirector extends pwfDispositionEmailBase
 		$main = (isset($ret['main'])) ? $ret['main'] : array();
 
 		$main[] = array($mod->Lang('title_select_one_message'),
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_select_one',
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_select_one',
 			$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
 		$main[] = array($mod->Lang('title_allow_subject_override'),
-			$mod->CreateInputHidden($formDescriptor,'fbrp_opt_subject_override','0').
-			$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_subject_override',
+			$mod->CreateInputHidden($formDescriptor,'pwfp_opt_subject_override','0').
+			$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_subject_override',
                 '1',$this->GetOption('subject_override','0')),
 			$mod->Lang('title_allow_subject_override_long'));
 //		$main[] = array($mod->Lang('title_director_details'),$dests);
@@ -165,9 +165,9 @@ class pwfDispositionDirector extends pwfDispositionEmailBase
 		for ($i=0;$i<$num;$i++)
 		{
 			$dests[] = array(
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_destination_subject[]',$this->GetOptionElement('destination_subject',$i),40,128),
-			$mod->CreateInputText($formDescriptor, 'fbrp_opt_destination_address[]',$this->GetOptionElement('destination_address',$i),50,128),
-			$mod->CreateInputCheckbox($formDescriptor, 'fbrp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_destination_subject[]',$this->GetOptionElement('destination_subject',$i),40,128),
+			$mod->CreateInputText($formDescriptor, 'pwfp_opt_destination_address[]',$this->GetOptionElement('destination_address',$i),50,128),
+			$mod->CreateInputCheckbox($formDescriptor, 'pwfp_sel_'.$i, $i,-1,'style="margin-left:1em;"')
 			);
 		}
 		$ret['table'] = $dests;

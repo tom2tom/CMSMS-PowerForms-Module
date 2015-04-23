@@ -1,5 +1,5 @@
 <p style="font-weight:bold;">{$help_vars_title}:</p>
-<table class="module_fb_legend">
+<table class="pwf_legend">
 <thead><tr>
 <th>{$variable}</th><th>{$attribute}</th>
 </tr></thead>
@@ -25,7 +25,7 @@
 {$help_other_fields}<br />
 {if !empty($subfields)}
 <br />{$help_field_object}:<br />
-<table class="module_fb_legend">
+<table class="pwf_legend">
 {foreach from=$obfields item=entry}
 {cycle name=obfields values='odd,even' assign=rowclass}
 <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">

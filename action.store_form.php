@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if(isset ($params['fbrp_cancel']))
+if(isset ($params['pwfp_cancel']))
 {
 	unset ($params); //maybe a message param?
 	$this->Redirect($id, 'defaultadmin');
@@ -17,25 +17,25 @@ if(!$this->CheckAccess()) exit;
 $funcs = new pwfUtils($this, $params, true);
 if($funcs->Store())
 {
-	if($params['fbrp_submit'] == $this->Lang('save')) //submit
+	if($params['pwfp_submit'] == $this->Lang('save')) //submit
 	{
-		$op = $params['fbrp_form_op'];
+		$op = $params['pwfp_form_op'];
 		unset ($params);
-		$params['fbrp_message'] = $this->Lang('form',$params['fbrp_form_op']);
+		$params['pwfp_message'] = $this->Lang('form',$params['pwfp_form_op']);
 		$this->Redirect($id, 'defaultadmin', '', $params);
 	}
 	else //apply
 	{
 		$tab = $this->GetActiveTab($params);
-		echo $funcs->AddEditForm($id, $returnid, $tab, $this->Lang('form',$params['fbrp_form_op']));
+		echo $funcs->AddEditForm($id, $returnid, $tab, $this->Lang('form',$params['pwfp_form_op']));
 	}
 }
 else
 {
 	//error msg set downstream
-	$msg = $params['fbrp_message'];
+	$msg = $params['pwfp_message'];
 	unset ($params);
-	$params['fbrp_message'] = $this->ShowErrors($msg);
+	$params['pwfp_message'] = $this->ShowErrors($msg);
 	$this->Redirect($id, 'defaultadmin', '', $params);
 }
 

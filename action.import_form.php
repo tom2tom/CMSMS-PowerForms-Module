@@ -7,18 +7,18 @@
 
 if(!$this->CheckAccess()) exit;
 
-$params['fbrp_xml_file'] = $_FILES[$id.'fbrp_xmlfile']['tmp_name'];
+$params['pwfp_xml_file'] = $_FILES[$id.'pwfp_xmlfile']['tmp_name'];
 
 $funcs = new pwfUtils($this, $params, true);
-if($funcs->newID ($params['fbrp_import_formname'],$params['fbrp_import_formalias']))
+if($funcs->newID ($params['pwfp_import_formname'],$params['pwfp_import_formalias']))
 {
 	if($funcs->ImportXML($params))
-		$params['fbrp_message'] = $this->Lang('form_imported');
+		$params['pwfp_message'] = $this->Lang('form_imported');
 	else
-		$params['fbrp_message'] = $this->Lang('form_import_failed');
+		$params['pwfp_message'] = $this->Lang('form_import_failed');
 }
 else
-	$params['fbrp_message'] = $this->Lang('duplicate_identifier');
+	$params['pwfp_message'] = $this->Lang('duplicate_identifier');
 
 $this->Redirect($id, 'defaultadmin', '', $params);
 ?>

@@ -24,7 +24,7 @@ class pwfFromEmailNameField extends pwfFieldBase
 		$html5 = $this->GetOption('html5','0') == '1' ? ' placeholder="'.$this->GetOption('default').'"' : '';
 		$default = $html5 ? '' : htmlspecialchars($this->GetOption('default'), ENT_QUOTES);
 
-		return $mod->fbCreateInputText($id, 'fbrp__'.$this->Id,
+		return $mod->fbCreateInputText($id, 'pwfp__'.$this->Id,
 			($this->HasValue()?htmlspecialchars($this->Value, ENT_QUOTES):$default),
 			25,128,$html5.$js.$this->GetCSSIdTag());
 	}
@@ -35,19 +35,19 @@ class pwfFromEmailNameField extends pwfFieldBase
 		$main = array();
 		$hopts = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
 		$main[] = array($mod->Lang('title_headers_to_modify'),
-			$mod->CreateInputDropdown($formDescriptor, 'fbrp_opt_headers_to_modify', $hopts, -1, $this->GetOption('headers_to_modify','b')));
+			$mod->CreateInputDropdown($formDescriptor, 'pwfp_opt_headers_to_modify', $hopts, -1, $this->GetOption('headers_to_modify','b')));
 		$adv = array(
 			array(
 				$mod->Lang('title_field_default_value'),
-				$mod->CreateInputText($formDescriptor, 'fbrp_opt_default',$this->GetOption('default'),25,1024)),
+				$mod->CreateInputText($formDescriptor, 'pwfp_opt_default',$this->GetOption('default'),25,1024)),
 			array(
 				$mod->Lang('title_html5'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_html5','0').
-					$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_html5','1',$this->GetOption('html5','0'))),
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_html5','0').
+					$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_html5','1',$this->GetOption('html5','0'))),
 			array(
 				$mod->Lang('title_clear_default'),
-				$mod->CreateInputHidden($formDescriptor,'fbrp_opt_clear_default','0').
-					$mod->CreateInputCheckbox($formDescriptor, 'fbrp_opt_clear_default','1',$this->GetOption('clear_default','0')),
+				$mod->CreateInputHidden($formDescriptor,'pwfp_opt_clear_default','0').
+					$mod->CreateInputCheckbox($formDescriptor, 'pwfp_opt_clear_default','1',$this->GetOption('clear_default','0')),
 					$mod->Lang('title_clear_default_help'))
 		);
 

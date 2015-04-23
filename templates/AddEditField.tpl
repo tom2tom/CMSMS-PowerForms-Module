@@ -12,7 +12,7 @@
 {if !empty($mainvarhelp)}<br /><div class="pageinput">{$help_vars}</div>{/if}
 {if isset($mainTable)}
    <br />
-   <table class="module_fb_table pageinput" style="border-collapse:collapse;width:auto;">
+   <table class="pwf_table pageinput" style="border-collapse:collapse;width:auto;">
  {section name=r loop=$mainTable}
   {if $smarty.section.r.first}
    <thead>
