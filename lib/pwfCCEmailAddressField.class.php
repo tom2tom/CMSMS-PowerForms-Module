@@ -56,7 +56,6 @@ class pwfCCEmailAddressField extends pwfFieldBase
 		return array('main'=>$main);
 	}
 
-
 	function ModifyOtherFields()
 	{
 		$mod = $this->form_ptr->module_ptr;
