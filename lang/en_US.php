@@ -1,6 +1,6 @@
 <?php
 // English_US Localization File
-$lang['friendlyname'] = 'Form Builder';
+$lang['friendlyname'] = 'Power Forms';
 
 // field types
 $lang['field_type_DispositionEmailFromFEUProperty'] = '*Email users matching an FEU property';
@@ -107,8 +107,8 @@ $lang['must_specify_one_destination']='You need to specify at least one destinat
 $lang['are_you_sure_delete_form']='Are you sure you want to delete the form %s?';
 $lang['are_you_sure_delete_field']='Are you sure you want to delete the field %s?';
 $lang['notice_select_type']='Advanced options are not available until the field type has been set.';
-$lang['field_name_in_use']='The field name "%s" is already in use. Please use unique field names, or disable unique field names in the Form Builder configuration.';
-$lang['field_no_name'] = 'Fields must be named, unless you disable this in the Form Builder configuration.';
+$lang['field_name_in_use']='The field name "%s" is already in use. Please use unique field names, or disable unique field names in the Power Forms configuration.';
+$lang['field_no_name'] = 'Fields must be named, unless you disable this in the Power Forms configuration.';
 $lang['no_field_assigned'] = 'No field assigned for %s';
 $lang['duplicate_identifier'] = 'Form name or alias is already in use';
 $lang['database_error'] = 'Database command failed';
@@ -165,6 +165,13 @@ $lang['edit'] = 'Edit';
 $lang['copy'] = 'Copy';
 $lang['delete'] = 'Delete';
 $lang['export'] = 'Export';
+$lang['export_tip'] = 'export form as XML';
+$lang['true'] = 'true';
+$lang['false'] = 'false';
+$lang['moveup'] = 'move up';
+$lang['movedn'] = 'move down';
+$lang['info'] = 'help';
+
 $lang['day'] = 'Day';
 $lang['mon'] = 'Month';
 $lang['year'] = 'Year';
@@ -185,11 +192,11 @@ $lang['value_checked'] = 'Checked';
 $lang['value_unchecked'] = 'Unchecked';
 
 $lang['tab_main']='Main';
-$lang['tab_symbol']='Form Display Settings';
-$lang['tab_submit']='Form Submission';
-$lang['tab_captcha']='Captcha Settings';
+$lang['tab_fields']='Fields';
+$lang['tab_design']='Design';
+$lang['tab_submit']='Submission';
 $lang['tab_advanced']='Advanced Settings';
-$lang['tab_templatelayout'] = 'Form Template';
+$lang['tab_templatelayout'] = 'Template';
 $lang['tab_submissiontemplate'] = 'Submission Template';
 $lang['tab_udt'] = 'UDT Integration';
 
@@ -301,10 +308,10 @@ $lang['title_field_valuearray']='Array of field value(s)';
 $lang['title_radiogroup_details']='Radio Button Group Details';
 $lang['title_field_type']='Field type';
 $lang['title_not_ready3']='to create a form handling field.';
-$lang['title_form_alias']='Form alias';
+$lang['title_page_tag']='Page Tag';
 $lang['title_add_new_form']='Add New Form';
-$lang['title_show_version']='Show FormBuilder version';
-$lang['title_show_version_long']='This will embed your installed version number of FormBuilder module in a comment, to aid in debugging';
+$lang['title_show_version']='Show PowerForms version';
+$lang['title_show_version_long']='This will embed your installed version number of PowerForms module in a comment, to aid in debugging';
 $lang['title_add_new_field']='Add New Field';
 $lang['title_form_submit_button']='Form "Submit" button label';
 $lang['title_button_text']='Button label';
@@ -412,7 +419,7 @@ $lang['title_feu_binding'] = 'Frontend User binding';
 $lang['title_install_feu'] = 'Please install the Frontend User module to connect a form and its data to a specific user';
 $lang['title_feu_bind_help'] = 'Check this to lock front-end access to this form\'s data to the logged-in front-end user.';
 $lang['title_encryption'] = 'Encryption';
-$lang['title_export_form_to_udt'] = 'Export form reference to UDT as $params[\'FORM\'] (do not do this if you are going to print_r($params) )';
+$lang['title_export_form_to_udt'] = 'Export form reference to UDT as $params[\'FORM\'] (do not do this if you are going to print_r($params))';
 $lang['title_url_help'] = 'Entire URL, including protocol and path (e.g. http://myhost.com/form_handler.cgi)';
 $lang['title_url'] = 'Form submission URL';
 $lang['title_method'] = 'Form method';
@@ -436,7 +443,7 @@ $lang['help_submission_date']='Date of Submission';
 $lang['help_server_name']='Your server';
 $lang['help_sub_source_ip']='IP address of person using form';
 $lang['help_sub_url']='URL of page containing form';
-$lang['help_fb_version']='FormBuilder version';
+$lang['help_fb_version']='PowerForms version';
 $lang['help_tab']='Tab Character';
 $lang['help_ignored_if_upload']='(This field ignored if you use the Uploads module to manage files)';
 $lang['help_array_fields']='Another way of accessing field values is via $fieldname_obj, $alias_obj, or $fld_#_obj, where each field is an object with attributes';
@@ -450,7 +457,7 @@ $lang['help_variable_name']='Smarty variable';
 $lang['help_form_field']='Field represented';
 $lang['basic']='Basic';
 $lang['advanced']='Advanced';
-$lang['help_rtf_file_template']='Specify a file located in the FormBuilder/templates/ folder. This field is ignored if you use TXT as your file type.';
+$lang['help_rtf_file_template']='Specify a file located in the PowerForms/templates/ folder. This field is ignored if you use TXT as your file type.';
 $lang['help_rtf_template_type']='Basic: Use the textarea below to layout the field names/values in a single block.<br />
 Advanced: Specify Smarty variables in the RTF Template File as you would below, but arrange them however you like and add formatting.<br />
 &nbsp;You can still use the %%HEADER%% and %%FOOTER%% sections in the RTF file.';
@@ -479,9 +486,9 @@ $lang['title_value'] = 'Value (see Advanced Tab if you use Smarty tags)';
 $lang['title_date_format']='Date Format for display (standard <a href="http://www.php.net/manual/en/function.date.php">PHP Date Formats</a>)';
 $lang['title_use_wysiwyg']='Use WYSIWYG editor (admin side only)';
 $lang['title_submit_actions'] = 'Form Submission Behavior';
-$lang['title_submit_labels'] = 'Submission Button Labels';
+$lang['title_submit_labels'] = 'Button Labels';
 $lang['title_sortable_field'] = 'Sortable Field #%s';
-$lang['title_submit_help'] = 'This page lets you customize Form Submission. It doesn\'t determine what the Form Builder does with the submitted data. You can set that up by adding "Disposition" fields to your form.';
+$lang['title_submit_help'] = 'This page lets you customize Form Submission. It doesn\'t determine what the Power Forms does with the submitted data. You can set that up by adding "Disposition" fields to your form.';
 $lang['title_start_year'] = 'Year range start';
 $lang['title_end_year'] = 'Year range end';
 $lang['title_default_year'] = 'Default Year';
@@ -513,14 +520,14 @@ $lang['title_compute'] = 'Computed/PHP';
 $lang['title_string'] = 'String';
 $lang['title_numeric'] = 'Numeric';
 $lang['title_inline_form'] = 'Display form inline';
-$lang['title_inline_form_help'] = 'Inline means any form followup replaces the {FormBuilder} tag, non-inline replaces the {content} tag.';
+$lang['title_inline_form_help'] = 'Inline means any form followup replaces the {PowerForms} tag, non-inline replaces the {content} tag.';
 $lang['title_field_default_value'] = 'Default value for field';
 $lang['title_clear_default'] = 'Clear default on click';
 $lang['title_clear_default_help'] = 'Check this to clear the default value when the user clicks this field. Since this uses a javascript string compare, it will fail if you put single quotes in your default text. Other un-javascript-friendly characters may also cause it to fail.';
 $lang['title_remove_file_from_server'] = 'Delete uploaded file from server after processing (email dispositions)';
 $lang['title_field_javascript'] = 'Javascript for field';
 $lang['title_field_javascript_long'] = 'Make this the complete Javascript call, including the event you want to trap, e.g., onclick="yourfn()"';
-$lang['title_submit_javascript'] = 'Form Submission Javascript';
+$lang['title_submit_javascript'] = 'Form submission javascript';
 $lang['title_submit_javascript_long'] = 'Make this the complete Javascript call, including the event you want to trap, e.g., onclick="yourfn()".<br />This will probably not work well if you use the "safety script" option above.';
 $lang['email_from_addr_help']='Do not put some random address here. Many ISPs will not deliver mail if you use a domain name other than your actual host name (i.e. use something like name@%s)';
 $lang['email_to_help']='Emails can be sent without a "To" field';
@@ -611,11 +618,11 @@ $lang['upgrade03to04'] = 'Form Template was updated automatically as part of the
 $lang['admindesc']='Add, edit and manage interactive forms';
 $lang['must_specify_one_admin']='Must specify an admininstrator';
 
-$lang['operators_help'] = 'If you use string evaluation, the only operation available is concatenation (+). If you use number evaluation you have basic, very simple math (, +, -, *, /, ). If you use computed/PHP evaluation, you can
+$lang['operators_help'] = 'If you use string evaluation, the only operation available is concatenation (+). If you use number evaluation you have basic, very simple math (, +, -, *, /,). If you use computed/PHP evaluation, you can
 use any function you want, but you need to quote things (substitution occurs before evaluation), e.g., substr(\'$fld_22\',0,2).\'$fld_23\'.';
 $lang['help_module_interface']='Using Module Interface';
 $lang['help_module_interface_long']='<b>This field is used as a gateway to other modules!</b>
-Use it by creating your form elements in the templates of the other module(s) you wish to incorporate, and using the <strong>{$FBid}</strong> to tie it back to FormBuilder. For example, to include form options based on the Products module, create the following template in Products:<br />
+Use it by creating your form elements in the templates of the other module(s) you wish to incorporate, and using the <strong>{$FBid}</strong> to tie it back to PowerForms. For example, to include form options based on the Products module, create the following template in Products:<br />
 <pre>
 {foreach from=$items item=entry}
 	{assign var=MData value=\'\'}
@@ -896,7 +903,7 @@ $lang['ZM']='Zambia';
 $lang['ZW']='Zimbabwe';
 
 $lang['submission_error'] = 'Sorry! There was an error handling your form submission.';
-$lang['submit_error']='FormBuilder submit error: %s';
+$lang['submit_error']='PowerForms submit error: %s';
 $lang['uploads_error'] = 'Error committing file to the uploads module: %s';
 $lang['nouploads_error'] = 'Could not find the uploads module';
 $lang['upload_attach_error'] = 'Upload/Attachment error on file %s (tmp_name: %s, of type %s)';
@@ -904,35 +911,37 @@ $lang['submission_error_file_lock'] = 'Error. Unable to obtain lock for file.';
 $lang['unchecked_by_default']='Default: unchecked';
 $lang['checked_by_default']='Default: checked';
 
-$lang['email_default_template'] = 'FormBuilder Submission';
+$lang['email_default_template'] = 'PowerForms Submission';
 $lang['email_template_not_set'] = 'Email template not yet set!';
-$lang['missing_cms_mailer'] = 'FormBuilder: Cannot find required module CMSMailer!';
+$lang['missing_cms_mailer'] = 'PowerForms: Cannot find required module CMSMailer!';
 $lang['user_approved_submission']='User approved submission %s from %s';
 
-$lang['event_info_OnFormBuilderFormSubmit']='Event triggered when a FormBuilder form is submitted';
-$lang['event_info_OnFormBuilderFormSubmitError']='Event triggered if there is an error when a FormBuilder form is submitted';
-$lang['event_info_OnFormBuilderFormDisplay']='Event triggered when a FormBuilder form is displayed';
+$lang['event_info_OnFormSubmit']='Event triggered when a PowerForms form is submitted';
+$lang['event_info_OnFormSubmitError']='Event triggered if there is an error when a PowerForms form is submitted';
+$lang['event_info_OnFormDisplay']='Event triggered when a PowerForms form is displayed';
 
-$lang['event_help_OnFormBuilderFormSubmit']='<p>Event triggered when a FormBuilder form is submitted.</p>
+$lang['event_help_OnFormSubmit']='<p>Event triggered when a PowerForms form is submitted.</p>
 <h4>Parameters</h4>
 <ul>
 <li><em>form_name</em> - The form name (string)</li>
 <li><em>form_id</em> - The internal form id (int)</li>
 <li><em>value_&lt;name&gt;</em> - Supply a default value to a field with the specified name.</li>
 </ul> ';
-$lang['event_help_OnFormBuilderFormSubmitError']='<p>Event triggered if there is an error when a FormBuilder form is submitted</p>
+$lang['event_help_OnFormSubmitError']='<p>Event triggered if there is an error when a PowerForms form is submitted</p>
 <h4>Parameters</h4>
 <ul>
 <li><em>form_name</em> - The form name (string)</li>
 <li><em>form_id</em> - The internal form id (int)</li>
 <li><em>error</em> - A list of all known errors (string)</li>
 </ul> ';
-$lang['event_help_OnFormBuilderFormDisplay']='<p>Event triggered when a FormBuilder form is displayed</p>
+$lang['event_help_OnFormDisplay']='<p>Event triggered when a PowerForms form is displayed</p>
 <h4>Parameters</h4>
 <ul>
 <li><em>form_name</em> - The form name (string)</li>
 <li><em>form_id</em> - The internal form id (int)</li>
 </ul> ';
+
+$lang['perm_modify'] = 'Modify Power Forms';
 
 $lang['formbuilder_params_response_id'] = 'Response ID. Used by FormBrowser';
 $lang['formbuilder_params_passed_from_tag'] = 'Default field values; see module help';
@@ -966,7 +975,7 @@ $lang['desc_field_helptext_id']='a string including field->id';
 $lang['desc_has_label']='1 if the field type has a label, otherwise 0';
 $lang['desc_helptext']='the field\'s help text';
 $lang['desc_hide_name']='1 if the field name should be hidden, otherwise 0';
-$lang['desc_id']='the internal / opaque id FormBuilder uses for this field';
+$lang['desc_id']='the internal / opaque id PowerForms uses for this field';
 $lang['desc_input_id']='the ID of the field\'s input (useful for label for="foo")';
 $lang['desc_input']='the field\'s input control (e.g., the input field itself)';
 $lang['desc_label_parts']='1 if the collection of controls has separate labels for each control';
@@ -993,12 +1002,12 @@ For a multi-page form, you can access the value of previous fields. They are in 
  can use this in Static Text fields as well, which is a nice way to personalize forms.';
 
 // post-install message
-$lang['post_install']="FormBuilder installed. Please consult the module's Help page for documentation.";
+$lang['post_install']="Power Forms module installed. Please consult the module's help page for documentation.";
 
 $lang['help'] = "<h3>What Does This Do?</h3>
-<p>The Form Builder Module allows you to create forms (in fact, it's a replacement of the original Feedback Form module), with
+<p>The Power Forms module allows you to create forms (in fact, it's a replacement of the original Feedback Form module), with
 the added power of database storage. With its companion module Form Browser, you can use it to create simple database applications.</p>
-<p>The forms created using the Form Builder may be inserted
+<p>The forms created using the Power Forms may be inserted
 into templates and/or content pages. Forms may contain many kinds of inputs, and may have
 validation applied to these inputs. The results of these forms may be handled in a variety of ways.</p>
 
@@ -1008,13 +1017,13 @@ If you get stuck, chat with me on the #cms IRC channel, post to the forum, send 
 really desperate, try reading the instructions on the rest of this page.</P>
 
 <h3>How Do I Create a Form</h3>
-<p>In the CMS Admin Menu, you should get a new menu item called FormBuilder. Click on this. On the page
+<p>In the CMS Admin Menu, you should get a new menu item called PowerForms. Click on this. On the page
 that gets shown, there are options (at the bottom of the list of Forms) to Add a New Form or Modify
 Configuration.</p>
 
 <h3>Adding a Form to a Page</h3>
-<p>In the main FormBuilder admin page, you can see an example of the tag used to display each form. It looks
-something like {FormBuilder form='sample_form'}</p>
+<p>In the main Power Forms admin page, you can see an example of the tag used to display each form. It looks
+something like {PowerForms form='sample_form'}</p>
 <p>By copying this tag into the content of a page, or into a template, will cause that form to be displayed.
 In theory, you can have multiple forms on a page if you really want to. Be careful when pasting the tag
 into a page's content if you use a WYSIWYG editor such as TinyMCE, FCKEdit, or HTMLArea. These editors may stealthily
@@ -1126,7 +1135,7 @@ are they embedded in the HTML.</li>
 form that the user sees. The email addresses are not made visible nor
 are they embedded in the HTML.</li>
 <li>*Email results based on frontend fields. This field is an email disposition that allows form fields' user input to specify the Email Subject, \"From Name\", \"From Address\", and Destination Email Address.</li>
-<li>*Email to User-Supplied Address. This puts an input field in the form for the user to populate with an email address. The form results get sent to that address. Beware of Spam abuse! Active the primitive anti-spam features in the FormBuilder configuration screen.</li>
+<li>*Email to User-Supplied Address. This puts an input field in the form for the user to populate with an email address. The form results get sent to that address. Beware of Spam abuse! Active the primitive anti-spam features in the Power Forms configuration screen.</li>
 <li>*Store Results in Database. <strong>Deprecated.</strong> Use Store Results for FormBrowser Module instead! This will store the form contents in an internal database. You will always use this disposition if you use the form with FormBrowser.</li>
 <li>*Redirect to Page Based on Pulldown. This allows you to redirect the form to a different site page depending on its value. If you have multiple dispositions, make sure this is used last.</li>
 <li>*Validate via Email. This is a strange and powerful field. It provides the user a mandatory input for their email address. Once they submit their form, the standard form dispositions are not performed -- rather, it send the user an email with a special coded link. If they click on the link, the other form is considered \"approved,\" and the other dispositions are all performed.</li>
@@ -1139,7 +1148,7 @@ You can specify a filename pattern using values from form fields, set its format
 <li>*Save Results to File(s) Based on Multiple Selections. Like the Flat File disposition, except the value(s) of checkboxes  determines which file(s) results get written to.</li>
 <li>*Email to CMS Admin User. Provides a pull-down of CMS Admin users, and directs the results as an email to the selected admin.</li>
 <li>*Store Results for FormBrowser Module v.0.3. Stores the form results in an XML structure as a single database record. This is the only interface to Form Browser. See section below.</li>
-<li>*Submit to an arbitrary form action. Craft an HTTP GET or POST, and transmit it using cURL to the specified URL. This lets you use FormBuilder as a front-end to any CGI or Form Handling script out there.</li>
+<li>*Submit to an arbitrary form action. Craft an HTTP GET or POST, and transmit it using cURL to the specified URL. This lets you use Power Forms as a front-end to any CGI or Form Handling script out there.</li>
 
 </ul></li></li></ul>
 
@@ -1147,27 +1156,27 @@ You can specify a filename pattern using values from form fields, set its format
 <p>Calguy added a nice feature, which is that you can pass default field values to your form via the module tag. This allows you to have
 the same form in multiple places, but with different default values. It may not work for more exotic field types, but for fields that have
 a single value, you can specify like:</p>
-<p>{FormBuilder form='my_form' value_<i>FIELDNAME</i>='default_value'}</p>
+<p>{PowerForms form='my_form' value_<i>FIELDNAME</i>='default_value'}</p>
 <p>This will set the field with <i>FIELDNAME</i> to 'default_value'.</p>
 <p>This can be problematic, as sometimes field names are unwieldy or contain characters that don't work well with Smarty. So there is an
 alternative like this:</p>
-<p>{FormBuilder form='my_form' value_fld<i>NUMBER</i>='default_value'}</p>
-<p>That uses field <i>NUMBER</i>, where <i>NUMBER</i> is the internal FormBuilder field id. You might wonder how you know what that id is. Simply go into the FormBuilder configuration tab,
+<p>{PowerForms form='my_form' value_fld<i>NUMBER</i>='default_value'}</p>
+<p>That uses field <i>NUMBER</i>, where <i>NUMBER</i> is the internal PowerForms field id. You might wonder how you know what that id is. Simply go into the PowerForms configuration tab,
 and check \"Show Field IDs\"</p>
 
 <h3>Email and Flat File Templates</h3>
-<p>Many disposition types allow you to create a template for the email that is generated, or for the way the results are written to a file. If you opt not to create a template, the FormBuilder will use its own best guess, which may or may not work out to your liking. You can always click on the \"Create Sample Template\" and then customize the results.</p>
+<p>Many disposition types allow you to create a template for the email that is generated, or for the way the results are written to a file. If you opt not to create a template, the PowerForms will use its own best guess, which may or may not work out to your liking. You can always click on the \"Create Sample Template\" and then customize the results.</p>
 <p>To the right, you'll find a legend which lists all of the variables that are available to you to use in your template. As of version 0.3, variables have two names, one based on the field name, the other based on the field ID. If you use field names that have characters outside of the ASCII 32-126 range, it will be safer to use the ID-based variables. As of version 0.5, variables also have aliases, which you can use.</p>
 <p><strong>Note that once you've changed a template, it will no longer automatically add new fields.</strong> For this reason, it's usually best to create your templates as the last step of creating your form.</p>
 <p>As of version 0.2.4, you can opt to send any of these emails as HTML email. There should be a checkbox at the top of the template page for this. There is also a \"Create Sample HTML Template\" button over in the legend area. For HTML email, the email body will also provide the default text-only values.</p>
 
-<h3>Use with FormBrowser v3</h3>
-<p>There are some special features when using FormBuilder with FormBrowser. The new approach stores the form results in XML, so that far fewer
+<h3>Use with FormBrowser module v3</h3>
+<p>There are some special features when using Power Forms with FormBrowser. The new approach stores the form results in XML, so that far fewer
 queries are needed to retrieve records. This means you can use FormBrowser with hundreds or even thousands of records. It also means you
 will have to choose up front which fields you will want to be able to sort by. You can choose up to five. Changing these after there are submitted records will result in improper sorting! A re-index function will be added to a future version.</p>
 <p>In advanced options, you can tie a form to Frontend Users. That means each user gets one record for the form; they can create it
 a single time, subsequent times they will be editing their record. The record will not be visible to any other users (excluding admins).
-This form should be added to your page using the syntax {FormBuilder action='feuserform' form='form_name'}.</p>
+This form should be added to your page using the syntax {PowerForms action='feuserform' form='form_name'}.</p>
 <p>For greater data safety, you can encrypt the stored forms in the database. You can use the built-in mycrypt library or the OpenSSL module.
 In either case, for the passphrase, you can either enter text in the field or a file name. If you specify a file name, the contents of that
 file will be used as the passphrase for encrypting.</p>
@@ -1198,7 +1207,7 @@ forms). This is set in the Form Admin in the UDT Integration tab. The UDT gets c
 every time any page of the form is displayed (including when validation fails).</li>
 </ul>
 <h3>Configuration</h3>
-<p>There are some global configuration options for FormBuilder:</p>
+<p>There are some global configuration options for Power Forms:</p>
 <ul>
 <li>Enable fast field add pulldown. This enables the pulldown on the Form Edit page which saves a step in the creation of new fields.</li>
 <li>Run in MLE Mode. This changes some queries against the content table to try to prevent ugly crashes under the MLE fork. Checking this will cause ugly crashes if you are NOT running the MLE fork.</li>
@@ -1206,17 +1215,17 @@ every time any page of the form is displayed (including when validation fails).<
 <li>Require Field Names. Typically, you will want form fields to be named so you can tell which is which. However, in some cases, you might want to have nameless fields. Uncheck this if you want to allow nameless fields.</li>
 <li>Unique Field Names. Typically, you will want form fields to have unique names so you can tell which is which. Uncheck this if you want to allow fields to share names.</li>
 <li>Use relaxed email validation. This uses a less restrictive regular expression for validating email; e.g., x@y will be allowed, where typically x@y.tld is required.</li>
-<li>Show Form Builder Version. Displays the version of FormBuilder you're using in a comment when the form is generated. Typically only useful when debugging.</li>
+<li>Show Power Forms Version. Displays the version of Power Forms you're using in a comment when the form is generated. Typically only useful when debugging.</li>
 <li>Enable primitive anti-spam features. When turned on, this allows any given IP address to only generate 10 emails per hour.</li>
-<li>Show Field IDs. When turned on, FormBuilder will display field ids when adding or editing a form.</li>
+<li>Show Field IDs. When turned on, Power Forms will display field ids when adding or editing a form.</li>
 </ul>
 <h3>Styling and CSS</h3>
-<p>After a bit of nagging on the part of people who actually respect standards, FormBuilder no longer encourages tricks like embedding CSS in
-static text fields. Instead, it creates a stylesheet called \"FormBuilder Default\" that you are encouraged to attach to the page template
+<p>After a bit of nagging on the part of people who actually respect standards, PowerForms no longer encourages tricks like embedding CSS in
+static text fields. Instead, it creates a stylesheet called \"PowerForms Default\" that you are encouraged to attach to the page template
 that you use for pages that contain your form.</p>
 <p>This default CSS was graciously provided by Paul Noone.</p>
 <h3>Credits</h3>
-<p>Many people have contributed code, bug reports, cash, and ideas to FormBuilder. Among them (alphabetically):
+<p>Many people have contributed code, bug reports, cash, and ideas to PowerForms' ancestor, FormBuilder. Among them (alphabetically):
 <ul>
 <li><a href=\"http://www.bpti.eu\">Baltic institute of advanced technology</a> - code, funding </li>
 <li>Jeremy Bass - code and suggestions</li>
@@ -1243,13 +1252,13 @@ that you use for pages that contain your form.</p>
 </ul>
 <h3>Known Issues</h3>
 <ul>
-<li>FormBuilder does not yet support pretty URLs, although that shouldn't matter since the user side is pretty simple.</li>
+<li>Power Forms does not yet support pretty URLs, although that shouldn't matter since the user side is pretty simple.</li>
 <li>FileUpload Fields may not work correctly with multipage forms.</li>
 </ul>
 
 <h3>Troubleshooting</h3>
 <ol>
-<li>FormBuilder/FormBrowser <strong>requires</strong> PHP 5 or later to function correctly.</li>
+<li>PowerForms/FormBrowser <strong>requires</strong> PHP 5 or later to function correctly.</li>
 <li>First step is to check you're running CMS 1.6 or later.</li>
 <li>Second step is to read and understand the caveat about WYSIWYG editors up in the
 section <em>Adding a Form to a Page</em>.</li>
