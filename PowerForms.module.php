@@ -2,7 +2,7 @@
 #------------------------------------------------------------------------
 # This is CMS Made Simple module: PowerForms
 # Portions copyright (C) 2012-2015 Tom Phane <@>
-# Derived from FormBuilder module copyright (C) 2005-2012, Samuel Goldstein <sjg@cmsmodules.com>
+# Derived largely from FormBuilder module, copyright (C) 2005-2012, Samuel Goldstein <sjg@cmsmodules.com>
 # This project's forge-page is: http://dev.cmsmadesimple.org/projects/powerforms
 #
 # This module is free software; you can redistribute it and/or modify it under
@@ -18,7 +18,7 @@
 #-----------------------------------------------------------------------
 define('MailerReqVersion', '1.73'); //minumum acceptable version of CMSMailer module
 
-class FormBuilder extends CMSModule
+class PowerForms extends CMSModule
 {
 	var $field_types;
 	var $disp_field_types;
@@ -39,11 +39,6 @@ class FormBuilder extends CMSModule
 		$this->email_regex = "/^([\w\d\.\-\_])+\@([\w\d\.\-\_]+)\.(\w+)$/i";
 		$this->email_regex_relaxed = "/^([\w\d\.\-\_])+\@([\w\d\.\-\_])+$/i";
 		$this->dbHandle = cmsms()->GetDb();
-
-//		require_once (cms_join_path(dirname(__FILE__),'lib','Form.class.php')); //TODO as needed
-//		require_once (cms_join_path(dirname(__FILE__),'lib','FieldBase.class.php'));
-//		$path = cms_join_path(dirname(__FILE__),'lib');
-//		set_include_path(get_include_path().PATH_SEPARATOR.$path);
 	}
 
 	function initialize()
@@ -176,25 +171,8 @@ class FormBuilder extends CMSModule
 
 	function GetHeaderHTML()
 	{
-		$config = cmsms()->GetConfig();
-		$incpath = $this->GetModuleURLPath().'/include/';
-		$pref = '<script type="text/javascript" src="'.$incpath;
-		$suff = '"></script>'."\n";
-
-		if(version_compare($GLOBALS['CMS_VERSION'],'1.9') >= 0)
-		{
-			$ret = '';
-		}
-		else
-		{
-		    $ret = $pref.'jquery-1.4.2.min.js'.$suff;
-		}
-//		$ret .= $pref.'jquery.tablednd.min.js'.$suff;
-//		$ret .= $pref.'fb_jquery_functions.js'.$suff;
-//		$ret .= $pref.'fb_jquery.js'.$suff;
-		$ret .= '<link rel="stylesheet" type="text/css" href="'.$incpath.'admin.css" />'."\n";
-
-		return $ret;
+		return '<link rel="stylesheet" type="text/css" href="'.
+			$this->GetModuleURLPath().'/include/admin.css" />';
 	}
 
 	/**
@@ -274,21 +252,18 @@ class FormBuilder extends CMSModule
 		return true;
 	}
 
-	/*
-	DO NOT allow parameters to be used for passing the order_by! It is not escaped before
-	database access. If we let ADODB quote it, the SQL is not valid (not that MySQL cares,
-	but Postgres does).
-	*/
-
 	function GetForms($order_by='name')
 	{
-		$db = $this->dbHandle;
-		$sql = 'SELECT * FROM '.cms_db_prefix().'module_fb_form ORDER BY '.$order_by;
 		$result = array();
+		$db = $this->dbHandle;
+		//DO NOT parameterise order_by! If ADODB quotes it, the SQL is not valid
+		$sql = 'SELECT * FROM '.cms_db_prefix().'module_pwf_form ORDER BY '.$order_by;
 		$rs = $db->Execute($sql);
-		if($rs && $rs->RecordCount() > 0)
+		if($rs)
 		{
-			$result = $rs->GetArray();
+			if($rs->RecordCount() > 0)
+				$result = $rs->GetArray();
+			$rs->Close();
 		}
 		return $result;
 	}
@@ -296,12 +271,17 @@ class FormBuilder extends CMSModule
 	function GetFormIDFromAlias($form_alias)
 	{
 		$db = $this->dbHandle;
-		$sql = 'SELECT form_id from '.cms_db_prefix().'module_fb_form WHERE alias = ?';
+		$sql = 'SELECT form_id FROM '.cms_db_prefix().'module_pwf_form WHERE alias = ?';
 		$rs = $db->Execute($sql, array($form_alias));
-		if($rs && $rs->RecordCount() > 0)
+		if($rs)
 		{
-			$result = $rs->FetchRow();
-			return $result['form_id'];
+			if($rs->RecordCount() > 0)
+			{
+				$row = $rs->FetchRow();
+				$rs->Close();
+				return $row['form_id'];
+			}
+			$rs->Close();
 		}
 		return -1;
 	}
@@ -309,13 +289,19 @@ class FormBuilder extends CMSModule
 	function GetFormNameFromID($form_id)
 	{
 		$db = $this->dbHandle;
-		$sql = 'SELECT name from '.cms_db_prefix().'module_fb_form WHERE form_id = ?';
+		$sql = 'SELECT name FROM '.cms_db_prefix().'module_pwf_form WHERE form_id = ?';
 		$rs = $db->Execute($sql, array($form_id));
-		if($rs && $rs->RecordCount() > 0)
+		if($rs)
 		{
-			$result = $rs->FetchRow();
+			if($rs->RecordCount() > 0)
+			{
+				$row = $rs->FetchRow();
+				$rs->Close();
+				return $row['name'];
+			}
+			$rs->Close();
 		}
-		return $result['name'];
+		return '';
 	}
 
 	function GetFormByID($form_id,$loadDeep=false)
@@ -339,20 +325,21 @@ class FormBuilder extends CMSModule
 		$names = array();
 		$values = array();
 		$db = $this->dbHandle;
-		$Field = $this->GetFormBrowserField($form_id);
-		if($Field == false)
+		$obfield = $this->GetFormBrowserField($form_id);
+		if($obfield == false)
 		{
 			// error handling goes here
 			echo($this->Lang('error_no_browser_field'));
 		}
 
-		$dbresult = $db->Execute('SELECT * FROM '.cms_db_prefix().
-					'module_fb_formbrowser WHERE fbr_id=?', array($response_id));
+		$rs = $db->Execute('SELECT * FROM '.cms_db_prefix().
+			'module_pwf_browse WHERE browser_id=?', array($response_id));
 
 		$oneset = new stdClass();
-		if($dbresult && $row = $dbresult->FetchRow())
+		if($rs)
 		{
-			$oneset->id = $row['fbr_id'];
+			$row = $rs->FetchRow();
+			$oneset->id = $row['browser_id'];
 			$oneset->user_approved = (empty($row['user_approved'])?'':date($dateFmt,$db->UnixTimeStamp($row['user_approved'])));
 			$oneset->admin_approved = (empty($row['admin_approved'])?'':date($dateFmt,$db->UnixTimeStamp($row['admin_approved'])));
 			$oneset->submitted = date($dateFmt,$db->UnixTimeStamp($row['submitted']));
@@ -363,10 +350,11 @@ class FormBuilder extends CMSModule
 			$oneset->fields = array();
 			$oneset->names = array();
 			$oneset->fieldsbyalias = array();
+			$rs->Close();
 		}
 
 		$populate_names = true;
-		$this->HandleResponseFromXML($Field, $oneset);
+		$this->HandleResponseFromXML($obfield, $oneset);
 		list($fnames, $aliases, $vals) = $this->ParseResponseXML($oneset->xml);
 
 		foreach($fnames as $id=>$name)
@@ -394,7 +382,7 @@ class FormBuilder extends CMSModule
 		{
 			if($human_readable_values)
 			{
-				if(isset($xmlfield['display_in_submission']) && $xmlfield['display_in_submission'] == '1')
+				if(!empty($xmlfield['display_in_submission']))
 				{
 					$id = (int)$xmlfield['id'];
 					$names[$id] = ((string)$xmlfield->field_name);
@@ -448,34 +436,39 @@ class FormBuilder extends CMSModule
 	function GetFormBrowserField($form_id)
 	{
 		$db = $this->dbHandle;
-		$sql = 'SELECT * FROM ' . cms_db_prefix().'module_fb_field WHERE form_id=? and type=?';
-		$rs = $this->dbHandle->Execute($sql, array($form_id,'DispositionFormBrowser'));
-		$result = array();
-		if(!$rs || $rs->RecordCount() == 0)
+		$sql = 'SELECT * FROM '.cms_db_prefix().'module_pwf_field WHERE form_id=? and type=?';
+		$rs = $db->Execute($sql, array($form_id,'DispositionFormBrowser'));
+		if(!$rs)
 		{
 			return false;
 		}
-		$thisRes = $rs->GetArray();
+		if($rs->RecordCount() == 0)
+		{
+			$rs->Close();
+			return false;
+		}
+
 		$params = array();
 		$funcs = new pwfUtils($this, $params, false);
 
+		$thisRes = $rs->GetArray();
 		$className = $funcs->MakeClassName($thisRes[0]['type'], '');
 		// create the field object
 		$field = $funcs->NewField($thisRes[0]);
 		return $field;
 	}
 
-	function HandleResponseFromXML(&$Field, &$responseObj)
+	function HandleResponseFromXML(&$obfield, &$responseObj)
 	{
-		$crypt = $Field->GetOption('crypt','0');
+		$crypt = $obfield->GetOption('crypt','0');
 		if($crypt == '1')
 		{
-			$cryptlib = $Field->GetOption('crypt_lib');
-			$keyfile = $Field->GetOption('keyfile');
+			$cryptlib = $obfield->GetOption('crypt_lib');
+			$keyfile = $obfield->GetOption('keyfile');
 			if($cryptlib == 'openssl')
 			{
 				$openssl = $this->GetModuleInstance('OpenSSL');
-				$pkey = $Field->GetOption('private_key');
+				$pkey = $obfield->GetOption('private_key');
 				$openssl->Reset();
 				$openssl->load_private_keyfile($pkey,$keyfile);
 			}
@@ -484,7 +477,7 @@ class FormBuilder extends CMSModule
 				if(file_exists($keyfile))
 		    	{
 			        $keyfile = file_get_contents($keyfile);
-		 	     }
+		 		}
 			}
 		}
 
@@ -500,7 +493,7 @@ class FormBuilder extends CMSModule
 			}
 			else
 			{
-				$responseObj->xml = $this->fbdecrypt($responseObj->xml,$keyfile);
+				$responseObj->xml = self::Decrypt($responseObj->xml,$keyfile);
 			}
 		}
 	}
@@ -510,7 +503,7 @@ class FormBuilder extends CMSModule
 		$db = $this->dbHandle;
 		$names = array();
 		$values = array();
-		$sql = 'FROM '.cms_db_prefix().'module_fb_formbrowser WHERE form_id=?';
+		$sql = 'FROM '.cms_db_prefix().'module_pwf_browse WHERE form_id=?';
 		$sqlparms = array($form_id);
 		if($user_approved)
 		{
@@ -522,7 +515,7 @@ class FormBuilder extends CMSModule
 		}
 		if(!empty($params['pwfp_response_search']) && (is_array($params['pwfp_response_search'])))
 		{
-			$sql .= ' AND fbr_id IN ('. implode(',', $params['pwfp_response_search']) .')';
+			$sql .= ' AND browser_id IN ('. implode(',', $params['pwfp_response_search']) .')';
 		}
 		if(isset($params['filter_field']) && substr($params['filter_field'],0,5) =='index')
 		{
@@ -553,41 +546,47 @@ class FormBuilder extends CMSModule
 			}
 		}
 
-		$dbcount = $db->Execute('SELECT COUNT(*) AS num '.$sql,$sqlparms);
-
 		$records = 0;
-		if($dbcount && $row = $dbcount->FetchRow())
+		$rs = $db->Execute('SELECT COUNT(*) AS num '.$sql,$sqlparms);
+		if($rs)
 		{
+			$row = $rs->FetchRow())
 			$records = $row['num'];
+			$rs->Close();
 		}
 
 		if($number > -1)
 		{
-			$dbresult = $db->SelectLimit('SELECT * '.$sql, $number, $start_point, $sqlparms);
+			$rs = $db->SelectLimit('SELECT * '.$sql, $number, $start_point, $sqlparms);
 		}
 		else
 		{
-			$dbresult = $db->Execute('SELECT * '.$sql, $sqlparms);
+			$rs = $db->Execute('SELECT * '.$sql, $sqlparms);
 		}
 
-		while($dbresult && $row = $dbresult->FetchRow())
+		if($rs)
 		{
-			$oneset = new stdClass();
-			$oneset->id = $row['fbr_id'];
-			$oneset->user_approved = (empty($row['user_approved'])?'':date($dateFmt,$db->UnixTimeStamp($row['user_approved'])));
-			$oneset->admin_approved = (empty($row['admin_approved'])?'':date($dateFmt,$db->UnixTimeStamp($row['admin_approved'])));
-			$oneset->submitted = date($dateFmt,$db->UnixTimeStamp($row['submitted']));
-			$oneset->user_approved_date = (empty($row['user_approved'])?'':$db->UnixTimeStamp($row['user_approved']));
-			$oneset->admin_approved_date = (empty($row['admin_approved'])?'':$db->UnixTimeStamp($row['admin_approved']));
-			$oneset->submitted_date = $db->UnixTimeStamp($row['submitted']);
+			while($row = $rs->FetchRow())
+			{
+				$oneset = new stdClass();
+				$oneset->id = $row['browser_id'];
+				$oneset->user_approved = (empty($row['user_approved'])?'':date($dateFmt,$db->UnixTimeStamp($row['user_approved'])));
+				$oneset->admin_approved = (empty($row['admin_approved'])?'':date($dateFmt,$db->UnixTimeStamp($row['admin_approved'])));
+				$oneset->submitted = date($dateFmt,$db->UnixTimeStamp($row['submitted']));
+				$oneset->user_approved_date = (empty($row['user_approved'])?'':$db->UnixTimeStamp($row['user_approved']));
+				$oneset->admin_approved_date = (empty($row['admin_approved'])?'':$db->UnixTimeStamp($row['admin_approved']));
+				$oneset->submitted_date = $db->UnixTimeStamp($row['submitted']);
 
-			$oneset->xml = $row['response'];
-			$oneset->fields = array();
-			$oneset->fieldsbyalias = array();
-			$values[] = $oneset;
+				$oneset->xml = $row['response'];
+				$oneset->fields = array();
+				$oneset->fieldsbyalias = array();
+				$values[] = $oneset;
+			}
+			$rs->Close();
 		}
-		$Field = $this->GetFormBrowserField($form_id);
-		if($Field == false)
+
+		$obfield = $this->GetFormBrowserField($form_id);
+		if($obfield == false)
 		{
 			// error handling goes here.
 			echo($this->Lang('error_no_browser_field'));
@@ -597,7 +596,7 @@ class FormBuilder extends CMSModule
 		$mapfields = (count($field_list) > 0);
 		for ($i=0;$i<count($values);$i++)
 		{
-			$this->HandleResponseFromXML($Field, $values[$i]);
+			$this->HandleResponseFromXML($obfield, $values[$i]);
 			list($fnames, $aliases, $vals) = $this->ParseResponseXML($values[$i]->xml);
 			foreach($fnames as $id=>$name)
 			{
@@ -634,13 +633,13 @@ class FormBuilder extends CMSModule
 		return array($records, $names, $values);
 	}
 
-	// writes all records into a flat file.
+	// writes all records into a flat file
 	function WriteSortedResponsesToFile($form_id,$filespec,$striptags=true,$dateFmt='d F y',&$params)
 	{
 		$db = $this->dbHandle;
 		$names = array();
 		$values = array();
-		$sql = 'FROM '.cms_db_prefix().'module_fb_formbrowser WHERE form_id=?';
+		$sql = 'FROM '.cms_db_prefix().'module_pwf_browse WHERE form_id=?';
 
 		if(!isset($params['pwfp_sort_field']) || $params['pwfp_sort_field']=='submitdate' || empty($params['pwfp_sort_field']))
 		{
@@ -665,8 +664,8 @@ class FormBuilder extends CMSModule
 			}
 		}
 
-		$Field = $this->GetFormBrowserField($form_id);
-		if($Field == false)
+		$obfield = $this->GetFormBrowserField($form_id);
+		if($obfield == false)
 		{
 			// error handling goes here.
 			echo($this->Lang('error_no_browser_field'));
@@ -678,47 +677,50 @@ class FormBuilder extends CMSModule
 			return false;
 		}
 
-		$dbresult = $db->Execute('SELECT * '.$sql, array($form_id));
-
 		$populate_names = true;
-		while ($dbresult && $row = $dbresult->FetchRow())
+		$rs = $db->Execute('SELECT * '.$sql, array($form_id));
+		if($rs)
 		{
-			$oneset = new stdClass();
-			$oneset->id = $row['fbr_id'];
-			$oneset->user_approved = (empty($row['user_approved'])?'':date($dateFmt,$db->UnixTimeStamp($row['user_approved'])));
-			$oneset->admin_approved = (empty($row['admin_approved'])?'':date($dateFmt,$db->UnixTimeStamp($row['admin_approved'])));
-			$oneset->submitted = date($dateFmt,$db->UnixTimeStamp($row['submitted']));
-			$oneset->xml = $row['response'];
-			$this->HandleResponseFromXML($Field, $oneset);
-			list($fnames, $aliases, $vals) = $this->ParseResponseXML($oneset->xml);
-			if($populate_names)
+			while ($row = $rs->FetchRow())
 			{
-				if($striptags)
-	         	{
-					foreach($fnames as $id=>$name)
-					{
-		            	$fnames[$i] = strip_tags($fnames[$i]);
-	            	}
-	         	}
-				fputs ($fh, $this->Lang('title_submit_date')."\t".
-					$this->Lang('title_approval_date')."\t".
-					$this->Lang('title_user_approved')."\t".
-					implode("\t",$fnames)."\n");
-				$populate_names = false;
+				$oneset = new stdClass();
+				$oneset->id = $row['browser_id'];
+				$oneset->user_approved = (empty($row['user_approved'])?'':date($dateFmt,$db->UnixTimeStamp($row['user_approved'])));
+				$oneset->admin_approved = (empty($row['admin_approved'])?'':date($dateFmt,$db->UnixTimeStamp($row['admin_approved'])));
+				$oneset->submitted = date($dateFmt,$db->UnixTimeStamp($row['submitted']));
+				$oneset->xml = $row['response'];
+				$this->HandleResponseFromXML($obfield, $oneset);
+				list($fnames, $aliases, $vals) = $this->ParseResponseXML($oneset->xml);
+				if($populate_names)
+				{
+					if($striptags)
+			     	{
+						foreach($fnames as $id=>$name)
+						{
+				        	$fnames[$i] = strip_tags($fnames[$i]);
+			        	}
+			     	}
+					fputs ($fh, $this->Lang('title_submit_date')."\t".
+						$this->Lang('title_approval_date')."\t".
+						$this->Lang('title_user_approved')."\t".
+						implode("\t",$fnames)."\n");
+					$populate_names = false;
+				}
+				fputs ($fh,$oneset->submitted . "\t");
+				fputs ($fh,$oneset->admin_approved . "\t");
+				fputs ($fh,$oneset->user_approved . "\t");
+				foreach($vals as $tv)
+				{
+					if($striptags)
+			        {
+						$tv = strip_tags($tv);
+			        }
+					fputs ($fh,preg_replace('/[\n\t\r]/',' ',$tv));
+					fputs ($fh,"\t");
+				}
+				fputs($fh,"\n");
 			}
-			fputs ($fh,$oneset->submitted . "\t");
-			fputs ($fh,$oneset->admin_approved . "\t");
-			fputs ($fh,$oneset->user_approved . "\t");
-			foreach($vals as $tv)
-			{
-				if($striptags)
-	            {
-					$tv = strip_tags($tv);
-	            }
-				fputs ($fh,preg_replace('/[\n\t\r]/',' ',$tv));
-				fputs ($fh,"\t");
-			}
-			fputs($fh,"\n");
+			$rs->Close();
 		}
 		fclose($fh);
 		return true;
@@ -728,10 +730,10 @@ class FormBuilder extends CMSModule
 	{
 		$parm = array('form_id'=>$form_id);
 		$funcs = new pwfUtils($this, $parm, true);
-		$Field = $funcs->GetFormBrowserField();
-		if($Field != false)
+		$obfield = $funcs->GetFormBrowserField();
+		if($obfield != false)
 		{
-			return $Field->getSortFieldList();
+			return $obfield->getSortFieldList();
 		}
 		// error handling goes here
 		return array();
@@ -740,7 +742,7 @@ class FormBuilder extends CMSModule
 	function GetFEUIDFromResponseID($response_id)
 	{
 		$db = $this->dbHandle;
-		$sql = 'SELECT feuid FROM '.cms_db_prefix().'module_fb_formbrowser WHERE fbr_id=?';
+		$sql = 'SELECT feuid FROM '.cms_db_prefix().'module_pwf_browse WHERE browser_id=?';
 		if($result = $db->GetRow($sql, array($response_id)))
 		{
 			return $result['feuid'];
@@ -752,8 +754,7 @@ class FormBuilder extends CMSModule
 	{
 		$db = $this->dbHandle;
 
-		// Fix for Bug 5422. Adapted from Mike Hughesdon's code.
-		$sql = 'SELECT fbr_id FROM '.cms_db_prefix().'module_fb_formbrowser WHERE feuid=?';
+		$sql = 'SELECT browser_id FROM '.cms_db_prefix().'module_pwf_browse WHERE feuid=?';
 		if($form_id != -1)
 		{
 			$sql .= ' AND form_id = '.$form_id.' ORDER BY submitted DESC';
@@ -761,7 +762,7 @@ class FormBuilder extends CMSModule
 
 		if($result = $db->GetRow($sql, array($feu_id)))
 		{
-			return $result['fbr_id'];
+			return $result['browser_id'];
 		}
 		return false;
  	}
@@ -779,18 +780,22 @@ class FormBuilder extends CMSModule
 	// For a given form, returns an array of response objects
 	function ListResponses($form_id,$sort_order='submitted')
 	{
-		$db = $this->dbHandle;
 		$ret = array();
-		$sql = 'SELECT * FROM '.cms_db_prefix().'module_fb_resp WHERE form_id=? ORDER BY ?';
-		$dbresult = $db->Execute($query, array($form_id,$sort_order));
-		while ($dbresult && $row = $dbresult->FetchRow())
+		$db = $this->dbHandle;
+		$sql = 'SELECT * FROM '.cms_db_prefix().'module_pwf_resp WHERE form_id=? ORDER BY ?';
+		$rs = $db->Execute($query, array($form_id,$sort_order));
+		if($rs)
 		{
-			$oneset = new stdClass();
-			$oneset->id = $result['resp_id'];
-			$oneset->user_approved = $db->UnixTimeStamp($result['user_approved']);
-			$oneset->admin_approved = $db->UnixTimeStamp($result['admin_approved']);
-			$oneset->submitted = $db->UnixTimeStamp($result['submitted']);
-			$ret[] = $oneset;
+			while ($row = $rs->FetchRow())
+			{
+				$oneset = new stdClass();
+				$oneset->id = $row['resp_id'];
+				$oneset->user_approved = $db->UnixTimeStamp($row['user_approved']);
+				$oneset->admin_approved = $db->UnixTimeStamp($row['admin_approved']);
+				$oneset->submitted = $db->UnixTimeStamp($row['submitted']);
+				$ret[] = $oneset;
+			}
+			$rs->Close();
 		}
 		return $ret;
 	}
@@ -819,26 +824,29 @@ class FormBuilder extends CMSModule
 	function ClearFileLock()
 	{
 		$db = $this->dbHandle;
-		$sql = 'DELETE FROM '.cms_db_prefix().'module_fb_flock';
-		$rs = $db->Execute($sql);
+		$sql = 'DELETE FROM '.cms_db_prefix().'module_pwf_flock';
+		$db->Execute($sql);
 	}
 
 	function GetFileLock()
 	{
 		$db = $this->dbHandle;
-		$sql = 'INSERT INTO '.cms_db_prefix().'module_fb_flock (flock_id, flock) values (1,'.$db->sysTimeStamp.')';
-		$rs = $db->Execute($sql);
-		if($rs)
+		$pref = cms_db_prefix();
+		$sql = 'INSERT INTO '.$pref.'module_pwf_flock (flock_id, flock) VALUES (1,'.$db->sysTimeStamp.')';
+		if($db->Execute($sql))
 		{
 			return true;
 		}
 		$sql = 'SELECT flock_id FROM '.cms_db_prefix().
-				"module_fb_flock WHERE flock + interval 15 second < ".$db->sysTimeStamp;
+				"module_pwf_flock WHERE flock + interval 15 second < ".$db->sysTimeStamp;
 		$rs = $db->Execute($sql);
-		if($rs && $rs->RecordCount() > 0)
+		if($rs)
 		{
-			$this->ClearFileLock();
-			return false;
+			if($rs->RecordCount() > 0)
+			{
+				$this->ClearFileLock();
+			}
+			$rs->Close();
 		}
 		return false;
 	}
@@ -872,21 +880,25 @@ class FormBuilder extends CMSModule
 		// get a list of the pages used by this template
 		$mypages = array();
 
-		$q = 'SELECT content_id,content_name FROM '.cms_db_prefix().
+		$sql = 'SELECT content_id,content_name FROM '.cms_db_prefix().
 			'content WHERE type = ? AND active = 1';
-		$dbresult = $db->Execute($q, array('content'));
-		while($row = $dbresult->FetchRow())
+		$rs = $db->Execute($sql, array('content'));
+		if($rs)
 		{
-			if($defaultid != '' && $row['content_id'] == $defaultid)
+			while($row = $rs->FetchRow())
 			{
-				// use a star instead of a word here so I don't have to
-				// worry about translation stuff
-				$mypages[$row['content_name'].' (*)'] = $row['content_id'];
+				if($defaultid != '' && $row['content_id'] == $defaultid)
+				{
+					// use a star instead of a word here so I don't have to
+					// worry about translation stuff
+					$mypages[$row['content_name'].' (*)'] = $row['content_id'];
+				}
+				else
+				{
+					$mypages[$row['content_name']] = $row['content_id'];
+				}
 			}
-			else
-			{
-				$mypages[$row['content_name']] = $row['content_id'];
-			}
+			$rs->Close();
 		}
 		return $this->CreateInputDropdown($id,'pwfp_'.$name,$mypages,-1,$current,$addtext);
 	}
@@ -930,7 +942,7 @@ class FormBuilder extends CMSModule
 			{
 				$key = $kf;
 			}
-			$enc = $this->fbencrypt($string,$key);
+			$enc = self::Encrypt($string,$key);
 		}
 		return array(true,$enc);
 	}
@@ -946,9 +958,9 @@ class FormBuilder extends CMSModule
 
 	function GetActiveTab(&$params)
 	{
-		if(!empty($params['fbr_atab']))
+		if(!empty($params['pwfp_atab']))
 		{
-		    return $params['fbr_atab'];
+		    return $params['pwfp_atab'];
 		}
 		else
 		{
@@ -956,7 +968,7 @@ class FormBuilder extends CMSModule
 		}
 	}
 
-	function fbencrypt($string,$key)
+	function Encrypt($string,$key)
 	{
 		$key = substr(md5($key),0,24);
 		$td = mcrypt_module_open ('tripledes', '', 'ecb', '');
@@ -968,7 +980,7 @@ class FormBuilder extends CMSModule
 		return $enc;
 	}
 
-	function fbdecrypt($crypt,$key)
+	function Decrypt($crypt,$key)
 	{
 		$crypt = base64_decode($crypt);
 		$td = mcrypt_module_open ('tripledes', '', 'ecb', '');
@@ -981,7 +993,7 @@ class FormBuilder extends CMSModule
 		return $plain;
 	}
 
-	function fbCreateInputText($id,$name,$value='',$size='10',$maxlength='255',$addttext='',$type='text')
+	function CustomCreateInputText($id,$name,$value='',$size='10',$maxlength='255',$addttext='',$type='text')
 	{
 		$value = cms_htmlentities($value);
 		$id = cms_htmlentities($id);
@@ -1000,7 +1012,7 @@ class FormBuilder extends CMSModule
 		return $text;
 	}
 
-	function fbCreateInputSubmit($id,$name,$value='',$addttext='',$image='',$confirmtext='')
+	function CustomCreateInputSubmit($id,$name,$value='',$addttext='',$image='',$confirmtext='')
 	{
 		$id = cms_htmlentities($id);
 		$name = cms_htmlentities($name);
@@ -1072,7 +1084,7 @@ tinymce.create('tinymce.plugins.formpicker', {
      m.add({
       title : '" . $form['name'] . "',
       onclick : function() {
-       tinyMCE.activeEditor.execCommand('mceInsertContent', false, '&#123;FormBuilder form=\"".$form["alias"]."\"&#125;');
+       tinyMCE.activeEditor.execCommand('mceInsertContent', false, '&#123;PowerForms form=\"".$form["alias"]."\"&#125;');
       }
      });
 ";
