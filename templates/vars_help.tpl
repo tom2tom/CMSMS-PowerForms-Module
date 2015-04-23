@@ -5,17 +5,19 @@
 </tr></thead>
 <tbody>
 {foreach from=$sysfields item=entry}
-{cycle values='odd,even' assign='rowclass'}
-<tr class="{$rowclass}"><td>{$entry->name}</td><td>{$entry->title}</td></tr>
+{cycle name=sysfields values='odd,even' assign=rowclass}
+<tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
+<td>{$entry->name}</td><td>{$entry->title}</td></tr>
 {/foreach}
 {if !empty($subfields)}
  {foreach from=$subfields item=entry}
  {if $rowclass == 'even'}
-  {cycle values='odd,even' assign='rowclass'}
+  {cycle name=subfields values='odd,even' assign=rowclass}
  {else}
-  {cycle values='even,odd' assign='rowclass'}
+  {cycle name=subfields values='even,odd' assign=rowclass}
  {/if}
-<tr class="{$rowclass}"><td>{ldelim}${$entry->name}{rdelim} / {ldelim}$fld_{$entry->id}{rdelim}</td><td>{$entry->title}</td></tr>
+<tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
+<td>{ldelim}${$entry->name}{rdelim} / {ldelim}$fld_{$entry->id}{rdelim}</td><td>{$entry->title}</td></tr>
  {/foreach}
 {/if}
 </tbody>
@@ -25,8 +27,9 @@
 <br />{$help_field_object}:<br />
 <table class="module_fb_legend">
 {foreach from=$obfields item=entry}
-{cycle values='odd,even' assign='rowclass'}
-<tr class="{$rowclass}"><td>{$entry->name}</td><td>{$entry->title}</td></tr>
+{cycle name=obfields values='odd,even' assign=rowclass}
+<tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
+<td>{$entry->name}</td><td>{$entry->title}</td></tr>
 {/foreach}
 </table>
 {$help_object_example}
