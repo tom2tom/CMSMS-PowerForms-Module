@@ -1,7 +1,5 @@
 jQuery.fn.fb_delete_field = function(message) {
-
-    if (confirm(message)) {
-
+	if (confirm(message)) {
 		var url = jQuery(this).attr("href");
 		var parent = jQuery(this).closest("tr");
 
@@ -9,13 +7,10 @@ jQuery.fn.fb_delete_field = function(message) {
 			type: "GET",
 			url: url,
 			error: function() {
-
 				alert('Sorry. There was an error.');
 			},
 			success: function() {
-
 				parent.fadeOut("1000", function() {
-
 					parent.remove();
 					var totalrows = jQuery(".module_fb_table").find("tbody tr").size();
 
@@ -33,17 +28,14 @@ jQuery.fn.fb_get_template = function(message, url) {
 	var value = jQuery(this).val();
 
 	if (confirm(message)) {
-
 		jQuery.ajax({
 			type: "GET",
 			url: url,
 			data: '&m1_fbrp_tid='+value,
 			error: function() {
-
 				alert('Sorry. There was an error.');
 			},
 			success: function(data) {
-
 				jQuery("#fb_form_template").val(data);
 			}
 		});
