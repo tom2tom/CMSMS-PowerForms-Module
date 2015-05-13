@@ -1,16 +1,15 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
 # Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if(!$this->CheckAccess()) exit;
+if(!$this->CheckAccess('ModifyPFForms')) exit;
 
-$funcs = new pwfUtils($this, $params, true);
-$funcs->Delete();
+$funcs = new pwfFormOperations();
+$funcs->Delete($this,$params['form_id']);
 
-$params['pwfp_message'] = $this->Lang('form_deleted');
-$this->Redirect($id, 'defaultadmin', '', $params);
+$this->Redirect($id,'defaultadmin',$returnid,array(
+	'message' => $this->PrettyMessage('form_deleted')));
 
 ?>
