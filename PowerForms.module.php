@@ -256,6 +256,27 @@ class PowerForms extends CMSModule
 			return 'maintab';
 	}
 
+	function PrettyMessage($text,$success=TRUE,$faillink=FALSE,$key=TRUE)
+	{
+		$base = ($key) ? $this->Lang($text) : $text;
+		if ($success)
+			return $this->ShowMessage($base);
+		else
+		{
+			$msg = $this->ShowErrors($base);
+			if ($faillink == FALSE)
+			{
+				//strip the link
+				$pos = strpos($msg,'<a href=');
+				$part1 = ($pos !== FALSE) ? substr($msg,0,$pos) : '';
+				$pos = strpos($msg,'</a>',$pos);
+				$part2 = ($pos !== FALSE) ? substr($msg,$pos+4) : $msg;
+				$msg = $part1.$part2;
+			}
+			return $msg;
+		}
+	}
+
 	function &GetFormData(&$params=NULL)
 	{
 		$fd = new pwfData();
