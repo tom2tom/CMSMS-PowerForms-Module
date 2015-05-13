@@ -1,4 +1,7 @@
+UNUSED*
 PowerForms.project*
 PowerForms.tags*
 .svn
-
+.buildpath
+.project
+/nbproject/private/
