@@ -12,8 +12,8 @@ $dict = NewDataDictionary($db);
 
 $flds = "
 	form_id I KEY,
-	name C(255),
-	alias C(255)
+	name C(256),
+	alias C(128)
 ";
 $sqlarray = $dict->CreateTableSQL($pref.'module_pwf_form', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
@@ -24,7 +24,7 @@ $db->Execute('create index '.$pref.'module_pwf_form_idx on '.$pref.'module_pwf_f
 $flds = "
 	form_attr_id I KEY,
 	form_id I,
-	name C(35),
+	name C(48),
 	value X
 ";
 $sqlarray = $dict->CreateTableSQL($pref.'module_pwf_form_attr', $flds, $taboptarray);
@@ -36,31 +36,31 @@ $db->Execute('create index '.$pref.'module_pwf_form_attr_idx on '.$pref.'module_
 $flds = "
 	field_id I KEY,
 	form_id I,
-	name C(255),
-	type C(50),
-	validation_type C(50),
-	required I1,
-	hide_label I1,
-	order_by I
+	name C(256),
+	type C(48),
+	validation_type C(48),
+	required I(1),
+	hide_label I(1),
+	order_by I(2)
 ";
 $sqlarray = $dict->CreateTableSQL($pref.'module_pwf_field', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
 $db->CreateSequence($pref.'module_pwf_field_seq');
-$db->Execute('create index '.$pref.'module_pwf_field_idx on '.$pref.'module_pwf_field (form_id)');
+$db->Execute('CREATE INDEX '.$pref.'module_pwf_field_idx ON '.$pref.'module_pwf_field (form_id)');
 
 $flds = "
 	option_id I KEY,
 	field_id I,
 	form_id I,
-	name C(255),
+	name C(256),
 	value X
 ";
 $sqlarray = $dict->CreateTableSQL($pref.'module_pwf_field_opt', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
 $db->CreateSequence($pref.'module_pwf_field_opt_seq');
-$db->Execute('create index '.$pref.'module_pwf_field_opt_idx on '.$pref.'module_pwf_field_opt (field_id,form_id)');
+$db->Execute('CREATE INDEX '.$pref.'module_pwf_field_opt_idx ON '.$pref.'module_pwf_field_opt (field_id,form_id)');
 
 $flds = "
 	flock_id I KEY,
@@ -68,29 +68,29 @@ $flds = "
 ";
 $sqlarray = $dict->CreateTableSQL($pref.'module_pwf_flock', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
-
+/*
 $flds = "
 	resp_id I KEY,
 	form_id I,
 	feuser_id I,
 	user_approved ".CMS_ADODB_DT.",
-	secret_code C(35),
+	secret_code C(36),
 	admin_approved ".CMS_ADODB_DT.",
 	submitted ".CMS_ADODB_DT;
 $sqlarray = $dict->CreateTableSQL($pref.'module_pwf_resp', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
+$db->CreateSequence($pref.'module_pwf_resp_seq');
+
 $flds = "
 	resp_attr_id I KEY,
 	resp_id I,
-	name C(35),
+	name C(36),
 	value X
 ";
 $sqlarray = $dict->CreateTableSQL($pref.'module_pwf_resp_attr', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
-
 $db->CreateSequence($pref.'module_pwf_resp_attr_seq');
-$db->CreateSequence($pref.'module_pwf_resp_seq');
 
 $flds = "
 	resp_val_id I KEY,
@@ -102,7 +102,7 @@ $sqlarray = $dict->CreateTableSQL($pref.'module_pwf_resp_val', $flds, $taboptarr
 $dict->ExecuteSQLArray($sqlarray);
 
 $db->CreateSequence($pref.'module_pwf_resp_val_seq');
-
+*/
 $flds = "
 	sent_id I KEY,
 	src_ip C(40),
@@ -111,9 +111,9 @@ $sqlarray = $dict->CreateTableSQL($pref.'module_pwf_ip_log', $flds, $taboptarray
 $dict->ExecuteSQLArray($sqlarray);
 
 $db->CreateSequence($pref.'module_pwf_ip_log_seq');
-
+/*
 $flds = "
-	fbr_id I KEY,
+	browser_id I KEY,
 	form_id I,
 	index_key_1 C(80),
 	index_key_2 C(80),
@@ -123,16 +123,36 @@ $flds = "
 	feuid I,
 	response XL,
 	user_approved ".CMS_ADODB_DT.",
-	secret_code C(35),
+	secret_code C(36),
 	admin_approved ".CMS_ADODB_DT.",
 	submitted ".CMS_ADODB_DT;
-$sqlarray = $dict->CreateTableSQL($pref.'module_pwf_formbrowser', $flds, $taboptarray);
+$sqlarray = $dict->CreateTableSQL($pref.'module_pwf_browse', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pref.'module_pwf_formbrowser_seq');
+$db->CreateSequence($pref.'module_pwf_browse_seq');
+*/
 $db->CreateSequence($pref.'module_pwf_uniquefield_seq');
 
-$this->CreatePermission('ModifyForms',$this->Lang('perm_modify'));
+//TODO other prefs: e.g. user-specific forms
+$this->SetPreference('blank_invalid',0);
+$this->SetPreference('enable_antispam',1);
+$this->SetPreference('require_fieldnames',1);
+$this->SetPreference('adder_fields','advanced'); //or 'basic'
+
+$fp = $config['uploads_path'];
+if($fp && is_dir($fp))
+{
+	$ud = $this->GetName();
+	$fp = $fp.DIRECTORY_SEPARATOR.$ud;
+	if(!(is_dir($fp) || mkdir($fp,0644)))
+		$ud = '';
+}
+else
+	$ud = '';
+$this->SetPreference('uploads_dir',$ud); //path relative to host uploads dir
+
+$this->CreatePermission('ModifyPFForms',$this->Lang('perm_modify'));
+$this->CreatePermission('ModifyPFSettings',$this->Lang('perm_admin'));
 
 $this->CreateEvent('OnFormDisplay');
 $this->CreateEvent('OnFormSubmit');
@@ -143,19 +163,18 @@ $css_id = $db->GenID($pref.'css_seq');
 $db->Execute('INSERT INTO '.$pref.'css (css_id, css_name, css_text, media_type, create_date) VALUES (?,?,?,?,?)',
 	array($css_id,'PowerForms Default Style',$css,'screen',date('Y-m-d')));
 
-//include 'include/FormBuilderSampleData.inc';
+//TODO $funcs = new pwfFormOperations();
 $path = cms_join_path(dirname(__FILE__),'include');
 $dir = opendir($path);
 while($filespec = readdir($dir))
 {
 	$params = array();
-	$funcs = '';
 	if(preg_match('/.xml$/',$filespec) > 0)
 	{
-		$params['pwfp_xml_file'] = cms_join_path($path,$filespec);
-		$funcs = new pwfUtils($this, $params, true);
-		$res = $funcs->ImportXML($params);
+		$params['xml_file'] = cms_join_path($path,$filespec);
+//TODO		$funcs->ImportXML($this,$params);
 	}
 }
+
 
 ?>
