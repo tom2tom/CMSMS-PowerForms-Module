@@ -54,12 +54,12 @@ if($allforms)
 		$oneset = new stdClass();
 		if($pmod)
 		{
-			$oneset->name = $this->CreateLink($id,'add_edit_form','',
-				$one['name'],array('form_id'=>$fid));
-			$oneset->editlink = $this->CreateLink($id,'add_edit_form','',
-				$iconedit,array('form_id'=>$fid));
-			$oneset->copylink = $this->CreateLink($id,'copy_form','',
-				$iconcopy,array('form_id'=>$fid));
+			$oneset->name = $this->CreateLink($id,'update_form','',
+				$one['name'],array('formedit'=>1,'form_id'=>$fid));
+			$oneset->editlink = $this->CreateLink($id,'update_form','',
+				$iconedit,array('formedit'=>1,'form_id'=>$fid));
+			$oneset->copylink = $this->CreateLink($id,'update_form','',
+				$iconcopy,array('formcopy'=>1,'form_id'=>$fid));
 			$oneset->deletelink = $this->CreateLink($id,'delete_form','',
 				$icondelete,array('form_id'=>$fid),
 				$this->Lang('confirm_delete_form',$one['name']));
@@ -101,10 +101,11 @@ else
 
 if($pmod)
 {
-	$smarty->assign('addlink',$this->CreateLink($id,'add_edit_form', '',
-		$theme->DisplayImage('icons/system/newobject.gif',$this->Lang('title_add_new_form'),'','','systemicon')));
-	$smarty->assign('addform',$this->CreateLink($id,'add_edit_form','',
-		$this->Lang('title_add_new_form')));
+	$smarty->assign('addlink',$this->CreateLink($id,'update_form', '',
+		$theme->DisplayImage('icons/system/newobject.gif',$this->Lang('title_add_new_form'),'','','systemicon'),
+		array('formedit'=>1,'form_id'=>-1)));
+	$smarty->assign('addform',$this->CreateLink($id,'update_form','',
+		$this->Lang('title_add_new_form'),array('formedit'=>1,'form_id'=>-1)));
 
 	$xmls = array();
 

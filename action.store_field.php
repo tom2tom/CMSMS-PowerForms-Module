@@ -5,25 +5,26 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if(!$this->CheckAccess()) exit;
+if(!$this->CheckAccess('ModifyPFForms')) exit;
 
-$funcs = new pwfUtils($this, $params, true);
-$obfield = $funcs->NewField($params);
+TODO $funcs = new pwfFieldOperations($this, $params, true);
+$obfield = $funcs->NewField($this,$params);
 $val = $obfield->AdminValidate();
 if($val[0])
 {
 	$obfield->PostAdminSubmitCleanup();
 	$obfield->Store(true);
 	$obfield->PostFieldSaveProcess($params);
-	$params['pwfp_message']=$params['pwfp_op'];
+	$params['message'] = $params['op'];
+	$params['formedit'] = 1;
 	//DO NOT ->Redirect - that flattens any $params[] that's an array
-	$this->DoAction('add_edit_form', $id, $params);
+	$this->DoAction('update_form',$id,$params);
 }
 else
 {
 	$obfield->LoadField($params);
-	$params['pwfp_message'] = $val[1];
-	echo $funcs->AddEditField($id, $obfield, (isset($params['pwfp_dispose_only'])?$params['pwfp_dispose_only']:0), $returnid);
+	$params['message'] = $val[1];
+	echo $funcs->AddEdit($obfield,(!empty($params['dispose_only'])),$id,$returnid);
 }
 
 ?>
