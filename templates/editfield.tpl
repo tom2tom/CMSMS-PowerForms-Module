@@ -1,7 +1,7 @@
 {if isset($message)}{$message}{/if}
 
 {$backtomod_nav}&nbsp;{$backtoform_nav}<br />
-{$form_start}{$hidden}{if isset($op)}{$op}{/if}
+{$form_start}{if isset($op)}{$op}{/if}
 {$tabs_start}
 {$maintab_start}
  <div class="pageoverflow">
