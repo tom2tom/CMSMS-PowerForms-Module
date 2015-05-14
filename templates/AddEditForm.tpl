@@ -59,17 +59,12 @@
  {else}
  <p class="pageinput">{$nofields}</p>
  {/if}
- {if $fastadd==1}
-  <div class="pageoverflow">
-   <p class="pagetext">{$title_fastadd}</p>
-   <div class="pageinput">
-  {$input_fastadd}
-   </div>
-  </div>
- {/if}
-   <br />
-  <div class="pageinput">{$add_field_link}</div>
-    </div>
+	 <div id="addfast">
+	  <p class="pagetext">{$title_fastadd}</p>
+	  <div class="pageinput">{$input_fastadd}<br />{$help_fastadd}</div>
+	 </div>
+  	 <div id="addslow" class="pageinput">{$add_field_link}</div>
+ </div>
 {/if}
 {$tab_end}{$designtab_start}
  <div class="pageoverflow">
@@ -88,8 +83,6 @@
   <p class="pageinput">{$input_title_user_captcha}</p>
   <p class="pagetext">{$title_user_captcha_error}:</p>
   <p class="pageinput">{$input_title_user_captcha_error}</p>
-{else}
-  <p class="pageinput">{$title_install_captcha}</p>
 {/if}
   <p class="pagetext">{$title_form_submit_button}:</p>
   <p class="pageinput">{$input_form_submit_button}</p>
@@ -130,20 +123,6 @@
   <p>{$help_attrs2}</p>
   </div>
  </div>
-{$tab_end}{$submittab_start}
-<p><strong>{$help_submit_tab}</strong></p>
- <div class="pageoverflow">
-  <p class="pagetext">{$title_submit_action}:</p>
-  <p class="pageinput">{$input_submit_action}</p>
-  <p class="pagetext">{$title_redirect_page}:</p>
-  <p class="pageinput">{$input_redirect_page}</p>
-  <p class="pagetext">{$title_submit_button_safety}:</p>
-  <p class="pageinput">{$input_submit_button_safety}</p>
-  <p class="pagetext">{$title_submit_javascript}:</p>
-  <p class="pageinput">{$input_submit_javascript}</p>
-  <p class="pagetext">{$title_inline_form}:</p>
-  <p class="pageinput">{$input_inline_form}</p>
- </div>
 {$tab_end}{$udttab_start}
  <div class="pageoverflow">
 {*<p class="pagetext">{$help_see_udt}</p>*}
@@ -154,8 +133,22 @@
   <p class="pagetext">{$title_form_validate_udt}:</p>
   <p class="pageinput">{$input_form_validate_udt}</p>
  </div>
-{$tab_end}{$submittemplatetab_start}
- <p><strong>{$help_submit_template}</strong></p>
+{$tab_end}{$submittab_start}
+<p><strong>{$help_submit_tab}</strong></p>
+ <div class="pageoverflow">
+ {if !$captcha_installed}
+  <br />
+  <p class="pageinput">{$help_captcha_not_installed}</p>
+  <br />
+ {/if}
+  <p class="pagetext">{$title_submit_button_safety}:</p>
+  <p class="pageinput">{$input_submit_button_safety}</p>
+  <p class="pagetext">{$title_submit_javascript}:</p>
+  <p class="pageinput">{$input_submit_javascript}</p>
+  <p class="pagetext">{$title_submit_action}:</p>
+  <p class="pageinput">{$input_submit_action}</p>
+  <p class="pagetext">{$title_redirect_page}:</p>
+  <p class="pageinput">{$input_redirect_page}</p>
  <div class="pageinput pageoverflow">
  {if !empty($buttons)}
   <br />
@@ -168,6 +161,9 @@
   <p style="font-weight:bold;">{$title_submit_template}:{$icon_info}</p>
   {$input_submit_template}
   <div class="showhelp"><br />{$help_vars}</div>
+ </div>
+  <p class="pagetext">{$title_inline_form}:</p>
+  <p class="pageinput">{$input_inline_form}</p>
  </div>
 {$tab_end}
 {$tabs_end}
