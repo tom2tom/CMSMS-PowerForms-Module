@@ -1,6 +1,6 @@
 {$backtomod_nav}<br />
 {if isset($message)}{$message}<br />{/if}
-{$formstart}{$hidden}
+{$form_start}{$hidden}
 {$tabs_start}
 
 {$maintab_start}
