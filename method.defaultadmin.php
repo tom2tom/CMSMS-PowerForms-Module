@@ -101,11 +101,10 @@ else
 
 if($pmod)
 {
-	$smarty->assign('addlink',$this->CreateLink($id,'update_form', '',
-		$theme->DisplayImage('icons/system/newobject.gif',$this->Lang('title_add_new_form'),'','','systemicon'),
-		array('formedit'=>1,'form_id'=>-1)));
-	$smarty->assign('addform',$this->CreateLink($id,'update_form','',
-		$this->Lang('title_add_new_form'),array('formedit'=>1,'form_id'=>-1)));
+	$smarty->assign('addlink',$this->CreateLink($id,'add_form','',
+		$theme->DisplayImage('icons/system/newobject.gif',$this->Lang('title_add_new_form'),'','','systemicon')));
+	$smarty->assign('addform',$this->CreateLink($id,'add_form','',
+		$this->Lang('title_add_new_form')));
 
 	$xmls = array();
 
@@ -205,6 +204,7 @@ function confirm_selected(msg) {
   return false;
  }
 }
+
 EOS;
 
 $smarty->assign('jsfuncs',$js);
