@@ -1,21 +1,17 @@
 {$backtomod_nav}<br />
-{if isset($message)}{$message}<br />{/if}
+{if !empty($message)}{$message}{/if}
 {$form_start}{$hidden}
 {$tabs_start}
-
 {$maintab_start}
  <div class="pageoverflow">
   <p class="pagetext">{$title_form_name}:</p>
   <div class="pageinput">{$input_form_name}</div>
   <p class="pagetext">{$title_form_alias}:</p>
   <div class="pageinput">{$input_form_alias}<br />{$help_form_alias}</div>
-{if $adding==0}
   <p class="pagetext">{$title_form_status}:</p>
   <p class="pageinput">{if $hasdisposition}{$text_ready}{else}{$text_notready}{/if}</p>
-{/if}
  </div>
 {$tab_end}{$fieldstab_start}
-{if $adding==0}
  <div class="pageoverflow">
  {if !empty($fields)}
   <p class="pagetext">{$title_form_fields}</p>
@@ -65,7 +61,6 @@
 	 </div>
   	 <div id="addslow" class="pageinput">{$add_field_link}</div>
  </div>
-{/if}
 {$tab_end}{$designtab_start}
  <div class="pageoverflow">
   <p class="pagetext">{$title_form_css_class}:</p>
