@@ -1,5 +1,5 @@
 <ul>
-<li>Version 0.9 April 2015 fork FormBuilder module
+<li>Version 0.7 April 2015 fork FormBuilder module
   <ul>
   </ul>
 </li>
