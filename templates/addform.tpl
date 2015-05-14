@@ -1,4 +1,5 @@
 {$form_start}
+<h2 class="pagetext">{$title_newform}</h2>
 <p class="pagetext">{$title_form_name}:</p>
 <div class="pageinput">{$input_form_name}</div>
 <p class="pagetext">{$title_form_alias}:</p>
