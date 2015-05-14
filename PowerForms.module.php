@@ -158,12 +158,12 @@ class PowerForms extends CMSModule
 	function GetHeaderHTML()
 	{
 		return '<link rel="stylesheet" type="text/css" href="'.
-			$this->GetModuleURLPath().'/include/admin.css" />';
+			$this->GetModuleURLPath().'/css/admin.css" />';
 	}
 */
 	function AdminStyle()
 	{
-		$fn = cms_join_path(dirname(__FILE__),'include','admin.css');
+		$fn = cms_join_path(dirname(__FILE__),'css','admin.css');
 		return ''.@file_get_contents($fn);
 	}
 
