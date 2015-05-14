@@ -4,22 +4,10 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-/* TODO replace actions
-add_edit_form >> formedit Y
-copy_form >> formcopy Y
-copy_field >> fieldcopy Y
-delete_field >> fielddelete Y
-store_form >> submit, apply, cancel Y
-update_field_order >> dir Y
-update_field_required >> active Y
-
->> update_form
-*/
-
 if(!$this->CheckAccess('ModifyPFForms')) exit;
 
 $form_id = (int)$params['form_id'];
-
+$funcs = FALSE;
 if(isset($params['cancel']))
 {
 	$this->Redirect($id,'defaultadmin');
@@ -29,7 +17,7 @@ elseif(isset($params['submit']))
 	$funcs = new pwfFormOperations();
 	if($funcs->Store($this,$form_id,$params))
 	{
-		$msg = $this->Lang('form',$params['form_op']); //updated or added
+		$msg = $this->Lang('form_op',$params['form_op']); //updated or added
 		$msg = $this->PrettyMessage($msg,TRUE,FALSE,FALSE);
 	}
 	else
@@ -46,7 +34,7 @@ elseif(isset($params['apply']))
 		$this->Redirect($id,'defaultadmin','',array(
 		'message' => $this->PrettyMessage($message,FALSE,FALSE,FALSE)));
 	}
-	$msg = $this->Lang('form',$params['form_op']);//updated or added
+	$msg = $this->Lang('form_op',$params['form_op']);//updated or added
 	$message = $this->PrettyMessage($msg,TRUE,FALSE,FALSE);
 }
 elseif(isset($params['formedit']))
@@ -58,19 +46,27 @@ elseif(isset($params['formedit']))
 elseif(isset($params['formcopy']))
 {
 	$funcs = new pwfFormOperations();
-	$funcs->Copy($this,$form_id,$params);
-	$message = '';
+	$form_id = $funcs->Copy($this,$form_id,$params);
+	if($form_id)
+	{
+		$message = '';
+	}
+	else
+	{
+		$this->Redirect($id,'defaultadmin','',array(
+			'message'=>$this->PrettyMessage('error_copy2',FALSE)));
+	}
 }
 elseif(isset($params['fielddelete']))
 {
-//TODO $funcs = new pwfFieldOperations($this,$params,TRUE);
-	$funcs->DeleteField($params['field_id']);
+	$ops = new pwfFieldOperations();
+//TODO $ops->DeleteField($formdata,$params['field_id']);
 	$message = $this->PrettyMessage('field_deleted');
 }
 elseif(isset($params['fieldcopy']))
 {
-//TODO $funcs = new pwfFieldOperations($this,$params,TRUE);
-	$obfield = $funcs->Replicate($this,$params);
+	$ops = new pwfFieldOperations();
+//TODO	$obfield = $ops->Replicate($formdata,$params['field_id');
 	if($obfield)
 	{
 		$obfield->Store(TRUE);
@@ -85,20 +81,20 @@ elseif(isset($params['fieldcopy']))
 }
 elseif(isset($params['dir']))
 {
-//TODO $funcs = new pwfFieldOperations($this,$params,TRUE);
-	$srcIndex = $funcs->GetFieldIndexFromId($params['field_id']);
+	$ops = new pwfFieldOperations();
+//TODO	$srcIndex = $ops->GetFieldIndexFromId($formdata,$params['field_id']);
 	if($params['dir'] == 'up')
 		$destIndex = $srcIndex - 1;
 	else
 		$destIndex = $srcIndex + 1;
-	$funcs->SwapFieldsByIndex($srcIndex,$destIndex);
+	$ops->SwapFieldsByIndex($srcIndex,$destIndex);
 	$message = $this->PrettyMessage('field_order_updated');
 }
 elseif(isset($params['active']))
 {
-//TODO $funcs = new pwfFieldOperations($this,$params,TRUE);
-	$obfield = $funcs->GetFieldById($params['field_id']);
-	if($obfield !== false)
+	$ops = new pwfFieldOperations();
+//TODO 	$obfield = $ops->GetFieldById($formdata,$params['field_id']);
+	if($obfield !== FALSE)
 	{
 //		$obfield->SetRequired(($params['active']=='on'));
 		$obfield->ToggleRequired();
@@ -113,9 +109,12 @@ elseif(isset($params['active']))
 else
 	exit;
 
+if(!$funcs)
+	$funcs = new pwfFormOperations();
+
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'method.update_form.php';
 
-echo $this->ProcessTemplate('AddEditForm.tpl');
+echo $this->ProcessTemplate('editform.tpl');
 
 ?>
 
