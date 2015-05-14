@@ -158,7 +158,7 @@ $this->CreateEvent('OnFormDisplay');
 $this->CreateEvent('OnFormSubmit');
 $this->CreateEvent('OnFormSubmitError');
 
-$css = @file_get_contents(cms_join_path(dirname(__FILE__), 'include','default.css'));
+$css = @file_get_contents(cms_join_path(dirname(__FILE__), 'css','default.css'));
 $css_id = $db->GenID($pref.'css_seq');
 $db->Execute('INSERT INTO '.$pref.'css (css_id, css_name, css_text, media_type, create_date) VALUES (?,?,?,?,?)',
 	array($css_id,'PowerForms Default Style',$css,'screen',date('Y-m-d')));
