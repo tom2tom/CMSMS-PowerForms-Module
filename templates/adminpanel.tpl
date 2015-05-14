@@ -1,4 +1,4 @@
-{if !empty($message)}<div class="pagemcontainer"><p class="pagemessage">{$message}</p></div>{/if}
+{if !empty($message){$message}{/if}
 {$tabs_start}
 {$formstab_start}
 {if !empty($forms)}
