@@ -61,6 +61,6 @@ else
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'method.update_field.php';
 
-echo $this->ProcessTemplate('AddEditField.tpl');
+echo $this->ProcessTemplate('editfield.tpl');
 
 ?>
