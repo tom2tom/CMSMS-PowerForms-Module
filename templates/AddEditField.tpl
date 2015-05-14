@@ -1,7 +1,8 @@
 {if isset($message)}{$message}{/if}
 
 {$backtomod_nav}&nbsp;{$backtoform_nav}<br />
-{$start_form}{$fb_hidden}{if isset($op)}{$op}{/if}{$tab_start}
+{$form_start}{$hidden}{if isset($op)}{$op}{/if}
+{$tabs_start}
 {$maintab_start}
  <div class="pageoverflow">
 {foreach from=$mainList item=entry}
@@ -12,7 +13,7 @@
 {if !empty($mainvarhelp)}<br /><div class="pageinput">{$help_vars}</div>{/if}
 {if isset($mainTable)}
    <br />
-   <table class="pwf_table pageinput" style="border-collapse:collapse;width:auto;">
+   <table class="pwf_table pageinput">
  {section name=r loop=$mainTable}
   {if $smarty.section.r.first}
    <thead>
@@ -47,10 +48,7 @@
  <br />
  <p class="pageinput">{if isset($submit)}{$submit}&nbsp;{/if}{$cancel}</p>
 </div>
-{$end_form}
-<script type="text/javascript" src="{$incpath}jquery.tablednd.min.js"></script>
-<script type="text/javascript" src="{$incpath}fb_jquery_functions.js"></script>
-<script type="text/javascript" src="{$incpath}fb_jquery.js"></script>
+{$form_end}
 {if !empty($jsfuncs)}
 <script type="text/javascript">
 //<![CDATA[

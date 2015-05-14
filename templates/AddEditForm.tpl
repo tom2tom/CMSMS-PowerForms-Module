@@ -1,25 +1,23 @@
 {$backtomod_nav}<br />
 {if isset($message)}{$message}<br />{/if}
-{$formstart}
-{$formid}{$fb_hidden}
-{$tab_start}
+{$formstart}{$hidden}
+{$tabs_start}
 
 {$maintab_start}
  <div class="pageoverflow">
   <p class="pagetext">{$title_form_name}:</p>
-  <p class="pageinput">{$input_form_name}</p>
-{if $adding == 0}
-  <p class="pagetext">{$title_form_status}:</p>
-  <p class="pageinput">{if $hasdisposition == 1}{$text_ready}{else}{$link_notready}{/if}</p>
-{/if}
+  <div class="pageinput">{$input_form_name}</div>
   <p class="pagetext">{$title_form_alias}:</p>
-  <p class="pageinput">{$input_form_alias}</p>
-  <p class="pagetext">{$title_inline_form}:</p>
-  <p class="pageinput">{$input_inline_form}</p>
+  <div class="pageinput">{$input_form_alias}<br />{$help_form_alias}</div>
+{if $adding==0}
+  <p class="pagetext">{$title_form_status}:</p>
+  <p class="pageinput">{if $hasdisposition}{$text_ready}{else}{$text_notready}{/if}</p>
+{/if}
  </div>
 {$tab_end}{$fieldstab_start}
 {if $adding==0}
  <div class="pageoverflow">
+ {if !empty($fields)}
   <p class="pagetext">{$title_form_fields}</p>
   <table class="pwf_table pagetable tabledrag">
    <thead><tr>
@@ -31,13 +29,13 @@
     <th class="pageicon">{$title_field_required_abbrev}</th>
     <th class="updown" style="width:20px;">&nbsp;</th>
     <th class="updown" style="width:20px;">&nbsp;</th>
-    <th class="pageicon">&nbsp;</th>
-    <th class="pageicon">&nbsp;</th>
-    <th class="pageicon">&nbsp;</th>
+    <th class="pageicon"></th>
+    <th class="pageicon"></th>
+    <th class="pageicon"></th>
    </tr></thead>
    <tbody>
   {foreach from=$fields item=entry}
-   {cycle name=fields values='odd,even' assign=rowclass}
+   {cycle name=fields values='row1,row2' assign=rowclass}
   	 <tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
    {if isset($title_field_id)}<td>{$entry->id}</td>{/if}
      <td>{$entry->name}</td>
@@ -55,9 +53,12 @@
    </tbody>
   </table>
   <div class="reordermsg pagemessage" style="margin-left:10%;display:none">
-  <p>{$title_can_drag}</p>
-  <div class="saveordermsg" style="display:none"><p>{$title_must_save_order}</p></div>
+  <p>{$help_can_drag}</p>
+  <div id="saveordermsg" style="display:none"><p>{$help_save_order}</p></div>
   </div>
+ {else}
+ <p class="pageinput">{$nofields}</p>
+ {/if}
  {if $fastadd==1}
   <div class="pageoverflow">
    <p class="pagetext">{$title_fastadd}</p>
@@ -104,31 +105,33 @@
  </div>
  <br />
  <div class="pageinput pageoverflow">
-  <p style="font-weight:bold;">{$title_form_template}:</p>
+  <p style="font-weight:bold;">{$title_form_template}:{$icon_info}</p>
   <p>{$input_form_template}</p>
+   <div class="showhelp">
   <p style="font-weight:bold;">{$title_form_vars}:</p>
 <table class="pwf_legend">
 <tr><th>{$variable}</th><th>{$description}</th></tr>
 {foreach from=$globalfields item=entry}
-{cycle name=globals values='odd,even' assign=rowclass}
+{cycle name=globals values='row1,row2' assign=rowclass}
  <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
  <td>{ldelim}${$entry->name}{rdelim}</td><td>{$entry->description}</td></tr>
 {/foreach}
 </table><br />
-  <p>{$globals_help1}</p>
-  <p>{$attrs_help1}</p>
+  <p>{$help_globals}</p>
+  <p>{$help_attrs1}</p>
 <table class="pwf_legend">
 <tr><th>{$attribute}</th><th>{$description}</th></tr>
 {foreach from=$attrs item=entry}
-{cycle name=attrs values='odd,even' assign=rowclass}
+{cycle name=attrs values='row1,row2' assign=rowclass}
 <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
 <td>field->{$entry->name}</td><td>{$entry->description}</td></tr>
 {/foreach}
 </table><br />
-  <p>{$attrs_help2}</p>
+  <p>{$help_attrs2}</p>
+  </div>
  </div>
 {$tab_end}{$submittab_start}
-<p>{$icon_info}&nbsp;{$title_submit_help}</p>
+<p><strong>{$help_submit_tab}</strong></p>
  <div class="pageoverflow">
   <p class="pagetext">{$title_submit_action}:</p>
   <p class="pageinput">{$input_submit_action}</p>
@@ -138,10 +141,12 @@
   <p class="pageinput">{$input_submit_button_safety}</p>
   <p class="pagetext">{$title_submit_javascript}:</p>
   <p class="pageinput">{$input_submit_javascript}</p>
+  <p class="pagetext">{$title_inline_form}:</p>
+  <p class="pageinput">{$input_inline_form}</p>
  </div>
 {$tab_end}{$udttab_start}
  <div class="pageoverflow">
-{*<p class="pagetext">{$title_see_also_udt}</p>*}
+{*<p class="pagetext">{$help_see_udt}</p>*}
   <p class="pagetext">{$title_form_predisplay_udt}:</p>
   <p class="pageinput">{$input_form_predisplay_udt}</p>
   <p class="pagetext">{$title_form_predisplay_each_udt}:</p>
@@ -150,19 +155,19 @@
   <p class="pageinput">{$input_form_validate_udt}</p>
  </div>
 {$tab_end}{$submittemplatetab_start}
- <p>{$icon_info}&nbsp;{$title_submit_template_help}</p>
+ <p><strong>{$help_submit_template}</strong></p>
  <div class="pageinput pageoverflow">
-  <p style="font-weight:bold;">{$title_submit_template}:</p>
-{$input_submit_template}<br />
-{if isset($buttons) && !empty($buttons)}
+ {if !empty($buttons)}
   <br />
-{foreach from=$buttons item=one name=buttons}
-{$one}{if !$smarty.foreach.buttons.last}&nbsp;{/if}
-{/foreach}
+  {foreach from=$buttons item=one name=buttons}
+   {$one}{if !$smarty.foreach.buttons.last}&nbsp;{/if}
+  {/foreach}
   <br />
-{/if}
- <br />
-{$help_vars}
+ {/if}
+  <br />
+  <p style="font-weight:bold;">{$title_submit_template}:{$icon_info}</p>
+  {$input_submit_template}
+  <div class="showhelp"><br />{$help_vars}</div>
  </div>
 {$tab_end}
 {$tabs_end}
@@ -172,12 +177,11 @@
  </div>
 {$form_end}
 <script type="text/javascript" src="{$incpath}jquery.tablednd.min.js"></script>
-<script type="text/javascript" src="{$incpath}fb_jquery_functions.js"></script>
-<script type="text/javascript" src="{$incpath}fb_jquery.js"></script>
+<script type="text/javascript" src="{$incpath}module.js"></script>
 {if !empty($jsfuncs)}
 <script type="text/javascript">
-/* <![CDATA[ */
+//<![CDATA[
 {foreach from=$jsfuncs item=func}{$func}{/foreach}
-/* ]]> */
+//]]>
 </script>
 {/if}
