@@ -8,15 +8,19 @@
 if(!$this->CheckAccess('ModifyPFForms')) exit;
 
 $funcs = new pwfFormOperations();
-if($funcs->NewID($this,$params['import_formname'],$params['import_formalias']))
+if($funcs->NewID($params['import_formname'],$params['import_formalias']))
 {
 	$params['xml_file'] = $_FILES[$id.'xmlfile']['tmp_name'];
-	$key = ($funcs->ImportXML($this,$params)) ? 'form_imported':'form_import_failed';
+	$state = $funcs->ImportXML($this,$params);
+	$key = ($state)?'form_imported':'error_form_import';
 }
 else
+{
+	$state = FALSE;
 	$key = 'duplicate_identifier';
+}
 
-$params['message'] = $this->Lang($key);
-$this->Redirect($id,'defaultadmin','',$params);
+$this->Redirect($id,'defaultadmin','',array(
+	'message' => $this->PrettyMessage($key,$state)));
 
 ?>
