@@ -5,193 +5,150 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if(!isset($params['form_id']) && isset($params['form']))
+if(!isset($params['form_id']) && isset($params['form'])) // got the form by alias
+	$params['form_id'] = pwfUtils::GetFormIDFromAlias($params['form']);
+if(empty($params['form_id']) || $params['form_id'] == -1)
 {
-    // get the form by name, not ID
-    $params['form_id'] = $this->GetFormIDFromAlias($params['form']);
+	echo "<!-- no form -->\n";
+	return;
 }
 
-$inline = false;
-if((isset($params['inline'])) && preg_match('/t(rue)*|y(yes)*|1/i',$params['inline']))
+$form_id = int($params['form_id']);
+$funcs = new pwfFormOperations();
+$formdata = $funcs->Load($this,$form_id,$params,TRUE);
+unset($funcs);
+if(!$formdata)
 {
-	$inline = true;
+	echo "<!-- no form -->\n";
+	return;
 }
 
-$pwfp_callcount = 0;
-$funcs = new pwfUtils($this,$params,true,true);
-
-$fld = $funcs->GetFormBrowserField();
-if($fld !== false && $fld->GetOption('feu_bind','0')=='1')
-{
-	$feu = $this->GetModuleInstance('FrontEndUsers');
-	if($feu == false)
-	{
-		debug_display("FAILED to instatiate FEU!");
-		return;
-	}
-	if($feu->LoggedInId() === false)
-	{
-		echo $this->Lang('please_login');
-		return;
-	}
-}
-
-if(!($inline || ($funcs->GetAttr('inline','0')== '1'))) $id = 'cntnt01';
-
-$smarty->assign('fb_form_has_validation_errors',0);
-$smarty->assign('fb_show_submission_errors',0);
-$smarty->assign('fb_form_header', $funcs->RenderFormHeader());
-$smarty->assign('fb_form_footer',$funcs->RenderFormFooter());
-
-$finished = false;
-$fieldExpandOp = false;
+$inline = (isset($params['inline']) && preg_match('/t(rue)?|y(es)?|1/i',$params['inline']));
+if(!($inline || (pwfUtils::GetAttr($formdata,'inline','0') == '1')))
+	$id = 'cntnt01'; //TODO generalise
 
 if(isset($params['pwfp_callcount']))
-{
     $pwfp_callcount = (int)$params['pwfp_callcount'];
-}
+else
+	$pwfp_callcount = 0;
 
+$fieldExpandOp = FALSE;
 foreach($params as $pKey=>$pVal)
 {
 	if(substr($pKey,0,9) == 'pwfp_FeX_' || substr($pKey,0,9) == 'pwfp_FeD_')
 	{
 		// expanding or shrinking a field
-		$fieldExpandOp = true;
+		$fieldExpandOp = TRUE;
 	}
 }
 
-if(!$fieldExpandOp && (($funcs->GetPageCount() > 1 && $funcs->GetPageNumber() > 0) || (isset($params['pwfp_done'])&& $params['pwfp_done']==1)))
+$smarty->assign('form_has_validation_errors',0);
+$smarty->assign('show_submission_errors',0);
+
+$finished = FALSE;
+if(!$fieldExpandOp && ($formdata->FormPagesCount > 1 && $formdata->Page > 0) || (isset($params['pwfp_done'])&& $params['pwfp_done']==1)))
 {
+	$ops = new pwfOperate();
 	// Validate form
-	$res = $funcs->Validate();
-
-	// We have validate errors
-    if($res[0] === false)
+	$res = $ops->FormValidate();
+    if($res[0] === FALSE)
     {
-		$smarty->assign('fb_form_validation_errors',$res[1]);
-		$smarty->assign('fb_form_has_validation_errors',1);
-
-		$funcs->PageBack();
-
-		// No validate errors, proceed
+		// Validation error(s)
+		$smarty->assign('form_validation_errors',$res[1]);
+		$smarty->assign('form_has_validation_errors',1);
+		$formdata->Page--;
 	}
-	else if(isset($params['pwfp_done']) && $params['pwfp_done']==1)
+	else if(!empty($params['pwfp_done']))
 	{
+		// No validate errors, proceed
 		// Check captcha, if installed
-		$ok = true;
+		$ok = TRUE;
 		$captcha = $this->getModuleInstance('Captcha');
-		if($funcs->GetAttr('use_captcha','0') == '1' && $captcha != null)
+		if(pwfUtils::GetAttr($formdata,'use_captcha','0') == '1' && $captcha != NULL)
 		{
 			if(!$captcha->CheckCaptcha($params['pwfp_captcha_phrase']))
 			{
-				$smarty->assign('captcha_error',$funcs->GetAttr('captcha_wrong',$this->Lang('wrong_captcha')));
-
-				$funcs->PageBack();
-				$ok = false;
+				$smarty->assign('captcha_error',pwfUtils::GetAttr($formdata,'captcha_wrong',$this->Lang('wrong_captcha')));
+				$formdata->Page--;
+				$ok = FALSE;
 			}
 		}
-
 		// All ok, dispose form and manage fileuploads
 		if($ok)
 		{
-			$finished = true;
-			$funcs->manageFileUploads();
-			$results = $funcs->Dispose($returnid);
+			$finished = TRUE;
+			$ops->ManageFileUploads();
+			$results = $ops->FormDispose($returnid);
 		}
 	}
+	unset($ops);
 }
 
-if(!$finished)
+$parms = array();
+$parms['form_id'] = $form_id;
+$parms['form_name'] = pwfUtils::GetFormNameFromID($form_id);
+
+if($finished)
 {
-	$parms = array();
-	$parms['form_name'] = $funcs->GetName();
-	$parms['form_id'] = $funcs->GetId();
-	$this->SendEvent('OnFormBuilderFormDisplay',$parms);
-
-    if(isset($params['fb_from_fb'])) //CHECKME never used
+	$smarty->assign('form_done',1);
+	if($results[0] == TRUE)
 	{
-		$smarty->assign('fb_form_start',
-			$this->CreateFormStart($id, 'user_edit_resp', $returnid, 'POST',
-				'multipart/form-data',
-				($funcs->GetAttr('inline','0') == '1'), '',
-				array('pwfp_callcount'=>$pwfp_callcount+1)).
-				$this->CreateInputHidden($id,'response_id',isset($params['response_id'])?$params['response_id']:'-1'));
-	}
-	else
-	{
-     	$smarty->assign('fb_form_start',
-			   $this->CreateFormStart($id, 'default', $returnid, 'POST',
-				'multipart/form-data',
-				($funcs->GetAttr('inline','0') == '1'), '',
-				array('pwfp_callcount'=>$pwfp_callcount+1)));
-	}
-
-	$smarty->assign('fb_form_end',$this->CreateFormEnd());
-	$smarty->assign('fb_form_done',0);
-}
-else
-{
-	$smarty->assign('fb_form_done',1);
-	if($results[0] == true)
-	{
-		$parms = array();
-		$parms['form_name'] = $funcs->GetName();
-		$parms['form_id'] = $funcs->GetId();
-		$this->SendEvent('OnFormBuilderFormSubmit',$parms);
-
-		$act = $funcs->GetAttr('submit_action','text');
+		$this->SendEvent('OnFormSubmit',$parms);
+		$act = pwfUtils::GetAttr($formdata,'submit_action','text');
 		if($act == 'text')
 		{
-			$message = $funcs->GetAttr('submission_template','');
-			$funcs->setFinishedFormSmarty(true);
-			//process via smarty without cacheing (smarty->fetch() fails)
+			$message = pwfUtils::GetAttr($formdata,'submission_template','');
+			pwfUtils::setFinishedFormSmarty($formdata,TRUE);
+			//process via smarty (no cacheing)
 			echo $this->ProcessTemplateFromData($message);
 			return;
 		}
-		else if($act == 'redir')
+		elseif($act == 'redir')
 		{
-			$ret = $funcs->GetAttr('redirect_page','-1');
+			$ret = pwfUtils::GetAttr($formdata,'redirect_page',-1);
 			if($ret != -1)
-			{
 				$this->RedirectContent($ret);
-			}
 		}
 	}
 	else
 	{
-		$parms = array();
-		$params['pwfp_error']='';
-		$smarty->assign('fb_submission_error',$this->Lang('submission_error'));
-
-		$show = $this->GetPreference('hide_errors','1');
-		$smarty->assign('fb_submission_error_list',$results[1]);
-		$smarty->assign('fb_show_submission_errors',$show);
-
-		$parms['form_name'] = $funcs->GetName();
-		$parms['form_id'] = $funcs->GetId();
-		$this->SendEvent('OnFormBuilderFormSubmitError',$parms);
+		$this->SendEvent('OnFormSubmitError',$parms);
+		$params['pwfp_error'] = '';
+		$smarty->assign('submission_error',$this->Lang('submission_error'));
+		$smarty->assign('submission_error_list',$results[1]);
+		$smarty->assign('show_submission_errors',!$this->GetPreference('hide_errors'));
 	}
 }
-
-$udtonce = $funcs->GetAttr('predisplay_udt','');
-$udtevery = $funcs->GetAttr('predisplay_each_udt','');
-if(!$finished &&
-   ((!empty($udtonce) && $udtonce != '-1') ||
-    (!empty($udtevery) && $udtevery != '-1')))
+else
 {
-	$usertagops = $gCms->GetUserTagOperations();
-	$parms = $params;
-	$parms['FORM'] =& $funcs;
-
-	if(isset($pwfp_callcount) && $pwfp_callcount == 0 &&
-		!empty($udtonce) && "-1" != $udtonce)
-	{
-		$tmp = $usertagops->CallUserTag($udtonce,$parms);
-	}
-	if(!empty($udtevery) && "-1" != $udtevery)
-	{
-		$tmp = $usertagops->CallUserTag($udtevery,$parms);
-	}
+	$smarty->assign('form_done',0);
+	$this->SendEvent('OnFormDisplay',$parms);
+	$smarty->assign('form_start',
+		$this->CreateFormStart($id,'default',$returnid,'POST','multipart/form-data',
+		(pwfUtils::GetAttr($formdata,'inline','0') == '1'), '',
+		array('pwfp_callcount'=>$pwfp_callcount+1)));
+	$smarty->assign('form_end',$this->CreateFormEnd());
 }
-echo $funcs->RenderForm($id, $params, $returnid);
+
+$udtonce = pwfUtils::GetAttr($formdata,'predisplay_udt','');
+$udtevery = pwfUtils::GetAttr($formdata,'predisplay_each_udt','');
+if(!$finished &&
+	((!empty($udtonce) && $udtonce != -1) || (!empty($udtevery) && $udtevery != -1)))
+{
+	$parms = $params;
+	$parms['FORM'] =& $formdata;
+	$usertagops = $gCms->GetUserTagOperations();
+	if(isset($pwfp_callcount) && $pwfp_callcount == 0 && !empty($udtonce) && $udtonce != '-1')
+		/*$tmp = */$usertagops->CallUserTag($udtonce,$parms);
+
+	if(!empty($udtevery) && $udtevery != '-1')
+		/*$tmp = */$usertagops->CallUserTag($udtevery,$parms);
+	unset($parms);
+	unset($usertagops);
+}
+
+require dirname(__FILE__).DIRECTORY_SEPARATOR.'method.default.php';
+
+echo $this->ProcessTemplateFromDatabase('pwf_'.$form_id);
+
 ?>
