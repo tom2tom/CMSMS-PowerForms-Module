@@ -1,23 +1,78 @@
-<?xml version="1.0" encoding="utf-8"?>
-<form id="14"
-	alias="advanced_contact">
-		<form_name><![CDATA[Advanced Contact Form]]></form_name>
-		<attribute key="submit_action"><![CDATA[text]]></attribute>
-		<attribute key="css_class"><![CDATA[advancedcontactform]]></attribute>
-		<attribute key="list_delimiter"><![CDATA[,]]></attribute>
-		<attribute key="inline"><![CDATA[0]]></attribute>
-		<attribute key="submit_javascript"><![CDATA[]]></attribute>
-		<attribute key="next_button_text"><![CDATA[Continue...]]></attribute>
-		<attribute key="title_user_captcha"><![CDATA[Please confirm that you are not a script by entering the letters from the image.]]></attribute>
-		<attribute key="use_captcha"><![CDATA[]]></attribute>
-		<attribute key="captcha_wrong"><![CDATA[Captcha was not correct.]]></attribute>
-		<attribute key="prev_button_text"><![CDATA[Back...]]></attribute>
-		<attribute key="required_field_symbol"><![CDATA[*]]></attribute>
-		<attribute key="unspecified"><![CDATA[[unspecified]]]></attribute>
-		<attribute key="submit_button_text"><![CDATA[Submit Form]]></attribute>
-		<attribute key="input_button_safety"><![CDATA[0]]></attribute>
-		<attribute key="redirect_page"><![CDATA[-1]]></attribute>
-		<attribute key="submit_response"><![CDATA[<p>Thank you, <strong>{$your_name}</strong>.</p>
+<?xml version="1.0" standalone="yes"?>
+<!DOCTYPE powerforms [
+<!ELEMENT powerforms (version,date,count,form)>
+<!ELEMENT version (#PCDATA)>
+<!ELEMENT date (#PCDATA)>
+<!ELEMENT count (#PCDATA)>
+<!ELEMENT form (properties,attributes,fields,fieldopts)>
+<!ELEMENT properties (form_id,name,alias)>
+<!ELEMENT form_id (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT alias (#PCDATA)>
+<!ELEMENT attributes (attribute)>
+<!ELEMENT attribute (form_attr_id,form_id,name,value)>
+<!ELEMENT form_attr_id (#PCDATA)>
+<!ELEMENT form_id (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
+<!ELEMENT fields (field)>
+<!ELEMENT field (field_id,form_id,name,type,validation_type,required,hide_label,order_by)>
+<!ELEMENT field_id (#PCDATA)>
+<!ELEMENT form_id (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT type (#PCDATA)>
+<!ELEMENT validation_type (#PCDATA)>
+<!ELEMENT required (#PCDATA)>
+<!ELEMENT hide_label (#PCDATA)>
+<!ELEMENT order_by (#PCDATA)>
+<!ELEMENT fieldopts (option)>
+<!ELEMENT option (option_id,field_id,form_id,name,value)>
+<!ELEMENT option_id (#PCDATA)>
+<!ELEMENT field_id (#PCDATA)>
+<!ELEMENT form_id (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
+]>
+<powerforms>
+	<version>0.7</version>
+	<date></date>
+	<count>1</count>
+	<form>
+		<properties>
+			<form_id>2</form_id>
+			<name>Advanced Contact Form</name>
+			<alias>advanced_contact</alias>
+		</properties>
+		<a:attributes xmlns:a="file:///attributes">
+			<attribute>
+				<a:form_attr_id>24</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>list_delimiter</a:name>
+				<a:value>,</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>25</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>css_class</a:name>
+				<a:value>advancedcontactform</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>26</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>submit_action</a:name>
+				<a:value>text</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>27</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>validate_udt</a:name>
+				<a:value>-1</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>28</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>submission_template</a:name>
+				<a:value><p>Thank you, <strong>{$your_name}</strong>.</p>
 <p>Your submission has been successful. You may wish to print this page as a reference.</p>
 <h3>Contact Details</h3>
 <p>
@@ -37,15 +92,24 @@
 <strong>URL of page containing form</strong>: {$sub_url}<br />
 <strong>Domain</strong>: {$sub_host}<br />
 <strong>Your IP address</strong>: {$sub_source_ip}
-</p> ]]></attribute>
-		<attribute key="predisplay_udt"><![CDATA[-1]]></attribute>
-		<attribute key="form_template"><![CDATA[{* DEFAULT FORM LAYOUT / pure CSS *}
-{$fb_form_header}
+</p> </a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>29</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>predisplay_udt</a:name>
+				<a:value>-1</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>30</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>form_template</a:name>
+				<a:value>{* DEFAULT FORM LAYOUT / pure CSS *}
 {if $fb_form_done == 1}
 	{* This first section is for displaying submission errors *}
-	{if isset($fb_submission_error) && $fb_submission_error}
+	{if !empty($fb_submission_error)}
 		<div class="error_message">{$fb_submission_error}</div>
-		{if isset($fb_show_submission_errors) && $fb_show_submission_errors}
+		{if !empty($fb_show_submission_errors)}
 			<div class="error">
 			<ul>
 			{foreach from=$fb_submission_error_list item=thisErr}
@@ -58,7 +122,7 @@
 {else}
 	{* this section is for displaying the form *}
 	{* we start with validation errors *}
-	{if isset($fb_form_has_validation_errors) && $fb_form_has_validation_errors}
+	{if !empty($fb_form_has_validation_errors)}
 		<div class="error_message">
 		<ul>
 		{foreach from=$fb_form_validation_errors item=thisErr}
@@ -67,12 +131,13 @@
 		</ul>
 		</div>
 	{/if}
-	{if isset($captcha_error) && $captcha_error}
+	{if !empty($captcha_error)}
 		<div class="error_message">{$captcha_error}</div>
 	{/if}
 
 	{* and now the form itself *}
 	{$fb_form_start}
+<h4 style="text-align:center;">Order</h4>
 	<div>{$fb_hidden}</div>
 	<div{if $css_class != ''} class="{$css_class}"{/if}>
 	{if $total_pages gt 1}<span>{$title_page_x_of_y}</span>{/if}
@@ -84,8 +149,7 @@
             	{if $entry->required == 1 || $entry->css_class != '' || $entry->valid == 0} class="
               		{if $entry->required == 1}required{/if}
               		{if $entry->css_class != ''} {$entry->css_class}{/if}
-                    {if $entry->valid == 0} fb_invalid{/if}
-              		"
+                    {if $entry->valid == 0} fb_invalid{/if}"
             	{/if}
             	>
          	{/if}
@@ -103,7 +167,7 @@
                		{else}
                			{$entry->input[numloop]->input}
                		{/if}
-               		{if isset($entry->input[numloop]->op) && $entry->input[numloop]->op}{$entry->input[numloop]->op}{/if}
+               		{if !empty($entry->input[numloop]->op)}{$entry->input[numloop]->op}{/if}
             	{/section}
          	{else}
             	{if $entry->smarty_eval == '1'}{eval var=$entry->input}{else}{$entry->input}{/if}
@@ -116,240 +180,624 @@
      	{/if}
 	{/foreach}
 	{if $has_captcha == 1}
-		<div class="captcha">{$graphic_captcha}{$title_captcha}<br />{$input_captcha}</div>
+        <div class="captcha">{$graphic_captcha}<br />{$title_captcha}<br />{$input_captcha}<br /></div>
 	{/if}
 	<div class="submit">{$prev}{$submit}</div>
 	</div>
 	{$fb_form_end}
-{/if}
-{$fb_form_footer}]]></attribute>
-	<field id="113"
-		type="FieldsetStart"
-		validation_type=""
-		order_by="1"
-		required="0"
-		hide_label="0"
-		display_in_submission="">
-			<field_name><![CDATA[About You Fieldset]]></field_name>
-			<options>
-			<option name="legend"><![CDATA[About You]]></option>
-			<option name="css_class"><![CDATA[]]></option>
-			<option name="field_alias"><![CDATA[]]></option>
-			<option name="helptext"><![CDATA[]]></option>
-			<option name="javascript"><![CDATA[]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="114"
-		type="FromEmailNameField"
-		validation_type=""
-		order_by="2"
-		required="1"
-		hide_label="0"
-		display_in_submission="1">
-			<field_name><![CDATA[Your Name]]></field_name>
-			<options>
-			<option name="css_class"><![CDATA[]]></option>
-			<option name="field_alias"><![CDATA[users_name]]></option>
-			<option name="helptext"><![CDATA[]]></option>
-			<option name="javascript"><![CDATA[]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="115"
-		type="DispositionFromEmailAddressField"
-		validation_type="none"
-		order_by="3"
-		required="0"
-		hide_label="0"
-		display_in_submission="1">
-			<field_name><![CDATA[Your Email Address]]></field_name>
-			<options>
-			<option name="email_subject"><![CDATA[Email from Site]]></option>
-			<option name="email_from_name"><![CDATA[Form Builder]]></option>
-			<option name="send_user_copy"><![CDATA[c]]></option>
-			<option name="send_user_label"><![CDATA[Send me a copy of form]]></option>
-			<option name="field_alias"><![CDATA[]]></option>
-			<option name="javascript"><![CDATA[]]></option>
-			<option name="html_email"><![CDATA[]]></option>
-			<option name="email_template"><![CDATA[FormBuilder Submission
+{/if}</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>31</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>redirect_page</a:name>
+				<a:value>-1</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>32</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>input_button_safety</a:name>
+				<a:value>0</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>33</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>submit_button_text</a:name>
+				<a:value>Submit Form</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>34</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>unspecified</a:name>
+				<a:value>[unspecified]</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>35</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>required_field_symbol</a:name>
+				<a:value>*</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>36</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>captcha_wrong</a:name>
+				<a:value>The entered text was not correct.</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>37</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>prev_button_text</a:name>
+				<a:value>Back...</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>38</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>use_captcha</a:name>
+				<a:value>0</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>39</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>inline</a:name>
+				<a:value>0</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>40</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>submit_javascript</a:name>
+				<a:value></a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>41</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>next_button_text</a:name>
+				<a:value>Continue...</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>42</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>title_user_captcha</a:name>
+				<a:value>Help prevent abuse by spammers, enter below the text from the image above.</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>43</a:form_attr_id>
+				<a:form_id>2</a:form_id>
+				<a:name>predisplay_each_udt</a:name>
+				<a:value>-1</a:value>
+			</attribute>
+		</a:attributes>
+		<f:fields xmlns:f="file:///fields">
+			<field>
+				<f:field_id>9</f:field_id>
+				<f:form_id>2</f:form_id>
+				<f:name>About You Fieldset</f:name>
+				<f:type>FieldsetStart</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>1</f:order_by>
+			</field>
+			<field>
+				<f:field_id>10</f:field_id>
+				<f:form_id>2</f:form_id>
+				<f:name>Your Name</f:name>
+				<f:type>FromEmailNameField</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>1</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>2</f:order_by>
+			</field>
+			<field>
+				<f:field_id>11</f:field_id>
+				<f:form_id>2</f:form_id>
+				<f:name>Your Email Address</f:name>
+				<f:type>DispositionFromEmailAddressField</f:type>
+				<f:validation_type>none</f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>3</f:order_by>
+			</field>
+			<field>
+				<f:field_id>12</f:field_id>
+				<f:form_id>2</f:form_id>
+				<f:name>Email Again</f:name>
+				<f:type>FromEmailAddressAgainField</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>4</f:order_by>
+			</field>
+			<field>
+				<f:field_id>13</f:field_id>
+				<f:form_id>2</f:form_id>
+				<f:name>About You Fieldset End</f:name>
+				<f:type>FieldsetEnd</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>5</f:order_by>
+			</field>
+			<field>
+				<f:field_id>14</f:field_id>
+				<f:form_id>2</f:form_id>
+				<f:name>breaker</f:name>
+				<f:type>PageBreakField</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>6</f:order_by>
+			</field>
+			<field>
+				<f:field_id>15</f:field_id>
+				<f:form_id>2</f:form_id>
+				<f:name>Contact Fieldset</f:name>
+				<f:type>FieldsetStart</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>7</f:order_by>
+			</field>
+			<field>
+				<f:field_id>16</f:field_id>
+				<f:form_id>2</f:form_id>
+				<f:name>Greeting</f:name>
+				<f:type>StaticTextField</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>8</f:order_by>
+			</field>
+			<field>
+				<f:field_id>17</f:field_id>
+				<f:form_id>2</f:form_id>
+				<f:name>Subject</f:name>
+				<f:type>FromEmailSubjectField</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>9</f:order_by>
+			</field>
+			<field>
+				<f:field_id>18</f:field_id>
+				<f:form_id>2</f:form_id>
+				<f:name>Message</f:name>
+				<f:type>TextAreaField</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>1</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>10</f:order_by>
+			</field>
+			<field>
+				<f:field_id>19</f:field_id>
+				<f:form_id>2</f:form_id>
+				<f:name>Send To</f:name>
+				<f:type>DispositionEmail</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>11</f:order_by>
+			</field>
+			<field>
+				<f:field_id>20</f:field_id>
+				<f:form_id>2</f:form_id>
+				<f:name>Contact Fieldset End</f:name>
+				<f:type>FieldsetEnd</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>12</f:order_by>
+			</field>
+		</f:fields>
+		<o:fieldopts xmlns:o="file:///fieldopts">
+			<option>
+				<o:option_id>76</o:option_id>
+				<o:field_id>9</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>legend</o:name>
+				<o:value>About You</o:value>
+			</option>
+			<option>
+				<o:option_id>77</o:option_id>
+				<o:field_id>9</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>78</o:option_id>
+				<o:field_id>9</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>field_alias</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>79</o:option_id>
+				<o:field_id>9</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>helptext</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>80</o:option_id>
+				<o:field_id>9</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>javascript</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>81</o:option_id>
+				<o:field_id>10</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>82</o:option_id>
+				<o:field_id>10</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>field_alias</o:name>
+				<o:value>users_name</o:value>
+			</option>
+			<option>
+				<o:option_id>83</o:option_id>
+				<o:field_id>10</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>helptext</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>84</o:option_id>
+				<o:field_id>10</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>javascript</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>85</o:option_id>
+				<o:field_id>11</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>email_subject</o:name>
+				<o:value>Email from Site</o:value>
+			</option>
+			<option>
+				<o:option_id>86</o:option_id>
+				<o:field_id>11</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>email_from_name</o:name>
+				<o:value>Power Form</o:value>
+			</option>
+			<option>
+				<o:option_id>87</o:option_id>
+				<o:field_id>11</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>send_user_copy</o:name>
+				<o:value>c</o:value>
+			</option>
+			<option>
+				<o:option_id>88</o:option_id>
+				<o:field_id>11</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>send_user_label</o:name>
+				<o:value>Send me a copy of form</o:value>
+			</option>
+			<option>
+				<o:option_id>89</o:option_id>
+				<o:field_id>11</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>field_alias</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>90</o:option_id>
+				<o:field_id>11</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>javascript</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>91</o:option_id>
+				<o:field_id>11</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>html_email</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>92</o:option_id>
+				<o:field_id>11</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>email_template</o:name>
+				<o:value>PowerForms Submission
 Form Name: {$sub_form_name}
 Date of Submission: {$sub_date}
 Your server: {$sub_host}
 IP address of person using form: {$sub_source_ip}
 URL of page containing form: {$sub_url}
-FormBuilder version: {$fb_version}
+PowerForms version: {$fb_version}
 Tab Character: {$TAB}
 ->
 -------------------------------------------------
-Your Name: {$fld_116}
-Your Email Address: {$fld_43}
-Email Again: {$fld_42}
-Subject: {$fld_118}
+Your Name: {$fld_10}
+Your Email Address: {$fld_11}
+Email Again: {$fld_12}
+Subject: {$fld_17}
 Message: {$foo}
-]]></option>
-			<option name="email_encoding"><![CDATA[utf-8]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="116"
-		type="FromEmailAddressAgainField"
-		validation_type=""
-		order_by="4"
-		required="0"
-		hide_label="0"
-		display_in_submission="1">
-			<field_name><![CDATA[Email Again]]></field_name>
-			<options>
-			<option name="field_to_validate"><![CDATA[Your Email Address]]></option>
-			<option name="field_alias"><![CDATA[]]></option>
-			<option name="css_class"><![CDATA[]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="120"
-		type="FieldsetEnd"
-		validation_type=""
-		order_by="5"
-		required="0"
-		hide_label="0"
-		display_in_submission="">
-			<field_name><![CDATA[About You Fieldset End]]></field_name>
-			<options>
-			<option name="field_alias"><![CDATA[]]></option>
-			<option name="css_class"><![CDATA[]]></option>
-			<option name="helptext"><![CDATA[]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="121"
-		type="PageBreakField"
-		validation_type=""
-		order_by="6"
-		required=""
-		hide_label="0"
-		display_in_submission="1">
-			<field_name><![CDATA[breaker]]></field_name>
-			<options>
-			<option name="field_alias"><![CDATA[]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="123"
-		type="FieldsetStart"
-		validation_type=""
-		order_by="7"
-		required="0"
-		hide_label="0"
-		display_in_submission="">
-			<field_name><![CDATA[Contact Fieldset]]></field_name>
-			<options>
-			<option name="legend"><![CDATA[Contact]]></option>
-			<option name="field_alias"><![CDATA[]]></option>
-			<option name="css_class"><![CDATA[]]></option>
-			<option name="helptext"><![CDATA[]]></option>
-			<option name="javascript"><![CDATA[]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="122"
-		type="StaticTextField"
-		validation_type=""
-		order_by="8"
-		required="0"
-		hide_label="0"
-		display_in_submission="">
-			<field_name><![CDATA[Greeting]]></field_name>
-			<options>
-			<option name="text"><![CDATA[Hello, {$users_name->value}!<br /> What is it you'd like to talk to us about?]]></option>
-			<option name="field_alias"><![CDATA[]]></option>
-			<option name="css_class"><![CDATA[]]></option>
-			<option name="helptext"><![CDATA[]]></option>
-			<option name="javascript"><![CDATA[]]></option>
-			<option name="smarty_eval"><![CDATA[1]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="117"
-		type="FromEmailSubjectField"
-		validation_type=""
-		order_by="9"
-		required="0"
-		hide_label="0"
-		display_in_submission="1">
-			<field_name><![CDATA[Subject]]></field_name>
-			<options>
-			<option name="css_class"><![CDATA[]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="118"
-		type="TextAreaField"
-		validation_type=""
-		order_by="10"
-		required="1"
-		hide_label="0"
-		display_in_submission="1">
-			<field_name><![CDATA[Message]]></field_name>
-			<options>
-			<option name="rows"><![CDATA[5]]></option>
-			<option name="cols"><![CDATA[60]]></option>
-			<option name="css_class"><![CDATA[]]></option>
-			<option name="field_alias"><![CDATA[message]]></option>
-			<option name="default"><![CDATA[Enter Your Message Here]]></option>
-			<option name="clear_default"><![CDATA[1]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="119"
-		type="DispositionEmail"
-		validation_type=""
-		order_by="11"
-		required="0"
-		hide_label="0"
-		display_in_submission="1">
-			<field_name><![CDATA[Send To]]></field_name>
-			<options>
-			<option name="email_subject"><![CDATA[Contact Form Submission]]></option>
-			<option name="email_from_name"><![CDATA[Form Builder]]></option>
-			<option name="email_from_address"><![CDATA[website@yourdomain.com]]></option>
-			<option name="destination_address"><![CDATA[you@yourdomain.com]]></option>
-			<option name="field_alias"><![CDATA[]]></option>
-			<option name="html_email"><![CDATA[1]]></option>
-			<option name="email_template"><![CDATA[<h1>FormBuilder Submission</h1>
+</o:value>
+			</option>
+			<option>
+				<o:option_id>93</o:option_id>
+				<o:field_id>11</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>email_encoding</o:name>
+				<o:value>utf-8</o:value>
+			</option>
+			<option>
+				<o:option_id>94</o:option_id>
+				<o:field_id>12</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>field_to_validate</o:name>
+				<o:value>Your Email Address</o:value>
+			</option>
+			<option>
+				<o:option_id>95</o:option_id>
+				<o:field_id>12</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>field_alias</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>96</o:option_id>
+				<o:field_id>12</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>97</o:option_id>
+				<o:field_id>13</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>field_alias</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>98</o:option_id>
+				<o:field_id>13</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>99</o:option_id>
+				<o:field_id>13</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>helptext</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>100</o:option_id>
+				<o:field_id>14</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>field_alias</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>101</o:option_id>
+				<o:field_id>15</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>legend</o:name>
+				<o:value>Contact</o:value>
+			</option>
+			<option>
+				<o:option_id>102</o:option_id>
+				<o:field_id>15</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>field_alias</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>103</o:option_id>
+				<o:field_id>15</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>104</o:option_id>
+				<o:field_id>15</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>helptext</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>105</o:option_id>
+				<o:field_id>15</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>javascript</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>106</o:option_id>
+				<o:field_id>16</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>text</o:name>
+				<o:value>Hello, {$users_name->value}!<br /> What is it you'd like to talk to us about?</o:value>
+			</option>
+			<option>
+				<o:option_id>107</o:option_id>
+				<o:field_id>16</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>field_alias</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>108</o:option_id>
+				<o:field_id>16</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>109</o:option_id>
+				<o:field_id>16</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>helptext</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>110</o:option_id>
+				<o:field_id>16</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>javascript</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>111</o:option_id>
+				<o:field_id>16</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>smarty_eval</o:name>
+				<o:value>1</o:value>
+			</option>
+			<option>
+				<o:option_id>112</o:option_id>
+				<o:field_id>17</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>113</o:option_id>
+				<o:field_id>18</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>rows</o:name>
+				<o:value>5</o:value>
+			</option>
+			<option>
+				<o:option_id>114</o:option_id>
+				<o:field_id>18</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>cols</o:name>
+				<o:value>60</o:value>
+			</option>
+			<option>
+				<o:option_id>115</o:option_id>
+				<o:field_id>18</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>116</o:option_id>
+				<o:field_id>18</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>field_alias</o:name>
+				<o:value>message</o:value>
+			</option>
+			<option>
+				<o:option_id>117</o:option_id>
+				<o:field_id>18</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>default</o:name>
+				<o:value>Enter Your Message Here</o:value>
+			</option>
+			<option>
+				<o:option_id>118</o:option_id>
+				<o:field_id>18</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>clear_default</o:name>
+				<o:value>1</o:value>
+			</option>
+			<option>
+				<o:option_id>119</o:option_id>
+				<o:field_id>19</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>email_subject</o:name>
+				<o:value>Contact Form Submission</o:value>
+			</option>
+			<option>
+				<o:option_id>120</o:option_id>
+				<o:field_id>19</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>email_from_name</o:name>
+				<o:value>Power Form</o:value>
+			</option>
+			<option>
+				<o:option_id>121</o:option_id>
+				<o:field_id>19</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>email_from_address</o:name>
+				<o:value>website@yourdomain.com</o:value>
+			</option>
+			<option>
+				<o:option_id>122</o:option_id>
+				<o:field_id>19</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>destination_address</o:name>
+				<o:value>you@yourdomain.com</o:value>
+			</option>
+			<option>
+				<o:option_id>123</o:option_id>
+				<o:field_id>19</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>field_alias</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>124</o:option_id>
+				<o:field_id>19</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>html_email</o:name>
+				<o:value>1</o:value>
+			</option>
+			<option>
+				<o:option_id>125</o:option_id>
+				<o:field_id>19</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>email_template</o:name>
+				<o:value><h1>PowerForms Submission</h1>
 <strong>Form Name</strong>: {$sub_form_name}<br />
 <strong>Date of Submission</strong>: {$sub_date}<br />
 <strong>Your server</strong>: {$sub_host}<br />
 <strong>IP address of person using form</strong>: {$sub_source_ip}<br />
 <strong>URL of page containing form</strong>: {$sub_url}<br />
-<strong>FormBuilder version</strong>: {$fb_version}<br />
+<strong>PowerForms version</strong>: {$fb_version}<br />
 <strong>Tab Character</strong>: {$TAB}<br />
 
 <hr />
-{if $fld_114 != "" && $fld_114 != "[unspecified]" }<strong>Your Name</strong>: {$fld_114}<br />{/if}
-{if $fld_115 != "" && $fld_115 != "[unspecified]" }<strong>Your Email Address</strong>: {$fld_115}<br />{/if}
-{if $fld_116 != "" && $fld_116 != "[unspecified]" }<strong>Email Again</strong>: {$fld_116}<br />{/if}
-{if $fld_117 != "" && $fld_117 != "[unspecified]" }<strong>Subject</strong>: {$fld_117}<br />{/if}
-{if $message != "" && $message != "[unspecified]" }<strong>Message</strong>: {$message}<br />{/if}
-{if $fld_119 != "" && $fld_119 != "[unspecified]" }<strong>Send To</strong>: {$fld_119}<br />{/if}
-]]></option>
-			<option name="email_encoding"><![CDATA[utf-8]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="124"
-		type="FieldsetEnd"
-		validation_type=""
-		order_by="12"
-		required="0"
-		hide_label="0"
-		display_in_submission="">
-			<field_name><![CDATA[Contact Fieldset End]]></field_name>
-			<options>
-			<option name="field_alias"><![CDATA[]]></option>
-			<option name="css_class"><![CDATA[]]></option>
-			<option name="helptext"><![CDATA[]]></option>
-			<value></value>
-			</options>
-</field>
-</form>
+{if $fld_10 != "" && $fld_10 != "[unspecified]" }<strong>Your Name</strong>: {$fld_10}<br />{/if}
+{if $fld_11 != "" && $fld_11 != "[unspecified]" }<strong>Your Email Address</strong>: {$fld_11}<br />{/if}
+{if $fld_12 != "" && $fld_12 != "[unspecified]" }<strong>Email Again</strong>: {$fld_12}<br />{/if}
+{if $fld_17 != "" && $fld_17 != "[unspecified]" }<strong>Subject</strong>: {$fld_17}<br />{/if}
+{if $fld_18 != "" && $fld_18 != "[unspecified]" }<strong>Message</strong>: {$fld_18}<br />{/if}
+{if $fld_19 != "" && $fld_19 != "[unspecified]" }<strong>Send To</strong>: {$fld_19}<br />{/if}
+</o:value>
+			</option>
+			<option>
+				<o:option_id>126</o:option_id>
+				<o:field_id>19</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>email_encoding</o:name>
+				<o:value>utf-8</o:value>
+			</option>
+			<option>
+				<o:option_id>127</o:option_id>
+				<o:field_id>20</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>field_alias</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>128</o:option_id>
+				<o:field_id>20</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>129</o:option_id>
+				<o:field_id>20</o:field_id>
+				<o:form_id>2</o:form_id>
+				<o:name>helptext</o:name>
+				<o:value></o:value>
+			</option>
+		</o:fieldopts>
+	</form>
+</powerforms>

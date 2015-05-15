@@ -1,15 +1,187 @@
-<?xml version="1.0" encoding="utf-8"?>
-<form id="4"
-	alias="sample_form">
-		<form_name><![CDATA[Sample Form]]></form_name>
-		<attribute key="submit_action"><![CDATA[text]]></attribute>
-		<attribute key="input_button_safety"><![CDATA[0]]></attribute>
-		<attribute key="use_catcha"><![CDATA[]]></attribute>
-		<attribute key="title_user_captcha"><![CDATA[Please confirm that you are not a script by entering the letters from the image.]]></attribute>
-		<attribute key="prev_button_text"><![CDATA[Back...]]></attribute>
-		<attribute key="inline"><![CDATA[0]]></attribute>
-		<attribute key="submit_javascript"><![CDATA[]]></attribute>
-		<attribute key="form_template"><![CDATA[{* DEFAULT FORM LAYOUT / pure CSS *}
+<?xml version="1.0" standalone="yes"?>
+<!DOCTYPE powerforms [
+<!ELEMENT powerforms (version,date,count,form)>
+<!ELEMENT version (#PCDATA)>
+<!ELEMENT date (#PCDATA)>
+<!ELEMENT count (#PCDATA)>
+<!ELEMENT form (properties,attributes,fields,fieldopts)>
+<!ELEMENT properties (form_id,name,alias)>
+<!ELEMENT form_id (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT alias (#PCDATA)>
+<!ELEMENT attributes (attribute)>
+<!ELEMENT attribute (form_attr_id,form_id,name,value)>
+<!ELEMENT form_attr_id (#PCDATA)>
+<!ELEMENT form_id (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
+<!ELEMENT fields (field)>
+<!ELEMENT field (field_id,form_id,name,type,validation_type,required,hide_label,order_by)>
+<!ELEMENT field_id (#PCDATA)>
+<!ELEMENT form_id (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT type (#PCDATA)>
+<!ELEMENT validation_type (#PCDATA)>
+<!ELEMENT required (#PCDATA)>
+<!ELEMENT hide_label (#PCDATA)>
+<!ELEMENT order_by (#PCDATA)>
+<!ELEMENT fieldopts (option)>
+<!ELEMENT option (option_id,field_id,form_id,name,value)>
+<!ELEMENT option_id (#PCDATA)>
+<!ELEMENT field_id (#PCDATA)>
+<!ELEMENT form_id (#PCDATA)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT value (#PCDATA)>
+]>
+<powerforms>
+	<version>0.7</version>
+	<date></date>
+	<count>1</count>
+	<form>
+		<properties>
+			<form_id>1</form_id>
+			<name>Sample Form</name>
+			<alias>sample_form</alias>
+		</properties>
+		<a:attributes xmlns:a="file:///attributes">
+			<attribute>
+				<a:form_attr_id>1</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>use_captcha</a:name>
+				<a:value>1</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>2</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>validate_udt</a:name>
+				<a:value>-1</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>3</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>predisplay_udt</a:name>
+				<a:value>-1</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>4</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>predisplay_each_udt</a:name>
+				<a:value>-1</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>5</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>title_position</a:name>
+				<a:value>left</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>6</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>list_delimiter</a:name>
+				<a:value> - </a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>7</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>required_field_symbol</a:name>
+				<a:value>*</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>8</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>unspecified</a:name>
+				<a:value>[unspecified]</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>9</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>next_button_text</a:name>
+				<a:value>Continue...</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>10</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>submit_button_text</a:name>
+				<a:value>Send Feedback</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>11</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>form_displaytype</a:name>
+				<a:value>tab</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>12</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>redirect_page</a:name>
+				<a:value>-1</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>13</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>css_class</a:name>
+				<a:value>PowerFormsform</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>14</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>captcha_wrong</a:name>
+				<a:value>The entered text was not correct</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>15</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>submission_template</a:name>
+				<a:value><h1>Thanks!</h1>
+<p>Your feedback helps to make this module better.</p></a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>16</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>submit_action</a:name>
+				<a:value>text</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>17</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>input_button_safety</a:name>
+				<a:value>0</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>18</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>use_catcha</a:name>
+				<a:value></a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>19</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>title_user_captcha</a:name>
+				<a:value>Help to prevent abuse by spammers, enter opposite the text from the image below</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>20</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>prev_button_text</a:name>
+				<a:value>Back...</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>21</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>inline</a:name>
+				<a:value>1</a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>22</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>submit_javascript</a:name>
+				<a:value></a:value>
+			</attribute>
+			<attribute>
+				<a:form_attr_id>23</a:form_attr_id>
+				<a:form_id>1</a:form_id>
+				<a:name>form_template</a:name>
+				<a:value>{* DEFAULT FORM LAYOUT / pure CSS *}
 {$fb_form_header}
 {if $fb_form_done == 1}
 	{* This first section is for displaying submission errors *}
@@ -89,217 +261,635 @@
          	{/strip}
      	{/if}
 	{/foreach}
-	{if $has_captcha == 1}
+	{if $has_captcha}
 		<div class="captcha">{$graphic_captcha}{$title_captcha}<br />{$input_captcha}</div>
 	{/if}
 	<div class="submit">{$prev}{$submit}</div>
 	</div>
 	{$fb_form_end}
 {/if}
-{$fb_form_footer}]]></attribute>
-		<attribute key="title_position"><![CDATA[left]]></attribute>
-		<attribute key="list_delimiter"><![CDATA[ - ]]></attribute>
-		<attribute key="required_field_symbol"><![CDATA[*]]></attribute>
-		<attribute key="unspecified"><![CDATA[[unspecified]]]></attribute>
-		<attribute key="next_button_text"><![CDATA[Continue...]]></attribute>
-		<attribute key="submit_button_text"><![CDATA[Send Feedback]]></attribute>
-		<attribute key="form_displaytype"><![CDATA[tab]]></attribute>
-		<attribute key="redirect_page"><![CDATA[-1]]></attribute>
-		<attribute key="css_class"><![CDATA[formbuilderform]]></attribute>
-		<attribute key="captcha_wrong"><![CDATA[Captcha was not correct.]]></attribute>
-		<attribute key="submit_response"><![CDATA[<h1>Thanks!</h1>
-
-<p>Your feedback helps me make this a better module.</p>
-
-<p>If you'd like to contribute to the future development of FormBuilder, you can make a donation below. I will be happy to give donors credit as a sponsor in the FormBuilder help. Every bit helps!</p>
-
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="2057231">
-<input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="">
-<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
-]]></attribute>
-	<field id="26"
-		type="FieldsetStart"
-		validation_type=""
-		order_by="2"
-		required="0"
-		hide_label="0"
-		alias="">
-			<field_name><![CDATA[Fieldset Start]]></field_name>
-			<options>
-			<option name="legend"><![CDATA[Help Improve Form Builder]]></option>
-			<option name="css_class"><![CDATA[]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="27"
-		type="DispositionEmail"
-		validation_type=""
-		order_by="3"
-		required="0"
-		hide_label="0"
-		alias="">
-			<field_name><![CDATA[Send It]]></field_name>
-			<options>
-			<option name="email_subject"><![CDATA[FormBuilder Sample Form Submission]]></option>
-			<option name="email_from_name"><![CDATA[Form Builder Installation]]></option>
-			<option name="email_from_address"><![CDATA[you@yourhost.com]]></option>
-			<option name="destination_address"><![CDATA[sjg@cmsmodules.com]]></option>
-			<option name="email_template"><![CDATA[<h1>Someone's Testing a FormBuilder Submission!</h1>
+{$fb_form_footer}</a:value>
+			</attribute>
+		</a:attributes>
+		<f:fields xmlns:f="file:///fields">
+			<field>
+				<f:field_id>1</f:field_id>
+				<f:form_id>1</f:form_id>
+				<f:name>Fieldset Start</f:name>
+				<f:type>FieldsetStart</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>2</f:order_by>
+			</field>
+			<field>
+				<f:field_id>2</f:field_id>
+				<f:form_id>1</f:form_id>
+				<f:name>Send It</f:name>
+				<f:type>DispositionEmail</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>3</f:order_by>
+			</field>
+			<field>
+				<f:field_id>3</f:field_id>
+				<f:form_id>1</f:form_id>
+				<f:name>Welcome!</f:name>
+				<f:type>StaticTextField</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>4</f:order_by>
+			</field>
+			<field>
+				<f:field_id>4</f:field_id>
+				<f:form_id>1</f:form_id>
+				<f:name>Modules you'll be using together</f:name>
+				<f:type>CheckboxGroupField</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>5</f:order_by>
+			</field>
+			<field>
+				<f:field_id>5</f:field_id>
+				<f:form_id>1</f:form_id>
+				<f:name>What will you personally be doing on your CMS MS site?</f:name>
+				<f:type>CheckboxGroupField</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>6</f:order_by>
+			</field>
+			<field>
+				<f:field_id>6</f:field_id>
+				<f:form_id>1</f:form_id>
+				<f:name>Where are you from?</f:name>
+				<f:type>CountryPickerField</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>7</f:order_by>
+			</field>
+			<field>
+				<f:field_id>7</f:field_id>
+				<f:form_id>1</f:form_id>
+				<f:name>Do you have any comments / feedback for me?</f:name>
+				<f:type>TextAreaField</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>8</f:order_by>
+			</field>
+			<field>
+				<f:field_id>8</f:field_id>
+				<f:form_id>1</f:form_id>
+				<f:name>Fieldset End</f:name>
+				<f:type>FieldsetEnd</f:type>
+				<f:validation_type></f:validation_type>
+				<f:required>0</f:required>
+				<f:hide_label>0</f:hide_label>
+				<f:order_by>9</f:order_by>
+			</field>
+		</f:fields>
+		<o:fieldopts xmlns:o="file:///fieldopts">
+			<option>
+				<o:option_id>1</o:option_id>
+				<o:field_id>1</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>legend</o:name>
+				<o:value>Help Improve Power Forms</o:value>
+			</option>
+			<option>
+				<o:option_id>2</o:option_id>
+				<o:field_id>1</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>3</o:option_id>
+				<o:field_id>2</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>email_subject</o:name>
+				<o:value>PowerForms Sample Form Submission</o:value>
+			</option>
+			<option>
+				<o:option_id>4</o:option_id>
+				<o:field_id>2</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>email_from_name</o:name>
+				<o:value>Power Forms Installation</o:value>
+			</option>
+			<option>
+				<o:option_id>5</o:option_id>
+				<o:field_id>2</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>email_from_address</o:name>
+				<o:value>me@overhere.com</o:value>
+			</option>
+			<option>
+				<o:option_id>6</o:option_id>
+				<o:field_id>2</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>destination_address</o:name>
+				<o:value>you@overthere.net</o:value>
+			</option>
+			<option>
+				<o:option_id>7</o:option_id>
+				<o:field_id>2</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>email_template</o:name>
+				<o:value><h1>Someone's Testing a PowerForms Submission!</h1>
 <strong>Form Name</strong>: {$sub_form_name}<br />
 <strong>Date of Submission</strong>: {$sub_date}<br />
 <strong>Your server</strong>: {$sub_host}<br />
 <strong>IP address of person using form</strong>: {$sub_source_ip}<br />
 <strong>URL of page containing form</strong>: {$sub_url}<br />
-
 <hr />
 <strong>Modules you'll be using together</strong>: {$modules_you_ll_be_using}<br />
 <strong>What will you personally be doing on your CMS MS site?</strong>: {$what_will_you}<br />
 <strong>Where are you from?</strong>: {$where_are_you_from_}<br />
 <strong>Do you have any comments / feedback for me?</strong>: {$do_you_have_any}<br />
-]]></option>
-			<option name="email_encoding"><![CDATA[utf-8]]></option>
-			<option name="html_email"><![CDATA[1]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="28"
-		type="StaticTextField"
-		validation_type=""
-		order_by="4"
-		required="0"
-		hide_label="0"
-		alias="">
-			<field_name><![CDATA[Welcome!]]></field_name>
-			<options>
-			<option name="text"><![CDATA[Thanks for trying out FormBuilder. You can use this form to provide me with feedback about how you will be using Form Builder, so I can best allocate resources for future development. Thanks, ___Samuel___]]></option>
-			<option name="css_class"><![CDATA[message]]></option>
-			<option name="field_alias"><![CDATA[]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="29"
-		type="CheckboxGroupField"
-		validation_type=""
-		order_by="5"
-		required="0"
-		hide_label="0"
-		alias="">
-			<field_name><![CDATA[Modules you'll be using together]]></field_name>
-			<options>
-			<option name="no_empty"><![CDATA[]]></option>
-			<option name="box_name"><![CDATA[FormBuilder]]></option>
-			<option name="box_name"><![CDATA[FormBrowser]]></option>
-			<option name="box_name"><![CDATA[Front End Users]]></option>
-			<option name="box_name"><![CDATA[Newsletter Made Simple (NMS)]]></option>
-			<option name="box_name"><![CDATA[Cataloger]]></option>
-			<option name="box_name"><![CDATA[Other(s)]]></option>
-			<option name="box_checked"><![CDATA[FormBuilder]]></option>
-			<option name="box_checked"><![CDATA[FormBrowser]]></option>
-			<option name="box_checked"><![CDATA[FEU]]></option>
-			<option name="box_checked"><![CDATA[NMS]]></option>
-			<option name="box_checked"><![CDATA[Cataloger]]></option>
-			<option name="box_checked"><![CDATA[Other(s)]]></option>
-			<option name="box_unchecked"><![CDATA[(not FormBuilder)]]></option>
-			<option name="box_unchecked"><![CDATA[(not FormBrowser)]]></option>
-			<option name="box_unchecked"><![CDATA[(not FEU)]]></option>
-			<option name="box_unchecked"><![CDATA[(not NMS)]]></option>
-			<option name="box_unchecked"><![CDATA[(not Cataloger)]]></option>
-			<option name="box_unchecked"><![CDATA[(no Others)]]></option>
-			<option name="box_is_set"><![CDATA[y]]></option>
-			<option name="box_is_set"><![CDATA[n]]></option>
-			<option name="box_is_set"><![CDATA[n]]></option>
-			<option name="box_is_set"><![CDATA[n]]></option>
-			<option name="box_is_set"><![CDATA[n]]></option>
-			<option name="box_is_set"><![CDATA[n]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="30"
-		type="CheckboxGroupField"
-		validation_type=""
-		order_by="6"
-		required="0"
-		hide_label="0"
-		alias="">
-			<field_name><![CDATA[What will you personally be doing on your CMS MS site?]]></field_name>
-			<options>
-			<option name="no_empty"><![CDATA[1]]></option>
-			<option name="box_name"><![CDATA[Graphical Design]]></option>
-			<option name="box_name"><![CDATA[HTML and CSS]]></option>
-			<option name="box_name"><![CDATA[Write / Maintain Content]]></option>
-			<option name="box_name"><![CDATA[Edit Smarty Templates]]></option>
-			<option name="box_name"><![CDATA[Write Modules]]></option>
-			<option name="box_name"><![CDATA[Write Core CMS code]]></option>
-			<option name="box_name"><![CDATA[Donate to Core/Module Developes]]></option>
-			<option name="box_checked"><![CDATA[Graphical Design]]></option>
-			<option name="box_checked"><![CDATA[HTML/CSS]]></option>
-			<option name="box_checked"><![CDATA[Content]]></option>
-			<option name="box_checked"><![CDATA[Smarty]]></option>
-			<option name="box_checked"><![CDATA[Modules]]></option>
-			<option name="box_checked"><![CDATA[Core]]></option>
-			<option name="box_checked"><![CDATA[donate!]]></option>
-			<option name="box_unchecked"><![CDATA[]]></option>
-			<option name="box_unchecked"><![CDATA[]]></option>
-			<option name="box_unchecked"><![CDATA[]]></option>
-			<option name="box_unchecked"><![CDATA[]]></option>
-			<option name="box_unchecked"><![CDATA[]]></option>
-			<option name="box_unchecked"><![CDATA[]]></option>
-			<option name="box_unchecked"><![CDATA[]]></option>
-			<option name="box_is_set"><![CDATA[n]]></option>
-			<option name="box_is_set"><![CDATA[n]]></option>
-			<option name="box_is_set"><![CDATA[n]]></option>
-			<option name="box_is_set"><![CDATA[n]]></option>
-			<option name="box_is_set"><![CDATA[n]]></option>
-			<option name="box_is_set"><![CDATA[n]]></option>
-			<option name="box_is_set"><![CDATA[n]]></option>
-			<option name="css_class"><![CDATA[]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="31"
-		type="CountryPickerField"
-		validation_type=""
-		order_by="7"
-		required="0"
-		hide_label="0"
-		alias="">
-			<field_name><![CDATA[Where are you from?]]></field_name>
-			<options>
-			<option name="default"><![CDATA[]]></option>
-			<option name="select_one"><![CDATA[Select One]]></option>
-			<option name="css_class"><![CDATA[]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="32"
-		type="TextAreaField"
-		validation_type=""
-		order_by="8"
-		required="0"
-		hide_label="0"
-		alias="">
-			<field_name><![CDATA[Do you have any comments / feedback for me?]]></field_name>
-			<options>
-			<option name="css_class"><![CDATA[]]></option>
-			<option name="rows"><![CDATA[10]]></option>
-			<option name="cols"><![CDATA[60]]></option>
-			<value></value>
-			</options>
-</field>
-	<field id="33"
-		type="FieldsetEnd"
-		validation_type=""
-		order_by="9"
-		required="0"
-		hide_label="0"
-		alias="">
-			<field_name><![CDATA[Fieldset End]]></field_name>
-			<options>
-			<option name="css_class"><![CDATA[]]></option>
-			<value></value>
-			</options>
-</field>
-</form>
+</o:value>
+			</option>
+			<option>
+				<o:option_id>8</o:option_id>
+				<o:field_id>2</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>email_encoding</o:name>
+				<o:value>utf-8</o:value>
+			</option>
+			<option>
+				<o:option_id>9</o:option_id>
+				<o:field_id>2</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>html_email</o:name>
+				<o:value>1</o:value>
+			</option>
+			<option>
+				<o:option_id>10</o:option_id>
+				<o:field_id>2</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>field_alias</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>11</o:option_id>
+				<o:field_id>3</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>text</o:name>
+				<o:value>Thanks for trying out PowerForms. You can use this form to provide me with feedback about how you will be using Form Builder, so I can best allocate resources for future development.</o:value>
+			</option>
+			<option>
+				<o:option_id>12</o:option_id>
+				<o:field_id>3</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value>message</o:value>
+			</option>
+			<option>
+				<o:option_id>13</o:option_id>
+				<o:field_id>3</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>field_alias</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>14</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>no_empty</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>15</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_name</o:name>
+				<o:value>PowerForms</o:value>
+			</option>
+			<option>
+				<o:option_id>16</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_name</o:name>
+				<o:value>FormBrowser</o:value>
+			</option>
+			<option>
+				<o:option_id>17</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_name</o:name>
+				<o:value>Front End Users</o:value>
+			</option>
+			<option>
+				<o:option_id>18</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_name</o:name>
+				<o:value>Newsletter Made Simple (NMS)</o:value>
+			</option>
+			<option>
+				<o:option_id>19</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_name</o:name>
+				<o:value>Cataloger</o:value>
+			</option>
+			<option>
+				<o:option_id>20</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_name</o:name>
+				<o:value>Other(s)</o:value>
+			</option>
+			<option>
+				<o:option_id>21</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_checked</o:name>
+				<o:value>PowerForms</o:value>
+			</option>
+			<option>
+				<o:option_id>22</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_checked</o:name>
+				<o:value>FormBrowser</o:value>
+			</option>
+			<option>
+				<o:option_id>23</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_checked</o:name>
+				<o:value>FEU</o:value>
+			</option>
+			<option>
+				<o:option_id>24</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_checked</o:name>
+				<o:value>NMS</o:value>
+			</option>
+			<option>
+				<o:option_id>25</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_checked</o:name>
+				<o:value>Cataloger</o:value>
+			</option>
+			<option>
+				<o:option_id>26</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_checked</o:name>
+				<o:value>Other(s)</o:value>
+			</option>
+			<option>
+				<o:option_id>27</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_unchecked</o:name>
+				<o:value>(not PowerForms)</o:value>
+			</option>
+			<option>
+				<o:option_id>28</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_unchecked</o:name>
+				<o:value>(not FormBrowser)</o:value>
+			</option>
+			<option>
+				<o:option_id>29</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_unchecked</o:name>
+				<o:value>(not FEU)</o:value>
+			</option>
+			<option>
+				<o:option_id>30</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_unchecked</o:name>
+				<o:value>(not NMS)</o:value>
+			</option>
+			<option>
+				<o:option_id>31</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_unchecked</o:name>
+				<o:value>(not Cataloger)</o:value>
+			</option>
+			<option>
+				<o:option_id>32</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_unchecked</o:name>
+				<o:value>(no Others)</o:value>
+			</option>
+			<option>
+				<o:option_id>33</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_is_set</o:name>
+				<o:value>y</o:value>
+			</option>
+			<option>
+				<o:option_id>34</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_is_set</o:name>
+				<o:value>n</o:value>
+			</option>
+			<option>
+				<o:option_id>35</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_is_set</o:name>
+				<o:value>n</o:value>
+			</option>
+			<option>
+				<o:option_id>36</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_is_set</o:name>
+				<o:value>n</o:value>
+			</option>
+			<option>
+				<o:option_id>37</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_is_set</o:name>
+				<o:value>n</o:value>
+			</option>
+			<option>
+				<o:option_id>38</o:option_id>
+				<o:field_id>4</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_is_set</o:name>
+				<o:value>n</o:value>
+			</option>
+			<option>
+				<o:option_id>39</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>no_empty</o:name>
+				<o:value>1</o:value>
+			</option>
+			<option>
+				<o:option_id>40</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_name</o:name>
+				<o:value>Graphical Design</o:value>
+			</option>
+			<option>
+				<o:option_id>41</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_name</o:name>
+				<o:value>HTML and CSS</o:value>
+			</option>
+			<option>
+				<o:option_id>42</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_name</o:name>
+				<o:value>Write / Maintain Content</o:value>
+			</option>
+			<option>
+				<o:option_id>43</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_name</o:name>
+				<o:value>Edit Smarty Templates</o:value>
+			</option>
+			<option>
+				<o:option_id>44</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_name</o:name>
+				<o:value>Write Modules</o:value>
+			</option>
+			<option>
+				<o:option_id>45</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_name</o:name>
+				<o:value>Write Core CMS code</o:value>
+			</option>
+			<option>
+				<o:option_id>46</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_name</o:name>
+				<o:value>Donate to Core/Module Developers</o:value>
+			</option>
+			<option>
+				<o:option_id>47</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_checked</o:name>
+				<o:value>Graphical Design</o:value>
+			</option>
+			<option>
+				<o:option_id>48</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_checked</o:name>
+				<o:value>HTML/CSS</o:value>
+			</option>
+			<option>
+				<o:option_id>49</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_checked</o:name>
+				<o:value>Content</o:value>
+			</option>
+			<option>
+				<o:option_id>50</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_checked</o:name>
+				<o:value>Smarty</o:value>
+			</option>
+			<option>
+				<o:option_id>51</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_checked</o:name>
+				<o:value>Modules</o:value>
+			</option>
+			<option>
+				<o:option_id>52</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_checked</o:name>
+				<o:value>Core</o:value>
+			</option>
+			<option>
+				<o:option_id>53</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_checked</o:name>
+				<o:value>donate!</o:value>
+			</option>
+			<option>
+				<o:option_id>54</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_unchecked</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>55</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_unchecked</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>56</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_unchecked</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>57</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_unchecked</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>58</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_unchecked</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>59</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_unchecked</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>60</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_unchecked</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>61</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_is_set</o:name>
+				<o:value>n</o:value>
+			</option>
+			<option>
+				<o:option_id>62</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_is_set</o:name>
+				<o:value>n</o:value>
+			</option>
+			<option>
+				<o:option_id>63</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_is_set</o:name>
+				<o:value>n</o:value>
+			</option>
+			<option>
+				<o:option_id>64</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_is_set</o:name>
+				<o:value>n</o:value>
+			</option>
+			<option>
+				<o:option_id>65</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_is_set</o:name>
+				<o:value>n</o:value>
+			</option>
+			<option>
+				<o:option_id>66</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_is_set</o:name>
+				<o:value>n</o:value>
+			</option>
+			<option>
+				<o:option_id>67</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>box_is_set</o:name>
+				<o:value>n</o:value>
+			</option>
+			<option>
+				<o:option_id>68</o:option_id>
+				<o:field_id>5</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>69</o:option_id>
+				<o:field_id>6</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>default</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>70</o:option_id>
+				<o:field_id>6</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>select_one</o:name>
+				<o:value>Select One</o:value>
+			</option>
+			<option>
+				<o:option_id>71</o:option_id>
+				<o:field_id>6</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>72</o:option_id>
+				<o:field_id>7</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+			<option>
+				<o:option_id>73</o:option_id>
+				<o:field_id>7</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>rows</o:name>
+				<o:value>10</o:value>
+			</option>
+			<option>
+				<o:option_id>74</o:option_id>
+				<o:field_id>7</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>cols</o:name>
+				<o:value>60</o:value>
+			</option>
+			<option>
+				<o:option_id>75</o:option_id>
+				<o:field_id>8</o:field_id>
+				<o:form_id>1</o:form_id>
+				<o:name>css_class</o:name>
+				<o:value></o:value>
+			</option>
+		</o:fieldopts>
+	</form>
+</powerforms>
