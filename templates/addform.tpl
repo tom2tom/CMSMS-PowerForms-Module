@@ -1,4 +1,4 @@
-{$form_start}
+{$form_start}{if !empty($hidden)}{$hidden}{/if}
 <h2 class="pagetext">{$title_newform}</h2>
 <p class="pagetext">{$title_form_name}:</p>
 <div class="pageinput">{$input_form_name}</div>
