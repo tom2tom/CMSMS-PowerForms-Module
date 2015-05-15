@@ -1,0 +1,50 @@
+textarea.pwf_tallarea {width: 50em; height: 15em;}
+textarea.pwf_shortarea {width: 50em; height: 8em;}
+.pwf_link {text-decoration: underline;}
+.pwf_fieldset {margin-bottom: 2em;}
+.pwf_helptext {display: none;}
+//.pwf_help { display:none; }
+//.pwf_innernav, .pwf_browsenav {padding:5px;}
+//span.pwf_order { display:none; visibility:hidden; }
+table.pwf_table
+{
+ font-size: 10px;
+ margin-left: 5%;
+ width: auto;
+ table-layout: auto;
+ border-collapse: collapse;
+}
+table.pwf_table th {font-size: 1em;}
+
+table.pwf_legend
+{
+ font-size: 11px;
+ margin: 6px 0;
+ border: 1px solid black;
+ border-collapse: collapse;
+}
+table.pwf_legend th {background-color: #AAA;}
+
+table.leftwards {
+margin-left:5%;
+width:auto;
+table-layout:auto;
+}
+table.rightwards {
+margin-right:5%;
+width:auto;
+table-layout:auto;
+}
+//multi-page submit buttons
+.submit_current {}
+.submit_next {}
+.submit_prev {}
+//.odd {background-color: #FFF;text-align:left;vertical-alignment: top;}
+//.even {background-color: #DDD;text-align:left;vertical-alignment: top;}
+//.inputhelp {color: #384654; padding: 0; margin: 0,0,0,20%; width: auto; text-align:left; }
+.error {font-weight:bold;font-size:13px;color:#F00;}
+.error_message {font-weight:bold;color:#F00;}
+//.captcha {}
+.dndhelp { display:none; } /* changed at runtime if js is available */
+img.tipper { display:none; } /* ditto */
+#addfast { display:none; } /* ditto */
