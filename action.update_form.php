@@ -43,36 +43,22 @@ elseif(isset($params['formedit']))
 		$this->SetPreference('adder_fields',$params['set_field_level']);
 	$message = '';
 }
-elseif(isset($params['formcopy']))
-{
-	$funcs = new pwfFormOperations();
-	$form_id = $funcs->Copy($this,$form_id,$params);
-	if($form_id)
-	{
-		$message = '';
-	}
-	else
-	{
-		$this->Redirect($id,'defaultadmin','',array(
-			'message'=>$this->PrettyMessage('error_copy2',FALSE)));
-	}
-}
 elseif(isset($params['fielddelete']))
 {
 	$ops = new pwfFieldOperations();
-//TODO $ops->DeleteField($formdata,$params['field_id']);
+//TODO formdata	$ops->DeleteField($formdata,$params['field_id']);
 	$message = $this->PrettyMessage('field_deleted');
 }
 elseif(isset($params['fieldcopy']))
 {
 	$ops = new pwfFieldOperations();
-//TODO	$obfield = $ops->Replicate($formdata,$params['field_id');
+//TODO formdata		$obfield = $ops->Replicate($formdata,$params['field_id');
 	if($obfield)
 	{
 		$obfield->Store(TRUE);
-		$funcs->Fields[] = $obfield; //QQQ
-		echo $funcs->AddEdit($obfield,false,$id,$returnid);
-		return;
+		$formdata->Fields[] = $obfield;
+		$this->Redirect($id,'update_field',$returnid,
+			array('field_id'=>$params['field_id'],'form_id'=>$fid));
 	}
 	else
 	{
@@ -83,17 +69,14 @@ elseif(isset($params['dir']))
 {
 	$ops = new pwfFieldOperations();
 //TODO	$srcIndex = $ops->GetFieldIndexFromId($formdata,$params['field_id']);
-	if($params['dir'] == 'up')
-		$destIndex = $srcIndex - 1;
-	else
-		$destIndex = $srcIndex + 1;
+	$destIndex = ($params['dir'] == 'up') ? $srcIndex - 1 : $srcIndex + 1;
 	$ops->SwapFieldsByIndex($srcIndex,$destIndex);
 	$message = $this->PrettyMessage('field_order_updated');
 }
 elseif(isset($params['active']))
 {
 	$ops = new pwfFieldOperations();
-//TODO 	$obfield = $ops->GetFieldById($formdata,$params['field_id']);
+//TODO formdata	 	$obfield = $ops->GetFieldById($formdata,$params['field_id']);
 	if($obfield !== FALSE)
 	{
 //		$obfield->SetRequired(($params['active']=='on'));
