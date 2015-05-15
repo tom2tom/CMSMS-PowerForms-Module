@@ -58,8 +58,8 @@ if($allforms)
 				$one['name'],array('formedit'=>1,'form_id'=>$fid));
 			$oneset->editlink = $this->CreateLink($id,'update_form','',
 				$iconedit,array('formedit'=>1,'form_id'=>$fid));
-			$oneset->copylink = $this->CreateLink($id,'update_form','',
-				$iconcopy,array('formcopy'=>1,'form_id'=>$fid));
+			$oneset->copylink = $this->CreateLink($id,'add_form','',
+				$iconcopy,array('form_id'=>$fid));
 			$oneset->deletelink = $this->CreateLink($id,'delete_form','',
 				$icondelete,array('form_id'=>$fid),
 				$this->Lang('confirm_delete_form',$one['name']));
@@ -78,7 +78,7 @@ if($allforms)
 	$smarty->assign('forms',$data);
 
 	if(count($data) > 1)
-		$t = $this->CreateInputCheckbox($id,'item',true,false,'onclick="select_all(this);"');
+		$t = $this->CreateInputCheckbox($id,'item',TRUE,FALSE,'onclick="select_all(this);"');
 	else
 		$t = '';
 	$smarty->assign('selectall_forms',$t);
@@ -135,7 +135,7 @@ if($pmod)
 	{
 		unset($ob);
 		$smarty->assign('legend_fbimport',$this->Lang('title_importfb_legend'));
-		$smarty->assign('start_importfbform',$this->CreateFormStart($id,'import_formbrowser',$returnid));
+		$smarty->assign('start_importfbform',$this->CreateFormStart($id,'import_formbuilder',$returnid));
 		$smarty->assign('submitfb',$this->CreateInputSubmit($id,'importforms',
 			$this->Lang('import_fb'),
 			'title="'.$this->Lang('tip_import_fb').'"'));
