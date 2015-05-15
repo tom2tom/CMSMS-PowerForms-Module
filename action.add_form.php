@@ -12,24 +12,71 @@ elseif(isset($params['save']))
 {
 	$name = trim($params['form_name']);
 	$alias = trim($params['form_alias']);
-	if(!($name || $alias))
-		$this->Redirect($id,'defaultadmin');
-	if(!$name)
+	if(!$alias)
+	{
+		if($name)
+			$alias = pwfUtils::MakeAlias($name);
+		else
+			$name = '<'.$this->Lang('tab_form').'>'; //alias stays empty
+		$seetab = 'maintab';
+	}
+	elseif(!$name)
+	{
 		$name = $alias;
-	$pref = cms_db_prefix();
-	$newid = $db->GenID($pref.'module_pwf_form_seq');
-	$sql = 'INSERT INTO '.$pref.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
-	$db->Execute($sql,array($newid,$name,$alias));
-	$this->Redirect($id,'update_form','',array('formedit'=>1,'form_id'=>$newid));
+		$seetab = 'maintab';
+	}
+	else
+		$seetab = 'fieldstab';
+	$params['form_name'] = $name;
+	$params['form_alias'] = $alias;
+
+	$funcs = new pwfFormOperations();
+	if(isset($params['form_id']))
+	{
+		$newid = $funcs->Copy($this,$params['form_id'],$params);
+		if(!$newid)
+			$this->Redirect($id,'defaultadmin','',array(
+				'message'=>$this->PrettyMessage('error_copy2',FALSE)));
+		$seetab = 'maintab'; //name/alias will be different
+	}
+	else
+	{
+		$newid = $funcs->Add($this,$params);
+		if(!$newid)
+			$this->Redirect($id,'defaultadmin','',array(
+				'message'=>$this->PrettyMessage('error_name',FALSE)));
+	}
+	unset($funcs);
+	$this->Redirect($id,'update_form','',array(
+		'formedit'=>1,'form_id'=>$newid,'active_tab'=>$seetab));
+}
+
+if(isset($params['form_id']))
+{
+	$h = $this->CreateInputHidden($id,'form_id',$params['form_id']); //remember what to copy
+	$t = $this->Lang('copy');
+	$name = pwfUtils::GetFormNameFromID($params['form_id']);
+	if($name)
+		$name .= ' '.$t
+	$alias = pwfUtils::GetFormAliasFromID($params['form_id']);
+	if($alias)
+		$alias .= '_'.pwfUtils::MakeAlias($t);
+}
+else
+{
+	$h = '';
+	$name = '';
+	$alias = '';
 }
 
 $smarty->assign('form_start',$this->CreateFormStart($id,'add_form',$returnid));
 $smarty->assign('form_end',$this->CreateFormEnd());
+$smarty->assign('hidden',$h);
 $smarty->assign('title_newform',$this->Lang('title_newform'));
 $smarty->assign('title_form_name',$this->Lang('title_form_name'));
-$smarty->assign('input_form_name',$this->CreateInputText($id,'form_name','',50));
+$smarty->assign('input_form_name',$this->CreateInputText($id,'form_name',$name,50,200));
 $smarty->assign('title_form_alias',$this->Lang('title_form_alias'));
-$smarty->assign('input_form_alias',$this->CreateInputText($id,'form_alias','',50));
+$smarty->assign('input_form_alias',$this->CreateInputText($id,'form_alias',$alias,50,100));
 $smarty->assign('help_form_alias',$this->Lang('help_form_alias'));
 $smarty->assign('save',$this->CreateInputSubmit($id,'save',$this->Lang('save')));
 $smarty->assign('cancel',$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel')));
