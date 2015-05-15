@@ -17,7 +17,7 @@ function delTree($dir)
 			if(is_dir($fp))
 			{
 			 	if(!delTree($fp))
-					return false;
+					return FALSE;
 			}
 			else
 				unlink($fp);
@@ -27,40 +27,40 @@ function delTree($dir)
 	return rmdir($dir);
 }
 
-$pref = cms_db_prefix();
+$pre = cms_db_prefix();
 $dict = NewDataDictionary($db);
 
-$sqlarray = $dict->DropTableSQL($pref.'module_pwf_field');
+$sqlarray = $dict->DropTableSQL($pre.'module_pwf_field');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropTableSQL($pref.'module_pwf_field_opt');
+$sqlarray = $dict->DropTableSQL($pre.'module_pwf_field_opt');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropTableSQL($pref.'module_pwf_flock');
+$sqlarray = $dict->DropTableSQL($pre.'module_pwf_flock');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropTableSQL($pref.'module_pwf_form');
+$sqlarray = $dict->DropTableSQL($pre.'module_pwf_form');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropTableSQL($pref.'module_pwf_form_attr');
+$sqlarray = $dict->DropTableSQL($pre.'module_pwf_form_attr');
 $dict->ExecuteSQLArray($sqlarray);
-//$sqlarray = $dict->DropTableSQL($pref.'module_pwf_browse');
+//$sqlarray = $dict->DropTableSQL($pre.'module_pwf_browse');
 //$dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropTableSQL($pref.'module_pwf_ip_log');
+$sqlarray = $dict->DropTableSQL($pre.'module_pwf_ip_log');
 $dict->ExecuteSQLArray($sqlarray);
-//$sqlarray = $dict->DropTableSQL($pref.'module_pwf_resp');
+//$sqlarray = $dict->DropTableSQL($pre.'module_pwf_resp');
 //$dict->ExecuteSQLArray($sqlarray);
-//$sqlarray = $dict->DropTableSQL($pref.'module_pwf_resp_attr');
+//$sqlarray = $dict->DropTableSQL($pre.'module_pwf_resp_attr');
 //$dict->ExecuteSQLArray($sqlarray);
-//$sqlarray = $dict->DropTableSQL($pref.'module_pwf_resp_val');
+//$sqlarray = $dict->DropTableSQL($pre.'module_pwf_resp_val');
 //$dict->ExecuteSQLArray($sqlarray);
 
-$db->DropSequence($pref.'module_pwf_field_seq');
-$db->DropSequence($pref.'module_pwf_field_opt_seq');
-$db->DropSequence($pref.'module_pwf_form_seq');
-$db->DropSequence($pref.'module_pwf_form_attr_seq');
-//$db->DropSequence($pref.'module_pwf_browse_seq');
-$db->DropSequence($pref.'module_pwf_ip_log_seq');
-//$db->DropSequence($pref.'module_pwf_resp_seq');
-//$db->DropSequence($pref.'module_pwf_resp_attr_seq');
-//$db->DropSequence($pref.'module_pwf_resp_val_seq');
-$db->DropSequence($pref.'module_pwf_uniquefield_seq');
+$db->DropSequence($pre.'module_pwf_field_seq');
+$db->DropSequence($pre.'module_pwf_field_opt_seq');
+$db->DropSequence($pre.'module_pwf_form_seq');
+$db->DropSequence($pre.'module_pwf_form_attr_seq');
+//$db->DropSequence($pre.'module_pwf_browse_seq');
+$db->DropSequence($pre.'module_pwf_ip_log_seq');
+//$db->DropSequence($pre.'module_pwf_resp_seq');
+//$db->DropSequence($pre.'module_pwf_resp_attr_seq');
+//$db->DropSequence($pre.'module_pwf_resp_val_seq');
+$db->DropSequence($pre.'module_pwf_uniquefield_seq');
 
 $fp = $config['uploads_path'];
 if($fp && is_dir($fp))
@@ -85,6 +85,6 @@ $this->RemoveEvent('OnFormSubmitError');
 //CHECKME clean templates
 //$this->DeleteTemplate('pwf_*');
 
-$db->Execute('DELETE FROM '.$pref.'css WHERE css_name = ?', array('PowerForms Default Style'));
+$db->Execute('DELETE FROM '.$pre.'css WHERE css_name = ?', array('PowerForms Default Style'));
 
 ?>

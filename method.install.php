@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-$pref = cms_db_prefix();
+$pre = cms_db_prefix();
 $taboptarray = array('mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
 'mysqli' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci');
 $dict = NewDataDictionary($db);
@@ -15,11 +15,11 @@ $flds = "
 	name C(256),
 	alias C(128)
 ";
-$sqlarray = $dict->CreateTableSQL($pref.'module_pwf_form', $flds, $taboptarray);
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_form', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pref.'module_pwf_form_seq');
-$db->Execute('create index '.$pref.'module_pwf_form_idx on '.$pref.'module_pwf_form (alias)');
+$db->CreateSequence($pre.'module_pwf_form_seq');
+$db->Execute('create index '.$pre.'module_pwf_form_idx on '.$pre.'module_pwf_form (alias)');
 
 $flds = "
 	form_attr_id I KEY,
@@ -27,11 +27,11 @@ $flds = "
 	name C(48),
 	value X
 ";
-$sqlarray = $dict->CreateTableSQL($pref.'module_pwf_form_attr', $flds, $taboptarray);
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_form_attr', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pref.'module_pwf_form_attr_seq');
-$db->Execute('create index '.$pref.'module_pwf_form_attr_idx on '.$pref.'module_pwf_form_attr (form_id)');
+$db->CreateSequence($pre.'module_pwf_form_attr_seq');
+$db->Execute('create index '.$pre.'module_pwf_form_attr_idx on '.$pre.'module_pwf_form_attr (form_id)');
 
 $flds = "
 	field_id I KEY,
@@ -43,11 +43,11 @@ $flds = "
 	hide_label I(1),
 	order_by I(2)
 ";
-$sqlarray = $dict->CreateTableSQL($pref.'module_pwf_field', $flds, $taboptarray);
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_field', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pref.'module_pwf_field_seq');
-$db->Execute('CREATE INDEX '.$pref.'module_pwf_field_idx ON '.$pref.'module_pwf_field (form_id)');
+$db->CreateSequence($pre.'module_pwf_field_seq');
+$db->Execute('CREATE INDEX '.$pre.'module_pwf_field_idx ON '.$pre.'module_pwf_field (form_id)');
 
 $flds = "
 	option_id I KEY,
@@ -56,17 +56,17 @@ $flds = "
 	name C(256),
 	value X
 ";
-$sqlarray = $dict->CreateTableSQL($pref.'module_pwf_field_opt', $flds, $taboptarray);
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_field_opt', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pref.'module_pwf_field_opt_seq');
-$db->Execute('CREATE INDEX '.$pref.'module_pwf_field_opt_idx ON '.$pref.'module_pwf_field_opt (field_id,form_id)');
+$db->CreateSequence($pre.'module_pwf_field_opt_seq');
+$db->Execute('CREATE INDEX '.$pre.'module_pwf_field_opt_idx ON '.$pre.'module_pwf_field_opt (field_id,form_id)');
 
 $flds = "
 	flock_id I KEY,
 	flock T
 ";
-$sqlarray = $dict->CreateTableSQL($pref.'module_pwf_flock', $flds, $taboptarray);
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_flock', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 /*
 $flds = "
@@ -77,10 +77,10 @@ $flds = "
 	secret_code C(36),
 	admin_approved ".CMS_ADODB_DT.",
 	submitted ".CMS_ADODB_DT;
-$sqlarray = $dict->CreateTableSQL($pref.'module_pwf_resp', $flds, $taboptarray);
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_resp', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pref.'module_pwf_resp_seq');
+$db->CreateSequence($pre.'module_pwf_resp_seq');
 
 $flds = "
 	resp_attr_id I KEY,
@@ -88,9 +88,9 @@ $flds = "
 	name C(36),
 	value X
 ";
-$sqlarray = $dict->CreateTableSQL($pref.'module_pwf_resp_attr', $flds, $taboptarray);
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_resp_attr', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
-$db->CreateSequence($pref.'module_pwf_resp_attr_seq');
+$db->CreateSequence($pre.'module_pwf_resp_attr_seq');
 
 $flds = "
 	resp_val_id I KEY,
@@ -98,19 +98,19 @@ $flds = "
 	field_id I,
 	value X
 ";
-$sqlarray = $dict->CreateTableSQL($pref.'module_pwf_resp_val', $flds, $taboptarray);
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_resp_val', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pref.'module_pwf_resp_val_seq');
+$db->CreateSequence($pre.'module_pwf_resp_val_seq');
 */
 $flds = "
 	sent_id I KEY,
 	src_ip C(40),
 	sent_time ".CMS_ADODB_DT;
-$sqlarray = $dict->CreateTableSQL($pref.'module_pwf_ip_log', $flds, $taboptarray);
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_ip_log', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pref.'module_pwf_ip_log_seq');
+$db->CreateSequence($pre.'module_pwf_ip_log_seq');
 /*
 $flds = "
 	browser_id I KEY,
@@ -126,12 +126,12 @@ $flds = "
 	secret_code C(36),
 	admin_approved ".CMS_ADODB_DT.",
 	submitted ".CMS_ADODB_DT;
-$sqlarray = $dict->CreateTableSQL($pref.'module_pwf_browse', $flds, $taboptarray);
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_browse', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pref.'module_pwf_browse_seq');
+$db->CreateSequence($pre.'module_pwf_browse_seq');
 */
-$db->CreateSequence($pref.'module_pwf_uniquefield_seq');
+$db->CreateSequence($pre.'module_pwf_uniquefield_seq');
 
 //TODO other prefs: e.g. user-specific forms
 $this->SetPreference('blank_invalid',0);
@@ -159,8 +159,8 @@ $this->CreateEvent('OnFormSubmit');
 $this->CreateEvent('OnFormSubmitError');
 
 $css = @file_get_contents(cms_join_path(dirname(__FILE__), 'css','default.css'));
-$css_id = $db->GenID($pref.'css_seq');
-$db->Execute('INSERT INTO '.$pref.'css (css_id, css_name, css_text, media_type, create_date) VALUES (?,?,?,?,?)',
+$css_id = $db->GenID($pre.'css_seq');
+$db->Execute('INSERT INTO '.$pre.'css (css_id, css_name, css_text, media_type, create_date) VALUES (?,?,?,?,?)',
 	array($css_id,'PowerForms Default Style',$css,'screen',date('Y-m-d')));
 
 //TODO $funcs = new pwfFormOperations();

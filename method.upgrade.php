@@ -9,7 +9,7 @@ if(!$this->CheckAccess('ModifyPFSettings')) exit;
 $dict = NewDataDictionary($db);
 $taboptarray = array('mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
 'mysqli' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci');
-$pref = cms_db_prefix();
+$pre = cms_db_prefix();
 switch($oldversion)
 {
 }

@@ -110,56 +110,58 @@ $last = count($formdata->Fields);
 foreach($formdata->Fields as &$one)
 {
 	$oneset = new stdClass();
-	$oneset->id = $one->GetId();
+	$fid = (int)$one->GetId();
+	$oneset->id = $fid;
 	$oneset->name = $this->CreateLink($id,'update_field','',$one->GetName(),
-		array('field_id'=>$oneset->id,'form_id'=>$form_id));
+		array('field_id'=>$fid,'form_id'=>$form_id));
 	$oneset->alias = $one->GetAlias();
 	$oneset->type = $one->GetDisplayType();
 
 	if(!$one->DisplayInForm() || $one->IsNonRequirableField())
 	{
-		$oneset->disposition = '';
-		$no_avail = $this->Lang('not_available');
+		$oneset->disposition = ''; //$this->Lang('not_available');
 	}
 	else if($one->IsRequired())
 	{
 		$oneset->disposition = $this->CreateLink($id,'update_form','',
 			$icontrue,
-			array('field_id'=>$one->GetId(),'form_id'=>$form_id,'active'=>'off'),'','','',
+			array('form_id'=>$form_id,'field_id'=>$fid,'active'=>'off'),'','','',
 			'class="true" onclick="update_field_required();return false;"');
 	}
 	else
 	{
 		$oneset->disposition = $this->CreateLink($id,'update_form','',
 			$iconfalse,
-			array('field_id'=>$one->GetId(),'form_id'=>$form_id,'active'=>'on'),'','','',
+			array('form_id'=>$form_id,'field_id'=>$fid,'active'=>'on'),'','','',
 			'class="false" onclick="update_field_required();return false;"');
 	}
 
 	$oneset->field_status = $one->StatusInfo();
 	$oneset->editlink = $this->CreateLink($id,'update_field','',
 		$iconedit,
-		array('field_id'=>$one->GetId(),'form_id'=>$form_id));
+		array('field_id'=>$fid,'form_id'=>$form_id));
 	$oneset->copylink = $this->CreateLink($id,'update_form','',
 		$iconcopy,
-		array('fieldcopy'=>1,'field_id'=>$one->GetId(),'form_id'=>$form_id));
+		array('fieldcopy'=>1,'field_id'=>$fid,'form_id'=>$form_id));
 	$oneset->deletelink = $this->CreateLink($id,'update_form','',
 		$icondelete,
-		array('fielddelete'=>1,'field_id'=>$one->GetId(),'form_id'=>$form_id),'','','',
+		array('fielddelete'=>1,'field_id'=>$fid,'form_id'=>$form_id),'','','',
 		'onclick="delete_field(\''.$this->Lang('confirm_delete_field',htmlspecialchars($one->GetName())).'\'); return FALSE;"');
-
 	if($count > 1)
-		$oneset->up = $this->CreateLink($id,'update_form','',$iconup,array('form_id'=>$form_id,'dir'=>'up','field_id'=>$one->GetId()));
+		$oneset->up = $this->CreateLink($id,'update_form','',
+		$iconup,
+		array('form_id'=>$form_id,'field_id'=>$fid,'dir'=>'up'));
 	else
 		$oneset->up = '';
 	if($count < $last)
-		$oneset->down=$this->CreateLink($id,'update_form','',$icondown,array('form_id'=>$form_id,'dir'=>'down','field_id'=>$one->GetId()));
+		$oneset->down = $this->CreateLink($id,'update_form','',
+		$icondown,
+		array('form_id'=>$form_id,'field_id'=>$fid,'dir'=>'down'));
 	else
 		$oneset->down = '';
 
-	$count++;
-
 	$fields[] = $oneset;
+	$count++;
 }
 unset ($one);
 
@@ -181,7 +183,7 @@ $jsfuncs [] =<<<EOS
  function fast_add(field_type) {
  var type=field_type.options[field_type.selectedIndex].value;
  this.location='{$link}&{$id}field_type='+type;
- return true;
+ return TRUE;
 }
 
 EOS;
