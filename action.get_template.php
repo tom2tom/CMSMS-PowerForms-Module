@@ -5,32 +5,29 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if(preg_match('/\.tpl$/',$params['pwfp_tid']))
-{
-    $tplstr = file_get_contents(cms_join_path(dirname(__FILE__),'templates',$params['pwfp_tid']));
-}
+//this action processes ajax-calls
+
+if(preg_match('/\.tpl$/',$params['tid']))
+    $tplstr = ''.@file_get_contents(cms_join_path(dirname(__FILE__),'templates',$params['tid']));
 else
 {
-    $query = "SELECT value FROM ".cms_db_prefix().
-		"module_fb_form_attr WHERE form_id=? AND name='form_template'";
-	$rs = $db->Execute($query,array($params['pwfp_tid']));
-	if($rs)
-	{
-		$row = $rs->FetchRow();
-		$tplstr = $row['value'];
-		$rs->Close();
-	}
+    $sql = 'SELECT value FROM '.cms_db_prefix().
+		'module_pwf_form_attr WHERE form_id=? AND name=\'form_template\'';
+	$tplstr = $db->GetOne($sql,array($params['tid']));
 }
 
-@ob_clean();
-@ob_clean();
-header('Pragma: public');
-header('Expires: 0');
-header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-header('Cache-Control: private',false);
-header('Content-Description: File Transfer');
-header('Content-Length: ' . strlen($tplstr));
-echo $tplstr;
+if($tplstr)
+{
+	@ob_clean();
+	@ob_clean();
+	header('Pragma: public');
+	header('Expires: 0');
+	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+	header('Cache-Control: private',FALSE);
+	header('Content-Description: File Transfer');
+	header('Content-Length: '.strlen($tplstr));
+	echo $tplstr;
+}
 exit;
 
 ?>
