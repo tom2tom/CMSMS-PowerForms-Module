@@ -14,17 +14,17 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU Affero General Public License (www.gnu.org/licenses/licenses.html#AGPL)
-# for more details
+# for more details.
 #-----------------------------------------------------------------------
 
 class PowerForms extends CMSModule
 {
 	//these are populated when first used
-	var $field_types = false; //array of all usable field classnames
-	var $std_field_types = false; //subset : classes for use in 'fast-adder' simple mode
-	var $disp_field_types = false; //subset : disposition classes 
-//	var $all_validation_types = false; //accumulated validations NOT USED
-	var $email_regex = false; //used beyond email dispatchers
+	var $field_types = FALSE; //array of all usable field classnames
+	var $std_field_types = FALSE; //subset : classes for use in 'fast-adder' simple mode
+	var $disp_field_types = FALSE; //subset : disposition classes 
+//	var $all_validation_types = FALSE; //accumulated validations NOT USED
+	var $email_regex = FALSE; //used beyond email dispatchers
 
 	function __construct()
 	{
@@ -171,9 +171,9 @@ class PowerForms extends CMSModule
 	{
 		if(isset($_SERVER['QUERY_STRING']))
 		{
-			if(strpos($_SERVER['QUERY_STRING'],'export_form') !== false)
+			if(strpos($_SERVER['QUERY_STRING'],'export_form') !== FALSE)
 				return TRUE;
-			if(strpos($_SERVER['QUERY_STRING'],'get_template') !== false)
+			if(strpos($_SERVER['QUERY_STRING'],'get_template') !== FALSE)
 				return TRUE;
 		}
 		return FALSE;
@@ -214,7 +214,7 @@ class PowerForms extends CMSModule
 	function InitializeAdmin()
 	{
 		//document only the parameters relevant for external (page-tag) usage
-		$this->CreateParameter('form','',$this->Lang('param_form_alias'),false);
+		$this->CreateParameter('form','',$this->Lang('param_form_alias'),FALSE);
 //		$this->CreateParameter('form_id',-1,$this->Lang('param_form_id'));
 //		$this->CreateParameter('field_id',-1,$this->Lang('param_field_id'));
 //		$this->CreateParameter('response_id',-1,$this->Lang('param_response_id'));
@@ -230,22 +230,22 @@ class PowerForms extends CMSModule
 		{
 		 case 'ModifyPFForms':
  			if($this->CheckPermission('ModifyPFForms'))
-				return true;
+				return TRUE;
 			$desc = '"'.$this->Lang('perm_modify').'"';
 			break;
 		 case 'ModifyPFSettings':
 			if($this->CheckPermission('ModifyPFSettings'))
-				return true;
+				return TRUE;
 			$desc = '"'.$this->Lang('perm_admin').'"';
 			break;
 		 default:
 			if($this->CheckPermission('ModifyPFForms')
 			|| $this->CheckPermission('ModifyPFSettings'))
-				return true;
+				return TRUE;
 			$desc = $this->Lang('perm_any');
 		}
 		echo '<p class="error">'.$this->Lang('you_need_permission',$desc).'</p>';
-		return false;
+		return FALSE;
 	}
 
 	function GetActiveTab(&$params)
@@ -281,7 +281,7 @@ class PowerForms extends CMSModule
 	{
 		$fd = new pwfData();
 
-		$fd->pwfmodule =& $this;
+		$fd->formsmodule =& $this;
 		if($params == NULL)
 			return $fd;
 
@@ -331,6 +331,25 @@ class PowerForms extends CMSModule
 			$text .= ' '.$addttext;
 		$text .= ' />';
 		return $text . "\n";
+	}
+
+	function RegisterField($classfilepath,$menulabel)
+	{
+		//TODO
+		require $classfilepath;
+		$classname = func($classfilepath);
+		$fld = new $classname();
+		$menuname = func($menulabel,$fld);
+		$field_types[$menuname] = $classname;
+		sort($field_types);
+	}
+	
+	function DeregisterField($classfilepath)
+	{
+		//TODO
+		$classname = func($classfilepath);
+		$menuname = search($field_types,$classname);
+		unset($field_types[$menuname]);
 	}
 
 }
