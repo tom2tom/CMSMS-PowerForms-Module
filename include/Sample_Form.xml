@@ -15,13 +15,11 @@
 <!ELEMENT name (#PCDATA)>
 <!ELEMENT value (#PCDATA)>
 <!ELEMENT fields (field)>
-<!ELEMENT field (field_id,name,type,validation_type,required,hide_label,order_by,option)>
+<!ELEMENT field (field_id,name,alias,type,order_by,option)>
 <!ELEMENT field_id (#PCDATA)>
 <!ELEMENT name (#PCDATA)>
+<!ELEMENT alias (#PCDATA)>
 <!ELEMENT type (#PCDATA)>
-<!ELEMENT validation_type (#PCDATA)>
-<!ELEMENT required (#PCDATA)>
-<!ELEMENT hide_label (#PCDATA)>
 <!ELEMENT order_by (#PCDATA)>
 <!ELEMENT option (option_id,name,value)>
 <!ELEMENT option_id (#PCDATA)>
@@ -102,7 +100,7 @@
 			<attribute>
 				<form_attr_id>13</form_attr_id>
 				<name>css_class</name>
-				<value>PowerFormsform</value>
+				<value>powerform</value>
 			</attribute>
 			<attribute>
 				<form_attr_id>14</form_attr_id>
@@ -237,10 +235,8 @@
 			<field>
 				<field_id>1</field_id>
 				<name>Fieldset Start</name>
+				<alias>fieldset_start</alias>
 				<type>FieldsetStart</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>2</order_by>
 				<option>
 					<option_id>1</option_id>
@@ -252,37 +248,50 @@
 					<name>css_class</name>
 					<value></value>
 				</option>
+				<option>
+					<option_id>3</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>4</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>5</option_id>
+					<name>hide_label</name>
+					<value>0</value>
+				</option>
 			</field>
 			<field>
 				<field_id>2</field_id>
 				<name>Send It</name>
+				<alias>send_it</alias>
 				<type>DispositionEmail</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>3</order_by>
 				<option>
-					<option_id>3</option_id>
+					<option_id>6</option_id>
 					<name>email_subject</name>
-					<value>PowerForms Sample Form Submission</value>
+					<value>Power Forms Sample Form Submission</value>
 				</option>
 				<option>
-					<option_id>4</option_id>
+					<option_id>7</option_id>
 					<name>email_from_name</name>
 					<value>Power Forms Installation</value>
 				</option>
 				<option>
-					<option_id>5</option_id>
+					<option_id>8</option_id>
 					<name>email_from_address</name>
 					<value>me@overhere.com</value>
 				</option>
 				<option>
-					<option_id>6</option_id>
+					<option_id>9</option_id>
 					<name>destination_address</name>
 					<value>you@overthere.net</value>
 				</option>
 				<option>
-					<option_id>7</option_id>
+					<option_id>10</option_id>
 					<name>email_template</name>
 					<value><h1>Someone's Testing a PowerForms Submission!</h1>
 <strong>Date submitted</strong>: {$sub_date}<br />
@@ -297,398 +306,491 @@
 <strong>Do you have any comments / feedback for me?</strong>: {$do_you_have_any}</value>
 				</option>
 				<option>
-					<option_id>8</option_id>
+					<option_id>11</option_id>
 					<name>email_encoding</name>
 					<value>utf-8</value>
 				</option>
 				<option>
-					<option_id>9</option_id>
+					<option_id>12</option_id>
 					<name>html_email</name>
 					<value>1</value>
-				</option>
-				<option>
-					<option_id>10</option_id>
-					<name>field_alias</name>
-					<value></value>
-				</option>
-			</field>
-			<field>
-				<field_id>3</field_id>
-				<name>Welcome!</name>
-				<type>StaticTextField</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
-				<order_by>4</order_by>
-				<option>
-					<option_id>11</option_id>
-					<name>text</name>
-					<value>Thanks for trying out the PowerForms module.</value>
-				</option>
-				<option>
-					<option_id>12</option_id>
-					<name>css_class</name>
-					<value>message</value>
 				</option>
 				<option>
 					<option_id>13</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
-			</field>
-			<field>
-				<field_id>4</field_id>
-				<name>Modules you'll be using together</name>
-				<type>CheckboxGroupField</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
-				<order_by>5</order_by>
 				<option>
 					<option_id>14</option_id>
-					<name>no_empty</name>
+					<name>validation_type</name>
 					<value></value>
 				</option>
 				<option>
 					<option_id>15</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>16</option_id>
+					<name>hide_label</name>
+					<value>0</value>
+				</option>
+			</field>
+			<field>
+				<field_id>3</field_id>
+				<name>Welcome!</name>
+				<alias>welcome_</alias>
+				<type>StaticTextField</type>
+				<order_by>4</order_by>
+				<option>
+					<option_id>17</option_id>
+					<name>text</name>
+					<value>Thanks for trying out the PowerForms module.</value>
+				</option>
+				<option>
+					<option_id>18</option_id>
+					<name>css_class</name>
+					<value>message</value>
+				</option>
+				<option>
+					<option_id>19</option_id>
+					<name>field_alias</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>20</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>21</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>22</option_id>
+					<name>hide_label</name>
+					<value>0</value>
+				</option>
+			</field>
+			<field>
+				<field_id>4</field_id>
+				<name>Modules you'll be using together</name>
+				<alias>modules_you_ll_be_using_together</alias>
+				<type>CheckboxGroupField</type>
+				<order_by>5</order_by>
+				<option>
+					<option_id>23</option_id>
+					<name>no_empty</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>24</option_id>
 					<name>box_name</name>
 					<value>PowerForms</value>
 				</option>
 				<option>
-					<option_id>16</option_id>
+					<option_id>25</option_id>
 					<name>box_name</name>
 					<value>FormBrowser</value>
 				</option>
 				<option>
-					<option_id>17</option_id>
+					<option_id>26</option_id>
 					<name>box_name</name>
 					<value>Front End Users</value>
 				</option>
 				<option>
-					<option_id>18</option_id>
+					<option_id>27</option_id>
 					<name>box_name</name>
 					<value>Newsletter Made Simple (NMS)</value>
 				</option>
 				<option>
-					<option_id>19</option_id>
+					<option_id>28</option_id>
 					<name>box_name</name>
 					<value>Cataloger</value>
 				</option>
 				<option>
-					<option_id>20</option_id>
+					<option_id>29</option_id>
 					<name>box_name</name>
 					<value>Other(s)</value>
 				</option>
 				<option>
-					<option_id>21</option_id>
+					<option_id>30</option_id>
 					<name>box_checked</name>
 					<value>PowerForms</value>
 				</option>
 				<option>
-					<option_id>22</option_id>
+					<option_id>31</option_id>
 					<name>box_checked</name>
 					<value>FormBrowser</value>
 				</option>
 				<option>
-					<option_id>23</option_id>
+					<option_id>32</option_id>
 					<name>box_checked</name>
 					<value>FEU</value>
 				</option>
 				<option>
-					<option_id>24</option_id>
+					<option_id>33</option_id>
 					<name>box_checked</name>
 					<value>NMS</value>
 				</option>
 				<option>
-					<option_id>25</option_id>
+					<option_id>34</option_id>
 					<name>box_checked</name>
 					<value>Cataloger</value>
 				</option>
 				<option>
-					<option_id>26</option_id>
+					<option_id>35</option_id>
 					<name>box_checked</name>
 					<value>Other(s)</value>
 				</option>
 				<option>
-					<option_id>27</option_id>
+					<option_id>36</option_id>
 					<name>box_unchecked</name>
 					<value>(not PowerForms)</value>
 				</option>
 				<option>
-					<option_id>28</option_id>
+					<option_id>37</option_id>
 					<name>box_unchecked</name>
-					<value>(not FormBrowser)</value>
+					<value>(not PowerBrowse)</value>
 				</option>
 				<option>
-					<option_id>29</option_id>
+					<option_id>38</option_id>
 					<name>box_unchecked</name>
 					<value>(not FEU)</value>
 				</option>
 				<option>
-					<option_id>30</option_id>
+					<option_id>39</option_id>
 					<name>box_unchecked</name>
 					<value>(not NMS)</value>
 				</option>
 				<option>
-					<option_id>31</option_id>
+					<option_id>40</option_id>
 					<name>box_unchecked</name>
 					<value>(not Cataloger)</value>
 				</option>
 				<option>
-					<option_id>32</option_id>
+					<option_id>41</option_id>
 					<name>box_unchecked</name>
 					<value>(no Others)</value>
 				</option>
 				<option>
-					<option_id>33</option_id>
+					<option_id>42</option_id>
 					<name>box_is_set</name>
 					<value>y</value>
 				</option>
 				<option>
-					<option_id>34</option_id>
+					<option_id>43</option_id>
 					<name>box_is_set</name>
 					<value>n</value>
 				</option>
 				<option>
-					<option_id>35</option_id>
+					<option_id>44</option_id>
 					<name>box_is_set</name>
 					<value>n</value>
 				</option>
 				<option>
-					<option_id>36</option_id>
+					<option_id>45</option_id>
 					<name>box_is_set</name>
 					<value>n</value>
 				</option>
 				<option>
-					<option_id>37</option_id>
+					<option_id>46</option_id>
 					<name>box_is_set</name>
 					<value>n</value>
 				</option>
 				<option>
-					<option_id>38</option_id>
+					<option_id>47</option_id>
 					<name>box_is_set</name>
 					<value>n</value>
+				</option>
+				<option>
+					<option_id>48</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>49</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>50</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>5</field_id>
 				<name>What will you personally be doing on your CMSMS site?</name>
+				<alias>what_will_you_personally_be_doing</alias>
 				<type>CheckboxGroupField</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>6</order_by>
 				<option>
-					<option_id>39</option_id>
+					<option_id>51</option_id>
 					<name>no_empty</name>
 					<value>1</value>
 				</option>
 				<option>
-					<option_id>40</option_id>
+					<option_id>52</option_id>
 					<name>box_name</name>
 					<value>Graphical Design</value>
 				</option>
 				<option>
-					<option_id>41</option_id>
+					<option_id>53</option_id>
 					<name>box_name</name>
 					<value>HTML and CSS</value>
 				</option>
 				<option>
-					<option_id>42</option_id>
+					<option_id>54</option_id>
 					<name>box_name</name>
 					<value>Write / Maintain Content</value>
 				</option>
 				<option>
-					<option_id>43</option_id>
+					<option_id>55</option_id>
 					<name>box_name</name>
 					<value>Edit Smarty Templates</value>
 				</option>
 				<option>
-					<option_id>44</option_id>
+					<option_id>56</option_id>
 					<name>box_name</name>
 					<value>Write Modules</value>
 				</option>
 				<option>
-					<option_id>45</option_id>
+					<option_id>57</option_id>
 					<name>box_name</name>
 					<value>Write Core CMS code</value>
 				</option>
 				<option>
-					<option_id>46</option_id>
+					<option_id>58</option_id>
 					<name>box_name</name>
 					<value>Donate to Core/Module Developers</value>
 				</option>
 				<option>
-					<option_id>47</option_id>
+					<option_id>59</option_id>
 					<name>box_checked</name>
 					<value>Graphical Design</value>
 				</option>
 				<option>
-					<option_id>48</option_id>
+					<option_id>60</option_id>
 					<name>box_checked</name>
 					<value>HTML/CSS</value>
 				</option>
 				<option>
-					<option_id>49</option_id>
+					<option_id>61</option_id>
 					<name>box_checked</name>
 					<value>Content</value>
 				</option>
 				<option>
-					<option_id>50</option_id>
+					<option_id>62</option_id>
 					<name>box_checked</name>
 					<value>Smarty</value>
 				</option>
 				<option>
-					<option_id>51</option_id>
+					<option_id>63</option_id>
 					<name>box_checked</name>
 					<value>Modules</value>
 				</option>
 				<option>
-					<option_id>52</option_id>
+					<option_id>64</option_id>
 					<name>box_checked</name>
 					<value>Core</value>
 				</option>
 				<option>
-					<option_id>53</option_id>
+					<option_id>65</option_id>
 					<name>box_checked</name>
 					<value>donate!</value>
 				</option>
 				<option>
-					<option_id>54</option_id>
-					<name>box_unchecked</name>
-					<value></value>
-				</option>
-				<option>
-					<option_id>55</option_id>
-					<name>box_unchecked</name>
-					<value></value>
-				</option>
-				<option>
-					<option_id>56</option_id>
-					<name>box_unchecked</name>
-					<value></value>
-				</option>
-				<option>
-					<option_id>57</option_id>
-					<name>box_unchecked</name>
-					<value></value>
-				</option>
-				<option>
-					<option_id>58</option_id>
-					<name>box_unchecked</name>
-					<value></value>
-				</option>
-				<option>
-					<option_id>59</option_id>
-					<name>box_unchecked</name>
-					<value></value>
-				</option>
-				<option>
-					<option_id>60</option_id>
-					<name>box_unchecked</name>
-					<value></value>
-				</option>
-				<option>
-					<option_id>61</option_id>
-					<name>box_is_set</name>
-					<value>n</value>
-				</option>
-				<option>
-					<option_id>62</option_id>
-					<name>box_is_set</name>
-					<value>n</value>
-				</option>
-				<option>
-					<option_id>63</option_id>
-					<name>box_is_set</name>
-					<value>n</value>
-				</option>
-				<option>
-					<option_id>64</option_id>
-					<name>box_is_set</name>
-					<value>n</value>
-				</option>
-				<option>
-					<option_id>65</option_id>
-					<name>box_is_set</name>
-					<value>n</value>
-				</option>
-				<option>
 					<option_id>66</option_id>
-					<name>box_is_set</name>
-					<value>n</value>
+					<name>box_unchecked</name>
+					<value></value>
 				</option>
 				<option>
 					<option_id>67</option_id>
+					<name>box_unchecked</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>68</option_id>
+					<name>box_unchecked</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>69</option_id>
+					<name>box_unchecked</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>70</option_id>
+					<name>box_unchecked</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>71</option_id>
+					<name>box_unchecked</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>72</option_id>
+					<name>box_unchecked</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>73</option_id>
 					<name>box_is_set</name>
 					<value>n</value>
 				</option>
 				<option>
-					<option_id>68</option_id>
+					<option_id>74</option_id>
+					<name>box_is_set</name>
+					<value>n</value>
+				</option>
+				<option>
+					<option_id>75</option_id>
+					<name>box_is_set</name>
+					<value>n</value>
+				</option>
+				<option>
+					<option_id>76</option_id>
+					<name>box_is_set</name>
+					<value>n</value>
+				</option>
+				<option>
+					<option_id>77</option_id>
+					<name>box_is_set</name>
+					<value>n</value>
+				</option>
+				<option>
+					<option_id>78</option_id>
+					<name>box_is_set</name>
+					<value>n</value>
+				</option>
+				<option>
+					<option_id>79</option_id>
+					<name>box_is_set</name>
+					<value>n</value>
+				</option>
+				<option>
+					<option_id>80</option_id>
 					<name>css_class</name>
 					<value></value>
+				</option>
+				<option>
+					<option_id>81</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>82</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>83</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>6</field_id>
 				<name>Where are you from?</name>
+				<alias>where_are_you_from_</alias>
 				<type>CountryPickerField</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>7</order_by>
 				<option>
-					<option_id>69</option_id>
+					<option_id>84</option_id>
 					<name>default</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>70</option_id>
+					<option_id>85</option_id>
 					<name>select_one</name>
 					<value>Select One</value>
 				</option>
 				<option>
-					<option_id>71</option_id>
+					<option_id>86</option_id>
 					<name>css_class</name>
 					<value></value>
+				</option>
+				<option>
+					<option_id>87</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>88</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>89</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>7</field_id>
 				<name>Do you have any comments / feedback for me?</name>
+				<alias>do_you_have_any_comments_feedback_for_me_</alias>
 				<type>TextAreaField</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>8</order_by>
 				<option>
-					<option_id>72</option_id>
+					<option_id>90</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>73</option_id>
+					<option_id>91</option_id>
 					<name>rows</name>
 					<value>10</value>
 				</option>
 				<option>
-					<option_id>74</option_id>
+					<option_id>92</option_id>
 					<name>cols</name>
 					<value>60</value>
+				</option>
+				<option>
+					<option_id>93</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>94</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>95</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>8</field_id>
 				<name>Fieldset End</name>
+				<alias>fieldset_end</alias>
 				<type>FieldsetEnd</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>9</order_by>
 				<option>
-					<option_id>75</option_id>
+					<option_id>96</option_id>
 					<name>css_class</name>
 					<value></value>
+				</option>
+				<option>
+					<option_id>97</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>98</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>99</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 		</fields>

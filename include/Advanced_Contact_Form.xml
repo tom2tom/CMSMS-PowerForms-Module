@@ -15,13 +15,11 @@
 <!ELEMENT name (#PCDATA)>
 <!ELEMENT value (#PCDATA)>
 <!ELEMENT fields (field)>
-<!ELEMENT field (field_id,name,type,validation_type,required,hide_label,order_by,option)>
+<!ELEMENT field (field_id,name,alias,type,order_by,option)>
 <!ELEMENT field_id (#PCDATA)>
 <!ELEMENT name (#PCDATA)>
+<!ELEMENT alias (#PCDATA)>
 <!ELEMENT type (#PCDATA)>
-<!ELEMENT validation_type (#PCDATA)>
-<!ELEMENT required (#PCDATA)>
-<!ELEMENT hide_label (#PCDATA)>
 <!ELEMENT order_by (#PCDATA)>
 <!ELEMENT option (option_id,name,value)>
 <!ELEMENT option_id (#PCDATA)>
@@ -243,10 +241,8 @@
 			<field>
 				<field_id>1</field_id>
 				<name>About You Fieldset</name>
+				<alias>about_you_fieldset</alias>
 				<type>FieldsetStart</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>1</order_by>
 				<option>
 					<option_id>1</option_id>
@@ -273,81 +269,107 @@
 					<name>javascript</name>
 					<value></value>
 				</option>
-			</field>
-			<field>
-				<field_id>2</field_id>
-				<name>Your Name</name>
-				<type>FromEmailNameField</type>
-				<validation_type></validation_type>
-				<required>1</required>
-				<hide_label>0</hide_label>
-				<order_by>2</order_by>
 				<option>
 					<option_id>6</option_id>
-					<name>css_class</name>
+					<name>validation_type</name>
 					<value></value>
 				</option>
 				<option>
 					<option_id>7</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>8</option_id>
+					<name>hide_label</name>
+					<value>0</value>
+				</option>
+			</field>
+			<field>
+				<field_id>2</field_id>
+				<name>Your Name</name>
+				<alias>your_name</alias>
+				<type>FromEmailNameField</type>
+				<order_by>2</order_by>
+				<option>
+					<option_id>9</option_id>
+					<name>css_class</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>10</option_id>
 					<name>field_alias</name>
 					<value>users_name</value>
 				</option>
 				<option>
-					<option_id>8</option_id>
+					<option_id>11</option_id>
 					<name>helptext</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>9</option_id>
+					<option_id>12</option_id>
 					<name>javascript</name>
 					<value></value>
+				</option>
+				<option>
+					<option_id>13</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>14</option_id>
+					<name>required</name>
+					<value>1</value>
+				</option>
+				<option>
+					<option_id>15</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>3</field_id>
 				<name>Your Email Address</name>
+				<alias>your_email_address</alias>
 				<type>DispositionFromEmailAddressField</type>
-				<validation_type>none</validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>3</order_by>
 				<option>
-					<option_id>10</option_id>
+					<option_id>16</option_id>
 					<name>email_subject</name>
 					<value>Email from Site</value>
 				</option>
 				<option>
-					<option_id>11</option_id>
+					<option_id>17</option_id>
 					<name>email_from_name</name>
 					<value>Power Forms</value>
 				</option>
 				<option>
-					<option_id>12</option_id>
+					<option_id>18</option_id>
 					<name>send_user_copy</name>
 					<value>c</value>
 				</option>
 				<option>
-					<option_id>13</option_id>
+					<option_id>19</option_id>
 					<name>send_user_label</name>
 					<value>Send me a copy of form</value>
 				</option>
 				<option>
-					<option_id>14</option_id>
+					<option_id>20</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>15</option_id>
+					<option_id>21</option_id>
 					<name>javascript</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>16</option_id>
+					<option_id>22</option_id>
 					<name>html_email</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>17</option_id>
+					<option_id>23</option_id>
 					<name>email_template</name>
 					<value>PowerForms Submission
 Date of submission: {$sub_date}
@@ -365,239 +387,343 @@ Subject: {$fld_9}
 Message: {$fld_10}</value>
 				</option>
 				<option>
-					<option_id>18</option_id>
+					<option_id>24</option_id>
 					<name>email_encoding</name>
 					<value>utf-8</value>
+				</option>
+				<option>
+					<option_id>25</option_id>
+					<name>validation_type</name>
+					<value>none</value>
+				</option>
+				<option>
+					<option_id>26</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>27</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>4</field_id>
 				<name>Email Again</name>
+				<alias>email_again</alias>
 				<type>FromEmailAddressAgainField</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>4</order_by>
 				<option>
-					<option_id>19</option_id>
+					<option_id>28</option_id>
 					<name>field_to_validate</name>
 					<value>Your Email Address</value>
 				</option>
 				<option>
-					<option_id>20</option_id>
+					<option_id>29</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>21</option_id>
+					<option_id>30</option_id>
 					<name>css_class</name>
 					<value></value>
+				</option>
+				<option>
+					<option_id>31</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>32</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>33</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>5</field_id>
 				<name>About You Fieldset End</name>
+				<alias>about_you_fieldset_end</alias>
 				<type>FieldsetEnd</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>5</order_by>
 				<option>
-					<option_id>22</option_id>
+					<option_id>34</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>23</option_id>
+					<option_id>35</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>24</option_id>
+					<option_id>36</option_id>
 					<name>helptext</name>
 					<value></value>
+				</option>
+				<option>
+					<option_id>37</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>38</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>39</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>6</field_id>
 				<name>breaker</name>
+				<alias>breaker</alias>
 				<type>PageBreakField</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>6</order_by>
 				<option>
-					<option_id>25</option_id>
+					<option_id>40</option_id>
 					<name>field_alias</name>
 					<value></value>
+				</option>
+				<option>
+					<option_id>41</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>42</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>43</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>7</field_id>
 				<name>Contact Fieldset</name>
+				<alias>contact_fieldset</alias>
 				<type>FieldsetStart</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>7</order_by>
 				<option>
-					<option_id>26</option_id>
+					<option_id>44</option_id>
 					<name>legend</name>
 					<value>Contact</value>
 				</option>
 				<option>
-					<option_id>27</option_id>
+					<option_id>45</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>28</option_id>
+					<option_id>46</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>29</option_id>
+					<option_id>47</option_id>
 					<name>helptext</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>30</option_id>
+					<option_id>48</option_id>
 					<name>javascript</name>
 					<value></value>
+				</option>
+				<option>
+					<option_id>49</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>50</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>51</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>8</field_id>
 				<name>Greeting</name>
+				<alias>greeting</alias>
 				<type>StaticTextField</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>8</order_by>
 				<option>
-					<option_id>31</option_id>
+					<option_id>52</option_id>
 					<name>text</name>
 					<value>Hello, {$users_name->value}!<br /> What is it you'd like to talk to us about?</value>
 				</option>
 				<option>
-					<option_id>32</option_id>
+					<option_id>53</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>33</option_id>
+					<option_id>54</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>34</option_id>
+					<option_id>55</option_id>
 					<name>helptext</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>35</option_id>
+					<option_id>56</option_id>
 					<name>javascript</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>36</option_id>
+					<option_id>57</option_id>
 					<name>smarty_eval</name>
 					<value>1</value>
+				</option>
+				<option>
+					<option_id>58</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>59</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>60</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>9</field_id>
 				<name>Subject</name>
+				<alias>subject</alias>
 				<type>FromEmailSubjectField</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>9</order_by>
 				<option>
-					<option_id>37</option_id>
+					<option_id>61</option_id>
 					<name>css_class</name>
 					<value></value>
+				</option>
+				<option>
+					<option_id>62</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>63</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>64</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>10</field_id>
 				<name>Message</name>
+				<alias>message</alias>
 				<type>TextAreaField</type>
-				<validation_type></validation_type>
-				<required>1</required>
-				<hide_label>0</hide_label>
 				<order_by>10</order_by>
 				<option>
-					<option_id>38</option_id>
+					<option_id>65</option_id>
 					<name>rows</name>
 					<value>5</value>
 				</option>
 				<option>
-					<option_id>39</option_id>
+					<option_id>66</option_id>
 					<name>cols</name>
 					<value>60</value>
 				</option>
 				<option>
-					<option_id>40</option_id>
+					<option_id>67</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>41</option_id>
+					<option_id>68</option_id>
 					<name>field_alias</name>
 					<value>message</value>
 				</option>
 				<option>
-					<option_id>42</option_id>
+					<option_id>69</option_id>
 					<name>default</name>
 					<value>Enter Your Message Here</value>
 				</option>
 				<option>
-					<option_id>43</option_id>
+					<option_id>70</option_id>
 					<name>clear_default</name>
 					<value>1</value>
+				</option>
+				<option>
+					<option_id>71</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>72</option_id>
+					<name>required</name>
+					<value>1</value>
+				</option>
+				<option>
+					<option_id>73</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>11</field_id>
 				<name>Send To</name>
+				<alias>send_to</alias>
 				<type>DispositionEmail</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>11</order_by>
 				<option>
-					<option_id>44</option_id>
+					<option_id>74</option_id>
 					<name>email_subject</name>
 					<value>Contact Form Submission</value>
 				</option>
 				<option>
-					<option_id>45</option_id>
+					<option_id>75</option_id>
 					<name>email_from_name</name>
 					<value>Power Forms</value>
 				</option>
 				<option>
-					<option_id>46</option_id>
+					<option_id>76</option_id>
 					<name>email_from_address</name>
 					<value>me@overhere.com</value>
 				</option>
 				<option>
-					<option_id>47</option_id>
+					<option_id>77</option_id>
 					<name>destination_address</name>
 					<value>you@overthere.net</value>
 				</option>
 				<option>
-					<option_id>48</option_id>
+					<option_id>78</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>49</option_id>
+					<option_id>79</option_id>
 					<name>html_email</name>
 					<value>1</value>
 				</option>
 				<option>
-					<option_id>50</option_id>
+					<option_id>80</option_id>
 					<name>email_template</name>
 					<value><h1>PowerForms Submission</h1>
 <strong>Date of submission</strong>: {$sub_date}<br />
@@ -615,33 +741,61 @@ Message: {$fld_10}</value>
 {if $fld_19 != "" && $fld_19 != "[unspecified]"}<strong>Send To</strong>: {$fld_19}<br />{/if}</value>
 				</option>
 				<option>
-					<option_id>51</option_id>
+					<option_id>81</option_id>
 					<name>email_encoding</name>
 					<value>utf-8</value>
+				</option>
+				<option>
+					<option_id>82</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>83</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>84</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 			<field>
 				<field_id>12</field_id>
 				<name>Contact Fieldset End</name>
+				<alias>contact_fieldset_end</alias>
 				<type>FieldsetEnd</type>
-				<validation_type></validation_type>
-				<required>0</required>
-				<hide_label>0</hide_label>
 				<order_by>12</order_by>
 				<option>
-					<option_id>52</option_id>
+					<option_id>85</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>53</option_id>
+					<option_id>86</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>54</option_id>
+					<option_id>87</option_id>
 					<name>helptext</name>
 					<value></value>
+				</option>
+				<option>
+					<option_id>88</option_id>
+					<name>validation_type</name>
+					<value></value>
+				</option>
+				<option>
+					<option_id>89</option_id>
+					<name>required</name>
+					<value>0</value>
+				</option>
+				<option>
+					<option_id>90</option_id>
+					<name>hide_label</name>
+					<value>0</value>
 				</option>
 			</field>
 		</fields>
