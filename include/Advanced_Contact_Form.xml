@@ -34,33 +34,33 @@
 	<count>1</count>
 	<form>
 		<properties>
-			<form_id>2</form_id>
+			<form_id>1</form_id>
 			<name>Advanced Contact Form</name>
 			<alias>advanced_contact</alias>
 		</properties>
 		<attributes>
 			<attribute>
-				<form_attr_id>24</form_attr_id>
+				<form_attr_id>1</form_attr_id>
 				<name>list_delimiter</name>
 				<value>,</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>25</form_attr_id>
+				<form_attr_id>2</form_attr_id>
 				<name>css_class</name>
 				<value>advancedcontactform</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>26</form_attr_id>
+				<form_attr_id>3</form_attr_id>
 				<name>submit_action</name>
 				<value>text</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>27</form_attr_id>
+				<form_attr_id>4</form_attr_id>
 				<name>validate_udt</name>
 				<value>-1</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>28</form_attr_id>
+				<form_attr_id>5</form_attr_id>
 				<name>submission_template</name>
 				<value><p>Thank you, <strong>{$your_name}</strong>.</p>
 <p>Your submission has been successful. You may wish to print this page as a reference.</p>
@@ -85,12 +85,12 @@
 </p></value>
 			</attribute>
 			<attribute>
-				<form_attr_id>29</form_attr_id>
+				<form_attr_id>6</form_attr_id>
 				<name>predisplay_udt</name>
 				<value>-1</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>30</form_attr_id>
+				<form_attr_id>7</form_attr_id>
 				<name>form_template</name>
 				<value>{* DEFAULT FORM LAYOUT / pure CSS *}
 {if $form_done}
@@ -174,74 +174,74 @@
 {/if}</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>31</form_attr_id>
+				<form_attr_id>8</form_attr_id>
 				<name>redirect_page</name>
 				<value>-1</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>32</form_attr_id>
+				<form_attr_id>9</form_attr_id>
 				<name>input_button_safety</name>
 				<value>0</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>33</form_attr_id>
+				<form_attr_id>10</form_attr_id>
 				<name>submit_button_text</name>
 				<value>Submit Form</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>34</form_attr_id>
+				<form_attr_id>11</form_attr_id>
 				<name>unspecified</name>
 				<value>[unspecified]</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>35</form_attr_id>
+				<form_attr_id>12</form_attr_id>
 				<name>required_field_symbol</name>
 				<value>*</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>36</form_attr_id>
+				<form_attr_id>13</form_attr_id>
 				<name>captcha_wrong</name>
 				<value>The entered text was not correct.</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>37</form_attr_id>
+				<form_attr_id>14</form_attr_id>
 				<name>prev_button_text</name>
 				<value>Back...</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>38</form_attr_id>
+				<form_attr_id>15</form_attr_id>
 				<name>use_captcha</name>
 				<value>0</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>39</form_attr_id>
+				<form_attr_id>16</form_attr_id>
 				<name>inline</name>
 				<value>0</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>40</form_attr_id>
+				<form_attr_id>17</form_attr_id>
 				<name>submit_javascript</name>
 				<value></value>
 			</attribute>
 			<attribute>
-				<form_attr_id>41</form_attr_id>
+				<form_attr_id>18</form_attr_id>
 				<name>next_button_text</name>
 				<value>Continue...</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>42</form_attr_id>
+				<form_attr_id>19</form_attr_id>
 				<name>title_user_captcha</name>
 				<value>Help prevent abuse by spammers, enter the text from the image.</value>
 			</attribute>
 			<attribute>
-				<form_attr_id>43</form_attr_id>
+				<form_attr_id>20</form_attr_id>
 				<name>predisplay_each_udt</name>
 				<value>-1</value>
 			</attribute>
 		</attributes>
 		<fields>
 			<field>
-				<field_id>9</field_id>
+				<field_id>1</field_id>
 				<name>About You Fieldset</name>
 				<type>FieldsetStart</type>
 				<validation_type></validation_type>
@@ -249,33 +249,33 @@
 				<hide_label>0</hide_label>
 				<order_by>1</order_by>
 				<option>
-					<option_id>76</option_id>
+					<option_id>1</option_id>
 					<name>legend</name>
 					<value>About You</value>
 				</option>
 				<option>
-					<option_id>77</option_id>
+					<option_id>2</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>78</option_id>
+					<option_id>3</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>79</option_id>
+					<option_id>4</option_id>
 					<name>helptext</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>80</option_id>
+					<option_id>5</option_id>
 					<name>javascript</name>
 					<value></value>
 				</option>
 			</field>
 			<field>
-				<field_id>10</field_id>
+				<field_id>2</field_id>
 				<name>Your Name</name>
 				<type>FromEmailNameField</type>
 				<validation_type></validation_type>
@@ -283,28 +283,28 @@
 				<hide_label>0</hide_label>
 				<order_by>2</order_by>
 				<option>
-					<option_id>81</option_id>
+					<option_id>6</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>82</option_id>
+					<option_id>7</option_id>
 					<name>field_alias</name>
 					<value>users_name</value>
 				</option>
 				<option>
-					<option_id>83</option_id>
+					<option_id>8</option_id>
 					<name>helptext</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>84</option_id>
+					<option_id>9</option_id>
 					<name>javascript</name>
 					<value></value>
 				</option>
 			</field>
 			<field>
-				<field_id>11</field_id>
+				<field_id>3</field_id>
 				<name>Your Email Address</name>
 				<type>DispositionFromEmailAddressField</type>
 				<validation_type>none</validation_type>
@@ -312,42 +312,42 @@
 				<hide_label>0</hide_label>
 				<order_by>3</order_by>
 				<option>
-					<option_id>85</option_id>
+					<option_id>10</option_id>
 					<name>email_subject</name>
 					<value>Email from Site</value>
 				</option>
 				<option>
-					<option_id>86</option_id>
+					<option_id>11</option_id>
 					<name>email_from_name</name>
 					<value>Power Forms</value>
 				</option>
 				<option>
-					<option_id>87</option_id>
+					<option_id>12</option_id>
 					<name>send_user_copy</name>
 					<value>c</value>
 				</option>
 				<option>
-					<option_id>88</option_id>
+					<option_id>13</option_id>
 					<name>send_user_label</name>
 					<value>Send me a copy of form</value>
 				</option>
 				<option>
-					<option_id>89</option_id>
+					<option_id>14</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>90</option_id>
+					<option_id>15</option_id>
 					<name>javascript</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>91</option_id>
+					<option_id>16</option_id>
 					<name>html_email</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>92</option_id>
+					<option_id>17</option_id>
 					<name>email_template</name>
 					<value>PowerForms Submission
 Date of submission: {$sub_date}
@@ -358,20 +358,20 @@ URL of page containing form: {$form_url}
 PowerForms version: {$version}
 ->
 ----------------------------------------------
-Your Name: {$fld_12}
-Your Email Address: {$fld_43}
-Email Again: {$fld_42}
-Subject: {$fld_17}
-Message: {$fld_18}</value>
+Your Name: {$fld_2}
+Your Email Address: {$fld_3}
+Email Again: {$fld_4}
+Subject: {$fld_9}
+Message: {$fld_10}</value>
 				</option>
 				<option>
-					<option_id>93</option_id>
+					<option_id>18</option_id>
 					<name>email_encoding</name>
 					<value>utf-8</value>
 				</option>
 			</field>
 			<field>
-				<field_id>12</field_id>
+				<field_id>4</field_id>
 				<name>Email Again</name>
 				<type>FromEmailAddressAgainField</type>
 				<validation_type></validation_type>
@@ -379,23 +379,23 @@ Message: {$fld_18}</value>
 				<hide_label>0</hide_label>
 				<order_by>4</order_by>
 				<option>
-					<option_id>94</option_id>
+					<option_id>19</option_id>
 					<name>field_to_validate</name>
 					<value>Your Email Address</value>
 				</option>
 				<option>
-					<option_id>95</option_id>
+					<option_id>20</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>96</option_id>
+					<option_id>21</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 			</field>
 			<field>
-				<field_id>13</field_id>
+				<field_id>5</field_id>
 				<name>About You Fieldset End</name>
 				<type>FieldsetEnd</type>
 				<validation_type></validation_type>
@@ -403,23 +403,23 @@ Message: {$fld_18}</value>
 				<hide_label>0</hide_label>
 				<order_by>5</order_by>
 				<option>
-					<option_id>97</option_id>
+					<option_id>22</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>98</option_id>
+					<option_id>23</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>99</option_id>
+					<option_id>24</option_id>
 					<name>helptext</name>
 					<value></value>
 				</option>
 			</field>
 			<field>
-				<field_id>14</field_id>
+				<field_id>6</field_id>
 				<name>breaker</name>
 				<type>PageBreakField</type>
 				<validation_type></validation_type>
@@ -427,13 +427,13 @@ Message: {$fld_18}</value>
 				<hide_label>0</hide_label>
 				<order_by>6</order_by>
 				<option>
-					<option_id>100</option_id>
+					<option_id>25</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 			</field>
 			<field>
-				<field_id>15</field_id>
+				<field_id>7</field_id>
 				<name>Contact Fieldset</name>
 				<type>FieldsetStart</type>
 				<validation_type></validation_type>
@@ -441,33 +441,33 @@ Message: {$fld_18}</value>
 				<hide_label>0</hide_label>
 				<order_by>7</order_by>
 				<option>
-					<option_id>101</option_id>
+					<option_id>26</option_id>
 					<name>legend</name>
 					<value>Contact</value>
 				</option>
 				<option>
-					<option_id>102</option_id>
+					<option_id>27</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>103</option_id>
+					<option_id>28</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>104</option_id>
+					<option_id>29</option_id>
 					<name>helptext</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>105</option_id>
+					<option_id>30</option_id>
 					<name>javascript</name>
 					<value></value>
 				</option>
 			</field>
 			<field>
-				<field_id>16</field_id>
+				<field_id>8</field_id>
 				<name>Greeting</name>
 				<type>StaticTextField</type>
 				<validation_type></validation_type>
@@ -475,38 +475,38 @@ Message: {$fld_18}</value>
 				<hide_label>0</hide_label>
 				<order_by>8</order_by>
 				<option>
-					<option_id>106</option_id>
+					<option_id>31</option_id>
 					<name>text</name>
 					<value>Hello, {$users_name->value}!<br /> What is it you'd like to talk to us about?</value>
 				</option>
 				<option>
-					<option_id>107</option_id>
+					<option_id>32</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>108</option_id>
+					<option_id>33</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>109</option_id>
+					<option_id>34</option_id>
 					<name>helptext</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>110</option_id>
+					<option_id>35</option_id>
 					<name>javascript</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>111</option_id>
+					<option_id>36</option_id>
 					<name>smarty_eval</name>
 					<value>1</value>
 				</option>
 			</field>
 			<field>
-				<field_id>17</field_id>
+				<field_id>9</field_id>
 				<name>Subject</name>
 				<type>FromEmailSubjectField</type>
 				<validation_type></validation_type>
@@ -514,13 +514,13 @@ Message: {$fld_18}</value>
 				<hide_label>0</hide_label>
 				<order_by>9</order_by>
 				<option>
-					<option_id>112</option_id>
+					<option_id>37</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 			</field>
 			<field>
-				<field_id>18</field_id>
+				<field_id>10</field_id>
 				<name>Message</name>
 				<type>TextAreaField</type>
 				<validation_type></validation_type>
@@ -528,38 +528,38 @@ Message: {$fld_18}</value>
 				<hide_label>0</hide_label>
 				<order_by>10</order_by>
 				<option>
-					<option_id>113</option_id>
+					<option_id>38</option_id>
 					<name>rows</name>
 					<value>5</value>
 				</option>
 				<option>
-					<option_id>114</option_id>
+					<option_id>39</option_id>
 					<name>cols</name>
 					<value>60</value>
 				</option>
 				<option>
-					<option_id>115</option_id>
+					<option_id>40</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>116</option_id>
+					<option_id>41</option_id>
 					<name>field_alias</name>
 					<value>message</value>
 				</option>
 				<option>
-					<option_id>117</option_id>
+					<option_id>42</option_id>
 					<name>default</name>
 					<value>Enter Your Message Here</value>
 				</option>
 				<option>
-					<option_id>118</option_id>
+					<option_id>43</option_id>
 					<name>clear_default</name>
 					<value>1</value>
 				</option>
 			</field>
 			<field>
-				<field_id>19</field_id>
+				<field_id>11</field_id>
 				<name>Send To</name>
 				<type>DispositionEmail</type>
 				<validation_type></validation_type>
@@ -567,37 +567,37 @@ Message: {$fld_18}</value>
 				<hide_label>0</hide_label>
 				<order_by>11</order_by>
 				<option>
-					<option_id>119</option_id>
+					<option_id>44</option_id>
 					<name>email_subject</name>
 					<value>Contact Form Submission</value>
 				</option>
 				<option>
-					<option_id>120</option_id>
+					<option_id>45</option_id>
 					<name>email_from_name</name>
 					<value>Power Forms</value>
 				</option>
 				<option>
-					<option_id>121</option_id>
+					<option_id>46</option_id>
 					<name>email_from_address</name>
 					<value>me@overhere.com</value>
 				</option>
 				<option>
-					<option_id>122</option_id>
+					<option_id>47</option_id>
 					<name>destination_address</name>
 					<value>you@overthere.net</value>
 				</option>
 				<option>
-					<option_id>123</option_id>
+					<option_id>48</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>124</option_id>
+					<option_id>49</option_id>
 					<name>html_email</name>
 					<value>1</value>
 				</option>
 				<option>
-					<option_id>125</option_id>
+					<option_id>50</option_id>
 					<name>email_template</name>
 					<value><h1>PowerForms Submission</h1>
 <strong>Date of submission</strong>: {$sub_date}<br />
@@ -607,21 +607,21 @@ Message: {$fld_18}</value>
 <strong>Form name</strong>: {$form_name}<br />
 <strong>PowerForms version</strong>: {$version}<br />
 <hr />
-{if $fld_10 != "" && $fld_10 != "[unspecified]"}<strong>Your Name</strong>: {$fld_10}<br />{/if}
-{if $fld_11 != "" && $fld_11 != "[unspecified]"}<strong>Your Email Address</strong>: {$fld_11}<br />{/if}
-{if $fld_12 != "" && $fld_12 != "[unspecified]"}<strong>Email Again</strong>: {$fld_12}<br />{/if}
-{if $fld_17 != "" && $fld_17 != "[unspecified]"}<strong>Subject</strong>: {$fld_17}<br />{/if}
-{if $fld_18 != "" && $fld_18 != "[unspecified]"}<strong>Message</strong>: {$fld_18}<br />{/if}
+{if $fld_2 != "" && $fld_2 != "[unspecified]"}<strong>Your Name</strong>: {$fld_2}<br />{/if}
+{if $fld_3 != "" && $fld_3 != "[unspecified]"}<strong>Your Email Address</strong>: {$fld_3}<br />{/if}
+{if $fld_4 != "" && $fld_4 != "[unspecified]"}<strong>Email Again</strong>: {$fld_4}<br />{/if}
+{if $fld_9 != "" && $fld_9 != "[unspecified]"}<strong>Subject</strong>: {$fld_9}<br />{/if}
+{if $fld_10 != "" && $fld_10 != "[unspecified]"}<strong>Message</strong>: {$fld_10}<br />{/if}
 {if $fld_19 != "" && $fld_19 != "[unspecified]"}<strong>Send To</strong>: {$fld_19}<br />{/if}</value>
 				</option>
 				<option>
-					<option_id>126</option_id>
+					<option_id>51</option_id>
 					<name>email_encoding</name>
 					<value>utf-8</value>
 				</option>
 			</field>
 			<field>
-				<field_id>20</field_id>
+				<field_id>12</field_id>
 				<name>Contact Fieldset End</name>
 				<type>FieldsetEnd</type>
 				<validation_type></validation_type>
@@ -629,17 +629,17 @@ Message: {$fld_18}</value>
 				<hide_label>0</hide_label>
 				<order_by>12</order_by>
 				<option>
-					<option_id>127</option_id>
+					<option_id>52</option_id>
 					<name>field_alias</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>128</option_id>
+					<option_id>53</option_id>
 					<name>css_class</name>
 					<value></value>
 				</option>
 				<option>
-					<option_id>129</option_id>
+					<option_id>54</option_id>
 					<name>helptext</name>
 					<value></value>
 				</option>
