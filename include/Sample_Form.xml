@@ -286,7 +286,7 @@
 					<name>email_template</name>
 					<value><h1>Someone's Testing a PowerForms Submission!</h1>
 <strong>Date submitted</strong>: {$sub_date}<br />
-<strong>IP address from which form was submitted</strong>: {$sub_source_ip}<br />
+<strong>IP address from which form was submitted</strong>: {$sub_source}<br />
 <strong>Form server</strong>: {$form_host}<br />
 <strong>URL of page containing form</strong>: {$form_url}<br />
 <strong>Form name</strong>: {$form_name}<br />
