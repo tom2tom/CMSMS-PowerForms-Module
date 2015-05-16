@@ -285,11 +285,11 @@
 					<option_id>7</option_id>
 					<name>email_template</name>
 					<value><h1>Someone's Testing a PowerForms Submission!</h1>
-<strong>Form Name</strong>: {$sub_form_name}<br />
-<strong>Date of Submission</strong>: {$sub_date}<br />
-<strong>Your server</strong>: {$sub_host}<br />
-<strong>IP address of person using form</strong>: {$sub_source_ip}<br />
-<strong>URL of page containing form</strong>: {$sub_url}<br />
+<strong>Date submitted</strong>: {$sub_date}<br />
+<strong>IP address from which form was submitted</strong>: {$sub_source_ip}<br />
+<strong>Form server</strong>: {$form_host}<br />
+<strong>URL of page containing form</strong>: {$form_url}<br />
+<strong>Form name</strong>: {$form_name}<br />
 <hr />
 <strong>Modules you'll be using together</strong>: {$modules_you_ll_be_using}<br />
 <strong>What will you personally be doing on your CMS MS site?</strong>: {$what_will_you}<br />
