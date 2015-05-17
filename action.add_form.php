@@ -57,7 +57,7 @@ if(isset($params['form_id']))
 	$t = $this->Lang('copy');
 	$name = pwfUtils::GetFormNameFromID($params['form_id']);
 	if($name)
-		$name .= ' '.$t
+		$name .= ' '.$t;
 	$alias = pwfUtils::GetFormAliasFromID($params['form_id']);
 	if($alias)
 		$alias .= '_'.pwfUtils::MakeAlias($t);
