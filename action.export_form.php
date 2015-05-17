@@ -7,25 +7,30 @@
 
 if(!isset($params['form_id']) && isset($params['form']))
 {
-	// get the form by name, not ID
-	$params['form_id'] = $this->GetFormIDFromAlias($params['form']);
+	// got the form by alias, not ID
+	$params['form_id'] = pwfUtils::GetFormIDFromAlias($params['form']);
 }
+if(empty($params['form_id']) || $params['form_id'] == -1) exit; //TODO feedback
 
-$funcs = new pwfUtils($this,$params,true);
-$spec = $funcs->GetName().".xml";
-$spec = preg_replace('/[^\w\d\.\-\_]/','_',$spec);
-$xmlstr = $funcs->ExportXML(isset($params['pwfp_export_values'])?true:false);
+$fn = $this->GetName().$this->Lang('export').'-'.
+	pwfUtils::GetFormNameFromID($params['form_id']).'-'.date('Y-m-d-H-i').'.xml';
+$fn = preg_replace('/[^\w\-.]/','_',$fn);
+
+$funcs = new pwfFormOperations();
+//TODO $param['export_values'] not used anywhere
+$xmlstr = $funcs->CreateXML($this,$params['form_id'],date('Y-m-d H:i:s'),
+	isset($params['export_values'])); //no charset
 
 @ob_clean();
 @ob_clean();
 header('Pragma: public');
 header('Expires: 0');
 header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-header('Cache-Control: private',false);
+header('Cache-Control: private',FALSE);
 header('Content-Description: File Transfer');
 header('Content-Type: application/force-download; charset=utf-8');
-header('Content-Length: ' . strlen($xmlstr));
-header('Content-Disposition: attachment; filename=' . $spec);
+header('Content-Length: '.strlen($xmlstr));
+header('Content-Disposition: attachment; filename='.$fn);
 echo $xmlstr;
 exit;
 ?>
