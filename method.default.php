@@ -95,18 +95,13 @@ TODO	if($one->GetFieldType() == 'FileUploadField')
 		}
 		continue;
 	}
-	$oneset = new stdClass();
-	
-	if($one->GetAlias() != '')
-	{
-		$smarty->assign($one->GetAlias(),$oneset);
-		$oneset->alias = $one->GetAlias();
-	}
-	else
-	{
-		$oneset->alias = $name_alias;
-	}
 
+	$oneset = new stdClass();
+	$alias = $one->GetAlias();
+	if(!$alias)
+		$alias = $one->GetVariableName();
+
+	$oneset->alias = $alias;
 	$oneset->css_class = $one->GetOption('css_class');
 	$oneset->display = $one->DisplayInForm()?1:0;
 	$oneset->error = $one->GetOption('is_valid',TRUE)?'':$one->validationErrorText;
@@ -118,7 +113,7 @@ TODO	if($one->GetFieldType() == 'FileUploadField')
 	else
 		$oneset->hide_name = 0;
 	$oneset->id = $one->GetId();
-	$oneset->input = $one->GetFieldInput($id, $params, $returnid);
+	$oneset->input = $one->GetFieldInput($id,$params,$returnid);
 	$oneset->input_id = $one->GetCSSId();
 	$oneset->label_parts = $one->LabelSubComponents()?1:0;
 	$oneset->logic = $one->GetFieldLogic();
@@ -133,12 +128,7 @@ TODO	if($one->GetFieldType() == 'FileUploadField')
 	$oneset->values = $one->GetAllHumanReadableValues();
 //	$oneset->valid = $one->GetOption('is_valid',TRUE)?1:0;
 
-	$name_alias = $one->GetName();
-	$name_alias = str_replace($toreplace, $replacement, $name_alias);
-	$name_alias = strtolower($name_alias);
-	$name_alias = preg_replace('/[^a-z0-9]+/i','_',$name_alias);
-	$smarty->assign($name_alias,$oneset);
-
+	$smarty->assign($alias,$oneset); //CHECKME by ref ?
 	$fields[$oneset->input_id] = $oneset;
 //	$fields[] = $oneset;
 }
