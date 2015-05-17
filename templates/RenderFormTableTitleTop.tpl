@@ -3,39 +3,38 @@
 {assign var="cols" value="3"}
 <script type="text/javascript">
 //<![CDATA[{literal}
-function fbht(htid) {
- var fbhtc=document.getElementById(htid);
- if(fbhtc) {
-  if(fbhtc.style.display == 'none') {
-	fbhtc.style.display = 'inline';
-} else {
-    fbhtc.style.display = 'none';
-}
+function help_toggle(htid) {
+ var help_container=document.getElementById(htid);
+ if(help_container) {
+  if(help_container.style.display == 'none') {
+	help_container.style.display = 'inline';
+  } else {
+    help_container.style.display = 'none';
+  }
  }
 }
 {/literal}//]]>
 </script>
-{$fb_form_header}
-{if $fb_form_done == 1}
-	{* This first section is for displaying submission errors *}
-	{if $fb_submission_error}
-		<div class="error_message">{$fb_submission_error}</div>
-		{if $fb_show_submission_errors}
+{if $form_done}
+	{* This section is for displaying submission-errors *}
+	{if !empty($submission_error)}
+		<div class="error_message">{$submission_error}</div>
+		{if $show_submission_errors}
 			<table class="error">
-			{foreach from=$fb_submission_error_list item=thisErr}
-				<tr><td>{$thisErr}</td></tr>
+			{foreach from=$submission_error_list item=one}
+				<tr><td>{$one}</td></tr>
 			{/foreach}
 			</table>
 		{/if}
 	{/if}
 {else}
-	{* this section is for displaying the form *}
+	{* This section is for displaying the form *}
 	{* we start with validation errors *}
-	{if $fb_form_has_validation_errors}
+	{if $form_has_validation_errors}
 		<div class="error_message">
 		<ul>
-		{foreach from=$fb_form_validation_errors item=thisErr}
-			<li>{$thisErr}</li>
+		{foreach from=$form_validation_errors item=one}
+			<li>{$one}</li>
 		{/foreach}
 		</ul>
 		</div>
@@ -45,48 +44,40 @@ function fbht(htid) {
 	{/if}
 
 	{* and now the form itself *}
-	{$fb_form_start}
-	<div>{$fb_hidden}</div>
+	{$form_start}
+	<div>{$hidden}</div>
 
 	<table{if $css_class != ''} class="{$css_class}"{/if}>
 	{if $total_pages gt 1}<tr><td colspan="2">{$title_page_x_of_y}</td></tr>{/if}
-	{foreach from=$fields item=entry}
-		{if $entry->display == 1 &&
-			$entry->type != '-Fieldset Start' &&
-			$entry->type != '-Fieldset End' }
+	{foreach from=$fields item=one}
+		{strip}
+		{if $one->display &&
+			$one->type != '-Fieldset Start' &&
+			$one->type != '-Fieldset End' }
 		<tr>
-			{strip}
-			<td valign="top"
-			{if $entry->required == 1 || $entry->css_class != ''} class=" 
-				{if $entry->required == 1}
-					required
-				{/if}
-				{if $entry->required == 1 && $entry->css_class != ''} {/if}
-				{if $entry->css_class != ''}
-					{$entry->css_class}
-				{/if}
+			<td style="vertical-align:top;"
+			{if $one->required || $one->css_class} class=" 
+				{if $one->required}required {/if}
+				{if $one->css_class}{$one->css_class}{/if}
 				"
 			{/if}
 			>
-			{if $entry->hide_name == 0}
-				{$entry->name}
-				{if $entry->required_symbol != ''}
-					{$entry->required_symbol}
-				{/if}
+			{if !$one->hide_name}{$one->name}
+			{if $one->required_symbol}{$one->required_symbol}{/if}
 			{/if}
-			</td></tr><tr><td align="left" valign="top"{if $entry->css_class != ''} class="{$entry->css_class}"{/if}>
-			{if $entry->multiple_parts == 1}
+			</td></tr><tr><td style="text-align:left;vertical-align:top;"{if $one->css_class} class="{$one->css_class}"{/if}>
+			{if $one->multiple_parts}
 			<table>
 				<tr>
-				{section name=numloop loop=$entry->input}
-					<td>{$entry->input[numloop]->input}&nbsp;{$entry->input[numloop]->name}	{if !empty($entry->input[numloop]->op)}&nbsp;{$entry->input[numloop]->op}{/if}</td>
+				{section name=numloop loop=$one->input}
+					<td>{$one->input[numloop]->input}&nbsp;{$one->input[numloop]->name}	{if !empty($one->input[numloop]->op)}&nbsp;{$one->input[numloop]->op}{/if}</td>
 					{if not ($smarty.section.numloop.rownum mod $cols)}
 						{if not $smarty.section.numloop.last}
 				</tr><tr>
 						{/if}
 					{/if}
 					{if $smarty.section.numloop.last}
-						{math equation = "n - a % n" n=$cols a=$entry->input|@count assign="cells"}
+						{math equation = "n - a % n" n=$cols a=$one->input|@count assign="cells"}
 						{if $cells ne $cols}
 							{section name=pad loop=$cells}
 								<td>&nbsp;</td>
@@ -97,21 +88,20 @@ function fbht(htid) {
 				{/section}
 			</table>
 			{else}
-				{if $entry->smarty_eval == '1'}{eval var=$entry->input}{else}{$entry->input}{/if}
+				{if $one->smarty_eval}{eval var=$one->input}{else}{$one->input}{/if}
 			{/if}
-			{if $entry->valid == 0} &lt;--- {$entry->error}{/if}
-			{if $entry->helptext != ''}&nbsp;<a href="javascript:fbht('{$entry->field_helptext_id}')">
-				<img src="modules/FormBuilder/images/info-small.gif" alt="Help" title="help" /></a>
-				<span id="{$entry->field_helptext_id}" style="display:none" class="fbr_helptext">{$entry->helptext}</span>{/if}
+			{if !$one->valid} &lt;--- {$one->error}{/if}
+			{if $one->helptext != ''}&nbsp;<a href="javascript:help_toggle('{$one->field_helptext_id}')">
+				<img src="modules/PowerForms/images/info-small.gif" alt="Help" title="help" /></a>
+				<span id="{$one->field_helptext_id}" class="pwf_helptext">{$one->helptext}</span>{/if}
 			</td></tr>
-			{/strip}
 		{/if}
+		{/strip}
 	{/foreach}
-	{if $has_captcha == 1}
+	{if !empty($has_captcha)}
 	<tr><td>{$graphic_captcha}</td></tr><tr><td>{$input_captcha}<br />{$title_captcha}</td></tr>
 	{/if}
 	<tr><td>{$prev}</td></tr><tr><td>{$submit}</td></tr>
-</table>
-{$fb_form_end}
+	</table>
+	{$form_end}
 {/if}
-{$fb_form_footer}

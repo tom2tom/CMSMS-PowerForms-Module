@@ -1,40 +1,40 @@
 {* DEFAULT FORM LAYOUT / pure CSS *}
 <script type="text/javascript">
 //<![CDATA[{literal}
-function fbht(htid) {
- var fbhtc=document.getElementById(htid);
- if(fbhtc) {
-  if(fbhtc.style.display == 'none') {
-	fbhtc.style.display = 'inline';
-} else {
-    fbhtc.style.display = 'none';
-}
+function help_toggle(htid) {
+ var help_container=document.getElementById(htid);
+ if(help_container) {
+  if(help_container.style.display == 'none') {
+	help_container.style.display = 'inline';
+  } else {
+    help_container.style.display = 'none';
+  }
  }
 }
 {/literal}//]]>
 </script>
-{$fb_form_header}
-{if $fb_form_done == 1}
-	{* This first section is for displaying submission errors *}
-	{if isset($fb_submission_error) && $fb_submission_error}
-		<div class="error_message">{$fb_submission_error}</div>
-		{if isset($fb_show_submission_errors) && $fb_show_submission_errors}
+{if $form_done}
+	{* This section is for displaying submission-errors *}
+	{if !empty($submission_error)}
+		<div class="error_message">{$submission_error}</div>
+		{if $show_submission_errors}
 			<div class="error">
 			<ul>
-			{foreach from=$fb_submission_error_list item=thisErr}
-				<li>{$thisErr}</li>
+			{foreach from=$submission_error_list item=one}
+				<li>{$one}</li>
 			{/foreach}
 			</ul>
 		</div>
 		{/if}
 	{/if}
 {else}
-	{* this section is for displaying the form, we start with validation errors *}
-	{if isset($fb_form_has_validation_errors) && $fb_form_has_validation_errors}
+	{* This section is for displaying the form *}
+	{* we start with validation errors *}
+	{if !empty($form_has_validation_errors)}
 		<div class="error_message">
 		<ul>
-		{foreach from=$fb_form_validation_errors item=thisErr}
-			<li>{$thisErr}</li>
+		{foreach from=$form_validation_errors item=one}
+			<li>{$one}</li>
 		{/foreach}
 		</ul>
 		</div>
@@ -42,59 +42,55 @@ function fbht(htid) {
 	{if !empty($captcha_error)}
 		<div class="error_message">{$captcha_error}</div>
 	{/if}
-
 	{* and now the form itself *}
-	{$fb_form_start}
-	<div>{$fb_hidden}</div>
-	<div{if $css_class != ''} class="{$css_class}"{/if}>
+	{$form_start}
+	<div>{$hidden}</div>
+	<div{if $css_class} class="{$css_class}"{/if}>
 	{if $total_pages gt 1}<span>{$title_page_x_of_y}</span>{/if}
-	{foreach from=$fields item=entry}
-		{if $entry->display == 1}
-			{strip}
-			{if $entry->needs_div == 1}
+	{foreach from=$fields item=one}
+		{strip}
+		{if $one->display}
+			{if $one->needs_div}
 				<div
-				{if $entry->required == 1 || $entry->css_class != '' || $entry->valid == 0} class="
-					{if $entry->required == 1}required{/if}
-					{if $entry->css_class != ''} {$entry->css_class}{/if}
-					{if $entry->valid == 0} fb_invalid{/if}
+				{if $one->required || $one->css_class || !$one->valid} class="
+					{if $one->required}required {/if}
+					{if $one->css_class}{$one->css_class} {/if}
+					{if !$one->valid}pwf_invalid{/if}
 					"
 				{/if}
 				>
 			{/if}
-			{if $entry->hide_name == 0}
-				<label{if $entry->multiple_parts != 1} for="{$entry->input_id}"{/if}>{$entry->name}
-				{if $entry->required_symbol != ''}
-					{$entry->required_symbol}
-				{/if}
+			{if !$one->hide_name}
+				<label{if $one->multiple_parts != 1} for="{$one->input_id}"{/if}>{$one->name}
+				{if $one->required_symbol}{$one->required_symbol}{/if}
 				</label>
 			{/if}
-			{if $entry->multiple_parts == 1}
-				{section name=numloop loop=$entry->input}
-					{if $entry->label_parts == 1}
-						<div>{$entry->input[numloop]->input}&nbsp;{$entry->input[numloop]->name}</div>
+			{if $one->multiple_parts}
+				{section name=numloop loop=$one->input}
+					{if $one->label_parts}
+						<div>{$one->input[numloop]->input}&nbsp;{$one->input[numloop]->name}</div>
 					{else}
-						{$entry->input[numloop]->input}
+						{$one->input[numloop]->input}
 					{/if}
-					{if !empty($entry->input[numloop]->op)}{$entry->input[numloop]->op}{/if}
+					{if !empty($one->input[numloop]->op)}{$one->input[numloop]->op}{/if}
 				{/section}
 			{else}
-				{if $entry->smarty_eval == '1'}{eval var=$entry->input}{else}{$entry->input}{/if}
+				{if $one->smarty_eval}{eval var=$one->input}{else}{$one->input}{/if}
 			{/if}
-			{if $entry->helptext != ''}&nbsp;<a href="javascript:fbht('{$entry->field_helptext_id}')">
-				<img src="modules/FormBuilder/images/info-small.gif" alt="Help" title="help" /></a>
-				<span id="{$entry->field_helptext_id}" style="display:none" class="fbr_helptext">{$entry->helptext}</span>{/if}
-			{if $entry->valid == 0} &lt;--- {$entry->error}{/if}
-			{if $entry->needs_div == 1}
+			{if $one->helptext != ''}&nbsp;<a href="javascript:help_toggle('{$one->field_helptext_id}')">
+				<img src="modules/PowerForms/images/info-small.gif" alt="Help" title="help" /></a>
+				<span id="{$one->field_helptext_id}" class="pwf_helptext">{$one->helptext}</span>{/if}
+			{if !$one->valid} &lt;--- {$one->error}{/if}
+			{if $one->needs_div}
 				</div>
 			{/if}
-			{/strip}
 		{/if}
+		{/strip}
 	{/foreach}
-	{if $has_captcha == 1}
-		<div class="captcha">{$graphic_captcha}{$title_captcha}<br />{$input_captcha}</div>
+	{if !empty($has_captcha)}
+		<div class="captcha">{$graphic_captcha}{$title_captcha}<br />{$input_captcha}<br /></div>
 	{/if}
-	<div class="submit">{$prev}{$submit}</div>
+	<div class="submit">{$prev} {$submit}</div>
 	</div>
-	{$fb_form_end}
+	{$form_end}
 {/if}
-{$fb_form_footer}
