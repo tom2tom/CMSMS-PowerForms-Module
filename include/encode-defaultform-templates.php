@@ -167,24 +167,22 @@ $templates['Contact_form'] =<<<EOS
 	{* and now the form itself *}
 	{\$form_start}
 	<div>{\$hidden}</div>
-	<div{if \$css_class != ''} class="{\$css_class}"{/if}>
+	<div{if \$css_class} class="{\$css_class}"{/if}>
 	{if \$total_pages gt 1}<span>{\$title_page_x_of_y}</span>{/if}
 	{foreach from=\$fields item=one}
 	{strip}
 		{if \$one->display}
 			{if \$one->needs_div}
 				<div
-{if \$one->required || \$one->css_class != '' || !\$one->valid} class="
-{if \$one->required}required{/if}{if \$one->css_class} {\$one->css_class}{/if}{if !\$one->valid} pwf_invalid{/if}
+{if \$one->required || \$one->css_class || !\$one->valid} class="
+{if \$one->required}required {/if}{if \$one->css_class}{\$one->css_class} {/if}{if !\$one->valid}pwf_invalid{/if}
 "
 {/if}
 				>
 			{/if}
 			{if !\$one->hide_name}
 				<label{if \$one->multiple_parts != 1} for="{\$one->input_id}"{/if}>{\$one->name}
-				{if \$one->required_symbol != ''}
-					{\$one->required_symbol}
-				{/if}
+				{if \$one->required_symbol}{\$one->required_symbol}{/if}
 				</label>
 			{/if}
 			{if \$one->multiple_parts}
