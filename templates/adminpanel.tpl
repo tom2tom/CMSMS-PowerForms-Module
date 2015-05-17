@@ -4,7 +4,7 @@
 {if !empty($forms)}
 {$start_formsform}
 <div style="overflow:auto;">
-<table class="pwf_table pagetable">
+<table class="pagetable leftwards">
  <thead><tr>
   <th>{$title_name}</th>
   <th>{$title_alias}</th>
