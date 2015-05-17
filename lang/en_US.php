@@ -578,7 +578,7 @@ You can still use the %%HEADER%% and %%FOOTER%% sections in the RTF file.
 EOS;
 $lang['help_server_name'] = 'Your server';
 $lang['help_submission_date'] = 'Date of submission';
-$lang['help_sub_source_ip'] = 'IP address of form user';
+$lang['help_sub_source'] = 'IP address of form user';
 $lang['help_form_url'] = 'URL of page containing form';
 $lang['help_tab_symbol'] = 'a tab character';
 $lang['help_tab'] = 'Tab character';
