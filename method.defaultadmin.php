@@ -155,9 +155,11 @@ if($pmod)
 							$this->Lang('import_browsedata'),
 							'title="'.$this->Lang('tip_import_browsedata').'"'));
 					}
+					$rs->Close();
 				}
 			}
-			$rs->Close();
+			else
+				$rs->Close();
 		}
 	}
 	$smarty->assign('pmod',1);
