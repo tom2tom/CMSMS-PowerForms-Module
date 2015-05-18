@@ -68,7 +68,7 @@
 	<fieldset>
 	<legend>{$legend_fbimport}</legend>
 		{$start_importfbform}
-		<div class="pageinput">{$submitfb} {$submitfbdata}</div>
+		<div class="pageinput">{$submitfb}{if isset($submitdata)} {$submitdata}{/if}</div>
 		{$form_end}
 	</fieldset>
 {/if}
