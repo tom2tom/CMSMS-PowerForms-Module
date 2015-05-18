@@ -114,7 +114,7 @@ function Get_Fields(&$db,$pre,$oldfid,$newfid)
 	}
 }
 
-function Get_Attrs(&$db,$pre,$oldfid,$newfid)
+function Get_Opts(&$mod,&$db,$pre,$oldfid,$newfid)
 {
 	$sql = 'SELECT * FROM '.$pre.'module_fb_form_attr WHERE form_id=? ORDER BY form_attr_id';
 	$data = $db->GetArray($sql,array($oldfid));
@@ -124,6 +124,11 @@ function Get_Attrs(&$db,$pre,$oldfid,$newfid)
 (option_id,form_id,name,value) VALUES (?,?,?,?)';
 		foreach($data as $row)
 		{
+			if($row['name'] == 'form_template')
+			{
+				$mod->SetTemplate('pwf_'.$newfid,$row['value']);
+				$row['value'] = 'pwf_'.$newfid;
+			}
 			$newopt = $db->GenID($pre.'module_pwf_form_opt_seq');
 			$db->Execute($sql,array($newopt,$newfid,$row['name'],$row['value']));
 		}
@@ -161,7 +166,7 @@ if(isset($params['import']))
 		foreach($renums as $new=>$old)
 		{
 			$db->Execute($sql,array($old,$new));
-			Get_Attrs($db,$pre,$old,$new);
+			Get_Opts($this,$db,$pre,$old,$new);
 			Get_Fields($db,$pre,$old,$new);
 			//data may've already been imported by the browser module
 			$rs = $db->SelectLimit('SELECT * FROM '.$pre.'module_pwbr_browser',1);
