@@ -303,10 +303,9 @@ $smarty->assign('input_list_delimiter',
 	$this->CreateInputText($id,'forma_list_delimiter',
 		pwfUtils::GetAttr($formdata,'list_delimiter',','),5));
 
-$tplstr = ''.@file_get_contents(cms_join_path(dirname(dirname(__FILE__)),'templates','RenderFormDefault.tpl'));
 $smarty->assign('input_form_template',
 	$this->CreateTextArea(FALSE,$id,
-		pwfUtils::GetAttr($formdata,'form_template',$tplstr),
+		$this->GetTemplate('pwf_'.$form_id),
 		'forma_form_template',
 		'pwf_tallarea',
 		'form_template',
