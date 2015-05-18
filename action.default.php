@@ -13,7 +13,7 @@ if(empty($params['form_id']) || $params['form_id'] == -1)
 	return;
 }
 
-$form_id = int($params['form_id']);
+$form_id = (int)$params['form_id'];
 $funcs = new pwfFormOperations();
 $formdata = $funcs->Load($this,$form_id,$params,TRUE);
 unset($funcs);
@@ -46,7 +46,8 @@ $smarty->assign('form_has_validation_errors',0);
 $smarty->assign('show_submission_errors',0);
 
 $finished = FALSE;
-if(!$fieldExpandOp && ($formdata->FormPagesCount > 1 && $formdata->Page > 0) || (isset($params['pwfp_done'])&& $params['pwfp_done']==1)))
+if(!$fieldExpandOp &&
+($formdata->FormPagesCount > 1 && $formdata->Page > 0) || (!empty($params['pwfp_done'])))
 {
 	$ops = new pwfOperate();
 	// Validate form
