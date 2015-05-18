@@ -12,6 +12,10 @@ function Match_Browses(&$db,$pre)
 	$data = $db->GetAssoc($sql);
 	if($data)
 	{
+		/*
+		UPDATE form_id IN module_pwbr_browser module_pwbr_record
+		UPDATE form_field IN module_pwbr_field
+		*/
 		$sql = 'UPDATE '.$pre.'module_pwbr_browser SET form_id=? WHERE form_id=?';
 		$sql2 = 'UPDATE '.$pre.'module_pwbr_record SET form_id=? WHERE form_id=?';
 		$sql3 = 'UPDATE '.$pre.'module_pwbr_field SET form_field=? WHERE form_field=?';
@@ -113,38 +117,53 @@ function Get_Attrs(&$db,$pre,$oldfid,$newfid)
 	}
 }
 
-$pre = cms_db_prefix();
-$sql = 'SELECT * FROM '.$pre.'module_fb_form ORDER BY form_id';
-$oldforms = $db->GetArray($sql);
-if($oldforms)
+if(isset($params['import']))
 {
-	$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
-	$renums = array();
-	foreach($oldforms as $row)
+	$pre = cms_db_prefix();
+	$db->Execute('DELETE FROM '.$pre.'module_pwf_trans');
+	$sql = 'SELECT * FROM '.$pre.'module_fb_form ORDER BY form_id';
+	$oldforms = $db->GetArray($sql);
+	if($oldforms)
 	{
-		$fid = $db->GenID($pre.'module_pwf_form_seq');
-		$db->Execute($sql,array($fid,$row['name'],$row['alias']));
-		$renums[$fid] = (int)$row['form_id'];
-	}
-	$sql = 'INSERT INTO '.$pre.'module_pwf_trans (old_id,new_id,isform) VALUES (?,?,1)';
-	foreach($renums as $new=>$old)
-	{
-		$db->Execute($sql,array($old,$new));
-		Get_Attrs($db,$pre,$old,$new);
-		Get_Fields($db,$pre,$old,$new);
-		if(!empty($params['importdata']))
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+		$renums = array();
+		foreach($oldforms as $row)
 		{
+			$fid = $db->GenID($pre.'module_pwf_form_seq');
+			$db->Execute($sql,array($fid,$row['name'],$row['alias']));
+			$renums[$fid] = (int)$row['form_id'];
+		}
+		$sql = 'INSERT INTO '.$pre.'module_pwf_trans (old_id,new_id,isform) VALUES (?,?,1)';
+		foreach($renums as $new=>$old)
+		{
+			$db->Execute($sql,array($old,$new));
+			Get_Attrs($db,$pre,$old,$new);
+			Get_Fields($db,$pre,$old,$new);
 			//data may've already been imported by the browser module
-			$ob = $this->GetModuleInstance('PowerBrowse');
-			if($ob)
+			$rs = $db->SelectLimit('SELECT * FROM '.$pre.'module_pwbr_browser',1);
+			if($rs)
 			{
-				unset($ob);
-				Match_Browses($db,$pre);
+				if(!rs->EOF)
+					Match_Browses($db,$pre);
+				$rs->Close();
 			}
 		}
+		$this->Redirect($id,'defaultadmin');
 	}
+	else
+		$message = $this->PrettyMessage('no_forms',FALSE);
 }
+elseif(isset($params['conform']))
+{
+	//relevant checks are done upstream (method.defaultadmin.php)
+	$pre = cms_db_prefix();
+	Match_Browses($db,$pre);
+	$message = $this->PrettyMessage('browsers_updated');
+}
+else
+	$message = $this->PrettyMessage('error',FALSE);
 
-$this->Redirect($id,'defaultadmin');
+$this->Redirect($id,'defaultadmin','',array(
+	'message'=>$message,'active_tab'=>'import'));
 
 ?>
