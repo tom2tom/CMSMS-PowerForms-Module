@@ -136,12 +136,29 @@ if($pmod)
 		unset($ob);
 		$smarty->assign('legend_fbimport',$this->Lang('title_importfb_legend'));
 		$smarty->assign('start_importfbform',$this->CreateFormStart($id,'import_formbuilder',$returnid));
-		$smarty->assign('submitfb',$this->CreateInputSubmit($id,'importforms',
+		$smarty->assign('submitfb',$this->CreateInputSubmit($id,'import',
 			$this->Lang('import_fb'),
 			'title="'.$this->Lang('tip_import_fb').'"'));
-		$smarty->assign('submitfbdata',$this->CreateInputSubmit($id,'importdata',
-			$this->Lang('import_fbdata'),
-			'title="'.$this->Lang('tip_import_fbdata').'"'));
+		$pre = cms_db_prefix();
+		$rs = $db->SelectLimit('SELECT trans_id FROM '.$pre.'module_pwf_trans',1);
+		if($rs)
+		{
+			if(!$rs->EOF)
+			{
+				$rs->Close();
+				$rs = $db->SelectLimit('SELECT * FROM '.$pre.'module_pwbr_browser',1);
+				if($rs)
+				{
+					if(!$rs->EOF)
+					{
+						$smarty->assign('submitdata',$this->CreateInputSubmit($id,'conform',
+							$this->Lang('import_browsedata'),
+							'title="'.$this->Lang('tip_import_browsedata').'"'));
+					}
+				}
+			}
+			$rs->Close();
+		}
 	}
 	$smarty->assign('pmod',1);
 }
