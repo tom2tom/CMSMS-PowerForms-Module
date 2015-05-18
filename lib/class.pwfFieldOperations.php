@@ -7,31 +7,19 @@
 
 class pwfFieldOperations
 {
-	// returns reference to field-objects array
+	// returns reference to field-objects array in $formdata
 	function &GetFields(&$formdata)
 	{
 		return $formdata->Fields;
 	}
 
+	// returns count of field-objects in $formdata
 	function GetFieldCount(&$formdata)
 	{
 		return count($formdata->Fields);
 	}
 
-	// returns reference to first-found field-object whose id matches $field_id
-	function &GetFieldById(&$formdata,$field_id)
-	{
-		foreach($formdata->Fields as &$fld)
-		{
-			if($fld->GetId() == $field_id)
-				return $fld;
-		}
-		unset ($fld);
-		$fld = false; //need ref to this
-		return $fld;
-	}
-
-	// returns reference to first-found field-object whose alias matches $field_alias
+	// returns reference to first-found field-object in $formdata and whose alias matches $field_alias
 	function &GetFieldByAlias(&$formdata,$field_alias)
 	{
 		foreach($formdata->Fields as &$fld)
@@ -40,11 +28,11 @@ class pwfFieldOperations
 				return $fld;
 		}
 		unset ($fld);
-		$fld = false; //need ref to this
+		$fld = FALSE; //need ref to this
 		return $fld;
 	}
 
-	// returns reference to first-found field-object whose name matches $field_name
+	// returns reference to first-found field-object in $formdata and whose name matches $field_name
 	function &GetFieldByName(&$formdata,$field_name)
 	{
 		foreach($formdata->Fields as &$fld)
@@ -53,17 +41,17 @@ class pwfFieldOperations
 				return $fld;
 		}
 		unset ($fld);
-		$fld = false; //need ref to this
+		$fld = FALSE; //need ref to this
 		return $fld;
 	}
 
-	// returns reference to field-object whose array-key is $field_index
+	// returns reference to field-object in $formdata and whose array-key is $field_index
 	function &GetFieldByIndex(&$formdata,$field_index)
 	{
-		return &$formdata->Fields[$field_index];
+		return $formdata->Fields[$field_index];
 	}
 
-	// returns index of first-found field with matching id
+	// returns index of first-found field in $formdata and with id matching $field_id
 	function GetFieldIndexFromId(&$formdata,$field_id)
 	{
 		$i = 0; //don't assume anything about fields-array key
@@ -80,15 +68,16 @@ class pwfFieldOperations
 		return -1;
 	}
 
-	// add new field
+	// returns reference to new field-object corresponding to $params['field_id']
 	function &NewField(&$formdata,&$params)
 	{
-		$obfield = false;//may need ref to this
+		$obfield = FALSE;//may need ref to this
 		if(isset($params['field_id']) && $params['field_id'] != -1)
 		{
 			// we're loading an extant field
 			$sql = 'SELECT type FROM '.cms_db_prefix().'module_pwf_field WHERE field_id=?';
-TODO DB			$type = $formdata->pwfmodule->dbHandle->GetOne($sql,array($params['field_id']));
+			$db = cmsms()->GetDb();
+			$type = $db->GetOne($sql,array($params['field_id']));
 			if($type != '')
 			{
 				$className = pwfUtils::MakeClassName($type);
@@ -96,7 +85,7 @@ TODO DB			$type = $formdata->pwfmodule->dbHandle->GetOne($sql,array($params['fie
 				$obfield->LoadField($params);
 			}
 		}
-		if($obfield === false)
+		if($obfield === FALSE)
 		{
 			// new field
 			if(!empty($params['field_type']))
@@ -114,267 +103,88 @@ TODO DB			$type = $formdata->pwfmodule->dbHandle->GetOne($sql,array($params['fie
 		return $obfield;
 	}
 
-	function AddEdit(&$formdata,&$obfield,$dispose_only,$id,$returnid,$message='')
+	// swaps field display-orders 
+	function SwapFieldsByIndex($field_index1,$field_index2)
 	{
-		$mod = $formdata->pwfmodule;
-		$smarty = cmsms()->GetSmarty();
-
-		if(!empty($message))
-			$smarty->assign('message',$mod->ShowMessage($message)); //success message
-		elseif(isset($params['message']))
-			$smarty->assign('message',$params['message']); //probably an error message
-		$smarty->assign('backtomod_nav', $mod->CreateLink($id,'defaultadmin','',$mod->Lang('back_top'), array()));
-		$smarty->assign('backtoform_nav',$mod->CreateLink($id,'add_edit_form',$returnid, $mod->Lang('link_back_to_form'), array('form_id'=>$formdata->Id)));
-
-		$mainList = array();
-		$advList = array();
-		$baseList = $obfield->PrePopulateBaseAdminForm($id, $dispose_only);
-		if($obfield->GetFieldType() == '')
-		{
-			// still need type
-			$fieldList = array();
-		}
-		else
-		{
-			// we have our type
-			$fieldList = $obfield->PrePopulateAdminForm($id);
-		}
-
-		$hasmain = isset($baseList['main']) || isset($fieldList['main']);
-		$hasadvanced = isset($baseList['adv']) || isset($fieldList['adv']);
-
-		$smarty->assign('start_form',$mod->CreateFormStart($id,'add_edit_field',$returnid));
-		$smarty->assign('end_form', $mod->CreateFormEnd());
-		$tmp = $mod->StartTabHeaders();
-		if($hasmain)
-			$tmp .= $mod->SetTabHeader('maintab',$mod->Lang('tab_main'));
-		if($hasadvanced)
-			$tmp .= $mod->SetTabHeader('advancedtab',$mod->Lang('tab_advanced'));
-		$tmp .= $mod->EndTabHeaders() . $mod->StartTabContent();
-		$smarty->assign('tabs_start',$tmp);
-		$smarty->assign('tabs_end',$mod->EndTabContent());
-		if($hasmain)
-			$smarty->assign('maintab_start',$mod->StartTab('maintab'));
-		if($hasadvanced)
-			$smarty->assign('advancedtab_start',$mod->StartTab('advancedtab'));
-		$smarty->assign('tab_end',$mod->EndTab());
-		$smarty->assign('notice_select_type',$mod->Lang('notice_select_type'));
-
-		if($obfield->GetId() != -1)
-		{
-			$smarty->assign('op',$mod->CreateInputHidden($id, 'op',$mod->Lang('updated')));
-			$smarty->assign('submit',$mod->CreateInputSubmit($id, 'aef_upd', $mod->Lang('update')));
-		}
-		elseif($obfield->GetFieldType() != '')
-		{
-			$smarty->assign('op',$mod->CreateInputHidden($id, 'op', $mod->Lang('added')));
-			$smarty->assign('submit',$mod->CreateInputSubmit($id, 'aef_add', $mod->Lang('add')));
-		}
-		$smarty->assign('cancel',$mod->CreateInputSubmit($id,'aef_cancel',$mod->Lang('cancel')));
-
-		if($obfield->HasAddOp())
-		{
-			$smarty->assign('add',$mod->CreateInputSubmit($id,'aef_optadd',$obfield->GetOptionAddButton()));
-		}
-		else
-		{
-			$smarty->assign('add','');
-		}
-		if($obfield->HasDeleteOp())
-		{
-			$smarty->assign('del',$mod->CreateInputSubmit($id,'aef_optdel',$obfield->GetOptionDeleteButton()));
-		}
-		else
-		{
-			$smarty->assign('del','');
-		}
-
-		$smarty->assign('hidden', $mod->CreateInputHidden($id, 'form_id', $formdata->Id) .
-			$mod->CreateInputHidden($id, 'field_id', $obfield->GetId()) .
-			$mod->CreateInputHidden($id, 'pwfp_order_by', $obfield->GetOrder()) .
-			$mod->CreateInputHidden($id, 'pwfp_set_from_form','1'));
-
-		if(/*!$obfield->IsDisposition() && */ !$obfield->IsNonRequirableField())
-		{
-			$smarty->assign('requirable',1);
-		}
-		else
-		{
-			$smarty->assign('requirable',0);
-		}
-
-		if(isset($baseList['main']))
-		{
-			foreach($baseList['main'] as $item)
-			{
-				list ($titleStr, $inputStr, $helpStr) = $item + array (null, null, null);
-				$oneset = new stdClass();
-				if($titleStr) $oneset->title = $titleStr;
-				if($inputStr) $oneset->input = $inputStr;
-				if($helpStr) $oneset->help = $helpStr;
-				$mainList[] = $oneset;
-			}
-		}
-		if(isset($baseList['adv']))
-		{
-			foreach($baseList['adv'] as $item)
-			{
-				list ($titleStr, $inputStr, $helpStr) = $item + array (null, null, null);
-				$oneset = new stdClass();
-				if($titleStr) $oneset->title = $titleStr;
-				if($inputStr) $oneset->input = $inputStr;
-				if($helpStr) $oneset->help = $helpStr;
-				$advList[] = $oneset;
-			}
-		}
-		if(isset($fieldList['main']))
-		{
-			foreach($fieldList['main'] as $item)
-			{
-				list ($titleStr, $inputStr, $helpStr) = $item + array (null, null, null);
-				$oneset = new stdClass();
-				if($titleStr) $oneset->title = $titleStr;
-				if($inputStr) $oneset->input = $inputStr;
-				if($helpStr) $oneset->help = $helpStr;
-				$mainList[] = $oneset;
-			}
-		}
-		if(isset($fieldList['adv']))
-		{
-			foreach($fieldList['adv'] as $item)
-			{
-				list ($titleStr, $inputStr, $helpStr) = $item + array (null, null, null);
-				$oneset = new stdClass();
-				if($titleStr) $oneset->title = $titleStr;
-				if($inputStr) $oneset->input = $inputStr;
-				if($helpStr) $oneset->help = $helpStr;
-				$advList[] = $oneset;
-			}
-		}
-		$obfield->PostPopulateAdminForm($mainList, $advList);
-
-		$smarty->assign('mainList',$mainList);
-		$smarty->assign('advList',$advList);
-		if(isset($fieldList['table']))
-			$smarty->assign('mainTable', $fieldList['table']);
-		else
-			$smarty->clear_assign('mainTable');
-		if(isset($fieldList['funcs']))
-			$smarty->assign('jsfuncs',$fieldList['funcs']);
-		else
-			$smarty->clear_assign('jsfuncs');
-		if(isset($fieldList['extra']))
-		{
-			$showvars = false;
-			switch ($fieldList['extra'])
-			{
-			 case 'varshelpadv':
-				$showvars = true;
-				$smarty->assign('advvarhelp',1);
-				break;
-			 case 'varshelpmain':
-				$showvars = true;
-				$smarty->assign('mainvarhelp',1);
-				break;
-			 case 'varshelpboth':
-				$showvars = true;
-				$smarty->assign('mainvarhelp',1);
-				$smarty->assign('advvarhelp',1);
-				break;
-			}
-			if($showvars)
-				self::SetupVarsHelp($mod, $smarty);
-		}
-		$smarty->assign('incpath',$mod->GetModuleURLPath().'/include/');
-
-		return $mod->ProcessTemplate('AddEditField.tpl');
+		$Field1 = self::GetFieldByIndex($field_index1);
+		$Field2 = self::GetFieldByIndex($field_index2);
+		$tmp = $Field2->GetOrder();
+		$Field2->SetOrder($Field1->GetOrder());
+		$Field2->Store();
+		$Field1->SetOrder($tmp);
+		$Field1->Store();
 	}
 
-	function SwapFieldsByIndex($src_field_index,$dest_field_index)
+	//'hard' copy an existing field returns TRUE/FALSE
+	function CopyField($field_id,$newform=FALSE,$neworder=FALSE)
 	{
-		$srcField = self::GetFieldByIndex($src_field_index);
-		$destField = self::GetFieldByIndex($dest_field_index);
-		$tmpOrderBy = $destField->GetOrder();
-		$destField->SetOrder($srcField->GetOrder());
-		$destField->Store();
-		$srcField->SetOrder($tmpOrderBy);
-		$srcField->Store();
-	}
-
-	//'hard' copy an existing field
-	function CopyField(&$formdata,$field_id,$newform=false,$neworder=false)
-	{
-		$pref = cms_db_prefix();
-TODO DB		$db = $formdata->pwfmodule->dbHandle;
-		$sql = 'SELECT * FROM '.$pref.'module_pwf_field WHERE field_id=?';
+		$pre = cms_db_prefix();
+		$db = cmsms()->GetDb();
+		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
 		$row = $db->GetRow($sql,array($field_id));
 		if(!$row)
-			return false;
+			return FALSE;
 
-		$fid = $db->GenID($pref.'module_pwf_field_seq');
-		if($newform == false)
+		$fid = $db->GenID($pre.'module_pwf_field_seq');
+		if($newform == FALSE)
 			$newform = (int)$row['form_id'];
 
 		$row['field_id'] = $fid;
 		$row['form_id'] = $newform;
 //		$row['name'] .= ' '.$mod->Lang('copy');
 		if($row['validation_type'] == '')
-			$row['validation_type'] = null;
+			$row['validation_type'] = NULL;
 
-		if($neworder === false)
+		if($neworder === FALSE)
 		{
-			$sql = 'SELECT MAX(order_by) AS last FROM '.$pref.'module_pwf_field WHERE form_id=?';
+			$sql = 'SELECT MAX(order_by) AS last FROM '.$pre.'module_pwf_field WHERE form_id=?';
 			$neworder = $db->GetOne($sql, array($newform));
-			if($neworder == false)
+			if($neworder == FALSE)
 				$neworder = 0;
 			$neworder++;
 		}
 		$row['order_by'] = $neworder;
-		$sql = 'INSERT INTO '.$pref.
+		$sql = 'INSERT INTO '.$pre.
 		 'module_pwf_field (field_id,form_id,name,type,validation_type,required,hide_label,order_by) VALUES (?,?,?,?,?,?,?,?)';
 		$db->Execute($sql,$row);
 
-		$sql = 'SELECT * FROM '.$pref.'module_pwf_field_opt WHERE field_id=?';
+		$sql = 'SELECT * FROM '.$pre.'module_pwf_field_opt WHERE field_id=?';
 		$rs = $db->Execute($sql,array($field_id));
 		if($rs)
 		{
-			$sql = 'INSERT INTO '.$pref.
+			$sql = 'INSERT INTO '.$pre.
 			 'module_pwf_field_opt (option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 			while ($row = $rs->FetchRow())
 			{
-				$row['option_id'] = $db->GenID($pref.'module_pwf_field_opt_seq');
+				$row['option_id'] = $db->GenID($pre.'module_pwf_field_opt_seq');
 				$row['field_id'] = $fid;
 				$row['form_id'] = $newform;
 				$db->Execute($sql,$row);
 			}
 			$rs->Close();
 		}
-		return true;
+		return TRUE;
 	}
 
-	//clone an existing field-object
-	function &Replicate(&$formdata,&$params)
+	// returns reference to a clone of existing field-object corresponding to $field_id
+	function &Replicate(&$formdata,$field_id)
 	{
-		$obfield = false;//may need ref to this
-		if(isset($params['field_id']) && $params['field_id'] != -1)
+		$obfield = FALSE;//may need ref to this
+		if($field_id != -1)
 		{
-			$last = -1;
-			$orig = $params['field_id'];
-			foreach($formdata->Fields as &$fld)
+			foreach($formdata->Fields as &$one)
 			{
-				if($fld->GetId() == $orig)
+				if($one->GetId() == $field_id)
 				{
-					$obfield = clone($fld);
+					$name = $one->GetName();
+					$obfield = clone($one);
 					$obfield->Id = -1;
-					$name = $obfield->GetName();
-					$obfield->SetName($name.' '.$formdata->pwfmodule->Lang('copy'));
+					$obfield->SetName($name.' '.$formdata->formsmodule->Lang('copy'));
+					$obfield->SetOrder(count($formdata->Fields)+1); //bit racy!
+					break;
 				}
-				if($fld->GetOrder() > $last)
-					$last = $fld->GetOrder();
 			}
-			unset($fld);
-			if($obfield)
-				$obfield->SetOrder($last+1);
+			unset($one);
 		}
 		return $obfield;
 	}
@@ -391,10 +201,10 @@ TODO DB		$db = $formdata->pwfmodule->dbHandle;
 
 	function ResetFields(&$formdata)
 	{
-		foreach($formdata->Fields as &$fld)
-			$fld->ResetValue();
+		foreach($formdata->Fields as &$one)
+			$one->ResetValue();
 
-		unset($fld);
+		unset($one);
 	}
 
 }
