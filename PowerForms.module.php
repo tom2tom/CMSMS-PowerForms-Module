@@ -335,21 +335,43 @@ class PowerForms extends CMSModule
 
 	function RegisterField($classfilepath,$menulabel)
 	{
-		//TODO
-		require $classfilepath;
-		$classname = func($classfilepath);
-		$fld = new $classname();
-		$menuname = func($menulabel,$fld);
-		$field_types[$menuname] = $classname;
-		sort($field_types);
+		if(!$this->field_types)
+			pwfUtils::Initialize($this);
+		$basename = basename($classfilepath);
+		$fp = cms_join_path($this->GetModulePath(),'lib',$basename);
+		copy($classfilepath,$fp);
+		require $fp;
+		$classname = pwfUtils::FileClassName($basename);
+		$params = array();
+		$formdata = $this->GetFormData($params);
+		$obfld = new $classname($formdata,$params);
+		if(!($obfld->IsInput || $obfld->sortable)) //TODO check this
+		{
+			$menuname = '-'.$menulabel;
+		}
+		elseif($obfld->IsDisposition)
+		{
+			$menuname = '*'.$menulabel;
+			$this->disp_field_types[$menuname] = $classname;
+			uksort($this->disp_field_types,array('pwfUtils','fieldcmp'));
+		}
+		$this->field_types[$menuname] = $classname;
+		uksort($this->field_types,array('pwfUtils','fieldcmp'));
 	}
 	
 	function DeregisterField($classfilepath)
 	{
-		//TODO
-		$classname = func($classfilepath);
-		$menuname = search($field_types,$classname);
-		unset($field_types[$menuname]);
+		$basename = basename($classfilepath);
+		$classname = pwfUtils::FileClassName($basename);
+		$fp = cms_join_path($this->GetModulePath(),'lib',$basename);
+		if(is_file($fp))
+			unlink($fp);
+		$menuname = array_search($classname,$this->field_types);
+		if($menuname !== FALSE)
+			unset($this->field_types[$menuname]);
+		$menuname = array_search($classname,$this->disp_field_types);
+		if($menuname !== FALSE)
+			unset($this->field_types[$menuname]);
 	}
 
 }
