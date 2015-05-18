@@ -20,17 +20,22 @@ $funcs = new pwfFormOperations();
 //TODO $param['export_values'] not used anywhere
 $xmlstr = $funcs->CreateXML($this,$params['form_id'],date('Y-m-d H:i:s'),
 	isset($params['export_values'])); //no charset
+if($xmlstr)
+{
+	@ob_clean();
+	@ob_clean();
+	header('Pragma: public');
+	header('Expires: 0');
+	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+	header('Cache-Control: private',FALSE);
+	header('Content-Description: File Transfer');
+	header('Content-Type: application/force-download; charset=utf-8');
+	header('Content-Length: '.strlen($xmlstr));
+	header('Content-Disposition: attachment; filename='.$fn);
+	echo $xmlstr;
+	exit;
+}
 
-@ob_clean();
-@ob_clean();
-header('Pragma: public');
-header('Expires: 0');
-header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-header('Cache-Control: private',FALSE);
-header('Content-Description: File Transfer');
-header('Content-Type: application/force-download; charset=utf-8');
-header('Content-Length: '.strlen($xmlstr));
-header('Content-Disposition: attachment; filename='.$fn);
-echo $xmlstr;
-exit;
+$this->Redirect($id,'defaultadmin'); //TODO feedback
+
 ?>
