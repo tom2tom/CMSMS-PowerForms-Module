@@ -48,7 +48,7 @@ foreach($formdata->Fields as &$one)
 
 		// Ryan's ugly fix for Bug 4307
 		// We should figure out why this field wasn't populating its Smarty variable
-TODO	if($one->GetFieldType() == 'FileUploadField')
+		if($one->GetFieldType() == 'FileUploadField') //TODO
 		{
 			$smarty->assign('fld_'.$one->GetId(),$one->GetHumanReadableValue());
 			$hidden .= $this->CreateInputHidden($id,
