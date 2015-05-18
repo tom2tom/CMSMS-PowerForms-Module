@@ -352,7 +352,7 @@ EOS;
 
 $fh = fopen(dirname(__FILE__).DIRECTORY_SEPARATOR.'encoded-templates.xml','w');
 foreach ($templates as $key=>&$value)
-	fwrite($fh,"<{$key}_template>".urlencode($value)."</{$key}_template>\n\n");
+	fwrite($fh,"<{$key}_template>]][[".urlencode($value)."</{$key}_template>\n\n");
 
 unset($value);
 fclose($fh);
