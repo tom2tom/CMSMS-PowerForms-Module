@@ -10,8 +10,8 @@ if(!$this->CheckAccess('ModifyPFForms')) exit;
 $funcs = new pwfFormOperations();
 if($funcs->NewID($params['import_formname'],$params['import_formalias']))
 {
-	$params['xml_file'] = $_FILES[$id.'xmlfile']['tmp_name'];
-	$state = $funcs->ImportXML($this,$params);
+	$fp = $_FILES[$id.'xmlfile']['tmp_name'];
+	$state = $funcs->ImportXML($this,$fp);
 	$key = ($state)?'form_imported':'error_form_import';
 }
 else
