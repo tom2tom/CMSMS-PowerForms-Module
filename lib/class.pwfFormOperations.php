@@ -5,483 +5,91 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
+//for filtering options for a field
+class IsFieldOption
+{
+	private $id;
+	function __construct($id)
+	{
+		$this->id = $id;
+	}
+
+	function isMine($fieldopt)
+	{
+		return $fieldopt['field_id'] == $this->id;
+	}
+}
+
 class pwfFormOperations
 {
 	/**
-	AddEdit:
-	Setup and display 
+	Add:
 	@mod: reference to the current PowerForms module object
-	@form_id: enumerator of form to be processed
-	@id:
-	@returnid:
-	@tab: string, 'maintab' etc, identifier of the focused tab
-	@message: string (optional), message to display on the main tab
+	@params: reference to array of parameters, which must include
+		'form_name' and preferably also 'form_alias'
+	$params['form_name'] and $params['form_alias'] may be set/updated to unique values
+	Returns: new form id or FALSE
 	*/
-	function AddEdit(&$mod,$form_id,$id,$returnid,$tab,$message='')
+	function Add(&$mod,&$params)
 	{
-		$gCms = cmsms();
-		$config = $gCms->GetConfig();
-		$theme = $gCms->variables['admintheme'];
-		$smarty = $gCms->GetSmarty();
-TODO		$formdata = $mod->GetFormData($params); LOAD FILE IF EXISTS
-
-		if(!empty($message))
-			$smarty->assign('message',$mod->ShowMessage($message));
-
-		$smarty->assign('backtomod_nav', $mod->CreateLink($id, 'defaultadmin', '', $mod->Lang('back_top'), array()));
-
-		$smarty->assign('formid',$mod->CreateInputHidden($id,'form_id',$form_id));
-		$smarty->assign('formstart',$mod->CreateFormStart($id,'store_form',$returnid));
-		$smarty->assign('tabs_start',$mod->StartTabHeaders().
-			$mod->SetTabHeader('maintab',$mod->Lang('tab_main'),($tab == 'maintab')).
-			$mod->SetTabHeader('fieldstab',$mod->Lang('tab_fields'),($tab == 'fieldstab')).
-			$mod->SetTabHeader('designtab',$mod->Lang('tab_design'),($tab == 'designtab')).
-			$mod->SetTabHeader('templatetab',$mod->Lang('tab_templatelayout'),($tab == 'templatetab')).
-			$mod->SetTabHeader('udttab',$mod->Lang('tab_udt'),($tab == 'udttab')).
-			$mod->SetTabHeader('submittab',$mod->Lang('tab_submit'),($tab == 'submittab')).
-			$mod->SetTabHeader('submittpltab',$mod->Lang('tab_submissiontemplate'),($tab == 'submittpltab')).
-			$mod->EndTabHeaders().$mod->StartTabContent());
-
-		$smarty->assign('tabs_end',$mod->EndTabContent());
-		$smarty->assign('maintab_start',$mod->StartTab('maintab'));
-		$smarty->assign('fieldstab_start',$mod->StartTab('fieldstab'));
-		$smarty->assign('designtab_start',$mod->StartTab('designtab'));
-		$smarty->assign('templatetab_start',$mod->StartTab('templatetab'));
-		$smarty->assign('udttab_start',$mod->StartTab('udttab'));
-		$smarty->assign('submittab_start',$mod->StartTab('submittab'));
-		$smarty->assign('submittemplatetab_start',$mod->StartTab('submittpltab'));
-		$smarty->assign('tab_end',$mod->EndTab());
-		$smarty->assign('form_end',$mod->CreateFormEnd());
-
-		$smarty->assign('title_form_name',$mod->Lang('title_form_name'));
-		$smarty->assign('input_form_name',
-			$mod->CreateInputText($id,'form_name',$formdata->Name,50));
-
-		$smarty->assign('title_load_template',$mod->Lang('title_load_template'));
-		$smarty->assign('security_key',CMS_SECURE_PARAM_NAME.'='.$_SESSION[CMS_USER_KEY]);
-
-		$templateList = array(''=>'',
-			$mod->Lang('default_template')=>'RenderFormDefault.tpl',
-			$mod->Lang('table_left_template')=>'RenderFormTableTitleLeft.tpl',
-			$mod->Lang('table_top_template')=>'RenderFormTableTitleTop.tpl');
-
-		$allForms = pwfUtils::GetForms();
-		foreach($allForms as $one)
+		$name = self::GetName($params);
+		if(!$name)
+			return FALSE;
+		$alias = self::GetAlias($params);
+		if(!$alias)
+			$alias = pwfUtils::MakeAlias($name);
+		$tn = $name;
+		$ta = $alias;
+		$i = 1;
+		while(!self::NewID($name,$alias))
 		{
-			if($one['form_id'] != $form_id)
-				$templateList[$mod->Lang('form_template_name',$one['name'])] = $one['form_id'];
+			$name = $tn."[$i]";
+			$alias = $ta."[$i]";
+			$i++;
 		}
-
-		$modLink = $mod->CreateLink($id,'get_template',$returnid,'',array(),'',true);
-		$smarty->assign('input_load_template',$mod->CreateInputDropdown($id,'template_load',
-			$templateList, -1, '', 'id="template_load" onchange="get_template(\''.$mod->Lang('confirm_template').'\',\''.$modLink.'\');"'));
-
-		$globalfields = array();
-		foreach(array(
-			'total_pages',
-			'this_page',
-			'title_page_x_of_y',
-			'css_class',
-			'form_name',
-			'form_id',
-			'in_formbrowser',
-			'in_admin',
-			'browser_id',
-			'hidden',
-			'prev',
-			'submit'
-			) as $name)
-		{
-			$oneset = new stdClass();
-			$oneset->name = $name;
-			$oneset->description = $mod->Lang('desc_'.$name);
-			$globalfields[] = $oneset;
-		}
-		$smarty->assign('globalfields',$globalfields);
-
-		$attrs = array();
-		foreach(array(
-			'alias',
-			'css_class',
-			'display',
-			'error',
-			'field_helptext_id',
-			'has_label',
-			'helptext',
-			'hide_name',
-			'id',
-			'input_id',
-			'input',
-			'label_parts',
-			'logic',
-			'multiple_parts',
-			'name',
-			'needs_div',
-			'required_symbol',
-			'required',
-			'smarty_eval',
-			'type',
-			'valid',
-			'values'
-			) as $name)
-		{
-			$oneset = new stdClass();
-			$oneset->name = $name;
-			$oneset->description = $mod->Lang('desc_'.$name);
-			$attrs[] = $oneset;
-		}
-		$smarty->assign('attrs',$attrs);
-
-		$smarty->assign('variable', $mod->Lang('variable'));
-		$smarty->assign('attribute', $mod->Lang('attribute'));
-		$smarty->assign('description', $mod->Lang('description'));
-		$smarty->assign('help_globals', $mod->Lang('help_globals'));
-		$smarty->assign('help_attrs1', $mod->Lang('help_attrs1'));
-		$smarty->assign('help_attrs2', $mod->Lang('help_attrs2'));
-
-		$smarty->assign('title_form_unspecified',$mod->Lang('title_form_unspecified'));
-		$smarty->assign('input_form_unspecified',
-			$mod->CreateInputText($id, 'forma_unspecified',
-				self::GetAttr($formdata,'unspecified',$mod->Lang('unspecified')),30));
-		$smarty->assign('title_form_status', $mod->Lang('title_form_status'));
-		$smarty->assign('text_ready', $mod->Lang('title_ready_for_deployment'));
-		$smarty->assign('title_form_alias',$mod->Lang('title_form_alias'));
-		$smarty->assign('input_form_alias',
-		$mod->CreateInputText($id,'form_alias',$formdata->Alias,50));
-		$smarty->assign('title_form_css_class',$mod->Lang('title_form_css_class'));
-		$smarty->assign('input_form_css_class',
-			 $mod->CreateInputText($id, 'forma_css_class',
-			 	self::GetAttr($formdata,'css_class','formbuilderform'),50,50));
-		$smarty->assign('title_form_fields', $mod->Lang('title_form_fields'));
-		$smarty->assign('title_form_main', $mod->Lang('title_form_main'));
-		$t = ($mod->GetPreference('show_fieldids')) ? $mod->Lang('title_field_id') : '';
-		$smarty->assign('title_field_id',$t);
-		$t = ($mod->GetPreference('show_fieldaliases')) ? $mod->Lang('title_field_alias_short') : '';
-		$smarty->assign('title_field_alias',$t);
-		$smarty->assign('title_field_name', $mod->Lang('title_field_name'));
-		$smarty->assign('title_field_type', $mod->Lang('title_field_type'));
-		$smarty->assign('title_field_type', $mod->Lang('title_field_type'));
-		$smarty->assign('title_form_template', $mod->Lang('title_form_template'));
-		$smarty->assign('title_form_vars', $mod->Lang('title_form_vars'));
-		$smarty->assign('title_list_delimiter', $mod->Lang('title_list_delimiter'));
-		$smarty->assign('title_redirect_page', $mod->Lang('title_redirect_page'));
-		$smarty->assign('title_submit_action', $mod->Lang('title_submit_action'));
-		$smarty->assign('title_submit_template', $mod->Lang('title_submit_response'));
-		$smarty->assign('help_can_drag', $mod->Lang('help_can_drag'));
-		$smarty->assign('title_must_save_order', $mod->Lang('title_must_save_order'));
-		$smarty->assign('title_inline_form', $mod->Lang('title_inline_form'));
-		$smarty->assign('title_submit_actions', $mod->Lang('title_submit_actions'));
-		$smarty->assign('title_submit_labels', $mod->Lang('title_submit_labels'));
-		$smarty->assign('title_submit_javascript', $mod->Lang('title_submit_javascript'));
-		$smarty->assign('title_submit_help',$mod->Lang('title_submit_help'));
-		$smarty->assign('title_submit_template_help',$mod->Lang('title_submit_response_help'));
-
-		$smarty->assign('icon_info',
-			$theme->DisplayImage('icons/system/info.gif',$mod->Lang('info'),'','','systemicon'));
-		$submitActions = array($mod->Lang('display_text')=>'text',
-			 $mod->Lang('redirect_to_page')=>'redir');
-		$smarty->assign('input_submit_action',
-		$mod->CreateInputRadioGroup($id, 'forma_submit_action', $submitActions,
-			self::GetAttr($formdata,'submit_action','text'), '', '&nbsp;&nbsp;'));
-
-		$captcha = $mod->getModuleInstance('Captcha');
-		if($captcha == null)
-		{
-			 $smarty->assign('title_install_captcha',$mod->Lang('help_captcha_not_installed'));
-			 $smarty->assign('captcha_installed',0);
-		}
-		else
-		{
-			 $smarty->assign('title_use_captcha',$mod->Lang('title_use_captcha'));
-			 $smarty->assign('captcha_installed',1);
-
-			 $smarty->assign('input_use_captcha',$mod->CreateInputHidden($id,'forma_use_captcha','0').
-					$mod->CreateInputCheckbox($id,'forma_use_captcha','1',
-					self::GetAttr($formdata,'use_captcha','0')).
-					$mod->Lang('title_use_captcha_help'));
-		}
-		$smarty->assign('title_information',$mod->Lang('information'));
-		$smarty->assign('title_order',$mod->Lang('order'));
-		$smarty->assign('title_field_required_abbrev',$mod->Lang('title_field_required_abbrev'));
-TODO		$smarty->assign('hasdisposition',$this->HasDisposition()?1:0);
-		$maxOrder = 1;
-		if($form_id > 0)
-		{
-			$smarty->assign('hidden',
-				$mod->CreateInputHidden($id,'form_op',$mod->Lang('updated')).
-				$mod->CreateInputHidden($id,'sort_order').
-				$mod->CreateInputHidden($id,'active_tab'));
-			$smarty->assign('adding',0);
-			$smarty->assign('save', $mod->CreateInputSubmit($id, 'submit', $mod->Lang('save')));
-			$smarty->assign('apply', $mod->CreateInputSubmit($id, 'submit', $mod->Lang('apply'),
-					'title = "'.$mod->Lang('save_and_continue').'" onclick="set_tab()"'));
-			$fieldList = array();
-			$jsfuncs = array();
-			$count = 1;
-TODO			$last = $this->GetFieldCount();
-			
-			$icontrue = $theme->DisplayImage('icons/system/true.gif',$mod->Lang('true'),'','','systemicon');
-			$iconfalse = $theme->DisplayImage('icons/system/false.gif',$mod->Lang('false'),'','','systemicon');
-			$iconedit = $theme->DisplayImage('icons/system/edit.gif',$mod->Lang('edit'),'','','systemicon');
-			$iconcopy = $theme->DisplayImage('icons/system/copy.gif',$mod->Lang('copy'),'','','systemicon');
-			$icondelete = $theme->DisplayImage('icons/system/delete.gif',$mod->Lang('delete'),'','','systemicon');
-			$iconup = $theme->DisplayImage('icons/system/arrow-u.gif',$mod->Lang('moveup'),'','','systemicon');
-			$icondown = $theme->DisplayImage('icons/system/arrow-d.gif',$mod->Lang('movedn'),'','','systemicon');
-
-			foreach($formdata->Fields as &$fld)
-			{
-				$oneset = new stdClass();
-				$oneset->name = $mod->CreateLink($id,'add_edit_field','',$fld->GetName(),array('field_id'=>$fld->GetId(),'form_id'=>$form_id));
-				if($mod->GetPreference('show_fieldids',0) != 0)
-				{
-					$oneset->id = $mod->CreateLink($id,'add_edit_field','',$fld->GetId(),array('field_id'=>$fld->GetId(),'form_id'=>$form_id));
-				}
-				$oneset->type = $fld->GetDisplayType();
-				$oneset->alias = $fld->GetAlias();
-				$oneset->id = $fld->GetID();
-
-				if(!$fld->DisplayInForm() || $fld->IsNonRequirableField())
-				{
-					$oneset->disposition = '';
-					$no_avail = $mod->Lang('not_available');
-				}
-				else if($fld->IsRequired())
-				{
-					$oneset->disposition = $mod->CreateLink($id,'update_field_required','',
-						$icontrue, array('form_id'=>$form_id,'active'=>'off','field_id'=>$fld->GetId()),'','','',
-						'class="true" onclick="update_field_required(); return false;"');
-				}
-				else
-				{
-					$oneset->disposition = $mod->CreateLink($id,'update_field_required','',
-						$iconfalse, array('form_id'=>$form_id,'active'=>'on','field_id'=>$fld->GetId()),'','','',
-						'class="false" onclick="update_field_required(); return false;"');
-				}
-
-				$oneset->field_status = $fld->StatusInfo();
-				$oneset->editlink = $mod->CreateLink($id,'add_edit_field','',$iconedit,array('field_id'=>$fld->GetId(),'form_id'=>$form_id));
-				$oneset->copylink = $mod->CreateLink($id,'copy_field','',$iconcopy,array('field_id'=>$fld->GetId(),'form_id'=>$form_id));
-				$oneset->deletelink = $mod->CreateLink($id,'delete_field','',$icondelete,array('field_id'=>$fld->GetId(),'form_id'=>$form_id),'','','',
-					'onclick="delete_field(\''.$mod->Lang('confirm_delete_field',htmlspecialchars($fld->GetName())).'\'); return false;"');
-
-				if($count > 1)
-				{
-					$oneset->up = $mod->CreateLink($id,'update_field_order','',$iconup,array('form_id'=>$form_id,'dir'=>'up','field_id'=>$fld->GetId()));
-				}
-				else
-				{
-					$oneset->up = '';
-				}
-				if($count < $last)
-				{
-					$oneset->down=$mod->CreateLink($id,'update_field_order','',$icondown,array('form_id'=>$form_id,'dir'=>'down','field_id'=>$fld->GetId()));
-				}
-				else
-				{
-					$oneset->down = '';
-				}
-
-				$count++;
-				if($fld->GetOrder() >= $maxOrder)
-				{
-					$maxOrder = $fld->GetOrder() + 1;
-				}
-				$fieldList[] = $oneset;
-			}
-			unset ($fld);
-
-			$smarty->assign('fields',$fieldList);
-			$smarty->assign('add_field_link',
-				$mod->CreateLink($id, 'add_edit_field', $returnid,
-					$theme->DisplayImage('icons/system/newobject.gif',$mod->Lang('title_add_new_field'),'','','systemicon'),
-					array('form_id'=>$form_id, 'order_by'=>$maxOrder), '', false).' '.
-					$mod->CreateLink($id, 'add_edit_field', $returnid,$mod->Lang('title_add_new_field'),array('form_id'=>$form_id, 'order_by'=>$maxOrder), '', false));
-
-			if($mod->GetPreference('enable_fastadd',1) == 1)
-			{
-				$smarty->assign('fastadd',1);
-				$smarty->assign('title_fastadd',$mod->Lang('title_fastadd'));
-				$link = $mod->CreateLink($id,'add_edit_field',$returnid,'',
-					array('form_id'=>$form_id, 'order_by'=>$maxOrder),'',true,true);
-				$link = str_replace('&amp;','&',$link);
-				$typeFunc = <<<EOS
-function fast_add(field_type)
-{
- var type=field_type.options[field_type.selectedIndex].value;
- this.location='{$link}&{$id}field_type='+type;
- return true;
-}
-EOS;
-				$jsfuncs [] = $typeFunc; //TODO handle duplicates
-				$mod->initialize();
-				if($mod->GetPreference('show_field_level','basic') == 'basic')
-				{
-					$smarty->assign('input_fastadd',$mod->CreateInputDropdown($id, 'field_type',
-					array_merge(array($mod->Lang('select_type')=>''),$mod->std_field_types), -1,'', 'onchange="fast_add(this)"').
-						$mod->Lang('title_switch_advanced').
-						$mod->CreateLink($id,'add_edit_form',$returnid,$mod->Lang('title_switch_advanced_link'),
-						array('form_id'=>$form_id, 'set_field_level'=>'advanced')));
-				}
-				else
-				{
-					$smarty->assign('input_fastadd',$mod->CreateInputDropdown($id, 'field_type',
-					array_merge(array($mod->Lang('select_type')=>''),$mod->field_types), -1,'', 'onchange="fast_add(this)"').
-						$mod->Lang('title_switch_basic').
-						$mod->CreateLink($id,'add_edit_form',$returnid,$mod->Lang('title_switch_basic_link'),
-						array('form_id'=>$form_id, 'set_field_level'=>'basic')));
-				}
-			}
-		}
-		else
-		{
-			$smarty->assign('hidden',
-				$mod->CreateInputHidden($id,'form_op',$mod->Lang('added')).
-				$mod->CreateInputHidden($id,'sort_order').
-				$mod->CreateInputHidden($id,'active_tab'));
-			$smarty->assign('adding',1);
-			$smarty->assign('save','');
-			$smarty->assign('apply',
-					$mod->CreateInputSubmit($id, 'submit', $mod->Lang('add')));
-		}
-		$smarty->assign('cancel', $mod->CreateInputSubmit($id, 'cancel', $mod->Lang('cancel')));
-
-		$smarty->assign('link_notready','<strong>'.$mod->Lang('title_not_ready1').'</strong> '.
-			$mod->Lang('title_not_ready2').' '.
-			$mod->CreateLink($id,'add_edit_field',$returnid,$mod->Lang('title_not_ready_link'),
-			array('form_id'=>$form_id,'order_by'=>$maxOrder,'dispose_only'=>1),
-			'', false, false,'class="pwf_link"').' '.
-			$mod->Lang('title_not_ready3')
-		);
-
-		$smarty->assign('input_inline_form',$mod->CreateInputHidden($id,'forma_inline','0').
-			$mod->CreateInputCheckbox($id,'forma_inline','1',self::GetAttr($formdata,'inline','0')).
-				$mod->Lang('title_inline_form_help'));
-
-		$smarty->assign('title_form_submit_button',$mod->Lang('title_form_submit_button'));
-		$smarty->assign('input_form_submit_button',
-			$mod->CreateInputText($id, 'forma_submit_button_text',
-				self::GetAttr($formdata,'submit_button_text',$mod->Lang('button_submit')), 35, 35));
-		$smarty->assign('title_submit_button_safety',$mod->Lang('title_submit_button_safety_help'));
-		$smarty->assign('input_submit_button_safety',
-			$mod->CreateInputHidden($id,'forma_input_button_safety','0').
-			$mod->CreateInputCheckbox($id,'forma_input_button_safety','1',self::GetAttr($formdata,'input_button_safety','0')).
-			$mod->Lang('title_submit_button_safety'));
-		$smarty->assign('title_form_prev_button',$mod->Lang('title_form_prev_button'));
-		$smarty->assign('input_form_prev_button',
-			$mod->CreateInputText($id, 'forma_prev_button_text',
-				self::GetAttr($formdata,'prev_button_text',$mod->Lang('button_previous')), 35, 35));
-
-		$smarty->assign('input_title_user_captcha',
-			$mod->CreateInputText($id, 'forma_title_user_captcha',
-				self::GetAttr($formdata,'title_user_captcha',$mod->Lang('title_user_captcha')),50,80));
-		$smarty->assign('title_title_user_captcha',$mod->Lang('title_title_user_captcha'));
-
-		$smarty->assign('input_title_user_captcha_error',
-			$mod->CreateInputText($id, 'forma_captcha_wrong',
-				self::GetAttr($formdata,'captcha_wrong',$mod->Lang('wrong_captcha')),50,80));
-		$smarty->assign('title_user_captcha_error',$mod->Lang('title_user_captcha_error'));
-
-		$smarty->assign('title_form_next_button', $mod->Lang('title_form_next_button'));
-		$smarty->assign('input_form_next_button',
-			$mod->CreateInputText($id, 'forma_next_button_text',
-				self::GetAttr($formdata,'next_button_text',$mod->Lang('button_continue')), 35, 35));
-		$smarty->assign('title_form_predisplay_udt',$mod->Lang('title_form_predisplay_udt'));
-		$smarty->assign('title_form_predisplay_each_udt',$mod->Lang('title_form_predisplay_each_udt'));
-
-		$usertagops = $gCms->GetUserTagOperations();
-		$usertags = $usertagops->ListUserTags();
-		$usertaglist = array();
-		$usertaglist[$mod->lang('none')] = -1;
-		foreach($usertags as $key => $value)
-			$usertaglist[$value] = $key;
-		$smarty->assign('input_form_predisplay_udt',
-			$mod->CreateInputDropdown($id,'forma_predisplay_udt',$usertaglist,-1,
-				self::GetAttr($formdata,'predisplay_udt',-1)));
-		$smarty->assign('input_form_predisplay_each_udt',
-			$mod->CreateInputDropdown($id,'forma_predisplay_each_udt',$usertaglist,-1,
-				self::GetAttr($formdata,'predisplay_each_udt',-1)));
-
-		$smarty->assign('title_form_validate_udt',$mod->Lang('title_form_validate_udt'));
-		$usertagops = $gCms->GetUserTagOperations();
-		$usertags = $usertagops->ListUserTags();
-		$usertaglist = array();
-		$usertaglist[$mod->lang('none')] = -1;
-		foreach($usertags as $key => $value)
-			$usertaglist[$value] = $key;
-		$smarty->assign('input_form_validate_udt',
-			$mod->CreateInputDropdown($id,'forma_validate_udt',$usertaglist,-1,
-				self::GetAttr($formdata,'validate_udt',-1)));
-
-		$smarty->assign('title_form_required_symbol',$mod->Lang('title_form_required_symbol'));
-		$smarty->assign('input_form_required_symbol',
-			 $mod->CreateInputText($id, 'forma_required_field_symbol',
-				self::GetAttr($formdata,'required_field_symbol','*'), 5));
-		$smarty->assign('input_list_delimiter',
-			$mod->CreateInputText($id, 'forma_list_delimiter',
-				self::GetAttr($formdata,'list_delimiter',','), 5));
-
-		$contentops = $gCms->GetContentOperations();
-		$smarty->assign('input_redirect_page',$contentops->CreateHierarchyDropdown('',self::GetAttr($formdata,'redirect_page','0'), $id.'forma_redirect_page'));
-
-		$smarty->assign('input_form_template',
-			$mod->CreateTextArea(false, $id,
-TODO				self::GetAttr($formdata,'form_template',$this->DefaultTemplate()),
-				'forma_form_template',
-				'pwf_tallarea',
-				'form_template',
-				'', '', 80, 15));
-
-		$smarty->assign('input_submit_javascript',
-			$mod->CreateTextArea(false, $id,
-				self::GetAttr($formdata,'submit_javascript',''), 'forma_submit_javascript','pwf_shortarea','submit_javascript',
-				'', '', 80, 15,'','').
-				'<br />'.$mod->Lang('title_submit_javascript_long'));
-
-		$attr_name = 'submission_template';
-		$smarty->assign('input_submit_template',
-			 $mod->CreateTextArea(false, $id,
-TODO				self::GetAttr($formdata,$attr_name,$this->createSampleTemplate(true,false)),
-				'forma_'.$attr_name,
-				'pwf_tallarea',
-				'', '', '', 80, 15));
-
-		self::SetupVarsHelp($mod,$smarty);
-
-		$parms = array();
-		$parms[$attr_name]['general_button'] = true;
-		list ($popfuncs, $buttons) = self::AdminTemplateActions($id,$parms);
-
-		$smarty->assign('incpath',$mod->GetModuleURLPath().'/include/');
-		$smarty->assign('jsfuncs',array_merge($jsfuncs,$popfuncs));
-		$smarty->assign('buttons',$buttons);
-
-		return $mod->ProcessTemplate('AddEditForm.tpl');
+		$params['form_name'] = $name;
+		$params['form_alias'] = $alias;
+		$pre = cms_db_prefix();
+		$db = cmsms()->GetDb();
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+		$newid = $db->GenID($pre.'module_pwf_form_seq');
+		$db->Execute($sql,array($newid,$name,$alias));
+		return $newid;
 	}
 
 	/**
 	Delete:
 	@mod: reference to the current PowerForms module object
 	@form_id: enumerator of form to be processed
+	Returns: boolean TRUE/FALSE whether deletion succeeded
 	*/
 	function Delete(&$mod,$form_id)
 	{
-TODO		$formdata = $mod->GetFormData($params); LOAD
-		$noparms = array();
-		self::Load($mod,$form_id,$noparms,true);
-		foreach($formdata->Fields as &$fld)
-		{
-			$fld->Delete();
-		}
-		unset ($fld);
+/*		$noparms = array();
+		$formdata = self::Load($mod,$form_id,$noparms,TRUE);
+		if(!$formdata)
+			return FALSE;
+		foreach($formdata->Fields as &$one)
+			$one->Delete();
+		unset($one);
+*/
 		$mod->DeleteTemplate('pwf_'.$form_id);
-		$pref = cms_db_prefix();
-		$sql = 'DELETE FROM '. $pref.'module_pwf_form where form_id=?';
-		$db = $mod->dbHandle;
-		if(!$db->Execute($sql,array($form_id)))
-			return false;
-		$sql = 'DELETE FROM '.$pref.'module_pwf_form_attr where form_id=?';
+		$pre = cms_db_prefix();
+		$db = cmsms()->GetDb();
+		$sql = 'DELETE FROM '.$pre.'module_pwf_trans WHERE new_id=? AND isform=1';
+		$db->Execute($sql,array($form_id));
+		$sql = 'DELETE FROM '.$pre.'module_pwf_field_opt WHERE form_id=?';
 		$res = $db->Execute($sql,array($form_id));
-		return ($res != false);
+		$sql = 'DELETE FROM '.$pre.'module_pwf_field WHERE form_id=?';
+		if(!$db->Execute($sql,array($form_id)))
+			$res = FALSE;
+		$sql = 'DELETE FROM '.$pre.'module_pwf_form_opt WHERE form_id=?';
+		if(!$db->Execute($sql,array($form_id)))
+			$res = FALSE;
+		$sql = 'DELETE FROM '. $pre.'module_pwf_form WHERE form_id=?';
+		if(!$db->Execute($sql,array($form_id)))
+			$res = FALSE;
+		return ($res != FALSE);
 	}
 
 	/**
@@ -490,127 +98,176 @@ TODO		$formdata = $mod->GetFormData($params); LOAD
 	@mod: reference to the current PowerForms module object
 	@form_id: enumerator of form to be processed
 	@params: reference to array of parameters
+	Returns: new form id or FALSE
+	$params['form_name'] and $params['form_alias'] are set/updated
 	*/
 	function Copy(&$mod,$form_id,&$params)
 	{
-TODO		$formdata = ;
-		if($formdata->loaded != 'full')
-		{
-			$noparms = array();
-			self::Load($mod,$form_id,$noparms,true);
-		}
-
-		$pref = cms_db_prefix();
-		$db = $mod->dbHandle;
-		$sql = 'INSERT INTO '.$pref.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
-		$newform = $db->GenID($pref.'module_pwf_form_seq');
+		$noparms = array();
+		$formdata = self::Load($mod,$form_id,$noparms,TRUE);
+		if(!$formdata)
+			return FALSE;
+		$tn = $mod->Lang('copy');
 		$name = self::GetName($params);
-		if($name)
-			$name .= ' '.$mod->Lang('copy');
-		$alias = $formdata->Alias;
-		if($alias)
-TODO			$alias .= '_'.$this->MakeAlias($mod->Lang('copy'), true);
-		$db->Execute($sql, array($newform,$name,$alias));
-
-		$res = true;
-		$order = 1;
-		foreach($formda->Fields as &$fld)
+		if(!$name)
 		{
-TODO			if(!$this->CopyField(intval($fld->GetId()), $newform, $order))
-				$res = false;
-			$order++;
+			$name = $formdata->Name;
+			if($name)
+				$name .= ' '.$tn;
+			else
+				return FALSE;
 		}
-		unset($fld);
-		return $res;
+		$alias = self::GetAlias($params);
+		if(!$alias)
+		{
+			$alias = $formdata->Alias;
+			if($alias)
+				$alias .= '_'.pwfUtils::MakeAlias($tn);
+			else
+				$alias = pwfUtils::MakeAlias($name);
+		}
+		$tn = $name;
+		$ta = $alias;
+		$i = 1;
+		while(!self::NewID($name,$alias))
+		{
+			$name = $tn."[$i]";
+			$alias = $ta."[$i]";
+			$i++;
+		}
+		$params['form_name'] = $name;
+		$params['form_alias'] = $alias;
+		
+		$pre = cms_db_prefix();
+		$db = cmsms()->GetDb();
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+		$newid = $db->GenID($pre.'module_pwf_form_seq');
+		$db->Execute($sql,array($newid,$name,$alias));
+
+		$res = TRUE;
+		$sql = 'INSERT INTO '.$pre.
+		'module_pwf_form_opt (option_id,form_id,name,value) VALUES (?,?,?,?)';
+		foreach($formdata->Attrs as $key=>&$one)
+		{
+			$AttrId = $db->GenID($pre.'module_pwf_form_opt_seq');
+			if($key == 'form_template')
+			{
+				$mod->SetTemplate('pwf_'.$form_id,$one);
+				$val = 'pwf_'.$form_id;
+			}
+			if(!$db->Execute($sql,array($AttrId,$form_id,$key,$one)))
+			{
+				$params['message'] = $mod->Lang('database_error');
+				$res = FALSE;
+			}
+		}
+		unset($one);
+
+		$funcs = new pwfFieldOperations();
+		$neworder = 1;
+		foreach($formdata->Fields as &$one)
+		{
+			if(!$funcs->CopyField((int)$one->GetId(),$newid,$neworder))
+			{
+				$params['message'] = $mod->Lang('database_error');
+				$res = FALSE;
+			}
+			$neworder++;
+		}
+		unset($one);
+
+		return ($res) ? $newid:FALSE;
 	}
 
 	/**
 	Store:
+	Updates tables: form,form_attr (by junking and re-insertion),field::order_by
 	@mod: reference to the current PowerForms module object
 	@form_id: enumerator of form to be processed
 	@params: reference to array of parameters
 	*/
 	function Store(&$mod,$form_id,&$params)
 	{
-		// For new form, check for duplicate name and/or alias
-		if($form_id == -1 && !self::NewID($mod,$params['form_name'],$params['form_alias']))
+		// if it's a new form,check for duplicate name and/or alias
+		if($form_id == -1 && !self::NewID($params['form_name'],$params['form_alias']))
 		{
 			$params['message'] = $mod->Lang('duplicate_identifier');
-			return false;
+			return FALSE;
 		}
 
-		$db = $mod->dbHandle;
-		$pref = cms_db_prefix();
-		// Check if new or old form
+		$formdata = $mod->GetFormData($params);
+		$db = cmsms()->GetDb();
+		$pre = cms_db_prefix();
 		if($form_id == -1)
 		{
-			$form_id = $db->GenID($pref.'module_pwf_form_seq');
-			$sql = 'INSERT INTO '.$pref.'module_pwf_form (form_id, name, alias) VALUES (?,?,?)';
-			$res = $db->Execute($sql, array($form_id,$formdata->Name,$formdata->Alias));
+			// new form
+			$form_id = $db->GenID($pre.'module_pwf_form_seq');
+			$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+			$res = $db->Execute($sql,array($form_id,$formdata->Name,$formdata->Alias));
 		}
 		else
 		{
-			$sql = 'UPDATE '.$pref.'module_pwf_form SET name=?,alias=? WHERE form_id=?';
-			$res = $db->Execute($sql, array($formdata->Name, $formdata->Alias, $form_id));
+			$sql = 'UPDATE '.$pre.'module_pwf_form SET name=?,alias=? WHERE form_id=?';
+			$res = $db->Execute($sql,array($formdata->Name,$formdata->Alias,$form_id));
 		}
-		if($res == false)
+		if($res == FALSE)
 		{
 			$params['message'] = $mod->Lang('database_error');
-			return false;
+			return FALSE;
 		}
 
-		// Save out the attrs
-		$sql = 'DELETE FROM '.$pref.'module_pwf_form_attr WHERE form_id=?';
-		if($db->Execute($sql,array($form_id)) == false)
+		// store form options
+		$sql = 'DELETE FROM '.$pre.'module_pwf_form_opt WHERE form_id=?';
+		if($db->Execute($sql,array($form_id)) == FALSE)
 		{
 			$params['message'] = $mod->Lang('database_error');
-			return false;
+			return FALSE;
 		}
 
-		foreach($formdata->Attrs as $thisAttrKey=>$thisAttrValue)
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form_opt (option_id,form_id,name,value) VALUES (?,?,?,?)';
+		foreach($formdata->Attrs as $key=>$val)
 		{
-			$formAttrId = $db->GenID($pref.'module_pwf_form_attr_seq');
-			$sql = 'INSERT INTO '.$pref.'module_pwf_form_attr (form_attr_id, form_id, name, value) VALUES (?,?,?,?)';
-			if($db->Execute($sql, array($formAttrId, $form_id, $thisAttrKey, $thisAttrValue)) != false)
+			$AttrId = $db->GenID($pre.'module_pwf_form_opt_seq');
+			if($key == 'form_template')
 			{
-				if($thisAttrKey == 'form_template')
-					$mod->SetTemplate('pwf_'.$form_id,$thisAttrValue);
+				$mod->SetTemplate('pwf_'.$form_id,$val);
+				$val = 'pwf_'.$form_id;
 			}
-			else
+			if(!$db->Execute($sql,array($AttrId,$form_id,$key,$val)))
 			{
 				$params['message'] = $mod->Lang('database_error');
-				return false;
+				return FALSE;
 			}
 		}
 
 		// Update field position
-		$order_list = false;
+		//TODO all dispositions after all others
 		if(isset($params['sort_order']))
-		{
 			$order_list = explode(',',$params['sort_order']);
-		}
+		else
+			$order_list = FALSE;
 
-		if(is_array($order_list) && count($order_list) > 0)
+		if($order_list)
 		{
 			$count = 1;
-			$sql = 'UPDATE '.$pref.'module_pwf_field SET order_by=? WHERE field_id=?';
+			$sql = 'UPDATE '.$pre.'module_pwf_field SET order_by=? WHERE field_id=?';
 
 			foreach($order_list as $onefldid)
 			{
 				$fieldid = substr($onefldid,5); //CHECKME
-				if($db->Execute($sql, array($count, $fieldid)) != false)
+				if($db->Execute($sql,array($count,$fieldid)))
 					$count++;
 				else
 				{
 					$params['message'] = $mod->Lang('database_error');
-					return false;
+					return FALSE;
 				}
 			}
 		}
 
 		// Reload everything
-		self::Load($mod,$form_id,$params,true);
-		return true;
+		self::Load($mod,$form_id,$params,TRUE);
+		return TRUE;
 	}
 
 	/**
@@ -618,66 +275,65 @@ TODO			if(!$this->CopyField(intval($fld->GetId()), $newform, $order))
 	@mod: reference to the current PowerForms module object
 	@form_id: enumerator of form to be processed
 	@params: reference to array of parameters
-	@loadDeep: optional boolean, default false
-	@loadResp: optional boolean, default false
+	@deep: optional whether to also load field data, default FALSE
+	@loadResp: optional boolean, default FALSE
+	Returns: reference to pwfData object for the form, or FALSE
 	*/
-	function Load(&$mod,$form_id,&$params,$loadDeep=false,$loadResp=false)
+	function &Load(&$mod,$form_id,&$params,$deep=FALSE,$loadResp=FALSE)
 	{
-TODO $formdata = ;
-		$db = $mod->dbHandle;
-		$pref = cms_db_prefix();
-//		error_log("entering Form Load with usage ".memory_get_usage());
-		$sql = 'SELECT * FROM '.$pref.'module_pwf_form WHERE form_id=?';
-		$result = $db->GetRow($sql, array($form_id));
-		if($result)
+		$db = cmsms()->GetDb();
+		$pre = cms_db_prefix();
+		$sql = 'SELECT * FROM '.$pre.'module_pwf_form WHERE form_id=?';
+		$row = $db->GetRow($sql,array($form_id));
+		if(!$row)
 		{
-			$formdata->Id = $result['form_id'];
-			if(empty($params['form_name']))
-				$formdata->Name = $result['name'];
-
-			if(empty($params['form_alias']))
-				$formdata->Alias = $result['alias'];
+			$ret = FALSE;
+			return $ret;
 		}
-		else
-		{
-			return false;
-		}
+		
+		$formdata = $mod->GetFormData($params);
+		$formdata->Id = $row['form_id'];
+		//$params (if present) override stored values
+		if(empty($params['form_name']))
+			$formdata->Name = $row['name'];
+		if(empty($params['form_alias']))
+			$formdata->Alias = $row['alias'];
 
-		$sql = 'SELECT name,value FROM '.$pref.'module_pwf_form_attr WHERE form_id=?';
-		$formdata->Attrs = $db->GetAssoc($sql, array($form_id));
+		$sql = 'SELECT name,value FROM '.$pre.'module_pwf_form_opt WHERE form_id=?';
+		$formdata->Attrs = $db->GetAssoc($sql,array($form_id));
 		$formdata->loaded = 'summary';
 
-		if(isset($params['response_id']))
+/*		if(isset($params['response_id']))
 		{
-			$loadDeep = true;
-			$loadResp = true;
+			$deep = TRUE;
+			$loadResp = TRUE;
 		}
-
-		if($loadDeep)
+*/
+		if($deep)
 		{
-			if($loadResp)
+/*			if($loadResp)
 			{
-				// if it's a stored form, load the results -- but we need to manually merge them,
+				// if it's a stored form,load the results -- but we need to manually merge them,
 				// since $params[] should override the database value (say we're resubmitting a form)
-				$obfield = $mod->GetFormBrowserField($form_id);
-				if($obfield != false)
+TODO				$obfield = $mod->GetFormBrowserField($form_id);
+				if($obfield != FALSE)
 				{
-					// if we're binding to FEU, get the FEU ID, see if there's a response for
-					// that user. If so, load it. Otherwise, bring up an empty form.
+					// if we're binding to FEU,get the FEU ID,see if there's a response for
+					// that user. If so,load it. Otherwise,bring up an empty form.
 					if($obfield->GetOption('feu_bind','0')=='1')
 					{
 						$feu = $mod->GetModuleInstance('FrontEndUsers');
-						if($feu == false)
+						if($feu == FALSE)
 						{
 							debug_display("FAILED to instatiate FEU!");
 							return;
 						}
 						if(!isset($_COOKIE['cms_admin_user_id']))
 						{
-							$response_id = $mod->GetResponseIDFromFEUID($feu->LoggedInId(), $form_id);
-							if($response_id !== false)
+TODO							$response_id = pwfDummy:GetResponseIDFromFEUID($feu->LoggedInId(),$form_id);
+							if($response_id !== FALSE)
 							{
-								$check = $db->GetOne('SELECT count(*) FROM '.$pref.
+								$check = $db->GetOne('SELECT count(*) FROM '.$pre.
 									'module_pwf_browse WHERE browser_id=?',array($response_id));
 								if($check == 1)
 								{
@@ -691,7 +347,7 @@ TODO $formdata = ;
 				{
 					$loadParams = array('response_id'=>$params['response_id']);
 					$loadTypes = array();
-TODO					$this->LoadResponseValues($loadParams, $loadTypes);
+					self::LoadResponseValues($loadParams,$loadTypes);
 					foreach($loadParams as $thisParamKey=>$thisParamValue)
 					{
 						if(!isset($params[$thisParamKey]))
@@ -708,131 +364,401 @@ TODO					$this->LoadResponseValues($loadParams, $loadTypes);
 					}
 				}
 			}
-			$sql = 'SELECT * FROM '.$pref.'module_pwf_field WHERE form_id=? ORDER BY order_by';
-			$result = $db->GetArray($sql, array($form_id));
-/*			$result = array();
-			if($rs && $rs->RecordCount() > 0)
-			{
-				$result = $rs->GetArray();
-			}
 */
-			if($result)
+			$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
+			$fields = $db->GetArray($sql,array($form_id));
+			if($fields)
 			{
-TODO				$funcs = new pwfFieldOperations($this,$params,false);
-				foreach($result as &$fldArray)
+				$funcs = new pwfFieldOperations();
+				foreach($fields as &$row)
 				{
-					//error_log("Instantiating Field. usage ".memory_get_usage());
-					$className = pwfUtils::MakeClassName($fldArray['type']);
+//					error_log("Instantiating Field. usage ".memory_get_usage());
+//					$className = pwfUtils::MakeClassName($row['type']);
+					$fid = $row['field_id'];
 					// create the field object
-					if((isset($fldArray['field_id']) && (isset($params['pwfp__'.$fldArray['field_id']]) || isset($params['pwfp___'.$fldArray['field_id']]))) ||
-						(isset($fldArray['field_id']) && isset($params['value_'.$fldArray['name']])) || (isset($fldArray['field_id']) && isset($params['value_fld'.$fldArray['field_id']])) ||
-						(isset($params['field_id']) && isset($fldArray['field_id']) && $params['field_id'] == $fldArray['field_id']))
+					if((isset($params['pwfp__'.$fid]) || isset($params['pwfp___'.$fid])) ||
+						isset($params['value_'.$row['name']]) || 
+						isset($params['value_fld'.$fid]) ||
+						(isset($params['field_id']) && $params['field_id'] == $fid)
+					  )
 					{
-						$fldArray = array_merge($fldArray,$params);
+						$row = array_merge($row,$params); //TODO
 					}
-
-					$fld = $funcs->NewField($mod,$fldArray);
-					$formdata->Fields[] = $fld;
-					if($fld->Type == 'PageBreakField')
-					{
-						$formdata->FormTotalPages++;
-					}
+					$obfield = $funcs->NewField($formdata,$row);
+					$formdata->Fields[] = $obfield;
+					if($obfield->Type == 'PageBreakField')
+						$formdata->FormPagesCount++;
 				}
-				unset ($fldArray);
+				unset($row);
 			}
 			$formdata->loaded = 'full';
-		} //end of $loadDeep
+		} //end of $deep
 
-		return true;
+		return $formdata;
 	}
 
 	/**
-	ExportXML:
-	@form_id: enumerator of form to be processed
-	@exportValues: optional boolean, whether to ... , default = false
+	CreateXML:
+	@mod: reference to PowerForms module
+	@form_id: single form identifier, or array of them
+	@date: date string for inclusion in the content
+	@charset: optional, name of content encoding, default = FALSE
+	@dtd: optional boolean, whether to consruct DTD in file, default TRUE
+	Returns: XML string, or FALSE. Included value-data are not bound by
+		<![CDATA[...]]> cuz that mechanism is not nestable. This means that
+		values which include javascript may be unbrowsable in a XML-viewer.		
 	*/
-	function ExportXML($form_id,$exportValues = false)
+	function CreateXML(&$mod,$form_id,$date,$charset=FALSE,$dtd=TRUE)
 	{
-TODO $formdata = ;
-		$xmlstr = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
-		$xmlstr .= "<form id=\"".$form_id."\"\n";
-		$xmlstr .= "\talias=\"".$formdata->Alias."\">\n";
-		$xmlstr .= "\t\t<form_name><![CDATA[".$formdata->Name."]]></form_name>\n";
-		foreach($formdata->Attrs as $thisAttrKey=>$thisAttrValue)
-			$xmlstr .= "\t\t<attribute key=\"$thisAttrKey\"><![CDATA[$thisAttrValue]]></attribute>\n";
-
-		foreach($formdata->Fields as &$fld)
-			$xmlstr .= $fld->ExportXML($exportValues);
-
-		unset($fld);
-		$xmlstr .= "</form>\n";
-		return $xmlstr;
-	}
-
-	private function inXML(&$var)
-	{
-		return (isset($var) && strlen($var) > 0);
-	}
-
-	/**
-	ImportXML:
-	@mod: reference to the current PowerForms module object
-	@params:
-	notable params:
-	  xml_file -- source file for the XML
-	  xml_string -- source string for the XML
-	*/
-	function ImportXML(&$mod,&$params)
-	{
-		// xml_parser_create, xml_parse_into_struct
-		$parser = xml_parser_create('');
-		xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
-		xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, 0); // was 1
-		if(!empty($params['xml_file']))
+		$pre = cms_db_prefix();
+		$db = cmsms()->GetDb();
+		$sql = 'SELECT * FROM '.$pre.'module_pwf_form WHERE form_id=?';
+		if (!is_array($form_id))
 		{
-			xml_parse_into_struct($parser, file_get_contents($params['xml_file']), $values);
-		}
-		elseif(!empty($params['xml_string']))
-		{
-			xml_parse_into_struct($parser, $params['xml_string'], $values);
+			$properties = $db->GetRow($sql,array($form_id));
+			$form_id = array($form_id);
 		}
 		else
 		{
-			return false;
-		}
-		xml_parser_free($parser);
-		$elements = array();
-		$stack = array();
-		$fieldMap = array();
-		foreach($values as $tag)
-		{
-			$index = count($elements);
-			if($tag['type'] == 'complete' || $tag['type'] == 'open')
+			//use form-properties data from first-found
+			foreach($form_id as $one)
 			{
-				$elements[$index] = array();
-				$elements[$index]['name'] = $tag['tag'];
-				$elements[$index]['attributes'] = empty($tag['attributes']) ? "" : $tag['attributes'];
-				$elements[$index]['content']	= empty($tag['value']) ? "" : $tag['value'];
-				if($tag['type'] == 'open')
+				$properties = $db->GetRow($sql,array($one));
+				if($properties != FALSE)
+					break;
+			}
+		}
+		if($properties == FALSE)
+			return FALSE;
+
+		$outxml = array();
+		$t = '<?xml version="1.0" standalone="yes"';
+		if($charset)
+			$t .= ' encoding="'.strtoupper($charset).'"';
+		$outxml[] = $t.'?>';
+		if($dtd)
+		{
+			$xml[] = <<<EOS
+<!DOCTYPE powerforms [
+<!ELEMENT powerforms (version,date,count,form)>
+<!ELEMENT version (#PCDATA)>
+<!ELEMENT date (#PCDATA)>
+<!ELEMENT count (#PCDATA)>
+<!ELEMENT form (properties,options?,fields?)>
+<!ELEMENT properties (#PCDATA)>
+<!ELEMENT options (#PCDATA)>
+<!ELEMENT fields (field)>
+<!ELEMENT field (properties,options?)>
+]>
+EOS;
+		}
+		$count = (is_array($form_id))?count($form_id):1;
+		$outxml[] = <<<EOS
+<powerforms>
+\t<version>{$mod->GetVersion()}</version>
+\t<date>{$date}</date>
+\t<count>{$count}</count>
+EOS;
+		$sql = 'SELECT name,value FROM '.$pre.'module_pwf_form_opt WHERE form_id=? ORDER BY name';
+		$sql2 = 'SELECT field_id,name,type,order_by FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
+		$sql3 = 'SELECT option_id,field_id,name,value FROM '.$pre.'module_pwf_field_opt WHERE form_id=? ORDER BY option_id,name';
+		$formpropkeys = array_keys($properties);
+
+		foreach($form_id as $one)
+		{
+			$formopts = $db->GetAssoc($sql,array($one));
+			$formfields = $db->GetAll($sql2,array($one));
+			$fieldkeys = ($formfields) ? array_keys($formfields[0]) : array();
+			$fieldopts = $db->GetArray($sql3,array($one));
+			$xml = array();
+			$xml[] =<<<EOS
+\t<form>
+\t\t<properties>
+EOS;
+			foreach($formpropkeys as $onekey)
+				$xml[] = "\t\t\t<$onekey>".$properties[$onekey]."</$onekey>";
+			$xml[] =<<<EOS
+\t\t</properties>
+\t\t<options>
+EOS;
+			foreach($formopts as $name=>$value)
+			{
+				if($value === '') continue;
+				if(strpos($name,'template') === FALSE)
+					$xml[] = "\t\t\t<$name>".trim($value)."</$name>";
+				else//smarty syntax can abort the xml-decoder - so mask it
 				{
-					# push
-					$elements[$index]['children'] = array();
-					$stack[count($stack)] = &$elements;
-					$elements = &$elements[$index]['children'];
+					if($name == 'form_template')
+						$value = $mod->GetTemplate('pwf_'.$form_id);
+					$xml[] = "\t\t\t<$name>]][[".urlencode(trim($value))."</$name>";
 				}
 			}
-			if($tag['type'] == 'close')
-			{	# pop
-				$elements = &$stack[count($stack) - 1];
-				unset($stack[count($stack) - 1]);
+			$xml[] =<<<EOS
+\t\t</options>
+\t\t<fields>
+EOS;
+			foreach($formfields as $thisfield)
+			{
+				$xml[] =<<<EOS
+\t\t\t<field>
+\t\t\t\t<properties>
+EOS;
+				foreach($fieldkeys as $onekey)
+					$xml[] = "\t\t\t\t\t<$onekey>".$thisfield[$onekey]."</$onekey>";
+				$xml[] =<<<EOS
+\t\t\t\t</properties>
+\t\t\t\t<options>
+EOS;
+				//get $fieldopts[] for this field
+				$myopts = array_filter($fieldopts,array(new IsFieldOption($thisfield['field_id']),'isMine'));
+				if($myopts)
+				{
+					foreach($myopts as &$oneopt)
+					{
+						if($oneopt['value'] === '') continue;
+						$name = $oneopt['name'];
+						if(strpos($name,'template') === FALSE)
+							$xml[] = "\t\t\t\t\t<$name>".trim($oneopt['value'])."</$name>";
+						else//as above, mask potentially-bad content
+							$xml[] = "\t\t\t\t\t<$name>]][[".urlencode(trim($oneopt['value']))."</$name>";
+					}
+					unset($oneopt);
+				}
+			$xml[] =<<<EOS
+\t\t\t\t</options>
+\t\t\t</field>
+EOS;
+			}
+			$xml[] =<<<EOS
+\t\t</fields>
+\t</form>
+EOS;
+			$outxml[] = implode("\n",$xml);
+		}
+		$outxml[] = '</powerforms>';
+		return implode("\n",$outxml);
+	}
+
+	private function ClearTags(&$array)
+	{
+		$suff = 1;
+		foreach($array as $indx=>&$val)
+		{
+			if(is_array($val))
+			{
+				if(is_numeric($indx))
+				{
+					$key = key(array_slice($val,0,1,TRUE));
+					array_shift($val);
+					if($key == 'field')
+						$key .= $suff++;
+					$array[$key] = $val;
+					unset($array[$indx]);
+				}
+				self::ClearTags($val); //recurse
 			}
 		}
-		//debug_display($elements);
-		if(!isset($elements[0]) || !isset($elements[0]) || !isset($elements[0]['attributes']))
+		unset($val);
+	 }
+
+	/**
+	 ParseXML:
+	 @xmlfile: filepath of xml file to be processed
+	 Read, parse and check high-level structure of xml file whose path is @xmlfile
+	 Returns: xml'ish tree-shaped array (with text encoded as UTF-8), or FALSE
+	 form-data are in sub-array(s) keyed as 'form1', ... 'form{array['count']}'
+	*/
+	function ParseXML($xmlfile)
+	{
+		$parser = xml_parser_create();
+		xml_parser_set_option($parser,XML_OPTION_CASE_FOLDING,0);
+		xml_parser_set_option($parser,XML_OPTION_SKIP_WHITE,1);
+//		xml_parser_set_option($parser,XML_OPTION_TARGET_ENCODING,'UTF-8');
+		$res = xml_parse_into_struct($parser,file_get_contents($xmlfile),$xmlarray);
+		xml_parser_free($parser);
+		if ($res === 0)
+			return FALSE;
+		if (empty($xmlarray[0]) || empty($xmlarray[0]['tag']) || $xmlarray[0]['tag'] != 'powerforms')
+			return FALSE;
+		array_shift($xmlarray); //ignore 'powerforms' tag
+		$arrsize = count($xmlarray);
+		//migrate $xmlarray to condensed format
+		$opened = array();
+		$opened[1] = 0;
+		for($j = 0; $j < $arrsize; $j++)
 		{
-			//parsing failed, or invalid file.
-			return false;
+			$val = $xmlarray[$j];
+			switch($val['type'])
+			{
+				case 'open': //start of a new level
+					$opened[$val['level']]=0;
+				case 'complete': //a single value
+					$lvl = $val['level'];
+					$index = '';
+					for($i = 1; $i < $lvl; $i++)
+						$index .= '['.$opened[$i].']';
+					$path = explode('][', substr($index, 1, -1));
+					if($val['type'] == 'complete')
+						array_pop($path);
+					$value = &$array;
+					foreach($path as $segment)
+						$value = &$value[$segment];
+					$v = (!empty($val['value'])) ? $val['value'] : null; //default value is null
+					$value[$val['tag']] = $v;
+					if($val['type'] == 'complete' && $lvl > 1)
+						$opened[$lvl-1]++;
+					break;
+				case 'close': //end of a level
+					if ($val['level'] > 1)
+						$opened[$val['level']-1]++;
+					unset($opened[$val['level']]);
+					break;
+			}
 		}
+		unset($value);
+		//clear top-level numeric keys and related tags
+		$suff = 1;
+		foreach($array as $indx=>&$value)
+		{
+			if (is_numeric($indx))
+			{
+				$key = key(array_slice($value,0,1,TRUE));
+				if($key == 'form')
+					$key .= $suff++;
+				array_shift($value);
+				$array[$key] = $value;
+				unset($array[$indx]);
+			}
+		}
+		unset($value);
+		foreach(array('version','date','count','form1') as $expected)
+		{
+			if (!array_key_exists($expected,$array))
+				return FALSE;
+		}
+		//and lower-level tags
+		self::ClearTags($array);
+		$expected = array('properties','options','fields');	
+		foreach ($array['form1'] as $indx=>&$check)
+		{
+			if (!in_array($indx,$expected))
+			{
+				unset($check);
+				return FALSE;
+			}
+		}
+		unset($check);
+		return $array;
+	}
+
+//====================
+/*	private function inXML(&$var)
+	{
+		return (isset($var) && strlen($var) > 0);
+	}
+*/
+	/**
+	ImportXML:
+	@mod: reference to the current PowerForms module object
+	@xmlfile:
+	Returns boolean T/F
+	*/
+	function ImportXML(&$mod,$xmlfile)
+	{
+		$data = self::ParseXML($xmlfile);
+		if($data == FALSE)
+			return FALSE;
+		//? check $data['version'], $data['date']
+/*$data = array (size>=4)
+  'version' => string '0.7' (length=3)
+  'date' => null
+  'count' => string '1' (length=1)
+  'form1' => 
+    array (size=3)
+      'properties' => 
+        array (size=3)
+          'form_id' => string '1' (length=1)
+          'name' => string 'Sample Form' (length=11)
+          'alias' => string 'sample_form' (length=11)
+      'options' => 
+        array (size=17)
+          'captcha_wrong' => string 'The entered text was not correct' (length=32)
+          'css_class' => string 'PowerFormsform' (length=14)
+          'form_displaytype' => string 'tab' (length=3)
+          'form_template' => string '%7B%2A+DEFAULT+FORM+LAYOUT+%2F+pure+CSS+%2A%7D%0A%7Bif+%24form_done%7D%0A%09%7B%2A+This+section+is+for+displaying+submission-errors+%2A%7D%0A%09%7Bif+%24submission_error%7D%0A%09%09%3Cdiv+class%3D%22error_message%22%3E%7B%24submission_error%7D%3C%2Fdiv%3E%0A%09%09%7Bif+%24show_submission_errors%7D%0A%09%09%09%3Cdiv+class%3D%22error%22%3E%0A%09%09%09%3Cul%3E%0A%09%09%09%7Bforeach+from%3D%24submission_error_list+item%3Done%7D%0A%09%09%09%09%3Cli%3E%7B%24one%7D%3C%2Fli%3E%0A%09%09%09%7B%2Fforeach%7D%0A%09%09%0'... (length=3531)
+          'inline' => string '1' (length=1)
+          'list_delimiter' => string '-' (length=1)
+          'next_button_text' => string 'Continue...' (length=11)
+          'prev_button_text' => string 'Back...' (length=7)
+          'redirect_page' => string '-1' (length=2)
+          'required_field_symbol' => string '*' (length=1)
+          'submission_template' => string '%3Ch1%3EThanks%21%3C%2Fh1%3E%0A%3Cp%3EYour+feedback+helps+make+the+PowerForms+module+better.%3C%2Fp%3E' (length=102)
+          'submit_action' => string 'text' (length=4)
+          'submit_button_text' => string 'Send Feedback' (length=13)
+          'title_position' => string 'left' (length=4)
+          'title_user_captcha' => string 'Help to prevent abuse by spammers, enter the text from the image' (length=64)
+          'unspecified' => string '[unspecified]' (length=13)
+          'use_captcha' => string '1' (length=1)
+      'fields' => 
+        array (size=8)
+          'field1' => 
+            array (size=2)
+              ...*/
+		$db = cmsms()->GetDb();
+		$pre = cms_db_prefix();
+		for($i=1; $i<=$data['count']; $i++)
+		{
+			$fdata = $data['form'.$i];
+			$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+			$form_id = $db->GenID($pre.'module_pwf_form_seq');
+			$db->Execute($sql,array($form_id,
+				$fdata['properties']['name'],
+				$fdata['properties']['alias']));
+			$sql = 'INSERT INTO '.$pre.'module_pwf_form_opt (option_id,form_id,name,value) VALUES (?,?,?,?)';
+			foreach($fdata['options'] as $name=>&$one)
+			{
+				$option_id = $db->GenID($pre.'module_pwf_form_opt_seq');
+				if(substr($one,0,4) != ']][[')
+					$val = $one;
+				else
+				{
+					$val = substr($one,4);
+					$val = urldecode($val); //TODO translate numbered fields in templates
+					if($name == 'form_template')
+					{
+						$mod->SetTemplate('pwf_'.$form_id,$val);
+						$val = 'pwf_'.$form_id;
+					}
+				}
+				$db->Execute($sql,array($option_id,$form_id,$name,$val));
+			}
+			unset($one);
+			$sql = 'INSERT INTO '.$pre.'module_pwf_field (
+field_id,form_id,name,type,order_by) VALUES (?,?,?,?,?)';
+			foreach($fdata['fields'] as &$fld)
+			{
+				$field_id = $db->GenID($pre.'module_pwf_field_seq');
+				$db->Execute($sql,array($field_id,$form_id,
+					$fld['properties']['name'],
+					$fld['properties']['type'],
+					$fld['properties']['order_by']));
+				$sql2 = 'INSERT INTO '.$pre.'module_pwf_field_opt (
+option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
+				foreach($fld['options'] as $name=>&$one)
+				{
+					$option_id = $db->GenID($pre.'module_pwf_field_opt_seq');
+					if(substr($one,0,4) != ']][[')
+						$val = $one;
+					else
+						$val = urldecode(substr($one,4)); //TODO translate numbered fields in templates
+					$db->Execute($sql2,array($option_id,$field_id,$form_id,$name,$val));
+				}
+				unset($one);
+			}
+			unset($fld);
+		}
+		return TRUE;
+/*
 		$params['form_id'] = -1; // override any form_id values that may be around
 		$formAttrs = &$elements[0]['attributes'];
 
@@ -846,8 +772,8 @@ TODO $formdata = ;
 		if(!empty($params['import_formname']))
 			$formdata->Name = $params['import_formname'];
 
-		$foundfields = false;
-		// populate the attributes and field name first. When we see a field, we save the form and then start adding the fields to it.
+		$foundfields = FALSE;
+		// populate the attributes and field name first. When we see a field,we save the form and then start adding the fields to it.
 
 		foreach($elements[0]['children'] as $thisChild)
 		{
@@ -859,7 +785,7 @@ TODO $formdata = ;
 			}
 			elseif($thisChild['name'] == 'attribute')
 			{
-TODO				$this->SetAttr($thisChild['attributes']['key'], $thisChild['content']);
+				$formdata->Attrs[$thisChild['attributes']['key']] =  $thisChild['content'];
 			}
 			else
 			{
@@ -867,7 +793,7 @@ TODO				$this->SetAttr($thisChild['attributes']['key'], $thisChild['content']);
 				if(!$foundfields)
 				{
 					// first field
-					$foundfields = true;
+					$foundfields = TRUE;
 					if(isset($params['import_formname']) &&
 					   trim($params['import_formname']) != '')
 						$formdata->Name = trim($params['import_formname']);
@@ -916,7 +842,7 @@ TODO				$this->SetAttr($thisChild['attributes']['key'], $thisChild['content']);
 						}
 					}
 				}
-				$newField->Store(true);
+				$newField->Store(TRUE);
 				$formdata->Fields[] = $newField;
 				$fieldMap[$oldId] = $newField->GetId();
 			}
@@ -926,24 +852,24 @@ TODO				$this->SetAttr($thisChild['attributes']['key'], $thisChild['content']);
 		if(!empty($params['xml_file']))
 		{
 			// need to update mappings in templates.
-TODO			$tmp = $this->updateRefs(self::GetAttr($formdata,'form_template',''), $fieldMap);
-TODO			$this->SetAttr('form_template',$tmp);
-TODO			$tmp = $this->updateRefs(self::GetAttr($formdata,'submission_template',''), $fieldMap);
-TODO			$this->SetAttr('submission_template',$tmp);
+			$tmp = self::UpdateRefs(pwfUtils::GetAttr($formdata,'form_template',''),$fieldMap);
+			$formdata->Attrs['form_template'] = $tmp;
+			$tmp = self::UpdateRefs(pwfUtils::GetAttr($formdata,'submission_template',''),$fieldMap);
+			$formdata->Attrs['submission_template'] = $tmp;
 
 			// need to update mappings in field templates.
 			$options = array('email_template','file_template');
 			foreach($formdata->Fields as &$fld)
 			{
-				$changes = false;
+				$changes = FALSE;
 				foreach($options as $to)
 				{
 					$templ = $fld->GetOption($to,'');
 					if(!empty($templ))
 					{
-TODO						$tmp = $this->updateRefs($templ, $fieldMap);
+						$tmp = self::UpdateRefs($templ,$fieldMap);
 						$fld->SetOption($to,$tmp);
-						$changes = true;
+						$changes = TRUE;
 					}
 				}
 				// need to update mappings in FormBrowser sort fields
@@ -955,13 +881,13 @@ TODO						$tmp = $this->updateRefs($templ, $fieldMap);
 						if(isset($fieldMap[$old]))
 						{
 							$fld->SetOption('sortfield'.$i,$fieldMap[$old]);
-							$changes = true;
+							$changes = TRUE;
 						}
 					}
 				}
 				if($changes)
 				{
-					$fld->Store(true);
+					$fld->Store(TRUE);
 				}
 			}
 			unset ($fld);
@@ -969,29 +895,19 @@ TODO						$tmp = $this->updateRefs($templ, $fieldMap);
 			self::Store($mod,$params['form_id'],$params);
 		}
 
-		return true;
-	}
-	
-	/**
-	GetBrowsers:
-	@mod: reference to the current PowerForms module object
-	@form_id: enumerator of form to be processed
-	*/
-	function GetBrowsers(&$mod,$form_id)
-	{
-		$fbr = $mod->GetModuleInstance('FormBrowser');
-		if($fbr != false)
-		{
-			$db = $mod->dbHandle;
-			$sql = 'SELECT browser_id FROM '.cms_db_prefix().'module_fbr_browser WHERE form_id=?';
-			$browsers = $db->GetAll($sql,array($form_id));
-		}
-		else
-			$browsers = array();
-		return $browsers;
+		return TRUE;
+*/
 	}
 
-	function NewID(&$mod,$name = false,$alias = false)
+/*	private function UpdateRefs($text,&$fieldMap)
+	{
+		foreach($fieldMap as $k=>$v)
+			$text = preg_replace('/([\{\b\s])\$fld_'.$k.'([\}\b\s])/','$1\$fld_'.$v.'$2',$text);
+		return $text;
+	}
+*/
+	//returns TRUE if a form with matching name OR alias does NOT exist
+	function NewID($name = FALSE,$alias = FALSE)
 	{
 		$where = array();
 		$vars = array();
@@ -1006,36 +922,31 @@ TODO						$tmp = $this->updateRefs($templ, $fieldMap);
 			$where[] = 'alias=?';
 			$vars[] = $alias;
 		}
-		if(count($where) > 0)
+		if($where)
 		{
-			$db = $mod->dbHandle;
+			$db = cmsms()->GetDb();
 			$sql = 'SELECT form_id FROM '.cms_db_prefix().'module_pwf_form WHERE ';
 			$sql .= implode(' OR ',$where);
-			$exists = $db->GetOne($sql, $vars);
+			$exists = $db->GetOne($sql,$vars);
 			if($exists)
-				return false;
+				return FALSE;
 		}
-		return true;
+		return TRUE;
 	}
 
 	function GetId(&$params)
 	{
-		$fid = (isset($params['form_id'])) ? (int)$params['form_id'] : -1;
-		return $fid;
+		return (isset($params['form_id'])) ? (int)$params['form_id'] : -1;
 	}
 
 	function GetName(&$params)
 	{
-		$fname = (isset($params['form_name'])) ? trim($params['form_name']) : '';
-		return $fname;
+		return (isset($params['form_name'])) ? trim($params['form_name']) : '';
 	}
 
-	function GetAttr(&$formdata, $attrname, $default='')
+	function GetAlias(&$params)
 	{
-		if(isset($formdata->Attrs[$attrname]))
-			return $formdata->Attrs[$attrname];
-		else
-			return $default;
+		return (isset($params['form_alias'])) ? trim($params['form_alias']) : '';
 	}
 
 }
