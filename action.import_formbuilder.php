@@ -44,8 +44,20 @@ function Get_FieldOpts(&$db,$pre,$oldfid,$newfid,$oldf,$newf,&$fieldrow)
 		if($fieldrow['hide_label']) $extras['hide_label'] = 1;
 		if($fieldrow['required']) $extras['required'] = 1;
 		if($fieldrow['validation_type']) $extras['validation_type'] = trim($fieldrow['validation_type']);
-
-		$sequence = ($fieldrow['type'] == 'CheckboxGroupField'); //ETC?
+		//some field-types simply repeat the same option-name (relying on save-order for any reconciliation!)
+		//we are more careful!
+		$sequence = in_array($fieldrow['type'],array(
+			'PulldownField',
+			'RadioGroupField',
+			'CheckboxGroupField',
+			'MultiselectField',
+			'DispositionDirector',
+			'DispositionEmail',
+			'DispositionEmailBasedFrontendFields',
+			'DispositionFileDirector',
+			'DispositionMultiselectFileDirector',
+			'DispositionPageRedirector'
+		));
 		if($sequence)
 			$desc = '';
 
@@ -68,7 +80,8 @@ function Get_FieldOpts(&$db,$pre,$oldfid,$newfid,$oldf,$newf,&$fieldrow)
 			}
 			$db->Execute($sql,array($oid,$newf,$newfid,$nm,$row['value']));
 			//existing option-value prevails over actions-table 'transfer'
-			$extras[$$row['name']] = FALSE;
+			if(isset($extras[$row['name']]))
+				$extras[$row['name']] = FALSE;
 		}
 		foreach($extras as $name=>$value)
 		{
@@ -125,12 +138,23 @@ if(isset($params['import']))
 	$oldforms = $db->GetArray($sql);
 	if($oldforms)
 	{
+		$funcs = new pwfFormOperations();
 		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
 		$renums = array();
 		foreach($oldforms as $row)
 		{
 			$fid = $db->GenID($pre.'module_pwf_form_seq');
-			$db->Execute($sql,array($fid,$row['name'],$row['alias']));
+			$alias = $row['alias'];
+			if(!$alias)
+				$alias = pwfUtils::MakeAlias();
+			$ta = $alias;
+			$i = 1;
+			while(!$funcs->NewID(FALSE,$alias))
+			{
+				$alias = $ta."[$i]";
+				$i++;
+			}
+			$db->Execute($sql,array($fid,$row['name'],$alias));
 			$renums[$fid] = (int)$row['form_id'];
 		}
 		$sql = 'INSERT INTO '.$pre.'module_pwf_trans (old_id,new_id,isform) VALUES (?,?,1)';
@@ -143,7 +167,7 @@ if(isset($params['import']))
 			$rs = $db->SelectLimit('SELECT * FROM '.$pre.'module_pwbr_browser',1);
 			if($rs)
 			{
-				if(!rs->EOF)
+				if(!$rs->EOF)
 					Match_Browses($db,$pre);
 				$rs->Close();
 			}
