@@ -154,11 +154,10 @@ $path = cms_join_path(dirname(__FILE__),'include');
 $dir = opendir($path);
 while($filespec = readdir($dir))
 {
-	$params = array();
 	if(preg_match('/.xml$/',$filespec) > 0)
 	{
-		$params['xml_file'] = cms_join_path($path,$filespec);
-//TODO		$funcs->ImportXML($this,$params);
+		$fp = cms_join_path($path,$filespec);
+		$funcs->ImportXML($this,$fp);
 	}
 }
 
