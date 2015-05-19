@@ -174,7 +174,6 @@ if($formdata->Page > 1)
 else
 	$smarty->assign('prev','');
 
-$smarty->assign('has_captcha',0);
 if($formdata->Page < $formPageCount)
 {
 	$smarty->assign('submit',
@@ -183,15 +182,6 @@ if($formdata->Page < $formPageCount)
 }
 else
 {
-	$captcha = $this->getModuleInstance('Captcha');
-	if(pwfUtils::GetAttr($formdata,'use_captcha','0') == '1' && $captcha != NULL)
-	{
-		$smarty->assign('graphic_captcha',$captcha->getCaptcha());
-		$smarty->assign('title_captcha',pwfUtils::GetAttr($formdata,'title_user_captcha',$this->Lang('title_user_captcha')));
-		$smarty->assign('input_captcha',$this->CreateInputText($id, 'pwfp_captcha_phrase',''));
-		$smarty->assign('has_captcha',1);
-	}
-
 	$smarty->assign('submit',
 	'<input class="cms_submit submit_current" name="'.$id.'submit" id="'.$id.'submit" value="'.
 	pwfUtils::GetAttr($formdata,'submit_button_text').'" type="submit" '.$js.' />');
