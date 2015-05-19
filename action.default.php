@@ -47,40 +47,22 @@ $smarty->assign('show_submission_errors',0);
 
 $finished = FALSE;
 if(!$fieldExpandOp &&
-($formdata->FormPagesCount > 1 && $formdata->Page > 0) || (!empty($params['pwfp_done'])))
+(!empty($params['pwfp_done']) || $formdata->FormPagesCount > 1 && $formdata->Page > 0))
 {
 	$ops = new pwfOperate();
-	// Validate form
-	$res = $ops->FormValidate();
+	// validate form
+	$res = $ops->FormValidate($this,$formdata,$params);
     if($res[0] === FALSE)
     {
-		// Validation error(s)
-		$smarty->assign('form_validation_errors',$res[1]);
+		// validation error(s)
 		$smarty->assign('form_has_validation_errors',1);
+		$smarty->assign('form_validation_errors',$res[1]);
 		$formdata->Page--;
 	}
 	else if(!empty($params['pwfp_done']))
 	{
-		// No validate errors, proceed
-		// Check captcha, if installed
-		$ok = TRUE;
-		$captcha = $this->getModuleInstance('Captcha');
-		if(pwfUtils::GetAttr($formdata,'use_captcha','0') == '1' && $captcha != NULL)
-		{
-			if(!$captcha->CheckCaptcha($params['pwfp_captcha_phrase']))
-			{
-				$smarty->assign('captcha_error',pwfUtils::GetAttr($formdata,'captcha_wrong',$this->Lang('wrong_captcha')));
-				$formdata->Page--;
-				$ok = FALSE;
-			}
-		}
-		// All ok, dispose form and manage fileuploads
-		if($ok)
-		{
-			$finished = TRUE;
-			$ops->ManageFileUploads();
-			$results = $ops->FormDispose($returnid);
-		}
+		$finished = TRUE;
+		$results = $ops->FormDispose($formdata,$returnid);
 	}
 	unset($ops);
 }
@@ -133,16 +115,15 @@ else
 
 $udtonce = pwfUtils::GetAttr($formdata,'predisplay_udt','');
 $udtevery = pwfUtils::GetAttr($formdata,'predisplay_each_udt','');
-if(!$finished &&
-	((!empty($udtonce) && $udtonce != -1) || (!empty($udtevery) && $udtevery != -1)))
+if(!$finished && (!empty($udtonce) || !empty($udtevery)))
 {
 	$parms = $params;
 	$parms['FORM'] =& $formdata;
 	$usertagops = $gCms->GetUserTagOperations();
-	if(isset($pwfp_callcount) && $pwfp_callcount == 0 && !empty($udtonce) && $udtonce != '-1')
+	if(isset($pwfp_callcount) && $pwfp_callcount == 0 && !empty($udtonce))
 		/*$tmp = */$usertagops->CallUserTag($udtonce,$parms);
 
-	if(!empty($udtevery) && $udtevery != '-1')
+	if(!empty($udtevery))
 		/*$tmp = */$usertagops->CallUserTag($udtevery,$parms);
 	unset($parms);
 	unset($usertagops);
