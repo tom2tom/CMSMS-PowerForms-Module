@@ -235,34 +235,6 @@ $smarty->assign('input_form_prev_button',
 	$this->CreateInputText($id,'forma_prev_button_text',
 		pwfUtils::GetAttr($formdata,'prev_button_text',$this->Lang('button_previous')),35,35));
 
-$captcha = $this->getModuleInstance('Captcha');
-if($captcha)
-{
-	unset($captcha);
-	$smarty->assign('title_use_captcha',$this->Lang('title_use_captcha'));
-	$smarty->assign('captcha_installed',1);
-
-	$smarty->assign('input_use_captcha',$this->CreateInputHidden($id,'forma_use_captcha','0').
-		$this->CreateInputCheckbox($id,'forma_use_captcha','1',
-			pwfUtils::GetAttr($formdata,'use_captcha','0')).
-		$this->Lang('help_use_captcha'));
-
-	$smarty->assign('title_title_user_captcha',$this->Lang('title_title_user_captcha'));
-	$smarty->assign('input_title_user_captcha',
-		$this->CreateInputText($id,'forma_title_user_captcha',
-			pwfUtils::GetAttr($formdata,'title_user_captcha',$this->Lang('title_user_captcha')),50,80));
-
-	$smarty->assign('title_user_captcha_error',$this->Lang('title_user_captcha_error'));
-	$smarty->assign('input_title_user_captcha_error',
-		$this->CreateInputText($id,'forma_captcha_wrong',
-			pwfUtils::GetAttr($formdata,'captcha_wrong',$this->Lang('wrong_captcha')),50,80));
-}
-else
-{
-	$smarty->assign('help_captcha_not_installed',$this->Lang('help_captcha_not_installed'));
-	$smarty->assign('captcha_installed',0);
-}
-
 $smarty->assign('title_form_next_button',$this->Lang('title_form_next_button'));
 $smarty->assign('input_form_next_button',
 	$this->CreateInputText($id,'forma_next_button_text',
@@ -338,9 +310,9 @@ $smarty->assign('title_load_template',$this->Lang('title_load_template'));
 $smarty->assign('security_key',CMS_SECURE_PARAM_NAME.'='.$_SESSION[CMS_USER_KEY]);
 
 $templateList = array(''=>'',
-	$this->Lang('default_template')=>'RenderFormDefault.tpl',
-	$this->Lang('table_left_template')=>'RenderFormTableTitleLeft.tpl',
-	$this->Lang('table_top_template')=>'RenderFormTableTitleTop.tpl');
+	$this->Lang('default_template')=>'defaultform.tpl',
+	$this->Lang('table_left_template')=>'tableform_lefttitles.tpl',
+	$this->Lang('table_top_template')=>'tableform_toptitles.tpl');
 
 $allForms = pwfUtils::GetForms();
 foreach($allForms as $one)
@@ -353,6 +325,7 @@ $thisLink = $this->CreateLink($id,'get_template',$returnid,'',array(),'',TRUE);
 $smarty->assign('input_load_template',$this->CreateInputDropdown($id,'template_load',
 	$templateList,-1,'','id="template_load" onchange="get_template(\''.$this->Lang('confirm_template').'\',\''.$thisLink.'\');"'));
 
+//TODO $in_browser never used here - in PowerBrowse ?
 $globalfields = array();
 foreach(array(
 	'total_pages',
@@ -361,7 +334,7 @@ foreach(array(
 	'css_class',
 	'form_name',
 	'form_id',
-	'in_formbrowser',
+	'in_browser',
 	'in_admin',
 	'browser_id',
 	'hidden',
