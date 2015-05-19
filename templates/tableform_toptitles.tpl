@@ -39,14 +39,9 @@ function help_toggle(htid) {
 		</ul>
 		</div>
 	{/if}
-	{if !empty($captcha_error)}
-		<div class="error_message">{$captcha_error}</div>
-	{/if}
-
 	{* and now the form itself *}
 	{$form_start}
 	<div>{$hidden}</div>
-
 	<table{if $css_class != ''} class="{$css_class}"{/if}>
 	{if $total_pages gt 1}<tr><td colspan="2">{$title_page_x_of_y}</td></tr>{/if}
 	{foreach from=$fields item=one}
@@ -56,9 +51,10 @@ function help_toggle(htid) {
 			$one->type != '-Fieldset End' }
 		<tr>
 			<td style="vertical-align:top;"
-			{if $one->required || $one->css_class} class=" 
+			{if $one->required || $one->css_class || !$one->valid} class=" 
 				{if $one->required}required {/if}
-				{if $one->css_class}{$one->css_class}{/if}
+				{if $one->css_class}{$one->css_class} {/if}
+				{if !$one->valid}fieldbad{/if}
 				"
 			{/if}
 			>
@@ -92,15 +88,12 @@ function help_toggle(htid) {
 			{/if}
 			{if !$one->valid} &lt;--- {$one->error}{/if}
 			{if $one->helptext != ''}&nbsp;<a href="javascript:help_toggle('{$one->field_helptext_id}')">
-				<img src="modules/PowerForms/images/info-small.gif" alt="Help" title="help" /></a>
+TODO translate				<img src="modules/PowerForms/images/info-small.gif" alt="Help" title="help" /></a>
 				<span id="{$one->field_helptext_id}" class="pwf_helptext">{$one->helptext}</span>{/if}
 			</td></tr>
 		{/if}
 		{/strip}
 	{/foreach}
-	{if !empty($has_captcha)}
-	<tr><td>{$graphic_captcha}</td></tr><tr><td>{$input_captcha}<br />{$title_captcha}</td></tr>
-	{/if}
 	<tr><td>{$prev}</td></tr><tr><td>{$submit}</td></tr>
 	</table>
 	{$form_end}

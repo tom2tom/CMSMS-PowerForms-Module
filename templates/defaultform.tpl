@@ -39,9 +39,6 @@ function help_toggle(htid) {
 		</ul>
 		</div>
 	{/if}
-	{if !empty($captcha_error)}
-		<div class="error_message">{$captcha_error}</div>
-	{/if}
 	{* and now the form itself *}
 	{$form_start}
 	<div>{$hidden}</div>
@@ -55,7 +52,7 @@ function help_toggle(htid) {
 				{if $one->required || $one->css_class || !$one->valid} class="
 					{if $one->required}required {/if}
 					{if $one->css_class}{$one->css_class} {/if}
-					{if !$one->valid}pwf_invalid{/if}
+					{if !$one->valid}fieldbad{/if}
 					"
 				{/if}
 				>
@@ -78,7 +75,7 @@ function help_toggle(htid) {
 				{if $one->smarty_eval}{eval var=$one->input}{else}{$one->input}{/if}
 			{/if}
 			{if $one->helptext != ''}&nbsp;<a href="javascript:help_toggle('{$one->field_helptext_id}')">
-				<img src="modules/PowerForms/images/info-small.gif" alt="Help" title="help" /></a>
+TODO translate				<img src="modules/PowerForms/images/info-small.gif" alt="Help" title="help" /></a>
 				<span id="{$one->field_helptext_id}" class="pwf_helptext">{$one->helptext}</span>{/if}
 			{if !$one->valid} &lt;--- {$one->error}{/if}
 			{if $one->needs_div}
@@ -87,9 +84,6 @@ function help_toggle(htid) {
 		{/if}
 		{/strip}
 	{/foreach}
-	{if !empty($has_captcha)}
-		<div class="captcha">{$graphic_captcha}{$title_captcha}<br />{$input_captcha}<br /></div>
-	{/if}
 	<div class="submit">{$prev} {$submit}</div>
 	</div>
 	{$form_end}
