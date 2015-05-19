@@ -71,14 +71,6 @@
   <p class="pageinput">{$input_list_delimiter}</p>
   <p class="pagetext">{$title_form_unspecified}:</p>
   <p class="pageinput">{$input_form_unspecified}</p>
-{if $captcha_installed}
-  <p class="pagetext">{$title_use_captcha}:</p>
-  <p class="pageinput">{$input_use_captcha}</p>
-  <p class="pagetext">{$title_title_user_captcha}:</p>
-  <p class="pageinput">{$input_title_user_captcha}</p>
-  <p class="pagetext">{$title_user_captcha_error}:</p>
-  <p class="pageinput">{$input_title_user_captcha_error}</p>
-{/if}
   <p class="pagetext">{$title_form_submit_button}:</p>
   <p class="pageinput">{$input_form_submit_button}</p>
   <p class="pagetext">{$title_form_next_button}:</p>
@@ -131,11 +123,6 @@
 {$tab_end}{$submittab_start}
 <p><strong>{$help_submit_tab}</strong></p>
  <div class="pageoverflow">
- {if !$captcha_installed}
-  <br />
-  <p class="pageinput">{$help_captcha_not_installed}</p>
-  <br />
- {/if}
   <p class="pagetext">{$title_submit_button_safety}:</p>
   <p class="pageinput">{$input_submit_button_safety}</p>
   <p class="pagetext">{$title_submit_javascript}:</p>
