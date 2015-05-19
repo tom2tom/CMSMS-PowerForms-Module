@@ -22,9 +22,12 @@ class PowerForms extends CMSModule
 	//these are populated when first used
 	var $field_types = FALSE; //array of all usable field classnames
 	var $std_field_types = FALSE; //subset : classes for use in 'fast-adder' simple mode
-	var $disp_field_types = FALSE; //subset : disposition classes 
+	var $disp_field_types = FALSE; //subset : disposition classes
 //	var $all_validation_types = FALSE; //accumulated validations NOT USED
-	var $email_regex = FALSE; //used beyond email dispatchers
+	//this is used by several field-types, not just email*
+	//pretty much everything is valid, provided there's an '@' in there!
+	//(we're concerned more about typo's than format!)
+	var $email_regex = '/.+@.+\..+/';
 
 	function __construct()
 	{
@@ -357,6 +360,18 @@ class PowerForms extends CMSModule
 		}
 		$this->field_types[$menuname] = $classname;
 		uksort($this->field_types,array('pwfUtils','fieldcmp'));
+		//cache this data
+		$imports = $this->GetPreference('imported_fields');
+		if($imports)
+		{
+			$imports = unserialize($imports);
+			$imports[$menuname] = $classname;
+		}
+		else
+		{
+			$imports = array($menuname=>$classname);
+		}
+		$this->SetPreference('imported_fields',serialize($imports));
 	}
 	
 	function DeregisterField($classfilepath)
@@ -372,6 +387,20 @@ class PowerForms extends CMSModule
 		$menuname = array_search($classname,$this->disp_field_types);
 		if($menuname !== FALSE)
 			unset($this->field_types[$menuname]);
+		//uncache this data
+		$imports = $this->GetPreference('imported_fields');
+		if($imports)
+		{
+			$imports = unserialize($imports);
+			$menuname = array_search($classname,$imports);
+			if($menuname !== FALSE)
+				unset($imports[$menuname]);
+			if($imports)
+				$this->SetPreference('imported_fields',serialize($imports));
+			else
+				$this->SetPreference('imported_fields',FALSE);
+		}
+		
 	}
 
 }
