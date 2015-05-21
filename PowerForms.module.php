@@ -22,9 +22,7 @@ class PowerForms extends CMSModule
 	//these are populated when first used
 	var $field_types = FALSE; //array of all usable field classnames
 	var $std_field_types = FALSE; //subset : classes for use in 'fast-adder' simple mode
-	var $disp_field_types = FALSE; //subset : disposition classes
-//	var $all_validation_types = FALSE; //accumulated validations NOT USED
-	//this is used by several field-types, not just email*
+	//this regex is used by several field-types, not just email*
 	//pretty much everything is valid, provided there's an '@' in there!
 	//(we're concerned more about typo's than format!)
 	var $email_regex = '/.+@.+\..+/';
@@ -207,6 +205,7 @@ class PowerForms extends CMSModule
 		$this->SetParameterType('form_id',CLEAN_INT);
 		$this->SetParameterType('field_id',CLEAN_INT);
 		$this->SetParameterType('response_id',CLEAN_INT);
+		$this->SetParameterType('captcha_input',CLEAN_STRING);
 		$this->SetParameterType(CLEAN_REGEXP.'/pwfp_.*/',CLEAN_STRING);
 		$this->SetParameterType(CLEAN_REGEXP.'/value_.*/',CLEAN_STRING);
 	}
@@ -295,6 +294,7 @@ class PowerForms extends CMSModule
 		return $fd;
 	}
 
+	// like API function CreateInputText() but doesn't throw in an ID that's the same as $name
 	function CustomCreateInputType($id,$name,$value='',$size=10,$maxlength=255,$addttext='',$type='text')
 	{
 		$id = cms_htmlentities($id);
@@ -306,11 +306,32 @@ class PowerForms extends CMSModule
 		$value = str_replace('"', '&quot;', $value);
 
 		$text = '<input type="'.$type.'" name="'.$id.$name.'" value="'.$value.'" size="'.$size.'" maxlength="'.$maxlength.'"';
-		if($addttext != '')
+		if($addttext)
 			$text .= ' ' . $addttext;
 		$text .= " />\n";
 		return $text;
 	}
+
+	// imported from pwfFieldBase TODO used pwfLinkField (twice): reconcile
+	// like API function CreateInputText(), but doesn't throw in an ID that's the same as $name
+	// and $id,$name,$value may be htmlentitiesO()-ized
+/*	function CreateCustomInputText($id,$name,$value='',$size=10,$maxlength=255,$addttext='')
+	{
+		$id = cms_htmlentities(html_entity_decode($id));
+		$name = cms_htmlentities(html_entity_decode($name));
+		$value = cms_htmlentities(html_entity_decode($value));
+		$size = ($size!=''?cms_htmlentities($size):10);
+		$maxlength = ($maxlength!=''?cms_htmlentities($maxlength):255);
+
+		$value = str_replace('"','&quot;',$value);
+
+		$text = '<input type="text" name="'.$id.$name.'" value="'.$value.'" size="'.$size.'" maxlength="'.$maxlength.'"';
+		if($addttext)
+			$text .= ' ' . $addttext;
+		$text .= " />\n";
+		return $text;
+	}
+*/
 
 	function CustomCreateInputSubmit($id,$name,$value='',$addttext='',$image='',$confirmtext='')
 	{
@@ -318,7 +339,7 @@ class PowerForms extends CMSModule
 		$name = cms_htmlentities($name);
 		$image = cms_htmlentities($image);
 		$text = '<input name="'.$id.$name.'" value="'.$value.'" type=';
-		if($image != '')
+		if($image)
 		{
 			$text .= '"image"';
 			$config = cmsms()->GetConfig();
@@ -328,50 +349,35 @@ class PowerForms extends CMSModule
 		else
 			$text .= '"submit"';
 
-		if($confirmtext != '')
+		if($confirmtext)
 			$text .= ' onclick="return confirm(\''.$confirmtext.'\');"';
-		if($addttext != '')
+		if($addttext)
 			$text .= ' '.$addttext;
 		$text .= ' />';
 		return $text . "\n";
 	}
 
-	function RegisterField($classfilepath,$menulabel)
+	function RegisterField($classfilepath)
 	{
-		if(!$this->field_types)
-			pwfUtils::Initialize($this);
 		$basename = basename($classfilepath);
 		$fp = cms_join_path($this->GetModulePath(),'lib',$basename);
 		copy($classfilepath,$fp);
-		require $fp;
+		
 		$classname = pwfUtils::FileClassName($basename);
-		$params = array();
-		$formdata = $this->GetFormData($params);
-		$obfld = new $classname($formdata,$params);
-		if(!($obfld->IsInput || $obfld->sortable)) //TODO check this
-		{
-			$menuname = '-'.$menulabel;
-		}
-		elseif($obfld->IsDisposition)
-		{
-			$menuname = '*'.$menulabel;
-			$this->disp_field_types[$menuname] = $classname;
-			uksort($this->disp_field_types,array('pwfUtils','fieldcmp'));
-		}
-		$this->field_types[$menuname] = $classname;
-		uksort($this->field_types,array('pwfUtils','fieldcmp'));
-		//cache this data
+		//cache field data to be ready for restarts
 		$imports = $this->GetPreference('imported_fields');
 		if($imports)
 		{
 			$imports = unserialize($imports);
-			$imports[$menuname] = $classname;
+			$imports[] = $classname;
 		}
 		else
 		{
-			$imports = array($menuname=>$classname);
+			$imports = array($classname);
 		}
 		$this->SetPreference('imported_fields',serialize($imports));
+		if($this->field_types)
+			pwfUtils::Show_Field($this,$classname);
 	}
 	
 	function DeregisterField($classfilepath)
@@ -381,26 +387,25 @@ class PowerForms extends CMSModule
 		$fp = cms_join_path($this->GetModulePath(),'lib',$basename);
 		if(is_file($fp))
 			unlink($fp);
-		$menuname = array_search($classname,$this->field_types);
-		if($menuname !== FALSE)
-			unset($this->field_types[$menuname]);
-		$menuname = array_search($classname,$this->disp_field_types);
-		if($menuname !== FALSE)
-			unset($this->field_types[$menuname]);
+		if($this->field_types)
+		{
+			$menuname = array_search($classname,$this->field_types);
+			if($menuname !== FALSE)
+				unset($this->field_types[$menuname]);
+		}
 		//uncache this data
 		$imports = $this->GetPreference('imported_fields');
 		if($imports)
 		{
 			$imports = unserialize($imports);
-			$menuname = array_search($classname,$imports);
-			if($menuname !== FALSE)
-				unset($imports[$menuname]);
+			$key = array_search($classname,$imports);
+			if($key !== FALSE)
+				unset($imports[$key]);
 			if($imports)
 				$this->SetPreference('imported_fields',serialize($imports));
 			else
 				$this->SetPreference('imported_fields',FALSE);
 		}
-		
 	}
 
 }
