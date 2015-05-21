@@ -12,25 +12,23 @@ if(empty($params['form_id']) || $params['form_id'] == -1)
 	echo "<!-- no form -->\n";
 	return;
 }
-
 $form_id = (int)$params['form_id'];
-$funcs = new pwfFormOperations();
-$formdata = $funcs->Load($this,$form_id,$params,TRUE);
-unset($funcs);
-if(!$formdata)
-{
-	echo "<!-- no form -->\n";
-	return;
-}
 
-$inline = (isset($params['inline']) && preg_match('/t(rue)?|y(es)?|1/i',$params['inline']));
-if(!($inline || (pwfUtils::GetAttr($formdata,'inline','0') == '1')))
-	$id = 'cntnt01'; //TODO generalise
-
-if(isset($params['pwfp_callcount']))
-    $pwfp_callcount = (int)$params['pwfp_callcount'];
+if(isset($params['pwfp_form_data']))
+	$formdata = $params['pwfp_form_data'];
 else
-	$pwfp_callcount = 0;
+{
+	$funcs = new pwfFormOperations();
+	$formdata = $funcs->Load($this,$form_id,$params,TRUE);
+	unset($funcs);
+	if($formdata)
+		$formdata->Page = 1;
+	else
+	{
+		echo "<!-- no form -->\n";
+		return;
+	}
+}
 
 $fieldExpandOp = FALSE;
 foreach($params as $pKey=>$pVal)
@@ -49,23 +47,130 @@ $finished = FALSE;
 if(!$fieldExpandOp &&
 (!empty($params['pwfp_done']) || $formdata->FormPagesCount > 1 && $formdata->Page > 0))
 {
-	$ops = new pwfOperate();
 	// validate form
-	$res = $ops->FormValidate($this,$formdata,$params);
-    if($res[0] === FALSE)
+	$allvalid = TRUE;
+	$message = array();
+	$formPageCount = 1;
+	$valPage = $formdata->Page - 1;
+	$usertagops = cmsms()->GetUserTagOperations();
+	$udt = pwfUtils::GetFormOption($formdata,'validate_udt','');
+	$unspec = pwfUtils::GetFormOption($formdata,'unspecified',$mod->Lang('unspecified'));
+
+	foreach($formdata->Fields as &$one)
+	{
+		if($one->GetFieldType() == 'PageBreakField')
+			$formPageCount++;
+		if($valPage != $formPageCount)
+			continue; //ignore pages before the current one
+
+		$deny_space_validation = !!$mod->GetPreference('blank_invalid');
+		if(// ! $one->IsNonRequirableField() &&
+			$one->IsRequired() && $one->HasValue($deny_space_validation) === FALSE)
+		{
+			$allvalid = FALSE;
+			$one->validated = FALSE;
+			$one->ValidationMessage = $mod->Lang('please_enter_a_value',$one->GetName());
+			$message[] = $one->ValidationMessage;
+			$one->SetOption('is_valid',FALSE);
+		}
+		elseif($one->GetValue() != $mod->Lang('unspecified'))
+		{
+			$res = $one->Validate();
+			if($res[0])
+				$one->SetOption('is_valid',TRUE);
+			else
+			{
+				$allvalid = FALSE;
+				$message[] = $res[1];
+				$one->SetOption('is_valid',FALSE);
+			}
+		}
+
+		if($allvalid && !empty($udt))
+		{
+			$parms = $params;
+			foreach($formdata->Fields as &$othr)
+			{
+				$replVal = '';
+				if($othr->DisplayInSubmission())
+				{
+					$replVal = $othr->GetHumanReadableValue();
+					if($replVal == '')
+					{
+						$replVal = $unspec;
+					}
+				}
+				$name = $othr->GetVariableName();
+				$parms[$name] = $replVal;
+				$id = $othr->GetId();
+				$parms['fld_'.$id] = $replVal;
+				$alias = $othr->GetAlias();
+				if(!empty($alias))
+					$parms[$alias] = $replVal;
+			}
+			unset($othr);
+			$res = $usertagops->CallUserTag($udt,$parms);
+			if(!$res[0])
+			{
+				$allvalid = FALSE;
+				$message[] = $res[1];
+			}
+		}
+	}
+	unset($one);
+
+    if(!$allvalid)
     {
 		// validation error(s)
 		$smarty->assign('form_has_validation_errors',1);
-		$smarty->assign('form_validation_errors',$res[1]);
+		$smarty->assign('form_validation_errors',$message);
 		$formdata->Page--;
 	}
-	else if(!empty($params['pwfp_done']))
+	elseif(!empty($params['pwfp_done']))
 	{
 		$finished = TRUE;
-		$results = $ops->FormDispose($formdata,$returnid);
+		// run all field methods that modify other fields
+		$computes = array();
+		$i = 0; //don't assume anything about fields-array key
+		foreach($formdata->Fields as &$one)
+		{
+			if($one->ModifiesOtherFields())
+				$one->ModifyOtherFields();
+			if($one->ComputeOnSubmission())
+				$computes[$i] = $one->ComputeOrder();
+			$i++;
+		}
+
+		asort($computes);
+		foreach($computes as $cKey=>$cVal)
+			$formdata->Fields[$cKey]->Compute();
+
+		$alldisposed = TRUE;
+		$message = array();
+		// dispose TODO handle 'blocked' notices
+		foreach($formdata->Fields as &$one)
+		{
+			if($one->IsDisposition() && $one->DispositionIsPermitted())
+			{
+				$res = $one->DisposeForm($returnid);
+				if(!$res[0])
+				{
+					$alldisposed = FALSE;
+					$message[] = $res[1];
+				}
+			}
+		}
+		// cleanups
+		foreach($formdata->Fields as &$one)
+			$one->PostDispositionAction();
+		unset($one);
 	}
-	unset($ops);
 }
+
+if(isset($params['pwfp_callcount']))
+	$callcount = (int)$params['pwfp_callcount'];
+else
+	$callcount = 0;
 
 $parms = array();
 $parms['form_id'] = $form_id;
@@ -74,13 +179,13 @@ $parms['form_name'] = pwfUtils::GetFormNameFromID($form_id);
 if($finished)
 {
 	$smarty->assign('form_done',1);
-	if($results[0] == TRUE)
+	if($alldisposed)
 	{
 		$this->SendEvent('OnFormSubmit',$parms);
-		$act = pwfUtils::GetAttr($formdata,'submit_action','text');
+		$act = pwfUtils::GetFormOption($formdata,'submit_action','text');
 		if($act == 'text')
 		{
-			$message = pwfUtils::GetAttr($formdata,'submission_template','');
+			$message = pwfUtils::GetFormOption($formdata,'submission_template','');
 			pwfUtils::setFinishedFormSmarty($formdata,TRUE);
 			//process via smarty (no cacheing)
 			echo $this->ProcessTemplateFromData($message);
@@ -88,7 +193,7 @@ if($finished)
 		}
 		elseif($act == 'redir')
 		{
-			$ret = pwfUtils::GetAttr($formdata,'redirect_page',-1);
+			$ret = pwfUtils::GetFormOption($formdata,'redirect_page',-1);
 			if($ret != -1)
 				$this->RedirectContent($ret);
 		}
@@ -98,36 +203,31 @@ if($finished)
 		$this->SendEvent('OnFormSubmitError',$parms);
 		$params['pwfp_error'] = '';
 		$smarty->assign('submission_error',$this->Lang('submission_error'));
-		$smarty->assign('submission_error_list',$results[1]);
+		$smarty->assign('submission_error_list',$message);
 		$smarty->assign('show_submission_errors',!$this->GetPreference('hide_errors'));
 	}
 }
 else
 {
-	$smarty->assign('form_done',0);
-	$this->SendEvent('OnFormDisplay',$parms);
-	$smarty->assign('form_start',
-		$this->CreateFormStart($id,'default',$returnid,'POST','multipart/form-data',
-		(pwfUtils::GetAttr($formdata,'inline','0') == '1'), '',
-		array('pwfp_callcount'=>$pwfp_callcount+1)));
-	$smarty->assign('form_end',$this->CreateFormEnd());
+	$udtonce = pwfUtils::GetFormOption($formdata,'predisplay_udt');
+	$udtevery = pwfUtils::GetFormOption($formdata,'predisplay_each_udt');
+	if($udtonce || $udtevery)
+	{
+		$parms2 = $params;
+		$parms2['FORM'] =& $formdata;
+		$usertagops = cmsms()->GetUserTagOperations();
+		if($udtonce && $callcount == 0)
+			/*$tmp = */$usertagops->CallUserTag($udtonce,$parms2);
+		if($udtevery)
+			/*$tmp = */$usertagops->CallUserTag($udtevery,$parms2);
+		unset($parms2);
+		unset($usertagops);
+	}
 }
 
-$udtonce = pwfUtils::GetAttr($formdata,'predisplay_udt','');
-$udtevery = pwfUtils::GetAttr($formdata,'predisplay_each_udt','');
-if(!$finished && (!empty($udtonce) || !empty($udtevery)))
-{
-	$parms = $params;
-	$parms['FORM'] =& $formdata;
-	$usertagops = $gCms->GetUserTagOperations();
-	if(isset($pwfp_callcount) && $pwfp_callcount == 0 && !empty($udtonce))
-		/*$tmp = */$usertagops->CallUserTag($udtonce,$parms);
-
-	if(!empty($udtevery))
-		/*$tmp = */$usertagops->CallUserTag($udtevery,$parms);
-	unset($parms);
-	unset($usertagops);
-}
+$smarty->assign('form_done',0);
+$this->SendEvent('OnFormDisplay',$parms);
+unset($parms);
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'method.default.php';
 
