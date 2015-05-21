@@ -17,10 +17,9 @@ $obfield = $funcs->NewField($formdata,$params);
 unset($funcs);
 
 $message = '';
-$dispose_only = !empty($params['dispose_only']);
 
 if(isset($params['fieldupdate']) ||
-	(isset($params['fieldadd']) && $obfield->GetFieldType() != ''))
+	(isset($params['fieldadd']) && $obfield->GetFieldType()))
 {
 	$val = $obfield->AdminValidate();
 	if($val[0])
