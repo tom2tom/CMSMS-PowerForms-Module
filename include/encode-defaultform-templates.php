@@ -104,6 +104,10 @@ $templates['Sample_email'] =<<<EOS
 <strong>Do you have any comments / feedback for me?</strong>: {\$do_you_have}
 EOS;
 
+$templates['Sample_captcha'] =<<<EOS
+{\$captcha_prompt}<br />{\$captcha_input}<br />{\$captcha_image}
+EOS;
+
 $templates['Contact_submission'] =<<<EOS
 <p>Thank you, <strong>{\$your_name}</strong>.</p>
 <p>Your submission has been successful. You may wish to print this page as a reference.</p>
@@ -216,6 +220,10 @@ Your name: {\$your_name}
 Your email address: {\$your_email_a}
 Subject: {\$subject}
 Message: {\$message}
+EOS;
+
+$templates['Contact_captcha'] =<<<EOS
+{\$captcha_prompt}<br />{\$captcha_input}<br />{\$captcha_image}
 EOS;
 
 $templates['Advanced_submission'] =<<<EOS
@@ -333,6 +341,10 @@ Your name: {\$your_name}
 Your email address: {\$your_email}
 Subject: {\$subject}
 Message: {\$message}
+EOS;
+
+$templates['Advanced_captcha'] =<<<EOS
+{\$captcha_prompt}<br />{\$captcha_input}<br />{\$captcha_image}
 EOS;
 
 $fh = fopen(dirname(__FILE__).DIRECTORY_SEPARATOR.'encoded-templates.xml','w');

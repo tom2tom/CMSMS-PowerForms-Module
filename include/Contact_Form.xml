@@ -155,7 +155,7 @@
 					<captcha_label>0</captcha_label>
 					<captcha_prompt>Please enter the text from the image</captcha_prompt>
 					<captcha_wrong>The entered text was not correct</captcha_wrong>
-					<captcha_template>TODO encode</captcha_template>
+					<captcha_template>]][[%7B%24captcha_prompt%7D%3Cbr+%2F%3E%7B%24captcha_input%7D%3Cbr+%2F%3E%7B%24captcha_image%7D</captcha_template>
 				</options>
 			</field>
 		</fields>
