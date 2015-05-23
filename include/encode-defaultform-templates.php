@@ -42,9 +42,6 @@ $templates['Sample_form'] =<<<EOS
 		</ul>
 		</div>
 	{/if}
-	{if !empty(\$captcha_error)}
-		<div class="error_message">{\$captcha_error}</div>
-	{/if}
 	{* and now the form itself *}
 	{\$form_start}
 	<div>{\$hidden}</div>
@@ -86,12 +83,10 @@ $templates['Sample_form'] =<<<EOS
 		{/if}
 		{/strip}
 	{/foreach}
-	{if !empty(\$has_captcha)}
-		<div class="captcha">{\$graphic_captcha}{\$title_captcha}<br />{\$input_captcha}</div>
-	{/if}
 	<div class="submit">{\$prev} {\$submit}</div>
 	</div>
 	{\$form_end}
+	{\$jscript}
 {/if}
 EOS;
 
@@ -103,10 +98,10 @@ $templates['Sample_email'] =<<<EOS
 <strong>URL of page containing form</strong>: {\$form_url}<br />
 <strong>Form name</strong>: {\$form_name}<br />
 <hr />
-<strong>Modules you'll be using together</strong>: {\$modules_you_ll_be_using}<br />
-<strong>What will you personally be doing on your CMS MS site?</strong>: {\$what_will_you_personally}<br />
-<strong>Where are you from?</strong>: {\$where_are_you_from}<br />
-<strong>Do you have any comments / feedback for me?</strong>: {\$do_you_have_any_comments}
+<strong>Modules you'll be using together</strong>: {\$modules_you}<br />
+<strong>What will you personally be doing on your CMS MS site?</strong>: {\$what_will_yo}<br />
+<strong>Where are you from?</strong>: {\$where_are_yo}<br />
+<strong>Do you have any comments / feedback for me?</strong>: {\$do_you_have}
 EOS;
 
 $templates['Contact_submission'] =<<<EOS
@@ -115,7 +110,7 @@ $templates['Contact_submission'] =<<<EOS
 <h3>Contact Details</h3>
 <p>
 <strong>Name</strong>: {\$your_name}<br />
-<strong>Email</strong>: <a href="mailto:{\$your_email_address}">{\$your_email_address}</a><br />
+<strong>Email</strong>: <a href="mailto:{\$your_email_a}">{\$your_email_a}</a><br />
 </p>
 <h3>Feedback Details</h3>
 <p>
@@ -161,9 +156,6 @@ $templates['Contact_form'] =<<<EOS
 		</ul>
 		</div>
 	{/if}
-	{if !empty(\$captcha_error)}
-		<div class="error_message">{\$captcha_error}</div>
-	{/if}
 	{* and now the form itself *}
 	{\$form_start}
 	<div>{\$hidden}</div>
@@ -175,7 +167,7 @@ $templates['Contact_form'] =<<<EOS
 			{if \$one->needs_div}
 				<div
 {if \$one->required || \$one->css_class || !\$one->valid} class="
-{if \$one->required}required {/if}{if \$one->css_class}{\$one->css_class} {/if}{if !\$one->valid}pwf_invalid{/if}
+{if \$one->required}required {/if}{if \$one->css_class}{\$one->css_class} {/if}{if !\$one->valid}fieldbad{/if}
 "
 {/if}
 				>
@@ -204,12 +196,10 @@ $templates['Contact_form'] =<<<EOS
 		{/if}
 	{/strip}
 	{/foreach}
-	{if !empty(\$has_captcha)}
-		<div class="captcha">{\$graphic_captcha}{\$title_captcha}<br />{\$input_captcha}<br /></div>
-	{/if}
 	<div class="submit">{\$prev} {\$submit}</div>
 	</div>
 	{\$form_end}
+	{\$jscript}
 {/if}
 EOS;
 
@@ -223,7 +213,7 @@ Form name: {\$form_name}
 PowerForms version: {\$version}
 ----------------------------------------------
 Your name: {\$your_name}
-Your email address: {\$your_email_address}
+Your email address: {\$your_email_a}
 Subject: {\$subject}
 Message: {\$message}
 EOS;
@@ -234,7 +224,7 @@ $templates['Advanced_submission'] =<<<EOS
 <h3>Contact Details</h3>
 <p>
 <strong>Name</strong>: {\$your_name}<br />
-<strong>Email</strong>: <a href="mailto:{\$your_email_address}">{\$your_email_address}</a><br />
+<strong>Email</strong>: <a href="mailto:{\$your_email_a}">{\$your_email_a}</a><br />
 </p>
 <h3>Feedback Details</h3>
 <p>
@@ -280,29 +270,26 @@ $templates['Advanced_form'] =<<<EOS
 		</ul>
 		</div>
 	{/if}
-	{if !empty(\$captcha_error)}
-		<div class="error_message">{\$captcha_error}</div>
-	{/if}
 	{* and now the form itself *}
 	{\$form_start}
 	<h4 style="text-align:center;">Order</h4>
-	<div>{\$hidden}</div>
-	<div{if \$css_class != ''} class="{\$css_class}"{/if}>
+	{\$hidden}
+	<div{if \$css_class} class="{\$css_class}"{/if}>
 	{if \$total_pages gt 1}<span>{\$title_page_x_of_y}</span>{/if}
 	{foreach from=\$fields item=one}
 		{strip}
 		{if \$one->display}
 			{if \$one->needs_div}
 				<div
-				{if \$one->required || \$one->css_class != '' || !\$one->valid} class="
-{if \$one->required}required{/if}{if \$one->css_class} {\$one->css_class}{/if}{if !\$one->valid} pwf_invalid{/if}
+				{if \$one->required || \$one->css_class || !\$one->valid} class="
+{if \$one->required}required{/if}{if \$one->css_class} {\$one->css_class}{/if}{if !\$one->valid} fieldbad{/if}
 "
 				{/if}
 				>
 			{/if}
 			{if !\$one->hide_name}
 				<label{if \$one->multiple_parts != 1} for="{\$one->input_id}"{/if}>{\$one->name}
-				{if \$one->required_symbol != ''}
+				{if \$one->required_symbol}
 					{\$one->required_symbol}
 				{/if}
 				</label>
@@ -326,12 +313,10 @@ $templates['Advanced_form'] =<<<EOS
 		{/if}
 		{/strip}
 	{/foreach}
-	{if !empty(\$has_captcha)}
-		<div class="captcha">{\$graphic_captcha}<br />{\$title_captcha}<br />{\$input_captcha}<br /></div>
-	{/if}
-	<div class="submit">{\$prev}{\$submit}</div>
+	<div class="submit">{\$prev} {\$submit}</div>
 	</div>
 	{\$form_end}
+	{\$jscript}
 {/if}
 EOS;
 
@@ -345,14 +330,16 @@ Form name: {\$form_name}
 PowerForms version: {\$version}
 ----------------------------------------------
 Your name: {\$your_name}
-Your email address: {\$your_email_address}
+Your email address: {\$your_email}
 Subject: {\$subject}
 Message: {\$message}
 EOS;
 
 $fh = fopen(dirname(__FILE__).DIRECTORY_SEPARATOR.'encoded-templates.xml','w');
 foreach ($templates as $key=>&$value)
+{
 	fwrite($fh,"<{$key}_template>]][[".urlencode($value)."</{$key}_template>\n\n");
+}
 
 unset($value);
 fclose($fh);
