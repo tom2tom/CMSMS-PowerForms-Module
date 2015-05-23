@@ -53,7 +53,7 @@ if(!$fieldExpandOp &&
 	$formPageCount = 1;
 	$valPage = $formdata->Page - 1;
 	$usertagops = cmsms()->GetUserTagOperations();
-	$udt = pwfUtils::GetFormOption($formdata,'validate_udt','');
+	$udt = pwfUtils::GetFormOption($formdata,'validate_udt');
 	$unspec = pwfUtils::GetFormOption($formdata,'unspecified',$mod->Lang('unspecified'));
 
 	foreach($formdata->Fields as &$one)
