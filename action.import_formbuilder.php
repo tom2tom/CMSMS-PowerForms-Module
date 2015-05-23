@@ -67,7 +67,7 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		'FormBuilder',
 		'{$fb_form_header}',
 		'{$fb_form_footer}',
-		'$fb_version'
+		'$fb_version',
 		'fb_invalid',
 		'$fb_',
 		'$fbr_id',
@@ -76,13 +76,13 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		'$sub_form_name',
 		'$sub_url',
 		'$sub_host',
-		'$sub_source_ip',
+		'$sub_source_ip'
 	);
 	$repls = array(
 		'PowerForms',
 		'',
 		'',
-		'$version'
+		'$version',
 		'fieldbad',
 		'$',
 		'$browser_id',
@@ -91,7 +91,7 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		'$form_name',
 		'$form_url',
 		'$form_host',
-		'$sub_source',
+		'$sub_source'
 	);
 
 	$sql = 'SELECT * FROM '.$pre.'module_pwf_trans WHERE NOT isform ORDER BY old_id';
@@ -156,16 +156,16 @@ function Get_FieldOpts(&$db,$pre,$oldfid,$newfid,$oldf,$newf,&$fieldrow)
 		//some field-types simply repeat the same option-name (relying on save-order for any reconciliation!)
 		//we are more careful!
 		$sequence = in_array($fieldrow['type'],array(
-			'PulldownField',
-			'RadioGroupField',
-			'CheckboxGroupField',
-			'MultiselectField',
-			'DispositionDirector',
-			'DispositionEmail',
-			'DispositionEmailBasedFrontendFields',
-			'DispositionFileDirector',
-			'DispositionMultiselectFileDirector',
-			'DispositionPageRedirector'
+		 'PulldownField',
+		 'RadioGroupField',
+		 'CheckboxGroupField',
+		 'MultiselectField',
+		 'DispositionDirector',
+		 'DispositionEmail',
+		 'DispositionEmailBasedFrontendFields',
+		 'DispositionFileDirector',
+		 'DispositionMultiselectFileDirector',
+		 'DispositionPageRedirector'
 		));
 		if($sequence)
 			$desc = '';
@@ -209,6 +209,63 @@ function Get_Fields(&$db,$pre,$oldfid,$newfid)
 	$data = $db->GetArray($sql,array($oldfid));
 	if($data)
 	{
+		$renames = array(
+		 'ButtonField'=>'Button',
+		 'CatalogerItemsField'=>'CatalogerItems',
+		 'CCEmailAddressField'=>'EmailCCAddress',
+		 'CheckboxExtendedField'=>'CheckboxExtended',
+		 'CheckboxField'=>'Checkbox',
+		 'CheckboxGroupField'=>'CheckboxGroup',
+		 'CompanyDirectoryField'=>'CompanyDirectory',
+		 'ComputedField'=>'Computed',
+		 'CountryPickerField'=>'CountryPicker',
+		 'DatePickerField'=>'DatePicker',
+		 'DispositionDeliverToEmailAddressField'=>'EmailOne',
+		 'DispositionDirector'=>'EmailDirector',
+		 'DispositionEmail'=>'SystemEmail',
+		 'DispositionEmailBasedFrontendFields'=>'CustomEmail',
+		 'DispositionEmailConfirmation'=>'EmailConfirmation',
+		 'DispositionEmailFromFEUProperty'=>'EmailFEUProperty',
+		 'DispositionEmailSiteAdmin'=>'EmailSiteAdmin',
+		 'DispositionFile'=>'WriteFile',
+		 'DispositionFileDirector'=>'FileDirector',
+		 'DispositionForm'=>'SubmitForm',
+		 'DispositionFormBrowser'=>'FormBrowser',
+		 'DispositionFromEmailAddressField'=>'UserEmail',
+		 'DispositionMultiselectFileDirector'=>'MultiselectFileDirector',
+		 'DispositionPageRedirector'=>'PageRedirector',
+		 'DispositionUniqueFile'=>'UniqueFile',
+		 'DispositionUserTag'=>'SubmissionTag',
+		 'FieldsetEnd'=>'FieldsetEnd',
+		 'FieldsetStart'=>'FieldsetStart',
+		 'FileUploadField'=>'FileUpload',
+		 'FromEmailAddressAgainField'=>'EmailAddressAgain',
+		 'FromEmailAddressField'=>'EmailAddress',
+		 'FromEmailNameField'=>'EmailSender',
+		 'FromEmailSubjectField'=>'EmailSubject',
+		 'HiddenField'=>'Hidden',
+		 'LinkField'=>'Link',
+		 'ModuleInterfaceField'=>'ModuleInterface',
+		 'MultiselectField'=>'Multiselect',
+		 'OzStatePickerField'=>'OzStatePicker',
+		 'PageBreakField'=>'PageBreak',
+		 'PasswordAgainField'=>'PasswordAgain',
+		 'PasswordField'=>'Password',
+		 'ProvincePickerField'=>'ProvincePicker',
+		 'PulldownField'=>'Pulldown',
+		 'RadioGroupField'=>'RadioGroup',
+		 'SiteAdminField'=>'EmailSiteAdmin',
+		 'StatePickerField'=>'StatePicker',
+		 'StaticTextField'=>'StaticText',
+		 'SystemLinkField'=>'SystemLink',
+		 'TextAreaField'=>'TextArea',
+		 'TextField'=>'Text',
+		 'TextFieldExpandable'=>'TextExpandable',
+		 'TimePickerField'=>'TimePicker',
+		 'UniqueIntegerField'=>'UniqueInteger',
+		 'UserTagField'=>'InputTag',
+		 'YearPullDownField'=>'YearPulldown'
+		);
 		$sql = 'INSERT INTO '.$pre.'module_pwf_field
 (field_id,form_id,name,type,order_by) VALUES (?,?,?,?,?)';
 		$sql2 = 'INSERT INTO '.$pre.'module_pwf_trans (old_id,new_id,isform) VALUES (?,?,0)';
@@ -216,7 +273,8 @@ function Get_Fields(&$db,$pre,$oldfid,$newfid)
 		{
 			$oldf = (int)$row['field_id'];
 			$newf = $db->GenID($pre.'module_pwf_field_seq');
-			$db->Execute($sql,array($newf,$newfid,$row['name'],$row['type'],$row['order_by']));
+			$newt = (array_key_exists($row['type'],$renames)) ? $renames[$row['type']] : $row['type'];
+			$db->Execute($sql,array($newf,$newfid,$row['name'],$newt,$row['order_by']));
 			$db->Execute($sql2,array($oldf,$newf));
 			Get_FieldOpts($db,$pre,$oldfid,$newfid,$oldf,$newf,$row);
 		}
