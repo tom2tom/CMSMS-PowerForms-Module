@@ -5,17 +5,17 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfSubmissionTagField extends pwfFieldBase
+class pwfSubmissionTag extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->Type = 'SubmissionTagField';
-		$this->IsDisposition = TRUE;
-		$this->NonRequirableField = TRUE;
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
+		$this->IsDisposition = TRUE;
 		$this->IsSortable = FALSE;
+		$this->NonRequirableField = TRUE;
+		$this->Type = 'SubmissionTag';
 	}
 
 	function GetFieldStatus()
@@ -26,31 +26,29 @@ class pwfSubmissionTagField extends pwfFieldBase
 	function DisposeForm($returnid)
 	{
 		$mod = $this->formdata->formsmodule;
-		$others = $this->formdata->Fields;
 		$unspec = $this->GetFormOption('unspecified',$mod->Lang('unspecified'));
+
 		$params = array();
 		if($this->GetOption('export_form',0))
 			$params['FORM'] = $this->formdata;
 
-		for($i=0; $i<count($others); $i++)
+		foreach($this->formdata->Fields as &$one)
 		{
-			$replVal = '';
-			if($others[$i]->DisplayInSubmission())
+			$val = '';
+			if($one->DisplayInSubmission())
 			{
-				$replVal = $others[$i]->GetHumanReadableValue();
-				if($replVal == '')
-				{
-					$replVal = $unspec;
-				}
+				$val = $one->GetHumanReadableValue();
+				if(!$val)
+					$val = $unspec;
 			}
-			$name = $others[$i]->GetVariableName();
-			$params[$name] = $replVal;
+			$name = $one->GetVariableName();
+			$params[$name] = $val;
+			$alias = $one->ForceAlias();
+			$params[$alias] = $val;
 			$id = $others[$i]->GetId();
-			$params['fld_'.$id] = $replVal;
-			$alias = $others[$i]->GetAlias();
-			if(!empty($alias))
-				$params[$alias] = $replVal;
+			$params['fld_'.$id] = $val;
 		}
+		unset($one);
 
 		pwfUtils::SetFinishedFormSmarty($this->formdata);
 		$usertagops = cmsms()->GetUserTagOperations();
