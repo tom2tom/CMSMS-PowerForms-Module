@@ -276,6 +276,9 @@ $lang['button_submit'] = 'Submit Form';
 
 $lang['cancel'] = 'Cancel';
 $lang['canuse_smarty'] = 'Smarty variables are valid in this field';
+$lang['captcha_not_installed'] = 'A <a href="http://www.wikipedia.org/wiki/Captcha" target="_new">Captcha</a> can be used to protect form submissions after the <a href="http://dev.cmsmadesimple.org/projects/captcha/">Captcha module</a> is installed.';
+$lang['captcha_prompt'] = 'Please help to combat spam, by entering the text from the image.';
+$lang['captcha_wrong'] = 'The entered captcha-text was not correct.';
 $lang['cc'] = 'CC';
 $lang['checked_by_default'] = 'Default: checked';
 $lang['choose_crypt'] = 'Encryption Library';
@@ -310,8 +313,9 @@ $lang['delete_checkboxes'] = 'Delete Selected Checkboxes';
 $lang['delete'] = 'Delete';
 $lang['delete_destination'] = 'Delete Selected Destinations';
 $lang['delete_options'] = 'Delete Selected Options';
+$lang['desc_actionid'] = 'TODO';
 $lang['desc_alias'] = 'the alias specified for this field';
-//$lang['desc_browser_id'] = 'Response ID if form is being viewed from FormBrowser';
+//$lang['desc_browser_id'] = 'Browser ID if form is being viewed or edited from PowerBrowse';
 $lang['desc_css_class'] = 'CSS class for the form';
 $lang['desc_css_class'] = 'the CSS class specified for this field';
 $lang['desc_display'] = '1 if the field should be displayed, otherwise 0';
@@ -320,14 +324,16 @@ $lang['desc_field_helptext_id'] = 'a string including field->id';
 $lang['desc_form_id'] = 'Form identifier (number)';
 $lang['desc_form_name'] = 'Form name';
 $lang['desc_has_label'] = '1 if the field type has a label, otherwise 0';
+$lang['desc_help_icon'] = 'String to generate help/info icon displayed on the form';
 $lang['desc_helptext'] = 'the field\'s help text';
 $lang['desc_hidden'] = 'Collection of necessary hidden stuff';
-$lang['desc_hide_name'] = '1 if the field name should be hidden, otherwise 0';
+$lang['desc_hide_name'] = 'true if the field name should be hidden, otherwise 0';
 $lang['desc_id'] = 'the internal / opaque id PowerForms uses for this field';
-$lang['desc_in_admin'] = '1 if form is being viewed via PowerBrowse admin';
-//TODO $lang['desc_in_formbrowser'] = '1 if form is being viewed from PowerBrowse';
+//$lang['desc_in_admin'] = 'true if the form is being viewed or edited from PowerBrowse';
+$lang['desc_in_browser'] = 'true if form is being viewed or edited from PowerBrowse';
 $lang['desc_input_id'] = 'the ID of the field\'s input (useful for label for="foo")';
 $lang['desc_input'] = 'the field\'s input control (e.g., the input field itself)';
+$lang['desc_jscript'] = 'Javascript to be included';
 $lang['desc_label_parts'] = '1 if the collection of controls has separate labels for each control';
 $lang['desc_logic'] = 'smarty data or logic associated with the field';
 $lang['desc_multiple_parts'] = '1 if the field->input is actually a collection of controls';
@@ -366,6 +372,7 @@ $lang['error_file_exists'] = 'File %s already exists, and cannot be overwritten.
 $lang['error_form_import'] = 'Form import failed! There was a problem with the format of the XML file.';
 $lang['error_large_file'] = 'Uploaded file is too large! Maximum size is:';
 //$lang['error_no_browser_field'] = 'Error! Either the form has no Form Browser Disposition, or it failed to instantiate (due to memory issues?)';
+$lang['error_module_captcha'] = 'The Captcha module is not available';
 $lang['error_module_cataloger'] = 'The Cataloger module is not available.';
 $lang['error_module_CompanyDirectory'] = 'The Company Directory module is not available!';
 $lang['error_module_upload'] = 'The Uploads module is not available';
@@ -414,67 +421,69 @@ $lang['field_requirement_updated'] = 'Field required state updated.';
 $lang['fields'] = 'fields';
 $lang['field_op'] = 'Field %s';
 
-$lang['field_type_BCCEmailAddressField'] = 'Email "Blind Carbon Copy (BCC) Address" field';
-$lang['field_type_ButtonField'] = 'Button';
-$lang['field_type_CaptchaField'] = 'Captcha protection for form';
-$lang['field_type_CatalogerItemsField'] = 'Select one (or more) cataloger items';
-$lang['field_type_CCEmailAddressField'] = 'Email "Carbon Copy (CC) Address" field';
-$lang['field_type_CheckboxExtendedField'] = 'Checkbox extended'; // Need to remove
-$lang['field_type_CheckboxField'] = 'Checkbox';
-$lang['field_type_CheckboxGroupField'] = 'Checkbox group';
-$lang['field_type_CompanyDirectoryField'] = 'Company directory field';
-$lang['field_type_ComputedField'] = '-Computed field';
-$lang['field_type_CountryPickerField'] = 'Country picker';
-$lang['field_type_DatePickerField'] = 'Date picker';
-$lang['field_type_DispositionDeliverToEmailAddressField'] = '*Email to user-supplied email address';
-$lang['field_type_DispositionDirector'] = '*Email results based on pulldown';
-$lang['field_type_DispositionEmailBasedFrontendFields'] = '*Email results based on frontend fields';
-$lang['field_type_DispositionEmailConfirmation'] = '*Validate-via-email address';
-$lang['field_type_DispositionEmail'] = '*Email results to set address(es)';
-$lang['field_type_DispositionEmailFromFEUProperty'] = '*Email users matching an FEU property';
-$lang['field_type_DispositionEmailSiteAdmin'] = '*Email to CMS admin user';
-$lang['field_type_DispositionFileDirector'] = '*Save results to file based on pulldown';
-$lang['field_type_DispositionFile'] = '*Write results to flat file';
-//$lang['field_type_DispositionFormBrowser'] = '*Store results for FormBrowser module';
-$lang['field_type_DispositionForm'] = '*Submit to an arbitrary form action';
-$lang['field_type_DispositionFromEmailAddressField'] = '*Email "From Address" field, and send copy';
-$lang['field_type_DispositionMultiselectFileDirector'] = '*Save results to file(s) based on multiple selections';
-$lang['field_type_DispositionPageRedirector'] = '*Redirect to page based on pulldown';
-$lang['field_type_DispositionUniqueFile'] = '*Write each submission to a unique flat file';
-$lang['field_type_DispositionUserTag'] = '*Call a User Defined Tag with the form results';
+$lang['field_type_field'] = 'Field Type Not Set';
+$lang['field_type_Button'] = 'Button';
+$lang['field_type_Captcha'] = '*Captcha protection for form';
+$lang['field_type_CatalogerItems'] = 'Select cataloger item(s)';
+$lang['field_type_Checkbox'] = 'Checkbox';
+$lang['field_type_CheckboxExtended'] = 'Checkbox extended'; // Need to remove
+$lang['field_type_CheckboxGroup'] = 'Checkbox group';
+$lang['field_type_CompanyDirectory'] = 'Company directory field';
+$lang['field_type_Computed'] = '-Computed field';
+$lang['field_type_CountryPicker'] = 'Country picker';
+$lang['field_type_CustomEmail'] = '*Email based on form fields';
+$lang['field_type_DatePicker'] = 'Date picker';
+$lang['field_type_EmailDirector'] = '*Email to selected address';
+$lang['field_type_EmailAddress'] = 'Email "From Address"';
+$lang['field_type_EmailAddressAgain'] = 'Email "From Address" (verify)';
+$lang['field_type_EmailBCCAddress'] = 'Email "Blind Carbon Copy (BCC) Address"';
+$lang['field_type_EmailCCAddress'] = 'Email "Carbon Copy (CC) Address"';
+$lang['field_type_EmailConfirmation'] = '*Validate-via-email address';
+$lang['field_type_EmailFEUProperty'] = '*Email users matching an FEU property';
+$lang['field_type_EmailOne'] = '*Email to user-supplied email address';
+$lang['field_type_EmailSender'] = 'Email "From Name"';
+$lang['field_type_EmailSiteAdmin'] = '*Email to CMS admin user';
+$lang['field_type_EmailSubject'] = 'Email "Subject"';
 $lang['field_type_FieldsetEnd'] = '-Fieldset end';
 $lang['field_type_FieldsetStart'] = '-Fieldset start';
-$lang['field_type_'] = 'Field Type Not Set';
-$lang['field_type_FileUploadField'] = 'File upload';
-$lang['field_type_FromEmailAddressAgainField'] = 'Email "From Address" again field';
-$lang['field_type_FromEmailAddressField'] = 'Email "From Address" field';
-$lang['field_type_FromEmailNameField'] = 'Email "From Name" field';
-$lang['field_type_FromEmailSubjectField'] = 'Email "Subject" field';
-$lang['field_type_HiddenField'] = '-Hidden field';
-$lang['field_type_HTML5EmailField'] = 'HTML5 email input';
-$lang['field_type_HTML5NumberField'] = 'HTML5 number input';
-$lang['field_type_HTML5URLField'] = 'HTML5 URL input';
-$lang['field_type_LinkField'] = 'Link (user-entered)';
-$lang['field_type_ModuleInterfaceField'] = '-Module interface field';
-$lang['field_type_MultiselectField'] = 'Multiselect';
-$lang['field_type_OzStatePickerField'] = 'Australian state picker';
-$lang['field_type_PageBreakField'] = '-Page break';
-$lang['field_type_PasswordAgainField'] = 'Password again (verify)';
-$lang['field_type_PasswordField'] = 'Password';
-$lang['field_type_ProvincePickerField'] = 'Canadian province picker';
-$lang['field_type_PulldownField'] = 'Pulldown';
-$lang['field_type_RadioGroupField'] = 'Radiobutton group';
-$lang['field_type_SiteAdminField'] = 'Site admin';
-$lang['field_type_StatePickerField'] = 'U.S. state picker';
-$lang['field_type_StaticTextField'] = '-Static text';
-$lang['field_type_SystemLinkField'] = '-Static link';
-$lang['field_type_TextAreaField'] = 'Text area';
-$lang['field_type_TextFieldExpandable'] = 'Text input (multiple)';
-$lang['field_type_TextField'] = 'Text input';
-$lang['field_type_TimePickerField'] = 'Time picker';
-$lang['field_type_UniqueIntegerField'] = '-Unique integer (serial)';
-$lang['field_type_UserTagField'] = '-User Defined Tag call';
-$lang['field_type_YearPullDownField'] = 'Year pulldown';
+$lang['field_type_FileDirector'] = '*Save submitted data in selected file';
+$lang['field_type_FileUpload'] = 'File upload';
+//$lang['field_type_FormBrowser'] = '*Store results for FormBrowser module';
+$lang['field_type_HTML5Email'] = 'HTML5 email input';
+$lang['field_type_HTML5Number'] = 'HTML5 number input';
+$lang['field_type_HTML5URL'] = 'HTML5 URL input';
+$lang['field_type_Hidden'] = '-Hidden field';
+$lang['field_type_InputTag'] = '-Call User Defined Tag to generate form content';
+$lang['field_type_Link'] = 'Link (user-entered)';
+$lang['field_type_ModuleInterface'] = '-Module interface field';
+$lang['field_type_Multiselect'] = 'Multiselect';
+$lang['field_type_MultiselectFileDirector'] = '*Save submitted data in multiple file(s)';
+$lang['field_type_OzStatePicker'] = 'Australian state picker';
+$lang['field_type_PageBreak'] = '-Page break';
+$lang['field_type_PageRedirector'] = '*Redirect to selected page';
+$lang['field_type_Password'] = 'Password';
+$lang['field_type_PasswordAgain'] = 'Password (verify)';
+$lang['field_type_ProvincePicker'] = 'Canadian province picker';
+$lang['field_type_Pulldown'] = 'Pulldown';
+$lang['field_type_RadioGroup'] = 'Radiobutton group';
+$lang['field_type_SequenceEnd'] = '-Fields-sequence end';
+$lang['field_type_SequenceStart'] = '-Fields-sequence start';
+$lang['field_type_SiteAdmin'] = 'Site admin';
+$lang['field_type_StatePicker'] = 'U.S. state picker';
+$lang['field_type_StaticText'] = '-Static text';
+$lang['field_type_SubmissionTag'] = '*Send form data to a User Defined Tag';
+$lang['field_type_SubmitForm'] = '*Submit to a specified form action';
+$lang['field_type_SystemEmail'] = '*Email to specified address(es)';
+$lang['field_type_SystemLink'] = '-Static link';
+$lang['field_type_Text'] = 'Text input';
+$lang['field_type_TextArea'] = 'Text area';
+$lang['field_type_TextExpandable'] = 'Text input (multiple)';
+$lang['field_type_TimePicker'] = 'Time picker';
+$lang['field_type_UniqueFile'] = '*Save submitted data in unique flat file';
+$lang['field_type_UniqueInteger'] = '-Unique integer (serial)';
+$lang['field_type_UserEmail'] = '*Send email according to user-specified parameters';
+$lang['field_type_WriteFile'] = '*Save submitted data in shared file';
+$lang['field_type_YearPulldown'] = 'Year pulldown';
 
 $lang['file_count'] = '%s possible files';
 $lang['form_deleted'] = 'Form deleted.';
@@ -484,6 +493,32 @@ $lang['forms'] = 'Forms';
 $lang['form_template_name'] = 'Template from %s';
 $lang['friendly_name'] = 'Power Forms';
 
+$lang['help'] = 'Help';
+$lang['help_attrs1'] = <<<EOS
+You can access form fields either using the <code>{\$fields}</code> array or by directly
+accessing fields by their names e.g. <code>{\$myfield->input}</code><br /><br />
+Alternate field names can be used interchangeably (especially useful if Smarty is choking on characters outside of ASCII 32-126).<br /><br />
+Each field has the following attributes:
+EOS;
+$lang['help_attrs2'] = <<<EOS
+In some cases, field->input is actually an array of objects rather than an input.
+This happens, for example, in CheckBoxGroups or RadioButtonGroups. For those, you
+can iterate through <code>field->input->name</code> and <code>field->input->input</code>
+and <code>field->input->op</code>.
+EOS;
+$lang['help_blank_invalid'] = 'Each required field must include at least one alphanumeric character';
+$lang['help_captcha_label'] =<<<EOS
+If checked, the Captcha image and prompt will substituted for the field label. Otherwise,
+they will treated as part of the field input, together with the captcha-text input field.
+EOS;
+$lang['help_captcha_template'] = <<<EOS
+The content constructed from this template will be substituted for either the 
+field label or field input, in accordance with the 'replace label' setting above.
+Include in the template <code>{\$prompt}</code> and <code>{\$captcha}</code>,
+and if replacing the label, <code>{\$captcha_input}</code>, plus anything else
+that's relevant, in whatever layout best suits the form.<br />
+TODO styling description.
+EOS;
 $lang['help_cataloger_attribute_fields'] = <<<EOS
 Below is a list of the attributes available from the Cataloger module.<br />
 You can optionally specify valid ranges, values, or numerous values to be used in filtering the list of items that is displayed to the user.<br />
@@ -498,36 +533,14 @@ To specify multiple values for an attribute use the syntax &quot;multi: value1|v
 To specify a value from a hidden field use the syntax {\$fld_id}<br />
 <br />
 EOS;
-$lang['help_attrs1'] = <<<EOS
-You can access form fields either using the <code>{\$fields}</code> array or by directly
-accessing fields by their names e.g. <code>{\$myfield->input}</code><br /><br />
-Alternate field names can be used interchangeably (especially useful if Smarty is choking on characters outside of ASCII 32-126).<br /><br />
-Each field has the following attributes:
-EOS;
-$lang['help_attrs2'] = <<<EOS
-In some cases, field->input is actually an array of objects rather than an input.
-This happens, for example, in CheckBoxGroups or RadioButtonGroups. For those, you
-can iterate through <code>field->input->name</code> and <code>field->input->input</code>
-and <code>field->input->op</code>.<br /><br />
-For a multi-page form, you can access the value of previous fields. They are in the
-<code>{\$previous}</code> array, or accessible by their names e.g. <code>{\$myfield->value}</code>.
-You can use this in Static Text fields as well, which is a nice way to personalize forms.
-EOS;
-$lang['help_blank_invalid'] = 'Each required field must include at least one alphanumeric character';
 $lang['help_date_format'] = 'See <a href="http://www.php.net/manual/en/function.date.php" target=_NEW>the PHP Manual</a> for formatting help.';
 $lang['help_date_order'] = 'Use "m" for Month, "d" for Day, and "y" for Year. Separate the items by hyphens.';
 $lang['help_enable_antispam'] = 'Limit to 10 form-submissions per hour per IP address';
 $lang['help_field_height'] = 'The height of the multiselect field';
-$lang['help_field_values'] = 'Another way of accessing field values is via $fieldname_obj, $alias_obj, or $fld_#_obj, where each field is an object with attributes';
+//$lang['help_field_values'] = 'Another way of accessing field values is via $fieldname_obj, $alias_obj, or $fld_#_obj, where each field is an object with attributes';
 $lang['help_file_footer_template'] = 'For TXT, this will be placed at the bottom of the file. For RTF, this will replace the %%FOOTER%% string in the template file.';
 $lang['help_file_header_template'] = 'For TXT, this will be placed at the top of the file. For RTF, this will replace the %%HEADER%% string in the template file.';
 $lang['help_file_rename'] = 'To rename a file upon uploading, create the template here. Leave blank to preserve original filename';
-$lang['help_file_root'] = <<<EOS
-This needs to be a directory into which the web server is permitted to write.<br />
-Chmod it 777 if you have problems/doubts.<br />
-Also, check that there is no PHP directory restriction.<br />
-If left blank, this will default to the default uploads directory (\$config['uploads_path']).
-EOS;
 $lang['help_form_alias'] = 'If left blank, an alias will be derived from the form name';
 $lang['help_globals'] = <<<EOS
 To make the form work, you'll need to always include the <code>{\$hidden}</code> and <code>{\$submit}</code> tags.
@@ -535,11 +548,9 @@ EOS;
 $lang['help_ignored_if_upload'] = '(This field ignored if you use the Uploads module to manage files)';
 $lang['help_import_alias'] = 'Optional replacement alias for the imported form';
 $lang['help_import_name'] = 'Optional replacement name for the imported form';
-$lang['help_module_interface'] = 'Using Module Interface';
-$lang['help_module_interface_long'] = <<<EOS
-<b>This field is used as a gateway to other modules!</b>
-Use it by creating your form elements in the templates of the other module(s) you wish to incorporate,
-and using a <code>{\$FBid}</code> tag to tie it back to PowerForms.
+$lang['help_tag'] = <<<EOS
+A template associated with another module may be used to generate content for the form.
+Such template must include a <code>{\$FBid}</code> tag to tie it back to PowerForms.
 For example, to include form options based on the Products module, create the following template in Products:<br />
 <pre>
 {foreach from=\$items item=entry}
@@ -557,11 +568,11 @@ For example, to include form options based on the Products module, create the fo
 {/foreach}
 </pre>
 <br />
-where in the input below you put something like <strong>{Products category="cat" summarytemplate="Your_FB_template"}</strong>
+and in the input above, put something like <strong>{Products category="cat" summarytemplate="Your_FB_template"}</strong>
 EOS;
 $lang['help_module_version'] = 'PowerForms module version';
 $lang['help_name_regex'] = 'A regular expression to allow filtering cataloger items by name';
-$lang['help_object_example'] = '<em>e.g.</em> you could use "{$fld_1_obj->name} = {$fld_1_obj->value}"';
+//$lang['help_object_example'] = '<em>e.g.</em> you could use "{$fld_1_obj->name} = {$fld_1_obj->value}"';
 $lang['help_operators'] = <<<EOS
 For string evaluation, the only operation available is concatenation (+). 
 For number evaluation, some basic, very simple math (+ - * /) is possible.
@@ -581,8 +592,6 @@ $lang['help_server_name'] = 'Your server';
 $lang['help_submission_date'] = 'Date of submission';
 $lang['help_sub_source'] = 'IP address of form user';
 $lang['help_form_url'] = 'URL of page containing form';
-$lang['help_tab_symbol'] = 'a tab character';
-$lang['help_tab'] = 'Tab character';
 $lang['help_unique_file_template'] = <<<EOS
 For TXT, this will be immediately after the Header Template.<br />
 For RTF, this will replace the %%FIELDS%% string in the template file if RTF template type is set to "Basic".<br />
@@ -595,7 +604,6 @@ $lang['help_allow_overwrite'] = 'Should uploaded file overwrite previously uploa
 $lang['help_allow_subject_override'] = 'Allow \'Email "Subject" Fields\' to override the subject specified in the pulldown.';
 $lang['help_browse_data'] = 'Data will be stored in an XML format in the [PREFIX]_module_pwf_browse database table.';
 $lang['help_can_drag'] = 'You can change the order by dragging any row, or double-click on any number of rows before dragging them all.';
-$lang['help_captcha_not_installed'] = 'You can use a <a href="http://www.wikipedia.org/wiki/Captcha" target="_new">Captcha</a> to protect form submissions if you install the <a href="http://dev.cmsmadesimple.org/projects/captcha/">Captcha module</a>.';
 $lang['help_cert_key_match'] = 'Select the private key that is appropriate for the certificate you are using for encryption!';
 $lang['help_changing_triggers_reindex'] = 'Changing any of the above fields will trigger a reindex of *all* saved records, so it could take a while.';
 $lang['help_clear_default'] = 'Check this to clear the default value when the user clicks this field. Since this uses a javascript string compare, it will fail if you put single quotes in your default text. Other un-javascript-friendly characters may also cause it to fail.';
@@ -604,9 +612,9 @@ $lang['help_computed_order'] = 'If more than one Computed Field exists, they wil
 $lang['help_default_today'] = 'If un-checked, default to today\'s date';
 $lang['help_default_year'] = 'Use -1 for the current year';
 $lang['help_dont_submit_unchecked'] = 'Check this if you only want checked boxes to return values';
-$lang['help_encrypt_database'] = 'Check this to encrypt the stored data. This makes it more difficult (but not impossible) for hackers to view the information.';
-$lang['help_encrypt_sortfields'] = 'This hashes the sort fields, but leaves the first few letters unencrypted. Cryptographically, this creates a vulnerability, but for most users it is an acceptable tradeoff between security and the ability to sort records. Sorting becomes approximate, but will remain pretty good. If you do not use this option, sort fields are stored in plaintext.';
-$lang['help_encryption_key'] = 'Passphrase, or path to file containing passphrase. (If using OpenSSL, this is the passphrase for the private key)';
+//$lang['help_encrypt_database'] = 'Check this to encrypt stored data. This makes it more difficult (but not impossible) for hackers to view the information.';
+//$lang['help_encrypt_sortfields'] = 'This hashes the sort fields, but leaves the first few letters unencrypted. Cryptographically, this creates a vulnerability, but for most users it is an acceptable tradeoff between security and the ability to sort records. Sorting becomes approximate, but will remain pretty good. If you do not use this option, sort fields are stored in plaintext.';
+//$lang['help_encryption_key'] = 'Passphrase, or path to file containing passphrase. (If using OpenSSL, this is the passphrase for the private key)';
 $lang['help_feu_bind'] = 'Check this to lock front-end access to this form\'s data to the logged-in front-end user.';
 $lang['help_field_hidebuttons'] = 'Hides frontend control buttons of this field.';
 $lang['help_field_includelabels'] = 'Enabling this includes labels to output. example - label: value,label2: value2';
@@ -615,12 +623,14 @@ $lang['help_field_logic'] = 'Can be smarty data, javascript, or some other data 
 $lang['help_field_required'] = 'Require a response for this field';
 $lang['help_field_siblings'] = 'Dropdown lists all siblings of this field and allows you to link this field to one of it\'s sibling. Makes possible controlling this field with selected sibling controls.';
 $lang['help_hide_label'] = 'Don\'t show this field\'s name on the form';
-$lang['info_feu_property'] = 'Only certain property types can be used for matching (dropdowns, multiselect fields, etc).';
+$lang['help_feu_property'] = 'Only certain property types can be used for matching (dropdowns, multiselect fields, etc).';
+$lang['help_help'] = 'more information';
 $lang['help_inline_form'] = 'Inline means any form followup replaces the {PowerForms} tag, non-inline replaces the {content} tag.';
 $lang['help_install_crypto'] = 'Please install the OpenSSL module or mcrypt support if you would like to enable database encryption.';
 $lang['help_link_autopopulate'] = 'Automatically populate with the URL of the page containing the form? (this overrides site page link option below)';
 $lang['help_maximum_size'] = 'This limitation is in addition to any limits set by the php or web server configuration';
 $lang['help_newline_replacement'] = 'Leave blank to allow newlines and carriage returns in output';
+$lang['help_not_ready'] = 'please add disposition-field(s) to the form';
 $lang['help_permitted_extensions'] = 'Enter a comma-separated list, excluding the dot (e.g. "jpg,gif,jpeg"). Spaces will be ignored. Leaving this blank means there will be no restrictions.';
 $lang['help_regex_use'] = 'This regular expression will only be used if "validation type" is set to a regex-related option. Include a full Perl-style regex, including the start/stop slashes and flags (e.g., "/image\.(\d+)/i")';
 $lang['help_save_order'] = 'You must click one of the "save" buttons to make the new field order permanent.';
@@ -638,7 +648,6 @@ and doesn't affect form dispositions. Disposition-specific templates are
 EOS;
 $lang['help_uploads_dir']='Filesystem path relative to website-host uploads directory. No leading or trailing path-separator, and any intermediate path-separator must be host-system-specific e.g. \'\\\' on Windows. If left blank, the default will be used.';
 $lang['help_url'] = 'Entire URL, including protocol and path (e.g. http://myhost.com/form_handler.cgi)';
-$lang['help_use_captcha'] = 'Check here to protect your form with a <a href="http://www.wikipedia.org/wiki/Captcha" target="_new">"Captcha"</a>.';
 $lang['hour'] = 'Hour';
 
 $lang['illegal_file'] = 'Attempted upload of illegal file type (%s) from %s';
@@ -648,7 +657,6 @@ $lang['import'] = 'Import';
 
 $lang['import_fb'] = 'Import Forms';
 $lang['import_browsedata'] = 'Conform Browsers';
-$lang['info'] = 'help';
 $lang['information'] = 'Parameters';
 $lang['installed'] = 'Module version %s installed.';
 
@@ -667,18 +675,18 @@ $lang['moveup'] = 'move up';
 $lang['must_specify_one_admin'] = 'Must specify an admininstrator';
 $lang['must_specify_one_destination'] = 'You need to specify at least one destination address!';
 
+$lang['next'] = 'Next page';
+$lang['no'] = 'No';
 $lang['no_default'] = 'No Default';
 $lang['no_field_assigned'] = 'No field assigned for %s';
 $lang['no_fields'] = 'No field is registered';
 $lang['no_forms'] = 'No form is registered';
-
-$lang['none'] = '(none)';
-$lang['no'] = 'No';
-$lang['nooverwrite'] = 'No Overwrite';
 $lang['no_referrer_info'] = 'No HTTP_REFERER info available (probably due to use of User Email Validation)';
-$lang['not_available'] = 'Not Available';
+$lang['none'] = '(none)';
+$lang['nooverwrite'] = 'No overwrite';
+$lang['not_available'] = 'Not available';
+$lang['not_required'] = 'Not required';
 $lang['notice_select_type'] = 'Advanced options are not available until the field type has been set.';
-$lang['not_required'] = 'Not Required';
 
 $lang['openssl'] = 'OpenSSL Library';
 $lang['option_always'] = 'Always';
@@ -715,6 +723,7 @@ $lang['please_enter_valid'] = 'Please enter a valid entry for "%s"';
 $lang['please_login'] = 'Please log in to use this form';
 $lang['post_install'] = 'Power Forms module installed. Please consult the module\'s help page for documentation.';
 $lang['post_uninstall'] = 'Power Forms module successfully uninstalled';
+$lang['previous'] = 'Previous page';
 
 $lang['recipients'] = 'recipients';
 $lang['redirect_after_approval'] = 'Page to redirect after approval';
@@ -726,7 +735,7 @@ $lang['restricted_to_group'] = 'Only in group %s';
 $lang['rows'] = '%s rows';
 
 $lang['save_and_continue'] = 'Save and continue editing';
-$lang['save'] = 'Submit';
+$lang['save'] = 'Save';
 $lang['select_one'] = 'Select One';
 $lang['select_type'] = 'Select Type';
 $lang['settings'] = 'Settings';
@@ -734,6 +743,7 @@ $lang['settings_updated'] = 'Settings updated.';
 $lang['sort_options'] = 'Sort options on output';
 $lang['submission_error_file_lock'] = 'Error. Unable to obtain lock for file.';
 $lang['submission_error'] = 'Sorry! There was an error handling your form submission.';
+$lang['submit'] = 'Submit';
 $lang['submit_error'] = 'PowerForms submit error: %s';
 $lang['suspected_spam_log'] = 'Suspected spam from IP %s stopped.';
 $lang['suspected_spam'] = 'Too many emails generated from your IP address. Anti-Spam code has prevented delivery.';
@@ -763,13 +773,11 @@ $lang['title_active_only'] = 'Only include active users?';
 $lang['title_add_button_text'] = 'Add button text';
 $lang['title_add_new_field'] = 'Add new field';
 $lang['title_add_new_form'] = 'Add new form';
-$lang['title_add_tag'] = 'Add your tag';
 $lang['title_additional'] = 'Additional submission';
 $lang['title_after_noon'] = 'PM';
 $lang['title_alias'] = 'Alias';
 $lang['title_allow_overwrite'] = 'Allow upload to overwrite previously files';
 $lang['title_allow_subject_override'] = 'Allow subject to be overridden';
-$lang['title_approval_date'] = 'Date Approved (by admin)';
 $lang['title_bad_function'] = 'Error when computing "%s".';
 $lang['title_before_noon'] = 'AM';
 $lang['title_blank_invalid'] = 'Do not accept blank space as valid response';
@@ -779,6 +787,10 @@ $lang['title_checkbox_label'] = 'Checkbox label';
 $lang['title_checked_value'] = 'Value when checked';
 $lang['title_choose_user_input'] = 'Choose User input';
 $lang['title_clear_default'] = 'Clear default on click';
+$lang['title_captcha_label'] = 'Replace field label';
+$lang['title_captcha_prompt'] = 'Prompt';
+$lang['title_captcha_template'] = 'Template for displaying Captcha elements';
+$lang['title_captcha_wrong'] = 'Mismatch message';
 $lang['title_compute'] = 'Computed/PHP';
 $lang['title_compute_value'] = 'Value to compute';
 $lang['title_confirmation_url'] = 'URL to click for form confirmation';
@@ -798,7 +810,7 @@ $lang['title_default_set'] = 'Checked by default';
 $lang['title_default_year'] = 'Default year';
 $lang['title_del_button_text'] = 'Delete button text';
 $lang['title_delete'] = 'Delete?';
-$lang['title_destination_address'] = 'Destination email address(es)';
+$lang['title_destination_address'] = 'Destination address(es)';
 $lang['title_destination_field'] = 'Field(s) containing email address(es)';
 $lang['title_destination_filename'] = 'Destination file name';
 $lang['title_destination_page'] = 'Destination page';
@@ -806,8 +818,8 @@ $lang['title_director_details'] = 'Pulldown-based emailer details';
 $lang['title_display_length'] = 'Display length';
 $lang['title_dont_submit_unchecked'] = 'Don\'t submit values for unchecked boxes';
 $lang['title_email_encoding'] = 'Email character-encoding';
-$lang['title_email_from_address'] = '"From address" for email';
-$lang['title_email_from_name'] = '"From name" for email';
+$lang['title_email_from_address'] = '"From" address';
+$lang['title_email_from_name'] = '"Sender" name';
 $lang['title_email_subject'] = 'Email subject';
 $lang['title_email_template'] = 'Email Template';
 $lang['title_enable_antispam'] = 'Enable primitive anti-spam features';
@@ -816,12 +828,12 @@ $lang['title_encrypt_sortfields'] = 'Hash sort fields';
 $lang['title_encryption'] = 'Encryption';
 $lang['title_encryption_functions'] = 'Storage encryption unavailable';
 $lang['title_end_year'] = 'Year range end';
-$lang['title_export_form_to_udt'] = 'Export form reference to UDT as $params[\'FORM\'] (do not do this if you are going to print_r($params))';
+//$lang['title_export_form_to_udt'] = 'Export form reference to UDT as $params[\'FORM\'] (do not do this if you are going to print_r($params))';
 //$lang['title_fastadd'] = 'Fast field adder';
-//TODO$lang['title_fbr_edit'] = 'Editable in PowerBrowse admin?';
+$lang['title_browser_edit'] = 'Editable in PowerBrowse admin?';
 $lang['title_feu_binding'] = 'Frontend User binding';
 $lang['title_feu_property'] = 'FrontEndUsers property';
-$lang['title_field_alias'] = 'Field alias and DOM id (CSS id) attribute';
+$lang['title_field_alias'] = 'Alias (also DOM id, CSS id)';
 $lang['title_field_alias_short'] = 'Alias';
 $lang['title_field_css_class'] = 'CSS class for field';
 $lang['title_field_css_id'] = 'CSS id for field';
@@ -844,13 +856,12 @@ $lang['title_field_type'] = 'Type';
 $lang['title_field_validation'] = 'Validation';
 $lang['title_field_value'] = 'Human-readable value';
 $lang['title_field_valuearray'] = 'Array of field value(s)';
-$lang['title_file_destination'] = 'Directory to save files into';
+//$lang['title_file_destination'] = 'Directory to save files into';
 $lang['title_file_footer'] = 'Template for the footer of output file';
 $lang['title_file_header'] = 'Template for the header of output file';
 $lang['title_file_name'] = 'File name';
 $lang['title_file_path'] = 'Destination directory for output files';
 $lang['title_file_rename'] = 'Filename template';
-$lang['title_file_root'] = 'Directory to save file in';
 $lang['title_file_template'] = 'Template for one line of output file';
 $lang['title_file_type'] = 'Choose a file type to use';
 $lang['title_form_alias'] = 'Alias';
@@ -901,10 +912,8 @@ $lang['title_multiselect_details'] = 'Multiselect options';
 $lang['title_name_regex'] = 'Cataloger item name regular expression';
 $lang['title_newform'] = 'New form';
 $lang['title_newline_replacement'] = 'Newline/Carriage Return replacement character';
-$lang['title_no_advanced_options'] = 'Field has no advanced options.';
-
-$lang['status_not_ready'] = 'Not ready';
-$lang['help_not_ready'] = 'please add disposition-field(s) to the form';
+$lang['title_no_advanced_options'] = 'None for this field.';
+$lang['title_not_ready'] = 'Not ready';
 //$lang['title_not_ready1'] = 'Not ready';
 //$lang['title_not_ready2'] = 'Please add a field to the form so that the user\'s input gets handled. You can';
 //$lang['title_not_ready3'] = 'to create a form handling field.';
@@ -926,7 +935,7 @@ $lang['title_pulldown_details'] = 'Pulldown options';
 $lang['title_radio_label'] = 'Radio button label';
 $lang['title_radiogroup_details'] = 'Radio button group details';
 $lang['title_read_only'] = 'Read Only';
-$lang['status_ready'] = 'Ready for deployment';
+$lang['title_ready'] = 'Ready for deployment';
 $lang['title_redirect_page'] = 'Page to redirect to after form submission';
 $lang['title_remove_file_from_server'] = 'Delete uploaded file from server after processing (email dispositions)';
 $lang['title_reorder_form'] = 'Reorder fields';
@@ -944,19 +953,19 @@ $lang['title_selection_displayname'] = 'Selection display name';
 $lang['title_selection_subject'] = 'Selection subject';
 $lang['title_selection_value'] = 'Selection value';
 $lang['title_send_me_a_copy'] = 'Send me a copy of form';
-$lang['title_send_usercopy'] = 'Send user a copy of submission';
-$lang['title_send_usercopy_label'] = 'Label for checkbox (if user choice)';
+$lang['title_send_user_copy'] = 'Send user a copy of submission';
+$lang['title_send_user_label'] = 'Label for checkbox (if copying to user)';
 $lang['title_send_using'] = 'Email addressing';
 $lang['title_sendto_uploads'] = 'Send this file to the uploads module';
 //$lang['title_show_fieldlevel'] = 'TODO';
 $lang['title_show_limitations'] = 'Display restrictions?';
-$lang['title_show_textfield'] = 'Show textfield'; // Remove?
+$lang['title_show_text'] = 'Show textfield'; // Remove?
 $lang['title_show_to_user'] = 'Display to user';
 $lang['title_show_userfirstname'] = 'Display user\'s first name';
 $lang['title_show_userlastname'] = 'Display user\'s last name';
 $lang['title_show_username'] = 'Display user\'s login name';
 $lang['title_smarty_eval'] = 'Process smarty tags within field';
-$lang['title_sortable_field'] = 'Sortable field #%s';
+//$lang['title_sortable_field'] = 'Sortable field #%s'; TODO
 $lang['title_start_year'] = 'Year range start';
 $lang['title_string'] = 'String';
 $lang['title_string_or_number_eval'] = 'Interpret variables as being numbers or strings';
@@ -975,13 +984,13 @@ $lang['title_switch_advanced'] = 'Need more field types? ';
 $lang['title_switch_advanced_link'] = 'Switch to advanced mode';
 $lang['title_switch_basic'] = 'Too many confusing field types? ';
 $lang['title_switch_basic_link'] = 'Switch to simple mode';
+$lang['title_tag'] = 'Tag';
 $lang['title_text'] = 'Static text to display';
 $lang['title_template_variables'] = 'Template variables';
 $lang['title_textarea_cols'] = 'Columns (note: this may be overridden by CSS)';
 $lang['title_textarea_length'] = 'Maximum length of field content (0 or blank means no limit)';
 $lang['title_textarea_rows'] = 'Rows (note: this may be overridden by CSS)';
 $lang['title_textfield_label'] = 'Textfield label'; // Remove?
-$lang['title_title_user_captcha'] = 'Help text for captcha';
 $lang['title_udt_name'] = 'User Defined Tag';
 $lang['title_unchecked_value'] = 'Value when not checked';
 $lang['title_unique_file_template'] = 'Template for output';
@@ -990,12 +999,8 @@ $lang['title_uploads_category'] = 'Uploads category';
 $lang['title_uploads_destpage'] = 'Page to return to with uploads link';
 $lang['title_uploads_dir'] = 'Sub-directory for module-specific file uploads';
 $lang['title_url'] = 'Form submission URL';
-$lang['title_use_captcha'] = 'Use a captcha to protect form submissions';
 $lang['title_use_random_generator'] = 'Use random number generator instead of static';
 $lang['title_use_wysiwyg'] = 'Use WYSIWYG editor (admin side only)';
-$lang['title_user_approved'] = 'Date approved (by submitter)';
-$lang['title_user_captcha'] = 'Please confirm that you are not a script by entering the letters from the image.';
-$lang['title_user_captcha_error'] = 'Failed text for captcha';
 $lang['title_value'] = 'Value (see Advanced Tab if you use Smarty tags)';
 $lang['title_variables_available'] = 'Variables available';
 $lang['title_xml_to_upload'] = 'XML file defining a form';
@@ -1037,7 +1042,6 @@ $lang['value_set'] = 'Value set: %s';
 $lang['value_unchecked'] = 'Unchecked';
 $lang['variable'] = 'Variable';
 $lang['warning'] = 'WARNING!';
-$lang['wrong_captcha'] = 'Captcha was not correct.';
 //$lang['year_start'] = 'Start year';
 $lang['year'] = 'Year';
 $lang['yes'] = 'Yes';
@@ -1055,6 +1059,17 @@ these inputs, and the results of the form may be handled in a variety of ways.</
 <p>Suitably authorised users will see a menu item called "Power Forms" in the admin "Extensions" menu.
 Click that item. On the displayed page (at the bottom of the list of forms), there are objects
 which can be activated to add a new form.</p>
+<h4>Importing forms</h4>
+<p>A form may be available as an XML file. Such file can be imported via the "Imports" tab.</p>
+<h4>Importing FormBuilder forms</h4>
+<p>Those 'old' forms can be imported via the "Imports" tab. <strong>However</strong>,
+the imported forms' templates (i.e. main, submission, field-specific) are not entirely
+compatible, and some manual attention will be needed. Specifically:</p>
+<ul>
+<li>Powerforms field-name aliases are shorter (max. 12 chars)</li>
+<li>all 'captcha'-related content needs to be removed
+(Powerforms has a Captcha field-type which replaces the FormBuilder general setting)</li>
+</ul>
 <h4>Displaying a form</h4>
 <p>The tag used to display each form is shown in the module's admin page. Each tag is like
 <code>{PowerForms form='sample_form'}</code>. Placing the relevant tag into the content of
@@ -1062,6 +1077,12 @@ a website page or template will cause that form to be displayed.</p>
 <br />
 MORE<br />
 <br />
+<h3>Importing field-types</h3>
+<p>Other modules may need field-type(s) that are not normally available.
+Such a field can be implemented by creating a suitable class for the field, and
+during installation/uninstallation of the other module, registering/deregistering
+that class. More specific requirements are provided for developers in a README file.
+The PowerBrowse module code provides an example of this process in use.<p>
 <h3>Support</h3>
 <p>This module is provided as-is. Please read the text of the license for the full disclaimer.
 Just to be clear, there's no guarantee of support. However, there are some resources available
