@@ -37,6 +37,7 @@ function Match_Browses(&$db,$pre)
 	$fld_X					$fld_Y
 	{$fb_form_header}		gone
 	{$fb_form_footer}		gone
+	{$fb_form_end}			{$form_end}{$jscript}
 	$fb_*					$*
 	fbr_*					pwf_*
 	fb_invalid				fieldbad
@@ -68,6 +69,7 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		'FormBuilder',
 		'{$fb_form_header}',
 		'{$fb_form_footer}',
+		'{$fb_form_end}',
 		'{$TAB}',
 		'$fb_version',
 		'fb_invalid',
@@ -84,6 +86,7 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		'PowerForms',
 		'',
 		'',
+		'{$form_end}{$jscript}',
 		"\t",
 		'$version',
 		'fieldbad',
