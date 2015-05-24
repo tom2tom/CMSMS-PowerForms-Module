@@ -46,7 +46,7 @@
 				</properties>
 				<options>
 					<legend>Help Improve Power Forms</legend>
-					<alias>fieldset_start</alias>
+					<alias>fieldset_sta</alias>
 				</options>
 			</field>
 			<field>
@@ -112,7 +112,7 @@
 					<box_is_set4>n</box_is_set4>
 					<box_is_set5>n</box_is_set5>
 					<box_is_set6>n</box_is_set6>
-					<alias>modules_you_ll_be_using</alias>
+					<alias>modules_you</alias>
 				</options>
 			</field>
 			<field>
@@ -142,7 +142,7 @@
 					<box_is_set4>n</box_is_set4>
 					<box_is_set5>n</box_is_set5>
 					<box_is_set6>n</box_is_set6>
-					<alias>what_will_you_personally</alias>
+					<alias>what_will_yo</alias>
 				</options>
 			</field>
 			<field>
@@ -154,7 +154,7 @@
 				</properties>
 				<options>
 					<select_one>Select One</select_one>
-					<alias>where_are_you_from</alias>
+					<alias>where_are_yo</alias>
 				</options>
 			</field>
 			<field>
@@ -167,7 +167,7 @@
 				<options>
 					<rows>10</rows>
 					<cols>60</cols>
-					<alias>do_you_have_any_comments</alias>
+					<alias>do_you_have</alias>
 				</options>
 			</field>
 			<field>
@@ -190,10 +190,10 @@
 				</properties>
 				<options>
 					<alias>captcha</alias>
-					<captcha_label>0</captcha_label>
-					<captcha_prompt>Please enter the text from the image</captcha_prompt>
-					<captcha_wrong>The entered text was not correct</captcha_wrong>
-					<captcha_template>]][[%7B%24captcha_prompt%7D%3Cbr+%2F%3E%7B%24captcha_input%7D%3Cbr+%2F%3E%7B%24captcha_image%7D</captcha_template>
+					<aslabel>1</aslabel>
+					<prompt>Please enter the text from the image</prompt>
+					<wrongtext>The entered text was not correct</wrongtext>
+					<captcha_template>]][[%7B%24prompt%7D%3Cbr+%2F%3E%7B%24captcha_input%7D%3Cbr+%2F%3E%7B%24captcha%7D</captcha_template>
 				</options>
 			</field>
 		</fields>

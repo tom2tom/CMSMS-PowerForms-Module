@@ -18,7 +18,7 @@
 		<properties>
 			<form_id>1</form_id>
 			<name>Advanced Contact Form</name>
-			<alias>advanced_contact</alias>
+			<alias>advanced_con</alias>
 		</properties>
 		<options>
 			<css_class>contactform</css_class>
@@ -43,7 +43,7 @@
 				</properties>
 				<options>
 					<legend>About You</legend>
-					<alias>about_you_fieldset</alias>
+					<alias>about_you_fi</alias>
 				</options>
 			</field>
 			<field>
@@ -73,7 +73,7 @@
 					<send_user_label>Send me a copy of form</send_user_label>
 					<email_template>]][[PowerForms+Submission%0ADate+submitted%3A+%7B%24sub_date%7D%0AIP+address+from+which+form+was+submitted%3A+%7B%24sub_source%7D%0AForm+host%3A+%7B%24form_host%7D%0AURL+of+page+containing+form%3A+%7B%24form_url%7D%0AForm+name%3A+%7B%24form_name%7D%0APowerForms+version%3A+%7B%24version%7D%0A----------------------------------------------%0AYour+name%3A+%7B%24your_name%7D%0AYour+email+address%3A+%7B%24your_email%7D%0ASubject%3A+%7B%24subject%7D%0AMessage%3A+%7B%24message%7D</email_template>
 					<email_encoding>utf-8</email_encoding>
-					<alias>your_email_address</alias>
+					<alias>your_email_a</alias>
 					<validation_type>none</validation_type>
 				</options>
 			</field>
@@ -97,7 +97,7 @@
 					<order_by>5</order_by>
 				</properties>
 				<options>
-					<alias>about_you_fieldset_end</alias>
+					<alias>about_you_fi</alias>
 				</options>
 			</field>
 			<field>
@@ -120,7 +120,7 @@
 				</properties>
 				<options>
 					<legend>Contact</legend>
-					<alias>contact_fieldset</alias>
+					<alias>contact_fiel</alias>
 				</options>
 			</field>
 			<field>
@@ -190,7 +190,7 @@
 					<order_by>12</order_by>
 				</properties>
 				<options>
-					<alias>contact_fieldset_end</alias>
+					<alias>contact_fiel</alias>
 				</options>
 			</field>
 			<field>
@@ -202,10 +202,10 @@
 				</properties>
 				<options>
 					<alias>captcha</alias>
-					<captcha_label>0</captcha_label>
-					<captcha_prompt>Please enter the text from the image</captcha_prompt>
-					<captcha_wrong>The entered text was not correct</captcha_wrong>
-					<captcha_template>]][[%7B%24captcha_prompt%7D%3Cbr+%2F%3E%7B%24captcha_input%7D%3Cbr+%2F%3E%7B%24captcha_image%7D</captcha_template>
+					<aslabel>1</aslabel>
+					<prompt>Please enter the text from the image</prompt>
+					<wrongtext>The entered text was not correct</wrongtext>
+					<captcha_template>]][[%7B%24prompt%7D%3Cbr+%2F%3E%7B%24captcha_input%7D%3Cbr+%2F%3E%7B%24captcha%7D</captcha_template>
 				</options>
 			</field>
 		</fields>
