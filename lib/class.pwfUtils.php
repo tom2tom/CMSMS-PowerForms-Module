@@ -9,70 +9,7 @@ class pwfUtils
 {
 //	const MAILERMINVERSION = '1.73'; //minumum acceptable version of CMSMailer module
 
-	/**
-	Initialize:
-	@mod: reference to PowerForms module
-	*/
-	public static function Initialize(&$mod)
-	{
-		if($mod->field_types)
-			return; //already done
-	
-		$feu = $mod->GetModuleInstance('FrontEndUsers');
-		$mail = $mod->GetModuleInstance('CMSMailer');
-/*		if($mail != FALSE)
-		{
-			if(version_compare($mail->GetVersion(),self::MAILERMINVERSION) < 0)
-				$mail = FALSE;
-		}
-*/
-		//this is used by several classes, not just email*
-		//pretty much everything can be valid, provided there's an '@' in there! be concerned about typo's more than format!
-		$mod->email_regex = '/.+@.+\..+/';
-
-		$mod->field_types = array();
-		$dir = opendir(dirname(__FILE__));
-		while($filespec = readdir($dir))
-		{
-			if(!endswith($filespec,'.php')) continue;
-			if(strpos($filespec,'Field') === FALSE && strpos($filespec,'Disposition') === FALSE)
-				continue;
-			if($mail == FALSE && strpos($filespec,'Disposition') !== FALSE && strpos($filespec,'Email') != FALSE)
-				continue;
-			if($feu == FALSE && strpos($filespec,'FEU') !== FALSE)
-				continue;
-			$shortname = substr($filespec,9,strpos($filespec,'.php',9) - 9);
-			if(substr($shortname,-4) == 'Base')
-				continue;
-			if(substr($shortname,-10) == 'Operations')
-				continue;
-
-			$mod->field_types[$mod->Lang('field_type_'.$shortname)] = 'pwf'.$shortname;
-		}
-		uksort($mod->field_types,array('pwfUtils','fieldcmp'));
-
-		foreach($mod->field_types as $tName=>$tType)
-		{
-			if(substr($tType,0,14) == 'pwfDisposition')
-				$mod->disp_field_types[$tName]=$tType;
-		}
-
-		$mod->std_field_types = array(
-			$mod->Lang('field_type_CheckboxField')=>'pwfCheckboxField',
-//			$mod->Lang('field_type_CheckboxGroupField')=>'pwfCheckboxGroupField',
-			$mod->Lang('field_type_DispositionEmail')=>'pwfDispositionEmail',
-			$mod->Lang('field_type_DispositionFile')=>'pwfDispositionFile',
-			$mod->Lang('field_type_PageBreakField')=>'pwfPageBreakField',
-			$mod->Lang('field_type_PulldownField')=>'pwfPulldownField',
-			$mod->Lang('field_type_RadioGroupField')=>'pwfRadioGroupField',
-			$mod->Lang('field_type_StaticTextField')=>'pwfStaticTextField',
-			$mod->Lang('field_type_TextAreaField')=>'pwfTextAreaField',
-			$mod->Lang('field_type_TextField')=>'pwfTextField');
-		uksort($mod->std_field_types,array('pwfUtils','fieldcmp'));
-//		$mod->all_validation_types = array(); NEVER USED
-	}
-
-	private static function fieldcmp($a, $b)
+	private static function fieldcmp($a,$b)
 	{
 		$fa = $a[0];
 		$fb = $b[0];
@@ -101,14 +38,103 @@ class pwfUtils
 	}
 
 	/**
+	Collect_Fields:
+	@mod: reference to PowerForms module
+	*/
+	public static function Collect_Fields(&$mod)
+	{
+		if($mod->field_types)
+			return; //already done
+		$fp = dirname(__FILE__).DIRECTORY_SEPARATOR.'Fields.manifest';
+		if(!file_exists($fp))
+			return;
+
+		$feu = $mod->GetModuleInstance('FrontEndUsers');
+		$mail = $mod->GetModuleInstance('CMSMailer');
+/*		if($mail != FALSE)
+		{
+			if(version_compare($mail->GetVersion(),self::MAILERMINVERSION) < 0)
+				$mail = FALSE;
+		}
+*/
+		$imports = $mod->GetPreference('imported_fields');
+		if($imports)
+			$imports = unserialize($imports);
+
+		$mod->field_types = array();
+
+		$rows = file($fp,FILE_SKIP_EMPTY_LINES); //flag doesn't work!!
+		foreach($rows as $oneline)
+		{
+			if($oneline[0] == '#' || ($oneline[0] == '/' && $oneline[1] == '/'))
+				continue;
+			$classname = trim($oneline);
+			if(!$classname)
+				continue;
+			if($mail == FALSE && strpos($classname,'Email') !== FALSE)
+				continue;
+			if($feu == FALSE && strpos($classname,'FEU') !== FALSE)
+				continue;
+			if($imports && in_array($imports,$classname))
+				self::Show_Field($mod,$classname,FALSE);
+			else
+			{
+				$menukey = 'field_type_'.substr($classname,3);
+				$mod->field_types[$mod->Lang($menukey)] = $classname;
+			}
+		}
+		uksort($mod->field_types,array('pwfUtils','fieldcmp'));
+
+		$mod->std_field_types = array(
+			$mod->Lang('field_type_Checkbox')=>'pwfCheckbox',
+			$mod->Lang('field_type_Pulldown')=>'pwfPulldown',
+			$mod->Lang('field_type_RadioGroup')=>'pwfRadioGroup',
+			$mod->Lang('field_type_StaticText')=>'pwfStaticText',
+			$mod->Lang('field_type_TextArea')=>'pwfTextArea',
+			$mod->Lang('field_type_Text')=>'pwfText',
+			$mod->Lang('field_type_SystemEmail')=>'pwfSystemEmail',
+			$mod->Lang('field_type_WriteFile')=>'pwfWriteFile');
+		uksort($mod->std_field_types,array('pwfUtils','fieldcmp'));
+	}
+
+	/**
+	Show_Field:
+	@mod: reference to PowerForms module
+	@classname:
+	Include @classname in the array of fields used in the field-adder pulldown
+	*/
+	public static function Show_Field(&$mod,$classname,$sort=TRUE)
+	{
+		if($mod->field_types)
+		{
+			$params = array();
+			$formdata = $mod->GetFormData($params);
+			$obfld = new $classname($formdata,$params);
+			if($obfield)
+			{
+				if(!($obfld->IsInput || $obfld->IsSortable)) //TODO check this
+					$t = '-';
+				elseif($obfld->IsDisposition)
+					$t = '*';
+				else
+					$t = '';
+				$menulabel = $t.$obfld->mymodule->Lang($obfld->MenuKey);
+				$mod->field_types[$menulabel] = $classname;
+				if($sort)
+					uksort($mod->field_types,array('pwfUtils','fieldcmp'));
+			}
+		}
+	}
+
+	/**
 	GetForms:
-	@orderby: forms-table field name, optional, default 'name'
+	@orderby: forms-table field name,optional,default 'name'
 	Returns: array of all content of the forms-table
 	*/
 	public static function GetForms($orderby='name')
 	{
-		// DO NOT parameterise $orderby! If ADODB quotes it, the SQL is not valid
-		// instead, rudimentary security checks
+		// DO NOT parameterise $orderby! If ADODB quotes it,the SQL is not valid
+		// instead,rudimentary security checks
 		$orderby = preg_replace('/\s/','',$orderby);
 		$orderby = preg_replace('/[^\w\-.]/','_',$orderby);
 		$sql = 'SELECT * FROM '.cms_db_prefix().'module_pwf_form ORDER BY '.$orderby;
@@ -129,8 +155,8 @@ class pwfUtils
 	*/
 	public static function MakeClassName($type)
 	{
-		// rudimentary security, cuz' $type could come from a form
-		$type = preg_replace('~[\W]|\.\.~', '_', $type); //TODO
+		// rudimentary security,cuz' $type could come from a form
+		$type = preg_replace('~[\W]|\.\.~','_',$type); //TODO
 		if(!$type)
 			$type = 'Field';
 		if(strpos($type,'pwf') === 0)
@@ -155,7 +181,7 @@ class pwfUtils
 	/**
 	CleanLog:
 	@module: reference to PowerTools module object
-	@time: timestamp, optional, default = 0
+	@time: timestamp,optional,default = 0
 	*/
 	public static function CleanLog(&$module,$time = 0)
 	{
@@ -164,24 +190,6 @@ class pwfUtils
 		$db = cmsms()->GetDb();
 		$limit = $db->DbTimeStamp($time);
 		$db->Execute('DELETE FROM '.cms_db_prefix().'module_pwf_ip_log WHERE sent_time<'.$limit);
-	}
-
-	/**
-	GetFieldById:
-	@formdata: reference to form data object
-	@$field_id:
-	Returns: reference to first-found field-object whose id matches $field_id
-	*/
-	public static function &GetFieldById(&$formdata,$field_id)
-	{
-		foreach($formdata->Fields as &$fld)
-		{
-			if($fld->GetId() == $field_id)
-				return $fld;
-		}
-		unset ($fld);
-		$fld = FALSE; //need ref to this
-		return $fld;
 	}
 
 	public static function GetFormNameFromID($form_id)
@@ -208,7 +216,7 @@ class pwfUtils
 	{
 		$db = cmsms()->GetDb();
 		$sql = 'SELECT form_id FROM '.cms_db_prefix().'module_pwf_form WHERE alias = ?';
-		$fid = $db->GetOne($sql, array($form_alias));
+		$fid = $db->GetOne($sql,array($form_alias));
 		if($fid)
 			return (int)$fid;
 		return -1;
@@ -233,8 +241,7 @@ class pwfUtils
 		 'form_host' => 'help_server_name',
 		 'sub_date' => 'help_submission_date',
 		 'sub_source' => 'help_sub_source',
-		 'version' => 'help_module_version',
-		 'TAB' => 'help_tab') as $name=>$langkey)
+		 'version' => 'help_module_version') as $name=>$langkey)
 		{
 			$oneset = new stdClass();
 			$oneset->name = '{$'.$name.'}';
@@ -251,10 +258,10 @@ class pwfUtils
 				if($one->DisplayInSubmission())
 				{
 					$oneset = new stdClass();
+					$oneset->title = $one->GetName();
+					$oneset->alias = $one->ForceAlias();
 					$oneset->name = $one->GetVariableName();
 					$oneset->id = $one->GetId();
-					$oneset->alias = $one->GetAlias();
-					$oneset->title = $one->GetName();
 					$oneset->escaped = str_replace("'","\\'",$oneset->title);
 					$subfields[] = $oneset;
 				}
@@ -263,7 +270,7 @@ class pwfUtils
 			$smarty->assign('subfields',$subfields);
 		}
 
-		$obfields = array();
+/*		$obfields = array();
 		foreach(array ('name','type','id','value','valuearray') as $name)
 		{
 			$oneset = new stdClass();
@@ -276,6 +283,7 @@ class pwfUtils
 //		$oneset->title = $mod->Lang('title_field_id2');
 		$smarty->assign('help_field_values',$mod->Lang('help_field_values'));
 		$smarty->assign('help_object_example',$mod->Lang('help_object_example'));
+*/
 		$smarty->assign('help_other_fields',$mod->Lang('help_other_fields'));
 
 		$smarty->assign('help_vars',$mod->ProcessTemplate('form_vars_help.tpl'));
@@ -318,10 +326,10 @@ class pwfUtils
 		return $mod->ProcessTemplate('form_vars_help.tpl');
 	}
 
-	public static function GetAttr(&$formdata,$attrname,$default='')
+	public static function GetFormOption(&$formdata,$optname,$default='')
 	{
-		if(isset($formdata->Attrs[$attrname]))
-			return $formdata->Attrs[$attrname];
+		if(isset($formdata->Options[$optname]))
+			return $formdata->Options[$optname];
 		else
 			return $default;
 	}
@@ -343,13 +351,14 @@ class pwfUtils
 	/**
 	CreateSampleTemplate:
 	@formdata: reference to form data object
-	@htmlish:=FALSE
-	@email:=TRUE
-	@oneline:=FALSE
-	@header:=FALSE
-	@footer:=FALSE
+	@htmlish:  default FALSE
+	@email:  default TRUE
+	@oneline: default FALSE
+	@header: default FALSE
+	@footer: default FALSE
 	*/
-	public static function CreateSampleTemplate(&$formdata,$htmlish=FALSE,$email=TRUE,$oneline=FALSE,$header=FALSE,$footer=FALSE)
+	public static function CreateSampleTemplate(&$formdata,
+		$htmlish=FALSE,$email=TRUE,$oneline=FALSE,$header=FALSE,$footer=FALSE)
 	{
 		$mod = $formdata->formsmodule;
 		$ret = '';
@@ -367,8 +376,7 @@ class pwfUtils
 			 'form_host' => 'help_server_name',
 			 'sub_date' => 'help_submission_date',
 			 'sub_source' => 'help_sub_source',
-			 'version' => 'help_module_version',
-			 'TAB' => 'help_tab') as $key=>$val)
+			 'version' => 'help_module_version') as $key=>$val)
 			{
 				if($htmlish)
 					$ret .= '<strong>'.$mod->Lang($val).'</strong>: {$'.$key.'}<br />';
@@ -400,20 +408,16 @@ class pwfUtils
 		{
 			if($one->DisplayInSubmission())
 			{
-				if($one->GetAlias() != '')
-					$fldref = $one->GetAlias();
-				else
-					$fldref = 'fld_'. $one->GetId();
-
-	 			$ret .= '{if $'.$fldref.' != "" && $'.$fldref.' != "'.self::GetAttr($formdata,'unspecified',$mod->Lang('unspecified')).'"}';
+				$fldref = $one->ForceAlias();
+	 			$ret .= '{if $'.$fldref.' != "" && $'.$fldref.' != "'.self::GetFormOption($formdata,'unspecified',$mod->Lang('unspecified')).'"}';
 				$fldref = '{$'.$fldref.'}';
 
 				if($htmlish)
 					$ret .= '<strong>'.$one->GetName().'</strong>: '.$fldref.'<br />';
 				elseif($oneline && !$header)
-					$ret .= $fldref. '{$TAB}';
+					$ret .= $fldref."\t";
 				elseif($oneline && $header)
-					$ret .= $one->GetName().'{$TAB}';
+					$ret .= $one->GetName()."\t";
 				else
 					$ret .= $one->GetName().': '.$fldref;
 				$ret .= "{/if}\n";
@@ -424,11 +428,12 @@ class pwfUtils
 	}
 
 	//called only from AdminTemplateActions()
-	private static function CreateAction(&$mod, $id, $fieldName='opt_email_template', $button_text='', $suffix='')
+	//returns array, member[0] is js click-func for button member[1] 
+	private static function CreateAction(&$mod,$id,$fieldName='opt_email_template',$button_text='',$suffix='')
 	{
-		$fldAlias = preg_replace('/[^\w\d]/','_',$fieldName).$suffix;
+		$fldAlias = preg_replace('/[^\w\d]/','_',$fieldName).$suffix; //TODO check this alias still works
 		$msg = $mod->Lang('confirm');
-//TODO js goes to where ?
+//TODO js goes to where ? |TEMPLATE| substitution where ?
 		$jsfunc = <<<EOS
 function populate_{$fldAlias}(formname) {
  if(confirm ('{$msg}')) {
@@ -447,10 +452,10 @@ EOS;
 	/**
 	AdminTemplateActions:
 	@formdata: reference to form data object
-	@formDescriptor
-	@fieldStruct
+	@module_id: The id given to the Powerforms module on execution
+	@fieldStruct:
 	*/
-	public static function AdminTemplateActions(&$formdata,$formDescriptor,$fieldStruct)
+	public static function AdminTemplateActions(&$formdata,$module_id,$fieldStruct)
 	{
 		$mod = $formdata->formsmodule;
 		$funcs = array();
@@ -476,17 +481,17 @@ EOS;
 
 			if($html_button && $text_button)
 			{
-				$sample = self::CreateSampleTemplate($formdata,FALSE, $is_email, $is_oneline, $is_header, $is_footer);
+				$sample = self::CreateSampleTemplate($formdata,FALSE,$is_email,$is_oneline,$is_header,$is_footer);
 				$sample = str_replace(array("'","\n"),array("\\'","\\n'+\n'"),$sample);
-				list($func,$btn) = self::CreateAction($mod, $formDescriptor, $key, $mod->Lang('title_create_sample_template'),'text');
-				$funcs[] = str_replace('|TEMPLATE|',"'".$sample."'", $func);
+				list($func,$btn) = self::CreateAction($mod,$module_id,$key,$mod->Lang('title_create_sample_template'),'text');
+				$funcs[] = str_replace('|TEMPLATE|',"'".$sample."'",$func);
 				$buttons[] = $btn;
 			}
 
-			$sample = self::CreateSampleTemplate($formdata,$html_button || $gen_button, $is_email, $is_oneline, $is_header, $is_footer);
+			$sample = self::CreateSampleTemplate($formdata,$html_button || $gen_button,$is_email,$is_oneline,$is_header,$is_footer);
 			$sample = str_replace(array("'","\n"),array("\\'","\\n'+\n'"),$sample);
-			list($func,$btn) = self::CreateAction($mod, $formDescriptor, $key, $button_text);
-			$funcs[] = str_replace('|TEMPLATE|',"'".$sample."'", $func);
+			list($func,$btn) = self::CreateAction($mod,$module_id,$key,$button_text);
+			$funcs[] = str_replace('|TEMPLATE|',"'".$sample."'",$func);
 			$buttons[]= $btn;
 		}
 		return array($funcs,$buttons);
@@ -501,7 +506,7 @@ EOS;
 	{
 		$mod = $formdata->formsmodule;
 
-		$unspec = self::GetAttr($formdata,'unspecified',$mod->Lang('unspecified'));
+		$unspec = self::GetFormOption($formdata,'unspecified',$mod->Lang('unspecified'));
 		$smarty = cmsms()->GetSmarty();
 
 		$formInfo = array();
@@ -527,18 +532,15 @@ EOS;
 			}
 
 			$name = $one->GetVariableName();
-			$fldobj = $one->ExportObject();
+//			$fldobj = $one->ExportObject();
 			$smarty->assign($name,$replVal);
-			$smarty->assign($name.'_obj',$fldobj);
+//			$smarty->assign_by_ref($name.'_obj',$fldobj);
+			$alias = $one->ForceAlias();
+			$smarty->assign($alias,$replVal);
+//			$smarty->assign_by_ref($alias.'_obj',$fldobj);
 			$id = $one->GetId();
 			$smarty->assign('fld_'.$id,$replVal);
-			$smarty->assign('fld_'.$id.'_obj',$fldobj);
-			$alias = $one->GetAlias();
-			if($alias != '')
-			{
-				$smarty->assign($alias,$replVal);
-				$smarty->assign($alias.'_obj',$fldobj);
-			}
+//			$smarty->assign_by_ref('fld_'.$id.'_obj',$fldobj);
 		}
 		unset ($one);
 
@@ -549,12 +551,11 @@ EOS;
 		$smarty->assign('sub_date',date('r'));
 		$smarty->assign('sub_source',$_SERVER['REMOTE_ADDR']);
 		$smarty->assign('version',$mod->GetVersion());
-		$smarty->assign('TAB',"\t");
 	}
 
 	/**
 	StoreResponse:
-	Master response saver, used by various field-classes
+	Master response saver,used by various field-classes
 	@response_id:=-1
 	@approver:=''
 	@Disposer:=NULL
@@ -568,10 +569,10 @@ EOS;
 		$hash_fields = FALSE;
 		$sort_fields = array();
 
-		// Check if form has database fields, do init
+		// Check if form has database fields,do init
 /*redundant FormBrowser
 		if(is_object($Disposer) &&
-			$Disposer->GetFieldType() == 'DispositionFormBrowser')
+			$Disposer->GetFieldType() == 'FormBrowser')
 		{
 			$crypt = ($Disposer->GetOption('crypt','0') == '1');
 			$hash_fields = ($Disposer->GetOption('hash_sort','0') == '1');
@@ -600,7 +601,7 @@ EOS;
 			foreach($formdata->Fields as &$one)
 			{
 				// set the response_id to be the attribute of the formbrowser disposition
-				if($one->GetFieldType() == 'DispositionFormBrowser')
+				if($one->GetFieldType() == 'FormBrowser')
 					$one->SetValue($response_id);
 			}
 			unset ($one);
@@ -635,9 +636,9 @@ EOS;
 		}
 		elseif(!$hash_fields)
 		{
-			list($res, $xml) = self::Crypt($xml,$Disposer);
+			list($res,$xml) = self::Crypt($xml,$Disposer);
 			if(!$res)
-				return array(FALSE, $xml);
+				return array(FALSE,$xml);
 
 			$output = self::StoreResponseXML(
 				$response_id,
@@ -653,9 +654,9 @@ EOS;
 		}
 		else
 		{
-			list($res, $xml) = self::Crypt($xml,$Disposer);
+			list($res,$xml) = self::Crypt($xml,$Disposer);
 			if(!$res)
-				return array(FALSE, $xml);
+				return array(FALSE,$xml);
 
 			$output = self::StoreResponseXML(
 				$response_id,
@@ -674,7 +675,7 @@ EOS;
 */
 	// Insert parsed XML data to database
 	private static function StoreResponseXML($response_id=-1,$newrec=FALSE,$approver='',$sortfield1,
-	   $sortfield2,$sortfield3,$sortfield4,$sortfield5, $feu_id,$xml)
+	   $sortfield2,$sortfield3,$sortfield4,$sortfield5,$feu_id,$xml)
 	{
 		$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();
@@ -683,11 +684,11 @@ EOS;
 		if($newrec)
 		{
 			// saving a new response
-/* TODO save into browser-module table, or just send there via API
+/* TODO save into browser-module table,or just send there via API
 			$secret_code = substr(md5(session_id().'_'.time()),0,7);
 			$response_id = $db->GenID($pre.'module_pwf_browse_seq');
 			$sql = 'INSERT INTO '.$pre.
-				'module_pwf_browse (browser_id, form_id, submitted, secret_code, index_key_1, index_key_2, index_key_3, index_key_4, index_key_5, feuid, response) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
+				'module_pwf_browse (browser_id,form_id,submitted,secret_code,index_key_1,index_key_2,index_key_3,index_key_4,index_key_5,feuid,response) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
 			$res = $db->Execute($sql,
 				array($response_id,
 					$formdata->Id,
@@ -699,21 +700,21 @@ EOS;
 				));
 */
 		}
-		else if($approver != '')
+		else if($approver)
 		{
-/* TODO save into browser-module table, or just send there via API
+/* TODO save into browser-module table,or just send there via API
 			$sql = 'UPDATE '.$pre.
 				'module_pwf_browse set user_approved=? where browser_id=?';
 			$res = $db->Execute($sql,array($db->DBTimeStamp(time()),$response_id));
 			$mod = cms_utils::get_module('PowerForms');
-			audit(-1, $mod->GetName(), $mod->Lang('user_approved_submission',array($response_id,$approver)));
+			audit(-1,$mod->GetName(),$mod->Lang('user_approved_submission',array($response_id,$approver)));
 */
 		}
 		if(!$newrec)
 		{
-/* TODO save into browser-module table, or just send there via API
+/* TODO save into browser-module table,or just send there via API
 			$sql = 'UPDATE '.$pre.
-				'module_pwf_browse set index_key_1=?, index_key_2=?, index_key_3=?, index_key_4=?, index_key_5=?, response=? where browser_id=?';
+				'module_pwf_browse set index_key_1=?,index_key_2=?,index_key_3=?,index_key_4=?,index_key_5=?,response=? where browser_id=?';
 			$res = $db->Execute($sql,
 				array($sortfield1,$sortfield2,$sortfield3,$sortfield4,$sortfield5,$xml,$response_id));
 */
@@ -763,10 +764,10 @@ EOS;
 	private static function Encrypt($string,$key)
 	{
 		$key = substr(md5($key),0,24);
-		$td = mcrypt_module_open ('tripledes', '', 'ecb', '');
-		$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size ($td), MCRYPT_RAND);
-		mcrypt_generic_init ($td, $key, $iv);
-		$enc = base64_encode(mcrypt_generic ($td, $string));
+		$td = mcrypt_module_open ('tripledes','','ecb','');
+		$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size ($td),MCRYPT_RAND);
+		mcrypt_generic_init ($td,$key,$iv);
+		$enc = base64_encode(mcrypt_generic ($td,$string));
 		mcrypt_generic_deinit ($td);
 		mcrypt_module_close ($td);
 		return $enc;
@@ -775,11 +776,11 @@ EOS;
 /*TODO	public static function Decrypt($crypt,$key)
 	{
 		$crypt = base64_decode($crypt);
-		$td = mcrypt_module_open ('tripledes', '', 'ecb', '');
+		$td = mcrypt_module_open ('tripledes','','ecb','');
 		$key = substr(md5($key),0,24);
-		$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size ($td), MCRYPT_RAND);
-		mcrypt_generic_init ($td, $key, $iv);
-		$plain = mdecrypt_generic ($td, $crypt);
+		$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size ($td),MCRYPT_RAND);
+		mcrypt_generic_init ($td,$key,$iv);
+		$plain = mdecrypt_generic ($td,$crypt);
 		mcrypt_generic_deinit ($td);
 		mcrypt_module_close ($td);
 		return $plain;
@@ -820,6 +821,25 @@ TODO				'module_pwf_flock WHERE flock < '.$db->sysTimeStamp + 15;
 		array('&'    ,'<!--'        ,'-->'    ,'>'   ,'<'   ,'"'     ,"'"    ,'$'     ,'!'    ),
 		$val);
 		return $val;
+	}
+
+	public static function GetUploadsPath()
+	{
+		$config = cmsms()->GetConfig();
+		$fp = $config['uploads_path'];
+		if($fp && is_dir($fp))
+		{
+			$mod = cms_utils::get_module('PowerForms');
+			$ud = $mod->GetPreference('uploads_dir');
+			if($ud)
+			{
+				$ud = $fp.DIRECTORY_SEPARATOR.$ud;
+				if(is_dir($ud))
+					return $ud;
+			}
+			return $fp;
+		}
+		return FALSE;
 	}
 
 }
