@@ -5,18 +5,17 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfSystemLinkField extends pwfFieldBase
+class pwfSystemLink extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->NonRequirableField = TRUE;
-		$this->Required = FALSE;
-		$this->Type = 'SystemLinkField';
-		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = array($mod->Lang('validation_none')=>'none');
         $this->HasMultipleFormComponents = TRUE;
         $this->IsSortable = FALSE;
+		$this->NonRequirableField = TRUE;
+		$this->Required = FALSE;
+		$this->Type = 'SystemLink';
+		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_none')=>'none');
 	}
 
 	function GetFieldInput($id,&$params)

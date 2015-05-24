@@ -5,13 +5,13 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfTextAreaField extends pwfFieldBase
+class pwfTextArea extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->Type = 'TextAreaField';
+		$this->Type = 'TextArea';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array(
 			$mod->Lang('validation_none')=>'none',

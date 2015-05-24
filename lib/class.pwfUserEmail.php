@@ -15,7 +15,7 @@ class pwfUserEmail extends pwfEmailBase
 		parent::__construct($formdata,$params);
 		$this->IsDisposition = TRUE;
 		$this->ModifiesOtherFields = TRUE;
-		$this->Type = 'EmailExtraCustom';
+		$this->Type = 'UserEmail';
 		$mod = $formdata->formsmodule;
 		$this->ValidationType = 'email';
 		$this->ValidationTypes = array(
@@ -26,13 +26,8 @@ class pwfUserEmail extends pwfEmailBase
 
 	function GetCSSId($suffix='')
 	{
-		$alias = $this->GetAlias();
-		if(empty($alias))
-			$cssid = 'pwfp_'.$this->Id;
-		else
-			$cssid = $alias;
-
-		if(empty($suffix))
+		$cssid = $this->ForceAlias();
+		if(!$suffix)
 			$cssid .= '_1';
 		else
 			$cssid .= $suffix;
@@ -107,24 +102,23 @@ class pwfUserEmail extends pwfEmailBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$ret = $this->PrePopulateAdminFormCommonEmail($module_id);
-		$main = (isset($ret['main'])) ? $ret['main'] : array();
-//TODO check this crap
 		$opts = array(
 			$mod->Lang('option_never')=>'n',
 			$mod->Lang('option_user_choice')=>'c',
 			$mod->Lang('option_always')=>'a');
-	
-		$main[] = array($mod->Lang('title_send_user_copy'),
+		$ret['main'][] = array($mod->Lang('title_send_user_copy'),
 			$mod->CreateInputDropdown($module_id,'opt_send_user_copy',$opts,-1,
 				$this->GetOption('send_user_copy','n')));
-		$main[] = array($mod->Lang('title_send_user_label'),
+		$ret['main'][] = array($mod->Lang('title_send_user_label'),
 			$mod->CreateInputText($module_id,'opt_send_user_label',
 				$this->GetOption('send_user_label',$mod->Lang('title_send_me_a_copy')),25,125));
-		$hopts = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
-		$main[] = array($mod->Lang('title_headers_to_modify'),
+		$hopts = array(
+			$mod->Lang('option_from')=>'f',
+			$mod->Lang('option_reply')=>'r',
+			$mod->Lang('option_both')=>'b');
+		$ret['main'][] = array($mod->Lang('title_headers_to_modify'),
 			$mod->CreateInputDropdown($module_id,'opt_headers_to_modify',$hopts,-1,
 				$this->GetOption('headers_to_modify','f')));
-		$ret['main'] = $main;
 		return $ret;
 	}
 
@@ -139,7 +133,7 @@ class pwfUserEmail extends pwfEmailBase
 		if($this->Value !== FALSE)
 		{
 			$htm = $this->GetOption('headers_to_modify','f');
-			foreach($this->formdata->Fields as &one)
+			foreach($this->formdata->Fields as &$one)
 			{
 				if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
 				{

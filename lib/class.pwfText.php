@@ -5,13 +5,13 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfTextField extends pwfFieldBase
+class pwfText extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->Type = 'TextField';
+		$this->Type = 'Text';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array(
             $mod->Lang('validation_none')=>'none',
@@ -24,18 +24,30 @@ class pwfTextField extends pwfFieldBase
            );
 	}
 
+	function GetFieldStatus()
+	{
+		$mod = $this->formdata->formsmodule;
+		$ret = $mod->Lang('abbreviation_length',$this->GetOption('length',80));
+
+		if($this->ValidationType)
+		  	$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
+
+		if($this->GetOption('readonly',0))
+			$ret .= ','.$mod->Lang('title_read_only');
+
+		return $ret;
+	}
+
 	function GetFieldInput($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
 		$js = $this->GetOption('javascript');
 		$ro = '';
 
-		if($this->GetOption('readonly','0') == '1')
-		{
+		if($this->GetOption('readonly',0))
 			$ro = ' readonly="readonly"';
-		}
 
-		if($this->GetOption('html5','0') == '1')
+		if($this->GetOption('html5',0))
 		{
 			return $mod->CustomCreateInputType($id,'pwfp_'.$this->Id,$this->Value,$this->GetOption('length')<25?$this->GetOption('length'):25,
 				$this->GetOption('length'),
@@ -44,26 +56,8 @@ class pwfTextField extends pwfFieldBase
 		else
 		{
 			return $mod->CustomCreateInputType($id,'pwfp_'.$this->Id,($this->HasValue()?$this->Value:$this->GetOption('default')),$this->GetOption('length')<25?$this->GetOption('length'):25,$this->GetOption('length'),
-				($this->GetOption('clear_default','0')==1?(' onfocus="if(this.value==this.defaultValue) this.value=\'\';" onblur="if(this.value==\'\') this.value=this.defaultValue;"'):' ').$js.$ro.$this->GetCSSIdTag());
+				($this->GetOption('clear_default',0)?(' onfocus="if(this.value==this.defaultValue) this.value=\'\';" onblur="if(this.value==\'\') this.value=this.defaultValue;"'):' ').$js.$ro.$this->GetCSSIdTag());
 		}
-	}
-
-	function GetFieldStatus()
-	{
-		$mod = $this->formdata->formsmodule;
-		$ret = $mod->Lang('abbreviation_length',$this->GetOption('length','80'));
-
-		if(strlen($this->ValidationType)>0)
-		{
-		  	$ret .= ",".array_search($this->ValidationType,$this->ValidationTypes);
-		}
-
-		if($this->GetOption('readonly','0') == '1')
-		{
-			$ret .= ",".$mod->Lang('title_read_only');
-		}
-
-		return $ret;
 	}
 
 	function PrePopulateAdminForm($module_id)
@@ -72,10 +66,10 @@ class pwfTextField extends pwfFieldBase
 
 		$main = array(
 			array($mod->Lang('title_maximum_length'),
-				$mod->CreateInputText($module_id,'opt_length',$this->GetOption('length','80'),25,25)),
+				$mod->CreateInputText($module_id,'opt_length',$this->GetOption('length',80),25,25)),
 			array($mod->Lang('title_read_only'),
-				$mod->CreateInputHidden($module_id,'opt_readonly','0').
-				$mod->CreateInputCheckbox($module_id,'opt_readonly','1',$this->GetOption('readonly','0')))
+				$mod->CreateInputHidden($module_id,'opt_readonly',0).
+				$mod->CreateInputCheckbox($module_id,'opt_readonly',1,$this->GetOption('readonly',0)))
 		);
 
 		$adv = array(
@@ -85,11 +79,11 @@ class pwfTextField extends pwfFieldBase
 			array($mod->Lang('title_field_default_value'),
 				$mod->CreateInputText($module_id,'opt_default',$this->GetOption('default'),25,1024)),
 			array($mod->Lang('title_html5'),
-				$mod->CreateInputHidden($module_id,'opt_html5','0').
-				$mod->CreateInputCheckbox($module_id,'opt_html5','1',$this->GetOption('html5','0'))),
+				$mod->CreateInputHidden($module_id,'opt_html5',0).
+				$mod->CreateInputCheckbox($module_id,'opt_html5',1,$this->GetOption('html5',0))),
 			array($mod->Lang('title_clear_default'),
-				$mod->CreateInputHidden($module_id,'opt_clear_default','0').
-				$mod->CreateInputCheckbox($module_id,'opt_clear_default','1',$this->GetOption('clear_default','0')),
+				$mod->CreateInputHidden($module_id,'opt_clear_default',0).
+				$mod->CreateInputCheckbox($module_id,'opt_clear_default',1,$this->GetOption('clear_default',0)),
 				$mod->Lang('help_clear_default'))
 		);
 
@@ -161,10 +155,11 @@ class pwfTextField extends pwfFieldBase
 			break;
 		}
 
-		if($this->GetOption('length',0) > 0 && strlen($this->Value) > $this->GetOption('length',0))
+		$lm = $this->GetOption('length',0);
+		if($lm && strlen($this->Value) > $lm)
 		{
 			$this->validated = FALSE;
-			$this->ValidationMessage = $mod->Lang('please_enter_no_longer',$this->GetOption('length',0));
+			$this->ValidationMessage = $mod->Lang('please_enter_no_longer',$lm);
 		}
 
 		return array($this->validated,$this->ValidationMessage);

@@ -5,19 +5,19 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfTimePickerField extends pwfFieldBase
+class pwfTimePicker extends pwfFieldBase
 {
 	var $flag12hour;
 
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->HasMultipleFormComponents = TRUE;
 		$this->IsInput = TRUE;
-		$this->Type = 'TimePickerField';
+		$this->LabelSubComponents = FALSE;
+		$this->Type = 'TimePicker';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array($mod->Lang('validation_none')=>'none');
-		$this->HasMultipleFormComponents = TRUE;
-		$this->LabelSubComponents = FALSE;
 		$this->flag12hour = array(
 			$mod->Lang('title_before_noon')=>$mod->Lang('title_before_noon'),
 			$mod->Lang('title_after_noon')=>$mod->Lang('title_after_noon'));
@@ -27,6 +27,28 @@ class pwfTimePickerField extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		return ($this->GetOption('24_hour','0') == '0'?$mod->Lang('12_hour'):$mod->Lang('24_hour'));
+	}
+
+	function GetHumanReadableValue($as_string=TRUE)
+	{
+		if($this->HasValue())
+		{
+			if($this->GetOption('24_hour',0) == 0)
+				$ret = $this->GetArrayValue(0).':'.
+					$this->GetArrayValue(1).' '.
+					$this->GetArrayValue(2);
+			else
+				$ret = $this->GetArrayValue(0).':'.
+					$this->GetArrayValue(1);
+		}
+		else
+			$ret = $this->GetFormOption('unspecified',
+				$this->formdata->formsmodule->Lang('unspecified'));
+
+		if($as_string)
+			return $ret;
+		else
+			return array($ret);
 	}
 
 	function GetFieldInput($id,&$params)
@@ -121,28 +143,6 @@ class pwfTimePickerField extends pwfFieldBase
 
 			return $ret;
 		}
-	}
-
-	function GetHumanReadableValue($as_string=TRUE)
-	{
-		if($this->HasValue())
-		{
-			if($this->GetOption('24_hour',0) == 0)
-				$ret = $this->GetArrayValue(0).':'.
-					$this->GetArrayValue(1).' '.
-					$this->GetArrayValue(2);
-			else
-				$ret = $this->GetArrayValue(0).':'.
-					$this->GetArrayValue(1);
-		}
-		else
-			$ret = $this->GetFormOption('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
-
-		if($as_string)
-			return $ret;
-		else
-			return array($ret);
 	}
 
 	function PrePopulateAdminForm($module_id)
