@@ -12,8 +12,9 @@
 {/foreach}
 {if !empty($mainvarhelp)}<br /><div class="pageinput">{$help_vars}</div>{/if}
 {if isset($mainTable)}
-   <br />
-   <table class="pwf_table pageinput">
+  <br />
+  <div class="pageoverflow">
+   <table class="leftwards pageoverflow">
  {section name=r loop=$mainTable}
   {if $smarty.section.r.first}
    <thead>
@@ -26,9 +27,10 @@
  {/section}
    </tbody>
    </table>
-	 {if $add != '' or $del != ''}
-    <br />
-    <p class="pageinput">{$add}&nbsp;{$del}</p>
+  </div>
+ {if $add || $del}
+  <br />
+  <p class="pageinput">{if $add}{$add}&nbsp;{/if}{if $del}{$del}{/if}</p>
  {/if}
  {/if}
  </div>
@@ -44,10 +46,8 @@
  </div>
 {$tab_end}
 {$tabs_end}
-<div class="pageoverflow">
  <br />
  <p class="pageinput">{if isset($submit)}{$submit}&nbsp;{/if}{$cancel}</p>
-</div>
 {$form_end}
 {if !empty($jsfuncs)}
 <script type="text/javascript">
