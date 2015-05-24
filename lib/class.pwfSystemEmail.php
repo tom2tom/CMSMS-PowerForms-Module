@@ -22,7 +22,7 @@ class pwfSystemEmail extends pwfEmailBase
 		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
 		$this->NonRequirableField = TRUE;
-		$this->Type = 'Email';
+		$this->Type = 'SystemEmail';
 		$this->addressAdd = FALSE;
 	}
 
@@ -100,17 +100,11 @@ class pwfSystemEmail extends pwfEmailBase
 	{
 		$tmp = $this->GetOptionRef('destination_address');
 		if(is_array($tmp))
-		{
 			$this->addressCount = count($tmp);
-		}
 		elseif($tmp !== FALSE)
-		{
 			$this->addressCount = 1;
-		}
 		else
-		{
 			$this->addressCount = 0;
-		}
 	}
 
 	function GetDests($module_id,$row,$sel)
@@ -143,7 +137,7 @@ class pwfSystemEmail extends pwfEmailBase
 		}
 
 		$ret = $this->PrePopulateAdminFormCommonEmail($module_id);
-//		$main[] = array($mod->Lang('title_destination_address'),$dests);
+//		$ret['main'][] = array($mod->Lang('title_destination_address'),$dests);
 		$dests = array();
 		$dests[] = array(
 			$mod->Lang('title_destination_address'),
@@ -196,24 +190,26 @@ class pwfSystemEmail extends pwfEmailBase
 
 	function AdminValidate()
 	{
-		$mod = $this->formdata->formsmodule;
 		$messages = array();
-
-  		list($ret,$msg) = $this->DoesFieldHaveName();
-		if(!$ret)
+  		list($ret,$msg) = parent::AdminValidate();
+		if(!ret)
 			$messages[] = $msg;
+
+		$mod = $this->formdata->formsmodule;
+		$opt = $this->GetOption('email_from_address');
+		if($opt)
+		{
+			list($rv,$msg) = $this->validateEmailAddr();
+			if(!$rv)
+			{
+				$ret = FALSE;
+				$messages[] = $msg;
+			}
+		}
 		else
 		{
-			list($ret,$msg) = $this->DoesFieldNameExist();
-			if(!$ret)
-				$messages[] = $msg;
-		}
-
-		list($rv,$msg) = $this->validateEmailAddr($this->GetOption('email_from_address'));
-		if(!$rv)
-		{
 			$ret = FALSE;
-			$messages[] = $msg;
+			$messages[] = $mod->Lang('must_specify_TODO');
 		}
 
     	$dests = $this->GetOptionRef('destination_address');
@@ -240,6 +236,21 @@ class pwfSystemEmail extends pwfEmailBase
 
 		$msg = ($ret)? '' : implode('<br />',$messages);
     	return array($ret,$msg);
+	}
+
+	function SetFromAddress()
+	{
+		return FALSE;
+	}
+
+	function SetReplyToName()
+	{
+		return FALSE;
+	}
+
+	function SetReplyToAddress()
+	{
+		return FALSE;
 	}
 
 	function DisposeForm($returnid)
