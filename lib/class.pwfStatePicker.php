@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfStatePickerField extends pwfFieldBase
+class pwfStatePicker extends pwfFieldBase
 {
 	var $States;
 
@@ -13,7 +13,7 @@ class pwfStatePickerField extends pwfFieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->Type = 'StatePickerField';
+		$this->Type = 'StatePicker';
 		$this->States = array(
         'Alabama'=>'AL','Alaska'=>'AK','Arizona'=>'AZ','Arkansas'=>'AR',
         'California'=>'CA','Colorado'=>'CO','Connecticut'=>'CT','Delaware'=>'DE',
@@ -64,7 +64,7 @@ class pwfStatePickerField extends pwfFieldBase
 	function PrePopulateAdminForm($module_id)
 	{
 		$mod = $this->formdata->formsmodule;
-		$choices = array_merge(array('No Default'=>''),$this->States)
+		$choices = array_merge(array('No Default'=>''),$this->States);
 		$main = array(
 			array($mod->Lang('title_select_default_state'),
             	$mod->CreateInputDropdown($module_id,'opt_default_state',
