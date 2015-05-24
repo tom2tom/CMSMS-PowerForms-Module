@@ -1,20 +1,6 @@
 {* TABLE FORM LAYOUT / Field titles on Left *}
 {* next line sets number of columns for things like checkbox groups *}
 {assign var="cols" value="3"}
-<script type="text/javascript">
-//<![CDATA[{literal}
-function help_toggle(htid) {
- var help_container=document.getElementById(htid);
- if(help_container) {
-  if(help_container.style.display == 'none') {
-	help_container.style.display = 'inline';
-  } else {
-    help_container.style.display = 'none';
-  }
- }
-}
-{/literal}//]]>
-</script>
 {if $form_done}
 	{* This section is for displaying submission-errors *}
 	{if !empty($submission_error)}
@@ -41,15 +27,12 @@ function help_toggle(htid) {
 	{/if}
 	{* and now the form itself *}
 	{$form_start}
-	<div>{$hidden}</div>
-
-	<table{if $css_class != ''} class="{$css_class}"{/if}>
+	{$hidden}
+	<table{if $css_class} class="{$css_class}"{/if}>
 	{if $total_pages gt 1}<tr><td colspan="2">{$title_page_x_of_y}</td></tr>{/if}
 	{foreach from=$fields item=one}
 		{strip}
-		{if $one->display &&
-			$one->type != '-Fieldset Start' &&
-			$one->type != '-Fieldset End' }
+		{if $one->display && $one->type != 'FieldsetStart' && $one->type != 'FieldsetEnd'}
 		<tr>
 			<td style="text-align:right;vertical-align:top;"
 			{if $one->required || $one->css_class || !$one->valid} class=" 
@@ -88,9 +71,8 @@ function help_toggle(htid) {
 				{if $one->smarty_eval}{eval var=$one->input}{else}{$one->input}{/if}
 			{/if}
 			{if !$one->valid} &lt;--- {$one->error}{/if}
-			{if $one->helptext != ''}&nbsp;<a href="javascript:help_toggle('{$one->field_helptext_id}')">
-TODO translate				<img src="modules/PowerForms/images/info-small.gif" alt="Help" title="help" /></a>
-				<span id="{$one->field_helptext_id}" class="pwf_helptext">{$one->helptext}</span>{/if}
+			{if $one->helptext}&nbsp;<a href="javascript:help_toggle('{$one->field_helptext_id}')">{$help_icon}</a>
+			<span id="{$one->field_helptext_id}" class="pwf_helptext">{$one->helptext}</span>{/if}
 			</td></tr>
 		{/if}
 		{/strip}
@@ -98,4 +80,5 @@ TODO translate				<img src="modules/PowerForms/images/info-small.gif" alt="Help"
 	<tr><td>{$prev}</td><td>{$submit}</td></tr>
 	</table>
 	{$form_end}
+	{$jscript}
 {/if}
