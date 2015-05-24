@@ -6,7 +6,7 @@ textarea.pwf_shortarea { width:50em;height:8em; }
 //.pwf_help { display:none; }
 //.pwf_innernav, .pwf_browsenav {padding:5px;}
 //span.pwf_order { display:none; visibility:hidden; }
-//.pwf_invalid {} TODO frontend needs this too see $entry->valid use
+.fieldbad {	color: #F33; }
 table.pwf_table
 {
  font-size:1em;
@@ -40,8 +40,8 @@ table.rightwards {
 .submit_current {}
 .submit_next {}
 .submit_prev {}
-//.odd {background-color:#FFF;text-align:left;vertical-alignment:top;}
-//.even {background-color:#DDD;text-align:left;vertical-alignment:top;}
+//.row1 {background-color:#FFF;text-align:left;vertical-align:top;}
+//.row2 {background-color:#DDD;text-align:left;vertical-align:top;}
 //.inputhelp {color:#384654; padding:0; margin:0,0,0,20%; width:auto; text-align:left; }
 .error {font-weight:bold;font-size:13px;color:#F00;}
 .error_message {font-weight:bold;color:#F00;}
