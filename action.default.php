@@ -13,68 +13,118 @@ if(empty($params['form_id']) || $params['form_id'] == -1)
 	return;
 }
 $form_id = (int)$params['form_id'];
-
-if(isset($params['pwfp_form_data']))
-	$formdata = $params['pwfp_form_data'];
-else
+$funcs = new pwfFormOperations();
+$formdata = $funcs->Load($this,$form_id,$params,TRUE); //CHECKME safely cache form data somewhere ?
+unset($funcs);
+if(!$formdata)
 {
-	$funcs = new pwfFormOperations();
-	$formdata = $funcs->Load($this,$form_id,$params,TRUE);
-	unset($funcs);
-	if($formdata)
-		$formdata->Page = 1;
-	else
-	{
-		echo "<!-- no form -->\n";
-		return;
-	}
+	echo "<!-- no form -->\n";
+	return;
 }
 
+//Crash;
+
 $fieldExpandOp = FALSE;
-foreach($params as $pKey=>$pVal)
+if(!isset($params['pwfp_callcount']))
 {
-	if(substr($pKey,0,9) == 'pwfp_FeX_' || substr($pKey,0,9) == 'pwfp_FeD_')
+	//first time
+	$callcount = 0;
+	$formdata->Page = 1;
+	$formdata->FormPagesCount = 1; //we will count
+}
+else
+{
+	$callcount = (int)$params['pwfp_callcount'];
+	$formdata->Page = (int)$params['pwfp_formpage'];
+	$formdata->FormPagesCount = 1;
+	//update all formdata from $params[] TODO cache these data somewhere
+	foreach($params as $pKey=>$pVal)
 	{
-		// expanding or shrinking a field
-		$fieldExpandOp = TRUE;
+		if(strpos($pKey,'pwfp_') === 0)
+		{
+			$pid = substr($pKey,5);
+			if(is_numeric($pid))
+			{
+				$fld = pwfFieldCheck::GetFieldById($formdata,$pid);
+				if($fld)
+					$fld->SetValue($pVal);
+/*
+'pwfp_13' => 
+    array (size=1)
+      0 => string '1' (length=1)
+  'pwfp_15' => string 'AD' (length=2)
+  'pwfp_16' => string 'asdas' (length=5)
+ */				
+			}
+			elseif(strpos($pid,'FeX_') === 0 || strpos($pid,'FeD_') === 0)
+			{
+				// expanding or shrinking a field
+				$fieldExpandOp = TRUE;
+			}
+		}
 	}
 }
 
 $smarty->assign('form_has_validation_errors',0);
 $smarty->assign('show_submission_errors',0);
-
 $finished = FALSE;
+
+$adbg = $params;
+$adbg2 = $formdata;
+//Crash;
+
 if(!$fieldExpandOp &&
-(!empty($params['pwfp_done']) || $formdata->FormPagesCount > 1 && $formdata->Page > 0))
+(!empty($params['pwfp_done']) || ($formdata->FormPagesCount > 1 && $formdata->Page > 0)) //TODO how Page updated
+)
 {
 	// validate form
+//Crash2;
 	$allvalid = TRUE;
 	$message = array();
 	$formPageCount = 1;
-	$valPage = $formdata->Page - 1;
+	$valPage = $formdata->Page - 1; //TODO off by 1 ?
 	$usertagops = cmsms()->GetUserTagOperations();
 	$udt = pwfUtils::GetFormOption($formdata,'validate_udt');
-	$unspec = pwfUtils::GetFormOption($formdata,'unspecified',$mod->Lang('unspecified'));
+	$unspec = pwfUtils::GetFormOption($formdata,'unspecified',$this->Lang('unspecified'));
 
 	foreach($formdata->Fields as &$one)
 	{
-		if($one->GetFieldType() == 'PageBreakField')
+		if($one->GetFieldType() == 'PageBreak')
 			$formPageCount++;
-		if($valPage != $formPageCount)
-			continue; //ignore pages before the current one
-
-		$deny_space_validation = !!$mod->GetPreference('blank_invalid');
+/*TODO logic? if($valPage != $formPageCount)
+		{
+$Crash1;
+			continue; //ignore pages before the current? last? one
+		}
+*/
+		$deny_space_validation = !!$this->GetPreference('blank_invalid');
 		if(// ! $one->IsNonRequirableField() &&
 			$one->IsRequired() && $one->HasValue($deny_space_validation) === FALSE)
 		{
+$Crash2;
 			$allvalid = FALSE;
 			$one->validated = FALSE;
-			$one->ValidationMessage = $mod->Lang('please_enter_a_value',$one->GetName());
+			$one->ValidationMessage = $this->Lang('please_enter_a_value',$one->GetName());
 			$message[] = $one->ValidationMessage;
 			$one->SetOption('is_valid',FALSE);
 		}
-		elseif($one->GetValue() != $mod->Lang('unspecified'))
+		elseif($one->Type == 'Captcha')
 		{
+			$res = $one->Validate();
+//$Crash4;
+			if($res[0])
+				$one->SetOption('is_valid',TRUE);
+			else
+			{
+				$allvalid = FALSE;
+				$message[] = $res[1];
+				$one->SetOption('is_valid',FALSE);
+			}
+
+		}
+		elseif($one->GetValue()) // != $this->Lang('unspecified'))
+		{
+//$Crash3;
 			$res = $one->Validate();
 			if($res[0])
 				$one->SetOption('is_valid',TRUE);
@@ -102,11 +152,10 @@ if(!$fieldExpandOp &&
 				}
 				$name = $othr->GetVariableName();
 				$parms[$name] = $replVal;
+				$alias = $othr->ForceAlias();
+				$parms[$alias] = $replVal;
 				$id = $othr->GetId();
 				$parms['fld_'.$id] = $replVal;
-				$alias = $othr->GetAlias();
-				if(!empty($alias))
-					$parms[$alias] = $replVal;
 			}
 			unset($othr);
 			$res = $usertagops->CallUserTag($udt,$parms);
@@ -167,10 +216,7 @@ if(!$fieldExpandOp &&
 	}
 }
 
-if(isset($params['pwfp_callcount']))
-	$callcount = (int)$params['pwfp_callcount'];
-else
-	$callcount = 0;
+//$Crash10;
 
 $parms = array();
 $parms['form_id'] = $form_id;
