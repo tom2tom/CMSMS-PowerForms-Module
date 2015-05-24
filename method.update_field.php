@@ -5,7 +5,7 @@
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 if(!empty($message))
-	$smarty->assign('message',$$message);
+	$smarty->assign('message',$message);
 
 $smarty->assign('backtomod_nav',$this->CreateLink($id,'defaultadmin','','&#171; '.$this->Lang('back_top')));
 $smarty->assign('backtoform_nav',$this->CreateLink($id,'update_form',$returnid,'&#171; '.$this->Lang('back_form'),array('formedit'=>1,'form_id'=>$params['form_id'])));
@@ -20,17 +20,18 @@ $smarty->assign('form_end',$this->CreateFormEnd());
 
 $mainList = array();
 $advList = array();
-$baseList = $obfield->PrePopulateBaseAdminForm($id,$dispose_only);
-if($obfield->GetFieldType() == '')
+$baseList = $obfield->PrePopulateAdminFormCommon($id);
+/*if($obfield->GetFieldType() == '')
 {
 	// still need type
 	$fieldList = array();
 }
 else
 {
+*/
 	// we have our type
 	$fieldList = $obfield->PrePopulateAdminForm($id);
-}
+//}
 
 $hasmain = isset($baseList['main']) || isset($fieldList['main']);
 $hasadvanced = isset($baseList['adv']) || isset($fieldList['adv']);
@@ -56,7 +57,7 @@ if($obfield->GetId() != -1)
 	$smarty->assign('op',$this->CreateInputHidden($id,'field_op',$this->Lang('updated')));
 	$smarty->assign('submit',$this->CreateInputSubmit($id,'fieldupdate',$this->Lang('update')));
 }
-elseif($obfield->GetFieldType() != '')
+elseif($obfield->GetFieldType())
 {
 	$smarty->assign('op',$this->CreateInputHidden($id,'field_op',$this->Lang('added')));
 	$smarty->assign('submit',$this->CreateInputSubmit($id,'fieldadd',$this->Lang('add')));
@@ -123,6 +124,13 @@ if(isset($fieldList['adv']))
 	}
 }
 $obfield->PostPopulateAdminForm($mainList,$advList);
+if(!$advList)
+{
+	$oneset = new stdClass();
+	$oneset->help = $this->Lang('title_no_advanced_options');
+	$advList[] = $oneset;
+//TODO no advanced vars help for page
+}
 
 $smarty->assign('mainList',$mainList);
 $smarty->assign('advList',$advList);
@@ -145,7 +153,7 @@ if(isset($fieldList['extra']))
 		$smarty->assign('advvarhelp',1);
 		break;
 	 case 'varshelpmain':
-		$showvars = TRUE;
+		$showvars = FALSE;
 		$smarty->assign('mainvarhelp',1);
 		break;
 	 case 'varshelpboth':
@@ -154,11 +162,12 @@ if(isset($fieldList['extra']))
 		$smarty->assign('advvarhelp',1);
 		break;
 	}
-//	pwfUtils::Initialize($this); //TODO needed?
+
 	if($showvars)
 	{
-		$empty = array(); //need to ref last arg //TODO field template may need all args?
-		pwfUtils::SetupVarsHelp($this,$smarty,$empty);
+		$funcs = new pwfFormOperations();
+		$formdata = $funcs->Load($this,$params['form_id'],$params,TRUE);
+		pwfUtils::SetupVarsHelp($this,$smarty,$formdata->Fields);
 	}
 }
 
