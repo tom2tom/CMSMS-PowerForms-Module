@@ -5,23 +5,22 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfStaticTextField extends pwfFieldBase
+class pwfStaticText extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->DisplayInSubmission = FALSE;
-		$this->HasLabel = 0;
+		$this->HasLabel = FALSE;
 		$this->NonRequirableField = TRUE;
-		$this->Type = 'StaticTextField';
+		$this->Type = 'StaticText';
 	}
 
 	function GetFieldInput($id,&$params)
 	{
-		if($this->GetOption('smarty_eval','0') == '1')
-		{
+		if($this->GetOption('smarty_eval',0))
 			$this->SetSmartyEval(TRUE);
-		}
+
 		return $this->GetOption('text');
 	}
 
@@ -52,6 +51,11 @@ class pwfStaticTextField extends pwfFieldBase
             		'1',$this->GetOption('smarty_eval','0')))
 		);
 		return array('main'=>$main,'adv'=>$adv);
+	}
+	
+	function PostPopulateAdminForm(&$mainArray,&$advArray)
+	{
+		$this->OmitAdminCommon($mainArray,$advArray);
 	}
 }
 
