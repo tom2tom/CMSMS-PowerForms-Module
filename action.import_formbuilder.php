@@ -49,6 +49,7 @@ function Match_Browses(&$db,$pre)
 	$sub_host				$form_host
 	$sub_source_ip			$sub_source
 	$fb_version				$version
+	{$TAB}					"\t"
 
 	$old_alias				$new_alias NEEDS manual update
 	{if ... $has_captcha .... {/if} NEEDS manual removal
@@ -67,6 +68,7 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		'FormBuilder',
 		'{$fb_form_header}',
 		'{$fb_form_footer}',
+		'{$TAB}',
 		'$fb_version',
 		'fb_invalid',
 		'$fb_',
@@ -82,6 +84,7 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		'PowerForms',
 		'',
 		'',
+		"\t",
 		'$version',
 		'fieldbad',
 		'$',
