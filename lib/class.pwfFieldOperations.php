@@ -7,67 +7,6 @@
 
 class pwfFieldOperations
 {
-	// returns reference to field-objects array in $formdata
-	function &GetFields(&$formdata)
-	{
-		return $formdata->Fields;
-	}
-
-	// returns count of field-objects in $formdata
-	function GetFieldCount(&$formdata)
-	{
-		return count($formdata->Fields);
-	}
-
-	// returns reference to first-found field-object in $formdata and whose alias matches $field_alias
-	function &GetFieldByAlias(&$formdata,$field_alias)
-	{
-		foreach($formdata->Fields as &$fld)
-		{
-			if($fld->GetAlias() == $field_alias)
-				return $fld;
-		}
-		unset ($fld);
-		$fld = FALSE; //need ref to this
-		return $fld;
-	}
-
-	// returns reference to first-found field-object in $formdata and whose name matches $field_name
-	function &GetFieldByName(&$formdata,$field_name)
-	{
-		foreach($formdata->Fields as &$fld)
-		{
-			if($fld->GetName() == $field_name)
-				return $fld;
-		}
-		unset ($fld);
-		$fld = FALSE; //need ref to this
-		return $fld;
-	}
-
-	// returns reference to field-object in $formdata and whose array-key is $field_index
-	function &GetFieldByIndex(&$formdata,$field_index)
-	{
-		return $formdata->Fields[$field_index];
-	}
-
-	// returns index of first-found field in $formdata and with id matching $field_id
-	function GetFieldIndexFromId(&$formdata,$field_id)
-	{
-		$i = 0; //don't assume anything about fields-array key
-		foreach($formdata->Fields as &$fld)
-		{
-			if($fld->GetId() == $field_id)
-			{
-				unset($fld);
-				return $i;
-			}
-			$i++;
-		}
-		unset ($fld);
-		return -1;
-	}
-
 	// returns reference to new field-object corresponding to $params['field_id']
 	function &NewField(&$formdata,&$params)
 	{
@@ -78,7 +17,7 @@ class pwfFieldOperations
 			$sql = 'SELECT type FROM '.cms_db_prefix().'module_pwf_field WHERE field_id=?';
 			$db = cmsms()->GetDb();
 			$type = $db->GetOne($sql,array($params['field_id']));
-			if($type != '')
+			if($type)
 			{
 				$className = pwfUtils::MakeClassName($type);
 				$obfield = new $className($formdata,$params);
@@ -103,19 +42,7 @@ class pwfFieldOperations
 		return $obfield;
 	}
 
-	// swaps field display-orders 
-	function SwapFieldsByIndex($field_index1,$field_index2)
-	{
-		$Field1 = self::GetFieldByIndex($field_index1);
-		$Field2 = self::GetFieldByIndex($field_index2);
-		$tmp = $Field2->GetOrder();
-		$Field2->SetOrder($Field1->GetOrder());
-		$Field2->Store();
-		$Field1->SetOrder($tmp);
-		$Field1->Store();
-	}
-
-	//'hard' copy an existing field returns TRUE/FALSE
+	// 'hard' copy an existing field returns TRUE/FALSE
 	function CopyField($field_id,$newform=FALSE,$neworder=FALSE)
 	{
 		$pre = cms_db_prefix();
@@ -138,7 +65,7 @@ class pwfFieldOperations
 		if($neworder === FALSE)
 		{
 			$sql = 'SELECT MAX(order_by) AS last FROM '.$pre.'module_pwf_field WHERE form_id=?';
-			$neworder = $db->GetOne($sql, array($newform));
+			$neworder = $db->GetOne($sql,array($newform));
 			if($neworder == FALSE)
 				$neworder = 0;
 			$neworder++;
@@ -189,6 +116,41 @@ class pwfFieldOperations
 		return $obfield;
 	}
 
+	// returns reference to field-object in $formdata and whose array-key is $field_index
+	function &GetFieldByIndex(&$formdata,$field_index)
+	{
+		return $formdata->Fields[$field_index];
+	}
+
+	// swaps field display-orders 
+	function SwapFieldsByIndex($field_index1,$field_index2)
+	{
+		$Field1 = self::GetFieldByIndex($field_index1);
+		$Field2 = self::GetFieldByIndex($field_index2);
+		$tmp = $Field2->GetOrder();
+		$Field2->SetOrder($Field1->GetOrder());
+		$Field2->Store();
+		$Field1->SetOrder($tmp);
+		$Field1->Store();
+	}
+
+	// returns index of first-found field in $formdata and with id matching $field_id
+	function GetFieldIndexFromId(&$formdata,$field_id)
+	{
+		$i = 0; //don't assume anything about fields-array key
+		foreach($formdata->Fields as &$fld)
+		{
+			if($fld->GetId() == $field_id)
+			{
+				unset($fld);
+				return $i;
+			}
+			$i++;
+		}
+		unset ($fld);
+		return -1;
+	}
+
 	function DeleteField(&$formdata,$field_id)
 	{
 		$index = self::GetFieldIndexFromId($field_id);
@@ -199,14 +161,14 @@ class pwfFieldOperations
 		}
 	}
 
-	function ResetFields(&$formdata)
+/*	function ResetFields(&$formdata)
 	{
 		foreach($formdata->Fields as &$one)
 			$one->ResetValue();
 
 		unset($one);
 	}
-
+*/
 }
 
 ?>
