@@ -31,7 +31,7 @@ class PowerForms extends CMSModule
 	{
 		parent::__construct();
 		require_once cms_join_path(dirname(__FILE__),'lib','class.pwfData.php');
-		$this->RegisterModulePlugin();
+		$this->RegisterModulePlugin(TRUE);
 	}
 
 	function AllowAutoInstall()
