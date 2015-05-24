@@ -8,8 +8,10 @@
   <div class="pageinput">{$input_form_name}</div>
   <p class="pagetext">{$title_form_alias}:</p>
   <div class="pageinput">{$input_form_alias}<br />{$help_form_alias}</div>
+  <p class="pagetext">{$title_inline_form}:</p>
+  <p class="pageinput">{$input_inline_form}</p>
   <p class="pagetext">{$title_form_status}:</p>
-  <p class="pageinput">{if $hasdisposition}{$text_ready}{else}{$text_notready}{/if}</p>
+  <p class="pageinput">{if $text_ready}{$text_ready}{else}<strong>{$text_notready}</strong> - {$help_notready}{/if}</p>
  </div>
 {$tab_end}{$fieldstab_start}
  <div class="pageoverflow">
@@ -144,8 +146,6 @@
   {$input_submit_template}
   <div class="showhelp"><br />{$help_vars}</div>
  </div>
-  <p class="pagetext">{$title_inline_form}:</p>
-  <p class="pageinput">{$input_inline_form}</p>
  </div>
 {$tab_end}
 {$tabs_end}
