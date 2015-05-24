@@ -22,15 +22,4 @@
 {/if}
 </tbody>
 </table>
-{$help_other_fields}<br />
-{if !empty($subfields)}
-<br />{$help_field_values}:<br />
-<table class="pwf_legend">
-{foreach from=$obfields item=entry}
-{cycle name=obfields values='row1,row2' assign=rowclass}
-<tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
-<td>{$entry->name}</td><td>{$entry->title}</td></tr>
-{/foreach}
-</table>
-{$help_object_example}
-{/if}
+{$help_other_fields}
