@@ -1,18 +1,4 @@
 {* DEFAULT FORM LAYOUT / pure CSS *}
-<script type="text/javascript">
-//<![CDATA[{literal}
-function help_toggle(htid) {
- var help_container=document.getElementById(htid);
- if(help_container) {
-  if(help_container.style.display == 'none') {
-	help_container.style.display = 'inline';
-  } else {
-    help_container.style.display = 'none';
-  }
- }
-}
-{/literal}//]]>
-</script>
 {if $form_done}
 	{* This section is for displaying submission-errors *}
 	{if !empty($submission_error)}
@@ -74,9 +60,8 @@ function help_toggle(htid) {
 			{else}
 				{if $one->smarty_eval}{eval var=$one->input}{else}{$one->input}{/if}
 			{/if}
-			{if $one->helptext != ''}&nbsp;<a href="javascript:help_toggle('{$one->field_helptext_id}')">
-TODO translate				<img src="modules/PowerForms/images/info-small.gif" alt="Help" title="help" /></a>
-				<span id="{$one->field_helptext_id}" class="pwf_helptext">{$one->helptext}</span>{/if}
+			{if $one->helptext}&nbsp;<a href="javascript:help_toggle('{$one->field_helptext_id}')">{$help_icon}</a>
+			<span id="{$one->field_helptext_id}" class="pwf_helptext">{$one->helptext}</span>{/if}
 			{if !$one->valid} &lt;--- {$one->error}{/if}
 			{if $one->needs_div}
 				</div>
@@ -87,4 +72,5 @@ TODO translate				<img src="modules/PowerForms/images/info-small.gif" alt="Help"
 	<div class="submit">{$prev} {$submit}</div>
 	</div>
 	{$form_end}
+	{$jscript}
 {/if}
