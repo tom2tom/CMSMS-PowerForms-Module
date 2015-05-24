@@ -68,15 +68,14 @@ elseif(isset($params['fieldcopy']))
 elseif(isset($params['dir']))
 {
 	$ops = new pwfFieldOperations();
-//TODO	$srcIndex = $ops->GetFieldIndexFromId($formdata,$params['field_id']);
+//TODO formdata	$srcIndex = $ops->GetFieldIndexFromId($formdata,$params['field_id']);
 	$destIndex = ($params['dir'] == 'up') ? $srcIndex - 1 : $srcIndex + 1;
 	$ops->SwapFieldsByIndex($srcIndex,$destIndex);
 	$message = $this->PrettyMessage('field_order_updated');
 }
 elseif(isset($params['active']))
 {
-	$ops = new pwfFieldOperations();
-//TODO formdata	 	$obfield = $ops->GetFieldById($formdata,$params['field_id']);
+//TODO formdata	 	$obfield = pwfFieldCheck::GetFieldById($formdata,$params['field_id']);
 	if($obfield !== FALSE)
 	{
 //		$obfield->SetRequired(($params['active']=='on'));
