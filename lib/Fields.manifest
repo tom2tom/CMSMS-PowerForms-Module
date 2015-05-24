@@ -1,7 +1,8 @@
 #DO NOT DELETE THIS FILE
-#this is a list of the field-classes recognised by the PowerForms module
-#classes may be added or removed as appropriate
-#if so, lang[] entries for corresponding selector-menu items must be conformed
+#This is a list of the field-classes recognised by the PowerForms module
+#Order is irrelevant
+#Classes may be added or removed as appropriate
+#If so, lang[] entries for corresponding selector-menu items must be conformed
 
 pwfButton
 pwfCaptcha
@@ -12,27 +13,23 @@ pwfCheckboxGroup
 pwfCompanyDirectory
 pwfComputed
 pwfCountryPicker
+pwfCustomEmail
 pwfDatePicker
-pwfEmail
-pwfEmailBasedFrontend
+pwfEmailAddress
+pwfEmailAddressAgain
 pwfEmailBCCAddress
 pwfEmailCCAddress
 pwfEmailConfirmation
 pwfEmailDirector
 pwfEmailFEUProperty
 pwfEmailOne
+pwfEmailSender
 pwfEmailSiteAdmin
-pwfExpandableText
+pwfEmailSubject
 pwfFieldsetEnd
 pwfFieldsetStart
-pwfFile
 pwfFileDirector
 pwfFileUpload
-pwfForm
-pwfFromEmailAddress
-pwfFromEmailAddressAgain
-pwfFromEmailName
-pwfFromEmailSubject
 pwfHidden
 pwfInputTag
 pwfLink
@@ -47,17 +44,21 @@ pwfPasswordAgain
 pwfProvincePicker
 pwfPulldown
 pwfRadioGroup
-pwfSendFromEmailAddress
 pwfSequenceEnd
 pwfSequenceStart
 pwfSiteAdmin
 pwfStatePicker
 pwfStaticText
+pwfSubmitForm
 pwfSubmissionTag
+pwfSystemEmail
 pwfSystemLink
 pwfText
 pwfTextArea
+pwfTextExpandable
 pwfTimePicker
 pwfUniqueFile
 pwfUniqueInteger
+pwfUserEmail
+pwfWriteFile
 pwfYearPulldown
