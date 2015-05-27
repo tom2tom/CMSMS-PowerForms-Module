@@ -7,19 +7,23 @@
 
 class phpfastcache_wincache extends BasePhpFastCache implements phpfastcache_driver  {
 
-	function checkdriver() {
-		if(extension_loaded('wincache') && function_exists("wincache_ucache_set")) {
-			return true;
-		} else {
-			$this->fallback = true;
-			return false;
-		}
-	}
-
 	function __construct($config = array()) {
 		$this->setup($config);
 		if(!$this->checkdriver() && !isset($config['skipError'])) {
 			$this->fallback = true;
+		}
+	}
+
+	function __destruct() {
+		$this->driver_clean();
+	}
+
+	function checkdriver() {
+		if(extension_loaded('wincache') && function_exists('wincache_ucache_set')) {
+			return true;
+		} else {
+			$this->fallback = true;
+			return false;
 		}
 	}
 
@@ -31,9 +35,8 @@ class phpfastcache_wincache extends BasePhpFastCache implements phpfastcache_dri
 		}
 	}
 
+	// return cached value or null
 	function driver_get($keyword, $option = array()) {
-		// return null if no caching
-		// return value if in caching
 		$x = wincache_ucache_get($keyword,$suc);
 
 		if($suc == false) {
@@ -49,9 +52,9 @@ class phpfastcache_wincache extends BasePhpFastCache implements phpfastcache_dri
 
 	function driver_stats($option = array()) {
 		$res = array(
-			"info"  =>  "",
-			"size"  =>  "",
-			"data"  =>  wincache_scache_info(),
+			'info' => '',
+			'size' => '',
+			'data' => wincache_scache_info(),
 		);
 		return $res;
 	}

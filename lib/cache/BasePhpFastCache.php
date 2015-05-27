@@ -6,6 +6,8 @@ abstract class BasePhpFastCache {
 
 	// default options, this will be merge to Driver's Options
 	var $config = array();
+	// log of items in the cache
+	var $index = array();
 
 	var $fallback = false;
 	var $instant;
@@ -14,7 +16,7 @@ abstract class BasePhpFastCache {
 	 * Basic Functions
 	 */
 
-	public function set($keyword, $value = "", $time = 0, $option = array() ) {
+	public function set($keyword, $value = '', $time = 0, $option = array() ) {
 		/*
 		 * Infinity Time
 		 * Khoa. B
@@ -32,10 +34,10 @@ abstract class BasePhpFastCache {
 			return false;
 		}
 		$object = array(
-			"value" => $value,
-			"write_time"  => @date("U"),
-			"expired_in"  => $time,
-			"expired_time"  => @date("U") + (Int)$time,
+			'value' => $value,
+			'write_time' => @date('U'),
+			'expired_in' => $time,
+			'expired_time' => @date('U') + (Int)$time,
 		);
 
 		return $this->driver_set($keyword,$object,$time,$option);
@@ -82,21 +84,16 @@ abstract class BasePhpFastCache {
 	}
 
 	function isExisting($keyword) {
-		if(method_exists($this,"driver_isExisting")) {
+		if(method_exists($this,'driver_isExisting')) {
 			return $this->driver_isExisting($keyword);
 		}
 
 		$data = $this->get($keyword);
-		if($data == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return ($data != null);
 
 	}
 
-
-	public function setup($config_name,$value = "") {
+	public function setup($config_name,$value = '') {
 		/*
 		 * Config for class
 		 */
@@ -123,7 +120,7 @@ abstract class BasePhpFastCache {
 	}
 
 	public function __call($name, $args) {
-		$str = implode(",",$args);
+		$str = implode(',',$args);
 		eval('return $this->instant->$name('.$str.');');
 	}
 

@@ -7,15 +7,7 @@
 
 class phpfastcache_memcached extends BasePhpFastCache implements phpfastcache_driver  {
 
-	var $instant;
-
-	function checkdriver() {
-		if(class_exists("Memcached")) {
-			return true;
-		}
-		$this->fallback = true;
-	   return false;
-	}
+//	var $instant; see parent
 
 	function __construct($config = array()) {
 
@@ -23,12 +15,24 @@ class phpfastcache_memcached extends BasePhpFastCache implements phpfastcache_dr
 		if(!$this->checkdriver() && !isset($config['skipError'])) {
 			$this->fallback = true;
 		}
-		if(class_exists("Memcached")) {
+		if(class_exists('Memcached')) {
 			$this->instant = new Memcached();
 		} else {
 			$this->fallback = true;
 		}
+	}
 
+	function __destruct() {
+		$this->driver_clean();
+	}
+
+	function checkdriver() {
+		if(class_exists('Memcached')) {
+			return true;
+		} else {
+			$this->fallback = true;
+			return false;
+		}
 	}
 
 	function connectServer() {
@@ -40,15 +44,15 @@ class phpfastcache_memcached extends BasePhpFastCache implements phpfastcache_dr
 		$s = $this->option['memcache'];
 		if(count($s) < 1) {
 			$s = array(
-				array("127.0.0.1",11211,100),
+				array('127.0.0.1',11211,100),
 			);
 		}
 
 		foreach($s as $server) {
-			$name = isset($server[0]) ? $server[0] : "127.0.0.1";
+			$name = isset($server[0]) ? $server[0] : '127.0.0.1';
 			$port = isset($server[1]) ? $server[1] : 11211;
 			$sharing = isset($server[2]) ? $server[2] : 0;
-			$checked = $name."_".$port;
+			$checked = $name.'_'.$port;
 			if(!isset($this->checked[$checked])) {
 				try {
 					if($sharing >0 ) {
@@ -70,7 +74,7 @@ class phpfastcache_memcached extends BasePhpFastCache implements phpfastcache_dr
 		}
 	}
 
-	function driver_set($keyword, $value = "", $time = 300, $option = array() ) {
+	function driver_set($keyword, $value = '', $time = 300, $option = array() ) {
 		$this->connectServer();
 		if(empty($option['isExisting'])) {
 			return $this->instant->set($keyword, $value, time() + $time );
@@ -79,9 +83,8 @@ class phpfastcache_memcached extends BasePhpFastCache implements phpfastcache_dr
 		}
 	}
 
+	// return cached value or null
 	function driver_get($keyword, $option = array()) {
-		// return null if no caching
-		// return value if in caching
 		$this->connectServer();
 		$x = $this->instant->get($keyword);
 		if($x == false) {
@@ -99,9 +102,9 @@ class phpfastcache_memcached extends BasePhpFastCache implements phpfastcache_dr
 	function driver_stats($option = array()) {
 		$this->connectServer();
 		$res = array(
-		"info" => "",
-		"size"  =>  "",
-		"data"  => $this->instant->getStats(),
+		'info' => '',
+		'size' => '',
+		'data' => $this->instant->getStats(),
 		);
 		return $res;
 	}

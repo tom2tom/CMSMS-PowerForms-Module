@@ -7,20 +7,24 @@
 
 class phpfastcache_xcache extends BasePhpFastCache implements phpfastcache_driver  {
 
-	function checkdriver() {
-		// Check xcache
-		if(extension_loaded('xcache') && function_exists("xcache_get"))
-		{
-			return true;
-		}
-		$this->fallback = true;
-		return false;
-	}
-
 	function __construct($config = array()) {
 		$this->setup($config);
 		if(!$this->checkdriver() && !isset($config['skipError'])) {
 			$this->fallback = true;
+		}
+	}
+
+	function __destruct() {
+		$this->driver_clean();
+	}
+
+	// Check xcache
+	function checkdriver() {
+		if(extension_loaded('xcache') && function_exists('xcache_get')) {
+			return true;
+		} else {
+			$this->fallback = true;
+			return false;
 		}
 	}
 
@@ -34,11 +38,10 @@ class phpfastcache_xcache extends BasePhpFastCache implements phpfastcache_drive
 		return false;
 	}
 
+	// return cached value or null
 	function driver_get($keyword, $option = array()) {
-		// return null if no caching
-		// return value if in caching
 		$data = xcache_get($keyword);
-		if($data === false || $data == "") {
+		if($data === false || $data == '') {
 			return null;
 		}
 		return $data;
@@ -50,9 +53,9 @@ class phpfastcache_xcache extends BasePhpFastCache implements phpfastcache_drive
 
 	function driver_stats($option = array()) {
 		$res = array(
-			"info"  =>  "",
-			"size"  =>  "",
-			"data"  =>  "",
+			'info' => '',
+			'size' => '',
+			'data' => '',
 		);
 		try {
 			$res['data'] = xcache_list(XC_TYPE_VAR,100);

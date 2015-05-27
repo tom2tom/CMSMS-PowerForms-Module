@@ -11,6 +11,10 @@ class phpfastcache_database extends BasePhpFastCache implements phpfastcache_dri
 		$this->setup($config);
 	}
 
+	function __destruct() {
+		$this->driver_clean();
+	}
+
 	function checkdriver() {
 		return true;
 	}
@@ -61,13 +65,15 @@ class phpfastcache_database extends BasePhpFastCache implements phpfastcache_dri
 	function driver_stats($option = array()) {
 		$res = array(
 			'info' => '',
-			'size' =>  '',
+			'size' => '',
 			'data' => '',
 		);
 		return $res;
 	}
 
 	function driver_clean($option = array()) {
+		$db = cmsms()->GetDb();
+		db->Execute('DELETE FROM '.cms_db_prefix().'module_pwf_cache');
 	}
 
 	function driver_isExisting($keyword) {

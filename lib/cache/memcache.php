@@ -7,40 +7,44 @@
 
 class phpfastcache_memcache extends BasePhpFastCache implements phpfastcache_driver {
 
-	var $instant;
-
-	function checkdriver() {
-		// Check memcache
-		if(function_exists("memcache_connect")) {
-			return true;
-		}
-		$this->fallback = true;
-		return false;
-	}
+//	var $instant; see parent
 
 	function __construct($config = array()) {
 		$this->setup($config);
 		if(!$this->checkdriver() && !isset($config['skipError'])) {
 			$this->fallback = true;
 		}
-		if(class_exists("Memcache")) {
+		if(class_exists('Memcache')) {
 			$this->instant = new Memcache();
 		} else {
 			$this->fallback = true;
 		}
-
 	}
+
+	function __destruct() {
+		$this->driver_clean();
+	}
+
+	// Check memcache
+	function checkdriver() {
+		if(function_exists('memcache_connect')) {
+			return true;
+		}
+		$this->fallback = true;
+		return false;
+	}
+
 
 	function connectServer() {
 		$server = $this->option['memcache'];
 		if(count($server) < 1) {
 			$server = array(
-				array("127.0.0.1",11211),
+				array('127.0.0.1',11211),
 			);
 		}
 
 		foreach($server as $s) {
-			$name = $s[0]."_".$s[1];
+			$name = $s[0].'_'.$s[1];
 			if(!isset($this->checked[$name])) {
 				try {
 					if(!$this->instant->addserver($s[0],$s[1])) {
@@ -58,7 +62,7 @@ class phpfastcache_memcache extends BasePhpFastCache implements phpfastcache_dri
 		}
 	}
 
-	function driver_set($keyword, $value = "", $time = 300, $option = array() ) {
+	function driver_set($keyword, $value = '', $time = 300, $option = array() ) {
 		$this->connectServer();
 
 		if(empty($option['skipExisting'])) {
@@ -68,12 +72,10 @@ class phpfastcache_memcache extends BasePhpFastCache implements phpfastcache_dri
 		}
 	}
 
+	// return cached value or null
 	function driver_get($keyword, $option = array()) {
 
 		$this->connectServer();
-
-		// return null if no caching
-		// return value if in caching
 
 		$x = $this->instant->get($keyword);
 
@@ -93,9 +95,9 @@ class phpfastcache_memcache extends BasePhpFastCache implements phpfastcache_dri
 	function driver_stats($option = array()) {
 		$this->connectServer();
 		$res = array(
-			"info"  => "",
-			"size"  =>  "",
-			"data"  => $this->instant->getStats(),
+			'info' => '',
+			'size' => '',
+			'data' => $this->instant->getStats(),
 		);
 		return $res;
 	}

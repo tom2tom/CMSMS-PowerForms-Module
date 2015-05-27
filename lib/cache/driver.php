@@ -11,6 +11,8 @@ interface phpfastcache_driver {
 	 */
 	 function __construct($config = array());
 
+	 function __destruct();
+
 	 function checkdriver();
 
 	/*
