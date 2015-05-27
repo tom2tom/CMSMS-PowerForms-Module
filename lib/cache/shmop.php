@@ -59,6 +59,10 @@ class phpfastcache_shmop extends BasePhpFastCache implements phpfastcache_driver
 		return null;
 	}
 
+	function driver_getall($option = array()) {
+		return array_keys($this->index);
+	}
+
 	function driver_delete($keyword, $option = array()) {
 		if (array_key_exists($keyword, $this->index)) {
 			$shmid = $this->index[$keyword];

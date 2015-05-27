@@ -29,13 +29,17 @@ class phpfastcache_xcache extends BasePhpFastCache implements phpfastcache_drive
 	}
 
 	function driver_set($keyword, $value = "", $time = 300, $option = array() ) {
-
 		if(empty($option['skipExisting'])) {
-			return xcache_set($keyword,$value,$time);
+			$ret = xcache_set($keyword,$value,$time);
 		} else if(!$this->isExisting($keyword)) {
-			return xcache_set($keyword,$value,$time);
+			$ret = xcache_set($keyword,$value,$time);
 		} else {
-		return false;
+			$ret = false;
+		}
+		if($ret) {
+			$this->index[$keyword] = 1;
+		}
+		return $ret;
 	}
 
 	// return cached value or null
@@ -47,14 +51,23 @@ class phpfastcache_xcache extends BasePhpFastCache implements phpfastcache_drive
 		return $data;
 	}
 
+	function driver_getall($option = array()) {
+		return array_keys($this->index);
+	}
+
 	function driver_delete($keyword, $option = array()) {
-		return xcache_unset($keyword);
+		if(xcache_unset($keyword)) {
+			unset($this->index[$keyword]);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	function driver_stats($option = array()) {
 		$res = array(
 			'info' => '',
-			'size' => '',
+			'size' => count($this->index),
 			'data' => '',
 		);
 		try {
@@ -67,9 +80,10 @@ class phpfastcache_xcache extends BasePhpFastCache implements phpfastcache_drive
 
 	function driver_clean($option = array()) {
 		$cnt = xcache_count(XC_TYPE_VAR);
-		for ($i=0; $i < $cnt; $i++) {
+		for ($i=0; $i<$cnt; $i++) {
 			xcache_clear_cache(XC_TYPE_VAR, $i);
 		}
+		$this->index = array();
 		return true;
 	}
 

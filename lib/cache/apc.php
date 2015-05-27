@@ -19,8 +19,8 @@ class phpfastcache_apc extends BasePhpFastCache implements phpfastcache_driver {
 		$this->driver_clean();
 	}
 
+	// Check apc
 	function checkdriver() {
-		// Check apc
 		if(extension_loaded('apc') && ini_get('apc.enabled')) {
 			return true;
 		} else {
@@ -31,10 +31,14 @@ class phpfastcache_apc extends BasePhpFastCache implements phpfastcache_driver {
 
 	function driver_set($keyword, $value = '', $time = 300, $option = array()) {
 		if(empty($option['skipExisting'])) {
-			return apc_store($keyword,$value,$time);
+			$ret = apc_store($keyword,$value,$time);
 		} else {
-			return apc_add($keyword,$value,$time);
+			$ret = apc_add($keyword,$value,$time);
 		}
+		if($ret) {
+			$this->index[$keyword] = 1;
+		}
+		return $ret;
 	}
 
 	function driver_get($keyword, $option = array()) {
@@ -42,24 +46,33 @@ class phpfastcache_apc extends BasePhpFastCache implements phpfastcache_driver {
 		if($bo !== false) {
 			return $data;
 		}
-		return null; //no caching
+		return null;
+	}
+
+	function driver_getall($option = array()) {
+		return array_keys($this->index);
 	}
 
 	function driver_delete($keyword, $option = array()) {
-		return apc_delete($keyword);
+		if(apc_delete($keyword)) {
+			unset($this->index[$keyword]);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	function driver_stats($option = array()) {
 		$res = array(
 			'info' => '',
-			'size' => '',
+			'size' => count($this->index),
 			'data' => ''
 		);
 
 		try {
 			$res['data'] = apc_cache_info('user');
 		} catch(Exception $e) {
-			$res['data'] =  array();
+			$res['data'] = array();
 		}
 
 		return $res;
@@ -68,6 +81,7 @@ class phpfastcache_apc extends BasePhpFastCache implements phpfastcache_driver {
 	function driver_clean($option = array()) {
 		@apc_clear_cache();
 		@apc_clear_cache('user');
+		$this->index = array();
 	}
 
 	function driver_isExisting($keyword) {

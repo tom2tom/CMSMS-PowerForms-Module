@@ -95,41 +95,51 @@ class phpfastcache_redis extends BasePhpFastCache implements phpfastcache_driver
 		if($this->connectServer()) {
 			$value = $this->encode($value);
 			if (empty($option['skipExisting'])) {
-				return $this->instant->set($keyword, $value, $time);
+				$ret = $this->instant->set($keyword, $value, $time);
 			} else {
-				return $this->instant->set($keyword, $value, array('xx', 'ex' => $time));
+				$ret = $this->instant->set($keyword, $value, array('xx', 'ex' => $time));
 			}
 		} else {
-			return $this->backup()->set($keyword, $value, $time, $option);
+			$ret = $this->backup()->set($keyword, $value, $time, $option);
 		}
+		if($ret) {
+			$this->index[$keyword] = 1;
+		}
+		return $ret;
 	}
 
 	// return cached value or null
 	function driver_get($keyword, $option = array()) {
 		if($this->connectServer()) {
 			$x = $this->instant->get($keyword);
-			if($x == false) {
-				return null;
-			} else {
+			if($x) {
 				return $this->decode($x);
+			} else {
+				return null;
 			}
 		} else {
-			$this->backup()->get($keyword, $option);
+			return $this->backup()->get($keyword, $option);
 		}
+	}
 
+	function driver_getall($option = array()) {
+		return array_keys($this->index);
 	}
 
 	function driver_delete($keyword, $option = array()) {
 		if($this->connectServer()) {
 			$this->instant->delete($keyword);
+			unset($this->index[$keyword]);
+			return true;
 		}
+		return false;
 	}
 
 	function driver_stats($option = array()) {
 		if($this->connectServer()) {
 			$res = array(
 				'info' => '',
-				'size' => '',
+				'size' => count($this->index),
 				'data' => $this->instant->info(),
 			);
 			return $res;
@@ -140,17 +150,13 @@ class phpfastcache_redis extends BasePhpFastCache implements phpfastcache_driver
 	function driver_clean($option = array()) {
 		if($this->connectServer()) {
 			$this->instant->flushDB();
+			$this->index = array();
 		}
 	}
 
 	function driver_isExisting($keyword) {
 		if($this->connectServer()) {
-			$x = $this->instant->exists($keyword);
-			if($x == null) {
-				return false;
-			} else {
-				return true;
-			}
+			return ($this->instant->exists($keyword) != null);
 		} else {
 			return $this->backup()->isExisting($keyword);
 		}

@@ -26,26 +26,31 @@ class phpfastcache_database extends BasePhpFastCache implements phpfastcache_dri
 		$db = cmsms()->GetDb();
 		$sql = 'SELECT cache_id FROM '.$pre.'module_pwf_cache WHERE key=?';
 		$id = $db->GetOne($sql,array($keyword));
+		$ret = false;
 		if(empty($option['skipExisting']) {
 			//upsert, sort-of
 			if($id)
 			{
-			   $sql = 'UPDATE '.$pre.'module_pwf_cache set value=? WHERE cache_id=?';
-			   $db->Execute($sql,array($value,$id));
+				$sql = 'UPDATE '.$pre.'module_pwf_cache set value=? WHERE cache_id=?';
+				$ret = $db->Execute($sql,array($value,$id));
 			}
 			else
 			{
 				$sql = 'INSERT INTO '.$pre.'module_pwf_cache (key,value,save_time) VALUES (?,?,NOW())';
-				$db->Execute($sql,array($keyword,$value));
+				$ret = $db->Execute($sql,array($keyword,$value));
 			}
 		} else {
 			// skip driver
 			if(!$id)
 			{
 				$sql = 'INSERT INTO '.$pre.'module_pwf_cache (key,value,save_time) VALUES (?,?,NOW())';
-				$db->Execute($sql,array($keyword,$value));
+				$ret = $db->Execute($sql,array($keyword,$value));
 			}
 		}
+		if($ret) {
+			$this->index[$keyword] = 1;
+		}
+		return ($ret != false);
 	}
 
 	function driver_get($keyword, $option = array()) {
@@ -57,15 +62,24 @@ class phpfastcache_database extends BasePhpFastCache implements phpfastcache_dri
 		return null;
 	}
 
+	function driver_getall($option = array()) {
+		return array_keys($this->index);
+	}
+
 	function driver_delete($keyword, $option = array()) {
 		$db = cmsms()->GetDb();
-		$db->Execute('DELETE FROM '.cms_db_prefix().'module_pwf_cache WHERE key=?',array($keyword));
+		if($db->Execute('DELETE FROM '.cms_db_prefix().'module_pwf_cache WHERE key=?',array($keyword))) {
+			unset($this->index[$keyword]);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	function driver_stats($option = array()) {
 		$res = array(
 			'info' => '',
-			'size' => '',
+			'size' => count($this->index),
 			'data' => '',
 		);
 		return $res;
@@ -73,13 +87,12 @@ class phpfastcache_database extends BasePhpFastCache implements phpfastcache_dri
 
 	function driver_clean($option = array()) {
 		$db = cmsms()->GetDb();
-		db->Execute('DELETE FROM '.cms_db_prefix().'module_pwf_cache');
+		$db->Execute('DELETE FROM '.cms_db_prefix().'module_pwf_cache');
+		$this->index = array();
 	}
 
 	function driver_isExisting($keyword) {
-		$db = cmsms()->GetDb();
-		$res = $db->GetOne('SELECT key FROM '.cms_db_prefix().'module_pwf_cache WHERE key=?',array($keyword));
-		return ($res !== FALSE);
+		return array_key_exists($keyword, $this->index);
 	}
 
 }

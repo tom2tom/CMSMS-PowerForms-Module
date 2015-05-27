@@ -60,7 +60,6 @@ class phpfastcache_memcached extends BasePhpFastCache implements phpfastcache_dr
 							$this->fallback = true;
 						}
 					} else {
-
 						if(!$this->instant->addServer($name,$port)) {
 							$this->fallback = true;
 						}
@@ -69,59 +68,78 @@ class phpfastcache_memcached extends BasePhpFastCache implements phpfastcache_dr
 				} catch (Exception $e) {
 					$this->fallback = true;
 				}
-
 			}
 		}
+		return !$this->fallback;
 	}
 
 	function driver_set($keyword, $value = '', $time = 300, $option = array() ) {
-		$this->connectServer();
-		if(empty($option['isExisting'])) {
-			return $this->instant->set($keyword, $value, time() + $time );
+		if($this->connectServer()) {
+			if(empty($option['isExisting'])) {
+				$ret = $this->instant->set($keyword, $value, time() + $time );
+			} else {
+				$ret = $this->instant->add($keyword, $value, time() + $time );
+			}
+			if($ret) {
+				$this->index[$keyword] = 1;
+			}
 		} else {
-			return $this->instant->add($keyword, $value, time() + $time );
+			$ret = false;
 		}
+		return $ret;
 	}
 
 	// return cached value or null
 	function driver_get($keyword, $option = array()) {
-		$this->connectServer();
-		$x = $this->instant->get($keyword);
-		if($x == false) {
-			return null;
-		} else {
-			return $x;
+		if($this->connectServer()) {
+			$x = $this->instant->get($keyword);
+			if($x) {
+				return $x;
+			}
 		}
+		return null;
+	}
+
+	function driver_getall($option = array()) {
+		return array_keys($this->index);
 	}
 
 	function driver_delete($keyword, $option = array()) {
-		$this->connectServer();
-		$this->instant->delete($keyword);
+		if($this->connectServer()) {
+			$this->instant->delete($keyword);
+			unset($this->index[$keyword]);
+			return true;
+		}
+		return false;
 	}
 
 	function driver_stats($option = array()) {
-		$this->connectServer();
-		$res = array(
-		'info' => '',
-		'size' => '',
-		'data' => $this->instant->getStats(),
-		);
+		if($this->connectServer()) {
+			$res = array(
+			'info' => '',
+			'size' => count($this->index),
+			'data' => $this->instant->getStats()
+			);
+		} else {
+			$res = array(
+			'info' => '',
+			'size' => '',
+			'data' => ''
+			);
+		}
 		return $res;
 	}
 
 	function driver_clean($option = array()) {
-		$this->connectServer();
-		$this->instant->flush();
+		if($this->connectServer()) {
+			$this->instant->flush();
+			$this->index = array();
+		}
 	}
 
 	function driver_isExisting($keyword) {
 		$this->connectServer();
-		$x = $this->get($keyword);
-		if($x == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return ($this->get($keyword) != null);
 	}
 
 }

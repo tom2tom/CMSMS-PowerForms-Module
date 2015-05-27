@@ -34,7 +34,6 @@ class phpfastcache_memcache extends BasePhpFastCache implements phpfastcache_dri
 		return false;
 	}
 
-
 	function connectServer() {
 		$server = $this->option['memcache'];
 		if(count($server) < 1) {
@@ -55,48 +54,51 @@ class phpfastcache_memcache extends BasePhpFastCache implements phpfastcache_dri
 				} catch(Exception $e) {
 					$this->fallback = true;
 				}
-
-
 			}
-
 		}
 	}
 
 	function driver_set($keyword, $value = '', $time = 300, $option = array() ) {
 		$this->connectServer();
-
 		if(empty($option['skipExisting'])) {
-			return $this->instant->set($keyword, $value, false, $time );
+			$ret = $this->instant->set($keyword, $value, false, $time );
 		} else {
-			return $this->instant->add($keyword, $value, false, $time );
+			$ret = $this->instant->add($keyword, $value, false, $time );
 		}
+		if($ret) {
+			$this->index[$keyword] = 1;
+		}
+		return $ret;
 	}
 
 	// return cached value or null
 	function driver_get($keyword, $option = array()) {
 
 		$this->connectServer();
-
 		$x = $this->instant->get($keyword);
-
-		if($x == false) {
-			return null;
-		} else {
+		if($x) {
 			return $x;
+		} else {
+			return null;
 		}
+	}
 
+	function driver_getall($option = array()) {
+		return array_keys($this->index);
 	}
 
 	function driver_delete($keyword, $option = array()) {
 		$this->connectServer();
 		$this->instant->delete($keyword);
+		unset($this->index[$keyword]);
+		return true;
 	}
 
 	function driver_stats($option = array()) {
 		$this->connectServer();
 		$res = array(
 			'info' => '',
-			'size' => '',
+			'size' => count($this->index),
 			'data' => $this->instant->getStats(),
 		);
 		return $res;
@@ -105,16 +107,12 @@ class phpfastcache_memcache extends BasePhpFastCache implements phpfastcache_dri
 	function driver_clean($option = array()) {
 		$this->connectServer();
 		$this->instant->flush();
+		$this->index = array();
 	}
 
 	function driver_isExisting($keyword) {
 		$this->connectServer();
-		$x = $this->get($keyword);
-		if($x == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return ($this->get($keyword) != null);
 	}
 
 }
