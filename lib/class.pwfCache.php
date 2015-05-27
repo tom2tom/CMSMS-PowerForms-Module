@@ -8,11 +8,14 @@
 class pwfCache
 {
 	/**
+	Returns cache-object $module->cache, after creating it if not already done
 	@module: reference to current PowerForms module object
 	@storage: optional cache-type name, one (or more, ','-separated) of
 		auto,shmop,apc,memcached,wincache,xcache,memcache,redis,database
 		default = 'auto'
-	@settings: optional array of cache-object parameters, default empty
+	@settings: optional array of general and cache-type-specific parameters,
+		(e.g. see default array in this func)
+		default empty
 	*/
 	function __construct(&$module, $storage = 'auto', $settings = array())
 	{
@@ -32,12 +35,10 @@ class pwfCache
 			$url = $config['root_url'];
 			$settings = array_merge(
 				array(
-					'storage' => 'auto', // or blank for auto
-					// fallback when nothing else is available
-					'fallback' => 'database',
+					'storage' => 'auto', // or '' == auto
+					'fallback' => 'database', // storage when nothing else is available
 					'memcache' => array(
-						array($url,11211,1),
-//						array('new.host.ip',11211,1),
+						array($url,11211,1)
 					),
 					'redis' => array(
 						'host' => $url,
@@ -49,21 +50,14 @@ class pwfCache
 				), $settings);
 			if(strpos($settings['storage'],'auto') !== false)
 				$settings['storage'] = 'shmop,apc,memcached,wincache,xcache,memcache,redis,database';
+			$types = explode(',',$settings['storage']);
 
 			$type = false;
-			$types = explode(',',$settings['storage']);
 			foreach($types as $one)
 			{
 				$one = trim($one);
 				switch($one)
 				{
-				 case 'shmop':
-					if(extension_loaded('shmop'))
-					{
-						$type = $one;
-						break 2;
-					}
-					break;
 				 case 'apc':
 					if(extension_loaded('apc') && ini_get('apc.enabled') && strpos(PHP_SAPI,'CGI') === false)
 					{
@@ -71,6 +65,9 @@ class pwfCache
 						break 2;
 					}
 					break;
+				 case 'database':
+					$type = $one;
+					break 2;
 				 case 'memcached':
 					if(class_exists('memcached'))
 					{
@@ -80,6 +77,20 @@ class pwfCache
 					break;
 				 case 'memcache':
 					if(function_exists('memcache_connect'))
+					{
+						$type = $one;
+						break 2;
+					}
+					break;
+				 case 'redis':
+					if(class_exists('Redis'))
+					{
+						$type = $one;
+						break 2;
+					}
+					break;
+				 case 'shmop':
+					if(extension_loaded('shmop'))
 					{
 						$type = $one;
 						break 2;
@@ -99,27 +110,21 @@ class pwfCache
 						break 2;
 					}
 					break;
-				 case 'redis':
-					if(class_exists('Redis'))
-					{
-						$type = $one;
-						break 2;
-					}
-					break;
-				 case 'database':
-					$type = $one;
-					break 2;
 				}
 			}
 
 			if(!$type)
 				return false;
 			$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR;
-			require($path.'driver.php'); //interface def'n
+			require($path.'interface.phpfastcache_driver.php');
 			require($path.'BasePhpFastCache.php');
 			require($path.$type.'.php');
 			$class = 'phpfastcache_'.$type;
-			$module->cache = new $class($settings);
+			$ob = new $class($settings);
+			if($ob)
+				$module->cache =& $ob;
+			else
+				return false;
 		}
 		return $module->cache;
 	}
