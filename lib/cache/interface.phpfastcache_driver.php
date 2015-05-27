@@ -27,6 +27,8 @@ interface phpfastcache_driver {
 	 */
 	 function driver_get($keyword, $option = array());
 
+	 function driver_getall($option = array());
+
 	/*
 	 * Stats
 	 * Show stats of caching
