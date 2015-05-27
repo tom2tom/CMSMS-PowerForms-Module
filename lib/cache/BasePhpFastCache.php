@@ -1,4 +1,9 @@
 <?php
+/*
+ * khoaofgod@gmail.com
+ * Website: http://www.phpfastcache.com
+ * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
+ */
 
 abstract class BasePhpFastCache {
 
@@ -30,9 +35,9 @@ abstract class BasePhpFastCache {
 		 * Temporary disabled phpFastCache::$disabled = true
 		 * Khoa. B
 		 */
-		if(phpFastCache::$disabled === true) {
-			return false;
-		}
+//		if(phpFastCache::$disabled === true) {
+//			return false;
+//		}
 		$object = array(
 			'value' => $value,
 			'write_time' => @date('U'),
@@ -41,7 +46,6 @@ abstract class BasePhpFastCache {
 		);
 
 		return $this->driver_set($keyword,$object,$time,$option);
-
 	}
 
 	public function get($keyword, $option = array()) {
@@ -49,10 +53,9 @@ abstract class BasePhpFastCache {
 	   * Temporary disabled phpFastCache::$disabled = true
 	   * Khoa. B
 	   */
-
-		if(phpFastCache::$disabled === true) {
-			return null;
-		}
+//		if(phpFastCache::$disabled === true) {
+//			return null;
+//		}
 
 		$object = $this->driver_get($keyword,$option);
 
