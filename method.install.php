@@ -100,6 +100,15 @@ $dict->ExecuteSQLArray($sqlarray);
 
 $db->CreateSequence($pre.'module_pwf_resp_val_seq');
 */
+
+$flds = "
+	cache_id I(2) AUTO KEY,
+	keyword C(48),
+	value B,
+	save_time ".CMS_ADODB_DT;
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_cache',$flds,$taboptarray);
+$dict->ExecuteSQLArray($sqlarray);
+
 $flds = "
 	sent_id I KEY,
 	src_ip C(40),

@@ -42,6 +42,8 @@ $sqlarray = $dict->DropTableSQL($pre.'module_pwf_form_opt');
 $dict->ExecuteSQLArray($sqlarray);
 //$sqlarray = $dict->DropTableSQL($pre.'module_pwf_browse');
 //$dict->ExecuteSQLArray($sqlarray);
+$sqlarray = $dict->DropTableSQL($pre.'module_pwf_cache');
+$dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_ip_log');
 $dict->ExecuteSQLArray($sqlarray);
 //$sqlarray = $dict->DropTableSQL($pre.'module_pwf_resp');
