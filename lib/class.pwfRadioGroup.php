@@ -5,9 +5,8 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfRadioGroupField extends pwfFieldBase
+class pwfRadioGroup extends pwfFieldBase
 {
-
 	var $optionAdd;
 	var $optionCount;
 
@@ -16,10 +15,10 @@ class pwfRadioGroupField extends pwfFieldBase
 		parent::__construct($formdata,$params);
 		$this->HasAddOp = TRUE;
 		$this->HasDeleteOp = TRUE;
-		$this->IsInput = TRUE;
-		$this->Type = 'RadioGroupField';
 		$this->HasMultipleFormComponents = TRUE;
-		$this->optionAdd = 0;
+		$this->IsInput = TRUE;
+		$this->Type = 'RadioGroup';
+		$this->optionAdd = FALSE;
 		$this->optionCount = 0;
 	}
 
@@ -34,26 +33,14 @@ class pwfRadioGroupField extends pwfFieldBase
 			$this->optionCount = 0;
 	}
 
-	function GetFieldStatus()
-	{
-		$this->countBoxes();
-		$mod = $this->formdata->formsmodule;
-		$ret = $mod->Lang('options',$this->optionCount);
-		if($this->ValidationType)
-			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
-		return $ret;
-	}
-
 	function GetOptionAddButton()
 	{
-		$mod = $this->formdata->formsmodule;
-		return $mod->Lang('add_options');
+		return $this->formdata->formsmodule->Lang('add_options');
 	}
 
 	function GetOptionDeleteButton()
 	{
-		$mod = $this->formdata->formsmodule;
-		return $mod->Lang('delete_options');
+		return $this->formdata->formsmodule->Lang('delete_options');
 	}
 
 	function GetFieldInput($id,&$params)
@@ -81,7 +68,7 @@ class pwfRadioGroupField extends pwfFieldBase
 			else
 				$check_val = FALSE;
 
-			$thisBox->input = '<input type="radio" name="'.$id.'pwfp_'.$this->Id.'" value="'.$i.'"';
+			$thisBox->input = '<input type="radio" name="'.$id.$this->formdata->current_prefix.$this->Id.'" value="'.$i.'"';
 			if($check_val)
 				$thisBox->input .= ' checked="checked"';
 			$thisBox->input .= $js.$this->GetCSSIdTag('_'.$i).' />';
@@ -89,6 +76,15 @@ class pwfRadioGroupField extends pwfFieldBase
 		}
 		unset($one);
 		return $fieldDisp;
+	}
+
+	function GetFieldStatus()
+	{
+		$this->countBoxes();
+		$ret = $this->formdata->formsmodule->Lang('options',$this->optionCount);
+		if($this->ValidationType)
+			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
+		return $ret;
 	}
 
 	function GetHumanReadableValue($as_string=TRUE)

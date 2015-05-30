@@ -87,7 +87,7 @@ class pwfSiteAdmin extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$sorted = $this->buildList();
-		return $mod->CreateInputDropdown($id,'pwfp_'.$this->Id,$sorted,-1,$this->Value,$js.$this->GetCSSIdTag());
+		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$sorted,-1,$this->Value,$js.$this->GetCSSIdTag());
 	}
 
 	function PrePopulateAdminForm($module_id)

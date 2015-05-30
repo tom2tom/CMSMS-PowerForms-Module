@@ -49,13 +49,13 @@ class pwfText extends pwfFieldBase
 
 		if($this->GetOption('html5',0))
 		{
-			return $mod->CustomCreateInputType($id,'pwfp_'.$this->Id,$this->Value,$this->GetOption('length')<25?$this->GetOption('length'):25,
+			return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,$this->Value,$this->GetOption('length')<25?$this->GetOption('length'):25,
 				$this->GetOption('length'),
 					' placeholder="'.$this->GetOption('default').'"'.$js.$ro.$this->GetCSSIdTag());
 		}
 		else
 		{
-			return $mod->CustomCreateInputType($id,'pwfp_'.$this->Id,($this->HasValue()?$this->Value:$this->GetOption('default')),$this->GetOption('length')<25?$this->GetOption('length'):25,$this->GetOption('length'),
+			return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,($this->HasValue()?$this->Value:$this->GetOption('default')),$this->GetOption('length')<25?$this->GetOption('length'):25,$this->GetOption('length'),
 				($this->GetOption('clear_default',0)?(' onfocus="if(this.value==this.defaultValue) this.value=\'\';" onblur="if(this.value==\'\') this.value=this.defaultValue;"'):' ').$js.$ro.$this->GetCSSIdTag());
 		}
 	}

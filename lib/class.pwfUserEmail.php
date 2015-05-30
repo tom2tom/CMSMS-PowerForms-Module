@@ -85,12 +85,12 @@ class pwfUserEmail extends pwfEmailBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$js = $this->GetOption('javascript');
-		$ret = '<input type="text" name="'.$id.'pwfp_'.$this->Id.'[]" '.
+		$ret = '<input type="text" name="'.$id.$this->formdata->current_prefix.$this->Id.'[]" '.
 			$this->GetCSSIdTag('_1').' value="'.htmlspecialchars($this->Value[0],ENT_QUOTES).
 			'" size="25" maxlength="128" '.$js.'/>';
  		if($this->GetOption('send_user_copy','n') == 'c')
 		{
-			$ret .= $mod->CreateInputCheckbox($id,'pwfp_'.$this->Id.'[]',1,0,
+			$ret .= $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id.'[]',1,0,
 				$this->GetCSSIdTag('_2'),'email').
 				'<label for="'.$this->GetCSSId('_2').'" class="label">'.
 				$this->GetOption('send_user_label',$mod->Lang('title_send_me_a_copy')).'</label>';

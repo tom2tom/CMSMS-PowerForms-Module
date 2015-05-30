@@ -22,7 +22,7 @@ class pwfEmailSender extends pwfFieldBase
 		$html5 = $this->GetOption('html5',0) ? ' placeholder="'.$this->GetOption('default').'"' : '';
 		$default = $html5 ? '' : htmlspecialchars($this->GetOption('default'),ENT_QUOTES);
 
-		return $mod->CustomCreateInputType($id,'pwfp_'.$this->Id,
+		return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,
 			($this->HasValue()?htmlspecialchars($this->Value,ENT_QUOTES):$default),
 			25,128,$html5.$js.$this->GetCSSIdTag());
 	}

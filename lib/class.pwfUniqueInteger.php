@@ -20,7 +20,7 @@ class pwfUniqueInteger extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		if($this->Value)
 		{
-			$ret = $mod->CreateInputHidden($id,'pwfp_'.$this->Id,$this->Value);
+			$ret = $mod->CreateInputHidden($id,$this->formdata->current_prefix.$this->Id,$this->Value);
 			if($this->GetOption('show_to_user',0))
 				$ret .= $this->Value;
 		}
@@ -28,7 +28,7 @@ class pwfUniqueInteger extends pwfFieldBase
 		{
 			$times = $this->GetOption('numbers_to_generate',5);
 			$number = $this->generate_numbers(0,9,$times);
-			$ret = $mod->CreateInputHidden($id,'pwfp_'.$this->Id,$number);
+			$ret = $mod->CreateInputHidden($id,$this->formdata->current_prefix.$this->Id,$number);
 			if($this->GetOption('show_to_user',0))
 				$ret .= $number;
 		}
@@ -36,7 +36,7 @@ class pwfUniqueInteger extends pwfFieldBase
 		{
 			$db = cmsms()->GetDb();
 			$seq = $db->GenID(cms_db_prefix().'module_pwf_uniquefield_seq');
-			$ret = $mod->CreateInputHidden($id,'pwfp_'.$this->Id,$seq);
+			$ret = $mod->CreateInputHidden($id,$this->formdata->current_prefix.$this->Id,$seq);
 			if($this->GetOption('show_to_user',0))
 				$ret .= $seq;
 		}

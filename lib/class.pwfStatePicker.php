@@ -58,7 +58,7 @@ class pwfStatePicker extends pwfFieldBase
 		if(!$this->HasValue() && $this->GetOption('default_state'))
 			$this->SetValue($this->GetOption('default_state'));
 
-		return $mod->CreateInputDropdown($id,'pwfp_'.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
+		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
 	}
 
 	function PrePopulateAdminForm($module_id)

@@ -110,12 +110,14 @@ class pwfSystemEmail extends pwfEmailBase
 	function GetDests($module_id,$row,$sel)
 	{
 		$id = cms_htmlentities($module_id);
-		$name = $id.'pwfp_mailto_'.$row; //must be distinct for each address
+		$name = $id.$this->formdata->current_prefix.'mailto_'.$row; //must be distinct for each address
 		$totypes = array ('to','cc','bc');
 		$btns = array();
 		for ($i=0; $i<3; $i++)
 		{
-			$text = '<input class="cms_radio" style="margin-left:5px;" type="radio" name="'.$name.'" id="'.$id.'pwfp_mailto_'.$row.$i.'" value="'.$totypes[$i].'"';
+			$text = '<input type="radio" id="'.$id.'mailto_'.$row.$i. //'pwfp_' removed from id
+			'" class="cms_radio" style="margin-left:5px;" name="'.
+			$name.'" value="'.$totypes[$i].'"';
 			if($sel == $totypes[$i])
 				$text .= ' checked="checked"';
 			$text .= ' />';

@@ -46,7 +46,7 @@ class pwfYearPulldown extends pwfFieldBase
 		$choices = array($this->GetOption('select_one',$mod->Lang('select_one'))=>'') + $choices;
 
 		$js = $this->GetOption('javascript');
-		return $mod->CreateInputDropdown($id,'pwfp_'.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
+		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
 	}
 
 	function PrePopulateAdminForm($module_id)

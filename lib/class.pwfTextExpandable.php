@@ -38,31 +38,27 @@ class pwfTextExpandable extends pwfFieldBase
 		else
 			$vals = count($this->Value);
 
-		foreach($params as $pKey=>$pVal)
+		$matched = preg_grep('/^pwfp_\d{3}_Fe[DX]_/',array_keys($params));
+		if($matched)
 		{
-			if(substr($pKey,0,9) == 'pwfp_FeX_')
+			foreach($matched as $key)
 			{
-				$pts = explode('_',$pKey);
-				if($pts[2] == $this->Id || $pts[2] == $sibling_id)
+				$pts = explode('_',$key);
+				if($pts[3] == $this->Id || $pts[3] == $sibling_id)
 				{
-					// add row
-					$this->Value[$vals]='';
-					$vals++;
-				}
-        	}
-			else if(substr($pKey,0,9) == 'pwfp_FeD_')
-			{
-				$pts = explode('_',$pKey);
-				if($pts[2] == $this->Id || $pts[2] == $sibling_id)
-				{
-					// delete row
-					if(isset($this->Value[$pts[2]]))
+					if($key[11] == 'X') //add row
 					{
-						array_splice($this->Value,$pts[2],1);
+						$this->Value[$vals] = '';
+						$vals++;
 					}
-					$vals--;
-				}
-        	}
+					else // $key[11] == 'D' delete row
+					{
+						if(isset($this->Value[$pts[3]]))
+							array_splice($this->Value,$pts[3],1);
+						$vals--;
+					}
+		    	}
+			}
 		}
 
 		// Input fields
@@ -73,10 +69,12 @@ class pwfTextExpandable extends pwfFieldBase
 
 			//$thisRow->name = '';
 			//$thisRow->title = '';
-			$thisRow->input = $mod->CustomCreateInputType($id,'pwfp_'.$this->Id.'[]',$this->Value[$i],$this->GetOption('length')<25?$this->GetOption('length'):25,
+			$thisRow->input = $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id.'[]',$this->Value[$i],$this->GetOption('length')<25?$this->GetOption('length'):25,
 							$this->GetOption('length'),$js.$this->GetCSSIdTag('_'.$i));
 
-			if(!$hidebuttons) $thisRow->op = $mod->CustomCreateInputSubmit($id,'pwfp_FeD_'.$this->Id.'_'.$i,$this->GetOption('del_button','X'),$this->GetCSSIdTag('_del_'.$i).($vals==1?' disabled="disabled"':''));
+			if(!$hidebuttons) $thisRow->op = $mod->CustomCreateInputSubmit($id,
+				$this->formdata->current_prefix.'FeD_'.$this->Id.'_'.$i,
+				$this->GetOption('del_button','X'),$this->GetCSSIdTag('_del_'.$i).($vals==1?' disabled="disabled"':''));
 
 			$ret[] = $thisRow;
 		}
@@ -86,7 +84,9 @@ class pwfTextExpandable extends pwfFieldBase
 		//$thisRow->name = '';
 		//$thisRow->title = '';
 		//$thisRow->input = '';
-		if(!$hidebuttons) $thisRow->op = $mod->CustomCreateInputSubmit($id,'pwfp_FeX_'.$this->Id.'_'.$i,$this->GetOption('add_button','+'),$this->GetCSSIdTag('_add_'.$i));
+		if(!$hidebuttons) $thisRow->op = $mod->CustomCreateInputSubmit($id,
+			$this->formdata->current_prefix.'FeX_'.$this->Id.'_'.$i,
+			$this->GetOption('add_button','+'),$this->GetCSSIdTag('_add_'.$i));
 
 		$ret[] = $thisRow;
 

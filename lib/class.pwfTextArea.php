@@ -30,13 +30,13 @@ class pwfTextArea extends pwfFieldBase
 		if($this->GetOption('html5','0') == '1')
 		{
 			$ret = $mod->CreateTextArea($wysiwyg,$id,$this->Value,
-					'pwfp_'.$this->Id,'',$cssid,'','',$cols,$rows,
+					$this->formdata->current_prefix.$this->Id,'',$cssid,'','',$cols,$rows,
 					'','',' placeholder="'.$this->GetOption('default').'"'.$extra);
 		}
 		else
 		{
 			$ret = $mod->CreateTextArea($wysiwyg,$id,($this->Value?$this->Value:$this->GetOption('default')),
-					'pwfp_'.$this->Id,'',$cssid,'','',$cols,$rows,'','',$extra);
+					$this->formdata->current_prefix.$this->Id,'',$cssid,'','',$cols,$rows,'','',$extra);
 		}
 
 		if($this->GetOption('clear_default','0')=='1')

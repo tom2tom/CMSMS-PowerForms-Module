@@ -93,21 +93,21 @@ class pwfTimePicker extends pwfFieldBase
 			}
 
 			$hr = new stdClass();
-			$hr->input = $mod->CreateInputDropdown($id,'pwfp_'.$this->Id.'[]',
+			$hr->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
 				$Hours,-1,$now['tm_hour'],$js.$this->GetCSSIdTag('_hour'));
 			$hr->title = $mod->Lang('hour');
 			$hr->name = '<label for="'.$this->GetCSSId('_hour').'">'.$mod->Lang('hour').'</label>';
 			$ret[] = $hr;
 
 			$min = new stdClass();
-			$min->input = $mod->CreateInputDropdown($id,'pwfp_'.$this->Id.'[]',
+			$min->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
 				$Mins,-1,$now['tm_min'],$js.$this->GetCSSIdTag('_min'));
 			$min->title = $mod->Lang('min');
 			$min->name = '<label for="'.$this->GetCSSId('_min').'">'.$mod->Lang('min').'</label>';
 			$ret[] = $min;
 
 			$mer = new stdClass();
-			$mer->input = $mod->CreateInputDropdown($id,'pwfp_'.$this->Id.'[]',
+			$mer->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
 				$this->flag12hour,-1,$now['merid'],$js.$this->GetCSSIdTag('_meridian'));
 			$mer->name = '<label for="'.$this->GetCSSId('_meridian').'">'.$mod->Lang('merid').'</label>';
 			$mer->title = $mod->Lang('merid');
@@ -128,14 +128,14 @@ class pwfTimePicker extends pwfFieldBase
 				$now['tm_min'] = $this->GetArrayValue(1);
 			}
 			$hr = new stdClass();
-			$hr->input = $mod->CreateInputDropdown($id,'pwfp_'.$this->Id.'[]',
+			$hr->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
 				$Hours,-1,$now['tm_hour'],$js.$this->GetCSSIdTag('_hour'));
 			$hr->title = $mod->Lang('hour');
 			$hr->name = '<label for="'.$this->GetCSSId('_hour').'">'.$mod->Lang('hour').'</label>';
 			$ret[] = $hr;
 
 			$min = new stdClass();
-			$min->input = $mod->CreateInputDropdown($id,'pwfp_'.$this->Id.'[]',
+			$min->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
 				$Mins,-1,$now['tm_min'],$js.$this->GetCSSIdTag('_min'));
 			$min->title = $mod->Lang('min');
 			$min->name = '<label for="'.$this->GetCSSId('_min').'">'.$mod->Lang('min').'</label>';
