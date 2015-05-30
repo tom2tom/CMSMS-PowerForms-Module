@@ -5,40 +5,20 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfPasswordAgainField extends pwfFieldBase
+class pwfPasswordAgain extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->Type = 'PasswordAgainField';
 		$this->ModifiesOtherFields = FALSE;
-	}
-
-	function GetFieldInput($id,&$params)
-	{
-		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
-		if($this->GetOption('hide','1') == '0')
-		{
-			return $mod->CustomCreateInputType($id,'pwfp_'.$this->Id,
-				($this->Value?$this->Value:''),
-				$this->GetOption('length'),
-				255,
-				$js.$this->GetCSSIdTag());
-		}
-		else
-		{
-			return $mod->CreateInputPassword($id,'pwfp_'.$this->Id,
-				($this->Value?$this->Value:''),$this->GetOption('length'),
-				255,$js.$this->GetCSSIdTag());
-		}
+		$this->Type = 'PasswordAgain';
 	}
 
 	function GetFieldStatus()
 	{
-		$mod = $this->formdata->formsmodule;
-		return $mod->Lang('title_field_id') . ': ' . $this->GetOption('field_to_validate');
+		return $this->formdata->formsmodule->Lang('title_field_id').
+			': '.$this->GetOption('field_to_validate');
 	}
 
 	function PrePopulateAdminForm($module_id)
@@ -46,11 +26,12 @@ class pwfPasswordAgainField extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		$flds = $this->formdata->Fields;
 		$opts = array();
-		foreach($flds as $tf)
+		foreach($flds as $one)
 		{
-			if($tf->GetFieldType() == 'PasswordField')
+			if($one->GetFieldType() == 'Password')
 			{
-				$opts[$tf->GetName()]=$tf->GetName();
+				$tn = $one->GetName();
+				$opts[$tn] = $tn;
 			}
 		}
 		$main = array(
@@ -75,6 +56,26 @@ class pwfPasswordAgainField extends pwfFieldBase
 		);
 
 		return array('main'=>$main);
+	}
+
+	function GetFieldInput($id,&$params)
+	{
+		$mod = $this->formdata->formsmodule;
+		$js = $this->GetOption('javascript');
+		if($this->GetOption('hide',1))
+		{
+			return $mod->CreateInputPassword($id,$this->formdata->current_prefix.$this->Id,
+				($this->Value?$this->Value:''),$this->GetOption('length'),
+				255,$js.$this->GetCSSIdTag());
+		}
+		else
+		{
+			return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,
+				($this->Value?$this->Value:''),
+				$this->GetOption('length'),
+				255,
+				$js.$this->GetCSSIdTag());
+		}
 	}
 
 	function Validate()

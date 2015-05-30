@@ -5,13 +5,13 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfPasswordField extends pwfFieldBase
+class pwfPassword extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->Type = 'PasswordField';
+		$this->Type = 'Password';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array(
             $mod->Lang('validation_none')=>'none',
@@ -20,43 +20,14 @@ class pwfPasswordField extends pwfFieldBase
            );
 	}
 
-	function GetFieldInput($id,&$params)
-	{
-		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
-		$ro = '';
-		if($this->GetOption('readonly','0') == '1')
-		{
-			$ro = ' readonly="readonly"';
-		}
-		if($this->GetOption('hide','1') == '0')
-		{
-			return $mod->CreateInputText($id,'pwfp_'.$this->Id,
-					($this->Value?$this->Value:''),
-					$this->GetOption('length'),
-					255,
-					$js.$ro.$this->GetCSSIdTag());
-		}
-		else
-		{
-			return $mod->CreateInputPassword($id,'pwfp_'.$this->Id,
-					($this->Value?$this->Value:''),$this->GetOption('length'),
-					255,$js.$ro.$this->GetCSSIdTag());
-		}
-	}
-
 	function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
 		$ret = $mod->Lang('abbreviation_length',$this->GetOption('length','80'));
-		if(strlen($this->ValidationType)>0)
-		{
-			$ret .= ",".array_search($this->ValidationType,$this->ValidationTypes);
-		}
-		if($this->GetOption('readonly','0') == '1')
-		{
-			$ret .= ",".$mod->Lang('title_read_only');
-		}
+		if($this->ValidationType)
+			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
+		if($this->GetOption('readonly',0))
+			$ret .= ','.$mod->Lang('title_read_only');
 		return $ret;
 	}
 
@@ -65,32 +36,54 @@ class pwfPasswordField extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		$main = array(
 			array($mod->Lang('title_display_length'),
-			      $mod->CreateInputText($module_id,
-						    'opt_length',
-			         $this->GetOption('length','12'),25,25)),
+				$mod->CreateInputText($module_id,'opt_length',
+					$this->GetOption('length',12),25,25)),
 			array($mod->Lang('title_minimum_length'),
-			      $mod->CreateInputText($module_id,
-						    'opt_min_length',
-			         $this->GetOption('min_length','8'),25,25)),
+				$mod->CreateInputText($module_id,'opt_min_length',
+					$this->GetOption('min_length',8),25,25)),
 			array($mod->Lang('title_hide'),
-			      $mod->CreateInputHidden($module_id,'opt_hide','0').
-            $mod->CreateInputCheckbox($module_id,'opt_hide',
-            		'1',$this->GetOption('hide','1')),
-				  $mod->Lang('title_hide_help')),
+				$mod->CreateInputHidden($module_id,'opt_hide',0).
+        		$mod->CreateInputCheckbox($module_id,'opt_hide',1,
+					$this->GetOption('hide',1)),
+				$mod->Lang('title_hide_help')),
 			array($mod->Lang('title_read_only'),
-			      $mod->CreateInputHidden($module_id,'opt_readonly','0').
-            $mod->CreateInputCheckbox($module_id,'opt_readonly',
-            		'1',$this->GetOption('readonly','0')))
+				$mod->CreateInputHidden($module_id,'opt_readonly',0).
+        		$mod->CreateInputCheckbox($module_id,'opt_readonly',1,
+					$this->GetOption('readonly',0)))
 		);
 		$adv = array(
 			array($mod->Lang('title_field_regex'),
 			      $mod->CreateInputText($module_id,'opt_regex',
-							  $this->GetOption('regex'),25,1024),
+					  $this->GetOption('regex'),25,1024),
 			      $mod->Lang('help_regex_use')),
 		);
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
+	function GetFieldInput($id,&$params)
+	{
+		$mod = $this->formdata->formsmodule;
+		$js = $this->GetOption('javascript');
+		if($this->GetOption('readonly'0))
+			$ro = ' readonly="readonly"';
+		else
+			$ro = '';
+
+		if($this->GetOption('hide',1))
+		{
+			return $mod->CreateInputPassword($id,$this->formdata->current_prefix.$this->Id,
+					($this->Value?$this->Value:''),$this->GetOption('length'),
+					255,$js.$ro.$this->GetCSSIdTag());
+		}
+		else
+		{
+			return $mod->CreateInputText($id,$this->formdata->current_prefix.$this->Id,
+					($this->Value?$this->Value:''),
+					$this->GetOption('length'),
+					255,
+					$js.$ro.$this->GetCSSIdTag());
+		}
+	}
 
 	function Validate()
 	{

@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfProvincePickerField extends pwfFieldBase
+class pwfProvincePicker extends pwfFieldBase
 {
 	var $Provinces;
 
@@ -13,7 +13,7 @@ class pwfProvincePickerField extends pwfFieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->Type = 'ProvincePickerField';
+		$this->Type = 'ProvincePicker';
 		$this->Provinces = array(
         'Alberta'=>'AB','British Columbia'=>'BC','Manitoba'=>'MB',
 		'New Brunswick'=>'NB','Newfoundland and Labrador'=>'NL',
@@ -47,7 +47,7 @@ class pwfProvincePickerField extends pwfFieldBase
 		if(!$this->HasValue() && $this->GetOption('default_province'))
 			$this->SetValue($this->GetOption('default_province'));
 
-		return $mod->CreateInputDropdown($id,'pwfp_'.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
+		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
 	}
 
 	function PrePopulateAdminForm($module_id)

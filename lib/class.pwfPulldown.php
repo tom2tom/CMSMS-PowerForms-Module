@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfPulldownField extends pwfFieldBase
+class pwfPulldown extends pwfFieldBase
 {
 	var $optionCount;
 	var $optionAdd;
@@ -16,8 +16,8 @@ class pwfPulldownField extends pwfFieldBase
 		$this->HasAddOp = TRUE;
 		$this->IsInput = TRUE;
 		$this->HasDeleteOp = TRUE;
-		$this->Type = 'PulldownField';
-		$this->optionAdd = 0;
+		$this->Type = 'Pulldown';
+		$this->optionAdd = FALSE;
 	}
 
 	function array_sort_by_key($input)
@@ -39,19 +39,17 @@ class pwfPulldownField extends pwfFieldBase
 
 	function GetOptionAddButton()
 	{
-		$mod = $this->formdata->formsmodule;
-		return $mod->Lang('add_options');
+		return $this->formdata->formsmodule->Lang('add_options');
 	}
 
 	function GetOptionDeleteButton()
 	{
-		$mod = $this->formdata->formsmodule;
-		return $mod->Lang('delete_options');
+		return $this->formdata->formsmodule->Lang('delete_options');
 	}
 
 	function DoOptionAdd(&$params)
 	{
-		$this->optionAdd = 1;
+		$this->optionAdd = TRUE;
 	}
 
 	function DoOptionDelete(&$params)
@@ -61,7 +59,7 @@ class pwfPulldownField extends pwfFieldBase
 		{
 			if(substr($thisKey,0,8) == 'opt_sel_')
 			{
-				$this->RemoveOptionElement('option_name',$thisVal - $delcount);
+				$this->RemoveOptionElement('option_name',$thisVal - $delcount); //TODO
 				$this->RemoveOptionElement('option_value',$thisVal - $delcount);
 				$delcount++;
 			}
@@ -72,17 +70,11 @@ class pwfPulldownField extends pwfFieldBase
 	{
 		$tmp = $this->GetOptionRef('option_name');
 		if(is_array($tmp))
-		{
 			$this->optionCount = count($tmp);
-		}
 		elseif($tmp !== FALSE)
-		{
 			$this->optionCount = 1;
-		}
 		else
-		{
 			$this->optionCount = 0;
-		}
 	}
 
 	function GetFieldInput($id,&$params)
@@ -112,7 +104,7 @@ class pwfPulldownField extends pwfFieldBase
 		else
 			$sorted = array(' '.$mod->Lang('select_one')=>'') + $sorted;
 
-		return $mod->CreateInputDropdown($id,'pwfp_'.$this->Id,$sorted,-1,$this->Value,$js.$this->GetCSSIdTag());
+		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$sorted,-1,$this->Value,$js.$this->GetCSSIdTag());
 	}
 
 	function GetFieldStatus()
@@ -125,8 +117,7 @@ class pwfPulldownField extends pwfFieldBase
 		else
 			$num = 0;
 
-		$mod = $this->formdata->formsmodule;
-		return $mod->Lang('options',$num);
+		return $this->formdata->formsmodule->Lang('options',$num);
 	}
 
 	function PrePopulateAdminForm($module_id)
@@ -134,10 +125,10 @@ class pwfPulldownField extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 
 		$this->countItems();
-		if($this->optionAdd > 0)
+		if($this->optionAdd)
 		{
 			$this->optionCount += $this->optionAdd;
-			$this->optionAdd = 0;
+			$this->optionAdd = FALSE;
 		}
 		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
