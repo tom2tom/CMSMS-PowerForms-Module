@@ -6,19 +6,22 @@
 
 class pwfData
 {
-	public $pwfmodule = NULL; //reference to PowerForms-module object
+	public $formsmodule = NULL; //reference to PowerForms-module object
+	//time-specific object-name-prefixes (for bot-combat), must begin with 'pwfp_NNN_' where N = digit
+	public $current_prefix = FALSE; //for current 30-minute period
+	public $prior_prefix = FALSE; //for prior-period
 	//known form-properties
 	public $Alias = '';
-	public $Attrs = array();
+	public $Options = array();
 	public $Fields = array();
 	public $Id = -1;
 	public $Name = '';
 	public $Page = -1;
 	public $FormState = 'new';
-	public $FormTotalPages = 0;
+	public $FormPagesCount = 0;
 	public $loaded = 'not';
 //	public $sampleTemplateCode = '';
-	public $templateVariables = NULL;
+	public $templateVariables;
 	//extra form-properties
 	private $extradata = array();
 
@@ -37,7 +40,7 @@ class pwfData
             ' in '.$trace[0]['file'] .
             ' on line '.$trace[0]['line'],
             E_USER_NOTICE);
-        return null;			
+        return NULL;			
 	}	
 
 	public function __isset($name)
