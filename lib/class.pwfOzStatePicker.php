@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfOzStatePickerField extends pwfFieldBase
+class pwfOzStatePicker extends pwfFieldBase
 {
 	var $states;
 
@@ -13,8 +13,7 @@ class pwfOzStatePickerField extends pwfFieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->Type = 'OzStatePickerField';
-
+		$this->Type = 'OzStatePicker';
 		$this->states = array(
 		'Australian Capital Territory'=>'ACT',
 		'New South Wales'=>'NSW',
@@ -42,20 +41,6 @@ class pwfOzStatePickerField extends pwfFieldBase
 			return array($ret);
 	}
 
-
-	function GetFieldInput($id,&$params)
-	{
-		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
-
-		$choices = array_merge(array($this->GetOption('select_one',$mod->Lang('select_one'))=>''),$this->states);
-
-		if(!$this->HasValue() && $this->GetOption('default_state'))
-			$this->SetValue($this->GetOption('default_state'));
-
-		return $mod->CreateInputDropdown($id,'pwfp_'.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
-	}
-
 	function PrePopulateAdminForm($module_id)
 	{
 		$mod = $this->formdata->formsmodule;
@@ -70,6 +55,20 @@ class pwfOzStatePickerField extends pwfFieldBase
 		);
 		return array('main'=>$main);
 	}
+
+	function GetFieldInput($id,&$params)
+	{
+		$mod = $this->formdata->formsmodule;
+		$js = $this->GetOption('javascript');
+
+		$choices = array_merge(array($this->GetOption('select_one',$mod->Lang('select_one'))=>''),$this->states);
+
+		if(!$this->HasValue() && $this->GetOption('default_state'))
+			$this->SetValue($this->GetOption('default_state'));
+
+		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
+	}
+
 }
 
 ?>
