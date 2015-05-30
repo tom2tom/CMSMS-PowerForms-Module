@@ -60,7 +60,7 @@ $db->DropSequence($pre.'module_pwf_field_opt_seq');
 $db->DropSequence($pre.'module_pwf_form_seq');
 $db->DropSequence($pre.'module_pwf_form_opt_seq');
 //$db->DropSequence($pre.'module_pwf_browse_seq');
-$db->DropSequence($pre.'module_pwf_ip_log_seq');
+//$db->DropSequence($pre.'module_pwf_ip_log_seq');
 //$db->DropSequence($pre.'module_pwf_resp_seq');
 //$db->DropSequence($pre.'module_pwf_resp_attr_seq');
 //$db->DropSequence($pre.'module_pwf_resp_val_seq');
