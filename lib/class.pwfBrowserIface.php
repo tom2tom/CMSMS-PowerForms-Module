@@ -37,7 +37,7 @@ class pwfBrowserIface
 			{
 				$classname = 'pwf'.$row['type'];
 				$fld = new $classname($dummy,$params);
-				if($fld->sortable || $fld->IsInput)
+				if($fld->IsSortable || $fld->IsInput)
 					$result[$key] = $row['name'];
 				unset($fld);
 			}
