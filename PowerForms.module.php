@@ -26,6 +26,7 @@ class PowerForms extends CMSModule
 	//pretty much everything is valid, provided there's an '@' in there!
 	//(we're concerned more about typo's than format!)
 	var $email_regex = '/.+@.+\..+/';
+	var $cache = NULL;	//object for persistent cacheing of formdata objects, setup @ 1st use
 
 	function __construct()
 	{
@@ -180,14 +181,14 @@ class PowerForms extends CMSModule
 		return FALSE;
 	}
 
-	function SupportsLazyLoading()
+/*	function SupportsLazyLoading()
 	{
 		return TRUE;
 	}
-
+*/
 	function LazyLoadFrontend()
 	{
-		return TRUE;
+		return FALSE;
 	}
 
 	//setup for pre-1.10
@@ -206,7 +207,7 @@ class PowerForms extends CMSModule
 		$this->SetParameterType('field_id',CLEAN_INT);
 		$this->SetParameterType('response_id',CLEAN_INT);
 		$this->SetParameterType('captcha_input',CLEAN_STRING);
-		$this->SetParameterType(CLEAN_REGEXP.'/pwfp_.*/',CLEAN_STRING);
+		$this->SetParameterType(CLEAN_REGEXP.'/pwfp_\d{3}_.*/',CLEAN_STRING);
 		$this->SetParameterType(CLEAN_REGEXP.'/value_.*/',CLEAN_STRING);
 	}
 
@@ -284,6 +285,8 @@ class PowerForms extends CMSModule
 		$fd = new pwfData();
 
 		$fd->formsmodule =& $this;
+		list($fd->current_prefix,$fd->prior_prefix) = $this->GetTokens();
+
 		if($params == NULL)
 			return $fd;
 
@@ -292,6 +295,34 @@ class PowerForms extends CMSModule
 		if(isset($params['form_alias']))
 			$fd->Alias = trim($params['form_alias']);
 		return $fd;
+	}
+
+	/*
+	Returns a pair of object-name-prefixes, like 'pwfp_NNN_', for constructing
+	objects to be 'submitted' by a form, without being dropped (see
+	InitializeFrontend()), and with some bot-avoidance attributes
+	Submitted data will be accepted if the parameter-keys of that data include
+	either the 'current-period' prefix or the 'previous-period' one
+	*/
+	function GetTokens()
+	{
+		$now = time();
+		$base = floor($now / (84600 * 1800)) * 1800; //start of current 30-mins
+		$day = date('j',$now);
+		return array(
+			'pwfp_'.$this->Hash($base+$day).'_',
+			'pwfp_'.$this->Hash($base-1800+$day-1).'_'
+		);
+	}
+
+	private function Hash($num)
+	{
+		$n = ''.$num;
+		$l = strlen($n);
+		$hash = 5381;
+		for($i = 0; $i < $l; $i++)
+			$hash = $hash * 33 + $n[$i];
+		return substr($hash,-3);
 	}
 
 	// like API function CreateInputText() but doesn't throw in an ID that's the same as $name
