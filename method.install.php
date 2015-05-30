@@ -110,13 +110,14 @@ $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_cache',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
 $flds = "
-	sent_id I KEY,
-	src_ip C(40),
-	sent_time ".CMS_ADODB_DT;
+	log_id I(2) KEY AUTO,
+	src C(40),
+	howmany I(2) DEFAULT 1,
+	basetime ".CMS_ADODB_DT;
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_ip_log',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pre.'module_pwf_ip_log_seq');
+//$db->CreateSequence($pre.'module_pwf_ip_log_seq');
 
 $flds = "
 	trans_id I(2) AUTO KEY,
