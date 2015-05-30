@@ -160,14 +160,14 @@
 			<field>
 				<properties>
 					<field_id>7</field_id>
-					<name>Do you have any comments / feedback for me?</name>
+					<name>Enter here any comments that might be helpful</name>
 					<type>TextArea</type>
 					<order_by>7</order_by>
 				</properties>
 				<options>
 					<rows>10</rows>
 					<cols>60</cols>
-					<alias>do_you_have</alias>
+					<alias>enter_here_a</alias>
 				</options>
 			</field>
 			<field>
