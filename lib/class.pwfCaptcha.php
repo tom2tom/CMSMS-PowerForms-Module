@@ -6,36 +6,40 @@
 
 class pwfCaptcha extends pwfFieldBase
 {
-	$defaulttemplate;
-	$RealName = FALSE;
+	var $defaulttemplate = '{$prompt}<br />{$captcha}';
+	var $RealName = FALSE;
 
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->DisplayInSubmission = FALSE;
 		$this->IsSortable = FALSE;
-		$this->NonRequirableField = TRUE;
+		$this->IsRequired = TRUE;
 		$this->Type = 'Captcha';
-		$this->defaulttemplate = '{$captcha_image}<br />{$captcha_prompt}'; //TODO
 	}
 
 	function GetFieldInput($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
 		$captcha = $mod->getModuleInstance('Captcha');
-		$smarty->assign('captcha_image',$captcha->getCaptcha());
-		$smarty->assign('captcha_prompt',$this->GetOption('captcha_prompt',$mod->Lang('captcha_prompt'));
+		$smarty = cmsms()->GetSmarty();
+		$smarty->assign('captcha',$captcha->getCaptcha());
+		$smarty->assign('prompt',$this->GetOption('prompt',$mod->Lang('captcha_prompt')));
 		$test = method_exists($captcha,'NeedsInputField') ? $captcha->NeedsInputField() : TRUE;
 		if($test)
 		{
-			//for captcha validation, input-object name must be as shown, not e.g. 'pwfp_'.$this->Id
-			$input = $mod->CustomCreateInputType($id,'captcha_input',10,10,$this->GetCSSIdTag());
+			//for captcha validation, input-object name must be as shown, not e.g. $this->formdata->current_prefix.$this->Id
+//			$input = $mod->CustomCreateInputType($id,'captcha_input','',10,10,$this->GetCSSIdTag());
+			$input = $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,'',10,10,$this->GetCSSIdTag());
 			$smarty->assign('captcha_input',$input);
 		}
 		else
-			$smarty->assign('captcha_input','');
+		{
+			$hidden = $mod->CreateInputHidden($id,$this->formdata->current_prefix.$this->Id,1); //include field in post-submit walk
+			$smarty->assign('captcha_input',$hidden);
+		}
 		$tpl = $this->GetOption('captcha_template',$this->defaulttemplate);
-		if($this->GetOption('captcha_label',0))
+		if($this->GetOption('aslabel',0))
 		{
 			$this->HideLabel = FALSE;
 			$this->RealName = $this->Name;
@@ -73,20 +77,20 @@ class pwfCaptcha extends pwfFieldBase
 		{
 			unset($captcha);
 			$main[] = array($mod->Lang('title_captcha_prompt'),
-				$mod->CreateInputText($module_id,'opt_captcha_prompt',
-					$this->GetOption('captcha_prompt',$mod->Lang('captcha_prompt')),60,120));
+				$mod->CreateInputText($module_id,'opt_prompt',
+					$this->GetOption('prompt',$mod->Lang('captcha_prompt')),60,120));
 			$main[] = array($mod->Lang('title_captcha_wrong'),
-				$mod->CreateInputText($module_id,'opt_captcha_wrong',
-					$this->GetOption('captcha_wrong',$mod->Lang('captcha_wrong')),60,120));
+				$mod->CreateInputText($module_id,'opt_wrongtext',
+					$this->GetOption('wrongtext',$mod->Lang('captcha_wrong')),60,120));
 
 			$adv[] = array($mod->Lang('title_captcha_label'),
-				$mod->CreateInputHidden($module_id,'opt_captcha_label',0).
-				$mod->CreateInputCheckbox($module_id,'opt_captcha_label',1,$this->GetOption('captcha_label',0)),
+				$mod->CreateInputHidden($module_id,'opt_aslabel',0).
+				$mod->CreateInputCheckbox($module_id,'opt_aslabel',1,$this->GetOption('aslabel',0)),
 				$mod->Lang('help_captcha_label')
 				);
 			$adv[] = array($mod->Lang('title_captcha_template'),
 				$mod->CreateTextArea(FALSE,$module_id,$this->GetOption('captcha_template',$this->defaulttemplate),
-					'opt_captcha_template','pwf_shortarea','','','',50,8),
+					'opt_captcha_template','pwf_shortarea','','','',50,5),
 				$mod->Lang('help_captcha_template')
 				);
 			return array('main'=>$main,'adv'=>$adv);
@@ -101,20 +105,48 @@ class pwfCaptcha extends pwfFieldBase
 
 	function PostPopulateAdminForm(&$mainArray,&$advArray)
 	{
-		unset($mainArray[3]); //no helptext
+		unset($mainArray[4]); //no helptext
 		unset($advArray[0]); //no hide label
-		unset($advArray[3]); //no field javascript
-		unset($advArray[4]); //no field logic
+		unset($advArray[2]); //no field javascript
+		unset($advArray[3]); //no field logic
 	}
 
-	function PostFieldSaveProcess(&$params)
+	function AdminValidate()
 	{
-		if($this->RealName)
-			$this->Name = this->RealName;
+		$messages = array();
+  		list($ret,$msg) = parent::AdminValidate();
+		if(!ret)
+			$messages[] = $msg;
+		$opt = $this->GetOption('captcha_template');
+		if(!$opt)
+		{
+			$ret = FALSE;
+			$messages[] = $this->formdata->formsmodule->Lang('TODO must supply');
+		}
+		$opt = $this->GetOption('prompt');
+		if(!$opt)
+		{
+			$ret = FALSE;
+			$messages[] = $this->formdata->formsmodule->Lang('TODO must supply');
+		}
+		$opt = $this->GetOption('wrongtext');
+		if(!$opt)
+		{
+			$ret = FALSE;
+			$messages[] = $this->formdata->formsmodule->Lang('TODO must supply');
+		}
+		$msg = ($ret)? '' : implode('<br />',$messages);
+    	return array($ret,$msg);
 	}
 
 	function Validate()
 	{
+		//now it's safe to restore fieldname
+		if($this->RealName)
+		{
+			$this->Name = $this->RealName;
+			$this->RealName = FALSE;
+		}
 		$this->validated = TRUE;
 		$this->ValidationMessage = '';
 		$mod = $this->formdata->formsmodule;
@@ -124,10 +156,10 @@ class pwfCaptcha extends pwfFieldBase
 			$this->validated = FALSE;
 			$this->ValidationMessage = $mod->Lang('error_module_captcha');
 		}
-		elseif(!$captcha->CheckCaptcha($this->Value)) //TODO $params['captcha_input]
+		elseif(!$captcha->CheckCaptcha($this->Value)) //upstream migrated any $params['captcha_input] to this
 		{
 			$this->validated = FALSE;
-			$this->ValidationMessage = $this->GetOption('captcha_wrong',
+			$this->ValidationMessage = $this->GetOption('wrongtext',
 				$mod->Lang('captcha_wrong'));
 		}
 		return array($this->validated,$this->ValidationMessage);
