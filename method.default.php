@@ -13,70 +13,67 @@ $smarty->assign('form_name',$formdata->Name);
 $smarty->assign('form_id',$formdata->Id);
 $smarty->assign('actionid',$id);
 
-// Build hidden
-//$hidden = $this->CreateInputHidden($id,'form_id',$formdata->Id);
-//if(isset($params['lang'])) //TODO
-//	$hidden .= $this->CreateInputHidden($id,'lang',$params['lang']);
+// Build hidden (see also the form parameters, below)
 $hidden = '';
-
 //TODO how/when should these be originally set ?
 if(!empty($params['in_browser']))
 {
-	$hidden .= $this->CreateInputHidden($id,'in_browser',1).
-//	$this->CreateInputHidden($id,'browser_id',$params['browser_id']);
-//	$smarty->assign('in_browser',1);
+	$in_browser = 1;
 //	$smarty->assign('browser_id',(int)$params['browser_id']);
-	$in_browser = (int)$params['in_browser'];
+	$hidden .= $this->CreateInputHidden($id,'in_browser',1);
+//	.$this->CreateInputHidden($id,'browser_id',$params['browser_id']);
 }
 else
 	$in_browser = 0;
 $smarty->assign('in_browser',$in_browser);
+$smarty->assign('in_admin',$in_browser); //deprecated template var
 
-//if(isset($params['pwfp_browser_id']))
-//	$hidden .= $this->CreateInputHidden($id,'pwfp_browser_id',$params['pwfp_browser_id']);
-//if(isset($params['response_id'])) //TODO
-//	$hidden .= $this->CreateInputHidden($id,'response_id',$params['response_id']);
-
-if($formdata->Page > 1)
-	$hidden .= $this->CreateInputHidden($id,'pwfp_previous',($formdata->Page - 1));
-
-if($formdata->Page == $formdata->FormPagesCount)
-	$hidden .= $this->CreateInputHidden($id,'pwfp_done',1);
-else
-	$hidden .= $this->CreateInputHidden($id,'pwfp_continue',($formdata->Page + 1));
-
-//$inline = (isset($params['inline']) && preg_match('/t(rue)?|y(es)?|1/i',$params['inline']));
-//if(!($inline || pwfUtils::GetFormOption($formdata,'inline',0)))
-//	$id = 'cntnt01'; //TODO generalise
 $inline = (!$in_browser && pwfUtils::GetFormOption($formdata,'inline',0));
-
 $smarty->assign('form_start',$this->CreateFormStart($id,'default',$returnid,
 	'POST','multipart/form-data',$inline,'',array(
 	'form_id'=>$form_id,
-	'pwfp_formpage'=>$formdata->Page,
-	'pwfp_callcount'=>$callcount+1)));
+	$formdata->current_prefix.'formpage'=>$formdata->Page,
+	$formdata->current_prefix.'formdata'=>$cache_key)));
 $smarty->assign('form_end',$this->CreateFormEnd());
+
+
+//if($formdata->Page > 1)
+//	$hidden .= $this->CreateInputHidden($id,$formdata->current_prefix.'previous',($formdata->Page - 1)); //c.f. pwfp_NNN_prev for the button
+//if($formdata->Page < $formdata->FormPagesCount) //TODO c.f. $WalkPage in field-walker
+//	$hidden .= $this->CreateInputHidden($id,$formdata->current_prefix.'continue',($formdata->Page + 1));
 
 $reqSymbol = pwfUtils::GetFormOption($formdata,'required_field_symbol','*');
 // Start building fields
 $fields = array();
 //$prev = array(); //make other-page field-values available to templates
-$formPageCount = 1;
+$WalkPage = 1; //'current' page for field-walk purposes
 
 foreach($formdata->Fields as &$one)
 {
 	$alias = $one->ForceAlias();
 
 	if($one->GetFieldType() == 'PageBreak')
-		$formPageCount++;
+		$WalkPage++;
 
-	if($formPageCount != $formdata->Page)
+	if($WalkPage != $formdata->Page)
 	{
 		// not processing the 'current' form-page
-		// remember other-page field-values which haven't yet been saved
-		$valueindx = 'pwfp__'.$one->GetId();
-		if(isset($params[$valueindx]))
+		// remember other-page field-values which haven't yet been saved ?
+		//TODO checkme double-underscore use ?
+		//FormBuilder uses 'fbrp__' lots (apparently for all 'input' fields)
+//		$valueindx = 'pwfp__'.$one->GetId();
+//		if(isset($params[$valueindx]))
+		if($one->IsInputField()) //TODO check logic
 		{
+/*			$valueindx = $formdata->current_prefix.$one->GetId();
+			if(empty($params[$valueindx]))
+			{
+				$valueindx2 = $formdata->prior_prefix.$one->GetId();
+				if(empty($params[$valueindx2]))
+					$params[$valueindx] = 0; //assume an unchecked checkbox
+				else
+					$params[$valueindx] = $params[$valueindx2]; //prior-period-form value
+			}
 			if(is_array($params[$valueindx]))
 			{
 				//hide all members of the value
@@ -94,18 +91,18 @@ foreach($formdata->Fields as &$one)
 						   $valueindx,
 						   pwfUtils::unmy_htmlentities($params[$valueindx]));
 			}
-/*			//TODO this may be rubbish ! how do we get past the last page ?
-			if($formPageCount < $formdata->Page && $one->DisplayInSubmission())
-			{
-				$oneset = new stdClass();
-				$oneset->value = $one->GetHumanReadableValue();
-				$smarty->assign_by_ref($one->GetName(),$oneset);
-				$smarty->assign_by_ref($one->ForceAlias(),$oneset); //CHECKME by ref ? persistence!
-				$prev[] = $oneset;
-			}
 */
 			if($one->DisplayInSubmission())
 			{
+/*TODO			if($WalkPage < $formdata->Page)
+				{
+					$oneset = new stdClass();
+					$oneset->value = $one->GetHumanReadableValue();
+					$smarty->assign_by_ref($one->GetName(),$oneset);
+					$smarty->assign_by_ref($one->ForceAlias(),$oneset); //CHECKME by ref ? persistence!
+					$prev[] = $oneset;
+				}
+*/
 				$oneset = new stdClass();
 				if(is_array($params[$valueindx]))
 					$oneset->values = $params[$valueindx]; //CHECKME readable-version?
@@ -114,14 +111,15 @@ foreach($formdata->Fields as &$one)
 				$smarty->assign_by_ref($alias,$oneset); //CHECKME by ref ? persistence!
 			}
 		}
-		continue; //only current-page fields get the full monty
+		continue; //only current-page fields get the full suite of data
 	}
 
 	$oneset = new stdClass();
 	$oneset->alias = $alias;
 	$oneset->css_class = $one->GetOption('css_class');
 	$oneset->display = $one->DisplayInForm()?1:0;
-	$oneset->error = $one->GetOption('is_valid',TRUE)?'':$one->ValidationMessage;
+//	$oneset->error = $one->GetOption('is_valid',TRUE)?'':$one->ValidationMessage;
+	$oneset->error = $one->validated?'':$one->ValidationMessage;
 	$oneset->field_helptext_id = 'pwfp_ht_'.$one->GetID();
 	$oneset->has_label = $one->HasLabel();
 	$oneset->helptext = $one->GetOption('helptext');
@@ -142,15 +140,16 @@ foreach($formdata->Fields as &$one)
 	$oneset->required_symbol = $one->IsRequired()?$reqSymbol:'';
 	$oneset->smarty_eval = $one->GetSmartyEval()?1:0;
 	$oneset->type = $one->GetDisplayType();
+//	$oneset->valid = $one->GetOption('is_valid',TRUE)?1:0;
 	$oneset->valid = $one->validated?1:0;
 	$oneset->values = $one->GetAllHumanReadableValues();
-//	$oneset->valid = $one->GetOption('is_valid',TRUE)?1:0;
 
-	$smarty->assign($alias,$oneset); //CHECKME by ref ?
+	$smarty->assign_by_ref($alias,$oneset); //CHECKME by ref ?
 	$fields[$oneset->input_id] = $oneset;
-//	$fields[] = $oneset;
 }
 unset($one);
+
+$formdata->FormPagesCount = $WalkPage;
 
 $smarty->assign('hidden',$hidden);
 $smarty->assign('fields',$fields);
@@ -205,22 +204,32 @@ $jsfuncs .= <<<EOS
 EOS;
 $smarty->assign('jscript',$jsfuncs);
 
+//TODO id="*pwfp_prev" NOW id="*prev"
 if($formdata->Page > 1)
 	$smarty->assign('prev',
-	'<input class="cms_submit submit_prev" name="'.$id.'pwfp_prev" id="'.$id.'pwfp_prev" value="'.
-	pwfUtils::GetFormOption($formdata,'prev_button_text',$this->Lang('previous')).'" type="submit" '.$js.' />');
+	'<input type="submit" id="'.$id.'prev" class="cms_submit submit_prev" name="'.
+	$id.$formdata->current_prefix.'prev" value="'.
+	pwfUtils::GetFormOption($formdata,'prev_button_text',$this->Lang('previous')).'" '.
+	$js.' />');
 else
 	$smarty->assign('prev','');
 
-if($formdata->Page < $formPageCount)
+if($formdata->Page < $formdata->FormPagesCount)
 {
 	$smarty->assign('submit',
-	'<input class="cms_submit submit_next" name="'.$id.'pwfp_submit" id="'.$id.'submit" value="'.
-	pwfUtils::GetFormOption($formdata,'next_button_text',$this->Lang('next')).'" type="submit" '.$js.' />');
+	'<input type="submit" id="'.$id.'submit" class="cms_submit submit_next" name="'.
+	$id.$formdata->current_prefix.'submit" value="'.
+	pwfUtils::GetFormOption($formdata,'next_button_text',$this->Lang('next')).'" '.
+	$js.' />');
 }
 else
 {
 	$smarty->assign('submit',
-	'<input class="cms_submit submit_current" name="'.$id.'pwfp_submit" id="'.$id.'submit" value="'.
-	pwfUtils::GetFormOption($formdata,'submit_button_text',$this->Lang('submit')).'" type="submit" '.$js.' />');
+	'<input type="submit" id="'.$id.'submit" class="cms_submit submit_current" name="'.
+	$id.$formdata->current_prefix.'done" value="'.
+	pwfUtils::GetFormOption($formdata,'submit_button_text',$this->Lang('submit')).'" '.
+	$js.' />');
 }
+
+$formdata->formsmodule = NULL; //no need to cache this
+$cache->driver_set($cache_key,serialize($formdata));
