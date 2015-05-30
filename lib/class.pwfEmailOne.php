@@ -24,7 +24,7 @@ class pwfEmailOne extends pwfEmailBase
 
 	function PrePopulateAdminForm($module_id)
 	{
-//		return $this->PrePopulateAdminFormBase($module_id); //TODO
+//		return $this->PrePopulateAdminFormCommonEmail($module_id); //TODO
 		return array();
 	}
 
@@ -32,7 +32,7 @@ class pwfEmailOne extends pwfEmailBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$js = $this->GetOption('javascript');
-		return $mod->CustomCreateInputType($id,'pwfp_'.$this->Id,
+		return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($this->Value,ENT_QUOTES),25,128,$js.$this->GetCSSIdTag());
 	}
 

@@ -4,7 +4,7 @@
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
-//TODO 
+
 class pwfEmailCCAddress extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
@@ -26,11 +26,11 @@ class pwfEmailCCAddress extends pwfFieldBase
 			if($one->GetId() == $this->GetOption('field_to_modify'))
 			{
 				$ret = $mod->Lang('title_modifies',$one->GetName());
-				unset($one)
+				unset($one);
 				return $ret;
 			}
 		}
-		unset($one)
+		unset($one);
 	  	return '';
 	}
 
@@ -39,7 +39,7 @@ class pwfEmailCCAddress extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		$js = $this->GetOption('javascript');
 
-		return $mod->CustomCreateInputType($id,'pwfp_'.$this->Id,
+		return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($this->Value,ENT_QUOTES),25,128,$js.$this->GetCSSIdTag());
 	}
 
@@ -54,11 +54,8 @@ class pwfEmailCCAddress extends pwfFieldBase
 			if($one->IsDisposition()
 				&& is_subclass_of($one,'pwfEmailBase'))
 			{
-				$txt = $one->GetName().': '.$one->GetDisplayType();
-				$alias = $one->GetAlias();
-				if(!empty($alias))
-					$txt .= ' ('.$alias.')';
-
+				$txt = $one->GetName().': '.$one->GetDisplayType().
+					' ('.$one->ForceAlias().')';
 				$fieldlist[$txt] = $one->GetId();
 			}
 		}
@@ -78,7 +75,7 @@ class pwfEmailCCAddress extends pwfFieldBase
 			foreach($others as &$one)
 			{
 				if($one->IsDisposition()
-               		&& is_subclass_of($one,'pwfEmailFieldBase')
+               		&& is_subclass_of($one,'pwfEmailBase')
 					&& $one->GetId() == $this->GetOption('field_to_modify'))
 				{
 					$cc = $one->GetOption('email_cc_address');

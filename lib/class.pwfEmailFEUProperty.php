@@ -5,8 +5,8 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-//sends a pre-defined message to addresses recorded as a property of the
-//FrontEndUsers module 
+//This class sends a pre-defined message to a destination selected from addresses
+//recorded as a property of the FrontEndUsers module 
 
 class pwfEmailFEUProperty extends pwfEmailBase
 {
@@ -93,7 +93,7 @@ class pwfEmailFEUProperty extends pwfEmailBase
 			$mod->Lang('error_feudefns'))));
 		}
 //TODO
-		$ret = $this->PrePopulateAdminFormBase($module_id,TRUE);
+		$ret = $this->PrePopulateAdminFormCommonEmail($module_id,TRUE);
 		$main = $ret['main']; //assume it's there
 		$waslast = array_pop($main); //keep the email to-type selector for last
 		$keys = array_keys($opts);
@@ -113,13 +113,13 @@ class pwfEmailFEUProperty extends pwfEmailBase
 		$feu = $mod->GetModuleInstance('FrontEndUsers');
 		if(!$feu) return FALSE;
 
-		// get the proeprty name and data
+		// get the property name and data
 		$prop = $this->GetOption('feu_property');
 		if(!$prop) return FALSE;
 		$defn = $feu->GetPropertyDefn($prop);
 		if(!$defn) return FALSE;
 
-		// get the property input field.
+		// get the property input field
 		$options = $feu->GetSelectOptions($prop);
 		switch($defn['type'])
 		{
@@ -127,7 +127,7 @@ class pwfEmailFEUProperty extends pwfEmailBase
 		 case 5: // multiselect
 		 case 7: // radio button group
 			// rendered all as a dropdown field.
-			$res = $mod->CreateInputDropdown($id,'pwfp_'.$this->Id,$options,-1,$this->GetCSSIdTag());
+			$res = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$options,-1,$this->GetCSSIdTag());
 			break;
 		 default:
 			$res = FALSE;
