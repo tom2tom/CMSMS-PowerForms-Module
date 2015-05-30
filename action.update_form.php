@@ -46,17 +46,19 @@ elseif(isset($params['formedit']))
 elseif(isset($params['fielddelete']))
 {
 	$ops = new pwfFieldOperations();
-//TODO formdata	$ops->DeleteField($formdata,$params['field_id']);
+//TODO formdata
+	$ops->DeleteField($formdata,$params['field_id']);
 	$message = $this->PrettyMessage('field_deleted');
 }
 elseif(isset($params['fieldcopy']))
 {
 	$ops = new pwfFieldOperations();
-//TODO formdata		$obfield = $ops->Replicate($formdata,$params['field_id');
+//TODO formdata
+	$obfield = $ops->Replicate($formdata,$params['field_id');
 	if($obfield)
 	{
 		$obfield->Store(TRUE);
-		$formdata->Fields[] = $obfield;
+		$formdata->Fields[$obfield->Id] = $obfield;
 		$this->Redirect($id,'update_field',$returnid,
 			array('field_id'=>$params['field_id'],'form_id'=>$fid));
 	}
@@ -68,14 +70,16 @@ elseif(isset($params['fieldcopy']))
 elseif(isset($params['dir']))
 {
 	$ops = new pwfFieldOperations();
-//TODO formdata	$srcIndex = $ops->GetFieldIndexFromId($formdata,$params['field_id']);
+//TODO formdata
+	$srcIndex = $ops->GetFieldIndexFromId($formdata,$params['field_id']); //TODO conform index or id
 	$destIndex = ($params['dir'] == 'up') ? $srcIndex - 1 : $srcIndex + 1;
 	$ops->SwapFieldsByIndex($srcIndex,$destIndex);
 	$message = $this->PrettyMessage('field_order_updated');
 }
 elseif(isset($params['active']))
 {
-//TODO formdata	 	$obfield = pwfFieldCheck::GetFieldById($formdata,$params['field_id']);
+//TODO formdata
+	$obfield = $formdata->Fields[$params['field_id']];
 	if($obfield !== FALSE)
 	{
 //		$obfield->SetRequired(($params['active']=='on'));
