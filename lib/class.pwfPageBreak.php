@@ -5,27 +5,18 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfPageBreakField extends pwfFieldBase
+class pwfPageBreak extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->DisplayInForm = FALSE;
+		$this->IsSortable = FALSE;
 		$this->NonRequirableField = TRUE;
 		$this->Required = FALSE;
-		$this->Type = 'PageBreakField';
-		$this->IsSortable = FALSE;
+		$this->Type = 'PageBreak';
 //		$mod = $formdata->formsmodule;
 //		$this->ValidationTypes = array($mod->Lang('validation_none')=>'none');
-	}
-
-	function GetFieldInput($id,&$params,$return_id)
-	{
-	}
-
-	function GetFieldStatus()
-	{
-		return '';
 	}
 
 	function PrePopulateAdminForm($module_id)
@@ -36,11 +27,6 @@ class pwfPageBreakField extends pwfFieldBase
 	function PostPopulateAdminForm(&$mainArray,&$advArray)
 	{
 		$this->OmitAdminCommon($mainArray,$advArray);
-	}
-
-	function Validate()
-	{
-		return array(TRUE,'');
 	}
 
 }
