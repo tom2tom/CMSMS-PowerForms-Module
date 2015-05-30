@@ -5,63 +5,44 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-$this->DoNothing();
-
-if(!isset($params['fbrp_f']) || !isset($params['fbrp_r']) || !isset($params['fbrp_c']))
+$paramkeys = array_keys($params);
+$matched = preg_grep('/^pwfp_\d{3}_[cdfr]$/',$paramkeys);
+if(count($matched) != 4)
 {
 	echo $this->Lang('validation_param_error');
-	return false;
+	return;
 }
-
-$params['response_id']=$params['fbrp_r'];
-$params['form_id']=$params['fbrp_f'];
-$params['fbrp_user_form_validate']=true;
-$aeform = new pwfForm($this, $params, true);
-
-if(!$aeform->CheckResponse($params['fbrp_f'], $params['fbrp_r'], $params['fbrp_c']))
+$key = reset($matched);
+$key = substr($key,0,9); //prefix
+$code = $params[$key.'c'];
+$form_id = $params[$key.'f'];
+$response_id = $params[$key.'r'];
+if(!pwfUtils::CheckResponse($form_id,$response_id,$code))
 {
 	echo $this->Lang('validation_response_error');
-	return false;
+	return;
 }
 
-/* Stikki removed: Old stuff, should be removed from Form.class.php aswell
-else
+$funcs = new pwfFormOperations();
+$formdata = $funcs->Load($this,$form_id,$params,TRUE); //CHECKME safely cache form data somewhere ?
+$field_id = $params[$key.'d'];
+$obfield = $formdata->Fields[$field_id];
+$obfield->ApproveToGo($response_id); //block another disposition of this field
+$res = $whole-form-Dispose($returnid); //TODO 'really' dispose, this time
+if($res[0])
 {
-	//[#2792] DeleteResponse is never called on validation;
-	//$aeform->DeleteResponse($params['fbrp_r']);
-}
-*/
-
-$confirmationField = false;
-foreach($aeform->GetFields() as &$thisField)
-{
-	if($thisField->GetFieldType() == 'DispositionEmailConfirmation')
+	$ret = $obfield->GetOption('redirect_page',-1);
+	if($ret != -1)
+		$this->RedirectContent($ret);
+	else
 	{
-		$thisField->ApproveToGo($params['fbrp_r']);
-		$results = $aeform->Dispose($returnid);
-		if($results[0] == true)
-		{
-			$ret = $thisField->GetOption('redirect_page','-1');
-			if($ret != -1)
-			{
-				unset ($thisfield);
-				$this->RedirectContent($ret);
-			}
-		}
-		else
-		{
-			echo 'Error!: '; //TODO translate
-			foreach($results[1] as $thisRes)
-			{
-				echo $thisRes . '<br />';
-			}
-		}
-		$confirmationField = true;
-		break;
+$this->Crash();
 	}
 }
-unset ($thisfield);
+else
+{
+	$msg = $this->Lang('error').'<br />'.implode('<br />',$res[1]);
+	echo $msg;
+}
 
-if(!$confirmationField)
-	echo $this->Lang('validation_no_field_error');
 ?>
