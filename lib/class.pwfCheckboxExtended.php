@@ -4,7 +4,7 @@
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
-//TODO
+
 class pwfCheckboxExtended extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
@@ -24,9 +24,9 @@ class pwfCheckboxExtended extends pwfFieldBase
 	function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		$ret =  ($this->GetOption('is_checked','0')=='1'?$mod->Lang('checked_by_default'):$mod->Lang('unchecked_by_default'));
-		if(strlen($this->ValidationType)>0)
-		  	$ret .= ",".array_search($this->ValidationType,$this->ValidationTypes);
+		$ret = ($this->GetOption('is_checked',0)?$mod->Lang('checked_by_default'):$mod->Lang('unchecked_by_default'));
+		if($this->ValidationType)
+			$ret .= ",".array_search($this->ValidationType,$this->ValidationTypes);
 		return $ret;
 	}
 
@@ -98,7 +98,7 @@ class pwfCheckboxExtended extends pwfFieldBase
 
 		$obj = new stdClass();
 		$obj->name = $box_label;
-		$obj->input = $mod->CreateInputCheckbox($id,'pwfp_'.$this->Id.'[box]','t',$this->Value['box'],$js.$this->GetCSSIdTag('_0'));
+		$obj->input = $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id.'[box]','t',$this->Value['box'],$js.$this->GetCSSIdTag('_0'));
 
 		$output[] = $obj;
 
@@ -106,7 +106,7 @@ class pwfCheckboxExtended extends pwfFieldBase
 		{
 			$obj = new stdClass();
 			$obj->name = $text_label;
-			$obj->input = $mod->CustomCreateInputType($id,'pwfp_'.$this->Id.'[text]',($check_value['text']?$this->Value['text']:''),25,25,$js.$this->GetCSSIdTag('_1'));
+			$obj->input = $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id.'[text]',($check_value['text']?$this->Value['text']:''),25,25,$js.$this->GetCSSIdTag('_1'));
 			$output[] = $obj;
 		}
 

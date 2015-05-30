@@ -81,7 +81,7 @@ class pwfCheckboxGroup extends pwfFieldBase
 				$check_val = TRUE;
 			else
 				$check_val = FALSE;
-			$thisBox->input = $mod->CreateInputCheckbox($id,'pwfp_'.$this->Id.'[]',$i,
+			$thisBox->input = $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id.'[]',$i,
 				(($check_val !== FALSE)?$i:-1),$js.$this->GetCSSIdTag('_'.$i));
 
 			$fieldDisp[] = $thisBox;

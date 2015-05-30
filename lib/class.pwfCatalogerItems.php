@@ -4,7 +4,7 @@
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
-//TODO FIXES
+
 /*
 A class to provide a dynamic multiselect list to allow selecting one or
 more items from the cataloger module
@@ -89,14 +89,12 @@ class pwfCatalogerItems extends pwfFieldBase
 			$fields = $this->formdata->Fields;
 			foreach($fields as &$one)
 			{
-				if($one->GetFieldType() != 'HiddenField') continue;
+				if($one->GetFieldType() != 'Hidden') continue;
+				$smarty->assign($one->ForceAlias(),$one->Value);
 				$smarty->assign('fld_'.$one->GetId(),$one->Value);
-				if($one->GetAlias())
-					$smarty->assign($one->GetAlias(),$one->Value);
 			}
 			unset($one);
-
-TODO			$gCms->variables['pwf_smarty_vars_set'] = 1; //FIXME
+			$gCms->variables['pwf_smarty_vars_set'] = 1; //TODO BAD MODULE BEHAVIOUR 
 		}
 
 		// for each hierarchy item (from the root down)
@@ -202,7 +200,7 @@ TODO			$gCms->variables['pwf_smarty_vars_set'] = 1; //FIXME
 				}
 			}
 			$cssid = $this->GetCSSIdTag();
-			return $mod->CreateInputSelectList($id,'pwfp_'.$this->Id.'[]',$results,$val,
+			return $mod->CreateInputSelectList($id,$this->formdata->current_prefix.$this->Id.'[]',$results,$val,
 						   $size,$cssid);
 		}
 

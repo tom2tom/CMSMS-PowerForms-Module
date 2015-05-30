@@ -74,7 +74,7 @@ class pwfCheckbox extends pwfFieldBase
 
 		$mod = $this->formdata->formsmodule;
 		$js = $this->GetOption('javascript');
-		return $mod->CreateInputCheckbox($id,'pwfp_'.$this->Id,'t',$this->Value,$js.$this->GetCSSIdTag()).$label;
+		return $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id,'t',$this->Value,$js.$this->GetCSSIdTag()).$label;
 	}
 
 	function Validate()

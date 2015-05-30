@@ -100,7 +100,7 @@ class pwfCompanyDirectory extends pwfFieldBase
 					{
 						while($row = $rs2->FetchRow())
 							$FDval = $row['value'];
-						rs2->Close();
+						$rs2->Close();
 					}
 
 					$companies[$company] = $FDval;
@@ -148,7 +148,7 @@ class pwfCompanyDirectory extends pwfFieldBase
 						{
 							while($row = $rs2->FetchRow())
 								$FDval = $row['value'];
-							rs2->Close();
+							$rs2->Close();
 						}
 						$companies[$company] = $FDval;
 					}
@@ -178,13 +178,13 @@ class pwfCompanyDirectory extends pwfFieldBase
 			$cssid = $this->GetCSSIdTag();
 			$UserInput = $this->GetOption('UserInput','Dropdown');
 			if($UserInput=='Select List-single')
-				return $mod->CreateInputSelectList($id,'pwfp_'.$this->Id.'[]',$companies,$val,$size,$cssid);
+				return $mod->CreateInputSelectList($id,$this->formdata->current_prefix.$this->Id.'[]',$companies,$val,$size,$cssid);
 			elseif($UserInput=='Select List-multiple')
-				return $mod->CreateInputSelectList($id,'pwfp_'.$this->Id.'[]',$companies,$val,$size,$cssid,TRUE);
+				return $mod->CreateInputSelectList($id,$this->formdata->current_prefix.$this->Id.'[]',$companies,$val,$size,$cssid,TRUE);
 			elseif($UserInput=='Dropdown')
-				return $mod->CreateInputDropdown($id,'pwfp_'.$this->Id.'',$companies,'-1',$val);
+				return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'',$companies,'-1',$val);
 			elseif($UserInput=='Radio Group')
-				return $mod->CreateInputRadioGroup($id,'pwfp_'.$this->Id.'',$companies,$val,'','&nbsp;&nbsp;');
+				return $mod->CreateInputRadioGroup($id,$this->formdata->current_prefix.$this->Id.'',$companies,$val,'','&nbsp;&nbsp;');
 		}
 		return ''; // error
 	}

@@ -4,7 +4,7 @@
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
-//done
+
 class pwfButton extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
@@ -21,7 +21,7 @@ class pwfButton extends pwfFieldBase
 		$js = $this->GetOption('javascript');
 		$cssid = $this->GetCSSIdTag();
 
-		return '<input type="button" name="'.$id.'pwfp_'.$this->Id.
+		return '<input type="button" name="'.$id.$this->formdata->current_prefix.$this->Id.
 		'" value="'.$this->GetOption('text').'" '.$js.$cssid.' />';
 	}
 
