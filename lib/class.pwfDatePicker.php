@@ -71,13 +71,13 @@ class pwfDatePicker extends pwfFieldBase
 			$today['mon'] = $this->GetArrayValue(array_search("m",$arrUserOrder));
 			$today['year'] = $this->GetArrayValue(array_search("y",$arrUserOrder));
 		}
-		else if($this->GetOption('default_blank','0') == '1')
+		else if($this->GetOption('default_blank',0))
 		{
 			$today['mday']='';
 			$today['mon']='';
 			$today['year']='';
 		}
-		else if($this->GetOption('default_year','-1') != '-1')
+		else if($this->GetOption('default_year',-1) != -1)
 		{
 			$today['year'] = $this->GetOption('default_year','-1');
 		}
@@ -86,19 +86,19 @@ class pwfDatePicker extends pwfFieldBase
 		$day = new stdClass();
 		$js = $this->GetOption('javascript');
 
-		$day->input = $mod->CreateInputDropdown($id,'pwfp_'.$this->Id.'[]',$Days,-1,
+		$day->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Days,-1,
 		$today['mday'],$js.$this->GetCSSIdTag('_day'));
 		$day->title = $mod->Lang('day');
 		$day->name = '<label for="'.$this->GetCSSId('_day').'">'.$mod->Lang('day').'</label>';
 
 		$mon = new stdClass();
-		$mon->input = $mod->CreateInputDropdown($id,'pwfp_'.$this->Id.'[]',$this->Months,-1,
+		$mon->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$this->Months,-1,
 		$today['mon'],$js.$this->GetCSSIdTag('_month'));
 		$mon->title = $mod->Lang('mon');
 		$mon->name = '<label for="'.$this->GetCSSId('_month').'">'.$mod->Lang('mon').'</label>';
 
 		$yr = new stdClass();
-		$yr->input = $mod->CreateInputDropdown($id,'pwfp_'.$this->Id.'[]',$Year,-1,
+		$yr->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Year,-1,
 			$today['year'],$js.$this->GetCSSIdTag('_year'));
 		$yr->name = '<label for="'.$this->GetCSSId('_year').'">'.$mod->Lang('year').'</label>';
 		$yr->title = $mod->Lang('year');
@@ -147,7 +147,7 @@ class pwfDatePicker extends pwfFieldBase
 				$this->GetArrayValue(array_search('y',$arrUserOrder)));
 			$ret = date($this->GetOption('date_format','j F Y'),$theDate);
 
-			$ret = str_replace(array('January','February','March','April','May','June','July','August','September','October','November',"December'),
+			$ret = str_replace(array('January','February','March','April','May','June','July','August','September','October','November','December'),
 				array(
 					$mod->Lang('date_january'),
 					$mod->Lang('date_february'),
@@ -163,12 +163,10 @@ class pwfDatePicker extends pwfFieldBase
 					$mod->Lang('date_december')
 					),
 				$ret);
-
 				$ret = html_entity_decode($ret,ENT_QUOTES,'UTF-8');
 		}
 		else
-			$ret = $this->GetFormOption('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
+			$ret = $this->GetFormOption('unspecified',$mod->Lang('unspecified'));
 
 		if($as_string)
 			return $ret;
@@ -182,32 +180,31 @@ class pwfDatePicker extends pwfFieldBase
 		$today = getdate();
 		$main = array(
 			array($mod->Lang('title_date_format'),
-					$mod->CreateInputText($module_id,'opt_date_format',
-          	$this->GetOption('date_format','j F Y'),25,25),
-					$mod->Lang('help_date_format')),
+				$mod->CreateInputText($module_id,'opt_date_format',
+					$this->GetOption('date_format','j F Y'),25,25),
+				$mod->Lang('help_date_format')),
 			array($mod->Lang('title_date_order'),
-					$mod->CreateInputText($module_id,'opt_date_order',
-						$this->GetOption('date_order','d-m-y'),5,5),
-					$mod->Lang('help_date_order')),
-		   array($mod->Lang('title_default_blank'),
-					$mod->CreateInputHidden($module_id,'opt_default_blank','0').
-					$mod->CreateInputCheckbox($module_id,'opt_default_blank',
-            		'1',$this->GetOption('default_blank','0')),
-					$mod->Lang('help_default_today')),
-		   array($mod->Lang('title_start_year'),
-					$mod->CreateInputText($module_id,'opt_start_year',
-						$this->GetOption('start_year',($today['year']-10)),10,10)),
-		   array($mod->Lang('title_end_year'),
-					$mod->CreateInputText($module_id,'opt_end_year',
-						$this->GetOption('end_year',($today['year']+10)),10,10)),
-		   array($mod->Lang('title_default_year'),
-					$mod->CreateInputText($module_id,'opt_default_year',
-						$this->GetOption('default_year','-1'),10,10),
-					$mod->Lang('help_default_year'))
+				$mod->CreateInputText($module_id,'opt_date_order',
+					$this->GetOption('date_order','d-m-y'),5,5),
+				$mod->Lang('help_date_order')),
+			array($mod->Lang('title_default_blank'),
+				$mod->CreateInputHidden($module_id,'opt_default_blank',0).
+				$mod->CreateInputCheckbox($module_id,'opt_default_blank',
+					1,$this->GetOption('default_blank','0')),
+				$mod->Lang('help_default_today')),
+			array($mod->Lang('title_start_year'),
+				$mod->CreateInputText($module_id,'opt_start_year',
+					$this->GetOption('start_year',($today['year']-10)),10,10)),
+			array($mod->Lang('title_end_year'),
+				$mod->CreateInputText($module_id,'opt_end_year',
+					$this->GetOption('end_year',($today['year']+10)),10,10)),
+			array($mod->Lang('title_default_year'),
+				$mod->CreateInputText($module_id,'opt_default_year',
+					$this->GetOption('default_year','-1'),10,10),
+				$mod->Lang('help_default_year'))
 		);
 		return array('main'=>$main);
 	}
-
 }
 
 ?>
