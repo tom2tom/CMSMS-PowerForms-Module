@@ -5,7 +5,7 @@
  * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
  */
 
-abstract class BasePhpFastCache {
+abstract class FastCacheBase {
 
 	var $tmp = array();
 
@@ -13,9 +13,6 @@ abstract class BasePhpFastCache {
 	var $config = array();
 	// log of items in the cache
 	var $index = array();
-
-	var $fallback = false;
-	var $instant;
 
 	/*
 	 * Basic Functions
@@ -26,7 +23,7 @@ abstract class BasePhpFastCache {
 		 * Infinity Time
 		 * Khoa. B
 		 */
-		if((Int)$time <= 0) {
+		if((int)$time <= 0) {
 			// 5 years, however memcached or memory cached will gone when u restart it
 			// just recommended for sqlite. files
 			$time = 3600*24*365*5;
@@ -110,11 +107,11 @@ abstract class BasePhpFastCache {
 	/*
 	 * Magic Functions
 	 */
-	function __get($name) {
+	public function function_get($name) {
 		return $this->get($name);
 	}
 
-	function __set($name, $v) {
+	public function function_set($name, $v) {
 		if(isset($v[1]) && is_numeric($v[1])) {
 			return $this->set($name,$v[0],$v[1], isset($v[2]) ? $v[2] : array() );
 		} else {
@@ -122,7 +119,7 @@ abstract class BasePhpFastCache {
 		}
 	}
 
-	public function __call($name, $args) {
+	public function function_call($name, $args) {
 		$str = implode(',',$args);
 		eval('return $this->instant->$name('.$str.');');
 	}
