@@ -8,49 +8,45 @@
  * http://pecl.php.net/package/redis
  */
 
-class phpfastcache_redis extends BasePhpFastCache implements phpfastcache_driver {
+class FastCache_redis extends FastCacheBase implements FastCache {
 
+	var $instant;
 	var $checked_redis = false;
 
 	function __construct($config = array()) {
-		$this->setup($config);
-		if(!$this->checkdriver() && !isset($config['skipError'])) {
-			$this->fallback = true;
-		}
-		if(class_exists('Redis')) {
+		if($this->checkdriver()) {
 			$this->instant = new Redis();
+			$this->setup($config);
+			if($this->connectServer()) {
+				return;
+			}
+			unset($this->instant);
 		}
+		throw new Exception('no redis storage');
 	}
 
-	function __destruct() {
+/*	function __destruct() {
 		$this->driver_clean();
 	}
-
-	// Check redis
+*/
 	function checkdriver() {
-		if(class_exists('Redis')) {
-			return true;
-		} else {
-			$this->fallback = true;
-			return false;
-		}
+		return class_exists('Redis');
 	}
 
 	function connectServer() {
-
-		$server = isset($this->option['redis']) ? $this->option['redis'] : array(
-			'host' => '127.0.0.1',
-			'port'  => '6379',
-			'password' => '',
-			'database' => '',
-			'timeout' => '1',
-		);
-
-		if($this->checked_redis === false) {
+		if(!$this->checked_redis) {
+			$settings = isset($this->option['redis']) ? $this->option['redis'] : array();
+			$server = array_merge(array(
+				'host' => '127.0.0.1',
+				'port'  => 6379,
+				'password' => '',
+				'database' => '',
+				'timeout' => 1,
+				), $settings);
 
 			$host = $server['host'];
 
-			$port = isset($server['port']) ? (Int)$server['port'] : '';
+			$port = isset($server['port']) ? (int)$server['port'] : '';
 			if($port!='') {
 				$c['port'] = $port;
 			}
@@ -75,32 +71,26 @@ class phpfastcache_redis extends BasePhpFastCache implements phpfastcache_driver
 				$c['read_write_timeout'] = $read_write_timeout;
 			}
 
-			if(!$this->instant->connect($host,(int)$port,(Int)$timeout)) {
+			if(!$this->instant->connect($host,(int)$port,(int)$timeout)) {
 				$this->checked_redis = true;
-				$this->fallback = true;
 				return false;
 			} else {
 				if($database!='') {
-					$this->instant->select((Int)$database);
+					$this->instant->select((int)$database);
 				}
 				$this->checked_redis = true;
 				return true;
 			}
 		}
-
 		return true;
 	}
 
 	function driver_set($keyword, $value = '', $time = 300, $option = array() ) {
-		if($this->connectServer()) {
-			$value = $this->encode($value);
-			if (empty($option['skipExisting'])) {
-				$ret = $this->instant->set($keyword, $value, $time);
-			} else {
-				$ret = $this->instant->set($keyword, $value, array('xx', 'ex' => $time));
-			}
+		$value = $this->encode($value);
+		if (empty($option['skipExisting'])) {
+			$ret = $this->instant->set($keyword, $value, $time);
 		} else {
-			$ret = $this->backup()->set($keyword, $value, $time, $option);
+			$ret = $this->instant->set($keyword, $value, array('xx', 'ex' => $time));
 		}
 		if($ret) {
 			$this->index[$keyword] = 1;
@@ -110,15 +100,11 @@ class phpfastcache_redis extends BasePhpFastCache implements phpfastcache_driver
 
 	// return cached value or null
 	function driver_get($keyword, $option = array()) {
-		if($this->connectServer()) {
-			$x = $this->instant->get($keyword);
-			if($x) {
-				return $this->decode($x);
-			} else {
-				return null;
-			}
+		$x = $this->instant->get($keyword);
+		if($x) {
+			return $this->decode($x);
 		} else {
-			return $this->backup()->get($keyword, $option);
+			return null;
 		}
 	}
 
@@ -127,39 +113,26 @@ class phpfastcache_redis extends BasePhpFastCache implements phpfastcache_driver
 	}
 
 	function driver_delete($keyword, $option = array()) {
-		if($this->connectServer()) {
-			$this->instant->delete($keyword);
-			unset($this->index[$keyword]);
-			return true;
-		}
-		return false;
+		$this->instant->delete($keyword);
+		unset($this->index[$keyword]);
+		return true;
 	}
 
 	function driver_stats($option = array()) {
-		if($this->connectServer()) {
-			$res = array(
-				'info' => '',
-				'size' => count($this->index),
-				'data' => $this->instant->info(),
-			);
-			return $res;
-		}
-		return array();
+		return array(
+			'info' => '',
+			'size' => count($this->index),
+			'data' => $this->instant->info(),
+		);
 	}
 
 	function driver_clean($option = array()) {
-		if($this->connectServer()) {
-			$this->instant->flushDB();
-			$this->index = array();
-		}
+		$this->instant->flushDB();
+		$this->index = array();
 	}
 
 	function driver_isExisting($keyword) {
-		if($this->connectServer()) {
-			return ($this->instant->exists($keyword) != null);
-		} else {
-			return $this->backup()->isExisting($keyword);
-		}
+		return ($this->instant->exists($keyword) != null);
 	}
 
 }

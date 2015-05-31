@@ -5,28 +5,22 @@
  * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
  */
 
-class phpfastcache_apc extends BasePhpFastCache implements phpfastcache_driver {
+class FastCache_apc extends FastCacheBase implements FastCache {
 
 	function __construct($config = array()) {
-		$this->setup($config);
-
-		if(!$this->checkdriver() && !isset($config['skipError'])) {
-			$this->fallback = true;
+		if($this->checkdriver()) {
+			$this->setup($config);
+		} else {
+			throw new Exception('no apc storage');
 		}
 	}
 
-	function __destruct() {
+/*	function __destruct() {
 		$this->driver_clean();
 	}
-
-	// Check apc
+*/
 	function checkdriver() {
-		if(extension_loaded('apc') && ini_get('apc.enabled')) {
-			return true;
-		} else {
-			$this->fallback = true;
-			return false;
-		}
+		return (extension_loaded('apc') && ini_get('apc.enabled'));
 	}
 
 	function driver_set($keyword, $value = '', $time = 300, $option = array()) {
@@ -57,24 +51,20 @@ class phpfastcache_apc extends BasePhpFastCache implements phpfastcache_driver {
 		if(apc_delete($keyword)) {
 			unset($this->index[$keyword]);
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	function driver_stats($option = array()) {
 		$res = array(
 			'info' => '',
-			'size' => count($this->index),
-			'data' => ''
+			'size' => count($this->index)
 		);
-
 		try {
 			$res['data'] = apc_cache_info('user');
 		} catch(Exception $e) {
 			$res['data'] = array();
 		}
-
 		return $res;
 	}
 

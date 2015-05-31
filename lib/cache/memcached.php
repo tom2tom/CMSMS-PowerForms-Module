@@ -5,39 +5,34 @@
  * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
  */
 
-class phpfastcache_memcached extends BasePhpFastCache implements phpfastcache_driver  {
+class FastCache_memcached extends FastCacheBase implements FastCache  {
 
-//	var $instant; see parent
+	var $instant;
 
 	function __construct($config = array()) {
 
-		$this->setup($config);
-		if(!$this->checkdriver() && !isset($config['skipError'])) {
-			$this->fallback = true;
-		}
-		if(class_exists('Memcached')) {
+		if($this->checkdriver()) {
+			$this->setup($config);
 			$this->instant = new Memcached();
-		} else {
-			$this->fallback = true;
+			if($this->connectServer()) {
+				return;
+			}
+			unset($this->instant);
 		}
+		throw new Exception('no memcached storage');
 	}
 
-	function __destruct() {
+/*	function __destruct() {
 		$this->driver_clean();
 	}
-
+*/
 	function checkdriver() {
-		if(class_exists('Memcached')) {
-			return true;
-		} else {
-			$this->fallback = true;
-			return false;
-		}
+		return class_exists('Memcached');
 	}
 
 	function connectServer() {
 
-		if($this->checkdriver() == false) {
+		if(!$this->checkdriver()) {
 			return false;
 		}
 
@@ -55,49 +50,41 @@ class phpfastcache_memcached extends BasePhpFastCache implements phpfastcache_dr
 			$checked = $name.'_'.$port;
 			if(!isset($this->checked[$checked])) {
 				try {
-					if($sharing >0 ) {
-						if(!$this->instant->addServer($name,$port,$sharing)) {
-							$this->fallback = true;
+					if($sharing > 0) {
+						if($this->instant->addServer($name,$port,$sharing)) {
+							$this->checked[$checked] = 1;
+							return true;
 						}
-					} else {
-						if(!$this->instant->addServer($name,$port)) {
-							$this->fallback = true;
-						}
+					} elseif($this->instant->addServer($name,$port)) {
+						$this->checked[$checked] = 1;
+						return true;
 					}
-					$this->checked[$checked] = 1;
-				} catch (Exception $e) {
-					$this->fallback = true;
-				}
+				} catch(Exception $e) {}
 			}
 		}
-		return !$this->fallback;
+		return false;
 	}
 
 	function driver_set($keyword, $value = '', $time = 300, $option = array() ) {
-		if($this->connectServer()) {
-			if(empty($option['isExisting'])) {
-				$ret = $this->instant->set($keyword, $value, time() + $time );
-			} else {
-				$ret = $this->instant->add($keyword, $value, time() + $time );
-			}
-			if($ret) {
-				$this->index[$keyword] = 1;
-			}
+		if(empty($option['isExisting'])) {
+			$ret = $this->instant->set($keyword, $value, time() + $time );
 		} else {
-			$ret = false;
+			$ret = $this->instant->add($keyword, $value, time() + $time );
+		}
+		if($ret) {
+			$this->index[$keyword] = 1;
 		}
 		return $ret;
 	}
 
 	// return cached value or null
 	function driver_get($keyword, $option = array()) {
-		if($this->connectServer()) {
-			$x = $this->instant->get($keyword);
-			if($x) {
-				return $x;
-			}
+		$x = $this->instant->get($keyword);
+		if($x) {
+			return $x;
+		} else {
+			return null;
 		}
-		return null;
 	}
 
 	function driver_getall($option = array()) {
@@ -105,40 +92,25 @@ class phpfastcache_memcached extends BasePhpFastCache implements phpfastcache_dr
 	}
 
 	function driver_delete($keyword, $option = array()) {
-		if($this->connectServer()) {
-			$this->instant->delete($keyword);
-			unset($this->index[$keyword]);
-			return true;
-		}
-		return false;
+		$this->instant->delete($keyword);
+		unset($this->index[$keyword]);
+		return true;
 	}
 
 	function driver_stats($option = array()) {
-		if($this->connectServer()) {
-			$res = array(
+		return array(
 			'info' => '',
 			'size' => count($this->index),
 			'data' => $this->instant->getStats()
 			);
-		} else {
-			$res = array(
-			'info' => '',
-			'size' => '',
-			'data' => ''
-			);
-		}
-		return $res;
 	}
 
 	function driver_clean($option = array()) {
-		if($this->connectServer()) {
-			$this->instant->flush();
-			$this->index = array();
-		}
+		$this->instant->flush();
+		$this->index = array();
 	}
 
 	function driver_isExisting($keyword) {
-		$this->connectServer();
 		return ($this->get($keyword) != null);
 	}
 

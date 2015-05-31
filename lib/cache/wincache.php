@@ -5,26 +5,22 @@
  * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
  */
 
-class phpfastcache_wincache extends BasePhpFastCache implements phpfastcache_driver  {
+class FastCache_wincache extends FastCacheBase implements FastCache  {
 
 	function __construct($config = array()) {
-		$this->setup($config);
-		if(!$this->checkdriver() && !isset($config['skipError'])) {
-			$this->fallback = true;
+		if($this->checkdriver()) {
+			$this->setup($config);
+		} else {
+			throw new Exception('no wincache storage');
 		}
 	}
 
-	function __destruct() {
+/*	function __destruct() {
 		$this->driver_clean();
 	}
-
+*/
 	function checkdriver() {
-		if(extension_loaded('wincache') && function_exists('wincache_ucache_set')) {
-			return true;
-		} else {
-			$this->fallback = true;
-			return false;
-		}
+		return (extension_loaded('wincache') && function_exists('wincache_ucache_set'));
 	}
 
 	function driver_set($keyword, $value = "", $time = 300, $option = array() ) {

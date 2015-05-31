@@ -5,61 +5,50 @@
  * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
  */
 
-class phpfastcache_memcache extends BasePhpFastCache implements phpfastcache_driver {
+class FastCache_memcache extends FastCacheBase implements FastCache {
 
-//	var $instant; see parent
+	var $instant;
 
 	function __construct($config = array()) {
-		$this->setup($config);
-		if(!$this->checkdriver() && !isset($config['skipError'])) {
-			$this->fallback = true;
-		}
-		if(class_exists('Memcache')) {
+		if($this->checkdriver()) {
 			$this->instant = new Memcache();
-		} else {
-			$this->fallback = true;
+			$this->setup($config);
+			if($this->connectServer()) {
+				return;
+			}
+			unset($this->instant);
 		}
+		throw new Exception('no memcache storage');
 	}
 
-	function __destruct() {
+/*	function __destruct() {
 		$this->driver_clean();
 	}
-
-	// Check memcache
+*/
 	function checkdriver() {
-		if(function_exists('memcache_connect')) {
-			return true;
-		}
-		$this->fallback = true;
-		return false;
+		return class_exists('Memcache') && function_exists('memcache_connect');
 	}
 
 	function connectServer() {
-		$server = $this->option['memcache'];
-		if(count($server) < 1) {
-			$server = array(
-				array('127.0.0.1',11211),
-			);
-		}
-
+		$settings = isset($this->option['memcache']) ? $this->option['memcache'] : array();
+		$server = array_merge($settings, array(
+				array('127.0.0.1',11211)
+				));
 		foreach($server as $s) {
 			$name = $s[0].'_'.$s[1];
 			if(!isset($this->checked[$name])) {
 				try {
-					if(!$this->instant->addserver($s[0],$s[1])) {
-						$this->fallback = true;
+					if($this->instant->addserver($s[0],$s[1])) {
+						$this->checked[$name] = 1;
+						return true;
 					}
-
-					$this->checked[$name] = 1;
-				} catch(Exception $e) {
-					$this->fallback = true;
-				}
+				} catch(Exception $e) {}
 			}
 		}
+		return false;
 	}
 
 	function driver_set($keyword, $value = '', $time = 300, $option = array() ) {
-		$this->connectServer();
 		if(empty($option['skipExisting'])) {
 			$ret = $this->instant->set($keyword, $value, false, $time );
 		} else {
@@ -73,8 +62,6 @@ class phpfastcache_memcache extends BasePhpFastCache implements phpfastcache_dri
 
 	// return cached value or null
 	function driver_get($keyword, $option = array()) {
-
-		$this->connectServer();
 		$x = $this->instant->get($keyword);
 		if($x) {
 			return $x;
@@ -88,30 +75,25 @@ class phpfastcache_memcache extends BasePhpFastCache implements phpfastcache_dri
 	}
 
 	function driver_delete($keyword, $option = array()) {
-		$this->connectServer();
 		$this->instant->delete($keyword);
 		unset($this->index[$keyword]);
 		return true;
 	}
 
 	function driver_stats($option = array()) {
-		$this->connectServer();
-		$res = array(
+		return array(
 			'info' => '',
 			'size' => count($this->index),
 			'data' => $this->instant->getStats(),
 		);
-		return $res;
 	}
 
 	function driver_clean($option = array()) {
-		$this->connectServer();
 		$this->instant->flush();
 		$this->index = array();
 	}
 
 	function driver_isExisting($keyword) {
-		$this->connectServer();
 		return ($this->get($keyword) != null);
 	}
 

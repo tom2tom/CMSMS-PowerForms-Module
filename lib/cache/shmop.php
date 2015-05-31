@@ -5,29 +5,22 @@
  * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
  */
 
-class phpfastcache_shmop extends BasePhpFastCache implements phpfastcache_driver  {
+class FastCache_shmop extends FastCacheBase implements FastCache  {
 
 	function __construct($config = array()) {
-		$this->setup($config);
-		if(!$this->checkdriver() && !isset($config['skipError'])) {
-			throw new Exception('Can\'t use this driver for your website!');
+		if($this->checkdriver()) {
+			$this->setup($config);
+		} else {
+			throw new Exception('no shared memory storage');
 		}
 	}
 
-	function __destruct() {
+/*	function __destruct() {
 		$this->driver_clean();
 	}
-
+*/
 	function checkdriver() {
-		if (extension_loaded('shmop')) {
-			return true;
-		} else {
-			$this->fallback = true;
-			return false;
-		}
-	}
-
-	function connectServer() {
+		return extension_loaded('shmop');
 	}
 
 	function driver_set($keyword, $value = '', $time = 300, $option = array() ) {
@@ -51,7 +44,7 @@ class phpfastcache_shmop extends BasePhpFastCache implements phpfastcache_driver
 	}
 
 	function driver_get($keyword, $option = array()) {
-		if(array_key_exists($keyword, $this->index) {
+		if(array_key_exists($keyword, $this->index)) {
 			$shmid = $this->index[$keyword];
 			$size = shmop_size($shmid);
 			return shmop_read($shmid, 0, $size);
@@ -73,12 +66,11 @@ class phpfastcache_shmop extends BasePhpFastCache implements phpfastcache_driver
 	}
 
 	function driver_stats($option = array()) {
-		$res = array(
+		return array(
 			'info' => 'Number of cached items',
 			'size' => count($this->index),
-			'data' => '',
+			'data' => ''
 		);
-		return $res;
 	}
 
 	function driver_clean($option = array()) {

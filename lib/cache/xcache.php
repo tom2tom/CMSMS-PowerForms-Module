@@ -5,27 +5,22 @@
  * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
  */
 
-class phpfastcache_xcache extends BasePhpFastCache implements phpfastcache_driver  {
+class FastCache_xcache extends FastCacheBase implements FastCache  {
 
 	function __construct($config = array()) {
-		$this->setup($config);
-		if(!$this->checkdriver() && !isset($config['skipError'])) {
-			$this->fallback = true;
+		if($this->checkdriver()) {
+			$this->setup($config);
+		} else {
+			throw new Exception('no xcache storage');
 		}
 	}
 
-	function __destruct() {
+/*	function __destruct() {
 		$this->driver_clean();
 	}
-
-	// Check xcache
+*/
 	function checkdriver() {
-		if(extension_loaded('xcache') && function_exists('xcache_get')) {
-			return true;
-		} else {
-			$this->fallback = true;
-			return false;
-		}
+		return (extension_loaded('xcache') && function_exists('xcache_get'));
 	}
 
 	function driver_set($keyword, $value = "", $time = 300, $option = array() ) {
@@ -67,8 +62,7 @@ class phpfastcache_xcache extends BasePhpFastCache implements phpfastcache_drive
 	function driver_stats($option = array()) {
 		$res = array(
 			'info' => '',
-			'size' => count($this->index),
-			'data' => '',
+			'size' => count($this->index)
 		);
 		try {
 			$res['data'] = xcache_list(XC_TYPE_VAR,100);
