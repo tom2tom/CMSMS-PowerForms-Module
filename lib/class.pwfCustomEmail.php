@@ -21,7 +21,7 @@ class pwfCustomEmail extends pwfEmailBase
 		$this->Type = 'CustomEmail';
 	}
 
-	// Get all fields
+	// get all fields
 	private function GetFieldList($selectone = FALSE)
 	{
 		$mod = $this->formdata->formsmodule;
@@ -96,64 +96,64 @@ class pwfCustomEmail extends pwfEmailBase
 
 	function AdminValidate()
 	{
+		$messages = array();
+  		list($ret,$msg) = parent::AdminValidate();
+		if(!ret)
+			$messages[] = $msg;
+
 		$mod = $this->formdata->formsmodule;
-		$subject = $this->GetOption('email_subject');
-		$name = $this->GetOption('email_from_name');
-		$from = $this->GetOption('email_from_address');
-    	$dest = $this->GetOptionRef('destination_address');
-
-
-TODO  $validate = $this->validateEmailAddr($email);
-
-
-  		list($ret,$message) = $this->DoesFieldHaveName();
-
-		if($ret)
-			list($ret,$message) = $this->DoesFieldNameExist();
-		if(!$subject)
+		if(!$this->GetOption('email_subject'))
 		{
 			$ret = FALSE;
-			$message .= $mod->Lang('no_field_assigned',$mod->Lang('title_email_subject')).'<br />';
+			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_email_subject'));
 		}
-		if(!$name)
+		if(!$this->GetOption('email_from_name'))
 		{
 			$ret = FALSE;
-			$message .= $mod->Lang('no_field_assigned',$mod->Lang('title_email_from_name')).'<br />';
+			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_email_from_name'));
 		}
-		if(!$from)
+		if($this->GetOption('email_from_address'))
+		{
+			//TODO validate address
+		}
+		else
 		{
 			$ret = FALSE;
-			$message .= $mod->Lang('no_field_assigned',$mod->Lang('title_email_from_address')).'<br />';
+			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_email_from_address'));
 		}
-		if(!$dest)
+		if($this->GetOptionRef('destination_address'))
+		{
+			//TODO validate address(es)
+		}
+		else
 		{
 			$ret = FALSE;
-			$message .= $mod->Lang('no_field_assigned',$mod->Lang('title_destination_address')).'<br />';
+			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_destination_address'));
 		}
-        return array($ret,$message);
+		//TODO message-body field?
+		$msg = ($ret)?'':implode('<br />',$messages);
+	    return array($ret,$msg);
 	}
-	
+
 	function DisposeForm($returnid)
 	{
-		$mod = $this->formdata->formsmodule;
 		$formdata = $this->formdata;
 
-		$fld = pwfUtils::GetFieldByID($formdata,$this->GetOption('email_subject'));
-		$this->SetOption('email_subject',$fld->GetHumanReadableValue());
-
-		$fld = pwfUtils::GetFieldByID($formdata,$this->GetOption('email_from_name'));
+		$senderfld = $this->GetOption('email_from_name'); //TODO confirm this is field_id?
+		$fld = $formdata->Fields[$senderfld];
 		$this->SetOption('email_from_name',$fld->GetHumanReadableValue());
 
-		$fld = pwfUtils::GetFieldByID($formdata,$this->GetOption('email_from_address'));
+		$fromfld = $this->GetOption('email_from_address');
+		$fld = $formdata->Fields[$fromfld];
 		$this->SetOption('email_from_address',$fld->GetHumanReadableValue());
 
 		$addarr = array();
-		$dests = $this->GetOptionRef('destination_address'); //in this case, field id's ?
+		$dests = $this->GetOptionRef('destination_address'); //TODO in this case, field id's ?
 		if(!is_array($dests))
 			$dests = array($dests);
-		foreach($dests as $one)
+		foreach($dests as $field_id)
 		{
-			$fld = pwfUtils::GetFieldByID($formdata,$one);
+			$fld = $formdata->Fields[$field_id];
 			$value = $fld->GetHumanReadableValue();
 			if(strpos($value,',') !== FALSE)
 				$addarr = $addarr + explode(',',$value);
@@ -161,7 +161,21 @@ TODO  $validate = $this->validateEmailAddr($email);
 				$addarr[] = $value;
 		}
 
-		return $this->SendForm($addarr,$this->GetOption('email_subject'));
+/*		$subjectfld = $this->GetOption('email_subject');
+		$fld = $formdata->Fields[$subjectfld];
+		$this->SetOption('email_subject',$fld->GetHumanReadableValue());
+
+		$ret = $this->SendForm($addarr,$this->GetOption('email_subject'));
+
+		$this->SetOption('email_subject',$subjectfld);
+*/
+		$fld = $formdata->Fields[$this->GetOption('email_subject')];
+		$ret = $this->SendForm($addarr,$fld->GetHumanReadableValue()); //TODO check is ok, message content?
+
+		$this->SetOption('email_from_name',$senderfld);
+		$this->SetOption('email_from_address',$fromfld);
+
+		return $ret;
 	}
 
 }
