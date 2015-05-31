@@ -52,6 +52,8 @@ $dict->ExecuteSQLArray($sqlarray);
 //$dict->ExecuteSQLArray($sqlarray);
 //$sqlarray = $dict->DropTableSQL($pre.'module_pwf_resp_val');
 //$dict->ExecuteSQLArray($sqlarray);
+$sqlarray = $dict->DropTableSQL($pre.'module_pwf_record');
+$dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_trans');
 $dict->ExecuteSQLArray($sqlarray);
 

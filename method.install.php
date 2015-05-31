@@ -102,6 +102,15 @@ $db->CreateSequence($pre.'module_pwf_resp_val_seq');
 */
 
 $flds = "
+	record_id I(2) AUTO KEY,
+	form_id I,
+	submitted ".CMS_ADODB_DT.",
+	contents B
+";
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_record',$flds,$taboptarray);
+$dict->ExecuteSQLArray($sqlarray);
+
+$flds = "
 	cache_id I(2) AUTO KEY,
 	keyword C(48),
 	value B,
