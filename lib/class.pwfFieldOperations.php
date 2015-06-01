@@ -116,10 +116,13 @@ class pwfFieldOperations
 		return $obfield;
 	}
 
-	// returns reference to field-object in $formdata and whose array-key is $field_index
+	// returns reference to field-object in $formdata and whose (0-based) array-index is $field_index
 	function &GetFieldByIndex(&$formdata,$field_index)
 	{
-		return $formdata->Fields[$field_index];
+		$keys = array_keys($formdata->Fields);
+		if(isset($keys[$field_index]))
+			return $formdata->Fields[$keys[$field_index]];
+		return NULL;
 	}
 
 	// swaps field display-orders 
@@ -153,12 +156,8 @@ class pwfFieldOperations
 
 	function DeleteField(&$formdata,$field_id)
 	{
-		$index = self::GetFieldIndexFromId($field_id);
-		if($index != -1)
-		{
-			$formdata->Fields[$index]->Delete();
-			array_splice($formdata->Fields,$index,1);
-		}
+		$formdata->Fields[$field_id]->Delete();
+		unset($formdata->Fields[$field_id]);
 	}
 
 /*	function ResetFields(&$formdata)
