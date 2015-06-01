@@ -25,7 +25,7 @@ class pwfFormOperations
 	/**
 	Add:
 	@mod: reference to the current PowerForms module object
-	@params: reference to array of parameters, which must include
+	@params: reference to array of parameters,which must include
 		'form_name' and preferably also 'form_alias'
 	$params['form_name'] and $params['form_alias'] may be set/updated to unique values
 	Returns: new form id or FALSE
@@ -147,7 +147,7 @@ class pwfFormOperations
 		$res = TRUE;
 		$sql = 'INSERT INTO '.$pre.
 		'module_pwf_form_opt (option_id,form_id,name,value) VALUES (?,?,?,?)';
-		foreach($formdata->Attrs as $key=>&$one)
+		foreach($formdata->Options as $key=>&$one)
 		{
 			$AttrId = $db->GenID($pre.'module_pwf_form_opt_seq');
 			if($key == 'form_template')
@@ -225,7 +225,7 @@ class pwfFormOperations
 		}
 
 		$sql = 'INSERT INTO '.$pre.'module_pwf_form_opt (option_id,form_id,name,value) VALUES (?,?,?,?)';
-		foreach($formdata->Attrs as $key=>$val)
+		foreach($formdata->Options as $key=>$val)
 		{
 			$AttrId = $db->GenID($pre.'module_pwf_form_opt_seq');
 			if($key == 'form_template')
@@ -275,9 +275,9 @@ class pwfFormOperations
 	@mod: reference to the current PowerForms module object
 	@form_id: enumerator of form to be processed
 	@params: reference to array of parameters
-	@deep: optional whether to also load field data, default FALSE
-	@loadResp: optional boolean, default FALSE
-	Returns: reference to pwfData object for the form, or FALSE
+	@deep: optional whether to also load field data,default FALSE
+	@loadResp: optional boolean,default FALSE
+	Returns: reference to pwfData object for the form,or FALSE
 	*/
 	function &Load(&$mod,$form_id,&$params,$deep=FALSE,$loadResp=FALSE)
 	{
@@ -300,7 +300,7 @@ class pwfFormOperations
 			$formdata->Alias = $row['alias'];
 
 		$sql = 'SELECT name,value FROM '.$pre.'module_pwf_form_opt WHERE form_id=?';
-		$formdata->Attrs = $db->GetAssoc($sql,array($form_id));
+		$formdata->Options = $db->GetAssoc($sql,array($form_id));
 		$formdata->loaded = 'summary';
 
 /*		if(isset($params['response_id']))
@@ -311,60 +311,6 @@ class pwfFormOperations
 */
 		if($deep)
 		{
-/*			if($loadResp)
-			{
-				// if it's a stored form,load the results -- but we need to manually merge them,
-				// since $params[] should override the database value (say we're resubmitting a form)
-TODO				$obfield = $mod->GetFormBrowserField($form_id);
-				if($obfield != FALSE)
-				{
-					// if we're binding to FEU,get the FEU ID,see if there's a response for
-					// that user. If so,load it. Otherwise,bring up an empty form.
-					if($obfield->GetOption('feu_bind','0')=='1')
-					{
-						$feu = $mod->GetModuleInstance('FrontEndUsers');
-						if($feu == FALSE)
-						{
-							debug_display("FAILED to instatiate FEU!");
-							return;
-						}
-						if(!isset($_COOKIE['cms_admin_user_id']))
-						{
-TODO							$response_id = pwfDummy:GetResponseIDFromFEUID($feu->LoggedInId(),$form_id);
-							if($response_id !== FALSE)
-							{
-								$check = $db->GetOne('SELECT count(*) FROM '.$pre.
-									'module_pwf_browse WHERE browser_id=?',array($response_id));
-								if($check == 1)
-								{
-									$params['response_id'] = $response_id;
-								}
-							}
-						}
-					}
-				}
-				if(isset($params['response_id']))
-				{
-					$loadParams = array('response_id'=>$params['response_id']);
-					$loadTypes = array();
-					self::LoadResponseValues($loadParams,$loadTypes);
-					foreach($loadParams as $thisParamKey=>$thisParamValue)
-					{
-						if(!isset($params[$thisParamKey]))
-						{
-							if($formdata->FormState == 'update' && $loadTypes[$thisParamKey] == 'CheckboxField')
-							{
-								$params[$thisParamKey] = '';
-							}
-							else
-							{
-								$params[$thisParamKey] = $thisParamValue;
-							}
-						}
-					}
-				}
-			}
-*/
 			$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
 			$fields = $db->GetArray($sql,array($form_id));
 			if($fields)
@@ -376,7 +322,8 @@ TODO							$response_id = pwfDummy:GetResponseIDFromFEUID($feu->LoggedInId(),$fo
 //					$className = pwfUtils::MakeClassName($row['type']);
 					$fid = $row['field_id'];
 					// create the field object
-					if((isset($params['pwfp__'.$fid]) || isset($params['pwfp___'.$fid])) ||
+					if(isset($params[$formdata->current_prefix.$fid]) ||
+						isset($params[$formdata->prior_prefix.$fid]) ||
 						isset($params['value_'.$row['name']]) || 
 						isset($params['value_fld'.$fid]) ||
 						(isset($params['field_id']) && $params['field_id'] == $fid)
@@ -385,7 +332,8 @@ TODO							$response_id = pwfDummy:GetResponseIDFromFEUID($feu->LoggedInId(),$fo
 						$row = array_merge($row,$params); //TODO
 					}
 					$obfield = $funcs->NewField($formdata,$row);
-					$formdata->Fields[] = $obfield;
+					$obfield->Store(TRUE); //get an id
+					$formdata->Fields[$obfield->Id] = $obfield;
 					if($obfield->Type == 'PageBreakField')
 						$formdata->FormPagesCount++;
 				}
@@ -400,11 +348,11 @@ TODO							$response_id = pwfDummy:GetResponseIDFromFEUID($feu->LoggedInId(),$fo
 	/**
 	CreateXML:
 	@mod: reference to PowerForms module
-	@form_id: single form identifier, or array of them
+	@form_id: single form identifier,or array of them
 	@date: date string for inclusion in the content
-	@charset: optional, name of content encoding, default = FALSE
-	@dtd: optional boolean, whether to consruct DTD in file, default TRUE
-	Returns: XML string, or FALSE. Included value-data are not bound by
+	@charset: optional,name of content encoding,default = FALSE
+	@dtd: optional boolean,whether to consruct DTD in file,default TRUE
+	Returns: XML string,or FALSE. Included value-data are not bound by
 		<![CDATA[...]]> cuz that mechanism is not nestable. This means that
 		values which include javascript may be unbrowsable in a XML-viewer.		
 	*/
@@ -519,7 +467,7 @@ EOS;
 						$name = $oneopt['name'];
 						if(strpos($name,'template') === FALSE)
 							$xml[] = "\t\t\t\t\t<$name>".trim($oneopt['value'])."</$name>";
-						else//as above, mask potentially-bad content
+						else//as above,mask potentially-bad content
 							$xml[] = "\t\t\t\t\t<$name>]][[".urlencode(trim($oneopt['value']))."</$name>";
 					}
 					unset($oneopt);
@@ -564,9 +512,9 @@ EOS;
 	/**
 	 ParseXML:
 	 @xmlfile: filepath of xml file to be processed
-	 Read, parse and check high-level structure of xml file whose path is @xmlfile
-	 Returns: xml'ish tree-shaped array (with text encoded as UTF-8), or FALSE
-	 form-data are in sub-array(s) keyed as 'form1', ... 'form{array['count']}'
+	 Read,parse and check high-level structure of xml file whose path is @xmlfile
+	 Returns: xml'ish tree-shaped array (with text encoded as UTF-8),or FALSE
+	 form-data are in sub-array(s) keyed as 'form1',... 'form{array['count']}'
 	*/
 	function ParseXML($xmlfile)
 	{
@@ -597,7 +545,7 @@ EOS;
 					$index = '';
 					for($i = 1; $i < $lvl; $i++)
 						$index .= '['.$opened[$i].']';
-					$path = explode('][', substr($index, 1, -1));
+					$path = explode('][',substr($index,1,-1));
 					if($val['type'] == 'complete')
 						array_pop($path);
 					$value = &$array;
@@ -651,12 +599,6 @@ EOS;
 		return $array;
 	}
 
-//====================
-/*	private function inXML(&$var)
-	{
-		return (isset($var) && strlen($var) > 0);
-	}
-*/
 	/**
 	ImportXML:
 	@mod: reference to the current PowerForms module object
@@ -668,42 +610,6 @@ EOS;
 		$data = self::ParseXML($xmlfile);
 		if($data == FALSE)
 			return FALSE;
-		//? check $data['version'], $data['date']
-/*$data = array (size>=4)
-  'version' => string '0.7' (length=3)
-  'date' => null
-  'count' => string '1' (length=1)
-  'form1' => 
-    array (size=3)
-      'properties' => 
-        array (size=3)
-          'form_id' => string '1' (length=1)
-          'name' => string 'Sample Form' (length=11)
-          'alias' => string 'sample_form' (length=11)
-      'options' => 
-        array (size=17)
-          'captcha_wrong' => string 'The entered text was not correct' (length=32)
-          'css_class' => string 'PowerFormsform' (length=14)
-          'form_displaytype' => string 'tab' (length=3)
-          'form_template' => string '%7B%2A+DEFAULT+FORM+LAYOUT+%2F+pure+CSS+%2A%7D%0A%7Bif+%24form_done%7D%0A%09%7B%2A+This+section+is+for+displaying+submission-errors+%2A%7D%0A%09%7Bif+%24submission_error%7D%0A%09%09%3Cdiv+class%3D%22error_message%22%3E%7B%24submission_error%7D%3C%2Fdiv%3E%0A%09%09%7Bif+%24show_submission_errors%7D%0A%09%09%09%3Cdiv+class%3D%22error%22%3E%0A%09%09%09%3Cul%3E%0A%09%09%09%7Bforeach+from%3D%24submission_error_list+item%3Done%7D%0A%09%09%09%09%3Cli%3E%7B%24one%7D%3C%2Fli%3E%0A%09%09%09%7B%2Fforeach%7D%0A%09%09%0'... (length=3531)
-          'inline' => string '1' (length=1)
-          'list_delimiter' => string '-' (length=1)
-          'next_button_text' => string 'Continue...' (length=11)
-          'prev_button_text' => string 'Back...' (length=7)
-          'redirect_page' => string '-1' (length=2)
-          'required_field_symbol' => string '*' (length=1)
-          'submission_template' => string '%3Ch1%3EThanks%21%3C%2Fh1%3E%0A%3Cp%3EYour+feedback+helps+make+the+PowerForms+module+better.%3C%2Fp%3E' (length=102)
-          'submit_action' => string 'text' (length=4)
-          'submit_button_text' => string 'Send Feedback' (length=13)
-          'title_position' => string 'left' (length=4)
-          'title_user_captcha' => string 'Help to prevent abuse by spammers, enter the text from the image' (length=64)
-          'unspecified' => string '[unspecified]' (length=13)
-          'use_captcha' => string '1' (length=1)
-      'fields' => 
-        array (size=8)
-          'field1' => 
-            array (size=2)
-              ...*/
 		$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();
 		for($i=1; $i<=$data['count']; $i++)
@@ -758,154 +664,63 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 			unset($fld);
 		}
 		return TRUE;
-/*
-		$params['form_id'] = -1; // override any form_id values that may be around
-		$formAttrs = &$elements[0]['attributes'];
+	}
 
-		$formdata = $mod->GetFormData($params);
-
-		if(!empty($params['import_formalias']))
-			$formdata->Alias = $params['import_formalias'];
-		else if(self::inXML($formAttrs['alias']))
-			$formdata->Alias = $formAttrs['alias'];
-
-		if(!empty($params['import_formname']))
-			$formdata->Name = $params['import_formname'];
-
-		$foundfields = FALSE;
-		// populate the attributes and field name first. When we see a field,we save the form and then start adding the fields to it.
-
-		foreach($elements[0]['children'] as $thisChild)
-		{
-			if($thisChild['name'] == 'form_name')
+/*			if($loadResp)
 			{
-				$curname = self::GetName($params);
-				if(empty($curname))
-					$formdata->Name = $thisChild['content'];
-			}
-			elseif($thisChild['name'] == 'attribute')
-			{
-				$formdata->Attrs[$thisChild['attributes']['key']] =  $thisChild['content'];
-			}
-			else
-			{
-				// we got us a field
-				if(!$foundfields)
+				// if it's a stored form,load the results -- but we need to manually merge them,
+				// since $params[] should override the database value (say we're resubmitting a form)
+TODO				$obfield = $mod->GetFormBrowserField($form_id);
+				if($obfield != FALSE)
 				{
-					// first field
-					$foundfields = TRUE;
-					if(isset($params['import_formname']) &&
-					   trim($params['import_formname']) != '')
-						$formdata->Name = trim($params['import_formname']);
-
-					if(isset($params['import_formalias']) &&
-					   trim($params['import_formname']) != '')
-						$formdata->Alias = trim($params['import_formalias']);
-
-					self::Store($mod,$params['form_id'],$params);
-				}
-//				debug_display($thisChild);
-				$fieldAttrs = &$thisChild['attributes'];
-				$className = pwfUtils::MakeClassName($fieldAttrs['type']);
-//				debug_display($className);
-				$newField = new $className($formdata,$params);
-				$oldId = $fieldAttrs['id'];
-
-				if(self::inXML($fieldAttrs['alias']))
-				{
-					$newField->SetAlias($fieldAttrs['alias']);
-				}
-				$newField->SetValidationType($fieldAttrs['validation_type']);
-				if(self::inXML($fieldAttrs['order_by']))
-				{
-					$newField->SetOrder($fieldAttrs['order_by']);
-				}
-				if(self::inXML($fieldAttrs['required']))
-				{
-					$newField->SetRequired($fieldAttrs['required']);
-				}
-				if(self::inXML($fieldAttrs['hide_label']))
-				{
-					$newField->SetHideLabel($fieldAttrs['hide_label']);
-				}
-				foreach($thisChild['children'] as $thisOpt)
-				{
-					if($thisOpt['name'] == 'field_name')
+					// if we're binding to FEU,get the FEU ID,see if there's a response for
+					// that user. If so,load it. Otherwise,bring up an empty form.
+					if($obfield->GetOption('feu_bind','0')=='1')
 					{
-						$newField->SetName($thisOpt['content']);
-					}
-					if($thisOpt['name'] == 'options')
-					{
-						foreach($thisOpt['children'] as $thisOption)
+						$feu = $mod->GetModuleInstance('FrontEndUsers');
+						if($feu == FALSE)
 						{
-							$newField->OptionFromXML($thisOption);
+							debug_display("FAILED to instatiate FEU!");
+							return;
+						}
+						if(!isset($_COOKIE['cms_admin_user_id']))
+						{
+TODO							$response_id = pwfDummy:GetResponseIDFromFEUID($feu->LoggedInId(),$form_id);
+							if($response_id !== FALSE)
+							{
+								$check = $db->GetOne('SELECT count(*) FROM '.$pre.
+									'module_pwf_browse WHERE browser_id=?',array($response_id));
+								if($check == 1)
+								{
+									$params['response_id'] = $response_id;
+								}
+							}
 						}
 					}
 				}
-				$newField->Store(TRUE);
-				$formdata->Fields[] = $newField;
-				$fieldMap[$oldId] = $newField->GetId();
-			}
-		}
-
-		// clean up references
-		if(!empty($params['xml_file']))
-		{
-			// need to update mappings in templates.
-			$tmp = self::UpdateRefs(pwfUtils::GetAttr($formdata,'form_template',''),$fieldMap);
-			$formdata->Attrs['form_template'] = $tmp;
-			$tmp = self::UpdateRefs(pwfUtils::GetAttr($formdata,'submission_template',''),$fieldMap);
-			$formdata->Attrs['submission_template'] = $tmp;
-
-			// need to update mappings in field templates.
-			$options = array('email_template','file_template');
-			foreach($formdata->Fields as &$fld)
-			{
-				$changes = FALSE;
-				foreach($options as $to)
+				if(isset($params['response_id']))
 				{
-					$templ = $fld->GetOption($to,'');
-					if(!empty($templ))
+					$loadParams = array('response_id'=>$params['response_id']);
+					$loadTypes = array();
+					self::LoadResponseValues($loadParams,$loadTypes);
+					foreach($loadParams as $thisParamKey=>$thisParamValue)
 					{
-						$tmp = self::UpdateRefs($templ,$fieldMap);
-						$fld->SetOption($to,$tmp);
-						$changes = TRUE;
-					}
-				}
-				// need to update mappings in FormBrowser sort fields
-				if($fld->GetFieldType() == 'DispositionFormBrowser')
-				{
-					for ($i=1;$i<6;$i++)
-					{
-						$old = $fld->GetOption('sortfield'.$i);
-						if(isset($fieldMap[$old]))
+						if(!isset($params[$thisParamKey]))
 						{
-							$fld->SetOption('sortfield'.$i,$fieldMap[$old]);
-							$changes = TRUE;
+							if($formdata->FormState == 'update' && $loadTypes[$thisParamKey] == 'CheckboxField')
+							{
+								$params[$thisParamKey] = '';
+							}
+							else
+							{
+								$params[$thisParamKey] = $thisParamValue;
+							}
 						}
 					}
 				}
-				if($changes)
-				{
-					$fld->Store(TRUE);
-				}
 			}
-			unset ($fld);
-
-			self::Store($mod,$params['form_id'],$params);
-		}
-
-		return TRUE;
 */
-	}
 
-/*	private function UpdateRefs($text,&$fieldMap)
-	{
-		foreach($fieldMap as $k=>$v)
-			$text = preg_replace('/([\{\b\s])\$fld_'.$k.'([\}\b\s])/','$1\$fld_'.$v.'$2',$text);
-		return $text;
-	}
-*/
 	//returns TRUE if a form with matching name OR alias does NOT exist
 	function NewID($name = FALSE,$alias = FALSE)
 	{
