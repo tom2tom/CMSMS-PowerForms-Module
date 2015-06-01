@@ -96,7 +96,7 @@ class pwfTextExpandable extends pwfFieldBase
 	function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		$ret = $mod->Lang('abbreviation_length',$this->GetOption('length','80'));
+		$ret = $mod->Lang('abbreviation_length',$this->GetOption('length',80));
 		if(strlen($this->ValidationType)>0)
 			$ret .= ",".array_search($this->ValidationType,$this->ValidationTypes);
 
@@ -127,30 +127,30 @@ class pwfTextExpandable extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 
 		$main = array(
 			array($mod->Lang('title_maximum_length'),
-				$mod->CreateInputText($module_id,'opt_length',$this->GetOption('length','80'),25,25)),
+				$mod->CreateInputText($id,'opt_length',$this->GetOption('length',80),25,25)),
 			array($mod->Lang('title_add_button_text'),
-				$mod->CreateInputText($module_id,'opt_add_button',$this->GetOption('add_button','+'),15,25)),
+				$mod->CreateInputText($id,'opt_add_button',$this->GetOption('add_button','+'),15,25)),
 			array($mod->Lang('title_del_button_text'),
-				$mod->CreateInputText($module_id,'opt_del_button',$this->GetOption('del_button','X'),15,25))
+				$mod->CreateInputText($id,'opt_del_button',$this->GetOption('del_button','X'),15,25))
 		);
 
 		$adv = array(
 			array($mod->Lang('title_field_regex'),
-				$mod->CreateInputText($module_id,'opt_regex',$this->GetOption('regex'),25,255),
+				$mod->CreateInputText($id,'opt_regex',$this->GetOption('regex'),25,255),
 				$mod->Lang('help_regex_use')),
 			array($mod->Lang('title_field_siblings'),
-				$mod->CreateInputDropdown($module_id,'opt_siblings',$this->GetFieldSiblings(),-1,
+				$mod->CreateInputDropdown($id,'opt_siblings',$this->GetFieldSiblings(),-1,
 					$this->GetOption('siblings')),
 				$mod->Lang('help_field_siblings')),
 			array($mod->Lang('title_field_hidebuttons'),
-				$mod->CreateInputHidden($module_id,'opt_hidebuttons',0).
-				$mod->CreateInputCheckbox($module_id,'opt_hidebuttons',1,$this->GetOption('hidebuttons',0)),
+				$mod->CreateInputHidden($id,'opt_hidebuttons',0).
+				$mod->CreateInputCheckbox($id,'opt_hidebuttons',1,$this->GetOption('hidebuttons',0)),
 				$mod->Lang('help_field_hidebuttons'))
 		);
 
@@ -162,14 +162,15 @@ class pwfTextExpandable extends pwfFieldBase
 		return FALSE;
 	}
 
-	function Validate()
+	function Validate($id)
 	{
-		$this->validated = TRUE;
-		$this->ValidationMessage = '';
 		$mod = $this->formdata->formsmodule;
+		$res = TRUE;
+		$messages = array();
+		$l = $this->GetOption('length',0);
+
 		if(!is_array($this->Value))
 		    $this->Value = array($this->Value);
-
 		foreach($this->Value as $one)
 		{
 		    switch ($this->ValidationType)
@@ -177,52 +178,57 @@ class pwfTextExpandable extends pwfFieldBase
 			 case 'none':
 				break;
 			 case 'numeric':
-				if($one !== FALSE &&
-					!preg_match("/^([\d\.\,])+$/i",$one))
+				if($one && !preg_match('/^[\d\.\,]+$/',$one))
 				{
-					$this->validated = FALSE;
-					$this->ValidationMessage = $mod->Lang('please_enter_a_number',$this->Name);
+					$res = FALSE;
+					$messages[] = $mod->Lang('please_enter_a_number',$this->Name);
 				}
 				break;
 			 case 'integer':
-				if($one !== FALSE &&
-					!preg_match("/^([\d])+$/i",$one) || (int)$one != $one)
+				if($one && !preg_match('/^\d+$/',$one) || (int)$one != $one)
 				{
-					$this->validated = FALSE;
-					$this->ValidationMessage = $mod->Lang('please_enter_an_integer',$this->Name);
+					$res = FALSE;
+					$messages[] = $mod->Lang('please_enter_an_integer',$this->Name);
 				}
 				break;
 			 case 'email':
-				if($one !== FALSE &&
-					!preg_match($mod->email_regex,$one))
+				if($one && !preg_match($mod->email_regex,$one))
 				{
-					$this->validated = FALSE;
-					$this->ValidationMessage = $mod->Lang('please_enter_an_email',$this->Name);
+					$res = FALSE;
+					$messages[] = $mod->Lang('please_enter_an_email',$this->Name);
 				}
 				break;
 			 case 'regex_match':
-				if($one !== FALSE &&
-					!preg_match($this->GetOption('regex','/.*/'),$one))
+				if($one && !preg_match($this->GetOption('regex','/.*/'),$one))
 				{
-					$this->validated = FALSE;
-					$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
+					$res = FALSE;
+					$messages[] = $mod->Lang('please_enter_valid',$this->Name);
 				}
 				break;
 			 case 'regex_nomatch':
-				if($one !== FALSE &&
-				   preg_match($this->GetOption('regex','/.*/'),$one))
+				if($one && preg_match($this->GetOption('regex','/.*/'),$one))
 				{
-					$this->validated = FALSE;
-					$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
+					$res = FALSE;
+					$messages[] = $mod->Lang('please_enter_valid',$this->Name);
 				}
 				break;
 			}
 
-			if($this->GetOption('length',0) > 0 && strlen($one) > $this->GetOption('length',0))
+			if($l > 0 && strlen($one) > $l)
 			{
-				$this->validated = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_no_longer',$this->GetOption('length',0));
+				$res = FALSE;
+				$messages[] = $mod->Lang('please_enter_no_longer',$l);
 			}
+		}
+		if($res)
+		{
+			$this->validated = TRUE;
+			$this->ValidationMessage = '';
+		}
+		else
+		{
+			$this->validated = FALSE;
+			$this->ValidationMessage = implode('<br />',$messages);
 		}
 
 		return array($this->validated,$this->ValidationMessage);

@@ -32,8 +32,8 @@ pwfFileDirector
 pwfFileUpload
 pwfHidden
 pwfInputTag
+pwfInputTemplate
 pwfLink
-pwfModuleInterface
 pwfMultiselect
 pwfMultiselectFileDirector
 pwfOzStatePicker

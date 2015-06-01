@@ -60,37 +60,37 @@ class pwfText extends pwfFieldBase
 		}
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 
 		$main = array(
 			array($mod->Lang('title_maximum_length'),
-				$mod->CreateInputText($module_id,'opt_length',$this->GetOption('length',80),25,25)),
+				$mod->CreateInputText($id,'opt_length',$this->GetOption('length',80),25,25)),
 			array($mod->Lang('title_read_only'),
-				$mod->CreateInputHidden($module_id,'opt_readonly',0).
-				$mod->CreateInputCheckbox($module_id,'opt_readonly',1,$this->GetOption('readonly',0)))
+				$mod->CreateInputHidden($id,'opt_readonly',0).
+				$mod->CreateInputCheckbox($id,'opt_readonly',1,$this->GetOption('readonly',0)))
 		);
 
 		$adv = array(
 			array($mod->Lang('title_field_regex'),
-				$mod->CreateInputText($module_id,'opt_regex',$this->GetOption('regex'),25,1024),
+				$mod->CreateInputText($id,'opt_regex',$this->GetOption('regex'),25,1024),
 				$mod->Lang('help_regex_use')),
 			array($mod->Lang('title_field_default_value'),
-				$mod->CreateInputText($module_id,'opt_default',$this->GetOption('default'),25,1024)),
+				$mod->CreateInputText($id,'opt_default',$this->GetOption('default'),25,1024)),
 			array($mod->Lang('title_html5'),
-				$mod->CreateInputHidden($module_id,'opt_html5',0).
-				$mod->CreateInputCheckbox($module_id,'opt_html5',1,$this->GetOption('html5',0))),
+				$mod->CreateInputHidden($id,'opt_html5',0).
+				$mod->CreateInputCheckbox($id,'opt_html5',1,$this->GetOption('html5',0))),
 			array($mod->Lang('title_clear_default'),
-				$mod->CreateInputHidden($module_id,'opt_clear_default',0).
-				$mod->CreateInputCheckbox($module_id,'opt_clear_default',1,$this->GetOption('clear_default',0)),
+				$mod->CreateInputHidden($id,'opt_clear_default',0).
+				$mod->CreateInputCheckbox($id,'opt_clear_default',1,$this->GetOption('clear_default',0)),
 				$mod->Lang('help_clear_default'))
 		);
 
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		$this->validated = TRUE;
 		$this->ValidationMessage = '';
@@ -100,36 +100,33 @@ class pwfText extends pwfFieldBase
 		 case 'none':
 			break;
 		 case 'numeric':
-			if($this->Value !== FALSE) $this->Value = trim($this->Value);
-			if($this->Value !== FALSE &&
-				!preg_match("/^([\d\.\,])+$/i",$this->Value))
+			if($this->Value) $this->Value = trim($this->Value);
+			if($this->Value && !preg_match('/^[\d\.\,]+$',$this->Value))
 			{
 				$this->validated = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_a_number',$this->Name);
 			}
 			break;
 		 case 'integer':
-			if($this->Value !== FALSE) $this->Value = trim($this->Value);
-			if($this->Value !== FALSE &&
-				!preg_match("/^([\d])+$/i",$this->Value) ||
-				intval($this->Value) != $this->Value)
+			if($this->Value) $this->Value = trim($this->Value);
+			if($this->Value && !preg_match('/^\d+$/',$this->Value) ||
+				(int)$this->Value != $this->Value)
 			{
 				$this->validated = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_an_integer',$this->Name);
 			}
 			break;
 		 case 'email':
-			if($this->Value !== FALSE) $this->Value = trim($this->Value);
-			if($this->Value !== FALSE &&
-				!preg_match($mod->email_regex,$this->Value))
+			if($this->Value) $this->Value = trim($this->Value);
+			if($this->Value && !preg_match($mod->email_regex,$this->Value))
 			{
 				$this->validated = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_an_email',$this->Name);
 			}
 			break;
 		 case 'usphone':
-			if($this->Value !== FALSE) $this->Value = trim($this->Value);
-			if($this->Value !== FALSE &&
+			if($this->Value) $this->Value = trim($this->Value);
+			if($this->Value &&
 				!preg_match('/^([0-9][\s\.-]?)?(\(?[0-9]{3}\)?|[0-9]{3})[\s\.-]?([0-9]{3}[\s\.-]?[0-9]{4}|[a-zA-Z0-9]{7})(\s?(x|ext|ext.)\s?[a-zA-Z0-9]+)?$/',
 			$this->Value))
 			{
@@ -138,7 +135,7 @@ class pwfText extends pwfFieldBase
 			}
 			break;
 		 case 'regex_match':
-			if($this->Value !== FALSE &&
+			if($this->Value &&
 				!preg_match($this->GetOption('regex','/.*/'),$this->Value))
 			{
 				$this->validated = FALSE;
@@ -146,7 +143,7 @@ class pwfText extends pwfFieldBase
 			}
 			break;
 		 case 'regex_nomatch':
-			if($this->Value !== FALSE &&
+			if($this->Value &&
 				preg_match($this->GetOption('regex','/.*/'),$this->Value))
 			{
 				$this->validated = FALSE;

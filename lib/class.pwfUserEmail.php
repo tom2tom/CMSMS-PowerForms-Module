@@ -81,6 +81,54 @@ class pwfUserEmail extends pwfEmailBase
 		return $this->TemplateStatus();
 	}
 
+	function PrePopulateAdminForm($id)
+	{
+		$mod = $this->formdata->formsmodule;
+		$ret = $this->PrePopulateAdminFormCommonEmail($id);
+		$choices = array(
+			$mod->Lang('option_never')=>'n',
+			$mod->Lang('option_user_choice')=>'c',
+			$mod->Lang('option_always')=>'a');
+		$ret['main'][] = array($mod->Lang('title_send_user_copy'),
+			$mod->CreateInputDropdown($id,'opt_send_user_copy',$choices,-1,
+				$this->GetOption('send_user_copy','n')));
+		$ret['main'][] = array($mod->Lang('title_send_user_label'),
+			$mod->CreateInputText($id,'opt_send_user_label',
+				$this->GetOption('send_user_label',$mod->Lang('title_send_me_a_copy')),25,125));
+		$choices = array(
+			$mod->Lang('option_from')=>'f',
+			$mod->Lang('option_reply')=>'r',
+			$mod->Lang('option_both')=>'b');
+		$ret['main'][] = array($mod->Lang('title_headers_to_modify'),
+			$mod->CreateInputDropdown($id,'opt_headers_to_modify',$choices,-1,
+				$this->GetOption('headers_to_modify','f')));
+		return $ret;
+	}
+
+	function PostPopulateAdminForm(&$mainArray,&$advArray)
+	{
+		$this->RemoveAdminField($mainArray,$this->formdata->formsmodule->Lang('title_email_from_address'));
+	}
+
+	function ModifyOtherFields()
+	{
+		if($this->Value !== FALSE)
+		{
+			$htm = $this->GetOption('headers_to_modify','f');
+			foreach($this->formdata->Fields as &$one)
+			{
+				if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
+				{
+					if($htm == 'f' || $htm == 'b')
+						$one->SetOption('email_from_address',$this->Value[0]);
+					if($htm == 'r' || $htm == 'b')
+						$one->SetOption('email_reply_to_address',$this->Value[0]);
+				}
+			}
+			unset($one);
+		}
+	}
+
 	function GetFieldInput($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
@@ -98,81 +146,31 @@ class pwfUserEmail extends pwfEmailBase
 		return $ret;
 	}
 
-	function PrePopulateAdminForm($module_id)
-	{
-		$mod = $this->formdata->formsmodule;
-		$ret = $this->PrePopulateAdminFormCommonEmail($module_id);
-		$opts = array(
-			$mod->Lang('option_never')=>'n',
-			$mod->Lang('option_user_choice')=>'c',
-			$mod->Lang('option_always')=>'a');
-		$ret['main'][] = array($mod->Lang('title_send_user_copy'),
-			$mod->CreateInputDropdown($module_id,'opt_send_user_copy',$opts,-1,
-				$this->GetOption('send_user_copy','n')));
-		$ret['main'][] = array($mod->Lang('title_send_user_label'),
-			$mod->CreateInputText($module_id,'opt_send_user_label',
-				$this->GetOption('send_user_label',$mod->Lang('title_send_me_a_copy')),25,125));
-		$hopts = array(
-			$mod->Lang('option_from')=>'f',
-			$mod->Lang('option_reply')=>'r',
-			$mod->Lang('option_both')=>'b');
-		$ret['main'][] = array($mod->Lang('title_headers_to_modify'),
-			$mod->CreateInputDropdown($module_id,'opt_headers_to_modify',$hopts,-1,
-				$this->GetOption('headers_to_modify','f')));
-		return $ret;
-	}
-
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		$mod = $this->formdata->formsmodule;
-		$this->RemoveAdminField($mainArray,$mod->Lang('title_email_from_address'));
-	}
-
-	function ModifyOtherFields()
-	{
-		if($this->Value !== FALSE)
-		{
-			$htm = $this->GetOption('headers_to_modify','f');
-			foreach($this->formdata->Fields as &$one)
-			{
-				if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
-				{
-					if($htm == 'f' || $htm == 'b')
-						$one->SetOption('email_from_address',$this->Value[0]);
-
-					if($htm == 'r' || $htm == 'b')
-						$one->SetOption('email_reply_to_address',$this->Value[0]);
-				}
-			}
-			unset($one);
-		}
-	}
-
-	function Validate()
+	function Validate($id)
 	{
   		$this->validated = TRUE;
   		$this->ValidationMessage = '';
 		if($this->ValidationType != 'none')
 		{
-			$mod = $this->formdata->formsmodule;
 			if($this->Value)
 			{
-				if(!preg_match($mod->email_regex,$this->Value[0]))
+				list($rv,$msg) = $this->validateEmailAddr($this->Value);
+				if(!$rv)
 				{
 					$this->validated = FALSE;
-					$this->ValidationMessage = $mod->Lang('TODO bad email');
+					$this->ValidationMessage = $msg;
 				}
 			}
 			else
 			{
 				$this->validated = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_an_email',$this->Name);
+				$this->ValidationMessage = $this->formdata->formsmodule->Lang('please_enter_an_email',$this->Name);
 			}
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}
 
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
 		if($this->HasValue() &&
 		($this->GetOption('send_user_copy','n') == 'a' ||
@@ -186,7 +184,6 @@ class pwfUserEmail extends pwfEmailBase
 			return array(TRUE,'');
 		}
 	}
-
 
 }
 
