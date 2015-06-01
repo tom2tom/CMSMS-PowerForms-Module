@@ -7,53 +7,39 @@
 
 class pwfFieldsetEnd extends pwfFieldBase
 {
-	function __construct(&$formdata, &$params)
+	function __construct(&$formdata,&$params)
 	{
-		parent::__construct($formdata, $params);
-		$this->Type = 'FieldsetEnd';
-		$this->DisplayInForm = true;
-		$this->DisplayInSubmission = false;
-		$this->NonRequirableField = true;
-		$this->ValidationTypes = array();
+		parent::__construct($formdata,$params);
+		$this->DisplayInSubmission = FALSE;
 		$this->HasLabel = 0;
+		$this->IsSortable = FALSE;
 		$this->NeedsDiv = 0;
-		$this->sortable = false;
+		$this->NonRequirableField = TRUE;
+		$this->Type = 'FieldsetEnd';
 	}
 
-	function GetFieldInput($id, &$params, $returnid)
+	function GetFieldInput($id,&$params)
 	{
 		return '</fieldset>';
 	}
 
-	function StatusInfo()
+	function GetHumanReadableValue($as_string=TRUE)
 	{
-		return '';
-	}
-
-	function GetHumanReadableValue($as_string=true)
-	{
-		// there's nothing human readable about a fieldset.
 		$ret = '[End Fieldset: '.$this->Value.']';
 		if($as_string)
-		{
 			return $ret;
-		}
 		else
-		{
 			return array($ret);
-		}
 	}
 
-	function PrePopulateAdminForm($formDescriptor)
+	function PrePopulateAdminForm($module_id)
 	{
 		return array();
 	}
 
-	function PostPopulateAdminForm(&$mainArray, &$advArray)
+	function PostPopulateAdminForm(&$mainArray,&$advArray)
 	{
-		$mod = $this->formdata->pwfmodule;
-		$this->RemoveAdminField($advArray, $mod->Lang('title_field_javascript'));
-		$this->CheckForAdvancedTab($advArray);
+		$this->OmitAdminCommon($mainArray,$advArray);
 	}
 
 }

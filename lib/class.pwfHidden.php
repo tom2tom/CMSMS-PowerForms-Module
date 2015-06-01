@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfHiddenField extends pwfFieldBase
+class pwfHidden extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
 	{
@@ -13,39 +13,8 @@ class pwfHiddenField extends pwfFieldBase
 		$this->HasLabel = 0;
 		$this->NeedsDiv = 0;
 		$this->NonRequirableField = TRUE;
-		$this->Type = 'HiddenField';
+		$this->Type = 'Hidden';
 		$this->IsSortable = FALSE;
-	}
-
-	function GetFieldInput($id,&$params)
-	{
-		$mod = $this->formdata->formsmodule;
-
-		if($this->Value !== FALSE)
-		{
-			$v = $this->Value;
-		}
-		else
-		{
-			$v = $this->GetOption('value');
-		}
-
-		if($this->GetOption('smarty_eval','0') == '1')
-		{
-			//process without cacheing
-			$v = $mod->ProcessTemplateFromData($v);
-		}
-
-		if($this->GetOption('browser_edit','0') == '1' && $params['in_admin'] == 1)
-		{
-			$type = 'text';
-		}
-		else
-		{
-			$type = 'hidden';
-		}
-
-		return '<input type="'.$type.'" name="'.$id.'pwfp_'.$this->Id.'" value="'.$v.'"'.$this->GetCSSIdTag().' />';
 	}
 
 	function PrePopulateAdminForm($module_id)
@@ -72,7 +41,27 @@ class pwfHiddenField extends pwfFieldBase
 	{
 		$this->OmitAdminCommon($mainArray,$advArray); //TODO hidden field may use logic?
 	}
-	
+
+	function GetFieldInput($id,&$params)
+	{
+		$mod = $this->formdata->formsmodule;
+
+		if($this->Value !== FALSE)
+			$val = $this->Value;
+		else
+			$val = $this->GetOption('value');
+
+		if($this->GetOption('smarty_eval',0))
+			$val = $mod->ProcessTemplateFromData($val);
+
+		if($this->GetOption('browser_edit',0) && !empty($params['in_admin'])) //TODO deprecated
+			$type = 'text';
+		else
+			$type = 'hidden';
+
+		return '<input type="'.$type.'" name="'.$id.$this->formdata->current_prefix.$this->Id.'" value="'.$val.'"'.$this->GetCSSIdTag().' />';
+	}
+
 }
 
 ?>

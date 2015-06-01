@@ -5,73 +5,20 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfFileUploadField extends pwfFieldBase
+class pwfFileUpload extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->Type = 'FileUploadField';
+		$this->IsSortable = FALSE;
+		$this->Type = 'FileUpload';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array($mod->Lang('validation_none')=>'none');
-		$this->IsSortable = FALSE;
 	}
 
-	function GetFieldInput($id,&$params)
-	{
-		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
-		$txt = '';
-		if($this->Value)
-			$txt .= $this->GetHumanReadableValue().'<br />';	// Value line
-		$txt .= $mod->CreateFileUploadInput($id,'pwfp_'.$this->Id,$js.$this->GetCSSIdTag()); // Input line
-		if($this->Value)
-			$txt .= $mod->CreateInputCheckbox($id,'pwfp_delete__'.$this->Id,-1). //TODO is this used?
-			'&nbsp;'.$mod->Lang('delete').'<br />'; // Delete line
-
-		// Extras
-		if($this->GetOption('show_details','0') == '1')
-		{
-			$ms = $this->GetOption('max_size');
-			if($ms)
-				$txt .= ' '.$mod->Lang('maximum_size').': '.$ms.'kB';
-			$exts = $this->GetOption('permitted_extensions');
-			if($exts)
-				$txt .= ' '.$mod->Lang('permitted_extensions') . ': '.$exts;
-
-		}
-		return $txt;
-	}
-
-	function Load($id,&$params,$loadDeep=FALSE)
-	{
-		$mod = $this->formdata->formsmodule;
-		parent::Load($id,$params,$loadDeep);
-
-TODO ID		if(isset($_FILES) && isset($_FILES['m1_pwfp__'.$this->Id]) && $_FILES['m1_pwfp__'.$this->Id]['size'] > 0)
-		{
-			// Okay,a file was uploaded
-			$this->SetValue($_FILES['m1_pwfp__'.$this->Id]['name']);
-		}
-	}
-
-/* TODO
-		// Ryan's ugly fix for Bug 4307
-		// We should figure out why this field wasn't populating its Smarty variable
-		if($one->GetFieldType() == 'FileUploadField') //TODO
-		{
-			$smarty->assign('fld_'.$one->GetId(),$one->GetHumanReadableValue());
-			$hidden .= $this->CreateInputHidden($id,
-				$testIndex,
-				pwfUtils::unmy_htmlentities($one->GetHumanReadableValue()));
-			$thisAtt = $one->GetHumanReadableValue(FALSE);
-			$smarty->assign('test_'.$one->GetId(),$thisAtt);
-			$smarty->assign('value_fld'.$one->GetId(),$thisAtt[0]);
-		}
-
-*/
 	function GetHumanReadableValue($as_string=TRUE)
 	{
-		if($this->GetOption('suppress_filename','0'))
+		if($this->GetOption('suppress_filename',0))
 			return '';
 		if($as_string && is_array($this->Value) && isset($this->Value[1]))
 			return $this->Value[1];
@@ -82,6 +29,10 @@ TODO ID		if(isset($_FILES) && isset($_FILES['m1_pwfp__'.$this->Id]) && $_FILES['
 	function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
+		$ud = pwfUtils::GetUploadsPath();
+		if(!$ud)
+			return $mod->Lang('TODO no uploads');
+
 		$ms = $this->GetOption('max_size');
 		$exts = $this->GetOption('permitted_extensions');
 		$ret = '';
@@ -89,9 +40,10 @@ TODO ID		if(isset($_FILES) && isset($_FILES['m1_pwfp__'.$this->Id]) && $_FILES['
 			$ret .= $mod->Lang('maximum_size').': '.$ms.'kb,';
 		if($exts)
 			$ret .= $mod->Lang('permitted_extensions') . ': '.$exts.',';
-		if($this->GetOption('file_destination'))
-			$ret .= $this->GetOption('file_destination');
-		if($this->GetOption('allow_overwrite','0') != '0')
+//		if($this->GetOption('file_destination'))
+//			$ret .= $this->GetOption('file_destination');
+		$ret .= $ud;
+		if($this->GetOption('allow_overwrite',0))
 			$ret .= ' '.$mod->Lang('overwrite');
 		else
 			$ret .= ' '.$mod->Lang('nooverwrite');
@@ -155,11 +107,11 @@ TODO ID		if(isset($_FILES) && isset($_FILES['m1_pwfp__'.$this->Id]) && $_FILES['
 				'opt_remove_file','1',
 				$this->GetOption('remove_file','0')),
 				$mod->Lang('help_ignored_if_upload'));
-		$main[] = array($mod->Lang('title_file_destination'),
+/*		$main[] = array($mod->Lang('title_file_destination'),
 			$mod->CreateInputText($module_id,'opt_file_destination',
 				$this->GetOption('file_destination',$config['uploads_path']),60,255),
 				$mod->Lang('help_ignored_if_upload'));
-
+*/
 		if($uploads)
 		{
 			$categorylist = $uploads->getCategoryList();
@@ -176,6 +128,22 @@ TODO ID		if(isset($_FILES) && isset($_FILES['m1_pwfp__'.$this->Id]) && $_FILES['
 		}
 
 		return array('main'=>$main,'adv'=>$adv);
+	}
+
+	function Load($id,&$params,$loadDeep=FALSE)
+	{
+		$fname = FALSE;
+		if(isset($_FILES))
+		{
+			$key = 'm1_'.$this->formdata->current_prefix.$this->Id; //TODO m1_
+			if(!isset($_FILES[$key]))
+				$key = 'm1_'.$this->formdata->prior_prefix.$this->Id;
+			if(isset($_FILES[$key]) && $_FILES[$key]['size'] > 0) // file was uploaded
+				$fname = $_FILES[$key]['name'];
+		}
+		parent::Load($id,$params,$loadDeep);
+		if($fname)
+			$this->SetValue($fname);
 	}
 
 	function CreatePageDropdown($id,$name,$current='',$addtext='',$markdefault=TRUE)
@@ -202,17 +170,111 @@ TODO ID		if(isset($_FILES) && isset($_FILES['m1_pwfp__'.$this->Id]) && $_FILES['
 				$allpages = array($key.' (*)' => $defaultid) + $allpages;
 			}
 		}
-TODO MOD	return $mod->CreateInputDropdown($id,$name,$allpages,-1,$current,$addtext);
+		return $this->formdata->formsmodule->CreateInputDropdown($id,$name,$allpages,-1,$current,$addtext);
+	}
+
+	function GetFieldInput($id,&$params)
+	{
+		$mod = $this->formdata->formsmodule;
+		$js = $this->GetOption('javascript');
+		$txt = '';
+		if($this->Value)
+			$txt .= $this->GetHumanReadableValue().'<br />';	// Value line
+		$txt .= $mod->CreateFileUploadInput($id,$this->formdata->current_prefix.$this->Id,$js.$this->GetCSSIdTag()); // Input line
+		if($this->Value)
+			$txt .= $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.'delete__'.$this->Id,-1). //TODO is this used?
+				'&nbsp;'.$mod->Lang('delete').'<br />'; // Delete line
+
+		// Extras
+		if($this->GetOption('show_details','0') == '1')
+		{
+			$ms = $this->GetOption('max_size');
+			if($ms)
+				$txt .= ' '.$mod->Lang('maximum_size').': '.$ms.'kB';
+			$exts = $this->GetOption('permitted_extensions');
+			if($exts)
+				$txt .= ' '.$mod->Lang('permitted_extensions') . ': '.$exts;
+
+		}
+		return $txt;
+	}
+
+/* TODO
+	// Ryan's ugly fix for Bug 4307
+	// We should figure out why this field wasn't populating its Smarty variable
+	if($one->GetFieldType() == 'FileUpload') //TODO
+	{
+		$smarty->assign('fld_'.$one->GetId(),$one->GetHumanReadableValue());
+		$hidden .= $this->CreateInputHidden($id,
+			$testIndex,
+			pwfUtils::unmy_htmlentities($one->GetHumanReadableValue()));
+		$thisAtt = $one->GetHumanReadableValue(FALSE);
+		$smarty->assign('test_'.$one->GetId(),$thisAtt);
+		$smarty->assign('value_fld'.$one->GetId(),$thisAtt[0]);
+	}
+*/
+
+	function Validate()
+	{
+		$this->validated = TRUE;
+		$this->ValidationMessage = '';
+		$mod = $this->formdata->formsmodule;
+		$id = TODO; // m1_ is crap get real $id
+		$fullAlias = $id.$this->formdata->current_prefix.$this->Id;
+		if(empty($_FILES[$fullAlias]))
+			$fullAlias = $id.$this->formdata->prior_prefix.$this->Id;
+		if(empty($_FILES[$fullAlias]))
+		{
+			$this->validated = FALSE;
+			$this->ValidationMessage = $mod->Lang('TODO');
+			return array($this->validated,$this->ValidationMessage);
+		}
+		if($_FILES[$fullAlias]['size'] < 1 && ! $this->Required)
+			return array(TRUE,'');
+
+		$ms = $this->GetOption('max_size');
+		$exts = $this->GetOption('permitted_extensions');
+		if($_FILES[$fullAlias]['size'] < 1 && $this->Required)
+		{
+			$this->validated = FALSE;
+			$this->ValidationMessage = $mod->Lang('required_field_missing');
+		}
+		elseif($ms && $_FILES[$fullAlias]['size'] > ($ms * 1024))
+		{
+			$this->ValidationMessage = $mod->Lang('error_large_file'). ' '.$ms.'kb';//($ms * 1024).'kb'; // Stikki mods
+			$this->validated = FALSE;
+		}
+		elseif($exts)
+		{
+			$match = FALSE;
+			$legalExts = explode(',',$exts);
+			foreach($legalExts as $thisExt)
+			{
+				if(preg_match('/\.'.trim($thisExt).'$/i',$_FILES[$fullAlias]['name']))
+					$match = TRUE;
+				else if(preg_match('/'.trim($thisExt).'/i',$_FILES[$fullAlias]['type']))
+					$match = TRUE;
+			}
+			if(!$match)
+			{
+				$this->ValidationMessage = $mod->Lang('illegal_file_type');
+				$this->validated = FALSE;
+			}
+		}
+		return array($this->validated,$this->ValidationMessage);
 	}
 
 	/*
 	If the 'uploads' module is present,and the option is checked in the field,
-	then the file is added to the uploads module and a link is added to the results
-	If the option is not checked,then the file is uploaded to the "uploads" directory
+	then the file is added to the uploads module and a link is added to the results.
+	Otherwise, upload the file to the "uploads" directory.
 	*/
 	function DisposeForm($returnid)
 	{
-		$_id = 'm1_pwfp__'.$this->GetId();
+		$id = TODO; // m1_ is crap get real $id
+		$_id = $id.$this->formdata->current_prefix.$this->Id;
+		if(empty($_FILES[$_id]))
+			$_id = $id.$this->formdata->prior_prefix.$this->Id;
 		if(isset($_FILES[$_id]) && $_FILES[$_id]['size'] > 0)
 		{
 			$config = cmsms()->GetConfig();
@@ -233,7 +295,7 @@ TODO MOD	return $mod->CreateInputDropdown($id,$name,$allpages,-1,$current,$addte
 				$i = 0;
 				foreach($this->formdata->Fields as &$one)
 				{
-					$mapId[$one->GetId()] = $i;
+					$mapId[$one->Id] = $i;
 					$i++;
 				}
 				unset($one);
@@ -245,9 +307,9 @@ TODO MOD	return $mod->CreateInputDropdown($id,$name,$allpages,-1,$current,$addte
 				{
 					if(isset($mapId[$tF]))
 					{
-						$ref = $mapId[$tF];
+						$fid = $mapId[$tF];
 						$destination_name = str_replace('$fld_'.$tF,
-							 $this->Fields[$ref]->GetHumanReadableValue(),$destination_name);
+							 $this->formdata->Fields[$fid]->GetHumanReadableValue(),$destination_name);
 					}
 				}
 				$destination_name = str_replace('$ext',$thisExt,$destination_name);
@@ -260,8 +322,7 @@ TODO MOD	return $mod->CreateInputDropdown($id,$name,$allpages,-1,$current,$addte
 				if(!$uploads)
 				{
 					// no uploads module
-					audit(-1,$mod->GetName(),$mod->Lang('submit_error'),$mail->GetErrorInfo());
-					return array($res,$mod->Lang('error_module_upload'));
+					return array(FALSE,$mod->Lang('error_module_upload'));
 				}
 
 				$parms = array();
@@ -278,13 +339,12 @@ TODO MOD	return $mod->CreateInputDropdown($id,$name,$allpages,-1,$current,$addte
 
 				if($res[0] == FALSE)
 				{
-					// failed upload kills the send.
-					audit(-1,$mod->GetName(),$mod->Lang('submit_error',$res[1]));
-					return array($res[0],$mod->Lang('uploads_error',$res[1]));
+					// failed upload kills the send
+					return array(FALSE,$mod->Lang('uploads_error',$res[1]));
 				}
 
 				$uploads_destpage = $this->GetOption('uploads_destpage');
-				$url = $uploads->CreateLink ($parms['category_id'],'getfile',$uploads_destpage,'',
+				$url = $uploads->CreateLink($parms['category_id'],'getfile',$uploads_destpage,'',
 					array ('upload_id' => $res[1]),'',TRUE);
 
 				$url = str_replace('admin/moduleinterface.php?','index.php?',$url);
@@ -292,12 +352,14 @@ TODO MOD	return $mod->CreateInputDropdown($id,$name,$allpages,-1,$current,$addte
 				$this->ResetValue();
 				$this->SetValue($url);
 			}
-			else
+			else //we will upload
 			{
-				// Handle the upload ourselves
+				$ud = pwfUtils::GetUploadsPath();
+				if(!$ud)
+					return array(FALSE,'TODO');
+				
 				$src = $thisFile['tmp_name'];
-				$dest_path = $this->GetOption('file_destination',$config['uploads_path']);
-
+				//$dest_path = $this->GetOption('file_destination',$config['uploads_path']);
 				// validated message before,now do it for the file itself
 				$valid = TRUE;
 				$ms = $this->GetOption('max_size');
@@ -306,7 +368,7 @@ TODO MOD	return $mod->CreateInputDropdown($id,$name,$allpages,-1,$current,$addte
 				{
 					$valid = FALSE;
 				}
-				else if($exts)
+				elseif($exts)
 				{
 					$match = FALSE;
 					$legalExts = explode(',',$exts);
@@ -326,28 +388,27 @@ TODO MOD	return $mod->CreateInputDropdown($id,$name,$allpages,-1,$current,$addte
 						$valid = FALSE;
 					}
 				}
+
 				if(!$valid)
 				{
 					unlink($src);
-					audit(-1,$mod->GetName(),$mod->Lang('illegal_file',array($thisFile['name'],$_SERVER['REMOTE_ADDR'])));
-					return array(FALSE,'');
+					return array(FALSE,$mod->Lang('illegal_file',array($thisFile['name'],$_SERVER['REMOTE_ADDR'])));
 				}
-				$dest = $dest_path.DIRECTORY_SEPARATOR.$destination_name;
-				if(file_exists($dest) && $this->GetOption('allow_overwrite','0')=='0')
+
+				$dest = $$ud.DIRECTORY_SEPARATOR.$destination_name;
+				if(file_exists($dest) && !$this->GetOption('allow_overwrite',0))
 				{
 					unlink($src);
 					return array(FALSE,$mod->Lang('error_file_exists',array($destination_name)));
 				}
-				if(!move_uploaded_file($src,$dest))
+
+				if(move_uploaded_file($src,$dest))
 				{
-					audit(-1,$mod->GetName(),$mod->Lang('submit_error',''));
-					return array(FALSE,$mod->Lang('uploads_error',''));
-				}
-				else
-				{
-					if(strpos($dest_path,$config['root_path']) !== FALSE)
+/*
+//$TODO $config = ?
+					if(strpos($ud,$config['root_path']) !== FALSE)
 					{
-						$url = str_replace($gCms->config['root_path'],'',$dest_path).DIRECTORY_SEPARATOR.$destination_name;
+						$url = str_replace($config['root_path'],'',$ud).DIRECTORY_SEPARATOR.$destination_name;
 					}
 					else
 					{
@@ -355,6 +416,11 @@ TODO MOD	return $mod->CreateInputDropdown($id,$name,$allpages,-1,$current,$addte
 					}
 					//$this->ResetValue();
 					//$this->SetValue(array($dest,$url));
+*/
+				}
+				else
+				{
+					return array(FALSE,$mod->Lang('uploads_error',''));
 				}
 			}
 		}
@@ -364,60 +430,15 @@ TODO MOD	return $mod->CreateInputDropdown($id,$name,$allpages,-1,$current,$addte
 
 	function PostDispositionAction()
 	{
-		if($this->GetOption('remove_file','0') == '1')
+		if($this->GetOption('remove_file',0))
 		{
 			if(is_array($this->Value))
 			{
 				$dest = $this->Value[0];
-				if(file_exists($dest))
-				{
+				if(is_file($dest))
 					unlink($dest);
-				}
 			}
 		}
-	}
-
-	function Validate()
-	{
-		$this->validated = TRUE;
-		$this->ValidationMessage = '';
-		$ms = $this->GetOption('max_size');
-		$exts = $this->GetOption('permitted_extensions');
-		$mod = $this->formdata->formsmodule;
-		//$fullAlias = $this->GetValue(); -- Stikki modifys: Now gets correct alias
-		$fullAlias = 'm1_pwfp__'.$this->Id;
-		if($_FILES[$fullAlias]['size'] < 1 && ! $this->Required)
-		{
-			return array(TRUE,'');
-		}
-		if($_FILES[$fullAlias]['size'] < 1 && $this->Required)
-		{
-			$this->validated = FALSE;
-			$this->ValidationMessage = $mod->Lang('required_field_missing');
-		}
-		else if($ms && $_FILES[$fullAlias]['size'] > ($ms * 1024))
-		{
-			$this->ValidationMessage = $mod->Lang('error_large_file'). ' '.$ms.'kb';//($ms * 1024).'kb'; // Stikki mods
-			$this->validated = FALSE;
-		}
-		else if($exts)
-		{
-			$match = FALSE;
-			$legalExts = explode(',',$exts);
-			foreach($legalExts as $thisExt)
-			{
-				if(preg_match('/\.'.trim($thisExt).'$/i',$_FILES[$fullAlias]['name']))
-					$match = TRUE;
-				else if(preg_match('/'.trim($thisExt).'/i',$_FILES[$fullAlias]['type']))
-					$match = TRUE;
-			}
-			if(!$match)
-			{
-				$this->ValidationMessage = $mod->Lang('illegal_file_type');
-				$this->validated = FALSE;
-			}
-		}
-		return array($this->validated,$this->ValidationMessage);
 	}
 
 }

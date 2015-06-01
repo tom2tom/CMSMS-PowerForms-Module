@@ -7,69 +7,55 @@
 
 class pwfFieldsetStart extends pwfFieldBase
 {
-	function __construct(&$formdata, &$params)
+	function __construct(&$formdata,&$params)
 	{
-		parent::__construct($formdata, $params);
-		$this->Type = 'FieldsetStart';
-		$this->DisplayInForm = true;
-		$this->DisplayInSubmission = false;
-		$this->NonRequirableField = true;
-		$this->ValidationTypes = array();
+		parent::__construct($formdata,$params);
+		$this->DisplayInSubmission = FALSE;
 		$this->HasLabel = 0;
+		$this->IsSortable = FALSE;
 		$this->NeedsDiv = 0;
-		$this->sortable = false;
+		$this->NonRequirableField = TRUE;
+		$this->Type = 'FieldsetStart';
 	}
 
-	function GetFieldInput($id, &$params, $returnid)
+	function GetHumanReadableValue($as_string=TRUE)
 	{
-		$js = $this->GetOption('javascript','');
-		$str = '<fieldset';
-		$class = $this->GetOption('css_class');
-		$legend = $this->GetOption('legend');
-		$str .= $this->GetCSSIdTag();
-		if($class != '')
-		{
-			$str .= " class=\"$class\"";
-		}
-		if($js != '')
-		{
-			$str .= ' '.$js;
-		}
-		$str .= '>';
-		if($legend != '')
-		{
-			$str .= '<legend>'.$legend.'</legend>';
-		}
-		return $str;
-	}
-
-	function StatusInfo()
-	{
-		return '';
-	}
-
-	function GetHumanReadableValue($as_string=true)
-	{
-		// there's nothing human readable about a fieldset.
 		$ret = '[Begin Fieldset: '.$this->Value.']';
 		if($as_string)
-		{
 			return $ret;
-		}
 		else
-		{
 			return array($ret);
-		}
 	}
 
-	function PrePopulateAdminForm($formDescriptor)
+	function PrePopulateAdminForm($module_id)
 	{
-		$mod = $this->formdata->pwfmodule;
+		$mod = $this->formdata->formsmodule;
 		$main = array(
 			  array($mod->Lang('title_legend'),
-					$mod->CreateInputText($formDescriptor,'pwfp_opt_legend',
-					  $this->GetOption('legend',''), 50)));
+					$mod->CreateInputText($module_id,'opt_legend',
+					  $this->GetOption('legend'),50)));
 		return array('main'=>$main);
+	}
+
+	function PostPopulateAdminForm(&$mainArray,&$advArray)
+	{
+		$this->OmitAdminCommon($mainArray,$advArray);
+	}
+
+	function GetFieldInput($id,&$params)
+	{
+		$str = '<fieldset'.$this->GetCSSIdTag();
+		$opt = $this->GetOption('css_class');
+		if($opt)
+			$str .= ' class="'.$opt.'"';
+		$opt = $this->GetOption('javascript');
+		if($opt)
+			$str .= ' '.$opt;
+		$str .= '>';
+		$opt = $this->GetOption('legend');
+		if($opt)
+			$str .= '<legend>'.$opt.'</legend>';
+		return $str;
 	}
 
 }
