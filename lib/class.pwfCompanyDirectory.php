@@ -189,7 +189,7 @@ class pwfCompanyDirectory extends pwfFieldBase
 		return ''; // error
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$CompanyDirectory = $mod->GetModuleInstance('CompanyDirectory');
@@ -232,10 +232,10 @@ class pwfCompanyDirectory extends pwfFieldBase
 		$main = array(
 				array($mod->Lang('help_company_field'),''),
 				array($mod->Lang('title_pick_categories'),
-					$mod->CreateInputSelectList($module_id,'opt_Category',$Categories,$CategorySelected,5,'',TRUE)
+					$mod->CreateInputSelectList($id,'opt_Category',$Categories,$CategorySelected,5,'',TRUE)
 				),
 				array($mod->Lang('title_pick_fielddef'),
-					$mod->CreateInputSelectList($module_id,'opt_FieldDefs',$FieldDefs,$FieldDefsSelected,5,'',FALSE)
+					$mod->CreateInputSelectList($id,'opt_FieldDefs',$FieldDefs,$FieldDefsSelected,5,'',FALSE)
 				)
 		);
 		$choices = array($mod->Lang('option_dropdown')=>'Dropdown',
@@ -245,7 +245,7 @@ class pwfCompanyDirectory extends pwfFieldBase
 			  );
 		$adv = array(
 				array($mod->Lang('title_choose_user_input'),
-					$mod->CreateInputDropdown ($module_id,'opt_UserInput',$choices,'-1',$this->GetOption('UserInput'))
+					$mod->CreateInputDropdown ($id,'opt_UserInput',$choices,'-1',$this->GetOption('UserInput'))
 				)
 		);
 		return array('main'=>$main,'adv'=>$adv);

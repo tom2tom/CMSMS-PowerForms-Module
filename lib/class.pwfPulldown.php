@@ -120,7 +120,7 @@ class pwfPulldown extends pwfFieldBase
 		return $this->formdata->formsmodule->Lang('options',$num);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 
@@ -132,10 +132,10 @@ class pwfPulldown extends pwfFieldBase
 		}
 		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
-			$mod->CreateInputText($module_id,'opt_select_one',
+			$mod->CreateInputText($id,'opt_select_one',
 			  $this->GetOption('select_one',$mod->Lang('select_one')),25,128));
 		$main[] = array($mod->Lang('sort_options'),
-			$mod->CreateInputDropdown($module_id,'opt_sort',
+			$mod->CreateInputDropdown($id,'opt_sort',
 			  array($mod->Lang('yes')=>1,$mod->Lang('no')=>0),-1,
 			  $this->GetOption('sort',0)));
 //		$main[] = array($mod->Lang('title_pulldown_details'),$dests);
@@ -149,9 +149,9 @@ class pwfPulldown extends pwfFieldBase
 		for ($i=0; $i<$num; $i++)
 		{
 			$dests[] = array(
-			$mod->CreateInputText($module_id,'opt_option_name[]',$this->GetOptionElement('option_name',$i),30,128),
-			$mod->CreateInputText($module_id,'opt_option_value[]',$this->GetOptionElement('option_value',$i),30,128),
-			$mod->CreateInputCheckbox($module_id,'sel_'.$i,$i,-1,'style="margin-left:1em;"')
+			$mod->CreateInputText($id,'opt_option_name[]',$this->GetOptionElement('option_name',$i),30,128),
+			$mod->CreateInputText($id,'opt_option_value[]',$this->GetOptionElement('option_value',$i),30,128),
+			$mod->CreateInputCheckbox($id,'sel_'.$i,$i,-1,'style="margin-left:1em;"')
 			);
 		}
 		return array('main'=>$main,'table'=>$dests);

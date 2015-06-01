@@ -25,7 +25,7 @@ class pwfHTML5Email extends pwfFieldBase
 		'" '.$js.$cssid.' />';
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		//TODO
 	}

@@ -16,6 +16,15 @@ class pwfButton extends pwfFieldBase
 		$this->Type = 'Button';
 	}
 
+	function PrePopulateAdminForm($id)
+	{
+		$mod = $this->formdata->formsmodule;
+		$main = array(
+			array($mod->Lang('title_button_text'),
+			$mod->CreateInputText($id,'opt_text',$this->GetOption('text'),40)));
+		return array('main'=>$main);
+	}
+
 	function GetFieldInput($id,&$params)
 	{
 		$js = $this->GetOption('javascript');
@@ -25,14 +34,6 @@ class pwfButton extends pwfFieldBase
 		'" value="'.$this->GetOption('text').'" '.$js.$cssid.' />';
 	}
 
-	function PrePopulateAdminForm($module_id)
-	{
-		$mod = $this->formdata->formsmodule;
-		$main = array(
-			array($mod->Lang('title_button_text'),
-			$mod->CreateInputText($module_id,'opt_text',$this->GetOption('text'),40)));
-		return array('main'=>$main);
-	}
 }
 
 ?>

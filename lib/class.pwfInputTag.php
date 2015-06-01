@@ -5,6 +5,8 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
+//This class supplies content from a UDT
+
 class pwfInputTag extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
@@ -13,6 +15,7 @@ class pwfInputTag extends pwfFieldBase
 		$this->DisplayInSubmission = FALSE;
 		$this->IsSortable = FALSE;
 		$this->NonRequirableField = TRUE;
+//		$this->NeedsDiv = FALSE;
 		$this->Type = 'InputTag';
 	}
 
@@ -21,7 +24,7 @@ class pwfInputTag extends pwfFieldBase
 		return $this->GetOption('udtname',$this->formdata->formsmodule->Lang('unspecified'));
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$usertagops = cmsms()->GetUserTagOperations();
 		$usertags = $usertagops->ListUserTags();
@@ -32,11 +35,11 @@ class pwfInputTag extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		$main = array();
 		$main[] = array($mod->Lang('title_udt_name'),
-			$mod->CreateInputDropdown($module_id,'opt_udtname',$usertaglist,-1,
+			$mod->CreateInputDropdown($id,'opt_udtname',$usertaglist,-1,
 			  $this->GetOption('udtname')));
 		$main[] = array($mod->Lang('title_export_form_to_udt'),
-			$mod->CreateInputHidden($module_id,'opt_export_form',0).
-			$mod->CreateInputCheckbox($module_id,'opt_export_form',1,
+			$mod->CreateInputHidden($id,'opt_export_form',0).
+			$mod->CreateInputCheckbox($id,'opt_export_form',1,
 				$this->GetOption('export_form',0)));
 		return array('main'=>$main);
 	}

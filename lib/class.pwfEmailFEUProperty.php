@@ -50,7 +50,7 @@ class pwfEmailFEUProperty extends pwfEmailBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$feu = $mod->GetModuleInstance('FrontEndUsers');
@@ -93,12 +93,12 @@ class pwfEmailFEUProperty extends pwfEmailBase
 			$mod->Lang('error_feudefns'))));
 		}
 //TODO
-		$ret = $this->PrePopulateAdminFormCommonEmail($module_id,TRUE);
+		$ret = $this->PrePopulateAdminFormCommonEmail($id,TRUE);
 		$main = $ret['main']; //assume it's there
 		$waslast = array_pop($main); //keep the email to-type selector for last
 		$keys = array_keys($opts);
 		$main[] = array($mod->Lang('title_feu_property'),
-				$mod->CreateInputDropdown($module_id,'opt_feu_property',
+				$mod->CreateInputDropdown($id,'opt_feu_property',
 						   array_flip($opts),-1,
 						   $this->GetOption('feu_property',$keys[0])),
 				$mod->Lang('help_feu_property'));
@@ -135,7 +135,7 @@ class pwfEmailFEUProperty extends pwfEmailBase
 		return $res;
 	}
 
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
 		$mod = $this->formdata->formsmodule;
 		$feu = $mod->GetModuleInstance('FrontEndUsers');

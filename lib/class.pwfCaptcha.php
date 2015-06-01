@@ -68,7 +68,7 @@ class pwfCaptcha extends pwfFieldBase
 		return $this->ValidationMessage;
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$main = array();
 		$mod = $this->formdata->formsmodule;
@@ -77,19 +77,19 @@ class pwfCaptcha extends pwfFieldBase
 		{
 			unset($captcha);
 			$main[] = array($mod->Lang('title_captcha_prompt'),
-				$mod->CreateInputText($module_id,'opt_prompt',
+				$mod->CreateInputText($id,'opt_prompt',
 					$this->GetOption('prompt',$mod->Lang('captcha_prompt')),60,120));
 			$main[] = array($mod->Lang('title_captcha_wrong'),
-				$mod->CreateInputText($module_id,'opt_wrongtext',
+				$mod->CreateInputText($id,'opt_wrongtext',
 					$this->GetOption('wrongtext',$mod->Lang('captcha_wrong')),60,120));
 
 			$adv[] = array($mod->Lang('title_captcha_label'),
-				$mod->CreateInputHidden($module_id,'opt_aslabel',0).
-				$mod->CreateInputCheckbox($module_id,'opt_aslabel',1,$this->GetOption('aslabel',0)),
+				$mod->CreateInputHidden($id,'opt_aslabel',0).
+				$mod->CreateInputCheckbox($id,'opt_aslabel',1,$this->GetOption('aslabel',0)),
 				$mod->Lang('help_captcha_label')
 				);
 			$adv[] = array($mod->Lang('title_captcha_template'),
-				$mod->CreateTextArea(FALSE,$module_id,$this->GetOption('captcha_template',$this->defaulttemplate),
+				$mod->CreateTextArea(FALSE,$id,$this->GetOption('captcha_template',$this->defaulttemplate),
 					'opt_captcha_template','pwf_shortarea','','','',50,5),
 				$mod->Lang('help_captcha_template')
 				);
@@ -111,10 +111,10 @@ class pwfCaptcha extends pwfFieldBase
 		unset($advArray[3]); //no field logic
 	}
 
-	function AdminValidate()
+	function AdminValidate($id)
 	{
 		$messages = array();
-  		list($ret,$msg) = parent::AdminValidate();
+  		list($ret,$msg) = parent::AdminValidate($id);
 		if(!ret)
 			$messages[] = $msg;
 		$opt = $this->GetOption('captcha_template');
@@ -139,7 +139,7 @@ class pwfCaptcha extends pwfFieldBase
     	return array($ret,$msg);
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		//now it's safe to restore fieldname
 		if($this->RealName)

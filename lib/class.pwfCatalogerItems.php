@@ -207,7 +207,7 @@ class pwfCatalogerItems extends pwfFieldBase
 		return ''; // error
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$main = array();
 		$mod = $this->formdata->formsmodule;
@@ -215,11 +215,11 @@ class pwfCatalogerItems extends pwfFieldBase
 		if($cataloger)
 		{
 			$main[] = array($mod->Lang('title_field_height'),
-					 $mod->CreateInputText($module_id,'opt_lines',$this->GetOption('lines','5'),3,3),
+					 $mod->CreateInputText($id,'opt_lines',$this->GetOption('lines','5'),3,3),
 					 $mod->Lang('help_field_height'));
 
 			$main[] = array($mod->Lang('title_name_regex'),
-					 $mod->CreateInputText($module_id,'opt_nameregex',$this->GetOption('nameregex'),25,25),
+					 $mod->CreateInputText($id,'opt_nameregex',$this->GetOption('nameregex'),25,25),
 					 $mod->Lang('help_name_regex'));
 
 			$main[] = array('','',$mod->Lang('help_cataloger_attribute_fields'));
@@ -231,7 +231,7 @@ class pwfCatalogerItems extends pwfFieldBase
 				{
 					$safeattr = strtolower(preg_replace('/\W/','',$one->attr));
 					$main[] = array($one->attr,
-						 $mod->CreateInputText($module_id,'opt_attr_'.$safeattr,$this->GetOption('attr_'.$safeattr),30,80));
+						 $mod->CreateInputText($id,'opt_attr_'.$safeattr,$this->GetOption('attr_'.$safeattr),30,80));
 				}
 			}
 			unset($one);

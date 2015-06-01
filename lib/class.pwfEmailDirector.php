@@ -96,7 +96,7 @@ class pwfEmailDirector extends pwfEmailBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 
@@ -107,13 +107,13 @@ class pwfEmailDirector extends pwfEmailBase
 			$this->addressAdd = 0;
 		}
 
-		$ret = $this->PrePopulateAdminFormCommonEmail($module_id);
+		$ret = $this->PrePopulateAdminFormCommonEmail($id);
 		$ret['main'][] = array($mod->Lang('title_select_one_message'),
-			$mod->CreateInputText($module_id,'opt_select_one',
+			$mod->CreateInputText($id,'opt_select_one',
 			$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
 		$ret['main'][] = array($mod->Lang('title_allow_subject_override'),
-			$mod->CreateInputHidden($module_id,'opt_subject_override',0).
-			$mod->CreateInputCheckbox($module_id,'opt_subject_override',1,
+			$mod->CreateInputHidden($id,'opt_subject_override',0).
+			$mod->CreateInputCheckbox($id,'opt_subject_override',1,
 				$this->GetOption('subject_override',0)),
 			$mod->Lang('help_allow_subject_override'));
 //		$ret['main'][] = array($mod->Lang('title_director_details'),$dests);
@@ -127,11 +127,11 @@ class pwfEmailDirector extends pwfEmailBase
 		for($i=0; $i<$num; $i++)
 		{
 			$dests[] = array(
-			$mod->CreateInputText($module_id,'opt_destination_subject[]',
+			$mod->CreateInputText($id,'opt_destination_subject[]',
 				$this->GetOptionElement('destination_subject',$i),40,128),
-			$mod->CreateInputText($module_id,'opt_destination_address[]',
+			$mod->CreateInputText($id,'opt_destination_address[]',
 				$this->GetOptionElement('destination_address',$i),50,128),
-			$mod->CreateInputCheckbox($module_id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
+			$mod->CreateInputCheckbox($id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
 			);
 		}
 		$ret['table'] = $dests;
@@ -150,10 +150,10 @@ class pwfEmailDirector extends pwfEmailBase
 		$this->PostAdminSubmitCleanupEmail($params);
 	}
 
-	function AdminValidate()
+	function AdminValidate($id)
 	{
 		$messages = array();
-  		list($ret,$msg) = parent::AdminValidate();
+  		list($ret,$msg) = parent::AdminValidate($id);
 		if(!ret)
 			$messages[] = $msg;
 	
@@ -213,7 +213,7 @@ class pwfEmailDirector extends pwfEmailBase
 		return $mod->CreateInputDropdown($id,'pwfp_'.$this->Id,$sorted,-1,$this->Value,$js.$this->GetCSSIdTag());
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		if($this->Value)
 		{
@@ -228,7 +228,7 @@ class pwfEmailDirector extends pwfEmailBase
 		return array($this->validated,$this->ValidationMessage);
 	}
 
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
 		if($this->GetOption('subject_override',0) && $this->GetOption('email_subject'))
 			$subject = $this->GetOption('email_subject');

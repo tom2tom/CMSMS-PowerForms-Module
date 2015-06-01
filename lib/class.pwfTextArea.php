@@ -68,7 +68,7 @@ EOS;
 		return $ret;
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		$this->validated = TRUE;
 		$this->ValidationMessage = '';
@@ -106,30 +106,30 @@ EOS;
 	}
 
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 	   $mod = $this->formdata->formsmodule;
 	   $main = array(
 			array($mod->Lang('title_use_wysiwyg'),
-				$mod->CreateInputHidden($module_id,'opt_wysiwyg','0').
-				$mod->CreateInputCheckbox($module_id,'opt_wysiwyg','1',$this->GetOption('wysiwyg','0'))),
+				$mod->CreateInputHidden($id,'opt_wysiwyg','0').
+				$mod->CreateInputCheckbox($id,'opt_wysiwyg','1',$this->GetOption('wysiwyg','0'))),
 			array($mod->Lang('title_textarea_rows'),
-				$mod->CreateInputText($module_id,'opt_rows',$this->GetOption('rows','15'),5,5)),
+				$mod->CreateInputText($id,'opt_rows',$this->GetOption('rows','15'),5,5)),
 			array($mod->Lang('title_textarea_cols'),
-				$mod->CreateInputText($module_id,'opt_cols',$this->GetOption('cols','80'),5,5)),
+				$mod->CreateInputText($id,'opt_cols',$this->GetOption('cols','80'),5,5)),
 			array($mod->Lang('title_textarea_length'),
-				$mod->CreateInputText($module_id,'opt_length',$this->GetOption('length'),5,5))
+				$mod->CreateInputText($id,'opt_length',$this->GetOption('length'),5,5))
            );
 
 	   $adv = array(
 			array($mod->Lang('title_field_default_value'),
-				$mod->CreateTextArea(FALSE,$module_id,$this->GetOption('default'),'opt_default')),
+				$mod->CreateTextArea(FALSE,$id,$this->GetOption('default'),'opt_default')),
 			array($mod->Lang('title_html5'),
-				$mod->CreateInputHidden($module_id,'opt_html5','0').
-				$mod->CreateInputCheckbox($module_id,'opt_html5','1',$this->GetOption('html5','0'))),
+				$mod->CreateInputHidden($id,'opt_html5','0').
+				$mod->CreateInputCheckbox($id,'opt_html5','1',$this->GetOption('html5','0'))),
 			array($mod->Lang('title_clear_default'),
-				$mod->CreateInputHidden($module_id,'opt_clear_default','0').
-				$mod->CreateInputCheckbox($module_id,'opt_clear_default','1',$this->GetOption('clear_default','0')),
+				$mod->CreateInputHidden($id,'opt_clear_default','0').
+				$mod->CreateInputCheckbox($id,'opt_clear_default','1',$this->GetOption('clear_default','0')),
 				$mod->Lang('help_clear_default'))
 		);
 

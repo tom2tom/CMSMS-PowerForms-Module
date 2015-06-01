@@ -107,9 +107,9 @@ class pwfSystemEmail extends pwfEmailBase
 			$this->addressCount = 0;
 	}
 
-	function GetDests($module_id,$row,$sel)
+	function GetDests($id,$row,$sel)
 	{
-		$id = cms_htmlentities($module_id);
+		$id = cms_htmlentities($id);
 		$name = $id.$this->formdata->current_prefix.'mailto_'.$row; //must be distinct for each address
 		$totypes = array ('to','cc','bc');
 		$btns = array();
@@ -126,7 +126,7 @@ class pwfSystemEmail extends pwfEmailBase
 		return $btns;
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 
@@ -138,7 +138,7 @@ class pwfSystemEmail extends pwfEmailBase
 			$this->addressAdd = FALSE;
 		}
 
-		$ret = $this->PrePopulateAdminFormCommonEmail($module_id);
+		$ret = $this->PrePopulateAdminFormCommonEmail($id);
 //		$ret['main'][] = array($mod->Lang('title_destination_address'),$dests);
 		$dests = array();
 		$dests[] = array(
@@ -171,14 +171,14 @@ class pwfSystemEmail extends pwfEmailBase
 			}
 			else
 				$totype = 'to';
-			$btns = self::GetDests($module_id,$i,$totype);
+			$btns = self::GetDests($id,$i,$totype);
 
 			$dests[] = array(
-			$mod->CreateInputText($module_id,'opt_destination_address[]',$addr,50,128),
+			$mod->CreateInputText($id,'opt_destination_address[]',$addr,50,128),
 			array_shift ($btns),
 			array_shift ($btns),
 			array_shift ($btns),
-			$mod->CreateInputCheckbox($module_id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
+			$mod->CreateInputCheckbox($id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
 			);
 		}
 		$ret['table']= $dests;
@@ -190,10 +190,10 @@ class pwfSystemEmail extends pwfEmailBase
 		$this->OmitAdminCommon($mainArray,$advArray);
 	}
 
-	function AdminValidate()
+	function AdminValidate($id)
 	{
 		$messages = array();
-  		list($ret,$msg) = parent::AdminValidate();
+  		list($ret,$msg) = parent::AdminValidate($id);
 		if(!ret)
 			$messages[] = $msg;
 
@@ -201,7 +201,7 @@ class pwfSystemEmail extends pwfEmailBase
 		$opt = $this->GetOption('email_from_address');
 		if($opt)
 		{
-			list($rv,$msg) = $this->validateEmailAddr();
+			list($rv,$msg) = $this->validateEmailAddr($opt);
 			if(!$rv)
 			{
 				$ret = FALSE;
@@ -255,7 +255,7 @@ class pwfSystemEmail extends pwfEmailBase
 		return FALSE;
 	}
 
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
 		$dests = $this->GetOptionRef('destination_address');
 		return $this->SendForm($dests,$this->GetOption('email_subject'));

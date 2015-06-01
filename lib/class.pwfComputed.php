@@ -119,7 +119,7 @@ class pwfComputed extends pwfFieldBase
 		return $val;
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$processType = array($mod->Lang('title_numeric')=>'numeric',
@@ -131,16 +131,16 @@ class pwfComputed extends pwfFieldBase
 		$main = array(
 			 array(
 				$mod->Lang('title_compute_value'),
-				$mod->CreateInputText($module_id,'opt_value',$this->GetOption('value'),35,1024),
+				$mod->CreateInputText($id,'opt_value',$this->GetOption('value'),35,1024),
 				$help),
 			 array(
 				$mod->Lang('title_string_or_number_eval'),
-				$mod->CreateInputRadioGroup($module_id,'opt_string_or_number_eval',
+				$mod->CreateInputRadioGroup($id,'opt_string_or_number_eval',
 			    	$processType,
 			    	$this->GetOption('string_or_number_eval','numeric'),'&nbsp;&nbsp;')),
 			 array(
 				$mod->Lang('title_order'),
-				$mod->CreateInputText($module_id,'opt_order',$this->GetOption('order','1'),5,10),
+				$mod->CreateInputText($id,'opt_order',$this->GetOption('order','1'),5,10),
 				$mod->Lang('help_computed_order'))
 		);
 		return array('main'=>$main);

@@ -31,29 +31,29 @@ class pwfPassword extends pwfFieldBase
 		return $ret;
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$main = array(
 			array($mod->Lang('title_display_length'),
-				$mod->CreateInputText($module_id,'opt_length',
+				$mod->CreateInputText($id,'opt_length',
 					$this->GetOption('length',12),25,25)),
 			array($mod->Lang('title_minimum_length'),
-				$mod->CreateInputText($module_id,'opt_min_length',
+				$mod->CreateInputText($id,'opt_min_length',
 					$this->GetOption('min_length',8),25,25)),
 			array($mod->Lang('title_hide'),
-				$mod->CreateInputHidden($module_id,'opt_hide',0).
-        		$mod->CreateInputCheckbox($module_id,'opt_hide',1,
+				$mod->CreateInputHidden($id,'opt_hide',0).
+        		$mod->CreateInputCheckbox($id,'opt_hide',1,
 					$this->GetOption('hide',1)),
 				$mod->Lang('title_hide_help')),
 			array($mod->Lang('title_read_only'),
-				$mod->CreateInputHidden($module_id,'opt_readonly',0).
-        		$mod->CreateInputCheckbox($module_id,'opt_readonly',1,
+				$mod->CreateInputHidden($id,'opt_readonly',0).
+        		$mod->CreateInputCheckbox($id,'opt_readonly',1,
 					$this->GetOption('readonly',0)))
 		);
 		$adv = array(
 			array($mod->Lang('title_field_regex'),
-			      $mod->CreateInputText($module_id,'opt_regex',
+			      $mod->CreateInputText($id,'opt_regex',
 					  $this->GetOption('regex'),25,1024),
 			      $mod->Lang('help_regex_use')),
 		);
@@ -85,7 +85,7 @@ class pwfPassword extends pwfFieldBase
 		}
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		$this->validated = TRUE;
 		$this->ValidationMessage = '';

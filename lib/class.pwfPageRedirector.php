@@ -87,7 +87,7 @@ class pwfPageRedirector extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 
@@ -99,7 +99,7 @@ class pwfPageRedirector extends pwfFieldBase
 		}
 		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
-			$mod->CreateInputText($module_id,'opt_select_one',
+			$mod->CreateInputText($id,'opt_select_one',
 			$this->GetOption('select_one',$mod->Lang('select_one')),30,128));
 //		$main[] = array($mod->Lang('title_director_details'),$dests);
 		$dests = array();
@@ -113,10 +113,10 @@ class pwfPageRedirector extends pwfFieldBase
 		for($i=0; $i<$num; $i++)
 		{
 			$dests[] = array(
-			$mod->CreateInputText($module_id,'opt_destination_subject[]',$this->GetOptionElement('destination_subject',$i),30,128),
-			$contentops->CreateHierarchyDropdown('',$this->GetOptionElement('destination_page',$i),$module_id.'opt_destination_page[]'),
-			$mod->CreateInputHidden($module_id,'opt_sel_'.$i,0).
-			$mod->CreateInputCheckbox($module_id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
+			$mod->CreateInputText($id,'opt_destination_subject[]',$this->GetOptionElement('destination_subject',$i),30,128),
+			$contentops->CreateHierarchyDropdown('',$this->GetOptionElement('destination_page',$i),$id.'opt_destination_page[]'),
+			$mod->CreateInputHidden($id,'opt_sel_'.$i,0).
+			$mod->CreateInputCheckbox($id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
 			);
 		}
 		return array('main'=>$main,'table'=>$dests);
@@ -127,10 +127,10 @@ class pwfPageRedirector extends pwfFieldBase
 		$this->OmitAdminCommon($mainArray,$advArray);
 	}
 
-	function AdminValidate()
+	function AdminValidate($id)
 	{
 		$messages = array();
-  		list($ret,$msg) = parent::AdminValidate();
+  		list($ret,$msg) = parent::AdminValidate($id);
 		if(!ret)
 			$messages[] = $msg;
 
@@ -165,7 +165,7 @@ class pwfPageRedirector extends pwfFieldBase
 		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
 	}
 
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
 		//TODO ensure all other dispositions are run before this
 		$mod = $this->formdata->formsmodule;

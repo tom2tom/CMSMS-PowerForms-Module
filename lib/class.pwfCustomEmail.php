@@ -52,7 +52,7 @@ class pwfCustomEmail extends pwfEmailBase
 		return $ret;
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 
@@ -68,16 +68,16 @@ class pwfCustomEmail extends pwfEmailBase
 				$destadd_sel[$k] = $v;
 		}
 
-		$ret = $this->PrePopulateAdminFormCommonEmail($module_id,TRUE);
+		$ret = $this->PrePopulateAdminFormCommonEmail($id,TRUE);
 		$ret['main'] = array(
 			   array($mod->Lang('title_subject_field'),
-			   	$mod->CreateInputDropdown($module_id,'opt_email_subject',$this->GetFieldList(TRUE),-1,$this->GetOption('email_subject'))),
+			   	$mod->CreateInputDropdown($id,'opt_email_subject',$this->GetFieldList(TRUE),-1,$this->GetOption('email_subject'))),
 			   array($mod->Lang('title_from_field'),
-			   	$mod->CreateInputDropdown($module_id,'opt_email_from_name',$this->GetFieldList(TRUE),-1,$this->GetOption('email_from_name',$mod->Lang('friendly_name')))),
+			   	$mod->CreateInputDropdown($id,'opt_email_from_name',$this->GetFieldList(TRUE),-1,$this->GetOption('email_from_name',$mod->Lang('friendly_name')))),
 			   array($mod->Lang('title_from_address_field'),
-			   	$mod->CreateInputDropdown($module_id,'opt_email_from_address',$this->GetFieldList(TRUE),-1,$this->GetOption('email_from_address'))),
+			   	$mod->CreateInputDropdown($id,'opt_email_from_address',$this->GetFieldList(TRUE),-1,$this->GetOption('email_from_address'))),
 			   array($mod->Lang('title_destination_field'),
-			   	$mod->CreateInputSelectList($module_id,'opt_destination_address[]',$destadd_all,$destadd_sel,5)),
+			   	$mod->CreateInputSelectList($id,'opt_destination_address[]',$destadd_all,$destadd_sel,5)),
 			   array_pop($tmp) //keep only the default to-type selector
 			  );
 
@@ -94,10 +94,10 @@ class pwfCustomEmail extends pwfEmailBase
 		$this->PostAdminSubmitCleanupEmail($params);
 	}
 
-	function AdminValidate()
+	function AdminValidate($id)
 	{
 		$messages = array();
-  		list($ret,$msg) = parent::AdminValidate();
+  		list($ret,$msg) = parent::AdminValidate($id);
 		if(!ret)
 			$messages[] = $msg;
 
@@ -146,7 +146,7 @@ class pwfCustomEmail extends pwfEmailBase
 	    return array($ret,$msg);
 	}
 
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
 		$formdata = $this->formdata;
 

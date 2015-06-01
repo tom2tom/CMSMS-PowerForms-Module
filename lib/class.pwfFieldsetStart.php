@@ -27,12 +27,12 @@ class pwfFieldsetStart extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$main = array(
 			  array($mod->Lang('title_legend'),
-					$mod->CreateInputText($module_id,'opt_legend',
+					$mod->CreateInputText($id,'opt_legend',
 					  $this->GetOption('legend'),50)));
 		return array('main'=>$main);
 	}

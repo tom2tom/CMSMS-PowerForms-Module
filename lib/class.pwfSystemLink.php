@@ -60,18 +60,18 @@ class pwfSystemLink extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$contentops = cmsms()->GetContentOperations();
 
 		$main = array(
 				array($mod->Lang('title_link_autopopulate'),
-					 $mod->CreateInputCheckbox($module_id,'opt_auto_link',
+					 $mod->CreateInputCheckbox($id,'opt_auto_link',
             		'1',$this->GetOption('auto_link','0')),
 					 $mod->Lang('help_link_autopopulate')),
              array($mod->Lang('title_link_to_sitepage'),
-				 	$contentops->CreateHierarchyDropdown('',$this->GetOption('target_page'),$module_id.'opt_target_page'))
+				 	$contentops->CreateHierarchyDropdown('',$this->GetOption('target_page'),$id.'opt_target_page'))
 		);
 		return array('main'=>$main);
 	}

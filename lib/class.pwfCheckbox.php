@@ -42,22 +42,22 @@ class pwfCheckbox extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$main = array(
 			array($mod->Lang('title_checkbox_label'),
-					$mod->CreateInputText($module_id,'opt_label',
+					$mod->CreateInputText($id,'opt_label',
 						$this->GetOption('label'),25,255)),
 			array($mod->Lang('title_checked_value'),
-					$mod->CreateInputText($module_id,'opt_checked_value',
+					$mod->CreateInputText($id,'opt_checked_value',
          		$this->GetOption('checked_value',$mod->Lang('value_checked')),25,255)),
 			array($mod->Lang('title_unchecked_value'),
-					$mod->CreateInputText($module_id,'opt_unchecked_value',
+					$mod->CreateInputText($id,'opt_unchecked_value',
           	$this->GetOption('unchecked_value',$mod->Lang('value_unchecked')),25,255)),
 			array($mod->Lang('title_default_set'),
-					$mod->CreateInputHidden($module_id,'opt_is_checked','0').
-					$mod->CreateInputCheckbox($module_id,'opt_is_checked','1',
+					$mod->CreateInputHidden($id,'opt_is_checked','0').
+					$mod->CreateInputCheckbox($id,'opt_is_checked','1',
 						$this->GetOption('is_checked','0')))
 			);
 		return array('main'=>$main);
@@ -77,7 +77,7 @@ class pwfCheckbox extends pwfFieldBase
 		return $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id,'t',$this->Value,$js.$this->GetCSSIdTag()).$label;
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		$this->validated = TRUE;
 		$this->ValidationMessage = '';

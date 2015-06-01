@@ -30,12 +30,12 @@ class pwfLink extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$main = array(
-			array($mod->Lang('title_default_link'),$mod->CreateInputText($module_id,'opt_default_link',$this->GetOption('default_link'),25,128)),
-			array($mod->Lang('title_default_link_title'),$mod->CreateInputText($module_id,'opt_default_link_title',$this->GetOption('default_link_title'),25,128))
+			array($mod->Lang('title_default_link'),$mod->CreateInputText($id,'opt_default_link',$this->GetOption('default_link'),25,128)),
+			array($mod->Lang('title_default_link_title'),$mod->CreateInputText($id,'opt_default_link_title',$this->GetOption('default_link_title'),25,128))
 		);
 		return array('main'=>$main);
 	}

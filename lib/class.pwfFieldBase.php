@@ -429,23 +429,23 @@ class pwfFieldBase
 	  Returns: array with keys 'main' and 'adv', for use by the relevant
 	  PrePopulateAdminForm(), and ultimately in method.update_field.php.
 	*/
-	function PrePopulateAdminFormCommon($module_id)
+	function PrePopulateAdminFormCommon($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		//init main tab content
 		$main = array();
 /*0*/	$main[] = array(
 			$mod->Lang('title_field_name'),
-			$mod->CreateInputText($module_id,'field_name',$this->GetName(),50));
+			$mod->CreateInputText($id,'field_name',$this->GetName(),50));
 
 		$alias = $this->ForceAlias();
 /*1*/	$main[] = array($mod->Lang('title_field_alias'),
-			$mod->CreateInputText($module_id,'opt_field_alias',$alias,30));
+			$mod->CreateInputText($id,'opt_field_alias',$alias,30));
 
 //		if($this->Type)
-			$typeInput = $this->GetDisplayType().$mod->CreateInputHidden($module_id,'field_type',$this->Type);
+			$typeInput = $this->GetDisplayType().$mod->CreateInputHidden($id,'field_type',$this->Type);
 /*		else //field type can be chosen
-			$typeInput = $mod->CreateInputDropdown($module_id,'field_type',
+			$typeInput = $mod->CreateInputDropdown($id,'field_type',
 				array_merge(array($mod->Lang('select_type')=>''),$mod->field_types),
 				-1,'','onchange="this.form.submit()"');
 */
@@ -462,12 +462,12 @@ class pwfFieldBase
 			if(!$this->IsNonRequirableField())
 			{
 				$main[] = array($mod->Lang('title_field_required'),
-				$mod->CreateInputCheckbox($module_id,'field_required',1,$this->IsRequired()),
+				$mod->CreateInputCheckbox($id,'field_required',1,$this->IsRequired()),
 				$mod->Lang('help_field_required'));
 			}
 			//choice of validation type ?
 			if(count($this->GetValidationTypes()) > 1)
-				$validInput = $mod->CreateInputDropdown($module_id,'validation_type',
+				$validInput = $mod->CreateInputDropdown($id,'validation_type',
 					$this->GetValidationTypes(),-1,$this->GetValidationType());
 			else
 				$validInput = $mod->Lang('automatic'); //or 'none' ?
@@ -476,24 +476,24 @@ class pwfFieldBase
 			if($this->HasLabel)
 			{
 				$adv[] = array($mod->Lang('title_hide_label'),
-					$mod->CreateInputHidden($module_id,'hide_label',0).
-					$mod->CreateInputCheckbox($module_id,'hide_label',1,$this->HideLabel),
+					$mod->CreateInputHidden($id,'hide_label',0).
+					$mod->CreateInputCheckbox($id,'hide_label',1,$this->HideLabel),
 					$mod->Lang('help_hide_label'));
 			}
 
 			if($this->DisplayInForm())
 			{
 				$main[] = array($mod->Lang('title_field_helptext'),
-					$mod->CreateTextArea(FALSE,$module_id,$this->GetOption('helptext'),
+					$mod->CreateTextArea(FALSE,$id,$this->GetOption('helptext'),
 						'opt_helptext','pwf_shortarea','','','',50,8));
 				$adv[] = array($mod->Lang('title_field_css_class'),
-					$mod->CreateInputText($module_id,'opt_css_class',$this->GetOption('css_class'),30));
+					$mod->CreateInputText($id,'opt_css_class',$this->GetOption('css_class'),30));
 				$adv[] = array($mod->Lang('title_field_javascript'),
-					$mod->CreateTextArea(FALSE,$module_id,$this->GetOption('javascript'),
+					$mod->CreateTextArea(FALSE,$id,$this->GetOption('javascript'),
 						'opt_javascript','pwf_shortarea','','','',50,8,'','js'),
 					$mod->Lang('help_field_javascript'));
 				$adv[] = array($mod->Lang('title_field_logic'),
-					$mod->CreateTextArea(FALSE,$module_id,$this->GetOption('field_logic'),
+					$mod->CreateTextArea(FALSE,$id,$this->GetOption('field_logic'),
 						'opt_field_logic','pwf_shortarea','','','',50,8),
 					$mod->Lang('help_field_logic'));
 			}
@@ -552,7 +552,7 @@ class pwfFieldBase
 
 	  Returns: an associative array with 0 or more keys recognised in method.update_field.php.
 	*/
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		return array();
 	}
@@ -581,7 +581,7 @@ class pwfFieldBase
 	// Override this
 	// Returns an array: first member is boolean TRUE or FALSE (indicating
 	// whether or not the value is valid), the second is error message or ''
-	function Validate()
+	function Validate($id)
 	{
 		$this->validated = TRUE;
 		$this->ValidationMessage = '';
@@ -746,7 +746,7 @@ class pwfFieldBase
 	// Override this if needed.
 	//Returns: array,in which first member is a boolean TRUE or FALSE
 	//(indicating whether or not the value is valid),the second is a message
-	function AdminValidate()
+	function AdminValidate($id)
 	{
 		$messages = array();
   		list($ret,$msg) = $this->DoesFieldHaveName();
@@ -770,7 +770,7 @@ class pwfFieldBase
 	(indicating whether or not the disposition succeeded),and the second member
 	is empty,or explanatory text about the failure
 	*/
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
 		return array(TRUE,'');
 	}

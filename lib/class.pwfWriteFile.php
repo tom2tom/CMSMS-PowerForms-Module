@@ -25,18 +25,18 @@ class pwfWriteFile extends pwfFieldBase
 		return $this->GetOption('filespec',$mod->Lang('unspecified'));
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$config = cmsms()->GetConfig();
 
 		$main = array();
 		$main[] = array($mod->Lang('title_file_name'),
-				   $mod->CreateInputText($module_id,'opt_filespec',
+				   $mod->CreateInputText($id,'opt_filespec',
 						$this->GetOption('filespec','form_submissions.txt'),25,128));
 
 		$main[] = array($mod->Lang('title_newline_replacement'),
-				$mod->CreateInputText($module_id,'opt_newlinechar',
+				$mod->CreateInputText($id,'opt_newlinechar',
 						$this->GetOption('newlinechar'),5,15),
 				$mod->Lang('help_newline_replacement'));
 
@@ -46,23 +46,23 @@ class pwfWriteFile extends pwfFieldBase
 		$parmMain['opt_file_header']['is_header'] = TRUE;
 		$parmMain['opt_file_footer']['is_oneline'] = TRUE;
 		$parmMain['opt_file_footer']['is_footer'] = TRUE;
-		list ($funcs,$buttons) = pwfUtils::AdminTemplateActions($this->formdata,$module_id,$parmMain);
+		list ($funcs,$buttons) = pwfUtils::AdminTemplateActions($this->formdata,$id,$parmMain);
 
 		$adv = array();
 		$adv[] = array($mod->Lang('title_file_template'),
-				  $mod->CreateTextArea(FALSE,$module_id,
+				  $mod->CreateTextArea(FALSE,$id,
 						htmlspecialchars($this->GetOption('file_template')),
 						'opt_file_template','pwf_tallarea','','',50,15).
 						'<br /><br />'.$buttons[0]);
 
 		$adv[] = array($mod->Lang('title_file_header'),
-				  $mod->CreateTextArea(FALSE,$module_id,
+				  $mod->CreateTextArea(FALSE,$id,
 						htmlspecialchars($this->GetOption('file_header')),
 						'opt_file_header','pwf_shortarea','','',50,8).
 						'<br /><br />'.$buttons[1]);
 
 		$adv[] = array($mod->Lang('title_file_footer'),
-				  $mod->CreateTextArea(FALSE,$module_id,
+				  $mod->CreateTextArea(FALSE,$id,
 						htmlspecialchars($this->GetOption('file_footer')),
 						'opt_file_footer','pwf_shortarea','','',50,8).
 						'<br /><br />'.$buttons[2]);
@@ -75,7 +75,7 @@ class pwfWriteFile extends pwfFieldBase
 		$this->OmitAdminCommon($mainArray,$advArray);
 	}
 	
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
 		$ud = pwfUtils::GetUploadsPath();
 		if(!$ud)

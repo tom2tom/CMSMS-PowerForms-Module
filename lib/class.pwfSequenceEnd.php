@@ -30,12 +30,12 @@ class pwfSequenceEnd extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$main = array(
 			  array($mod->Lang('title_name'),
-					$mod->CreateInputText($module_id,'opt_sequencename',
+					$mod->CreateInputText($id,'opt_sequencename',
 					  $this->GetOption('legend'), 50)));
 //TODO id of sequence start
 		return array('main'=>$main);

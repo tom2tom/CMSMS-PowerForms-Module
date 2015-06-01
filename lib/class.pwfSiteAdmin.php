@@ -90,7 +90,7 @@ class pwfSiteAdmin extends pwfFieldBase
 		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$sorted,-1,$this->Value,$js.$this->GetCSSIdTag());
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$groupops = cmsms()->GetGroupOperations();
 		$groups = $groupops->LoadGroups();
@@ -98,23 +98,23 @@ class pwfSiteAdmin extends pwfFieldBase
 
 		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
-				$mod->CreateInputText($module_id,'opt_select_one',
+				$mod->CreateInputText($id,'opt_select_one',
 				$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
 		$main[] = array($mod->Lang('title_show_userfirstname'),
-				$mod->CreateInputHidden($module_id,'opt_show_userfirstname','0').
-				$mod->CreateInputCheckbox($module_id,'opt_show_userfirstname','1',
+				$mod->CreateInputHidden($id,'opt_show_userfirstname','0').
+				$mod->CreateInputCheckbox($id,'opt_show_userfirstname','1',
 				$this->GetOption('show_userfirstname','1')));
 		$main[] = array($mod->Lang('title_show_userlastname'),
-				$mod->CreateInputHidden($module_id,'opt_show_userlastname','0').
-				$mod->CreateInputCheckbox($module_id,'opt_show_userlastname','1',
+				$mod->CreateInputHidden($id,'opt_show_userlastname','0').
+				$mod->CreateInputCheckbox($id,'opt_show_userlastname','1',
 				$this->GetOption('show_userlastname','1')));
 		$main[] = array($mod->Lang('title_show_username'),
-				$mod->CreateInputHidden($module_id,'opt_show_username','0').
-				$mod->CreateInputCheckbox($module_id,'opt_show_username','1',
+				$mod->CreateInputHidden($id,'opt_show_username','0').
+				$mod->CreateInputCheckbox($id,'opt_show_username','1',
 				$this->GetOption('show_username','0')));
 		$main[] = array($mod->Lang('title_active_only'),
-				$mod->CreateInputHidden($module_id,'opt_active_only','0').
-				$mod->CreateInputCheckbox($module_id,'opt_active_only','1',
+				$mod->CreateInputHidden($id,'opt_active_only','0').
+				$mod->CreateInputCheckbox($id,'opt_active_only','1',
 				$this->GetOption('active_only','1')));
 
 		$items = array();
@@ -124,16 +124,16 @@ class pwfSiteAdmin extends pwfFieldBase
 		}
 
 		$main[] = array($mod->Lang('title_restrict_to_group'),
-				$mod->CreateInputHidden($module_id,'opt_restrict_to_group',0).
-				$mod->CreateInputCheckbox($module_id,'opt_restrict_to_group',1,
+				$mod->CreateInputHidden($id,'opt_restrict_to_group',0).
+				$mod->CreateInputCheckbox($id,'opt_restrict_to_group',1,
 				$this->GetOption('restrict_to_group',0)).
-				$mod->CreateInputDropdown($module_id,'opt_group',$items,-1,$this->GetOption('group'))
+				$mod->CreateInputDropdown($id,'opt_group',$items,-1,$this->GetOption('group'))
 				);
 
 		return array('main'=>$main);
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		$result = TRUE;
 		$message = '';

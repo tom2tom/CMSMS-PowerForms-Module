@@ -121,7 +121,7 @@ class pwfRadioGroup extends pwfFieldBase
 		}
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$yesNo = array($mod->Lang('no')=>'n',$mod->Lang('yes')=>'y');
@@ -145,10 +145,10 @@ class pwfRadioGroup extends pwfFieldBase
 		for ($i=0; $i<$num; $i++)
 		{
 			$boxes = array(
-			  $mod->CreateInputText($module_id,'opt_button_name[]',$this->GetOptionElement('button_name',$i),25,128),
-			  $mod->CreateInputText($module_id,'opt_button_checked[]',$this->GetOptionElement('button_checked',$i),25,128),
-			  $mod->CreateInputDropdown($module_id,'opt_button_is_set[]',$yesNo,-1,$this->GetOptionElement('button_is_set',$i)),
-			  $mod->CreateInputCheckbox($module_id,'sel_'.$i,$i,-1,'style="margin-left:1em;"')
+			  $mod->CreateInputText($id,'opt_button_name[]',$this->GetOptionElement('button_name',$i),25,128),
+			  $mod->CreateInputText($id,'opt_button_checked[]',$this->GetOptionElement('button_checked',$i),25,128),
+			  $mod->CreateInputDropdown($id,'opt_button_is_set[]',$yesNo,-1,$this->GetOptionElement('button_is_set',$i)),
+			  $mod->CreateInputCheckbox($id,'sel_'.$i,$i,-1,'style="margin-left:1em;"')
 			 );
 		}
 

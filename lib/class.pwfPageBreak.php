@@ -19,7 +19,7 @@ class pwfPageBreak extends pwfFieldBase
 //		$this->ValidationTypes = array($mod->Lang('validation_none')=>'none');
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		return array();
 	}

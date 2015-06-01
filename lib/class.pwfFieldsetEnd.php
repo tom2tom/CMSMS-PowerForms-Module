@@ -32,7 +32,7 @@ class pwfFieldsetEnd extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		return array();
 	}

@@ -44,16 +44,16 @@ class pwfUniqueInteger extends pwfFieldBase
 		return $ret;
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 
 		$main = array(
-			array($mod->Lang('title_show_to_user'),$mod->CreateInputHidden($module_id,'opt_show_to_user',0).
-					$mod->CreateInputCheckbox($module_id,'opt_show_to_user',1,$this->GetOption('show_to_user',0))),
-			array($mod->Lang('title_use_random_generator'),$mod->CreateInputHidden($module_id,'opt_use_random_generator',0).
-					$mod->CreateInputCheckbox($module_id,'opt_use_random_generator',1,$this->GetOption('use_random_generator',0))),
-			array($mod->Lang('title_numbers_to_generate'),$mod->CreateInputText($module_id,'opt_numbers_to_generate',$this->GetOption('numbers_to_generate','5'),25,25))
+			array($mod->Lang('title_show_to_user'),$mod->CreateInputHidden($id,'opt_show_to_user',0).
+					$mod->CreateInputCheckbox($id,'opt_show_to_user',1,$this->GetOption('show_to_user',0))),
+			array($mod->Lang('title_use_random_generator'),$mod->CreateInputHidden($id,'opt_use_random_generator',0).
+					$mod->CreateInputCheckbox($id,'opt_use_random_generator',1,$this->GetOption('use_random_generator',0))),
+			array($mod->Lang('title_numbers_to_generate'),$mod->CreateInputText($id,'opt_numbers_to_generate',$this->GetOption('numbers_to_generate','5'),25,25))
 		);
 
 		return array('main'=>$main);

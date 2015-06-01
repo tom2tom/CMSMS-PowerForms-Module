@@ -99,7 +99,7 @@ class pwfUniqueFile extends pwfFieldBase
 		}
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$config = cmsms()->GetConfig();
@@ -108,11 +108,11 @@ class pwfUniqueFile extends pwfFieldBase
 
 		$main = array();
 		$main[] = array($mod->Lang('title_file_name'),
-			$mod->CreateInputText($module_id,'opt_filespec',
+			$mod->CreateInputText($id,'opt_filespec',
 				$this->GetOption('filespec'),80,255));
-//		$mod->CreateInputFile($module_id,'opt_filespec','',60)
+//		$mod->CreateInputFile($id,'opt_filespec','',60)
 		$main[] = array($mod->Lang('title_newline_replacement'),
-			$mod->CreateInputText($module_id,'opt_newlinechar',
+			$mod->CreateInputText($id,'opt_newlinechar',
 				$this->GetOption('newlinechar'),5,15),
 			$mod->Lang('help_newline_replacement'));
 
@@ -120,18 +120,18 @@ class pwfUniqueFile extends pwfFieldBase
 		// array("Text displayed in option tag" => "Value of option tag");
 		$file_type_list = array('TXT'=>0,'RTF'=>1);
 		$adv[] = array($mod->Lang('title_file_type'),
-			$mod->CreateInputDropdown($module_id,
+			$mod->CreateInputDropdown($id,
 			'opt_file_type',$file_type_list,$file_type));
 
 		$adv[] = array($mod->Lang('title_rtf_file_template'),
-			$mod->CreateInputText($module_id,'opt_rtf_file_template',
+			$mod->CreateInputText($id,'opt_rtf_file_template',
 				$this->GetOption('rtf_file_template','RTF_TemplateBasic.rtf'),50,255),
 			$mod->Lang('help_rtf_file_template'));
-//		$mod->CreateInputFile($module_id,'opt_rtf_file_template','',60)
+//		$mod->CreateInputFile($id,'opt_rtf_file_template','',60)
 
 		$rtf_template_type_list = array($mod->Lang('basic')=>0,$mod->Lang('advanced')=>1);
 		$adv[] = array($mod->Lang('title_rtf_template_type'),
-			$mod->CreateInputDropdown($module_id,
+			$mod->CreateInputDropdown($id,
 				'opt_rtf_template_type',$rtf_template_type_list,$rtf_template_type),
 			$mod->Lang('help_rtf_template_type'));
 
@@ -141,20 +141,20 @@ class pwfUniqueFile extends pwfFieldBase
 		$parmMain['opt_file_header']['is_header'] = TRUE;
 		$parmMain['opt_file_footer']['is_oneline'] = TRUE;
 		$parmMain['opt_file_footer']['is_footer'] = TRUE;
-		list($funcs,$buttons) = pwfUtils::AdminTemplateActions($this->formdata,$module_id,$parmMain);
+		list($funcs,$buttons) = pwfUtils::AdminTemplateActions($this->formdata,$id,$parmMain);
 
 		$adv[] = array($mod->Lang('title_unique_file_template'),
-			$mod->CreateTextArea(FALSE,$module_id,$this->GetOption('file_template'),
+			$mod->CreateTextArea(FALSE,$id,$this->GetOption('file_template'),
 			'opt_file_template','pwf_tallarea','','','',50,15),
 			$mod->Lang('help_unique_file_template').'<br /><br />'.$buttons[0]);
 
 		$adv[] = array($mod->Lang('title_file_header'),
-			$mod->CreateTextArea(FALSE,$module_id,$this->GetOption('file_header'),
+			$mod->CreateTextArea(FALSE,$id,$this->GetOption('file_header'),
 				'opt_file_header','pwf_shortarea','','','',50,8),
 			$mod->Lang('help_file_header_template').'<br /><br />'.$buttons[1]);
 
 		$adv[] = array($mod->Lang('title_file_footer'),
-			$mod->CreateTextArea(FALSE,$module_id,$this->GetOption('file_footer'),
+			$mod->CreateTextArea(FALSE,$id,$this->GetOption('file_footer'),
 				'opt_file_footer','pwf_shortarea','','','',50,8),
 			$mod->Lang('help_file_footer_template').'<br /><br />'.$buttons[2]);
 		/*show variables-help on advanced tab*/
@@ -166,7 +166,7 @@ class pwfUniqueFile extends pwfFieldBase
 		$this->OmitAdminCommon($mainArray,$advArray);
 	}
 
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
 		$ud = pwfUtils::GetUploadsPath();
 		if(!$ud)

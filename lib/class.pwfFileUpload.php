@@ -50,7 +50,7 @@ class pwfFileUpload extends pwfFieldBase
 		return $ret;
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$config = cmsms()->GetConfig();
 		$mod = $this->formdata->formsmodule;
@@ -63,19 +63,19 @@ class pwfFileUpload extends pwfFieldBase
 
 		$main = array(
 			array($mod->Lang('title_maximum_size'),
-				$mod->CreateInputText($module_id,'opt_max_size',$ms,5,5),
+				$mod->CreateInputText($id,'opt_max_size',$ms,5,5),
 				$mod->Lang('help_maximum_size')),
 			array($mod->Lang('title_permitted_extensions'),
-				$mod->CreateInputText($module_id,'opt_permitted_extensions',$exts,25,80),
+				$mod->CreateInputText($id,'opt_permitted_extensions',$exts,25,80),
 				$mod->Lang('help_permitted_extensions')),
 			array($mod->Lang('title_show_limitations'),
-				$mod->CreateInputHidden($module_id,'opt_show_details','0').
-				$mod->CreateInputCheckbox($module_id,
+				$mod->CreateInputHidden($id,'opt_show_details','0').
+				$mod->CreateInputCheckbox($id,
 					'opt_show_details','1',$show),
 				$mod->Lang('help_show_limitations')),
 			array($mod->Lang('title_allow_overwrite'),
-				$mod->CreateInputHidden($module_id,'opt_allow_overwrite','0').
-				$mod->CreateInputCheckbox($module_id,
+				$mod->CreateInputHidden($id,'opt_allow_overwrite','0').
+				$mod->CreateInputCheckbox($id,
 					'opt_allow_overwrite','1',$this->GetOption('allow_overwrite','0')),
 				$mod->Lang('help_allow_overwrite'))
 			);
@@ -88,27 +88,27 @@ class pwfFileUpload extends pwfFieldBase
 		pwfUtils::fieldValueTemplate($this->formdata,array('$ext'=>$mod->Lang('original_file_extension')));
 
 		$adv[] = array($mod->Lang('title_file_rename'),
-			$mod->CreateInputText($module_id,'opt_file_rename',
+			$mod->CreateInputText($id,'opt_file_rename',
 				$this->GetOption('file_rename'),60,255),
 			$help_file_rename);
 		$adv[] = array($mod->Lang('title_suppress_filename'),
-			$mod->CreateInputHidden($module_id,'opt_suppress_filename','0').
-			$mod->CreateInputCheckbox($module_id,
+			$mod->CreateInputHidden($id,'opt_suppress_filename','0').
+			$mod->CreateInputCheckbox($id,
 				'opt_suppress_filename','1',
 				$this->GetOption('suppress_filename','0')));
 
 		$adv[] = array($mod->Lang('title_suppress_attachment'),
-			$mod->CreateInputHidden($module_id,'opt_suppress_attachment',0).
-				$mod->CreateInputCheckbox($module_id,'opt_suppress_attachment',1,$this->GetOption('suppress_attachment',1)));
+			$mod->CreateInputHidden($id,'opt_suppress_attachment',0).
+				$mod->CreateInputCheckbox($id,'opt_suppress_attachment',1,$this->GetOption('suppress_attachment',1)));
 
 		$main[] = array($mod->Lang('title_remove_file_from_server'),
-			$mod->CreateInputHidden($module_id,'opt_remove_file','0').
-				$mod->CreateInputCheckbox($module_id,
+			$mod->CreateInputHidden($id,'opt_remove_file','0').
+				$mod->CreateInputCheckbox($id,
 				'opt_remove_file','1',
 				$this->GetOption('remove_file','0')),
 				$mod->Lang('help_ignored_if_upload'));
 /*		$main[] = array($mod->Lang('title_file_destination'),
-			$mod->CreateInputText($module_id,'opt_file_destination',
+			$mod->CreateInputText($id,'opt_file_destination',
 				$this->GetOption('file_destination',$config['uploads_path']),60,255),
 				$mod->Lang('help_ignored_if_upload'));
 */
@@ -116,15 +116,15 @@ class pwfFileUpload extends pwfFieldBase
 		{
 			$categorylist = $uploads->getCategoryList();
 			$adv[] = array($mod->Lang('title_sendto_uploads'),
-				 $mod->CreateInputDropdown($module_id,
+				 $mod->CreateInputDropdown($id,
 					'opt_sendto_uploads',$sendto_uploads_list,
 					 $sendto_uploads));
 			$adv[] = array($mod->Lang('title_uploads_category'),
-				$mod->CreateInputDropdown($module_id,
+				$mod->CreateInputDropdown($id,
 					'opt_uploads_category',$categorylist,'',
 					$uploads_category));
 			$adv[] = array($mod->Lang('title_uploads_destpage'),
-				self::CreatePageDropdown($module_id,'opt_uploads_destpage',$uploads_destpage));
+				self::CreatePageDropdown($id,'opt_uploads_destpage',$uploads_destpage));
 		}
 
 		return array('main'=>$main,'adv'=>$adv);
@@ -135,9 +135,9 @@ class pwfFileUpload extends pwfFieldBase
 		$fname = FALSE;
 		if(isset($_FILES))
 		{
-			$key = 'm1_'.$this->formdata->current_prefix.$this->Id; //TODO m1_
+			$key = $id.$this->formdata->current_prefix.$this->Id;
 			if(!isset($_FILES[$key]))
-				$key = 'm1_'.$this->formdata->prior_prefix.$this->Id;
+				$key = $id.$this->formdata->prior_prefix.$this->Id;
 			if(isset($_FILES[$key]) && $_FILES[$key]['size'] > 0) // file was uploaded
 				$fname = $_FILES[$key]['name'];
 		}
@@ -214,32 +214,31 @@ class pwfFileUpload extends pwfFieldBase
 	}
 */
 
-	function Validate()
+	function Validate($id)
 	{
 		$this->validated = TRUE;
 		$this->ValidationMessage = '';
 		$mod = $this->formdata->formsmodule;
-		$id = TODO; // m1_ is crap get real $id
-		$fullAlias = $id.$this->formdata->current_prefix.$this->Id;
-		if(empty($_FILES[$fullAlias]))
-			$fullAlias = $id.$this->formdata->prior_prefix.$this->Id;
-		if(empty($_FILES[$fullAlias]))
+		$_id = $id.$this->formdata->current_prefix.$this->Id;
+		if(empty($_FILES[$_id]))
+			$_id = $id.$this->formdata->prior_prefix.$this->Id;
+		if(empty($_FILES[$_id]))
 		{
 			$this->validated = FALSE;
 			$this->ValidationMessage = $mod->Lang('TODO');
 			return array($this->validated,$this->ValidationMessage);
 		}
-		if($_FILES[$fullAlias]['size'] < 1 && ! $this->Required)
+		if($_FILES[$_id]['size'] < 1 && ! $this->Required)
 			return array(TRUE,'');
 
 		$ms = $this->GetOption('max_size');
 		$exts = $this->GetOption('permitted_extensions');
-		if($_FILES[$fullAlias]['size'] < 1 && $this->Required)
+		if($_FILES[$_id]['size'] < 1 && $this->Required)
 		{
 			$this->validated = FALSE;
 			$this->ValidationMessage = $mod->Lang('required_field_missing');
 		}
-		elseif($ms && $_FILES[$fullAlias]['size'] > ($ms * 1024))
+		elseif($ms && $_FILES[$_id]['size'] > ($ms * 1024))
 		{
 			$this->ValidationMessage = $mod->Lang('error_large_file'). ' '.$ms.'kb';//($ms * 1024).'kb'; // Stikki mods
 			$this->validated = FALSE;
@@ -250,9 +249,9 @@ class pwfFileUpload extends pwfFieldBase
 			$legalExts = explode(',',$exts);
 			foreach($legalExts as $thisExt)
 			{
-				if(preg_match('/\.'.trim($thisExt).'$/i',$_FILES[$fullAlias]['name']))
+				if(preg_match('/\.'.trim($thisExt).'$/i',$_FILES[$_id]['name']))
 					$match = TRUE;
-				else if(preg_match('/'.trim($thisExt).'/i',$_FILES[$fullAlias]['type']))
+				else if(preg_match('/'.trim($thisExt).'/i',$_FILES[$_id]['type']))
 					$match = TRUE;
 			}
 			if(!$match)
@@ -269,9 +268,8 @@ class pwfFileUpload extends pwfFieldBase
 	then the file is added to the uploads module and a link is added to the results.
 	Otherwise, upload the file to the "uploads" directory.
 	*/
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
-		$id = TODO; // m1_ is crap get real $id
 		$_id = $id.$this->formdata->current_prefix.$this->Id;
 		if(empty($_FILES[$_id]))
 			$_id = $id.$this->formdata->prior_prefix.$this->Id;
@@ -284,9 +282,7 @@ class pwfFileUpload extends pwfFieldBase
 			$thisExt = substr($thisFile['name'],strrpos($thisFile['name'],'.'));
 
 			if($this->GetOption('file_rename') == '')
-			{
 				$destination_name = $thisFile['name'];
-			}
 			else
 			{
 				// build rename map

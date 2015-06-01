@@ -21,7 +21,7 @@ class pwfPasswordAgain extends pwfFieldBase
 			': '.$this->GetOption('field_to_validate');
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$flds = $this->formdata->Fields;
@@ -37,20 +37,20 @@ class pwfPasswordAgain extends pwfFieldBase
 		$main = array(
 			array(
 				$mod->Lang('title_field_to_validate'),
-					$mod->CreateInputDropdown($module_id,
+					$mod->CreateInputDropdown($id,
 					'opt_field_to_validate',$opts,-1,$this->GetOption('field_to_validate'))
 			),
 			array($mod->Lang('title_display_length'),
-				$mod->CreateInputText($module_id,
+				$mod->CreateInputText($id,
 				'opt_length',
 				$this->GetOption('length','12'),25,25)),
 			array($mod->Lang('title_minimum_length'),
-				$mod->CreateInputText($module_id,
+				$mod->CreateInputText($id,
 				'opt_min_length',
 				$this->GetOption('min_length','8'),25,25)),
 			array($mod->Lang('title_hide'),
-				$mod->CreateInputHidden($module_id,'opt_hide','0').
-				$mod->CreateInputCheckbox($module_id,'opt_hide',
+				$mod->CreateInputHidden($id,'opt_hide','0').
+				$mod->CreateInputCheckbox($id,'opt_hide',
 				'1',$this->GetOption('hide','1')),
 				$mod->Lang('title_hide_help')),
 		);
@@ -78,7 +78,7 @@ class pwfPasswordAgain extends pwfFieldBase
 		}
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		$this->validated = TRUE;
 		$this->ValidationMessage = '';

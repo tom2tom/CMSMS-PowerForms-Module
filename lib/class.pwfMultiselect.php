@@ -102,7 +102,7 @@ class pwfMultiselect extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 
@@ -113,7 +113,7 @@ class pwfMultiselect extends pwfFieldBase
 			$this->optionAdd = 0;
 		}
 		$main = array();
-		$main[] = array($mod->Lang('title_lines_to_show'),$mod->CreateInputText($module_id,'opt_lines',$this->GetOption('lines','3'),10,10));
+		$main[] = array($mod->Lang('title_lines_to_show'),$mod->CreateInputText($id,'opt_lines',$this->GetOption('lines','3'),10,10));
 //		$main[] = array($mod->Lang('title_multiselect_details'),$dests);
 		$dests = array();
 		$dests[] = array(
@@ -125,9 +125,9 @@ class pwfMultiselect extends pwfFieldBase
 		for ($i=0; $i<$num; $i++)
 		{
 			$dests[] = array(
-			$mod->CreateInputText($module_id,'opt_option_name[]',$this->GetOptionElement('option_name',$i),30,128),
-			$mod->CreateInputText($module_id,'opt_option_value[]',$this->GetOptionElement('option_value',$i),30,128),
-			$mod->CreateInputCheckbox($module_id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
+			$mod->CreateInputText($id,'opt_option_name[]',$this->GetOptionElement('option_name',$i),30,128),
+			$mod->CreateInputText($id,'opt_option_value[]',$this->GetOptionElement('option_value',$i),30,128),
+			$mod->CreateInputCheckbox($id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
 			);
 		}
 		return array('main'=>$main,'table'=>$dests);

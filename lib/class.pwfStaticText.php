@@ -38,16 +38,16 @@ class pwfStaticText extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$main = array(
 				array($mod->Lang('title_text'),
-				$mod->CreateTextArea((get_preference(get_userid(),'use_wysiwyg')=='1'),$module_id,$this->GetOption('text'),'opt_text','pageheadtags'))
+				$mod->CreateTextArea((get_preference(get_userid(),'use_wysiwyg')=='1'),$id,$this->GetOption('text'),'opt_text','pageheadtags'))
 		);
 		$adv = array(
 				array($mod->Lang('title_smarty_eval'),
-				$mod->CreateInputCheckbox($module_id,'opt_smarty_eval',
+				$mod->CreateInputCheckbox($id,'opt_smarty_eval',
             		'1',$this->GetOption('smarty_eval','0')))
 		);
 		return array('main'=>$main,'adv'=>$adv);

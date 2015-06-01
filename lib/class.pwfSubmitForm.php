@@ -22,7 +22,7 @@ class pwfSubmitForm extends pwfFieldBase
 		return $this->GetOption('method').' '.$this->GetOption('url');
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$formdata = $this->formdata;
 		$mod = $formdata->formsmodule;
@@ -32,26 +32,26 @@ class pwfSubmitForm extends pwfFieldBase
 			$adv = array();
 			$methods = array('POST'=>'POST','GET'=>'GET');
 			$main[] = array($mod->Lang('title_method'),
-				$mod->CreateInputDropdown($module_id,'opt_method',$methods,-1,
+				$mod->CreateInputDropdown($id,'opt_method',$methods,-1,
 					$this->GetOption('method')));
 			$main[] = array($mod->Lang('title_url'),
-				$mod->CreateInputText($module_id,'opt_url',$this->GetOption('url'),40,255),
+				$mod->CreateInputText($id,'opt_url',$this->GetOption('url'),40,255),
 				$mod->Lang('help_url'));
 			foreach($formdata->Fields as &$one)
 			{
 				$alias = $one->ForceAlias();
 				$fid = $one->GetId();
 				$adv[] = array($mod->Lang('title_maps_to',$one->GetName()),
-					$mod->CreateInputText($module_id,'opt_fld_'.$fid,
+					$mod->CreateInputText($id,'opt_fld_'.$fid,
 						 $this->GetOption('fld_'.$fid,$alias),40,255).
-					$mod->CreateInputHidden($module_id,'opt_sub_'.$fid,0).
-					$mod->CreateInputCheckbox($module_id,'opt_sub_'.$fid,1,
+					$mod->CreateInputHidden($id,'opt_sub_'.$fid,0).
+					$mod->CreateInputCheckbox($id,'opt_sub_'.$fid,1,
 						$this->GetOption('sub_'.$fid,($one->DisplayInSubmission()?1:0))),
 					$mod->Lang('title_include_in_submission'));
 			}
 			unset($one);
 			$adv[] = array($mod->Lang('title_additional'),
-				$mod->CreateInputText($module_id,'opt_additional',
+				$mod->CreateInputText($id,'opt_additional',
 					$this->GetOption('additional'),40,255),
 				$mod->Lang('help_additional_payload'));
 			return array('main'=>$main,'adv'=>$adv);
@@ -68,7 +68,7 @@ class pwfSubmitForm extends pwfFieldBase
 		$this->OmitAdminCommon($mainArray,$advArray);
 	}
 
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
 		$formdata = $this->formdata;
 		$mod = $formdata->formsmodule;

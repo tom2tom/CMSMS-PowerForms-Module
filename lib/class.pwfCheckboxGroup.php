@@ -161,13 +161,13 @@ class pwfCheckboxGroup extends pwfFieldBase
 	}
 
 	// Populate tabs
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$main = array();
 		$main[] = array($mod->Lang('title_dont_submit_unchecked'),
-			$mod->CreateInputHidden($module_id,'opt_no_empty','0').
-			$mod->CreateInputCheckbox($module_id,'opt_no_empty','1',$this->GetOption('no_empty','0')),
+			$mod->CreateInputHidden($id,'opt_no_empty','0').
+			$mod->CreateInputCheckbox($id,'opt_no_empty','1',$this->GetOption('no_empty','0')),
 			$mod->Lang('help_dont_submit_unchecked'));
 //		$main[] = array($mod->Lang('title_checkbox_details'),$boxes);
 		$boxes = array();
@@ -184,11 +184,11 @@ class pwfCheckboxGroup extends pwfFieldBase
 		foreach($names as $i=>&$one)
 		{
 			$boxes[] = array(
-				$mod->CreateInputText($module_id,'opt_box_name[]',$one,30,128),
-				$mod->CreateInputText($module_id,'opt_box_checked[]',$this->GetOptionElement('box_checked',$i),20,128),
-				$mod->CreateInputText($module_id,'opt_box_unchecked[]',$this->GetOptionElement('box_unchecked',$i),20,128),
-				$mod->CreateInputDropdown($module_id,'opt_box_is_set[]',$yesNo,-1,$this->GetOptionElement('box_is_set',$i)),
-				$mod->CreateInputCheckbox($module_id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
+				$mod->CreateInputText($id,'opt_box_name[]',$one,30,128),
+				$mod->CreateInputText($id,'opt_box_checked[]',$this->GetOptionElement('box_checked',$i),20,128),
+				$mod->CreateInputText($id,'opt_box_unchecked[]',$this->GetOptionElement('box_unchecked',$i),20,128),
+				$mod->CreateInputDropdown($id,'opt_box_is_set[]',$yesNo,-1,$this->GetOptionElement('box_is_set',$i)),
+				$mod->CreateInputCheckbox($id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
 			);
 		}
 		unset($one);
@@ -196,19 +196,19 @@ class pwfCheckboxGroup extends pwfFieldBase
 		{
 			$i++;
 			$boxes[] = array(
-				$mod->CreateInputText($module_id,'opt_box_name[]','',30,128),
-				$mod->CreateInputText($module_id,'opt_box_checked[]','',20,128),
-				$mod->CreateInputText($module_id,'opt_box_unchecked[]','',20,128),
-				$mod->CreateInputDropdown($module_id,'opt_box_is_set[]',$yesNo,-1,'n'),
-				$mod->CreateInputCheckbox($module_id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
+				$mod->CreateInputText($id,'opt_box_name[]','',30,128),
+				$mod->CreateInputText($id,'opt_box_checked[]','',20,128),
+				$mod->CreateInputText($id,'opt_box_unchecked[]','',20,128),
+				$mod->CreateInputDropdown($id,'opt_box_is_set[]',$yesNo,-1,'n'),
+				$mod->CreateInputCheckbox($id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
 			);
 			$this->boxAdd = FALSE;
 		}
 		
 		$adv = array(
 			array($mod->Lang('title_field_includelabels'),
-					$mod->CreateInputHidden($module_id,'opt_include_labels','0').
-					$mod->CreateInputCheckbox($module_id,'opt_include_labels','1',$this->GetOption('include_labels','0')),
+					$mod->CreateInputHidden($id,'opt_include_labels','0').
+					$mod->CreateInputCheckbox($id,'opt_include_labels','1',$this->GetOption('include_labels','0')),
 					$mod->Lang('help_field_includelabels'))
 		);
 

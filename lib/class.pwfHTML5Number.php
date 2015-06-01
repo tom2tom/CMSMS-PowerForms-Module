@@ -28,23 +28,23 @@ class pwfHTML5Number extends pwfFieldBase
 		'" min="'.$min.'" max="'.$max.'" step="'.$step.'" '.$js.$cssid.' />';
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$main = array();
 		$main[] = array($mod->Lang('title_min_number'),
-			$mod->CreateInputText($module_id,'opt_min_number',$this->GetOption('min_number',0)));
+			$mod->CreateInputText($id,'opt_min_number',$this->GetOption('min_number',0)));
 		$main[] = array($mod->Lang('title_max_number'),
-			$mod->CreateInputText($module_id,'opt_max_number',$this->GetOption('max_number',500)));
+			$mod->CreateInputText($id,'opt_max_number',$this->GetOption('max_number',500)));
 		$main[] = array($mod->Lang('title_step_number'),
-			$mod->CreateInputText($module_id,'opt_step_number',$this->GetOption('step_number',50)));
+			$mod->CreateInputText($id,'opt_step_number',$this->GetOption('step_number',50)));
 		return array('main'=>$main);
 	}
 
-	function AdminValidate()
+	function AdminValidate($id)
 	{
 		$messages = array();
-  		list($ret,$msg) = parent::AdminValidate();
+  		list($ret,$msg) = parent::AdminValidate($id);
 		if(!ret)
 			$messages[] = $msg;
 

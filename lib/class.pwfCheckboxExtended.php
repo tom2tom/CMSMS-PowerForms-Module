@@ -49,29 +49,29 @@ class pwfCheckboxExtended extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$main = array(
 			array($mod->Lang('title_checkbox_label'),
-           		$mod->CreateInputText($module_id,'opt_box_label',
+           		$mod->CreateInputText($id,'opt_box_label',
 	           		$this->GetOption('box_label'),25,255)),
             array($mod->Lang('title_checked_value'),
-           		$mod->CreateInputText($module_id,'opt_checked_value',
+           		$mod->CreateInputText($id,'opt_checked_value',
 	           		$this->GetOption('checked_value',$mod->Lang('yes')),25,255)),
             array($mod->Lang('title_unchecked_value'),
-            		$mod->CreateInputText($module_id,'opt_unchecked_value',
+            		$mod->CreateInputText($id,'opt_unchecked_value',
 	            		$this->GetOption('unchecked_value',$mod->Lang('no')),25,255)),
 			array($mod->Lang('title_default_set'),
-				$mod->CreateInputHidden($module_id,'opt_is_checked','0').
-				$mod->CreateInputCheckbox($module_id,'opt_is_checked','1',
+				$mod->CreateInputHidden($id,'opt_is_checked','0').
+				$mod->CreateInputCheckbox($id,'opt_is_checked','1',
 					$this->GetOption('is_checked','0'))),
 			array($mod->Lang('title_textfield_label'),
-           		$mod->CreateInputText($module_id,'opt_text_label',
+           		$mod->CreateInputText($id,'opt_text_label',
             		$this->GetOption('text_label'),25,255)),
 			array($mod->Lang('title_show_textfield'),
-				$mod->CreateInputHidden($module_id,'opt_show_textfield','0').
-				$mod->CreateInputCheckbox($module_id,'opt_show_textfield','1',
+				$mod->CreateInputHidden($id,'opt_show_textfield','0').
+				$mod->CreateInputCheckbox($id,'opt_show_textfield','1',
 					$this->GetOption('show_textfield','0')))
 		);
 
@@ -113,7 +113,7 @@ class pwfCheckboxExtended extends pwfFieldBase
 		return $output;
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$this->validated = TRUE;
