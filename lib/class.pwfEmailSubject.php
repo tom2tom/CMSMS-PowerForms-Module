@@ -20,33 +20,35 @@ class pwfEmailSubject extends pwfFieldBase {
 		$mod = $this->formdata->formsmodule;
 		$js = $this->GetOption('javascript');
 
-		return $mod->CustomCreateInputType($id,'pwfp_'.$this->Id,
+		return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($this->Value,ENT_QUOTES),
            25,128,$js.$this->GetCSSIdTag());
 	}
 
+	function Validate()
+	{
+		if($this->Value)
+		{
+			$this->validated = TRUE;
+			$this->ValidationMessage = '';
+		}
+		else
+		{
+			$this->validated = FALSE;
+			$this->ValidationMessage = $mod->Lang('please_enter_TODO',$this->Name);
+		}
+		return array($this->validated,$this->ValidationMessage);
+	}
+
 	function ModifyOtherFields()
 	{
-		$mod = $this->formdata->formsmodule;
-		$others = $this->formdata->Fields;
-		if($this->Value !== FALSE)
+		foreach($this->formdata->Fields as &$one)
 		{
-			for($i=0; $i<count($others); $i++)
-			{
-				$replVal = '';
-				if($others[$i]->IsDisposition() && is_subclass_of($others[$i],'pwfEmailBase'))
-				{
-					$others[$i]->SetOption('email_subject',$this->Value);
-				}
-			}
+			if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
+				$one->SetOption('email_subject',$this->Value);
 		}
+		unset($one);
 	}
-
-	function GetFieldStatus()
-	{
-		return '';
-	}
-
 }
 
 ?>
