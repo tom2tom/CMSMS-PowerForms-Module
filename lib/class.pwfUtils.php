@@ -182,14 +182,15 @@ class pwfUtils
 	CleanLog:
 	@module: reference to PowerTools module object
 	@time: timestamp,optional,default = 0
+	Removes from table records older than 30-minutes
 	*/
 	public static function CleanLog(&$module,$time = 0)
 	{
 		if(!$time) $time = time();
-		$time -= 86400;
+		$time -= 900;
 		$db = cmsms()->GetDb();
 		$limit = $db->DbTimeStamp($time);
-		$db->Execute('DELETE FROM '.cms_db_prefix().'module_pwf_ip_log WHERE sent_time<'.$limit);
+		$db->Execute('DELETE FROM '.cms_db_prefix().'module_pwf_ip_log WHERE basetime<'.$limit);
 	}
 
 	public static function GetFormNameFromID($form_id)
@@ -553,16 +554,29 @@ EOS;
 		$smarty->assign('version',$mod->GetVersion());
 	}
 
+	public static function CheckResponse($form_id,$response_id,$code)
+	{
+		$db = cmsms()->GetDb();
+		$sql = 'SELECT secret_code FROM '.cms_db_prefix().'module_pwf_browse WHERE form_id=? AND browser_id=?'; //TODO
+		if($result = $db->GetOne($sql,array($form_id,$response_id)))
+		{
+			if($result == $code)
+				return TRUE;
+		}
+		return FALSE;
+	}
+
 	/**
 	StoreResponse:
 	Master response saver,used by various field-classes
-	@response_id:=-1
-	@approver:=''
-	@Disposer:=NULL
+	@formdata: reference to pwfData object
+	@response_id:  default = -1
+	@approver:  default = ''
+	@Disposer: default = NULL
 	*/
-/*	public static function StoreResponse(&$formdata,$response_id=-1,$approver='',&$Disposer=NULL)
+	public static function StoreResponse(&$formdata,$response_id=-1,$approver='',&$Disposer=NULL)
 	{
-		$mod = $formdata->formsmodule;
+/*		$mod = $formdata->formsmodule;
 		$db = cmsms()->GetDb();
 		$newrec = FALSE;
 		$crypt = FALSE;
@@ -671,8 +685,9 @@ EOS;
 				$xml);
 		}
 		return $output;
-	}
 */
+	}
+
 	// Insert parsed XML data to database
 	private static function StoreResponseXML($response_id=-1,$newrec=FALSE,$approver='',$sortfield1,
 	   $sortfield2,$sortfield3,$sortfield4,$sortfield5,$feu_id,$xml)
@@ -786,7 +801,6 @@ EOS;
 		return $plain;
 	}
 */
-
 	public static function GetFileLock()
 	{
 		$db = cmsms()->GetDb();
