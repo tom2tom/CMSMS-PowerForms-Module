@@ -21,7 +21,7 @@ class pwfHTML5URL extends pwfFieldBase
 		$js = $this->GetOption('javascript');
 		$cssid = $this->GetCSSIdTag();
 
-		return '<input type="url" name="'.$id.'pwfp_'.$this->Id.
+		return '<input type="url" name="'.$id.$this->formdata->current_prefix.$this->Id.
 		'" '.$js.$cssid.' />';
 	}
 

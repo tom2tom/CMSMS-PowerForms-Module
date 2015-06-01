@@ -24,7 +24,7 @@ class pwfHTML5Number extends pwfFieldBase
 		$js = $this->GetOption('javascript');
 		$cssid = $this->GetCSSIdTag();
 
-		return '<input type="number" name="'.$id.'pwfp_'.$this->Id.
+		return '<input type="number" name="'.$id.$this->formdata->current_prefix.$this->Id.
 		'" min="'.$min.'" max="'.$max.'" step="'.$step.'" '.$js.$cssid.' />';
 	}
 
