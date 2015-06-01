@@ -666,62 +666,12 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 		return TRUE;
 	}
 
-/*			if($loadResp)
-			{
-				// if it's a stored form,load the results -- but we need to manually merge them,
-				// since $params[] should override the database value (say we're resubmitting a form)
-TODO				$obfield = $mod->GetFormBrowserField($form_id);
-				if($obfield != FALSE)
-				{
-					// if we're binding to FEU,get the FEU ID,see if there's a response for
-					// that user. If so,load it. Otherwise,bring up an empty form.
-					if($obfield->GetOption('feu_bind','0')=='1')
-					{
-						$feu = $mod->GetModuleInstance('FrontEndUsers');
-						if($feu == FALSE)
-						{
-							debug_display("FAILED to instatiate FEU!");
-							return;
-						}
-						if(!isset($_COOKIE['cms_admin_user_id']))
-						{
-TODO							$response_id = pwfDummy:GetResponseIDFromFEUID($feu->LoggedInId(),$form_id);
-							if($response_id !== FALSE)
-							{
-								$check = $db->GetOne('SELECT count(*) FROM '.$pre.
-									'module_pwf_browse WHERE browser_id=?',array($response_id));
-								if($check == 1)
-								{
-									$params['response_id'] = $response_id;
-								}
-							}
-						}
-					}
-				}
-				if(isset($params['response_id']))
-				{
-					$loadParams = array('response_id'=>$params['response_id']);
-					$loadTypes = array();
-					self::LoadResponseValues($loadParams,$loadTypes);
-					foreach($loadParams as $thisParamKey=>$thisParamValue)
-					{
-						if(!isset($params[$thisParamKey]))
-						{
-							if($formdata->FormState == 'update' && $loadTypes[$thisParamKey] == 'CheckboxField')
-							{
-								$params[$thisParamKey] = '';
-							}
-							else
-							{
-								$params[$thisParamKey] = $thisParamValue;
-							}
-						}
-					}
-				}
-			}
-*/
-
-	//returns TRUE if a form with matching name OR alias does NOT exist
+	/**
+	NewID:
+	@name: optional form-name string, default = FALSE
+	@alias: optional form-alias string, default = FALSE
+	Returns TRUE if there's no form with matching name OR alias
+	*/
 	function NewID($name = FALSE,$alias = FALSE)
 	{
 		$where = array();
@@ -748,6 +698,8 @@ TODO							$response_id = pwfDummy:GetResponseIDFromFEUID($feu->LoggedInId(),$fo
 		}
 		return TRUE;
 	}
+
+	/* $params[] interpreters */
 
 	function GetId(&$params)
 	{
