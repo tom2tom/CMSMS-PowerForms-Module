@@ -12,25 +12,19 @@ class pwfEmailBase extends pwfFieldBase
 		parent::__construct($formdata,$params);
 		$this->IsDisposition = TRUE;
 		$this->IsEmailDisposition = TRUE;
-		$this->ValidationTypes = array();
 	}
 
 	function TemplateStatus()
 	{
-		if($this->GetOption('email_template') == '')
-		{
-			$mod = $this->formdata->formsmodule;
-			return $mod->Lang('email_template_not_set');
-		}
+		if($this->GetOption('email_template'))
+			return '';
+		return $this->formdata->formsmodule->Lang('email_template_not_set');
 	}
 
-	function PrePopulateAdminFormBase($module_id,$totype = FALSE)
+	function PrePopulateAdminFormCommonEmail($module_id,$totype = FALSE)
 	{
 		$mod = $this->formdata->formsmodule;
 		$message = $this->GetOption('email_template');
-
-		if($this->GetFieldType() == 'DispositionEmailConfirmation')
-			pwfUtils::AddTemplateVariable($this->formdata,'confirm_url',$mod->Lang('title_confirmation_url'));
 
 		/* main-tab items */
 		$main = array(
@@ -80,6 +74,56 @@ class pwfEmailBase extends pwfFieldBase
 		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>'varshelpadv');
 	}
 
+	function PostAdminSubmitCleanupEmail(&$params)
+	{
+//TODO set OptionElement('destination_address',$i) ??
+Crash;
+		if(!is_array($params['opt_destination_address']))
+			$params['opt_destination_address'] = array($params['opt_destination_address']);
+
+		foreach($params['opt_destination_address'] as $i => $to)
+		{
+			if(isset($params['mailto_'.$i]))
+			{
+				$totype = $params['mailto_'.$i];
+				switch ($totype)
+				{
+				 case 'cc';
+					$params['opt_destination_address'][$i] = '|cc|'.$to;
+					break;
+				 case 'bc':
+					$params['opt_destination_address'][$i] = '|bc|'.$to;
+					break;
+				}
+				unset($params[$totype]);
+			}
+		}
+	}
+
+	// override as necessary, return TRUE to include sender-address header in email 
+	function SetFromAddress()
+	{
+		return TRUE;
+	}
+
+	// override as necessary, return TRUE to include sender header in email 
+	function SetFromName()
+	{
+		return TRUE;
+	}
+
+	// override as necessary, return TRUE to include reply-to header in email 
+	function SetReplyToName()
+	{
+		return TRUE;
+	}
+
+	// override as necessary, return TRUE to include reply-to header in email 
+	function SetReplyToAddress()
+	{
+		return TRUE;
+	}
+
 	function validateEmailAddr($email)
 	{
 	//TODO CACHE VARIABLES
@@ -106,183 +150,24 @@ class pwfEmailBase extends pwfFieldBase
 		return array($ret,$message);
 	}
 
-	// send emails
+	// send email(s)
+	// $subject is processed via smarty
+	// message body is generated from field-option 'email_template' (or a default template)
 	function SendForm($destination_array,$subject)
 	{
+		$mod = $this->formdata->formsmodule;
 		if($destination_array == FALSE || $subject == FALSE)
-			return array(FALSE,'');
-
-		$formdata = $this->formdata;
-		$mod = $formdata->formsmodule;
-		$db = cmsms()->GetDb();
-
-		if($mod->GetPreference('enable_antispam'))
-		{
-			if(!empty($_SERVER['REMOTE_ADDR']))
-			{
-				$query = 'select count(src_ip) as sent from '.cms_db_prefix().
-				'module_pwf_ip_log where src_ip=? AND sent_time > ?';
-
-				$dbresult = $db->GetOne($query,array($_SERVER['REMOTE_ADDR'],
-					   trim($db->DBTimeStamp(time() - 3600),"'")));
-
-				if($dbresult && isset($dbresult['sent']) && $dbresult['sent'] > 9)
-				{
-					// too many from this IP address. Kill it.
-					$msg = '<hr />'.$mod->Lang('suspected_spam').'<hr />';
-					audit(-1,$mod->GetName(),$mod->Lang('log_suspected_spam',$_SERVER['REMOTE_ADDR']));
-					return array(FALSE,$msg);
-				}
-			}
-		}
+			return array(FALSE,$mod->Lang('missing_TODO'));
 
 		$mail = $mod->GetModuleInstance('CMSMailer');
-		if($mail == FALSE)
-		{
-			$msg = '<hr />'.$mod->Lang('missing_cms_mailer'). '<hr />';
-			audit(-1,$mod->GetName(),$mod->Lang('missing_cms_mailer'));
-			return array(FALSE,$msg);
-		}
+		if(!$mail)
+			return array(FALSE,$mod->Lang('missing_cms_mailer'));
+
 		$mail->reset();
 
-		$rt = $this->GetOption('email_reply_to_address');
-		$rn = $this->GetOption('email_reply_to_name');
-		if(empty($rn))
-		{
-			$rn = $this->GetOption('email_from_name');
-		}
-		if($this->SetReplyToAddress() && !empty($rt))
-		{
-			$mail->AddReplyTo($rt,$this->SetFromName()?$rn:'');
-		}
-
-		if($this->SetFromAddress())
-		{
-			$mail->SetFrom($this->GetOption('email_from_address'));
-		}
-		if($this->SetFromName())
-		{
-			$mail->SetFromName($this->GetOption('email_from_name'));
-		}
-
-		$mail->SetCharSet($this->GetOption('email_encoding','utf-8'));
-
-		$message = $this->GetOption('email_template');
-		$htmlemail = ($this->GetOption('html_email','0') == '1');
-		if($this->GetFieldType() == 'DispositionEmailConfirmation')
-			pwfUtils::AddTemplateVariable($this->formdata,'confirm_url',$mod->Lang('title_confirmation_url'));
-
-		if($htmlemail)
-			$mail->IsHTML(TRUE);
-
-		if(strlen($message) < 1)
-		{
-			$message = pwfUtils::CreateSampleTemplate($this->formdata,FALSE);
-			if($htmlemail)
-				$message2 = pwfUtils::CreateSampleTemplate($this->formdata,TRUE);
-		}
-		elseif($htmlemail)
-			$message2 = $message;
-
-		pwfUtils::SetFinishedFormSmarty($this->formdata,$htmlemail);
-
-		$fields = $formdata->Fields;
-		foreach ($fields as &$one)
-		{
-	 		if(strtolower(get_class($one)) == 'pwffileuploadfield')
-    		{
-				if(!$one->GetOption('suppress_attachment'))
-				{
-					if(!$one->GetOption('sendto_uploads'))
-					{
-						// we have a file we wish to attach
-						$thisAtt = $one->GetHumanReadableValue(FALSE);
-
-						if(is_array($thisAtt))
-						{
-							if(function_exists('finfo_open'))
-							{
-								$finfo = finfo_open(FILEINFO_MIME); // return mime type ala mimetype extension
-								$thisType = finfo_file($finfo,$thisAtt[0]);
-								finfo_close($finfo);
-							}
-							else if(function_exists('mime_content_type'))
-							{
-								$thisType = mime_content_type($thisAtt[0]);
-							}
-							else
-							{
-								$thisType = 'application/octet-stream';
-							}
-							$thisNames = split('[/:\\]',$thisAtt[0]);
-							$thisName = array_pop($thisNames);
-							if(!$mail->AddAttachment($thisAtt[0],$thisName,"base64",$thisType))
-							{
-								// failed upload kills the send.
-								audit(-1,$mod->GetName(),$mod->Lang('submit_error',$mail->GetErrorInfo()));
-								return array($res,$mod->Lang('upload_attach_error',
-										array($thisAtt[0],$thisAtt[0] ,$thisType)));
-							}
-						}
-						else if(strlen($thisAtt) > 0)
-						{	// Fix for Bug 4307
-							//Filepath can't be relative to CWD dir
-							$filepath = $one->GetOption('file_destination');
-							$filepath = cms_join_path($filepath,$thisAtt);
-
-							if(function_exists('finfo_open'))
-							{
-								$finfo = finfo_open(FILEINFO_MIME); // return mime type ala mimetype extension
-								$thisType = finfo_file($finfo,$filepath);
-								finfo_close($finfo);
-							}
-							else if(function_exists('mime_content_type'))
-							{
-								$thisType = mime_content_type($filepath);
-							}
-							else
-							{
-								$thisType = 'application/octet-stream';
-							}
-
-							$thisNames = split('[/:\\]',$filepath);
-							$thisName = array_pop($thisNames);
-
-							if(!$mail->AddAttachment($filepath,$thisName,"base64",$thisType))
-							{
-								// failed upload kills the send.
-								audit(-1,$mod->GetName(),$mod->Lang('submit_error',$mail->GetErrorInfo()));
-								return array($res,$mod->Lang('upload_attach_error',
-									array($filepath,$filepath ,$thisType)));
-							}
-						}
-					}
-				}
-     		}
-    	}
-		unset($one);
-		//process without cacheing
-		$message = $mod->ProcessTemplateFromData($message);
-		$subject = $mod->ProcessTemplateFromData($subject);
-		$mail->SetSubject($subject);
-		if($htmlemail)
-		{
-			$message2 = $mod->ProcessTemplateFromData($message2);
-			$mail->SetAltBody(strip_tags(html_entity_decode($message)));
-			$mail->SetBody($message2);
-		}
-		else
-		{
-			$mail->SetBody(html_entity_decode($message));
-		}
-
-//		$haveto = FALSE;
 		$defto = $this->GetOption('send_using','to');
 		if(!is_array($destination_array))
-		{
 			$destination_array = array($destination_array);
-		}
-
 		foreach($destination_array as $thisDest)
 		{
 			if(strpos($thisDest,',') !== FALSE)
@@ -325,8 +210,8 @@ class pwfEmailBase extends pwfFieldBase
 				}
 				if($res == FALSE)
 				{
-					audit(-1,$mod->GetName(),$mod->Lang('error_address',$this_ad));
-					$toReturn = array(FALSE,$mod->Lang('error_address',$this_ad));
+					$mail->reset();
+					return array(FALSE,$mod->Lang('error_address',$this_ad));
 				}
 			}
 			else
@@ -360,45 +245,144 @@ class pwfEmailBase extends pwfFieldBase
 						}
 						break;
 					}
-					$res = TRUE;
 				}
 				else
 				{
-					audit(-1,$mod->GetName(),$mod->Lang('error_address',$thisDest));
-					$toReturn = array(FALSE,$mod->Lang('error_address',$thisDest));
-					$res = FALSE;
+					$mail->reset();
+					return array(FALSE,$mod->Lang('error_address',$thisDest));
 				}
 			}
 		}
 
-		if($res != FALSE)
+		if($this->SetFromName())
+			$mail->SetFromName($this->GetOption('email_from_name'));
+
+		if($this->SetFromAddress())
+			$mail->SetFrom($this->GetOption('email_from_address'));
+
+		$rt = $this->GetOption('email_reply_to_address');
+		if($rt && $this->SetReplyToAddress())
 		{
-//			if($haveto == FALSE)
-//			$res = $mail->AddAddress(''); adding '' or NULL generates error
-			// send the message...
-			$res = $mail->Send();
-			if($res === FALSE)
+			if($this->SetFromName())
 			{
-				audit(-1,$mod->GetName(),$mod->Lang('submit_error',$mail->GetErrorInfo()));
-				$toReturn = array(FALSE,$mail->GetErrorInfo());
+				$rn = $this->GetOption('email_reply_to_name');
+				if(!$rn)
+					$rn = $this->GetOption('email_from_name');
 			}
 			else
-			{
-				if($mod->GetPreference('enable_antispam'))
-				{
-					if(!empty($_SERVER['REMOTE_ADDR']))
-					{
-						$rec_id = $db->GenID(cms_db_prefix().'module_pwf_ip_log_seq');
-						$query = 'INSERT INTO '.cms_db_prefix().
-						'module_pwf_ip_log (sent_id,src_ip,sent_time) VALUES (?,?,?)';
+				$rn = '';
+			$mail->AddReplyTo($rt,$rn);
+		}
 
-						$dbresult = $db->Execute($query,array($rec_id,$_SERVER['REMOTE_ADDR'],
-						   trim($db->DBTimeStamp(time()),"'")));
+		$mail->SetCharSet($this->GetOption('email_encoding','utf-8'));
+
+		$htmlemail = $this->GetOption('html_email',0);
+
+		pwfUtils::SetFinishedFormSmarty($this->formdata,$htmlemail);
+
+		$subject = $mod->ProcessTemplateFromData($subject);
+		$mail->SetSubject($subject);
+
+		$message = $this->GetOption('email_template');
+		if($message)
+		{
+			if($htmlemail)
+				$message2 = $message;
+		}
+		else
+		{
+			$message = pwfUtils::CreateSampleTemplate($this->formdata,FALSE);
+			if($htmlemail)
+				$message2 = pwfUtils::CreateSampleTemplate($this->formdata,TRUE);
+		}
+		$message = $mod->ProcessTemplateFromData($message);
+
+		if($htmlemail)
+		{
+			$mail->IsHTML(TRUE);
+			$message2 = $mod->ProcessTemplateFromData($message2);
+			$mail->SetAltBody(strip_tags(html_entity_decode($message)));
+			$mail->SetBody($message2);
+		}
+		else
+		{
+			$mail->SetBody(html_entity_decode($message));
+		}
+
+		foreach($this->formdata->Fields as &$one)
+		{
+	 		if($one->Type == 'FileUpload' &&
+ 			  !$one->GetOption('suppress_attachment') && !$one->GetOption('sendto_uploads'))
+			{
+				// file(s) to be attached to email
+				$ud = pwfUtils::GetUploadsPath();
+				if(!$ud)
+				{
+					$mail->reset();
+					return array(FALSE,$mod->Lang('TODO'));
+				}
+
+				$thisAtt = $one->GetHumanReadableValue(FALSE);
+
+				if(is_array($thisAtt))
+				{
+					foreach($thisAtt as $onefile)
+					{
+						$filepath = $ud.DIRECTORY_SEPARATORY.$onefile;
+						if(function_exists('finfo_open'))
+						{
+							$finfo = finfo_open(FILEINFO_MIME); // return mime type ala mimetype extension
+							$thisType = finfo_file($finfo,$filepath);
+							finfo_close($finfo);
+						}
+						else if(function_exists('mime_content_type'))
+							$thisType = mime_content_type($filepath);
+						else
+							$thisType = 'application/octet-stream';
+
+						$thisNames = split('[/:\\]',$filepath);
+						$thisName = array_pop($thisNames);
+						if(!$mail->AddAttachment($filepath,$thisName,"base64",$thisType))
+						{
+							$mail->reset();
+							return array(FALSE,$mod->Lang('upload_attach_error',
+									array($filepath,$filepath,$onefile)));
+						}
 					}
 				}
-				$toReturn = array(TRUE,'');
+				elseif($thisAtt)
+				{
+					$filepath = $ud.DIRECTORY_SEPARATORY.$thisAtt;
+					if(function_exists('finfo_open'))
+					{
+						$finfo = finfo_open(FILEINFO_MIME); // return mime type ala mimetype extension
+						$thisType = finfo_file($finfo,$filepath);
+						finfo_close($finfo);
+					}
+					else if(function_exists('mime_content_type'))
+						$thisType = mime_content_type($filepath);
+					else
+						$thisType = 'application/octet-stream';
+
+					$thisNames = split('[/:\\]',$filepath);
+					$thisName = array_pop($thisNames);
+
+					if(!$mail->AddAttachment($filepath,$thisName,"base64",$thisType))
+					{
+						$mail->reset();
+						return array(FALSE,$mod->Lang('upload_attach_error',
+							array($filepath,$filepath,$thisType)));
+					}
+				}
 			}
-		}
+    	}
+		unset($one);
+
+		// send the message
+		if($mail->Send() !== FALSE)
+			$toReturn = array(TRUE,'');
+		else
+			$toReturn = array(FALSE,$mail->GetErrorInfo());
 
 		$mail->reset();
 		return $toReturn;
