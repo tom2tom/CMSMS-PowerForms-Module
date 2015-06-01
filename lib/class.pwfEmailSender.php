@@ -15,6 +15,30 @@ class pwfEmailSender extends pwfFieldBase
 		$this->Type = 'EmailSender';
 	}
 
+	function PrePopulateAdminForm($id)
+	{
+		$mod = $this->formdata->formsmodule;
+		$main = array();
+		$hopts = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
+		$main[] = array($mod->Lang('title_headers_to_modify'),
+			$mod->CreateInputDropdown($id,'opt_headers_to_modify',$hopts,-1,$this->GetOption('headers_to_modify','b')));
+		$adv = array(
+			array(
+				$mod->Lang('title_field_default_value'),
+				$mod->CreateInputText($id,'opt_default',$this->GetOption('default'),25,1024)),
+			array(
+				$mod->Lang('title_html5'),
+				$mod->CreateInputHidden($id,'opt_html5',0).
+				$mod->CreateInputCheckbox($id,'opt_html5',1,$this->GetOption('html5',0))),
+			array(
+				$mod->Lang('title_clear_default'),
+				$mod->CreateInputHidden($id,'opt_clear_default',0).
+				$mod->CreateInputCheckbox($id,'opt_clear_default',1,$this->GetOption('clear_default',0)),
+				$mod->Lang('help_clear_default'))
+		);
+		return array('main'=>$main,'adv'=>$adv);
+	}
+
 	function GetFieldInput($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
@@ -27,62 +51,25 @@ class pwfEmailSender extends pwfFieldBase
 			25,128,$html5.$js.$this->GetCSSIdTag());
 	}
 
-	function PrePopulateAdminForm($module_id)
-	{
-		$mod = $this->formdata->formsmodule;
-		$main = array();
-		$hopts = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
-		$main[] = array($mod->Lang('title_headers_to_modify'),
-			$mod->CreateInputDropdown($module_id,'opt_headers_to_modify',$hopts,-1,$this->GetOption('headers_to_modify','b')));
-		$adv = array(
-			array(
-				$mod->Lang('title_field_default_value'),
-				$mod->CreateInputText($module_id,'opt_default',$this->GetOption('default'),25,1024)),
-			array(
-				$mod->Lang('title_html5'),
-				$mod->CreateInputHidden($module_id,'opt_html5','0').
-					$mod->CreateInputCheckbox($module_id,'opt_html5','1',$this->GetOption('html5','0'))),
-			array(
-				$mod->Lang('title_clear_default'),
-				$mod->CreateInputHidden($module_id,'opt_clear_default','0').
-					$mod->CreateInputCheckbox($module_id,'opt_clear_default','1',$this->GetOption('clear_default','0')),
-					$mod->Lang('help_clear_default'))
-		);
-
-		return array('main'=>$main,'adv'=>$adv);
-	}
-
 	function ModifyOtherFields()
 	{
-		$mod = $this->formdata->formsmodule;
-		$others = $this->formdata->Fields;
-		$htm = $this->GetOption('headers_to_modify','b');
-
-		if($this->Value !== FALSE)
+		if($this->Value)
 		{
-			for($i=0; $i<count($others); $i++)
+			$htm = $this->GetOption('headers_to_modify','b');
+			foreach(this->formdata->Fields as &$one)
 			{
-				$replVal = '';
-				if($others[$i]->IsDisposition()
-					&& is_subclass_of($others[$i],'pwfEmailBase'))
+				if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
 				{
 					if($htm == 'f' || $htm == 'b')
-					{
-						$others[$i]->SetOption('email_from_name',$this->Value);
-					}
+						$one->SetOption('email_from_name',$this->Value);
 					if($htm == 'r' || $htm == 'b')
-					{
-						$others[$i]->SetOption('email_reply_to_name',$this->Value);
-					}
+						$one->SetOption('email_reply_to_name',$this->Value);
 				}
 			}
+			unset($one);
 		}
 	}
 
-	function GetFieldStatus()
-	{
-		return '';
-	}
 }
 
 ?>

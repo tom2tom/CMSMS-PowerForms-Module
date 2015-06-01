@@ -62,52 +62,48 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
-		$groupops = cmsms()->GetGroupOperations();
-		$groups = $groupops->LoadGroups();
 		$mod = $this->formdata->formsmodule;
 
-		$ret = $this->PrePopulateAdminFormCommonEmail($module_id,TRUE);
-		$main = $ret['main'];
-		$waslast = array_pop($main); //keep the email to-type selector for last
-		$main[] = array($mod->Lang('title_select_one_message'),
-				$mod->CreateInputText($module_id,'opt_select_one',
+		$ret = $this->PrePopulateAdminFormCommonEmail($id,TRUE);
+		$waslast = array_pop($ret['main']); //keep the email to-type selector for later
+		$ret['main'][] = array($mod->Lang('title_select_one_message'),
+				$mod->CreateInputText($id,'opt_select_one',
 				$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
-		$main[] = array($mod->Lang('title_show_userfirstname'),
-				$mod->CreateInputHidden($module_id,'opt_show_userfirstname','0').
-				$mod->CreateInputCheckbox($module_id,'opt_show_userfirstname','1',
-				$this->GetOption('show_userfirstname','1')));
-		$main[] = array($mod->Lang('title_show_userlastname'),
-				$mod->CreateInputHidden($module_id,'opt_show_userlastname','0').
-				$mod->CreateInputCheckbox($module_id,'opt_show_userlastname','1',
-				$this->GetOption('show_userlastname','1')));
-		$main[] = array($mod->Lang('title_show_username'),
-				$mod->CreateInputHidden($module_id,'opt_show_username','0').
-				$mod->CreateInputCheckbox($module_id,'opt_show_username','1',
-				$this->GetOption('show_username','0')));
-		$main[] = $waslast;
+		$ret['main'][] = array($mod->Lang('title_show_userfirstname'),
+				$mod->CreateInputHidden($id,'opt_show_userfirstname',0).
+				$mod->CreateInputCheckbox($id,'opt_show_userfirstname',1,
+				$this->GetOption('show_userfirstname',1)));
+		$ret['main'][] = array($mod->Lang('title_show_userlastname'),
+				$mod->CreateInputHidden($id,'opt_show_userlastname',0).
+				$mod->CreateInputCheckbox($id,'opt_show_userlastname',1,
+				$this->GetOption('show_userlastname',1)));
+		$ret['main'][] = array($mod->Lang('title_show_username'),
+				$mod->CreateInputHidden($id,'opt_show_username',0).
+				$mod->CreateInputCheckbox($id,'opt_show_username',1,
+				$this->GetOption('show_username',0)));
+		$ret['main'][] = $waslast;
 
-		$items = array();
-		foreach($groups as $thisGroup)
-		{
-			$items[$thisGroup->name]=$thisGroup->id;
-		}
+		$choices = array();
+		$groupops = cmsms()->GetGroupOperations();
+		$groups = $groupops->LoadGroups();
+		foreach($groups as $one)
+			$choices[$one->name] = $one->id;
 
-		$main[] = array($mod->Lang('title_restrict_to_group'),
-				$mod->CreateInputHidden($module_id,'opt_restrict_to_group','0').
-				$mod->CreateInputCheckbox($module_id,'opt_restrict_to_group','1',
-				$this->GetOption('restrict_to_group','0')).
-				$mod->CreateInputDropdown($module_id,'opt_group',$items,-1,$this->GetOption('group'))
+		$ret['main'][] = array($mod->Lang('title_restrict_to_group'),
+				$mod->CreateInputHidden($id,'opt_restrict_to_group',0).
+				$mod->CreateInputCheckbox($id,'opt_restrict_to_group',1,
+				$this->GetOption('restrict_to_group',0)).
+				$mod->CreateInputDropdown($id,'opt_group',$choices,-1,$this->GetOption('group'))
 				);
-		$ret['main'] = $main;
 		return $ret;
 	}
 
-	function AdminValidate()
+	function AdminValidate($id)
 	{
 		$messages = array();
-  		list($ret,$msg) = parent::AdminValidate();
+  		list($ret,$msg) = parent::AdminValidate($id);
 		if(!ret)
 			$messages[] = $msg;
 
@@ -166,7 +162,7 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 		}
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		if($this->Value)
 		{
@@ -181,7 +177,7 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 		return array($this->validated,$this->ValidationMessage);
 	}
 
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
 		if($this->HasValue())
 		{

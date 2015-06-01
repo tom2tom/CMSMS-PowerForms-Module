@@ -22,9 +22,9 @@ class pwfEmailOne extends pwfEmailBase
 		return $this->TemplateStatus();
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
-//		return $this->PrePopulateAdminFormCommonEmail($module_id); //TODO
+//		return $this->PrePopulateAdminFormCommonEmail($id); //TODO
 		return array();
 	}
 
@@ -36,23 +36,28 @@ class pwfEmailOne extends pwfEmailBase
 			htmlspecialchars($this->Value,ENT_QUOTES),25,128,$js.$this->GetCSSIdTag());
 	}
 
-	function Validate()
+	function Validate($id)
 	{
-		$mod = $this->formdata->formsmodule;
-		if($this->Value && preg_match($mod->email_regex,$this->Value))
+		$this->validated = TRUE;
+		$this->ValidationMessage = '';
+		if($this->Value)
 		{
-			$this->validated = TRUE;
-			$this->ValidationMessage = '';
+			list($rv,$msg) = $this->validateEmailAddr($this->Value);
+			if(!$rv)
+			{
+				$this->validated = FALSE;
+				$this->ValidationMessage = $msg;
+			}
 		}
 		else
 		{
 			$this->validated = FALSE;
-			$this->ValidationMessage = $mod->Lang('please_enter_an_email',$this->Name);
+			$this->ValidationMessage = $this->formdata->formsmodule->Lang('please_enter_an_email',$this->Name);
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}
 
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
 		if($this->HasValue())
 			return $this->SendForm($this->Value,$this->GetOption('email_subject'));
