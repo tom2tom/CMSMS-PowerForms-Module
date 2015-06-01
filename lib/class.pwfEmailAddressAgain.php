@@ -16,6 +16,50 @@ class pwfEmailAddressAgain extends pwfFieldBase
 		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_email_address')=>'email');
 	}
 
+	function GetFieldStatus()
+	{
+		$mod = $this->formdata->formsmodule;
+		return $mod->Lang('title_field_id') . ': ' . $this->GetOption('field_to_validate');
+	}
+
+	function PrePopulateAdminForm($id)
+	{
+		$choices = array();
+		foreach($this->formdata->Fields as &$one)
+		{
+			if($one->IsInput && $one->Id != $this->Id)
+			{
+				$tn = $one->GetName();
+				$choices[$tn] = $tn;
+			}
+		}
+		unset($one);
+		$mod = $this->formdata->formsmodule;
+		$main = array(
+			array(
+				$mod->Lang('title_field_to_validate'),
+				$mod->CreateInputDropdown($id,
+					'opt_field_to_validate',$choices,-1,$this->GetOption('field_to_validate'))
+			)
+		);
+		$adv = array(
+			array(
+				$mod->Lang('title_field_default_value'),
+				$mod->CreateInputText($id,'opt_default',$this->GetOption('default'),25,1024)),
+			array(
+				$mod->Lang('title_html5'),
+				$mod->CreateInputHidden($id,'opt_html5',0).
+				$mod->CreateInputCheckbox($id,'opt_html5',1,$this->GetOption('html5',0))),
+			array(
+				$mod->Lang('title_clear_default'),
+				$mod->CreateInputHidden($id,'opt_clear_default',0).
+				$mod->CreateInputCheckbox($id,'opt_clear_default',1,$this->GetOption('clear_default',0)),
+				$mod->Lang('help_clear_default'))
+		);
+
+		return array('main'=>$main,'adv'=>$adv);
+	}
+
 	function GetFieldInput($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
@@ -28,47 +72,7 @@ class pwfEmailAddressAgain extends pwfFieldBase
 			25,128,$html5.$js.$this->GetCSSIdTag(),'email');
 	}
 
-	function GetFieldStatus()
-	{
-		$mod = $this->formdata->formsmodule;
-		return $mod->Lang('title_field_id') . ': ' . $this->GetOption('field_to_validate');
-	}
-
-	function PrePopulateAdminForm($module_id)
-	{
-		$mod = $this->formdata->formsmodule;
-		$flds = $this->formdata->Fields;
-		$opts = array();
-		foreach($flds as $tf)
-		{
-			$opts[$tf->GetName()]=$tf->GetName();
-		}
-		$main = array(
-			array(
-				$mod->Lang('title_field_to_validate'),
-				$mod->CreateInputDropdown($module_id,
-					'opt_field_to_validate',$opts,-1,$this->GetOption('field_to_validate'))
-			)
-		);
-		$adv = array(
-			array(
-				$mod->Lang('title_field_default_value'),
-				$mod->CreateInputText($module_id,'opt_default',$this->GetOption('default'),25,1024)),
-			array(
-				$mod->Lang('title_html5'),
-				$mod->CreateInputHidden($module_id,'opt_html5','0').
-					$mod->CreateInputCheckbox($module_id,'opt_html5','1',$this->GetOption('html5','0'))),
-			array(
-				$mod->Lang('title_clear_default'),
-				$mod->CreateInputHidden($module_id,'opt_clear_default','0').
-					$mod->CreateInputCheckbox($module_id,'opt_clear_default','1',$this->GetOption('clear_default','0')),
-					$mod->Lang('help_clear_default'))
-		);
-
-		return array('main'=>$main,'adv'=>$adv);
-	}
-
-	function Validate()
+	function Validate($id)
 	{
 		$this->validated = TRUE;
 		$this->ValidationMessage = '';
@@ -77,20 +81,19 @@ class pwfEmailAddressAgain extends pwfFieldBase
 
 		if($field_to_validate)
 		{
-			$mod = $this->formdata->formsmodule;
-			foreach($this->formdata->Fields as &$one_field)
+			foreach($this->formdata->Fields as &$one)
 			{
-				if($one_field->Name == $field_to_validate)
+				if($one->Name == $field_to_validate)
 				{
-					$value = $one_field->GetValue();
-					if($value != $this->Value)
+					if($$one->GetValue() != $this->Value)
 					{
 						$this->validated = FALSE;
-						$this->ValidationMessage = $mod->Lang('email_address_does_not_match',$field_to_validate);
+						$this->ValidationMessage = $this->formdata->formsmodule->Lang('email_address_does_not_match',$field_to_validate);
 					}
+					break;
 				}
 			}
-			unset ($one_field);
+			unset($one);
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}

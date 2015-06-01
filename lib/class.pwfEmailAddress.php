@@ -5,6 +5,8 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
+//This class is for a mandatory email-address input (single address, not ','-separated)
+
 class pwfEmailAddress extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
@@ -35,26 +37,26 @@ class pwfEmailAddress extends pwfFieldBase
 		return '';
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$main = array();
 		$hopts = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
 		$main[] = array($mod->Lang('title_headers_to_modify'),
-			$mod->CreateInputDropdown($module_id,'opt_headers_to_modify',$hopts,-1,$this->GetOption('headers_to_modify','f')));
+			$mod->CreateInputDropdown($id,'opt_headers_to_modify',$hopts,-1,$this->GetOption('headers_to_modify','f')));
 		$adv = array(
 			array(
 				$mod->Lang('title_field_default_value'),
-				$mod->CreateInputText($module_id,'opt_default',$this->GetOption('default'),25,1024)),
+				$mod->CreateInputText($id,'opt_default',$this->GetOption('default'),25,1024)),
 			array(
 				$mod->Lang('title_html5'),
-				$mod->CreateInputHidden($module_id,'opt_html5','0').
-					$mod->CreateInputCheckbox($module_id,'opt_html5','1',$this->GetOption('html5','0'))),
+				$mod->CreateInputHidden($id,'opt_html5',0).
+				$mod->CreateInputCheckbox($id,'opt_html5',1,$this->GetOption('html5',0))),
 			array(
 				$mod->Lang('title_clear_default'),
-				$mod->CreateInputHidden($module_id,'opt_clear_default','0').
-					$mod->CreateInputCheckbox($module_id,'opt_clear_default','1',$this->GetOption('clear_default','0')),
-					$mod->Lang('help_clear_default'))
+				$mod->CreateInputHidden($id,'opt_clear_default',0).
+				$mod->CreateInputCheckbox($id,'opt_clear_default',1,$this->GetOption('clear_default',0)),
+				$mod->Lang('help_clear_default'))
 		);
 
 		return array('main'=>$main,'adv'=>$adv);
@@ -62,41 +64,33 @@ class pwfEmailAddress extends pwfFieldBase
 
 	function ModifyOtherFields()
 	{
-		$mod = $this->formdata->formsmodule;
-		$others = $this->formdata->Fields;
-		$htm = $this->GetOption('headers_to_modify','f');
-
 		if($this->Value !== FALSE)
 		{
-			for($i=0; $i<count($others); $i++)
+			$htm = $this->GetOption('headers_to_modify','f');
+			foreach($this->formdata->Fields as &$one)
 			{
-				$replVal = '';
-				if($others[$i]->IsDisposition()
-			 	  && is_subclass_of($others[$i],'pwfEmailBase'))
+				if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
 				{
 					if($htm == 'f' || $htm == 'b')
-					{
-						$others[$i]->SetOption('email_from_address',$this->Value);
-					}
+						$one->SetOption('email_from_address',$this->Value);
 					if($htm == 'r' || $htm == 'b')
-					{
-						$others[$i]->SetOption('email_reply_to_address',$this->Value);
-					}
+						$one->SetOption('email_reply_to_address',$this->Value);
 				}
 			}
+			unset($one);
 		}
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		$this->validated = TRUE;
 		$this->ValidationMessage = '';
-		$mod = $this->formdata->formsmodule;
 		switch ($this->ValidationType)
 		{
 		 case 'email':
-			if($this->Value !== FALSE &&
-				!preg_match($mod->email_regex,$this->Value))
+			$mod = $this->formdata->formsmodule;
+			//no ','-separator support
+			if(!$this->Value || !preg_match($mod->email_regex,$this->Value))
 			{
 				$this->validated = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_an_email',$this->Name);

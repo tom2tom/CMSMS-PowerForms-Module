@@ -32,7 +32,7 @@ class pwfEmailConfirmation extends pwfEmailBase
 //TODO 'REALLY' dispose the whole form (without further confirmation)
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$contentops = cmsms()->GetContentOperations();
@@ -40,10 +40,10 @@ class pwfEmailConfirmation extends pwfEmailBase
 //TODO where should this be?
 		pwfUtils::AddTemplateVariable($this->formdata,'confirm_url',$mod->Lang('title_confirmation_url'));
 
-		$ret = $this->PrePopulateAdminFormCommonEmail($module_id);
+		$ret = $this->PrePopulateAdminFormCommonEmail($id);
 		$main = (isset($ret['main'])) ? $ret['main'] : array();
 		$main[] = array($mod->Lang('redirect_after_approval'),
-				@$contentops->CreateHierarchyDropdown('',$this->GetOption('redirect_page','0'),$module_id.'opt_redirect_page'));
+				@$contentops->CreateHierarchyDropdown('',$this->GetOption('redirect_page','0'),$id.'opt_redirect_page'));
 		$ret['main'] = $main;
 		return $ret;
 	}
@@ -73,33 +73,33 @@ class pwfEmailConfirmation extends pwfEmailBase
 			htmlspecialchars($this->Value,ENT_QUOTES),25,80,$this->GetCSSIdTag(),'email');
 	}
 
-	function Validate()
+	function Validate($id)
 	{
   		$this->validated = TRUE;
   		$this->ValidationMessage = '';
 		switch ($this->ValidationType)
 		{
 		 case 'email':
-			$mod = $this->formdata->formsmodule;
 			if($this->Value)
 			{
-				if(!preg_match($mod->email_regex,$this->Value))
+				list($rv,$msg) = $this->validateEmailAddr($this->Value);
+				if(!$rv)
 				{
 					$this->validated = FALSE;
-					$this->ValidationMessage = $mod->Lang('invalid_email',$this->Name); //TODO translate
+					$this->ValidationMessage = $msg;
 				}
 			}
 			else
 			{
 				$this->validated = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_an_email',$this->Name);
+				$this->ValidationMessage = $this->formdata->formsmodule->Lang('please_enter_an_email',$this->Name);
 			}
 			break;
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}
 
-	function DisposeForm($returnid)
+	function Dispose($id,$returnid)
 	{
 		if($this->approvedToGo)
 		{

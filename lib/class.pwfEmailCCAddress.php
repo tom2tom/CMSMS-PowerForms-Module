@@ -5,6 +5,8 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
+//This class is for an optional CC-address input (single address, not ','-separated)
+
 class pwfEmailCCAddress extends pwfFieldBase
 {
 	function __construct(&$formdata,&$params)
@@ -43,26 +45,24 @@ class pwfEmailCCAddress extends pwfFieldBase
 			htmlspecialchars($this->Value,ENT_QUOTES),25,128,$js.$this->GetCSSIdTag());
 	}
 
-	function PrePopulateAdminForm($module_id)
+	function PrePopulateAdminForm($id)
 	{
-		$mod = $this->formdata->formsmodule;
-		$main = array();
-		$fieldlist = array();
-		$others = $this->formdata->Fields;
-		foreach($others as &$one)
+		$choices = array();
+		foreach($this->formdata->Fields as &$one)
 		{
-			if($one->IsDisposition()
-				&& is_subclass_of($one,'pwfEmailBase'))
+			if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
 			{
 				$txt = $one->GetName().': '.$one->GetDisplayType().
 					' ('.$one->ForceAlias().')';
-				$fieldlist[$txt] = $one->GetId();
+				$choices[$txt] = $one->GetId();
 			}
 		}
-		unset ($one);
+		unset($one);
 
+		$mod = $this->formdata->formsmodule;
+		$main = array();
 		$main[] = array($mod->Lang('title_field_to_modify'),
-			$mod->CreateInputDropdown($module_id,'opt_field_to_modify',$fieldlist,-1,$this->GetOption('field_to_modify')));
+			$mod->CreateInputDropdown($id,'opt_field_to_modify',$choices,-1,$this->GetOption('field_to_modify')));
 
 		return array('main'=>$main);
 	}
@@ -71,34 +71,33 @@ class pwfEmailCCAddress extends pwfFieldBase
 	{
 		if($this->Value !== FALSE)
 		{
-			$others = $this->formdata->Fields;
-			foreach($others as &$one)
+			foreach($this->formdata->Fields as &$one)
 			{
 				if($one->IsDisposition()
                		&& is_subclass_of($one,'pwfEmailBase')
 					&& $one->GetId() == $this->GetOption('field_to_modify'))
 				{
 					$cc = $one->GetOption('email_cc_address');
-					if(!empty($cc))
+					if($cc)
 						$cc .= ',';
 					$cc .= $this->Value;
-					$one->SetOption('email_cc_address',$this->Value);
+					$one->SetOption('email_cc_address',$cc);
 				}
 			}
 			unset($one);
 		}
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		$this->validated = TRUE;
 		$this->ValidationMessage = '';
-		switch ($this->ValidationType)
+		switch($this->ValidationType)
 		{
 		 case 'email':
 			$mod = $this->formdata->formsmodule;
-			if($this->Value !== FALSE &&
-				!preg_match($mod->email_regex,$this->Value))
+			//no ','-separator support
+			if($this->Value && !preg_match($mod->email_regex,$this->Value))
 			{
 				$this->validated = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_an_email',$this->Name);

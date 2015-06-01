@@ -21,20 +21,20 @@ class pwfEmailBase extends pwfFieldBase
 		return $this->formdata->formsmodule->Lang('email_template_not_set');
 	}
 
-	function PrePopulateAdminFormCommonEmail($module_id,$totype = FALSE)
+	function PrePopulateAdminFormCommonEmail($id,$totype = FALSE)
 	{
 		$mod = $this->formdata->formsmodule;
 		$message = $this->GetOption('email_template');
 
 		/* main-tab items */
 		$main = array(
-				array($mod->Lang('title_email_subject'),$mod->CreateInputText($module_id,'opt_email_subject',
+				array($mod->Lang('title_email_subject'),$mod->CreateInputText($id,'opt_email_subject',
 						$this->GetOption('email_subject'),50),$mod->Lang('canuse_smarty')),
 
-				array($mod->Lang('title_email_from_name'),$mod->CreateInputText($module_id,'opt_email_from_name',
+				array($mod->Lang('title_email_from_name'),$mod->CreateInputText($id,'opt_email_from_name',
 						$this->GetOption('email_from_name',$mod->Lang('friendly_name')),40,128)),
 
-				array($mod->Lang('title_email_from_address'),$mod->CreateInputText($module_id,'opt_email_from_address',
+				array($mod->Lang('title_email_from_address'),$mod->CreateInputText($id,'opt_email_from_address',
 						$this->GetOption('email_from_address'),50,128),
 						$mod->Lang('email_from_addr_help',$_SERVER['SERVER_NAME']))
 			  );
@@ -43,7 +43,7 @@ class pwfEmailBase extends pwfFieldBase
 		if($totype)
 			$main[] = array(
 				$mod->Lang('title_send_using'),
-				$mod->CreateInputRadioGroup($module_id,'opt_send_using',
+				$mod->CreateInputRadioGroup($id,'opt_send_using',
 					array($mod->Lang('to')=>'to',$mod->Lang('cc')=>'cc',$mod->Lang('bcc')=>'bc'),
 					$this->getOption('send_using','to'),'','&nbsp;&nbsp;'),
 					$mod->Lang('email_to_help'));
@@ -52,20 +52,20 @@ class pwfEmailBase extends pwfFieldBase
 		$parm['opt_email_template']['html_button'] = TRUE;
 		$parm['opt_email_template']['text_button'] = TRUE;
 		$parm['opt_email_template']['is_email'] = TRUE;
-		list ($funcs,$buttons) = pwfUtils::AdminTemplateActions($this->formdata,$module_id,$parm);
+		list ($funcs,$buttons) = pwfUtils::AdminTemplateActions($this->formdata,$id,$parm);
 
 		/* advanced-tab items */
 		$adv = array(
 				array($mod->Lang('title_html_email'),
-					$mod->CreateInputHidden($module_id,'opt_html_email','0').
-					$mod->CreateInputCheckbox($module_id,'opt_html_email','1',
+					$mod->CreateInputHidden($id,'opt_html_email','0').
+					$mod->CreateInputCheckbox($id,'opt_html_email','1',
 						$this->GetOption('html_email','0'))),
 
-				array($mod->Lang('title_email_encoding'),$mod->CreateInputText($module_id,'opt_email_encoding',
+				array($mod->Lang('title_email_encoding'),$mod->CreateInputText($id,'opt_email_encoding',
 					$this->GetOption('email_encoding','utf-8'),15,128)),
 
 				array($mod->Lang('title_email_template'),
-					$mod->CreateTextArea(FALSE,$module_id,
+					$mod->CreateTextArea(FALSE,$id,
 					/*($this->GetOption('html_email','0')=='1'?$message:htmlspecialchars($message))*/
 					$message,'opt_email_template','pwf_tallarea','','','',50,15,'','html').
 					'<br /><br />'.$buttons[0].'&nbsp'.$buttons[1])
@@ -126,10 +126,9 @@ Crash;
 
 	function validateEmailAddr($email)
 	{
-	//TODO CACHE VARIABLES
 		$mod = $this->formdata->formsmodule;
 		$ret = TRUE;
-		$message = '';
+		$messages = array();
 		if(strpos($email,',') !== FALSE)
 			$ta = explode(',',$email);
 		else
@@ -144,10 +143,11 @@ Crash;
 			if(!preg_match($mod->email_regex,$to))
 			{
 				$ret = FALSE;
-				$message .= $mod->Lang('error_email_address',$to).'<br />';
+				$messages[] = $mod->Lang('error_email_address',$to);
 			}
 		}
-		return array($ret,$message);
+		$msg = ($ret) ? '':implode('<br />',$messages);
+		return array($ret,$msg);
 	}
 
 	// send email(s)
