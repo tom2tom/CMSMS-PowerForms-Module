@@ -112,18 +112,29 @@ class pwfCustomEmail extends pwfEmailBase
 			$ret = FALSE;
 			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_email_from_name'));
 		}
-		if($this->GetOption('email_from_address'))
+		$opt = $this->GetOption('email_from_address');
+		if($opt)
 		{
-			//TODO validate address
+			if(!$this->validateEmailAddr($opt))
+			{
+				$ret = FALSE;
+				$messages[] = $mod->Lang('invalid_TODO');
+			}
 		}
 		else
 		{
 			$ret = FALSE;
 			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_email_from_address'));
 		}
-		if($this->GetOptionRef('destination_address'))
+		$opt = $this->GetOptionRef('destination_address');
+		if($opt)
 		{
 			//TODO validate address(es)
+			if(0)
+			{
+				$ret = FALSE;
+				$messages[] = $mod->Lang('invalid_TODO');
+			}
 		}
 		else
 		{
@@ -170,7 +181,7 @@ class pwfCustomEmail extends pwfEmailBase
 		$this->SetOption('email_subject',$subjectfld);
 */
 		$fld = $formdata->Fields[$this->GetOption('email_subject')];
-		$ret = $this->SendForm($addarr,$fld->GetHumanReadableValue()); //TODO check is ok, message content?
+		$ret = $this->SendForm($addarr,$fld->GetHumanReadableValue()); //TODO check value(subject) is ok
 
 		$this->SetOption('email_from_name',$senderfld);
 		$this->SetOption('email_from_address',$fromfld);
