@@ -25,7 +25,7 @@ class pwfEmailSubject extends pwfFieldBase {
            25,128,$js.$this->GetCSSIdTag());
 	}
 
-	function Validate()
+	function Validate($id)
 	{
 		if($this->Value)
 		{
