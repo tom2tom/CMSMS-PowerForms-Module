@@ -7,18 +7,18 @@
 
 class pwfEmailConfirmation extends pwfEmailBase
 {
-	$approvedToGo;
+	var $approvedToGo;
 
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->IsDisposition = TRUE;
+		$this->ModifiesOtherFields = TRUE;
 		$this->Type = 'EmailConfirmation';
 		$this->ValidationType = 'email';
-		$this->approvedToGo = FALSE;
-		$this->ModifiesOtherFields = TRUE;
 		$mod = $formdata->formsmodule;
-		pwfUtils::AddTemplateVariable($formdata,'confirm_url',$mod->Lang('title_confirmation_url'));
+		$this->ValidationTypes = array($mod->Lang('validation_email_address')=>'email');
+		$this->approvedToGo = FALSE;
 	}
 
 	function GetFieldStatus()
@@ -29,6 +29,23 @@ class pwfEmailConfirmation extends pwfEmailBase
 	function ApproveToGo($response_id)
 	{
 		$this->approvedToGo = TRUE;
+//TODO 'REALLY' dispose the whole form (without further confirmation)
+	}
+
+	function PrePopulateAdminForm($module_id)
+	{
+		$mod = $this->formdata->formsmodule;
+		$contentops = cmsms()->GetContentOperations();
+
+//TODO where should this be?
+		pwfUtils::AddTemplateVariable($this->formdata,'confirm_url',$mod->Lang('title_confirmation_url'));
+
+		$ret = $this->PrePopulateAdminFormCommonEmail($module_id);
+		$main = (isset($ret['main'])) ? $ret['main'] : array();
+		$main[] = array($mod->Lang('redirect_after_approval'),
+				@$contentops->CreateHierarchyDropdown('',$this->GetOption('redirect_page','0'),$module_id.'opt_redirect_page'));
+		$ret['main'] = $main;
+		return $ret;
 	}
 
 	function ModifyOtherFields()
@@ -39,39 +56,21 @@ class pwfEmailConfirmation extends pwfEmailBase
 			return;
 		}
 		// If we haven't been approved,inhibit all other dispositions!
-		$others = $this->formdata->Fields;
-
-		for($i=0; $i<count($others); $i++)
+		foreach($this->formdata->Fields as &$one)
 		{
-			if($this->approvedToGo && $others[$i]->GetFieldType() == 'DispositionFormBrowser')
-			{
-				$others[$i]->SetApprovalName($this->GetValue());
-			}
-			elseif(!$this->approvedToGo && $others[$i]->IsDisposition())
-			{
-				$others[$i]->SetDispositionPermission(FALSE);
-			}
+			if($this->approvedToGo && $one->GetFieldType() == 'FormBrowser')
+				$one->SetApprovalName($this->GetValue());
+			elseif(!$this->approvedToGo && $one->IsDisposition())
+				$one->SetDispositionPermission(FALSE);
 		}
+		unset($one);
 		$this->SetDispositionPermission(TRUE);
 	}
 
 	function GetFieldInput($id,&$params)
 	{
-		$mod = $this->formdata->formsmodule;
-		return $mod->CustomCreateInputType($id,'pwfp_'.$this->Id,htmlspecialchars($this->Value,ENT_QUOTES),25,80,$this->GetCSSIdTag(),'email');
-	}
-
-	function PrePopulateAdminForm($module_id)
-	{
-		$mod = $this->formdata->formsmodule;
-		$contentops = cmsms()->GetContentOperations();
-
-		$ret = $this->PrePopulateAdminFormBase($module_id);
-		$main = (isset($ret['main'])) ? $ret['main'] : array();
-		$main[] = array($mod->Lang('redirect_after_approval'),
-				@$contentops->CreateHierarchyDropdown('',$this->GetOption('redirect_page','0'),$module_id.'opt_redirect_page'));
-		$ret['main'] = $main;
-		return $ret;
+		return $this->formdata->formsmodule->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,
+			htmlspecialchars($this->Value,ENT_QUOTES),25,80,$this->GetCSSIdTag(),'email');
 	}
 
 	function Validate()
@@ -100,28 +99,35 @@ class pwfEmailConfirmation extends pwfEmailBase
 		return array($this->validated,$this->ValidationMessage);
 	}
 
-    // send emails
 	function DisposeForm($returnid)
 	{
-		if(!$this->approvedToGo)
-		{
-			// create response URL
-			$handler = NULL;
-TODO			list($rid,$code) = pwfUtils::StoreResponse($formdata,-1,'',$handler);
-
-			$smarty = cmsms()->GetSmarty();
-			$mod = $this->formdata->formsmodule;
-			$smarty->assign('confirm_url',$mod->CreateFrontendLink('',$returnid,
-				'validate','',array('pwfp_f'=>$this->formdata->Id,'pwfp_r'=>$rid,'pwfp_c'=>$code),'',
-				TRUE,FALSE,'',TRUE));
-			return $this->SendForm($this->GetValue(),$this->GetOption('email_subject'));
-		}
-		else
+		if($this->approvedToGo)
 		{
 			return array(TRUE,'');
 		}
+		else
+		{
+//TODO cache form data, & abort disposition, pending confirmation
+			// create response URL
+			$handler = NULL;
+//TODO response store??? 
+			list($response_id,$code) = pwfUtils::StoreResponse($this->formdata,-1,'',$handler);
+			$smarty = cmsms()->GetSmarty();
+			$mod = $this->formdata->formsmodule;
+//TODO actually achieves anything?
+			pwfUtils::AddTemplateVariable($this->formdata,'confirm_url',$mod->Lang('title_confirmation_url'));
+			$pref = $this->formdata->current_prefix;
+//TODO setting URL actually achieves anything?
+			$smarty->assign('confirm_url',$mod->CreateFrontendLink('',$returnid,
+				'validate','',array(
+					$pref.'c'=>$code,
+					$pref.'d'=>$this->Id,
+					$pref.'f'=>$this->formdata->Id,
+					$pref.'r'=>$response_id),
+				'',TRUE,FALSE,'',TRUE));
+			return $this->SendForm($this->GetValue(),$this->GetOption('email_subject'));
+		}
 	}
-
 }
 
 ?>
