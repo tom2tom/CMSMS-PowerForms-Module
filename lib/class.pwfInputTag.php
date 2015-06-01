@@ -21,42 +21,6 @@ class pwfInputTag extends pwfFieldBase
 		return $this->GetOption('udtname',$this->formdata->formsmodule->Lang('unspecified'));
 	}
 
-	function GetFieldInput($id,&$params)
-	{
-		//setup variables for use in template
-		$params = array();
-		if($this->GetOption('export_form',0))
-			$params['FORM'] = $this->formdata;
-
-		$mod = $this->formdata->formsmodule;
-		$unspec = $this->GetFormOption('unspecified',$mod->Lang('unspecified'));
-		foreach($this->formdata->Fields as &$one)
-		{
-			$val = '';
-			if($one->DisplayInSubmission())
-			{
-				$val = $one->GetHumanReadableValue();
-				if(!$val)
-					$val = $unspec;
-			}
-			$alias = $one->GetAlias();
-			if($alias)
-				$params[$alias] = $val;
-			$name = $one->GetVariableName();
-			$params[$name] = $val;
-			$id = $one->GetId();
-			$params['fld_'.$id] = $val;
-		}
-		unset($one);
-
-		$usertagops = cmsms()->GetUserTagOperations();
-		$udt = $this->GetOption('udtname');
-		$res = $usertagops->CallUserTag($udt,$params);
-		if($res !== FALSE)
-			return $res;
-		return $mod->Lang('error_usertag_named',$udt);
-	}
-
 	function PrePopulateAdminForm($module_id)
 	{
 		$usertagops = cmsms()->GetUserTagOperations();
@@ -75,6 +39,40 @@ class pwfInputTag extends pwfFieldBase
 			$mod->CreateInputCheckbox($module_id,'opt_export_form',1,
 				$this->GetOption('export_form',0)));
 		return array('main'=>$main);
+	}
+
+	function GetFieldInput($id,&$params)
+	{
+		//setup variables for use in template
+		$params = array();
+		if($this->GetOption('export_form',0))
+			$params['FORM'] = $this->formdata;
+
+		$mod = $this->formdata->formsmodule;
+		$unspec = $this->GetFormOption('unspecified',$mod->Lang('unspecified'));
+		foreach($this->formdata->Fields as &$one)
+		{
+			$val = '';
+			if($one->DisplayInSubmission())
+			{
+				$val = $one->GetHumanReadableValue();
+				if(!$val)
+					$val = $unspec;
+			}
+			$params[$name] = $val;
+			$alias = $one->ForceAlias();
+			$params[$alias] = $val;
+			$id = $one->GetId();
+			$params['fld_'.$id] = $val;
+		}
+		unset($one);
+
+		$usertagops = cmsms()->GetUserTagOperations();
+		$udt = $this->GetOption('udtname');
+		$res = $usertagops->CallUserTag($udt,$params);
+		if($res !== FALSE)
+			return $res;
+		return $mod->Lang('error_usertag_named',$udt);
 	}
 
 }
