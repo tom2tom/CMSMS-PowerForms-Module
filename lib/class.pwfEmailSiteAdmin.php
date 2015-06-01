@@ -5,6 +5,8 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
+//This class is for email to a specified admin user
+
 class pwfEmailSiteAdmin extends pwfEmailBase
 {
 	function __construct(&$formdata,&$params)
@@ -60,48 +62,14 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 			return array($ret);
 	}
 
-	function GetFieldInput($id,&$params)
-	{
-		$mod = $this->formdata->formsmodule;
-		$userops = cmsms()->GetUserOperations();
-		if($this->GetOption('restrict_to_group',0))
-			$userlist = $userops->LoadUsersInGroup($this->GetOption('group'));
-		else
-			$userlist = $userops->LoadUsers();
-		$c = count($userlist);
-		if($c)
-		{
-			$choices = array();
-			$choices[' '.$this->GetOption('select_one',$mod->Lang('select_one'))]='';
-			for($i=0; $i<$c; $i++)
-			{
-				$parts = array();
-				if($this->GetOption('show_userfirstname',0))
-					$parts[] = $userlist[$i]->firstname;
-				if($this->GetOption('show_userlastname',0))
-					$parts[] = $userlist[$i]->lastname;
-				if($this->GetOption('show_username',0))
-					$parts[] = ' ('.$userlist[$i]->username.')';
-				$name = implode(' ',$parts);
-				$choices[$name] = ($i+1);
-			}
-			$js = $this->GetOption('javascript');
-			return $mod->CreateInputDropdown($id,'pwfp_'.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
-		}
-		else
-		{
-			return $mod->Lang('TODO');
-		}
-	}
-
 	function PrePopulateAdminForm($module_id)
 	{
 		$groupops = cmsms()->GetGroupOperations();
 		$groups = $groupops->LoadGroups();
 		$mod = $this->formdata->formsmodule;
 
-		$ret = $this->PrePopulateAdminFormBase($module_id,TRUE); //TODO
-		$main = $ret['main']; //assume it's there
+		$ret = $this->PrePopulateAdminFormCommonEmail($module_id,TRUE);
+		$main = $ret['main'];
 		$waslast = array_pop($main); //keep the email to-type selector for last
 		$main[] = array($mod->Lang('title_select_one_message'),
 				$mod->CreateInputText($module_id,'opt_select_one',
@@ -138,7 +106,64 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 
 	function AdminValidate()
 	{
-		return $this->validateEmailAddr($this->GetOption('email_from_address'));
+		$messages = array();
+  		list($ret,$msg) = parent::AdminValidate();
+		if(!ret)
+			$messages[] = $msg;
+
+		$mod = $this->formdata->formsmodule;
+    	$dest = $this->GetOption('email_from_address');
+		if($dest)
+		{
+			list($rv,$msg) = $this->validateEmailAddr($dest);
+			if(!$rv)
+			{
+				$ret = FALSE;
+				$messages[] = $msg;
+			}
+		}
+		else
+		{
+			$ret = FALSE;
+			$messages[] = $mod->Lang('must_specify_TODO');
+		}
+		$msg = ($ret)?'':implode('<br />',$messages);
+	    return array($ret,$msg);
+	}
+
+	function GetFieldInput($id,&$params)
+	{
+		$mod = $this->formdata->formsmodule;
+		$userops = cmsms()->GetUserOperations();
+		if($this->GetOption('restrict_to_group',0))
+			$userlist = $userops->LoadUsersInGroup($this->GetOption('group'));
+		else
+			$userlist = $userops->LoadUsers();
+		$c = count($userlist);
+		if($c)
+		{
+			$f = $this->GetOption('show_userfirstname',0);
+			$l = $this->GetOption('show_userlastname',0);
+			$u = $this->GetOption('show_username',0);
+			$choices = array();
+			$choices[' '.$this->GetOption('select_one',$mod->Lang('select_one'))]='';
+			for($i=0; $i<$c; $i++)
+			{
+				$parts = array();
+				$v = $userlist[$i];
+				if($f) $parts[] = $v->firstname;
+				if($l) $parts[] = $v->lastname;
+				if($u) $parts[] = '('.$v->username.')';
+				$name = implode(' ',$parts);
+				$choices[$name] = $i+1;
+			}
+			$js = $this->GetOption('javascript');
+			return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
+		}
+		else
+		{
+			return $mod->Lang('TODO');
+		}
 	}
 
 	function Validate()

@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-// class for emailing results based on pulldown
+//This class allows sending an email to a destination selected from a pulldown
 
 class pwfEmailDirector extends pwfEmailBase
 {
@@ -96,6 +96,97 @@ class pwfEmailDirector extends pwfEmailBase
 			return array($ret);
 	}
 
+	function PrePopulateAdminForm($module_id)
+	{
+		$mod = $this->formdata->formsmodule;
+
+		$this->countAddresses();
+		if($this->addressAdd > 0)
+		{
+			$this->addressCount += $this->addressAdd;
+			$this->addressAdd = 0;
+		}
+
+		$ret = $this->PrePopulateAdminFormCommonEmail($module_id);
+		$ret['main'][] = array($mod->Lang('title_select_one_message'),
+			$mod->CreateInputText($module_id,'opt_select_one',
+			$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
+		$ret['main'][] = array($mod->Lang('title_allow_subject_override'),
+			$mod->CreateInputHidden($module_id,'opt_subject_override',0).
+			$mod->CreateInputCheckbox($module_id,'opt_subject_override',1,
+				$this->GetOption('subject_override',0)),
+			$mod->Lang('help_allow_subject_override'));
+//		$ret['main'][] = array($mod->Lang('title_director_details'),$dests);
+		$dests = array();
+		$dests[] = array(
+			$mod->Lang('title_selection_subject'),
+			$mod->Lang('title_destination_address'),
+			$mod->Lang('title_select')
+			);
+		$num = ($this->addressCount>1) ? $this->addressCount:1;
+		for($i=0; $i<$num; $i++)
+		{
+			$dests[] = array(
+			$mod->CreateInputText($module_id,'opt_destination_subject[]',
+				$this->GetOptionElement('destination_subject',$i),40,128),
+			$mod->CreateInputText($module_id,'opt_destination_address[]',
+				$this->GetOptionElement('destination_address',$i),50,128),
+			$mod->CreateInputCheckbox($module_id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
+			);
+		}
+		$ret['table'] = $dests;
+		return $ret;
+	}
+
+	function PostPopulateAdminForm(&$mainArray,&$advArray)
+	{
+		// remove the "email subject" field
+		$this->RemoveAdminField($mainArray,
+			$this->formdata->formsmodule->Lang('title_email_subject'));
+	}
+
+	function PostAdminSubmitCleanup(&$params)
+	{
+		$this->PostAdminSubmitCleanupEmail($params);
+	}
+
+	function AdminValidate()
+	{
+		$messages = array();
+  		list($ret,$msg) = parent::AdminValidate();
+		if(!ret)
+			$messages[] = $msg;
+	
+		$mod = $this->formdata->formsmodule;
+		list($rv,$msg) = $this->validateEmailAddr($this->GetOption('email_from_address'));
+		if(!$rv)
+		{
+    	    $ret = FALSE;
+            $messages[] = $msg;
+		}
+    	$dests = $this->GetOption('destination_address');
+		$c = count($dests);
+		if($c)
+		{
+		    for($i=0; $i<$c; $i++)
+			{
+				list($rv,$msg) = $this->validateEmailAddr($dests[$i]);
+				if(!$rv)
+				{
+					$ret = FALSE;
+					$messages[] = $msg;
+				}
+			}
+		}
+		else
+		{
+			$ret = FALSE;
+			$messages[] = $mod->Lang('must_specify_one_destination');
+		}
+		$msg = ($ret)?'':implode('<br />',$messages);
+	    return array($ret,$msg);
+	}
+
 	function GetFieldInput($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
@@ -122,130 +213,19 @@ class pwfEmailDirector extends pwfEmailBase
 		return $mod->CreateInputDropdown($id,'pwfp_'.$this->Id,$sorted,-1,$this->Value,$js.$this->GetCSSIdTag());
 	}
 
-	function PrePopulateAdminForm($module_id)
-	{
-		$mod = $this->formdata->formsmodule;
-
-		$this->countAddresses();
-		if($this->addressAdd > 0)
-		{
-			$this->addressCount += $this->addressAdd;
-			$this->addressAdd = 0;
-		}
-
-		$ret = $this->PrePopulateAdminFormBase($module_id); //TODO
-		$main = (isset($ret['main'])) ? $ret['main'] : array();
-
-		$main[] = array($mod->Lang('title_select_one_message'),
-			$mod->CreateInputText($module_id,'opt_select_one',
-			$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
-		$main[] = array($mod->Lang('title_allow_subject_override'),
-			$mod->CreateInputHidden($module_id,'opt_subject_override','0').
-			$mod->CreateInputCheckbox($module_id,'opt_subject_override',
-                '1',$this->GetOption('subject_override','0')),
-			$mod->Lang('help_allow_subject_override'));
-//		$main[] = array($mod->Lang('title_director_details'),$dests);
-		$ret['main'] = $main;
-
-		$dests = array();
-		$dests[] = array(
-			$mod->Lang('title_selection_subject'),
-			$mod->Lang('title_destination_address'),
-			$mod->Lang('title_select')
-			);
-		$num = ($this->addressCount>1) ? $this->addressCount:1;
-		for ($i=0; $i<$num; $i++)
-		{
-			$dests[] = array(
-			$mod->CreateInputText($module_id,'opt_destination_subject[]',$this->GetOptionElement('destination_subject',$i),40,128),
-			$mod->CreateInputText($module_id,'opt_destination_address[]',$this->GetOptionElement('destination_address',$i),50,128),
-			$mod->CreateInputCheckbox($module_id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
-			);
-		}
-		$ret['table'] = $dests;
-		return $ret;
-	}
-
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		// remove the "email subject" field
-		$this->RemoveAdminField($mainArray,
-			$this->formdata->formsmodule->Lang('title_email_subject'));
-	}
-
-	function AdminValidate()
-	{
-		$mod = $this->formdata->formsmodule;
-    	$opt = $this->GetOption('destination_address');
-  		list($ret,$message) = $this->DoesFieldHaveName();
-		if($ret)
-		{
-			list($ret,$message) = $this->DoesFieldNameExist();
-		}
-
-		if(count($opt) == 0)
-		{
-			$ret = FALSE;
-			$message .= $mod->Lang('must_specify_one_destination').'<br />';
-		}
-		list($rv,$mess) = $this->validateEmailAddr($this->GetOption('email_from_address'));
-		if(!$rv)
-		{
-    	    $ret = FALSE;
-            $message .= $mess;
-		}
-        for($i=0; $i<count($opt); $i++)
-		{
-			list($rv,$mess) = $this->validateEmailAddr($opt[$i]);
-			if(!$rv)
-			{
-				$ret = FALSE;
-				$message .= $mess;
-			}
-		}
-
-        return array($ret,$message);
-	}
-
-	function PostAdminSubmitCleanup(&$params)
-	{
-TODO conform to GetOptionElement()
-		if(!is_array($params['opt_destination_address']))
-			$params['opt_destination_address'] = array($params['opt_destination_address']);
-
-		foreach($params['opt_destination_address'] as $i => $to)
-		{
-			if(isset($params['mailto_'.$i]))
-			{
-				$totype = $params['mailto_'.$i];
-				switch ($totype)
-				{
-				 case 'cc';
-					$params['opt_destination_address'][$i] = '|cc|'.$to;
-					break;
-				 case 'bc':
-					$params['opt_destination_address'][$i] = '|bc|'.$to;
-					break;
-				}
-				unset($params[$totype]);
-			}
-		}
-	}
-
 	function Validate()
 	{
-	//TODO cache vars
 		if($this->Value)
 		{
-			$this-> = TRUE;
-			$this-> = '';
+	  		$this->validated = TRUE;
+  			$this->ValidationMessage = '';
 		}
 		else
 		{
-			$this-> = FALSE;
-			$this-> = $this->formdata->formsmodule->Lang('must_specify_one_destination');
+	  		$this->validated = FALSE;
+  			$this->ValidationMessage = $this->formdata->formsmodule->Lang('must_specify_one_destination');
 		}
-		return array($this->?,$this->?);
+		return array($this->validated,$this->ValidationMessage);
 	}
 
 	function DisposeForm($returnid)
