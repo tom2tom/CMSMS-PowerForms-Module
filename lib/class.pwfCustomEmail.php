@@ -21,31 +21,14 @@ class pwfCustomEmail extends pwfEmailBase
 		$this->Type = 'CustomEmail';
 	}
 
-	// get all fields
-	private function GetFieldList($selectone = FALSE)
-	{
-		$mod = $this->formdata->formsmodule;
-		$ret = array();
-		if($selectone)
-			$ret[$mod->Lang('select_one')] = '';
-
-		foreach($this->formdata->Fields as &$one)
-		{
-			if($one->DisplayInForm)
-				$ret[$one->GetName()] = $one->GetId();
-		}
-		unset($one);
-		return $ret;
-	}
-
 	function GetFieldStatus()
 	{
-		$opt = $this->GetOptionRef('destination_address');
-		if(!is_array($opt))
-			$opt = array($opt);
-
 		$mod = $this->formdata->formsmodule;
-		$ret = $mod->Lang('to').': '.count($opt).' '.$mod->Lang('fields');
+		$opt = $this->GetOptionRef('destination_address');
+		if($opt)
+			$ret = $mod->Lang('to').': '.count($opt).' '.$mod->Lang('fields');
+		else
+			$ret = $mod->Lang('no address TODO');
 		$status = $this->TemplateStatus();
 		if($status)
 			$ret .= '<br />'.$status;
@@ -54,30 +37,36 @@ class pwfCustomEmail extends pwfEmailBase
 
 	function PrePopulateAdminForm($id)
 	{
-		$mod = $this->formdata->formsmodule;
-
-		$destadd_all = $this->GetFieldList();
-		$destadd_tmp = $this->GetOptionRef('destination_address');
-		if(!is_array($destadd_tmp))
-			$destadd_tmp = array($destadd_tmp);
-
-		$destadd_sel = array();
-		foreach($destadd_all as $k=>$v)
+		$displayfields = array();
+		foreach($this->formdata->Fields as &$one)
 		{
-			if(in_array($v,$destadd_tmp))
-				$destadd_sel[$k] = $v;
+			if($one->DisplayInForm)
+				$displayfields[$one->GetName()] = $one->GetId();
 		}
+		unset($one);
+		$destfields = array();
+		$opt = $this->GetOptionRef('destination_address');
+		if($opt)
+		{
+			foreach($displayfields as $k=>$v)
+			{
+				if(in_array($v,$opt))
+					$destfields[$k] = $v;
+			}
+		}
+		$mod = $this->formdata->formsmodule;
+		$choices = array($mod->Lang('select_one') => '') + $displayfields;
 
 		$ret = $this->PrePopulateAdminFormCommonEmail($id,TRUE);
 		$ret['main'] = array(
 			   array($mod->Lang('title_subject_field'),
-			   	$mod->CreateInputDropdown($id,'opt_email_subject',$this->GetFieldList(TRUE),-1,$this->GetOption('email_subject'))),
+			   	$mod->CreateInputDropdown($id,'opt_email_subject',$choices,-1,$this->GetOption('email_subject'))),
 			   array($mod->Lang('title_from_field'),
-			   	$mod->CreateInputDropdown($id,'opt_email_from_name',$this->GetFieldList(TRUE),-1,$this->GetOption('email_from_name',$mod->Lang('friendly_name')))),
+			   	$mod->CreateInputDropdown($id,'opt_email_from_name',$choices,-1,$this->GetOption('email_from_name',$mod->Lang('friendly_name')))),
 			   array($mod->Lang('title_from_address_field'),
-			   	$mod->CreateInputDropdown($id,'opt_email_from_address',$this->GetFieldList(TRUE),-1,$this->GetOption('email_from_address'))),
+			   	$mod->CreateInputDropdown($id,'opt_email_from_address',$choices,-1,$this->GetOption('email_from_address'))),
 			   array($mod->Lang('title_destination_field'),
-			   	$mod->CreateInputSelectList($id,'opt_destination_address[]',$destadd_all,$destadd_sel,5)),
+			   	$mod->CreateInputSelectList($id,'opt_destination_address'.$i,$displayfields,$destfields,5)),
 			   array_pop($tmp) //keep only the default to-type selector
 			  );
 
@@ -129,11 +118,11 @@ class pwfCustomEmail extends pwfEmailBase
 		$opt = $this->GetOptionRef('destination_address');
 		if($opt)
 		{
-			//TODO validate address(es)
-			if(0)
+			list($rv,$msg) = $this->validateEmailAddr($opt);
+			if(!$rv)
 			{
 				$ret = FALSE;
-				$messages[] = $mod->Lang('invalid_TODO');
+				$messages[] = $msg;
 			}
 		}
 		else
@@ -141,52 +130,59 @@ class pwfCustomEmail extends pwfEmailBase
 			$ret = FALSE;
 			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_destination_address'));
 		}
-		//TODO message-body field?
+		$msg = $this->TemplateStatus();
+		if($msg)
+		{
+			$ret = FALSE;
+			$messages[] = $msg;
+		}
 		$msg = ($ret)?'':implode('<br />',$messages);
 	    return array($ret,$msg);
 	}
 
 	function Dispose($id,$returnid)
 	{
-		$formdata = $this->formdata;
-
-		$senderfld = $this->GetOption('email_from_name'); //TODO confirm this is field_id?
-		$fld = $formdata->Fields[$senderfld];
-		$this->SetOption('email_from_name',$fld->GetHumanReadableValue());
-
-		$fromfld = $this->GetOption('email_from_address');
-		$fld = $formdata->Fields[$fromfld];
-		$this->SetOption('email_from_address',$fld->GetHumanReadableValue());
-
-		$addarr = array();
 		$dests = $this->GetOptionRef('destination_address'); //TODO in this case, field id's ?
-		if(!is_array($dests))
-			$dests = array($dests);
-		foreach($dests as $field_id)
+		if($dests)
 		{
-			$fld = $formdata->Fields[$field_id];
-			$value = $fld->GetHumanReadableValue();
-			if(strpos($value,',') !== FALSE)
-				$addarr = $addarr + explode(',',$value);
-			else
-				$addarr[] = $value;
-		}
+			$formdata = $this->formdata;
 
-/*		$subjectfld = $this->GetOption('email_subject');
-		$fld = $formdata->Fields[$subjectfld];
-		$this->SetOption('email_subject',$fld->GetHumanReadableValue());
+			$senderfld = $this->GetOption('email_from_name'); //TODO confirm this is field_id?
+			$fld = $formdata->Fields[$senderfld];
+			$this->SetOption('email_from_name',$fld->GetHumanReadableValue());
 
-		$ret = $this->SendForm($addarr,$this->GetOption('email_subject'));
+			$fromfld = $this->GetOption('email_from_address');
+			$fld = $formdata->Fields[$fromfld];
+			$this->SetOption('email_from_address',$fld->GetHumanReadableValue());
 
-		$this->SetOption('email_subject',$subjectfld);
+			$addrs = array();
+			foreach($dests as $field_id)
+			{
+				$fld = $formdata->Fields[$field_id];
+				$value = $fld->GetHumanReadableValue();
+				if(strpos($value,',') !== FALSE)
+					$addrs = $addrs + explode(',',$value);
+				else
+					$addrs[] = $value;
+			}
+
+/*			$subjectfld = $this->GetOption('email_subject');
+			$fld = $formdata->Fields[$subjectfld];
+			$this->SetOption('email_subject',$fld->GetHumanReadableValue());
+
+			$ret = $this->SendForm($addrs,$this->GetOption('email_subject'));
+
+			$this->SetOption('email_subject',$subjectfld);
 */
-		$fld = $formdata->Fields[$this->GetOption('email_subject')];
-		$ret = $this->SendForm($addarr,$fld->GetHumanReadableValue()); //TODO check value(subject) is ok
+			$fld = $formdata->Fields[$this->GetOption('email_subject')];
+			$ret = $this->SendForm($addrs,$fld->GetHumanReadableValue()); //TODO check value(subject) is ok
 
-		$this->SetOption('email_from_name',$senderfld);
-		$this->SetOption('email_from_address',$fromfld);
+			$this->SetOption('email_from_name',$senderfld);
+			$this->SetOption('email_from_address',$fromfld);
 
-		return $ret;
+			return $ret;
+		}
+		return array(FALSE,'errTODO');
 	}
 
 }
