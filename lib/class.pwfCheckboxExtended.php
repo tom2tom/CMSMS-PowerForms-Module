@@ -63,54 +63,67 @@ class pwfCheckboxExtended extends pwfFieldBase
             		$mod->CreateInputText($id,'opt_unchecked_value',
 	            		$this->GetOption('unchecked_value',$mod->Lang('no')),25,255)),
 			array($mod->Lang('title_default_set'),
-				$mod->CreateInputHidden($id,'opt_is_checked','0').
-				$mod->CreateInputCheckbox($id,'opt_is_checked','1',
-					$this->GetOption('is_checked','0'))),
+				$mod->CreateInputHidden($id,'opt_is_checked',0).
+				$mod->CreateInputCheckbox($id,'opt_is_checked',1,
+					$this->GetOption('is_checked',0))),
 			array($mod->Lang('title_textfield_label'),
            		$mod->CreateInputText($id,'opt_text_label',
             		$this->GetOption('text_label'),25,255)),
 			array($mod->Lang('title_show_textfield'),
-				$mod->CreateInputHidden($id,'opt_show_textfield','0').
-				$mod->CreateInputCheckbox($id,'opt_show_textfield','1',
-					$this->GetOption('show_textfield','0')))
+				$mod->CreateInputHidden($id,'opt_show_textfield',0).
+				$mod->CreateInputCheckbox($id,'opt_show_textfield',1,
+					$this->GetOption('show_textfield',0)))
 		);
 
 		return array('main'=>$main);
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
+		if($this->GetOption('box_label'))
+			$box_label = '<label for="'.$this->GetCSSId('_0').'">'.$this->GetOption('box_label').'</label>';
+		else
+			$box_label = '';
+
+		if($this->Value)
+		{
+			$box_value = !empty($this->Value['box']);
+			if(!$box_value && $this->GetOption('is_checked',0))
+				$this->Value['box'] = 't';
+		}
+		else
+			$box_value = FALSE;
+
 		$mod = $this->formdata->formsmodule;
 		$js = $this->GetOption('javascript');
-		$check_value = $this->_check_value();
-		$output = array();
-		$box_label = '';
-		$text_label = '';
+		$ret = array();
 
-		if(!$this->Value['box'] && $this->GetOption('is_checked','0')=='1')
-			$this->Value['box'] = 't';
-
-		if(strlen($this->GetOption('box_label')) > 0)
-			$box_label = '<label for="'.$this->GetCSSId('_0').'">'.$this->GetOption('box_label').'</label>';
-
-		if(strlen($this->GetOption('text_label')) > 0)
-			$text_label = '<label for="'.$this->GetCSSId('_1').'">'.$this->GetOption('text_label').'</label>';
-
-		$obj = new stdClass();
-		$obj->name = $box_label;
-		$obj->input = $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id.'[box]','t',$this->Value['box'],$js.$this->GetCSSIdTag('_0'));
-
-		$output[] = $obj;
+		$oneset = new stdClass();
+		$oneset->title = '';
+		$oneset->name = $box_label;
+		$oneset->input = $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id.'[box]','t',$this->Value['box'],$js.$this->GetCSSIdTag('_0'));
+		$ret[] = $oneset;
 
 		if($this->GetOption('show_textfield'))
 		{
-			$obj = new stdClass();
-			$obj->name = $text_label;
-			$obj->input = $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id.'[text]',($check_value['text']?$this->Value['text']:''),25,25,$js.$this->GetCSSIdTag('_1'));
-			$output[] = $obj;
+			if($this->GetOption('text_label'))
+				$text_label = '<label for="'.$this->GetCSSId('_1').'">'.$this->GetOption('text_label').'</label>';
+			else
+				$text_label = '';
+
+			if($this->Value)
+				$text_value = !empty($this->Value['text']);
+			else
+				$text_value = FALSE;
+
+			$oneset = new stdClass();
+			$oneset->title = '';
+			$oneset->name = $text_label;
+			$oneset->input = $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id.'[text]',($text_value?$this->Value['text']:''),25,25,$js.$this->GetCSSIdTag('_1'));
+			$ret[] = $oneset;
 		}
 
-		return $output;
+		return $ret;
 	}
 
 	function Validate($id)
@@ -139,17 +152,6 @@ class pwfCheckboxExtended extends pwfFieldBase
 			break;
 		}
 		return array($this->validated,$this->ValidationMessage);
-	}
-
-	private function _check_value()
-	{
-		$val = $this->Value;
-		if($val === FALSE)
-			return FALSE;
-		return array(
-		 'box' => isset($val['box']),
-		 'text' => !empty($val['text'])
-		);
 	}
 
 }

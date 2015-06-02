@@ -13,45 +13,15 @@ class pwfCaptcha extends pwfFieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->DisplayInSubmission = FALSE;
+		$this->HasMultipleFormComponents = FALSE; //actually it does, but we don't generate content-objects in Populate()
 		$this->IsSortable = FALSE;
 		$this->IsRequired = TRUE;
 		$this->Type = 'Captcha';
 	}
 
-	function GetFieldInput($id,&$params)
+	function GetFieldStatus()
 	{
-		$mod = $this->formdata->formsmodule;
-		$captcha = $mod->getModuleInstance('Captcha');
-		$smarty = cmsms()->GetSmarty();
-		$smarty->assign('captcha',$captcha->getCaptcha());
-		$smarty->assign('prompt',$this->GetOption('prompt',$mod->Lang('captcha_prompt')));
-		$test = method_exists($captcha,'NeedsInputField') ? $captcha->NeedsInputField() : TRUE;
-		if($test)
-		{
-			//for captcha validation, input-object name must be as shown, not e.g. $this->formdata->current_prefix.$this->Id
-//			$input = $mod->CustomCreateInputType($id,'captcha_input','',10,10,$this->GetCSSIdTag());
-			$input = $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,'',10,10,$this->GetCSSIdTag());
-			$smarty->assign('captcha_input',$input);
-		}
-		else
-		{
-			$hidden = $mod->CreateInputHidden($id,$this->formdata->current_prefix.$this->Id,1); //include field in post-submit walk
-			$smarty->assign('captcha_input',$hidden);
-		}
-		$tpl = $this->GetOption('captcha_template',$this->defaulttemplate);
-		if($this->GetOption('aslabel',0))
-		{
-			$this->HideLabel = FALSE;
-			$this->RealName = $this->Name;
-			$this->Name = $mod->ProcessTemplateFromData($tpl);
-			return '';
-		}
-		else
-		{
-			$this->HideLabel = TRUE;
-			$this->RealName = FALSE;
-			return $mod->ProcessTemplateFromData($tpl);
-		}
+		return $this->ValidationMessage; //TODO useless
 	}
 
 	function GetHumanReadableValue($as_string=TRUE)
@@ -61,11 +31,6 @@ class pwfCaptcha extends pwfFieldBase
 			return $ret;
 		else
 			return array($ret);
-	}
-
-	function GetFieldStatus()
-	{
-		return $this->ValidationMessage;
 	}
 
 	function PrePopulateAdminForm($id)
@@ -85,7 +50,8 @@ class pwfCaptcha extends pwfFieldBase
 
 			$adv[] = array($mod->Lang('title_captcha_label'),
 				$mod->CreateInputHidden($id,'opt_aslabel',0).
-				$mod->CreateInputCheckbox($id,'opt_aslabel',1,$this->GetOption('aslabel',0)),
+				$mod->CreateInputCheckbox($id,'opt_aslabel',1,
+					$this->GetOption('aslabel',0)),
 				$mod->Lang('help_captcha_label')
 				);
 			$adv[] = array($mod->Lang('title_captcha_template'),
@@ -139,9 +105,45 @@ class pwfCaptcha extends pwfFieldBase
     	return array($ret,$msg);
 	}
 
+	function Populate($id,&$params)
+	{
+		$mod = $this->formdata->formsmodule;
+		$captcha = $mod->getModuleInstance('Captcha');
+		$smarty = cmsms()->GetSmarty();
+		$smarty->assign('captcha',$captcha->getCaptcha());
+		$smarty->assign('prompt',$this->GetOption('prompt',$mod->Lang('captcha_prompt')));
+		$test = method_exists($captcha,'NeedsInputField') ? $captcha->NeedsInputField() : TRUE;
+		if($test)
+		{
+			//for captcha validation, input-object name must be as shown, not e.g. $this->formdata->current_prefix.$this->Id
+//			$input = $mod->CustomCreateInputType($id,'captcha_input','',10,10,$this->GetCSSIdTag());
+			$input = $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,'',10,10,$this->GetCSSIdTag());
+			$smarty->assign('captcha_input',$input);
+		}
+		else
+		{
+			$hidden = $mod->CreateInputHidden($id,$this->formdata->current_prefix.$this->Id,1); //include field in post-submit walk
+			$smarty->assign('captcha_input',$hidden);
+		}
+		$tpl = $this->GetOption('captcha_template',$this->defaulttemplate);
+		if($this->GetOption('aslabel',0))
+		{
+			$this->HideLabel = FALSE;
+			$this->RealName = $this->Name;
+			$this->Name = $mod->ProcessTemplateFromData($tpl);
+			return '';
+		}
+		else
+		{
+			$this->HideLabel = TRUE;
+			$this->RealName = FALSE;
+			return $mod->ProcessTemplateFromData($tpl);
+		}
+	}
+
 	function Validate($id)
 	{
-		//now it's safe to restore fieldname
+		//now it's safe to restore fieldname TODO reinstate when no text is input (so no validation)
 		if($this->RealName)
 		{
 			$this->Name = $this->RealName;

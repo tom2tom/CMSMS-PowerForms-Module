@@ -57,7 +57,42 @@ class pwfCatalogerItems extends pwfFieldBase
 			return array($ret);
 	}
 
-	function GetFieldInput($id,&$params)
+	function PrePopulateAdminForm($id)
+	{
+		$main = array();
+		$mod = $this->formdata->formsmodule;
+		$cataloger = $mod->GetModuleInstance('Cataloger');
+		if($cataloger)
+		{
+			$main[] = array($mod->Lang('title_field_height'),
+					 $mod->CreateInputText($id,'opt_lines',$this->GetOption('lines','5'),3,3),
+					 $mod->Lang('help_field_height'));
+
+			$main[] = array($mod->Lang('title_name_regex'),
+					 $mod->CreateInputText($id,'opt_nameregex',$this->GetOption('nameregex'),25,25),
+					 $mod->Lang('help_name_regex'));
+
+			$main[] = array('','',$mod->Lang('help_cataloger_attribute_fields'));
+
+			$attrs = cmsms()->variables['catalog_attrs']; //TODO bad module behaviour
+			foreach($attrs as &$one)
+			{
+				if(!$one->is_text)
+				{
+					$safeattr = strtolower(preg_replace('/\W/','',$one->attr));
+					$main[] = array($one->attr,
+						 $mod->CreateInputText($id,'opt_attr_'.$safeattr,$this->GetOption('attr_'.$safeattr),30,80));
+				}
+			}
+			unset($one);
+		}
+		else
+			$main[] = array($mod->Lang('warning'),$mod->Lang('error_module_cataloger'));
+
+		return array('main'=>$main);
+	}
+
+	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
 		$cataloger = $mod->GetModuleInstance('Cataloger');
@@ -184,11 +219,11 @@ class pwfCatalogerItems extends pwfFieldBase
 			}
 		} // foreach content
 
-		// All done,do we have something to display?
+		// All done, do we have something to display?
 		if(count($results))
 		{
 			$size = min($lines,count($results));
-			$size = min(50,$size); // maximum 50 lines,though this is probably big
+			$size = min(50,$size); // maximum 50 lines, though this is probably big
 
 			$val = array();
 			if($this->Value !== FALSE)
@@ -207,39 +242,5 @@ class pwfCatalogerItems extends pwfFieldBase
 		return ''; // error
 	}
 
-	function PrePopulateAdminForm($id)
-	{
-		$main = array();
-		$mod = $this->formdata->formsmodule;
-		$cataloger = $mod->GetModuleInstance('Cataloger');
-		if($cataloger)
-		{
-			$main[] = array($mod->Lang('title_field_height'),
-					 $mod->CreateInputText($id,'opt_lines',$this->GetOption('lines','5'),3,3),
-					 $mod->Lang('help_field_height'));
-
-			$main[] = array($mod->Lang('title_name_regex'),
-					 $mod->CreateInputText($id,'opt_nameregex',$this->GetOption('nameregex'),25,25),
-					 $mod->Lang('help_name_regex'));
-
-			$main[] = array('','',$mod->Lang('help_cataloger_attribute_fields'));
-
-			$attrs = cmsms()->variables['catalog_attrs']; //TODO bad module behaviour
-			foreach($attrs as &$one)
-			{
-				if(!$one->is_text)
-				{
-					$safeattr = strtolower(preg_replace('/\W/','',$one->attr));
-					$main[] = array($one->attr,
-						 $mod->CreateInputText($id,'opt_attr_'.$safeattr,$this->GetOption('attr_'.$safeattr),30,80));
-				}
-			}
-			unset($one);
-		}
-		else
-			$main[] = array($mod->Lang('warning'),$mod->Lang('error_module_cataloger'));
-
-		return array('main'=>$main);
-	}
 }
 ?>

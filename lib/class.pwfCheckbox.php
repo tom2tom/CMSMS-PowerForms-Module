@@ -56,14 +56,14 @@ class pwfCheckbox extends pwfFieldBase
 					$mod->CreateInputText($id,'opt_unchecked_value',
           	$this->GetOption('unchecked_value',$mod->Lang('value_unchecked')),25,255)),
 			array($mod->Lang('title_default_set'),
-					$mod->CreateInputHidden($id,'opt_is_checked','0').
-					$mod->CreateInputCheckbox($id,'opt_is_checked','1',
-						$this->GetOption('is_checked','0')))
+					$mod->CreateInputHidden($id,'opt_is_checked',0).
+					$mod->CreateInputCheckbox($id,'opt_is_checked',1,
+						$this->GetOption('is_checked',0)))
 			);
 		return array('main'=>$main);
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
 		$label = $this->GetOption('label');
 		if($label)
