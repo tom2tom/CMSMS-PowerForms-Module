@@ -91,11 +91,12 @@ class pwfComputed extends pwfFieldBase
 				}
 			}
 		}
+
 		if($eval_string)
 		{
 			$strToEval = "\$this->Value=$procstr;";
 			// see if we can trap an error
-			// this is all vulnerable to an evil form designer,but
+			// this is all vulnerable to an evil form designer, but
 			// not an evil form user.
 			ob_start();
 			if(eval('function testcfield'.rand().'() {'.$strToEval.'}') === FALSE)
@@ -122,11 +123,13 @@ class pwfComputed extends pwfFieldBase
 	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		$processType = array($mod->Lang('title_numeric')=>'numeric',
-		    $mod->Lang('title_string')=>'string',$mod->Lang('title_string_unspaced')=>'unstring',$mod->Lang('title_compute')=>'compute');
-
-			$help = pwfUtils::fieldValueTemplate($this->formdata).'<br /><br />'.
+		$help = pwfUtils::FormFieldsHelp($this->formdata).'<br /><br />'.
 			$mod->Lang('help_operators');
+		$processType = array(
+			$mod->Lang('title_numeric')=>'numeric',
+		    $mod->Lang('title_string')=>'string',
+			$mod->Lang('title_string_unspaced')=>'unstring',
+			$mod->Lang('title_compute')=>'compute');
 
 		$main = array(
 			 array(
@@ -140,7 +143,7 @@ class pwfComputed extends pwfFieldBase
 			    	$this->GetOption('string_or_number_eval','numeric'),'&nbsp;&nbsp;')),
 			 array(
 				$mod->Lang('title_order'),
-				$mod->CreateInputText($id,'opt_order',$this->GetOption('order','1'),5,10),
+				$mod->CreateInputText($id,'opt_order',$this->GetOption('order',1),5,10),
 				$mod->Lang('help_computed_order'))
 		);
 		return array('main'=>$main);
