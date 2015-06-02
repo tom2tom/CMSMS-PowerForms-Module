@@ -9,8 +9,7 @@
 
 class pwfEmailDirector extends pwfEmailBase
 {
-	var $addressAdd;
-	var $addressCount;
+	var $addressAdd = FALSE;
 
 	function __construct(&$formdata,&$params)
 	{
@@ -19,8 +18,6 @@ class pwfEmailDirector extends pwfEmailBase
 		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
 		$this->Type = 'EmailDirector';
-		$this->addressAdd = FALSE;
-		$this->addressCount = 0;
 	}
 
 	function GetOptionAddButton()
@@ -40,33 +37,19 @@ class pwfEmailDirector extends pwfEmailBase
 
 	function DoOptionDelete(&$params)
 	{
-		$delcount = 0;
-		foreach($params as $thisKey=>$thisVal)
+		foreach($params as $key=>$val)
 		{
-			if(substr($thisKey,0,8) == 'opt_sel_')
+			if(strncmp($key,'opt_chkb',8) == 0)
 			{
-				$this->RemoveOptionElement('destination_address',$thisVal - $delcount); //TODO
-				$this->RemoveOptionElement('destination_subject',$thisVal - $delcount);
-				$delcount++;
+				$this->RemoveOptionElement('destination_address',$val);
+				$this->RemoveOptionElement('destination_subject',$val);
 			}
 		}
-	}
-
-	function countAddresses()
-	{
-		$tmp = $this->GetOptionRef('destination_address');
-		if(is_array($tmp))
-			$this->addressCount = count($tmp);
-		elseif($tmp !== FALSE)
-			$this->addressCount = 1;
-		else
-			$this->addressCount = 0;
 	}
 
 	function GetFieldStatus()
 	{
 		$opt = $this->GetOption('destination_address');
-
 		if(is_array($opt))
 			$num = count($opt);
 		elseif($opt)
@@ -85,7 +68,7 @@ class pwfEmailDirector extends pwfEmailBase
 	function GetHumanReadableValue($as_string=TRUE)
 	{
 		if($this->HasValue())
-			$ret = $this->GetOptionElement('destination_subject',($this->Value - 1)); //TODO index
+			$ret = $this->GetOptionElement('destination_subject',$this->Value);
 		else
 			$ret = $this->GetFormOption('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
@@ -100,13 +83,6 @@ class pwfEmailDirector extends pwfEmailBase
 	{
 		$mod = $this->formdata->formsmodule;
 
-		$this->countAddresses();
-		if($this->addressAdd > 0)
-		{
-			$this->addressCount += $this->addressAdd;
-			$this->addressAdd = 0;
-		}
-
 		$ret = $this->PrePopulateAdminFormCommonEmail($id);
 		$ret['main'][] = array($mod->Lang('title_select_one_message'),
 			$mod->CreateInputText($id,'opt_select_one',
@@ -118,22 +94,32 @@ class pwfEmailDirector extends pwfEmailBase
 			$mod->Lang('help_allow_subject_override'));
 //		$ret['main'][] = array($mod->Lang('title_director_details'),$dests);
 		$dests = array();
-		$dests[] = array(
-			$mod->Lang('title_selection_subject'),
-			$mod->Lang('title_destination_address'),
-			$mod->Lang('title_select')
-			);
-		$num = ($this->addressCount>1) ? $this->addressCount:1;
-		for($i=0; $i<$num; $i++)
+		if($this->addressAdd)
+		{
+			$this->AddOptionElement('destination_subject','');
+			$this->AddOptionElement('destination_address','');
+			$this->addressAdd = FALSE;
+		}
+		$opt = $this->GetOptionRef('destination_subject');
+		if($opt)
 		{
 			$dests[] = array(
-			$mod->CreateInputText($id,'opt_destination_subject[]',
-				$this->GetOptionElement('destination_subject',$i),40,128),
-			$mod->CreateInputText($id,'opt_destination_address[]',
-				$this->GetOptionElement('destination_address',$i),50,128),
-			$mod->CreateInputCheckbox($id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
-			);
+				$mod->Lang('title_selection_subject'),
+				$mod->Lang('title_destination_address'),
+				$mod->Lang('title_select')
+				);
+			foreach($opt as $i=>&$one)
+			{
+				$dests[] = array(
+				$mod->CreateInputText($id,'opt_destination_subject'.$i,$one,40,128),
+				$mod->CreateInputText($id,'opt_destination_address'.$i,
+					$this->GetOptionElement('destination_address',$i),50,128),
+				$mod->CreateInputCheckbox($id,'opt_chkb'.$i,$i,-1,'style="margin-left:1em;"')
+				);
+			}
+			unset($one);
 		}
+
 		$ret['table'] = $dests;
 		return $ret;
 	}
@@ -187,30 +173,18 @@ class pwfEmailDirector extends pwfEmailBase
 	    return array($ret,$msg);
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
-		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
-
-		// why all this? Associative arrays are not guaranteed to preserve
-		// order,except in "chronological" creation order.
-		$sorted = array();
-		if($this->GetOption('select_one'))
-			$sorted[' '.$this->GetOption('select_one')] = '';
-		else
-			$sorted[' '.$mod->Lang('select_one')]='';
-
 		$subjects = $this->GetOptionRef('destination_subject');
-
-		if(count($subjects) > 1)
+		if($subjects)
 		{
-			for($i=0; $i<count($subjects); $i++)
-				$sorted[$subjects[$i]]=($i+1);
+			$mod = $this->formdata->formsmodule;
+			$choices = array(' '.$this->GetOption('select_one',$mod->Lang('select_one')) => '')
+				+ array_flip($subjects);
+			$js = $this->GetOption('javascript');
+			return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
 		}
-		else
-			$sorted[$subjects] = '1';
-
-		return $mod->CreateInputDropdown($id,'pwfp_'.$this->Id,$sorted,-1,$this->Value,$js.$this->GetCSSIdTag());
+		return '';
 	}
 
 	function Validate($id)
@@ -233,9 +207,9 @@ class pwfEmailDirector extends pwfEmailBase
 		if($this->GetOption('subject_override',0) && $this->GetOption('email_subject'))
 			$subject = $this->GetOption('email_subject');
 		else
-			$subject = $this->GetOptionElement('destination_subject',($this->Value - 1)); //TODO
+			$subject = $this->GetOptionElement('destination_subject',$this->Value);
 
-		return $this->SendForm($this->GetOptionElement('destination_address',($this->Value - 1)),$subject);
+		return $this->SendForm($this->GetOptionElement('destination_address',$this->Value),$subject);
 	}
 
 }
