@@ -43,77 +43,6 @@ class pwfDatePicker extends pwfFieldBase
          ($this->GetOption('default_year','-1')!=='-1'?' ('.$this->GetOption('default_year','-1').')':'');
 	}
 
-	function GetFieldInput($id,&$params)
-	{
-		$mod = $this->formdata->formsmodule;
-		$today = getdate();
-		$Days = array(''=>'');
-		for ($i=1; $i<32; $i++)
-		{
-			$Days[$i]=$i;
-		}
-		$Year = array(''=>'');
-		$sty = $this->GetOption('start_year',($today['year']-10));
-		if($sty == -1)
-		{
-			$sty = $today['year'];
-		}
-		for ($i=$sty; $i<$this->GetOption('end_year',($today['year']+10))+1; $i++)
-		{
-			$Year[$i]=$i;
-		}
-		if($this->HasValue())
-		{
-			$user_order = $this->GetOption('date_order','d-m-y');
-			$arrUserOrder = explode("-",$user_order);
-
-			$today['mday'] = $this->GetArrayValue(array_search("d",$arrUserOrder));
-			$today['mon'] = $this->GetArrayValue(array_search("m",$arrUserOrder));
-			$today['year'] = $this->GetArrayValue(array_search("y",$arrUserOrder));
-		}
-		else if($this->GetOption('default_blank',0))
-		{
-			$today['mday']='';
-			$today['mon']='';
-			$today['year']='';
-		}
-		else if($this->GetOption('default_year',-1) != -1)
-		{
-			$today['year'] = $this->GetOption('default_year','-1');
-		}
-
-		$ret = array();
-		$day = new stdClass();
-		$js = $this->GetOption('javascript');
-
-		$day->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Days,-1,
-		$today['mday'],$js.$this->GetCSSIdTag('_day'));
-		$day->title = $mod->Lang('day');
-		$day->name = '<label for="'.$this->GetCSSId('_day').'">'.$mod->Lang('day').'</label>';
-
-		$mon = new stdClass();
-		$mon->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$this->Months,-1,
-		$today['mon'],$js.$this->GetCSSIdTag('_month'));
-		$mon->title = $mod->Lang('mon');
-		$mon->name = '<label for="'.$this->GetCSSId('_month').'">'.$mod->Lang('mon').'</label>';
-
-		$yr = new stdClass();
-		$yr->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Year,-1,
-			$today['year'],$js.$this->GetCSSIdTag('_year'));
-		$yr->name = '<label for="'.$this->GetCSSId('_year').'">'.$mod->Lang('year').'</label>';
-		$yr->title = $mod->Lang('year');
-
-		$order = array("d" => $day,"m" => $mon,"y" => $yr);
-		$user_order = $this->GetOption('date_order','d-m-y');
-		$arrUserOrder = explode("-",$user_order);
-		foreach($arrUserOrder as $key)
-		{
-			$ret[] = $order[$key];
-		}
-
-      return $ret;
-	}
-
 	function HasValue($deny_blank_responses=FALSE)
 	{
 		if($this->Value === FALSE)
@@ -189,8 +118,8 @@ class pwfDatePicker extends pwfFieldBase
 				$mod->Lang('help_date_order')),
 			array($mod->Lang('title_default_blank'),
 				$mod->CreateInputHidden($id,'opt_default_blank',0).
-				$mod->CreateInputCheckbox($id,'opt_default_blank',
-					1,$this->GetOption('default_blank','0')),
+				$mod->CreateInputCheckbox($id,'opt_default_blank',1,
+					$this->GetOption('default_blank',0)),
 				$mod->Lang('help_default_today')),
 			array($mod->Lang('title_start_year'),
 				$mod->CreateInputText($id,'opt_start_year',
@@ -205,6 +134,73 @@ class pwfDatePicker extends pwfFieldBase
 		);
 		return array('main'=>$main);
 	}
+
+	function Populate($id,&$params)
+	{
+		$mod = $this->formdata->formsmodule;
+		$today = getdate();
+		$Days = array(''=>'');
+		for ($i=1; $i<32; $i++)
+			$Days[$i]=$i;
+
+		$Year = array(''=>'');
+		$sty = $this->GetOption('start_year',($today['year']-10));
+		if($sty == -1)
+			$sty = $today['year'];
+
+		for ($i=$sty; $i<$this->GetOption('end_year',($today['year']+10))+1; $i++)
+			$Year[$i]=$i;
+
+		if($this->HasValue())
+		{
+			$user_order = $this->GetOption('date_order','d-m-y');
+			$arrUserOrder = explode("-",$user_order);
+
+			$today['mday'] = $this->GetArrayValue(array_search('d',$arrUserOrder));
+			$today['mon'] = $this->GetArrayValue(array_search('m',$arrUserOrder));
+			$today['year'] = $this->GetArrayValue(array_search('y',$arrUserOrder));
+		}
+		else if($this->GetOption('default_blank',0))
+		{
+			$today['mday']='';
+			$today['mon']='';
+			$today['year']='';
+		}
+		else if($this->GetOption('default_year',-1) != -1)
+		{
+			$today['year'] = $this->GetOption('default_year','-1');
+		}
+
+		$ret = array();
+		$day = new stdClass();
+		$js = $this->GetOption('javascript');
+
+		$day->title = $mod->Lang('day');
+		$day->name = '<label for="'.$this->GetCSSId('_day').'">'.$mod->Lang('day').'</label>';
+		$day->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Days,-1,
+			$today['mday'],$js.$this->GetCSSIdTag('_day'));
+
+		$mon = new stdClass();
+		$mon->title = $mod->Lang('mon');
+		$mon->name = '<label for="'.$this->GetCSSId('_month').'">'.$mod->Lang('mon').'</label>';
+		$mon->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$this->Months,-1,
+			$today['mon'],$js.$this->GetCSSIdTag('_month'));
+
+		$yr = new stdClass();
+		$yr->title = $mod->Lang('year');
+		$yr->name = '<label for="'.$this->GetCSSId('_year').'">'.$mod->Lang('year').'</label>';
+		$yr->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Year,-1,
+			$today['year'],$js.$this->GetCSSIdTag('_year'));
+
+		$order = array('d' => $day,'m' => $mon,'y' => $yr);
+		$user_order = $this->GetOption('date_order','d-m-y');
+		$arrUserOrder = explode("-",$user_order);
+		foreach($arrUserOrder as $key)
+			$ret[] = $order[$key];
+
+		return $ret;
+	}
+
 }
 
 ?>

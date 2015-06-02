@@ -57,8 +57,8 @@ class pwfEmailBase extends pwfFieldBase
 		/* advanced-tab items */
 		$adv = array(
 				array($mod->Lang('title_html_email'),
-					$mod->CreateInputHidden($id,'opt_html_email','0').
-					$mod->CreateInputCheckbox($id,'opt_html_email','1',
+					$mod->CreateInputHidden($id,'opt_html_email',0).
+					$mod->CreateInputCheckbox($id,'opt_html_email',1,
 						$this->GetOption('html_email','0'))),
 
 				array($mod->Lang('title_email_encoding'),$mod->CreateInputText($id,'opt_email_encoding',
@@ -76,13 +76,12 @@ class pwfEmailBase extends pwfFieldBase
 
 	function PostAdminSubmitCleanupEmail(&$params)
 	{
-//TODO set OptionElement('destination_address',$i) ??
-Crash;
 		if(!is_array($params['opt_destination_address']))
 			$params['opt_destination_address'] = array($params['opt_destination_address']);
 
 		foreach($params['opt_destination_address'] as $i => $to)
 		{
+$mod->Crash;
 			if(isset($params['mailto_'.$i]))
 			{
 				$totype = $params['mailto_'.$i];
@@ -95,6 +94,7 @@ Crash;
 					$params['opt_destination_address'][$i] = '|bc|'.$to;
 					break;
 				}
+//TODO ?? somewhere $this->SetOptionElement('destination_address',[$i or other index],[adjusted]parameter) ??
 				unset($params[$totype]);
 			}
 		}
@@ -278,7 +278,7 @@ Crash;
 
 		$htmlemail = $this->GetOption('html_email',0);
 
-		pwfUtils::SetFinishedFormSmarty($this->formdata,$htmlemail);
+		pwfUtils::SetupFormVars($this->formdata,$htmlemail);
 
 		$subject = $mod->ProcessTemplateFromData($subject);
 		$mail->SetSubject($subject);
