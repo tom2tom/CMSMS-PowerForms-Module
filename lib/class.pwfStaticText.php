@@ -16,14 +16,6 @@ class pwfStaticText extends pwfFieldBase
 		$this->Type = 'StaticText';
 	}
 
-	function GetFieldInput($id,&$params)
-	{
-		if($this->GetOption('smarty_eval',0))
-			$this->SetSmartyEval(TRUE);
-
-		return $this->GetOption('text');
-	}
-
 	function GetFieldStatus()
 	{
 		return $this->formdata->formsmodule->Lang('text_length',strlen($this->GetOption('text')));
@@ -47,8 +39,9 @@ class pwfStaticText extends pwfFieldBase
 		);
 		$adv = array(
 				array($mod->Lang('title_smarty_eval'),
-				$mod->CreateInputCheckbox($id,'opt_smarty_eval',
-            		'1',$this->GetOption('smarty_eval','0')))
+				$mod->CreateInputHidden($id,'opt_smarty_eval',0).
+				$mod->CreateInputCheckbox($id,'opt_smarty_eval',1,
+					$this->GetOption('smarty_eval',0)))
 		);
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -57,6 +50,15 @@ class pwfStaticText extends pwfFieldBase
 	{
 		$this->OmitAdminCommon($mainArray,$advArray);
 	}
+
+	function Populate($id,&$params)
+	{
+		if($this->GetOption('smarty_eval',0))
+			$this->SetSmartyEval(TRUE);
+
+		return $this->GetOption('text');
+	}
+
 }
 
 ?>
