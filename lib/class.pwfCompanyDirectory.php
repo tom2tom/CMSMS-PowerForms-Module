@@ -55,7 +55,69 @@ class pwfCompanyDirectory extends pwfFieldBase
 			return array($ret);
 	}
 
-	function GetFieldInput($id,&$params)
+	function PrePopulateAdminForm($id)
+	{
+		$mod = $this->formdata->formsmodule;
+		$CompanyDirectory = $mod->GetModuleInstance('CompanyDirectory');
+		if($CompanyDirectory)
+			unset($CompanyDirectory);
+		else
+			return array('main'=>array($mod->Lang('error_module_CompanyDirectory'),''));
+
+		$Categories = array();
+		$Categories['All'] = $mod->Lang('all');	//TODO translate
+		$db = cmsms()->GetDb();
+		$pre = cms_db_prefix();
+		$query = 'SELECT id,name FROM '.$pre.'module_compdir_categories';
+		$rs = $db->Execute($query);
+		if($rs)
+		{
+			while($row = $rs->FetchRow())
+				$Categories[$row['name']] = $row['name'];
+			$rs->Close();
+		}
+		$CategorySelected = $this->GetOption('Category');
+		//check and force the right type
+		if(!is_array($CategorySelected))
+			$CategorySelected = explode(',',$CategorySelected);
+
+		$FieldDefs = array();
+		$FieldDefs['none'] = $this->Lang('none'); //TODO translate
+		$query = 'SELECT * FROM '.$pre.'module_compdir_fielddefs ORDER BY item_order';
+		$rs = $db->Execute($query);
+		if($rs)
+		{
+			while($row = $rs->FetchRow())
+				$FieldDefs[$row['name']] = $row['name'];
+			$rs->Close();
+		}
+		$FieldDefsSelected = $this->GetOption('FieldDefs');
+		if(!is_array($FieldDefsSelected))
+			$FieldDefsSelected = explode(',',$FieldDefsSelected);
+
+		$main = array(
+				array($mod->Lang('help_company_field'),''),
+				array($mod->Lang('title_pick_categories'),
+					$mod->CreateInputSelectList($id,'opt_Category',$Categories,$CategorySelected,5,'',TRUE)
+				),
+				array($mod->Lang('title_pick_fielddef'),
+					$mod->CreateInputSelectList($id,'opt_FieldDefs',$FieldDefs,$FieldDefsSelected,5,'',FALSE)
+				)
+		);
+		$choices = array($mod->Lang('option_dropdown')=>'Dropdown',
+			   $mod->Lang('option_selectlist_single')=>'Select List-single',
+			   $mod->Lang('option_selectlist_multiple')=>'Select List-multiple',
+			   $mod->Lang('option_radiogroup')=>'Radio Group'
+			  );
+		$adv = array(
+				array($mod->Lang('title_choose_user_input'),
+					$mod->CreateInputDropdown ($id,'opt_UserInput',$choices,'-1',$this->GetOption('UserInput'))
+				)
+		);
+		return array('main'=>$main,'adv'=>$adv);
+	}
+
+	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
 		$CompanyDirectory = $mod->GetModuleInstance('CompanyDirectory');
@@ -175,7 +237,7 @@ class pwfCompanyDirectory extends pwfFieldBase
 					$val = array($this->Value);
 			}
 
-			$cssid = $this->GetCSSIdTag();
+			$cssid = $this->GetCSSId(); //TODO following code creates duplicate 'id's
 			$UserInput = $this->GetOption('UserInput','Dropdown');
 			if($UserInput=='Select List-single')
 				return $mod->CreateInputSelectList($id,$this->formdata->current_prefix.$this->Id.'[]',$companies,$val,$size,$cssid);
@@ -187,68 +249,6 @@ class pwfCompanyDirectory extends pwfFieldBase
 				return $mod->CreateInputRadioGroup($id,$this->formdata->current_prefix.$this->Id.'',$companies,$val,'','&nbsp;&nbsp;');
 		}
 		return ''; // error
-	}
-
-	function PrePopulateAdminForm($id)
-	{
-		$mod = $this->formdata->formsmodule;
-		$CompanyDirectory = $mod->GetModuleInstance('CompanyDirectory');
-		if($CompanyDirectory)
-			unset($CompanyDirectory);
-		else
-			return array('main'=>array($mod->Lang('error_module_CompanyDirectory'),''));
-
-		$Categories = array();
-		$Categories['All'] = $mod->Lang('all');	//TODO translate
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
-		$query = 'SELECT id,name FROM '.$pre.'module_compdir_categories';
-		$rs = $db->Execute($query);
-		if($rs)
-		{
-			while($row = $rs->FetchRow())
-				$Categories[$row['name']] = $row['name'];
-			$rs->Close();
-		}
-		$CategorySelected = $this->GetOption('Category');
-		//check and force the right type
-		if(!is_array($CategorySelected))
-			$CategorySelected = explode(',',$CategorySelected);
-
-		$FieldDefs = array();
-		$FieldDefs['none'] = $this->Lang('none'); //TODO translate
-		$query = 'SELECT * FROM '.$pre.'module_compdir_fielddefs ORDER BY item_order';
-		$rs = $db->Execute($query);
-		if($rs)
-		{
-			while($row = $rs->FetchRow())
-				$FieldDefs[$row['name']] = $row['name'];
-			$rs->Close();
-		}
-		$FieldDefsSelected = $this->GetOption('FieldDefs');
-		if(!is_array($FieldDefsSelected))
-			$FieldDefsSelected = explode(',',$FieldDefsSelected);
-
-		$main = array(
-				array($mod->Lang('help_company_field'),''),
-				array($mod->Lang('title_pick_categories'),
-					$mod->CreateInputSelectList($id,'opt_Category',$Categories,$CategorySelected,5,'',TRUE)
-				),
-				array($mod->Lang('title_pick_fielddef'),
-					$mod->CreateInputSelectList($id,'opt_FieldDefs',$FieldDefs,$FieldDefsSelected,5,'',FALSE)
-				)
-		);
-		$choices = array($mod->Lang('option_dropdown')=>'Dropdown',
-			   $mod->Lang('option_selectlist_single')=>'Select List-single',
-			   $mod->Lang('option_selectlist_multiple')=>'Select List-multiple',
-			   $mod->Lang('option_radiogroup')=>'Radio Group'
-			  );
-		$adv = array(
-				array($mod->Lang('title_choose_user_input'),
-					$mod->CreateInputDropdown ($id,'opt_UserInput',$choices,'-1',$this->GetOption('UserInput'))
-				)
-		);
-		return array('main'=>$main,'adv'=>$adv);
 	}
 }
 

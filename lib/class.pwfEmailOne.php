@@ -28,12 +28,11 @@ class pwfEmailOne extends pwfEmailBase
 		return array();
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
 		return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,
-			htmlspecialchars($this->Value,ENT_QUOTES),25,128,$js.$this->GetCSSIdTag());
+			htmlspecialchars($this->Value,ENT_QUOTES),25,128,$this->GetCSSId().$this->GetScript());
 	}
 
 	function Validate($id)

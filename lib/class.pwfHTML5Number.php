@@ -16,18 +16,6 @@ class pwfHTML5Number extends pwfFieldBase
 		$this->Type = 'HTML5Number';
 	}
 
-	function GetFieldInput($id,&$params)
-	{
-		$min = $this->GetOption('min_number',0);
-		$max = $this->GetOption('max_number',500);
-		$step = $this->GetOption('step_number',50);
-		$js = $this->GetOption('javascript');
-		$cssid = $this->GetCSSIdTag();
-
-		return '<input type="number" name="'.$id.$this->formdata->current_prefix.$this->Id.
-		'" min="'.$min.'" max="'.$max.'" step="'.$step.'" '.$js.$cssid.' />';
-	}
-
 	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
@@ -70,5 +58,16 @@ class pwfHTML5Number extends pwfFieldBase
 		$msg = ($ret)?'':implode('<br />',$messages);
 		return array($ret,$msg);
 	}
+
+	function Populate($id,&$params)
+	{
+		$min = $this->GetOption('min_number',0);
+		$max = $this->GetOption('max_number',500);
+		$step = $this->GetOption('step_number',50);
+
+		return '<input type="number" name="'.$id.$this->formdata->current_prefix.$this->Id.
+		'" min="'.$min.'" max="'.$max.'" step="'.$step.'"'.$this->GetCSSId().$this->GetScript().' />';
+	}
 }
+
 ?>

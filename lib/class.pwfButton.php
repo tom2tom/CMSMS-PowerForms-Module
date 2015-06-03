@@ -25,13 +25,10 @@ class pwfButton extends pwfFieldBase
 		return array('main'=>$main);
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
-		$js = $this->GetOption('javascript');
-		$cssid = $this->GetCSSIdTag();
-
 		return '<input type="button" name="'.$id.$this->formdata->current_prefix.$this->Id.
-		'" value="'.$this->GetOption('text').'" '.$js.$cssid.' />';
+		'" value="'.$this->GetOption('text').'"'.$this->GetCSSId().$this->GetScript().' />';
 	}
 
 }

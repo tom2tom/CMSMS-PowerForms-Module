@@ -16,18 +16,16 @@ class pwfHTML5Email extends pwfFieldBase
 		$this->Type = 'HTML5Email';
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
-		$js = $this->GetOption('javascript');
-		$cssid = $this->GetCSSIdTag();
-
 		return '<input type="email" name="'.$id.$this->formdata->current_prefix.$this->Id.
-		'" '.$js.$cssid.' />';
+		'"'.$this->GetCSSId().$this->GetScript().' />';
 	}
 
-	function Validate($id)
+/*	function Validate($id)
 	{
 		//TODO
 	}
+*/
 }
 ?>

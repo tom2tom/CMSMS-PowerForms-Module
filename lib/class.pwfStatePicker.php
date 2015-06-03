@@ -35,11 +35,6 @@ class pwfStatePicker extends pwfFieldBase
 //		ksort($this->States);
 	}
 
-	function GetFieldStatus()
-	{
-		return '';
-	}
-
 	function GetHumanReadableValue($as_string=TRUE)
 	{
 		$ret = array_search($this->Value,$this->States);
@@ -47,18 +42,6 @@ class pwfStatePicker extends pwfFieldBase
 			return $ret;
 		else
 			return array($ret);
-	}
-
-	function GetFieldInput($id,&$params)
-	{
-		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
-
-		$choices = array_merge(array($this->GetOption('select_one',$mod->Lang('select_one'))=>''),$this->States);
-		if(!$this->HasValue() && $this->GetOption('default_state'))
-			$this->SetValue($this->GetOption('default_state'));
-
-		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
 	}
 
 	function PrePopulateAdminForm($id)
@@ -76,6 +59,16 @@ class pwfStatePicker extends pwfFieldBase
 		return array('main'=>$main);
 	}
 
+	function Populate($id,&$params)
+	{
+		$mod = $this->formdata->formsmodule;
+
+		$choices = array_merge(array($this->GetOption('select_one',$mod->Lang('select_one'))=>''),$this->States);
+		if(!$this->HasValue() && $this->GetOption('default_state'))
+			$this->SetValue($this->GetOption('default_state'));
+
+		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$this->GetCSSId().$this->GetScript());
+	}
 }
 
 ?>

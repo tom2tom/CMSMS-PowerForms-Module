@@ -42,13 +42,13 @@ class pwfFieldsetStart extends pwfFieldBase
 		$this->OmitAdminCommon($mainArray,$advArray);
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
-		$str = '<fieldset'.$this->GetCSSIdTag();
+		$str = '<fieldset'.$this->GetCSSId();
 		$opt = $this->GetOption('css_class');
 		if($opt)
 			$str .= ' class="'.$opt.'"';
-		$opt = $this->GetOption('javascript');
+		$opt = $this->GetScript();
 		if($opt)
 			$str .= ' '.$opt;
 		$str .= '>';

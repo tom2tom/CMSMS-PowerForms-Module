@@ -16,18 +16,16 @@ class pwfHTML5URL extends pwfFieldBase
 		$this->Type = 'HTML5URL';
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
-		$js = $this->GetOption('javascript');
-		$cssid = $this->GetCSSIdTag();
-
 		return '<input type="url" name="'.$id.$this->formdata->current_prefix.$this->Id.
-		'" '.$js.$cssid.' />';
+		'"'.$this->GetCSSId().$this->GetScript().' />';
 	}
 
-	function Validate($id)
+/*	function Validate($id)
 	{
 		//TODO
 	}
+*/
 }
 ?>

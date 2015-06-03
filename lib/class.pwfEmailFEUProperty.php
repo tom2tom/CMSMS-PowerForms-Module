@@ -107,7 +107,7 @@ class pwfEmailFEUProperty extends pwfEmailBase
 		return $ret;
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
 		$feu = $mod->GetModuleInstance('FrontEndUsers');
@@ -127,7 +127,7 @@ class pwfEmailFEUProperty extends pwfEmailBase
 		 case 5: // multiselect
 		 case 7: // radio button group
 			// rendered all as a dropdown field.
-			$res = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$options,-1,$this->GetCSSIdTag());
+			$res = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$options,-1,$this->GetCSSId());
 			break;
 		 default:
 			$res = FALSE;
@@ -178,7 +178,7 @@ class pwfEmailFEUProperty extends pwfEmailBase
 				$smarty->assign('user_info',$users[0]);
 			}
 		}
-		// send the form
+		// send email(s)
 		return $this->SendForm($destinations,$this->GetOption('email_subject'));
 	}
 }

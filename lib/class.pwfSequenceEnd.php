@@ -16,11 +16,6 @@ class pwfSequenceEnd extends pwfFieldBase
 		$this->Type = 'SequenceEnd';
 	}
 
-	function GetFieldInput($id,&$params)
-	{
-		return '';
-	}
-
 	function GetHumanReadableValue($as_string=TRUE)
 	{
 		$ret = '[End FieldSequence: '.$this->Value.']';
@@ -39,6 +34,11 @@ class pwfSequenceEnd extends pwfFieldBase
 					  $this->GetOption('legend'), 50)));
 //TODO id of sequence start
 		return array('main'=>$main);
+	}
+
+	function Populate($id,&$params)
+	{
+		return '';
 	}
 }
 

@@ -16,11 +16,6 @@ class pwfSequenceStart extends pwfFieldBase
 		$this->Type = 'SequenceStart';
 	}
 
-	function GetFieldInput($id,&$params)
-	{
-		return '';
-	}
-
 	function GetHumanReadableValue($as_string=TRUE)
 	{
 		$ret = '[Begin FieldSequence: '.$this->Value.']';
@@ -39,6 +34,11 @@ class pwfSequenceStart extends pwfFieldBase
 					  $this->GetOption('legend'), 50)));
 //TODO repeatcount
 		return array('main'=>$main);
+	}
+
+	function Populate($id,&$params)
+	{
+		return '';
 	}
 }
 

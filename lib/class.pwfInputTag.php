@@ -44,7 +44,7 @@ class pwfInputTag extends pwfFieldBase
 		return array('main'=>$main);
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
 		//setup variables for use in template
 		$params = array();

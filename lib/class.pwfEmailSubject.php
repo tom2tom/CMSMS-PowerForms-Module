@@ -15,14 +15,22 @@ class pwfEmailSubject extends pwfFieldBase {
 		$this->Type = 'EmailSubject';
 	}
 
-	function GetFieldInput($id,&$params)
+	function ModifyOtherFields()
+	{
+		foreach($this->formdata->Fields as &$one)
+		{
+			if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
+				$one->SetOption('email_subject',$this->Value);
+		}
+		unset($one);
+	}
+
+	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
-
 		return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($this->Value,ENT_QUOTES),
-           25,128,$js.$this->GetCSSIdTag());
+			25,128,$this->GetCSSId().$this->GetScript());
 	}
 
 	function Validate($id)
@@ -38,16 +46,6 @@ class pwfEmailSubject extends pwfFieldBase {
 			$this->ValidationMessage = $mod->Lang('please_enter_TODO',$this->Name);
 		}
 		return array($this->validated,$this->ValidationMessage);
-	}
-
-	function ModifyOtherFields()
-	{
-		foreach($this->formdata->Fields as &$one)
-		{
-			if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
-				$one->SetOption('email_subject',$this->Value);
-		}
-		unset($one);
 	}
 }
 

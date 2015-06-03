@@ -67,10 +67,10 @@ class pwfEmailConfirmation extends pwfEmailBase
 		$this->SetDispositionPermission(TRUE);
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
 		return $this->formdata->formsmodule->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,
-			htmlspecialchars($this->Value,ENT_QUOTES),25,80,$this->GetCSSIdTag(),'email');
+			htmlspecialchars($this->Value,ENT_QUOTES),25,80,$this->GetCSSId().$this->GetScript(),'email');
 	}
 
 	function Validate($id)

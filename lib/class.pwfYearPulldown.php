@@ -28,27 +28,6 @@ class pwfYearPulldown extends pwfFieldBase
 			return array($ret);
 	}
 
-	function GetFieldInput($id,&$params)
-	{
-		if($this->GetOption('year_start'))
-			$count_from = $this->GetOption('year_start');
-		else
-			$count_from = 1900;
-
-		$choices = array();
-		for($i=date('Y'); $i>=$count_from; $i--)
-			$choices[$i] = $i;
-
-		if($this->GetOption('sort'))
-			ksort($choices);
-
-		$mod = $this->formdata->formsmodule;
-		$choices = array($this->GetOption('select_one',$mod->Lang('select_one'))=>'') + $choices;
-
-		$js = $this->GetOption('javascript');
-		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
-	}
-
 	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
@@ -69,6 +48,27 @@ class pwfYearPulldown extends pwfFieldBase
 
 		return array('main'=>$main);
 	}
+
+	function Populate($id,&$params)
+	{
+		if($this->GetOption('year_start'))
+			$count_from = $this->GetOption('year_start');
+		else
+			$count_from = 1900;
+
+		$choices = array();
+		for($i=date('Y'); $i>=$count_from; $i--)
+			$choices[$i] = $i;
+
+		if($this->GetOption('sort'))
+			ksort($choices);
+
+		$mod = $this->formdata->formsmodule;
+		$choices = array($this->GetOption('select_one',$mod->Lang('select_one'))=>'') + $choices;
+
+		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$this->GetCSSId().$this->GetScript());
+	}
+
 }
 
 ?>

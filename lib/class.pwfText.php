@@ -38,28 +38,6 @@ class pwfText extends pwfFieldBase
 		return $ret;
 	}
 
-	function GetFieldInput($id,&$params)
-	{
-		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
-		$ro = '';
-
-		if($this->GetOption('readonly',0))
-			$ro = ' readonly="readonly"';
-
-		if($this->GetOption('html5',0))
-		{
-			return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,$this->Value,$this->GetOption('length')<25?$this->GetOption('length'):25,
-				$this->GetOption('length'),
-					' placeholder="'.$this->GetOption('default').'"'.$js.$ro.$this->GetCSSIdTag());
-		}
-		else
-		{
-			return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,($this->HasValue()?$this->Value:$this->GetOption('default')),$this->GetOption('length')<25?$this->GetOption('length'):25,$this->GetOption('length'),
-				($this->GetOption('clear_default',0)?(' onfocus="if(this.value==this.defaultValue) this.value=\'\';" onblur="if(this.value==\'\') this.value=this.defaultValue;"'):' ').$js.$ro.$this->GetCSSIdTag());
-		}
-	}
-
 	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
@@ -90,12 +68,37 @@ class pwfText extends pwfFieldBase
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
+	function Populate($id,&$params)
+	{
+		$mod = $this->formdata->formsmodule;
+
+		if($this->GetOption('readonly',0))
+			$ro = ' readonly="readonly"';
+		else
+			$ro = '';
+
+		if($this->GetOption('html5',0))
+		{
+			return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,$this->Value,$this->GetOption('length')<25?$this->GetOption('length'):25,
+				$this->GetOption('length'),
+				' placeholder="'.$this->GetOption('default').'"'.$ro.$this->GetCSSId().$this->GetScript());
+		}
+		else
+		{
+			$js = $this->GetScript();
+			if($this->GetOption('clear_default',0))
+				$js = ' onfocus="if(this.value==this.defaultValue) this.value=\'\';" onblur="if(this.value==\'\') this.value=this.defaultValue;"'.$js;
+			return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,($this->HasValue()?$this->Value:$this->GetOption('default')),$this->GetOption('length')<25?$this->GetOption('length'):25,$this->GetOption('length'),
+				$ro.$this->GetCSSId().$js);
+		}
+	}
+
 	function Validate($id)
 	{
 		$this->validated = TRUE;
 		$this->ValidationMessage = '';
 		$mod = $this->formdata->formsmodule;
-		switch ($this->ValidationType)
+		switch($this->ValidationType)
 		{
 		 case 'none':
 			break;

@@ -60,10 +60,9 @@ class pwfPassword extends pwfFieldBase
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
 		if($this->GetOption('readonly'0))
 			$ro = ' readonly="readonly"';
 		else
@@ -73,15 +72,14 @@ class pwfPassword extends pwfFieldBase
 		{
 			return $mod->CreateInputPassword($id,$this->formdata->current_prefix.$this->Id,
 					($this->Value?$this->Value:''),$this->GetOption('length'),
-					255,$js.$ro.$this->GetCSSIdTag());
+					255,$ro.$this->GetCSSId().$this->GetScript());
 		}
 		else
 		{
 			return $mod->CreateInputText($id,$this->formdata->current_prefix.$this->Id,
 					($this->Value?$this->Value:''),
 					$this->GetOption('length'),
-					255,
-					$js.$ro.$this->GetCSSIdTag());
+					255,$ro.$this->GetCSSId().$this->GetScript());
 		}
 	}
 

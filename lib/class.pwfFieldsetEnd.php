@@ -18,11 +18,6 @@ class pwfFieldsetEnd extends pwfFieldBase
 		$this->Type = 'FieldsetEnd';
 	}
 
-	function GetFieldInput($id,&$params)
-	{
-		return '</fieldset>';
-	}
-
 	function GetHumanReadableValue($as_string=TRUE)
 	{
 		$ret = '[End Fieldset: '.$this->Value.']';
@@ -42,6 +37,10 @@ class pwfFieldsetEnd extends pwfFieldBase
 		$this->OmitAdminCommon($mainArray,$advArray);
 	}
 
+	function Populate($id,&$params)
+	{
+		return '</fieldset>';
+	}
 }
 
 ?>
