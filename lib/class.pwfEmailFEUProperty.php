@@ -111,26 +111,29 @@ class pwfEmailFEUProperty extends pwfEmailBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$feu = $mod->GetModuleInstance('FrontEndUsers');
-		if(!$feu) return FALSE;
+		if(!$feu) return '';
 
 		// get the property name and data
 		$prop = $this->GetOption('feu_property');
-		if(!$prop) return FALSE;
+		if(!$prop) return '';
 		$defn = $feu->GetPropertyDefn($prop);
-		if(!$defn) return FALSE;
+		if(!$defn) return '';
 
 		// get the property input field
-		$options = $feu->GetSelectOptions($prop);
+		$choices = $feu->GetSelectOptions($prop);
 		switch($defn['type'])
 		{
 		 case 4: // dropdown
 		 case 5: // multiselect
 		 case 7: // radio button group
 			// rendered all as a dropdown field.
-			$res = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$options,-1,$this->GetCSSId());
+			//TODO duplicate id's in created string
+			$res = $mod->CreateInputDropdown(
+				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
+				$this->GetIdTag().$this->GetScript());
 			break;
 		 default:
-			$res = FALSE;
+			$res = '';
 		}
 		return $res;
 	}

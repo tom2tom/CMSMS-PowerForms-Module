@@ -55,8 +55,10 @@ class pwfProvincePicker extends pwfFieldBase
 
 		if(!$this->HasValue() && $this->GetOption('default_province'))
 			$this->SetValue($this->GetOption('default_province'));
-
-		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$this->GetCSSId().$this->GetScript());
+		//TODO eliminate duplicate id tags 
+		return $mod->CreateInputDropdown(
+			$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
+			$this->GetIdTag().$this->GetScript());
 	}
 }
 

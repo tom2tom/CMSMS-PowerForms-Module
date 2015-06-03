@@ -68,18 +68,20 @@ class pwfPassword extends pwfFieldBase
 		else
 			$ro = '';
 
+		//TODO eliminate duplicate id tags 
 		if($this->GetOption('hide',1))
 		{
 			return $mod->CreateInputPassword($id,$this->formdata->current_prefix.$this->Id,
-					($this->Value?$this->Value:''),$this->GetOption('length'),
-					255,$ro.$this->GetCSSId().$this->GetScript());
+					($this->Value?$this->Value:''),
+					$this->GetOption('length'),255,
+					$ro.$this->GetIdTag().$this->GetScript());
 		}
 		else
 		{
 			return $mod->CreateInputText($id,$this->formdata->current_prefix.$this->Id,
 					($this->Value?$this->Value:''),
-					$this->GetOption('length'),
-					255,$ro.$this->GetCSSId().$this->GetScript());
+					$this->GetOption('length'),255,
+					$ro.$this->GetIdTag().$this->GetScript());
 		}
 	}
 

@@ -30,9 +30,10 @@ class pwfEmailOne extends pwfEmailBase
 
 	function Populate($id,&$params)
 	{
-		$mod = $this->formdata->formsmodule;
-		return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,
-			htmlspecialchars($this->Value,ENT_QUOTES),25,128,$this->GetCSSId().$this->GetScript());
+		return $this->formdata->formsmodule->CustomCreateInputType(
+			$id,$this->formdata->current_prefix.$this->Id,
+			htmlspecialchars($this->Value,ENT_QUOTES),25,128,
+			$this->GetIdTag().$this->GetScript());
 	}
 
 	function Validate($id)

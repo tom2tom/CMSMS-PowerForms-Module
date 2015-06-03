@@ -222,10 +222,10 @@ class pwfCompanyDirectory extends pwfFieldBase
 		foreach($companies as $key=>$val)
 		{
 			if(empty($val))
-				$companies[$key]=$key;
+				$companies[$key] = $key;
 		}
-		// All done,do we have something to display?
-		if(count($companies))
+		// Do we have something to display?
+		if($companies)
 		{
 			$size = min(50,count($companies)); // maximum 50 lines,though this is probably big
 
@@ -237,16 +237,27 @@ class pwfCompanyDirectory extends pwfFieldBase
 					$val = array($this->Value);
 			}
 
-			$cssid = $this->GetCSSId(); //TODO following code creates duplicate 'id's
-			$UserInput = $this->GetOption('UserInput','Dropdown');
-			if($UserInput=='Select List-single')
-				return $mod->CreateInputSelectList($id,$this->formdata->current_prefix.$this->Id.'[]',$companies,$val,$size,$cssid);
-			elseif($UserInput=='Select List-multiple')
-				return $mod->CreateInputSelectList($id,$this->formdata->current_prefix.$this->Id.'[]',$companies,$val,$size,$cssid,TRUE);
-			elseif($UserInput=='Dropdown')
-				return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'',$companies,'-1',$val);
-			elseif($UserInput=='Radio Group')
-				return $mod->CreateInputRadioGroup($id,$this->formdata->current_prefix.$this->Id.'',$companies,$val,'','&nbsp;&nbsp;');
+			switch($this->GetOption('UserInput','Dropdown'))
+			{
+			 case 'Dropdown':
+				return $mod->CreateInputDropdown(
+					$id,$this->formdata->current_prefix.$this->Id,
+					$companies,'-1',$val);
+			 case 'Radio Group':
+				return $mod->CreateInputRadioGroup(
+					$id,$this->formdata->current_prefix.$this->Id,
+					$companies,$val,'','&nbsp;&nbsp;');
+			 case 'Select List-single':
+				//TODO code creates duplicate 'id's
+				return $mod->CreateInputSelectList(
+					$id,$this->formdata->current_prefix.$this->Id.'[]',
+					$companies,$val,$size,$this->GetIdTag().$this->GetScript());
+			 case 'Select List-multiple':
+				//TODO code creates duplicate 'id's
+				return $mod->CreateInputSelectList(
+					$id,$this->formdata->current_prefix.$this->Id.'[]',
+					$companies,$val,$size,$this->GetIdTag().$this->GetScript(),TRUE);
+			}
 		}
 		return ''; // error
 	}

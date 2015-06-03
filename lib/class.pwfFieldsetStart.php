@@ -44,7 +44,7 @@ class pwfFieldsetStart extends pwfFieldBase
 
 	function Populate($id,&$params)
 	{
-		$str = '<fieldset'.$this->GetCSSId();
+		$str = '<fieldset'.$this->GetIdTag();
 		$opt = $this->GetOption('css_class');
 		if($opt)
 			$str .= ' class="'.$opt.'"';

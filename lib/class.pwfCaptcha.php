@@ -116,8 +116,10 @@ class pwfCaptcha extends pwfFieldBase
 		if($test)
 		{
 			//for captcha validation, input-object name must be as shown, not e.g. $this->formdata->current_prefix.$this->Id
-//			$input = $mod->CustomCreateInputType($id,'captcha_input','',10,10,$this->GetCSSIdTag());
-			$input = $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,'',10,10,$this->GetCSSIdTag());
+//			$input = $mod->CustomCreateInputType($id,'captcha_input','',10,10,$this->GetIdTag());
+			$input = $mod->CustomCreateInputType(
+				$id,$this->formdata->current_prefix.$this->Id,'',10,10,
+				$this->GetIdTag());
 			$smarty->assign('captcha_input',$input);
 		}
 		else

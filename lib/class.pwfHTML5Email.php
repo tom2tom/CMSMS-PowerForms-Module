@@ -19,7 +19,7 @@ class pwfHTML5Email extends pwfFieldBase
 	function Populate($id,&$params)
 	{
 		return '<input type="email" name="'.$id.$this->formdata->current_prefix.$this->Id.
-		'"'.$this->GetCSSId().$this->GetScript().' />';
+		'"'.$this->GetIdTag().$this->GetScript().' />';
 	}
 
 /*	function Validate($id)

@@ -60,7 +60,10 @@ class pwfOzStatePicker extends pwfFieldBase
 		if(!$this->HasValue() && $this->GetOption('default_state'))
 			$this->SetValue($this->GetOption('default_state'));
 
-		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$this->GetCSSId().$this->GetScript());
+		//TODO eliminate duplicate id tags 
+		return $mod->CreateInputDropdown(
+			$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
+			$this->GetIdTag().$this->GetScript());
 	}
 
 }

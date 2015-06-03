@@ -133,9 +133,10 @@ class pwfCountryPicker extends pwfFieldBase
 
 		if(!$this->HasValue() && $this->GetOption('default_country'))
 			$this->SetValue($this->GetOption('default_country'));
-
-		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,
-			$this->Value,$this->GetCSSId().$this->GetScript());
+		//TODO duplicate id's in created string
+		return $mod->CreateInputDropdown(
+			$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
+			$this->GetIdTag().$this->GetScript());
 	}
 }
 
