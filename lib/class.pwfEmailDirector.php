@@ -181,8 +181,10 @@ class pwfEmailDirector extends pwfEmailBase
 			$mod = $this->formdata->formsmodule;
 			$choices = array(' '.$this->GetOption('select_one',$mod->Lang('select_one')) => '')
 				+ array_flip($subjects);
-			$js = $this->GetOption('javascript');
-			return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
+			$tmp = $mod->CreateInputDropdown(
+				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
+				$this->GetScript());
+			return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);				
 		}
 		return '';
 	}

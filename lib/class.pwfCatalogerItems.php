@@ -229,13 +229,11 @@ class pwfCatalogerItems extends pwfFieldBase
 			{
 				$val = $this->Value;
 				if(!is_array($this->Value))
-				{
 					$val = array($this->Value);
-				}
 			}
-			//TODO elimintate duplicate id's
-			return $mod->CreateInputSelectList($id,$this->formdata->current_prefix.$this->Id.'[]',$choices,$val,
-						   $size,$this->GetIdTag());
+			$tmp = $mod->CreateInputSelectList(
+				$id,$this->formdata->current_prefix.$this->Id.'[]',$choices,$val,$size);
+			return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
 		}
 
 		return ''; // error

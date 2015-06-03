@@ -29,26 +29,27 @@ class pwfEmailSender extends pwfFieldBase
 			array(
 				$mod->Lang('title_html5'),
 				$mod->CreateInputHidden($id,'opt_html5',0).
-				$mod->CreateInputCheckbox($id,'opt_html5',1,$this->GetOption('html5',0))),
+				$mod->CreateInputCheckbox($id,'opt_html5',1,
+					$this->GetOption('html5',0))),
 			array(
 				$mod->Lang('title_clear_default'),
 				$mod->CreateInputHidden($id,'opt_clear_default',0).
-				$mod->CreateInputCheckbox($id,'opt_clear_default',1,$this->GetOption('clear_default',0)),
+				$mod->CreateInputCheckbox($id,'opt_clear_default',1,
+					$this->GetOption('clear_default',0)),
 				$mod->Lang('help_clear_default'))
 		);
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
-		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
 		$html5 = $this->GetOption('html5',0) ? ' placeholder="'.$this->GetOption('default').'"' : '';
 		$default = $html5 ? '' : htmlspecialchars($this->GetOption('default'),ENT_QUOTES);
 
-		return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,
+		return $this->formdata->formsmodule->CustomCreateInputType(
+			$id,$this->formdata->current_prefix.$this->Id,
 			($this->HasValue()?htmlspecialchars($this->Value,ENT_QUOTES):$default),
-			25,128,$html5.$js.$this->GetCSSIdTag());
+			25,128,$html5.$this->GetIdTag().$this->GetScript());
 	}
 
 	function ModifyOtherFields()

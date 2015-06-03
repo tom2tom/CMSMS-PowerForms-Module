@@ -187,7 +187,7 @@ class pwfCheckboxGroup extends pwfFieldBase
 		{
 			$is_set = $this->GetOptionRef('box_is_set');
 			$mod = $this->formdata->formsmodule;
-			$js = $this->GetOption('javascript');
+			$js = $this->GetScript();
 			$ret = array();
 			foreach($names as $i=>&$one)
 			{
@@ -195,7 +195,7 @@ class pwfCheckboxGroup extends pwfFieldBase
 				if($one)
 				{
 					$oneset->title = $one;
-					$oneset->name = '<label for="'.$this->GetCSSId('_'.$i).'">'.$one.'</label>';
+					$oneset->name = '<label for="'.$this->GetInputId('_'.$i).'">'.$one.'</label>';
 				}
 				else
 				{
@@ -209,9 +209,9 @@ class pwfCheckboxGroup extends pwfFieldBase
 					$check_val = TRUE;
 				else
 					$check_val = FALSE;
-				$oneset->input = $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id.'[]',$i,
-					(($check_val)?$i:-1),$js.$this->GetCSSIdTag('_'.$i));
-
+				$tmp = $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id.'[]',$i,
+					(($check_val)?$i:-1),$js);
+				$oneset->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_'.$i).'"',$tmp);
 				$ret[] = $oneset;
 			}
 			unset($one);

@@ -74,15 +74,15 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 		$ret['main'][] = array($mod->Lang('title_show_userfirstname'),
 				$mod->CreateInputHidden($id,'opt_show_userfirstname',0).
 				$mod->CreateInputCheckbox($id,'opt_show_userfirstname',1,
-				$this->GetOption('show_userfirstname',1)));
+					$this->GetOption('show_userfirstname',1)));
 		$ret['main'][] = array($mod->Lang('title_show_userlastname'),
 				$mod->CreateInputHidden($id,'opt_show_userlastname',0).
 				$mod->CreateInputCheckbox($id,'opt_show_userlastname',1,
-				$this->GetOption('show_userlastname',1)));
+					$this->GetOption('show_userlastname',1)));
 		$ret['main'][] = array($mod->Lang('title_show_username'),
 				$mod->CreateInputHidden($id,'opt_show_username',0).
 				$mod->CreateInputCheckbox($id,'opt_show_username',1,
-				$this->GetOption('show_username',0)));
+					$this->GetOption('show_username',0)));
 		$ret['main'][] = $waslast;
 
 		$choices = array();
@@ -94,7 +94,7 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 		$ret['main'][] = array($mod->Lang('title_restrict_to_group'),
 				$mod->CreateInputHidden($id,'opt_restrict_to_group',0).
 				$mod->CreateInputCheckbox($id,'opt_restrict_to_group',1,
-				$this->GetOption('restrict_to_group',0)).
+					$this->GetOption('restrict_to_group',0)).
 				$mod->CreateInputDropdown($id,'opt_group',$choices,-1,$this->GetOption('group'))
 				);
 		return $ret;
@@ -127,7 +127,7 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 	    return array($ret,$msg);
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
 		$userops = cmsms()->GetUserOperations();
@@ -153,8 +153,10 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 				$name = implode(' ',$parts);
 				$choices[$name] = $i+1;
 			}
-			$js = $this->GetOption('javascript');
-			return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
+			$tmp = $mod->CreateInputDropdown(
+				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
+				$this->GetScript());
+			return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
 		}
 		else
 		{

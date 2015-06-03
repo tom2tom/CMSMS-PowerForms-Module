@@ -27,12 +27,12 @@ class pwfHidden extends pwfFieldBase
 		$adv = array(
 				array($mod->Lang('title_smarty_eval'),
 				$mod->CreateInputHidden($id,'opt_smarty_eval',0).
-				$mod->CreateInputCheckbox($id,'opt_smarty_eval',
-            		1,$this->GetOption('smarty_eval',0))),
+				$mod->CreateInputCheckbox($id,'opt_smarty_eval',1,
+					$this->GetOption('smarty_eval',0))),
 				array($mod->Lang('title_browser_edit'),
 				$mod->CreateInputHidden($id,'opt_browser_edit',0).
-				$mod->CreateInputCheckbox($id,'opt_browser_edit',
-					1,$this->GetOption('browser_edit',0)))
+				$mod->CreateInputCheckbox($id,'opt_browser_edit',1,
+					$this->GetOption('browser_edit',0)))
 		);
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -42,7 +42,7 @@ class pwfHidden extends pwfFieldBase
 		$this->OmitAdminCommon($mainArray,$advArray); //TODO hidden field may use logic?
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
 
@@ -59,7 +59,7 @@ class pwfHidden extends pwfFieldBase
 		else
 			$type = 'hidden';
 
-		return '<input type="'.$type.'" name="'.$id.$this->formdata->current_prefix.$this->Id.'" value="'.$val.'"'.$this->GetCSSIdTag().' />';
+		return '<input type="'.$type.'" name="'.$id.$this->formdata->current_prefix.$this->Id.'" value="'.$val.'"'.$this->GetIdTag().' />';
 	}
 
 }

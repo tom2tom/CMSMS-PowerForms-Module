@@ -85,7 +85,7 @@ class pwfFileUpload extends pwfFieldBase
 		$adv = array();
 
 		$help_file_rename = $mod->Lang('help_file_rename').
-		pwfUtils::fieldValueTemplate($this->formdata,array('$ext'=>$mod->Lang('original_file_extension')));
+		pwfUtils::FormFieldsHelp($this->formdata,array('$ext'=>$mod->Lang('original_file_extension')));
 
 		$adv[] = array($mod->Lang('title_file_rename'),
 			$mod->CreateInputText($id,'opt_file_rename',
@@ -99,18 +99,18 @@ class pwfFileUpload extends pwfFieldBase
 
 		$adv[] = array($mod->Lang('title_suppress_attachment'),
 			$mod->CreateInputHidden($id,'opt_suppress_attachment',0).
-				$mod->CreateInputCheckbox($id,'opt_suppress_attachment',1,$this->GetOption('suppress_attachment',1)));
+			$mod->CreateInputCheckbox($id,'opt_suppress_attachment',1,
+				$this->GetOption('suppress_attachment',1)));
 
 		$main[] = array($mod->Lang('title_remove_file_from_server'),
-			$mod->CreateInputHidden($id,'opt_remove_file','0').
-				$mod->CreateInputCheckbox($id,
-				'opt_remove_file','1',
-				$this->GetOption('remove_file','0')),
-				$mod->Lang('help_ignored_if_upload'));
+			$mod->CreateInputHidden($id,'opt_remove_file',0).
+			$mod->CreateInputCheckbox($id,'opt_remove_file',1,
+				$this->GetOption('remove_file',0)),
+			$mod->Lang('help_ignored_if_upload'));
 /*		$main[] = array($mod->Lang('title_file_destination'),
 			$mod->CreateInputText($id,'opt_file_destination',
 				$this->GetOption('file_destination',$config['uploads_path']),60,255),
-				$mod->Lang('help_ignored_if_upload'));
+			$mod->Lang('help_ignored_if_upload'));
 */
 		if($uploads)
 		{
@@ -173,14 +173,16 @@ class pwfFileUpload extends pwfFieldBase
 		return $this->formdata->formsmodule->CreateInputDropdown($id,$name,$allpages,-1,$current,$addtext);
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
 		$txt = '';
 		if($this->Value)
 			$txt .= $this->GetHumanReadableValue().'<br />';	// Value line
-		$txt .= $mod->CreateFileUploadInput($id,$this->formdata->current_prefix.$this->Id,$js.$this->GetCSSIdTag()); // Input line
+		$tmp = $mod->CreateFileUploadInput(
+			$id,$this->formdata->current_prefix.$this->Id,
+			$this->GetScript());
+		$txt .= preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp); // Input line
 		if($this->Value)
 			$txt .= $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.'delete__'.$this->Id,-1). //TODO is this used?
 				'&nbsp;'.$mod->Lang('delete').'<br />'; // Delete line
@@ -193,8 +195,7 @@ class pwfFileUpload extends pwfFieldBase
 				$txt .= ' '.$mod->Lang('maximum_size').': '.$ms.'kB';
 			$exts = $this->GetOption('permitted_extensions');
 			if($exts)
-				$txt .= ' '.$mod->Lang('permitted_extensions') . ': '.$exts;
-
+				$txt .= ' '.$mod->Lang('permitted_extensions').': '.$exts;
 		}
 		return $txt;
 	}

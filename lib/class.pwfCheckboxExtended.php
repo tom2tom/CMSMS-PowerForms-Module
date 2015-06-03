@@ -81,7 +81,7 @@ class pwfCheckboxExtended extends pwfFieldBase
 	function Populate($id,&$params)
 	{
 		if($this->GetOption('box_label'))
-			$box_label = '<label for="'.$this->GetCSSId('_0').'">'.$this->GetOption('box_label').'</label>';
+			$box_label = '<label for="'.$this->GetInputId('_0').'">'.$this->GetOption('box_label').'</label>';
 		else
 			$box_label = '';
 
@@ -95,19 +95,22 @@ class pwfCheckboxExtended extends pwfFieldBase
 			$box_value = FALSE;
 
 		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
+		$js = $this->GetScript();
 		$ret = array();
 
 		$oneset = new stdClass();
 		$oneset->title = '';
 		$oneset->name = $box_label;
-		$oneset->input = $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id.'[box]','t',$this->Value['box'],$js.$this->GetCSSIdTag('_0'));
+		$tmp = $mod->CreateInputCheckbox(
+			$id,$this->formdata->current_prefix.$this->Id.'[box]','t',$this->Value['box'],
+			$js);
+		$oneset->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_0').'"',$tmp);
 		$ret[] = $oneset;
 
 		if($this->GetOption('show_textfield'))
 		{
 			if($this->GetOption('text_label'))
-				$text_label = '<label for="'.$this->GetCSSId('_1').'">'.$this->GetOption('text_label').'</label>';
+				$text_label = '<label for="'.$this->GetInputId('_1').'">'.$this->GetOption('text_label').'</label>';
 			else
 				$text_label = '';
 
@@ -119,7 +122,10 @@ class pwfCheckboxExtended extends pwfFieldBase
 			$oneset = new stdClass();
 			$oneset->title = '';
 			$oneset->name = $text_label;
-			$oneset->input = $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id.'[text]',($text_value?$this->Value['text']:''),25,25,$js.$this->GetCSSIdTag('_1'));
+			$tmp = $mod->CustomCreateInputType(
+				$id,$this->formdata->current_prefix.$this->Id.'[text]',($text_value?$this->Value['text']:''),25,25,
+				$js);
+			$oneset->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_1').'"',$tmp);
 			$ret[] = $oneset;
 		}
 

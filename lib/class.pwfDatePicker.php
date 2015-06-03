@@ -173,24 +173,27 @@ class pwfDatePicker extends pwfFieldBase
 
 		$ret = array();
 		$day = new stdClass();
-		$js = $this->GetOption('javascript');
+		$js = $this->GetScript();
 
 		$day->title = $mod->Lang('day');
-		$day->name = '<label for="'.$this->GetCSSId('_day').'">'.$mod->Lang('day').'</label>';
-		$day->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Days,-1,
-			$today['mday'],$js.$this->GetCSSIdTag('_day'));
+		$day->name = '<label for="'.$this->GetInputId('_day').'">'.$mod->Lang('day').'</label>';
+		$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Days,-1,
+			$today['mday'],$js);
+		$day->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_day').'"',$tmp);
 
 		$mon = new stdClass();
 		$mon->title = $mod->Lang('mon');
-		$mon->name = '<label for="'.$this->GetCSSId('_month').'">'.$mod->Lang('mon').'</label>';
-		$mon->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$this->Months,-1,
-			$today['mon'],$js.$this->GetCSSIdTag('_month'));
+		$mon->name = '<label for="'.$this->GetInputId('_month').'">'.$mod->Lang('mon').'</label>';
+		$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$this->Months,-1,
+			$today['mon'],$js);
+		$mon->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_month').'"',$tmp);
 
 		$yr = new stdClass();
 		$yr->title = $mod->Lang('year');
-		$yr->name = '<label for="'.$this->GetCSSId('_year').'">'.$mod->Lang('year').'</label>';
-		$yr->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Year,-1,
-			$today['year'],$js.$this->GetCSSIdTag('_year'));
+		$yr->name = '<label for="'.$this->GetInputId('_year').'">'.$mod->Lang('year').'</label>';
+		$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Year,-1,
+			$today['year'],$js);
+		$yr->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_year').'"',$tmp);
 
 		$order = array('d' => $day,'m' => $mon,'y' => $yr);
 		$user_order = $this->GetOption('date_order','d-m-y');
