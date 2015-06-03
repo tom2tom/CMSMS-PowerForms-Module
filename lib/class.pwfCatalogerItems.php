@@ -5,10 +5,9 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-/*
-A class to provide a dynamic multiselect list to allow selecting one or
-more items from the cataloger module
-The list is filtered by an array of options specified in the admin
+/* This class provides a dynamic multiselect list to allow selecting one or
+more items from the cataloger module. The list is filtered by an array of
+options specified in the admin
 */
 class pwfCatalogerItems extends pwfFieldBase
 {
@@ -102,7 +101,7 @@ class pwfCatalogerItems extends pwfFieldBase
 		$cataloger->getUserAttributes();
 		$gCms = cmsms();
 		$tmp_attrs = $gCms->variables['catalog_attrs']; //BAD MODULE BEHAVIOUR!!
-		$lines = (int)$this->GetOption('lines','5');
+		$lines = (int)$this->GetOption('lines',5);
 		$nameregex = trim($this->GetOption('nameregex'));
 
 		$attrs = array();
@@ -135,7 +134,7 @@ class pwfCatalogerItems extends pwfFieldBase
 		// for each hierarchy item (from the root down)
 		$hm = $gCms->GetHierarchyManager();
 		$allcontent = $hm->getFlatList();
-		$results = array();
+		$choices = array();
 		foreach($allcontent as $onepage)
 		{
 			$content = $onepage->GetContent();
@@ -215,14 +214,14 @@ class pwfCatalogerItems extends pwfFieldBase
 
 			if($passed)
 			{
-				$results[$content->Name()] = $content->Name();
+				$choices[$content->Name()] = $content->Name();
 			}
 		} // foreach content
 
-		// All done, do we have something to display?
-		if(count($results))
+		// Do we have something to display?
+		if($choices)
 		{
-			$size = min($lines,count($results));
+			$size = min($lines,count($choices));
 			$size = min(50,$size); // maximum 50 lines, though this is probably big
 
 			$val = array();
@@ -234,9 +233,9 @@ class pwfCatalogerItems extends pwfFieldBase
 					$val = array($this->Value);
 				}
 			}
-			$cssid = $this->GetCSSIdTag();
-			return $mod->CreateInputSelectList($id,$this->formdata->current_prefix.$this->Id.'[]',$results,$val,
-						   $size,$cssid);
+			//TODO elimintate duplicate id's
+			return $mod->CreateInputSelectList($id,$this->formdata->current_prefix.$this->Id.'[]',$choices,$val,
+						   $size,$this->GetIdTag());
 		}
 
 		return ''; // error
