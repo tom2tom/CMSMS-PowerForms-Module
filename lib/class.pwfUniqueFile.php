@@ -12,51 +12,13 @@ class pwfUniqueFile extends pwfFieldBase
 		parent::__construct($formdata,$params);
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
-//		$this->IsComputedOnSubmission = TRUE;
 		$this->IsDisposition = TRUE;
 		$this->IsSortable = FALSE;
 		$this->NonRequirableField = TRUE;
 		$this->Type = 'UniqueFile';
 	}
 
-/*USELESS	function ComputeOrder()
-	{
-		return $this->GetOption('order',1);
-	}
-
-	function Compute()
-	{
-		$ud = pwfUtils::GetUploadsPath();
-		if(!$ud)
-			return;
-
-		$type = $this->GetOption('file_type',0) ? 'rtf':'txt';
-		$filespec = $this->GetOption('filespec');
-		if($filespec)
-		{
-			pwfUtils::SetupFormVars($this->formdata);
-			$fn = preg_replace('/[^\w\d\.]|\.\./','_',
-				$this->formdata->formsmodule->ProcessTemplateFromData($filespec));
-			//conform extension
-			$ext = '.'.$type;
-			if(substr($fn,-4) != $ext)
-				$fn .= $ext;
-		}
-		else
-			$fn = 'form_submission_'.date('Y-m-d_His').'.'$type;
-		$fp = $ud.DIRECTORY_SEPARATOR.$fn;
-		$config = cmsms()->GetConfig();
-		$rl = strlen($config['root_path']);
-		if($rl && strncmp($fp,$config['root_path'],$rl) == 0)
-			$relurl = str_replace('\\','/',substr($fp,$rl));
-		else
-			$relurl = '';
-		$url = $config['root_url'].$relurl;
-
-		$this->SetValue(array($fp,$url,$relurl,$fn));
-	}
-*/
-	function SetValue($value)
+/*	function SetValue($value)
 	{
 		if($this->Value === FALSE)
 		{
@@ -85,9 +47,12 @@ class pwfUniqueFile extends pwfFieldBase
 			}
 		}
 	}
-
+*/
 	function GetFieldStatus()
 	{
+		$ud = pwfUtils::GetUploadsPath();
+		if(!$ud)
+			return $mod->Lang('err_TODO');
 		return $this->GetOption('filespec',
 			$this->formdata->formsmodule->Lang('unspecified'));
 	}
@@ -108,10 +73,10 @@ class pwfUniqueFile extends pwfFieldBase
 	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		$config = cmsms()->GetConfig();
-		$file_type = $this->GetOption('file_type',0);
-		$rtf_template_type = $this->GetOption('rtf_template_type');
-
+		$ud = pwfUtils::GetUploadsPath();
+		if(!$ud)
+			return array('main'=>array($mod->Lang('err_TODO'),''));
+	
 		$main = array();
 		$main[] = array($mod->Lang('title_file_name'),
 			$mod->CreateInputText($id,'opt_filespec',
@@ -123,23 +88,6 @@ class pwfUniqueFile extends pwfFieldBase
 			$mod->Lang('help_newline_replacement'));
 
 		$adv = array();
-// 			array("Text displayed in option tag" => "Value of option tag");
-		$file_type_list = array('TXT'=>0,'RTF'=>1);
-		$adv[] = array($mod->Lang('title_file_type'),
-			$mod->CreateInputDropdown($id,
-			'opt_file_type',$file_type_list,$file_type));
-
-		$adv[] = array($mod->Lang('title_rtf_file_template'),
-			$mod->CreateInputText($id,'opt_rtf_file_template',
-				$this->GetOption('rtf_file_template','RTF_TemplateBasic.rtf'),50,255),
-			$mod->Lang('help_rtf_file_template'));
-//		$mod->CreateInputFile($id,'opt_rtf_file_template','',60)
-
-		$rtf_template_type_list = array($mod->Lang('basic')=>0,$mod->Lang('advanced')=>1);
-		$adv[] = array($mod->Lang('title_rtf_template_type'),
-			$mod->CreateInputDropdown($id,
-				'opt_rtf_template_type',$rtf_template_type_list,$rtf_template_type),
-			$mod->Lang('help_rtf_template_type'));
 
 		$parmMain = array();
 		$parmMain['opt_file_template']['is_oneline'] = TRUE;
@@ -174,12 +122,11 @@ class pwfUniqueFile extends pwfFieldBase
 
 	function Dispose($id,$returnid)
 	{
+		$mod = $formdata->formsmodule;
 		$ud = pwfUtils::GetUploadsPath();
 		if(!$ud)
 			return array(FALSE,$mod->Lang('error'));
 	
-		$formdata = $this->formdata;
-		$mod = $formdata->formsmodule;
 //TODO mutex
 		$count = 0;
 		while (!pwfUtils::GetFileLock() && $count<200)
@@ -192,119 +139,53 @@ class pwfUniqueFile extends pwfFieldBase
 
 		pwfUtils::SetupFormVars($this->formdata);
 
-		$type = $this->GetOption('file_type',0) ? 'rtf':'txt';
 		$filespec = $this->GetOption('filespec');
 		if($filespec)
-		{
 			$fn = preg_replace('/[^\w\d\.]|\.\./','_',$mod->ProcessTemplateFromData($filespec));
-			//conform extension
-			$ext = '.'.$type;
-			if(substr($fn,-4) != $ext)
-				$fn .= $ext;
-		}
 		else
-			$fn = 'form_submission_'.date('Y-m-d_His').'.'$type;
+			$fn = 'form_submission_'.date('Y-m-d_His').'.txt';
 		$fp = $ud.DIRECTORY_SEPARATOR.$fn;
 
-		if($type == 'txt')
+		$footer = $this->GetOption('file_footer');
+		if($footer)
+			$footer = $mod->ProcessTemplateFromData($footer);
+
+		$template = $this->GetOption('file_template');
+		if(!$template)
+			$template = pwfUtils::CreateSampleTemplate($this->formdata);
+
+		$newline = $mod->ProcessTemplateFromData($template);
+		$replchar = $this->GetOption('newlinechar');
+		if($replchar)
 		{
-			$footer = $this->GetOption('file_footer');
-			if($footer)
-				$footer = $mod->ProcessTemplateFromData($footer);
-
-			$template = $this->GetOption('file_template');
-			if(!$template)
-				$template = pwfUtils::CreateSampleTemplate($this->formdata);
-
-			$newline = $mod->ProcessTemplateFromData($template);
-			$replchar = $this->GetOption('newlinechar');
-			if($replchar)
-			{
-				$newline = rtrim($newline,"\r\n");
-				$newline = preg_replace('/[\n\r]/',$replchar,$newline);
-			}
-			if(substr($newline,-1) != "\n")
-				$newline .= "\n";
-
-			$first = !file_exists($fp);
-			$fh = fopen($fp,'w');
-			if($first)
-			{
-				$header = $this->GetOption('file_header');
-				if($header)
-					$header = $mod->ProcessTemplateFromData($header)."\n";
-				fwrite($fh,$header.$newline.$footer);
-			}
-			else
-			{
-				//seek to footer
-				$rows = file($fp);
-				foreach($rows as $oneline)
-				{
-					if(substr($footer,0,strlen($oneline)) == $oneline)
-						break;
-					fwrite($fh,$oneline);
-				}
-				fwrite($fh,$newline.$footer);
-			}
-			fclose($fh);
+			$newline = rtrim($newline,"\r\n");
+			$newline = preg_replace('/[\n\r]/',$replchar,$newline);
 		}
-		else //$type = 'rtf'
+		if(substr($newline,-1) != "\n")
+			$newline .= "\n";
+
+		$first = !file_exists($fp);
+		$fh = fopen($fp,'w');
+		if($first)
 		{
 			$header = $this->GetOption('file_header');
 			if($header)
-			{
-				$header = $mod->ProcessTemplateFromData($header);
-				$header = preg_replace('/(\r\n)/','\par$1',$header);
-			}
-			$footer = $this->GetOption('file_footer');
-			if($footer)
-			{
-				$footer = $mod->ProcessTemplateFromData($footer);
-				$footer = preg_replace('/(\r\n)/','\par$1',$footer);
-			}
-
-			if($this->GetOption('rtf_template_type') == 0) //Basic template
-			{
-				$template = $this->GetOption('file_template');
-				if($template == '')
-					$template = pwfUtils::CreateSampleTemplate($this->formdata);
-				$template = $mod->ProcessTemplateFromData($template);
-				$template = preg_replace('/(\r\n)/','\par$1',$template);
-
-				$search = array("%%HEADER%%","%%FIELDS%%","%%FOOTER%%");
-				$replace = array($header,$template,$footer);
-				$tp = cms_join_path($mod->GetModulePath(),'templates',
-					$this->GetOption('rtf_file_template','RTF_TemplateBasic.rtf')));
-				$rtf_template = @file_get_contents($tp);
-				$rtf_content = str_replace($search,$replace,$rtf_template);
-			}
-			else //Advanced template
-			{
-				$tp = cms_join_path($mod->GetModulePath(),'templates',
-					$this->GetOption('rtf_file_template','RTF_TemplateAdvanced.rtf'));
-				$template = @file_get_contents($tp);
-				/*
-				To prevent the Smarty parser eating the RTF Tags (which also use curly braces),
-				we swap the curly braces temporarily.
-				The template is expected to use percent sign and square bracket
-				(like %[TAG]%) instead of curly braces.
-				*/
-				$search = array('{','}','%[',']%');
-				$replace = array('<RTF_TAG>','</RTF_TAG>','{','}');
-				$template = str_replace($search,$replace,$template);
-				$template = $mod->ProcessTemplateFromData($template);
-				$search = array('<RTF_TAG>','</RTF_TAG>');
-				$replace = array('{','}');
-				$template = str_replace($search,$replace,$template);
-
-				$search = array("%%HEADER%%","%%FOOTER%%");
-				$replace = array($header,$footer);
-				$rtf_content = str_replace($search,$replace,$template);
-			}
-
-			$put = file_put_contents($fp,$rtf_content);
+				$header = $mod->ProcessTemplateFromData($header)."\n";
+			fwrite($fh,$header.$newline.$footer);
 		}
+		else
+		{
+			//seek to footer
+			$rows = file($fp);
+			foreach($rows as $oneline)
+			{
+				if(substr($footer,0,strlen($oneline)) == $oneline)
+					break;
+				fwrite($fh,$oneline);
+			}
+			fwrite($fh,$newline.$footer);
+		}
+		fclose($fh);
 //TODO mutex
 		pwfUtils::ClearFileLock();
 		return array(TRUE,'');
