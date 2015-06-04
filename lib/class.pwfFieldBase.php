@@ -153,19 +153,23 @@ class pwfFieldBase
 	{
 	}
 
-	function GetFieldInputId($id,&$params)
+/*	function GetFieldInputId($id,&$params)
 	{
 		return $id.$this->formdata->current_prefix.$this->Id;
 	}
-
-	/*Override this to generate an xhtml string which constitutes the field-input(s)
-	to be displayed in the (frontend or backend)form. Only the input portion itself,
-	any title and/or container(s) will be provided by the form renderer.
+*/
+	/*Override this to generate content for the frontend form, either:
+	* an xhtml string which constitutes the field-input(s) to be displayed in the
+	(frontend or backend) form. Only the input portion itself, any title and/or
+	container(s) will be provided by the form renderer
+	OR if the field->HasMultipleFormComponents, then
+	* an array of stdClass objects, each with properties:
+	->name, ->title, ->input, and optionally ->op 
 	Object-names must begin with $this->formdata->current_prefix, so as to not be
 	dropped as 'unknown' frontend parameters (see PowerForms::InitializeFrontend())
 	and not be excluded as time-expired
 	*/
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
 		return '';
 	}
@@ -186,46 +190,38 @@ class pwfFieldBase
 		return '';
 	}
 
-/*	function DebugDisplay()
-	{
-		$tmp = $this->formdata;
-		$this->formdata = '[frmptr: '.$tmp->GetId().']';
-		debug_display($this);
-		$this->formdata = $tmp;
-	}
-*/
 	//Whether to generate a submit-button labelled 'add',along with the field
 	function HasAddOp()
 	{
 		return $this->HasAddOp;
 	}
 
-	// Override this when necessary or useful
-	function DoOptionAdd(&$params)
-	{
-	}
 	// Override this to generate appropriate add-button label
 	function GetOptionAddButton()
 	{
 		$mod = $this->formdata->formsmodule;
 		return $mod->Lang('add_options');
 	}
+
+	// Override this when necessary or useful (often, just set a flag)
+	function DoOptionAdd(&$params)
+	{
+	}
 	//Whether to generate a submit-button labelled 'delete',along with the field
 	function HasDeleteOp()
 	{
 		return $this->HasDeleteOp;
 	}
-
-	// Override this when necessary or useful
-	function DoOptionDelete(&$params)
-	{
-	}
-
 	// Override this to generate appropriate delete-button label
 	function GetOptionDeleteButton()
 	{
 		$mod = $this->formdata->formsmodule;
 		return $mod->Lang('delete_options');
+	}
+
+	// Override this when necessary or useful to delete option-data
+	function DoOptionDelete(&$params)
+	{
 	}
 
 	// Gets the cached field-id
@@ -283,14 +279,23 @@ class pwfFieldBase
 		return trim($alias,'_');
 	}
 
-	function GetCSSIdTag($suffix='')
+	function GetIdTag($suffix='')
 	{
-		return ' id="'.$this->GetCSSId($suffix).'"';
+		return ' id="'.$this->ForceAlias().$suffix.'"';
 	}
 
-	function GetCSSId($suffix='')
+	function GetInputId($suffix='')
 	{
 		return $this->ForceAlias().$suffix;
+	}
+
+	function GetScript($prefix=' ')
+	{
+		$js = $this->GetOption('javascript');
+		if($js)
+			return $prefix.$js;
+		return '';
+
 	}
 
 	function SetSmartyEval($bool)
@@ -521,7 +526,7 @@ class pwfFieldBase
 	}
 
 	// clear fields unused by invisible dispositions
-	function OmitAdminCommon(&$mainArray,&$advArray,$hideReq=TRUE)
+	function OmitAdminVisible(&$mainArray,&$advArray,$hideReq=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
 		// no "required" (maybe)
@@ -563,7 +568,7 @@ class pwfFieldBase
 	{
 	}
 
-	// Override this as necessary
+	// Override this as necessary (especially for cleanup of classes with HasAddOp=TRUE)
 	function PostAdminSubmitCleanup(&$params)
 	{
 	}
@@ -693,13 +698,9 @@ class pwfFieldBase
 		if($this->Value !== FALSE)
 		{
 			if(is_array($this->Value))
-			{
 				return array_search($value,$this->Value);
-			}
 			elseif($this->Value == $value)
-			{
 				return TRUE;
-			}
 		}
 		return FALSE;
 	}
@@ -871,6 +872,11 @@ class pwfFieldBase
 		return $obj;
 	}
 
+	function SetOption($optionName,$optionValue)
+	{
+		$this->Options[$optionName] = $optionValue;
+	}
+
 	// Returns a field-option value, or $default if the option doesn't exist
 	function GetOption($optionName,$default='')
 	{
@@ -879,29 +885,31 @@ class pwfFieldBase
 
 		return $default;
 	}
-	// Gets a series of option-values stored with numeric suffix to the name
+
+	//returns array of option-values, or FALSE
+	//each array-key is the numeric-suffix to $optionName, & array-value is the stored value
 	function GetOptionRef($optionName)
 	{
 		$len = strlen($optionName);
 		$matches = array();
-		foreach($this->Options as $key => &$value)
+		foreach($this->Options as $key => &$val)
 		{
-			if (strpos($key,$optionName) === 0)
+			if(strpos($key,$optionName) === 0)
 			{
 				$o = (int)substr($key,$len);
-				$matches[$o] = $value;
+				$matches[$o] = $val;
 			}
 		}
-		unset($value);
-		return ($matches) ? $matches : FALSE;
+		unset($val);
+		return ($matches) ? ksort($matches) : FALSE;
 	  }
 
-	function RemoveOptionElement($optionName,$index)
+	function SetOptionElement($optionName,$index,$value)
 	{
-		unset($this->Options[$optionName.$index]);
+		$this->Options[$optionName.$index] = $value;
 	}
 
-	function GetOptionElement($optionName,$index,$default="")
+	function GetOptionElement($optionName,$index,$default='')
 	{
 		$so = $optionName.$index; 
 		if(isset($this->Options[$so]))
@@ -914,24 +922,27 @@ class pwfFieldBase
 		return $default;
 	}
 
-	function SetOption($optionName,$optionValue)
+	function AddOptionElement($optionName,$value)
 	{
-		$this->Options[$optionName] = $optionValue;
+		$len = strlen($optionName);
+		$max = -1;
+		foreach($this->Options as $key => &$one)
+		{
+			if (strpos($key,$optionName) === 0)
+			{
+				$o = (int)substr($key,$len);
+				if($o > $max)
+					$max = $o;
+			}
+		}
+		unset($one);
+		$index = ($max > -1) ? $max + 1 : 1
+		$this->Options[$optionName.$index] = $value;
 	}
-	//this func is unused - see Load() which does same thing
-	function PushOptionElement($optionName,$val)
+
+	function RemoveOptionElement($optionName,$index)
 	{
-		if(isset($this->Options[$optionName]))
-		{
-			if(is_array($this->Options[$optionName]))
-				$this->Options[$optionName][] = $val;
-			else
-				$this->Options[$optionName] = array($this->Options[$optionName],$val);
-		}
-		else
-		{
-			$this->Options[$optionName] = $val;
-		}
+		unset($this->Options[$optionName.$index]);
 	}
 
 	// Loads data for this field from database tables.
