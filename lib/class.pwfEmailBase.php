@@ -66,7 +66,7 @@ class pwfEmailBase extends pwfFieldBase
 
 				array($mod->Lang('title_email_template'),
 					$mod->CreateTextArea(FALSE,$id,
-					/*($this->GetOption('html_email','0')=='1'?$message:htmlspecialchars($message))*/
+					/*($this->GetOption('html_email',0)?$message:htmlspecialchars($message))*/
 					$message,'opt_email_template','pwf_tallarea','','','',50,15,'','html').
 					'<br /><br />'.$buttons[0].'&nbsp'.$buttons[1])
 			  );
