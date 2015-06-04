@@ -37,12 +37,12 @@ class pwfEmailDirector extends pwfEmailBase
 
 	function DoOptionDelete(&$params)
 	{
-		foreach($params as $key=>$val)
+		if(isset($params['selected']))
 		{
-			if(strncmp($key,'opt_chkb',8) == 0)
+			foreach($params['selected'] as $indx)
 			{
-				$this->RemoveOptionElement('destination_address',$val);
-				$this->RemoveOptionElement('destination_subject',$val);
+				$this->RemoveOptionElement('destination_address',$indx);
+				$this->RemoveOptionElement('destination_subject',$indx);
 			}
 		}
 	}
@@ -114,7 +114,7 @@ class pwfEmailDirector extends pwfEmailBase
 				$mod->CreateInputText($id,'opt_destination_subject'.$i,$one,40,128),
 				$mod->CreateInputText($id,'opt_destination_address'.$i,
 					$this->GetOptionElement('destination_address',$i),50,128),
-				$mod->CreateInputCheckbox($id,'opt_chkb'.$i,$i,-1,'style="margin-left:1em;"')
+				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
 			unset($one);
