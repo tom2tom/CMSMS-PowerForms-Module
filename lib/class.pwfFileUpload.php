@@ -29,8 +29,7 @@ class pwfFileUpload extends pwfFieldBase
 	function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		$ud = pwfUtils::GetUploadsPath();
-		if(!$ud)
+		if(!pwfUtils::GetUploadsPath())
 			return $mod->Lang('TODO no uploads');
 
 		$ms = $this->GetOption('max_size');
@@ -188,7 +187,7 @@ class pwfFileUpload extends pwfFieldBase
 				'&nbsp;'.$mod->Lang('delete').'<br />'; // Delete line
 
 		// Extras
-		if($this->GetOption('show_details','0') == '1')
+		if($this->GetOption('show_details',0))
 		{
 			$ms = $this->GetOption('max_size');
 			if($ms)
@@ -328,7 +327,7 @@ class pwfFileUpload extends pwfFieldBase
 				$parms['category_id'] = $this->GetOption('uploads_category');
 				$parms['field_name'] = $_id;
 				$parms['input_destname'] = $destination_name;
-				if($this->GetOption('allow_overwrite','0') == '1')
+				if($this->GetOption('allow_overwrite',0))
 				{
 					$parms['input_replace'] = 1;
 				}

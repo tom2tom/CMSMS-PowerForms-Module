@@ -75,7 +75,7 @@ class pwfCustomEmail extends pwfEmailBase
 
 	function PostPopulateAdminForm(&$mainArray,&$advArray)
 	{
-		$this->OmitAdminCommon($mainArray,$advArray);
+		$this->OmitAdminVisible($mainArray,$advArray);
 	}
 
 	function PostAdminSubmitCleanup(&$params)

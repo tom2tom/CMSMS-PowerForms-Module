@@ -71,51 +71,60 @@ class pwfFileDirector extends pwfFieldBase
 		return implode("\t",$fields);
 	}
 
+	function GetHumanReadableValue($as_string=TRUE)
+	{
+		$ret = $this->GetOptionElement('destination_displayname',$this->Value); //TODO
+		if($as_string)
+			return array($ret);
+		else
+			return $ret;
+	}
+
 	function GetFieldStatus()
 	{
-		$ud = pwfUtils::GetUploadsPath();
-		if(!$ud)
-			return $mod->Lang('err_TODO');
+		$mod = $this->formdata->formsmodule;
+		if(!pwfUtils::GetUploadsPath())
+			return $mod->Lang('TODO_error'));
 		$opt = $this->GetOptionRef('destination_filename');
 		if($opt)
 			$fileCount = count($opt);
 		else
 			$fileCount = 0;
-		return $this->formdata->formsmodule->Lang('file_count',$fileCount);
+		return $mod->Lang('file_count',$fileCount);
 	}
 
 	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		$ud = pwfUtils::GetUploadsPath();
-		if(!$ud)
-			return array('main'=>array($mod->Lang('err_TODO'),''));
+		if(!pwfUtils::GetUploadsPath())
+			return array('main'=>array($mod->Lang('TODO_error'),''));
 
 		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
-				$mod->CreateInputText($id,'opt_select_one',
-					$this->GetOption('select_one',$mod->Lang('select_one')),30,128));
-		$main[] = array($mod->Lang('title_newline_replacement'),
+			$mod->CreateInputText($id,
+			'opt_select_one',
+			$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
+/*		$main[] = array($mod->Lang('title_newline_replacement'),
 				$mod->CreateInputText($id,'opt_newlinechar',
 					$this->GetOption('newlinechar'),5,15),
 				$mod->Lang('help_newline_replacement'));
-
+*/
 		$dests = array();
 		if($this->fileAdd)
 		{
-			$this->AddOptionElement('destination_filename','');
 			$this->AddOptionElement('destination_displayname','');
+			$this->AddOptionElement('destination_filename','');
 			$this->fileAdd = FALSE;
 		}
-		$opt = $this->GetOptionRef('destination_filename');
-		if($opt)
+		$names = $this->GetOptionRef('destination_filename');
+		if($names)
 		{
 			$dests[] = array(
 				$mod->Lang('title_selection_displayname'),
 				$mod->Lang('title_destination_filename'),
 				$mod->Lang('title_select')
 				);
-			foreach($opt as $i=>&$one)
+			foreach($names as $i=>&$one)
 			{
 				$dests[] = array(
 				$mod->CreateInputText($id,'opt_destination_displayname'.$i,$this->GetOptionElement('destination_displayname',$i),30,128),
@@ -126,33 +135,50 @@ class pwfFileDirector extends pwfFieldBase
 			unset($one);
 		}
 
-		$adv = array();
-
 		$parmMain = array();
 		$parmMain['opt_file_template']['is_oneline'] = TRUE;
 		$parmMain['opt_file_header']['is_oneline'] = TRUE;
 		$parmMain['opt_file_header']['is_header'] = TRUE;
 		$parmMain['opt_file_footer']['is_oneline'] = TRUE;
 		$parmMain['opt_file_footer']['is_footer'] = TRUE;
-		list ($funcs,$buttons) = pwfUtils::AdminTemplateActions($this->formdata,$id,$parmMain);
+		list($funcs,$buttons) = pwfUtils::AdminTemplateActions($this->formdata,$id,$parmMain);
 
+		$adv = array();
 		$adv[] = array($mod->Lang('title_file_template'),
-				  $mod->CreateTextArea(FALSE,$id,
-					htmlspecialchars($this->GetOption('file_template')),
-					'opt_file_template','pwf_tallarea','','',50,15).
-					'<br /><br />'.$buttons[0]);
+			$mod->CreateTextArea(FALSE,$id,
+				htmlspecialchars($this->GetOption('file_template')),
+				'opt_file_template','pwf_tallarea','','','',50,15).
+				'<br /><br />'.$buttons[0]);
 		$adv[] = array($mod->Lang('title_file_header'),
-				  $mod->CreateTextArea(FALSE,$id,
-					htmlspecialchars($this->GetOption('file_header')),
-					'opt_file_header','pwf_shortarea','','',50,8).
-					'<br /><br />'.$buttons[1]);
+			$mod->CreateTextArea(FALSE,$id,
+				htmlspecialchars($this->GetOption('file_header')),
+				'opt_file_header','pwf_shortarea','','','',50,8).
+				'<br /><br />'.$buttons[1]);
 		$adv[] = array($mod->Lang('title_file_footer'),
-				  $mod->CreateTextArea(FALSE,$id,
-				  htmlspecialchars($this->GetOption('file_footer')),
-				  'opt_file_footer','pwf_shortarea','','',50,8).
-				  '<br /><br />'.$buttons[2]);
+			$mod->CreateTextArea(FALSE,$id,
+				htmlspecialchars($this->GetOption('file_footer')),
+				'opt_file_footer','pwf_shortarea','','','',50,8).
+				'<br /><br />'.$buttons[2]);
 		/*show variables-help on advanced tab*/
 		return array('main'=>$main,'table'=>$dests,'adv'=>$adv,'funcs'=>$funcs,'extra'=>'varshelpadv');
+	}
+
+	function PostAdminSubmitCleanup(&$params)
+	{
+		//cleanup empties
+		$names = $this->GetOptionRef('destination_filename');
+		if($names)
+		{
+			foreach($names as $i=>&$one)
+			{
+				if(!$one || !$this->GetOptionElement('destination_displayname',$i))
+				{
+					$this->RemoveOptionElement('destination_filename',$i);
+					$this->RemoveOptionElement('destination_displayname',$i);
+				}
+			}
+			unset($one);
+		}
 	}
 
 	function Populate($id,&$params)
@@ -173,10 +199,10 @@ class pwfFileDirector extends pwfFieldBase
 
 	function Dispose($id,$returnid)
 	{
-		$mod = $formdata->formsmodule;
+		$mod = $this->formdata->formsmodule;
 		$ud = pwfUtils::GetUploadsPath();
 		if(!$ud)
-			return array(FALSE,$mod->Lang('error'));
+			return array(FALSE,$mod->Lang('errorTODO'));
 
 //TODO mutex
 		$count = 0;

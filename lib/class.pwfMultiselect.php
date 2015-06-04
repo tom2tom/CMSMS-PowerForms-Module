@@ -7,8 +7,7 @@
 
 class pwfMultiselect extends pwfFieldBase
 {
-	var $optionCount;
-	var $optionAdd;
+	var $optionAdd = FALSE;
 
 	function __construct(&$formdata,&$params)
 	{
@@ -17,7 +16,6 @@ class pwfMultiselect extends pwfFieldBase
 		$this->HasDeleteOp = TRUE;
 		$this->IsInput = TRUE;
 		$this->Type = 'Multiselect';
-		$this->optionAdd = 0;
 	}
 
 	function GetOptionAddButton()
@@ -32,46 +30,29 @@ class pwfMultiselect extends pwfFieldBase
 
 	function DoOptionAdd(&$params)
 	{
-		$this->optionAdd = 2;
+		$this->optionAdd = TRUE;
 	}
 
 	function DoOptionDelete(&$params)
 	{
-		$delcount = 0;
-		foreach($params as $thisKey=>$thisVal)
+		if(isset($params['selected']))
 		{
-			if(substr($thisKey,0,8) == 'opt_sel_')
+			foreach($params['selected'] as $indx)
 			{
-				$this->RemoveOptionElement('option_name',$thisVal - $delcount); //TODO
-				$this->RemoveOptionElement('option_value',$thisVal - $delcount);
-				$delcount++;
+				$this->RemoveOptionElement('option_name',$indx);
+				$this->RemoveOptionElement('option_value',$indx);
 			}
 		}
-	}
-
-	function countItems()
-	{
-		$opt = $this->GetOptionRef('option_name');
-		if(is_array($opt))
-			$this->optionCount = count($opt);
-		elseif($opt !== FALSE)
-			$this->optionCount = 1;
-		else
-			$this->optionCount = 0;
 	}
 
 	function GetFieldStatus()
 	{
 		$opt = $this->GetOption('option_name');
 		if(is_array($opt))
-			$num = count($opt);
-		elseif($opt)
-			$num = 1;
+			$optionCount = count($opt);
 		else
-			$num = 0;
-
-		$mod = $this->formdata->formsmodule;
-		return $mod->Lang('options',$num);
+			$optionCount = 0;
+		return $this->formdata->formsmodule->Lang('options',$optionCount);
 	}
 
 	function GetHumanReadableValue($as_string=TRUE)
@@ -83,7 +64,7 @@ class pwfMultiselect extends pwfFieldBase
 				$ret = array();
 				$vals = $this->GetOptionRef('option_value');
 				foreach($this->Value as $one)
-					$ret[] = $vals[$one - 1]; //TODO off by one ?
+					$ret[] = $vals[$one];
 				if($as_string)
 					return implode($this->GetFormOption('list_delimiter',','),$ret);
 				else
@@ -106,58 +87,75 @@ class pwfMultiselect extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 
-		$this->countItems();
-		if($this->optionAdd > 0)
-		{
-			$this->optionCount += $this->optionAdd;
-			$this->optionAdd = 0;
-		}
 		$main = array();
 		$main[] = array($mod->Lang('title_lines_to_show'),$mod->CreateInputText($id,'opt_lines',$this->GetOption('lines','3'),10,10));
 //		$main[] = array($mod->Lang('title_multiselect_details'),$dests);
 		$dests = array();
-		$dests[] = array(
-			$mod->Lang('title_option_name'),
-			$mod->Lang('title_option_value'),
-			$mod->Lang('title_select')
-			);
-		$num = ($this->optionCount>1) ? $this->optionCount:1;
-		for ($i=0; $i<$num; $i++)
+			
+		if($this->optionAdd)
+		{
+			$this->AddOptionElement('option_name','');
+			$this->AddOptionElement('option_value','');
+			$this->optionAdd = FALSE;
+		}
+		$names = $this->GetOptionRef('option_name');
+		if($names)
 		{
 			$dests[] = array(
-			$mod->CreateInputText($id,'opt_option_name[]',$this->GetOptionElement('option_name',$i),30,128),
-			$mod->CreateInputText($id,'opt_option_value[]',$this->GetOptionElement('option_value',$i),30,128),
-			$mod->CreateInputCheckbox($id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
-			);
+				$mod->Lang('title_option_name'),
+				$mod->Lang('title_option_value'),
+				$mod->Lang('title_select')
+				);
+			foreach($names as $i=>&$one)
+			{
+				$dests[] = array(
+				$mod->CreateInputText($id,'opt_option_name'.$i,$one,30,128),
+				$mod->CreateInputText($id,'opt_option_value'.$i,$this->GetOptionElement('option_value',$i),30,128),
+				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
+				);
+			}
+			unset($one);
 		}
 		return array('main'=>$main,'table'=>$dests);
 	}
 
-	function GetFieldInput($id,&$params)
+	function PostAdminSubmitCleanup(&$params)
 	{
-		$choices = array();
-		$subjects = $this->GetOptionRef('option_name');
-		$c = count($subjects);
-		if($c > 1)
+		//cleanup empties
+		$names = $this->GetOptionRef('option_name');
+		if($names)
 		{
-			for($i=0; $i<$c; $i++)
-				$choices[$subjects[$i]] = ($i+1);
+			foreach($names as $i=>&$one)
+			{
+				if(!$one || !$this->GetOptionElement('option_value',$i))
+				{
+					$this->RemoveOptionElement('option_name',$i);
+					$this->RemoveOptionElement('option_value',$i);
+				}
+			}
+			unset($one);
 		}
-		else
-			$choices[$subjects] = 1;
+	}
 
-		if($this->Value === FALSE)
-			$val = array();
-		elseif(!is_array($this->Value))
-			$val = array($this->Value);
-		else
-			$val = $this->Value;
+	function Populate($id,&$params)
+	{
+		$choices = $this->GetOptionRef('option_name');
+		if($choices)
+		{
+			$choices = array_flip($choices);
+			if($this->Value === FALSE)
+				$val = array();
+			elseif(!is_array($this->Value))
+				$val = array($this->Value);
+			else
+				$val = $this->Value;
 
-		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
-
-		return $mod->CreateInputSelectList($id,$this->formdata->current_prefix.$this->Id.'[]',$choices,$val,$this->GetOption('lines',3),
-         $js.$this->GetCSSIdTag());
+			$tmp = $this->formdata->formsmodule->CreateInputSelectList(
+				$id,$this->formdata->current_prefix.$this->Id.'[]',$choices,$val,$this->GetOption('lines',3),
+			 	$this->GetScript());
+			return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+		 }
+		 return '';
 	}
 
 }

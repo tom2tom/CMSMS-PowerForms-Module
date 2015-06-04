@@ -166,6 +166,7 @@ class pwfCheckboxGroup extends pwfFieldBase
 
 	function PostAdminSubmitCleanup(&$params)
 	{
+		//cleanup empties
 		$names = $this->GetOptionRef('box_name');
 		if($names)
 		{

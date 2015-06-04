@@ -11,10 +11,10 @@ class pwfHidden extends pwfFieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->HasLabel = 0;
+		$this->IsSortable = FALSE;
 		$this->NeedsDiv = 0;
 		$this->NonRequirableField = TRUE;
 		$this->Type = 'Hidden';
-		$this->IsSortable = FALSE;
 	}
 
 	function PrePopulateAdminForm($id)
@@ -39,7 +39,7 @@ class pwfHidden extends pwfFieldBase
 	
 	function PostPopulateAdminForm(&$mainArray,&$advArray)
 	{
-		$this->OmitAdminCommon($mainArray,$advArray); //TODO hidden field may use logic?
+		$this->OmitAdminVisible($mainArray,$advArray); //TODO hidden field may use logic?
 	}
 
 	function Populate($id,&$params)

@@ -133,6 +133,20 @@ class pwfEmailDirector extends pwfEmailBase
 
 	function PostAdminSubmitCleanup(&$params)
 	{
+		//cleanup empties
+		$addrs = $this->GetOptionRef('destination_address');
+		if($addrs)
+		{
+			foreach($addrs as $i=>&$one)
+			{
+				if(!$one || !$this->GetOptionElement('destination_subject',$i))
+				{
+					$this->RemoveOptionElement('destination_address',$i);
+					$this->RemoveOptionElement('destination_subject',$i);
+				}
+			}
+			unset($one);
+		}
 		$this->PostAdminSubmitCleanupEmail($params);
 	}
 

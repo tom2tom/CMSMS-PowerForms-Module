@@ -1,16 +1,13 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
 # Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2007 Robert Campbell <calguy1000@hotmail.com>
+# Derived in part from FormBuilder-module file copyright (C) 2007 Robert Campbell <calguy1000@hotmail.com> 
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 class pwfMultiselectFileDirector extends pwfFieldBase
 {
-	var $fileCount;
-	var $fileAdd;
-	var $sampleTemplateCode;
-	var $sampleHeader;
+	var $fileAdd = FALSE;
 
 	function __construct(&$formdata,&$params)
 	{
@@ -22,9 +19,17 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 		$this->IsDisposition = TRUE;
 		$this->IsSortable = FALSE;
 		$this->Type = 'MultiselectFileDirector';
-		$this->fileAdd = FALSE;
 	}
 
+	function GetOptionAddButton()
+	{
+		return $this->formdata->formsmodule->Lang('add_file'); //TODO trans
+	}
+
+	function GetOptionDeleteButton()
+	{
+		return $this->formdata->formsmodule->Lang('delete_file'); //TODO trans
+	}
 
 	function DoOptionAdd(&$params)
 	{
@@ -33,27 +38,38 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 
 	function DoOptionDelete(&$params)
 	{
-		$delcount = 0;
-		foreach($params as $thisKey=>$thisVal)
+		if(isset($params['selected']))
 		{
-			if(substr($thisKey,0,8) == 'opt_sel_')
+			foreach($params['selected'] as $indx)
 			{
-				$this->RemoveOptionElement('destination_filename',$thisVal - $delcount);
-				$this->RemoveOptionElement('destination_displayname',$thisVal - $delcount);
-				$delcount++;
+				$this->RemoveOptionElement('destination_filename',$indx);
+				$this->RemoveOptionElement('destination_displayname',$indx);
 			}
 		}
 	}
 
-	function countFiles()
+	function CreateSampleHeader()
 	{
-		$tmp = $this->GetOptionRef('destination_filename');
-		if(is_array($tmp))
-			$this->fileCount = count($tmp);
-		elseif($tmp !== FALSE)
-			$this->fileCount = 1;
-		else
-			$this->fileCount = 0;
+		$fields = array();
+		foreach($this->formdata->Fields as &$one)
+		{
+			if($one->DisplayInSubmission())
+				$fields[] = $one->GetName();
+		}
+		unset($one);
+		return implode("\t",$fields);
+	}
+
+	function CreateSampleTemplate()
+	{
+		$fields = array();
+		foreach($this->formdata->Fields as &$one)
+		{
+			if($one->DisplayInSubmission())
+				$fields[] = '{$'.$one->GetVariableName().'}';
+		}
+		unset($one);
+		return implode("\t",$fields);
 	}
 
 	function GetHumanReadableValue($as_string=TRUE)
@@ -76,44 +92,58 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 
 	function GetFieldStatus()
 	{
-		$this->countFiles();
-		return $this->formdata->formsmodule->Lang('file_count',$this->fileCount);
+		$mod = $this->formdata->formsmodule;
+		if(!pwfUtils::GetUploadsPath())
+			return $mod->Lang('TODO_error'));
+		$opt = $this->GetOptionRef('destination_filename');
+		if($opt)
+			$fileCount = count($opt);
+		else
+			$fileCount = 0;
+		return $mod->Lang('file_count',$fileCount);
 	}
 
 	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
+		if(!pwfUtils::GetUploadsPath())
+			return array('main'=>array($mod->Lang('TODO_error'),''));
 
-		$this->countFiles();
-		if($this->fileAdd)
-		{
-			$this->fileCount++;
-			$this->fileAdd = FALSE;
-		}
 		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
 			$mod->CreateInputText($id,
 			'opt_select_one',
 			$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
 //	    $main[] = array($mod->Lang('title_director_details'),$dests);
+
 		$dests = array();
-		$dests[] = array(
-			$mod->Lang('title_selection_displayname'),
-			$mod->Lang('title_selection_value'),
-			$mod->Lang('title_destination_filename'),
-			$mod->Lang('title_select')
-			);
-		$num = ($this->fileCount>1) ? $this->fileCount:1;
-		for ($i=0; $i<$num; $i++)
+		if($this->fileAdd)
+		{
+			$this->AddOptionElement('destination_displayname','');
+			$this->AddOptionElement('destination_value','');
+			$this->AddOptionElement('destination_filename','');
+			$this->fileAdd = FALSE;
+		}
+		$names = $this->GetOptionRef('destination_filename');
+		if($names)
 		{
 			$dests[] = array(
-			$mod->CreateInputText($id,'opt_destination_displayname[]',$this->GetOptionElement('destination_displayname',$i),30,128),
-			$mod->CreateInputText($id,'opt_destination_value[]',$this->GetOptionElement('destination_value',$i),30,128),
-			$mod->CreateInputText($id,'opt_destination_filename[]',$this->GetOptionElement('destination_filename',$i),30,128),
-			$mod->CreateInputCheckbox($id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
-			);
+				$mod->Lang('title_selection_displayname'),
+				$mod->Lang('title_selection_value'),
+				$mod->Lang('title_destination_filename'),
+				$mod->Lang('title_select')
+				);
+			foreach($names as $i=>&$one)
+			{
+				$dests[] = array(
+				$mod->CreateInputText($id,'opt_destination_displayname'.$i,$this->GetOptionElement('destination_displayname',$i),30,128),
+				$mod->CreateInputText($id,'opt_destination_value'.$i,$this->GetOptionElement('destination_value',$i),30,128),
+				$mod->CreateInputText($id,'opt_destination_filename'.$i,$one,30,128),
+				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
+				);
+			}
+			unset($one);
 		}
-		$adv = array();
 
 		$parmMain = array();
 		$parmMain['opt_file_template']['is_oneline']=TRUE;
@@ -121,53 +151,72 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 		$parmMain['opt_file_header']['is_header']=TRUE;
 		$parmMain['opt_file_footer']['is_oneline']=TRUE;
 		$parmMain['opt_file_footer']['is_footer']=TRUE;
-		list ($funcs,$buttons) = pwfUtils::AdminTemplateActions($this->formdata,$id,$parmMain);
+		list($funcs,$buttons) = pwfUtils::AdminTemplateActions($this->formdata,$id,$parmMain);
 
+		$adv = array();
 		$adv[] = array($mod->Lang('title_file_template'),
 			$mod->CreateTextArea(FALSE,$id,
 			htmlspecialchars($this->GetOption('file_template')),
-			'opt_file_template','pwf_tallarea','','',50,15).
+			'opt_file_template','pwf_tallarea','','','',50,15).
 			'<br /><br />'.$buttons[0]);
 		$adv[] = array($mod->Lang('title_file_header'),
 			$mod->CreateTextArea(FALSE,$id,
 			htmlspecialchars($this->GetOption('file_header')),
-			'opt_file_header','pwf_shortarea','','',50,8).
+			'opt_file_header','pwf_shortarea','','','',50,8).
 			'<br /><br />'.$buttons[1]);
 		$adv[] = array($mod->Lang('title_file_footer'),
 			$mod->CreateTextArea(FALSE,$id,
 			htmlspecialchars($this->GetOption('file_footer')),
-			'opt_file_footer','pwf_shortarea','','',50,8).
+			'opt_file_footer','pwf_shortarea','','','',50,8).
 			'<br /><br />'.$buttons[2]);
 		/*show variables-help on advanced tab*/
 		return array('main'=>$main,'table'=>$dests,'adv'=>$adv,'funcs'=>$funcs,'extra'=>'varshelpadv');
 	}
 
-	function GetFieldInput($id,&$params)
+	function PostAdminSubmitCleanup(&$params)
 	{
-		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
-
-		// why all this? Associative arrays are not guaranteed to preserve
-		// order,except in "chronological" creation order.
-		$displaynames = $this->GetOptionRef('destination_displayname');
-		$displayfiles = $this->GetOptionRef('destination_filename');
-		$displayvalues = $this->GetOptionRef('destination_value');
-
-		$fields = array();
-		for($i = 0; $i < count($displaynames); $i++)
+		//cleanup empties
+		$names = $this->GetOptionRef('destination_filename');
+		if($names)
 		{
-			$label = '';
-			$ctrl = new stdClass();
-			$ctrl->name = '<label for="'.$this->GetCSSId('_'.$i).'">'.$displaynames[$i].'</label>';
-			$ctrl->title = $displaynames[$i];
-			$ctrl->input = $mod->CreateInputCheckbox($id,
-							 $this->formdata->current_prefix.$this->Id.'[]',
-							 $displayvalues[$i],
-							 (is_array($this->Value) && in_array($displayvalues[$i],$this->Value))?$displayvalues[$i]:'-1',
-							 $this->GetCSSIdTag('_'.$i).$js);
-			$fields[] = $ctrl;
+			foreach($names as $i=>&$one)
+			{
+				if(!$one || !$this->GetOptionElement('destination_displayname',$i))
+				{
+					$this->RemoveOptionElement('destination_filename',$i);
+					$this->RemoveOptionElement('destination_displayname',$i);
+				}
+			}
+			unset($one);
 		}
-		return $fields;
+	}
+
+	function Populate($id,&$params)
+	{
+		$names = $this->GetOptionRef('destination_displayname');
+		if($names)
+		{
+			$mod = $this->formdata->formsmodule;
+			$js = $this->GetScript();
+			$ret = array();
+
+			foreach($names as $i=>&$one)
+			{
+				$oneset = new stdClass();
+				$oneset->title = $one;
+				$oneset->name = '<label for="'.$this->GetInputId('_'.$i).'">'.$one.'</label>';
+				$value = $this->GetOptionElement('destination_value',$i);
+				$tmp = $mod->CreateInputCheckbox(
+					$id,$this->formdata->current_prefix.$this->Id.'[]',$value,
+					(is_array($this->Value) && in_array($value,$this->Value))?$value:-1,
+					$js);
+				$oneset->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_'.$i).'"',$tmp);
+				$ret[] = $oneset;
+			}
+			unset($one);
+			return $ret;
+		}
+		return '';
 	}
 
 	function Dispose($id,$returnid)
@@ -176,7 +225,7 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 		$ud = pwfUtils::GetUploadsPath();
 		if(!$ud)
 			return array(FALSE,$mod->Lang('error'));
-TODO mutex
+//TODO mutex
 		$count = 0;
 		while (!pwfUtils::GetFileLock() && $count < 200)
 		{
@@ -186,47 +235,59 @@ TODO mutex
 		if($count == 200)
 			return array(FALSE,$mod->Lang('submission_error_file_lock'));
 
-		pwfUtils::SetFinishedFormSmarty($this->formdata);
+		pwfUtils::SetupFormVars($this->formdata);
+
 		$header = $this->GetOption('file_header');
-		if($header == '')
-			$header = pwfUtils::CreateSampleTemplate($this->formdata,FALSE,FALSE,FALSE,TRUE);
-		$header .= "\n";
+		if(!$header)
+			$header = $this->CreateSampleHeader();
+		$header = $mod->ProcessTemplateFromData($header);
 
 		$template = $this->GetOption('file_template');
-		if($template == '')
-			$template = pwfUtils::CreateSampleTemplate($this->formdata);
+		if(!$template)
+			$template = $this->CreateSampleTemplate();
+		$newline = $mod->ProcessTemplateFromData($template);
+		if(substr($newline,-1) != "\n")
+			$newline .= "\n";
 
-		// Begin output to files
+		$footer = $this->GetOption('file_footer');
+		if($footer)
+			$footer = $mod->ProcessTemplateFromData($footer);
+
+		// output to files
 		if(is_array($this->Value))
 		{
-			$displayfiles = $this->GetOptionRef('destination_filename');
-			$displayvalues = $this->GetOptionRef('destination_value');
+			$values = $this->GetOptionRef('destination_value');
 
-			foreach($this->Value as $onevalue)
+			foreach($this->Value as $indx)
 			{
-				// I dunno why it's empty sometimes,but...
-				if(empty($onevalue)) continue;
+				$fn = preg_replace('/[^\w\d\.]|\.\./','_',
+					$this->GetOptionElement('destination_filename',$indx));
+				if(!$fn)
+					continue;
+				$fp = $ud.DIRECTORY_SEPARATOR.$fn;
 
-				$idx = array_search($onevalue,$displayvalues);
-
-				$tmp = $displayfiles[$idx];
-				// get the filename
-				$filespec = $ud.DIRECTORY_SEPARATOR.preg_replace("/[^\w\d\.]|\.\./","_",$tmp);
-
-				$line = $template;
-				if(!file_exists($filespec))
-					$line = $header.$template;
-
-				$newline = $mod->ProcessTemplateFromData($line);
-				if(substr($newline,-1,1) != "\n")
-					$newline .= "\n";
-
-				$f2 = fopen($filespec,"a");
-				fwrite($f2,$newline);
-				fclose($f2);
-
+				$first = !file_exists($fp);
+				$fh = fopen($fp,'w');
+				if($first)
+				{
+					fwrite($fh,$header."\n".$newline.$footer);
+				}
+				else
+				{
+					//seek to footer
+					$rows = file($fp);
+					foreach($rows as $oneline)
+					{
+						if(substr($footer,0,strlen($oneline)) == $oneline)
+							break;
+						fwrite($fh,$oneline);
+					}
+					fwrite($fh,$newline.$footer);
+				}
+				fclose($fh);
 			}
 		}
+//TODO mutex
 		pwfUtils::ClearFileLock();
 		return array(TRUE,'');
 	}
