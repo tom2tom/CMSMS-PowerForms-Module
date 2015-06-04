@@ -16,27 +16,17 @@ class pwfUserEmail extends pwfEmailBase
 		$this->IsDisposition = TRUE;
 		$this->ModifiesOtherFields = TRUE;
 		$this->Type = 'UserEmail';
-		$mod = $formdata->formsmodule;
 		$this->ValidationType = 'email';
+		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array(
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_email_address')=>'email'
 		);
 	}
 
-	function GetCSSId($suffix='')
-	{
-		$cssid = $this->ForceAlias();
-		if(!$suffix)
-			$cssid .= '_1';
-		else
-			$cssid .= $suffix;
-		return $cssid;
-	}
-
 	function HasValue($deny_blank_responses=FALSE)
 	{
-		return ($this->Value[0] !== FALSE && !empty($this->Value[0]));
+		return !empty($this->Value[0]);
 	}
 
   	function GetValue()
@@ -51,6 +41,11 @@ class pwfUserEmail extends pwfEmailBase
 		else
 			$this->Value = $valStr;
  	}
+
+	function GetFieldStatus()
+	{
+		return $this->TemplateStatus();
+	}
 
 	function GetHumanReadableValue($as_string=TRUE)
 	{
@@ -74,11 +69,6 @@ class pwfUserEmail extends pwfEmailBase
 			return $ret;
 		else
 			return array($ret);
-	}
-
-	function GetFieldStatus()
-	{
-		return $this->TemplateStatus();
 	}
 
 	function PrePopulateAdminForm($id)
@@ -129,19 +119,26 @@ class pwfUserEmail extends pwfEmailBase
 		}
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
+//TODO support html5
+		$toself = ($this->GetOption('send_user_copy','n') == 'c');
+		$multi = ($toself) ? '[]':'';
+		$sf = ($toself) ? '_1':'';
 		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
-		$ret = '<input type="text" name="'.$id.$this->formdata->current_prefix.$this->Id.'[]" '.
-			$this->GetCSSIdTag('_1').' value="'.htmlspecialchars($this->Value[0],ENT_QUOTES).
-			'" size="25" maxlength="128" '.$js.'/>';
- 		if($this->GetOption('send_user_copy','n') == 'c')
+		$tmp = $mod->CreateInputEmail(
+			$id,$this->formdata->current_prefix.$this->Id.$multi,
+			htmlspecialchars($this->Value[0],ENT_QUOTES),25,128,
+			$this->GetScript());
+		$ret = preg_replace('/id="\S+"/','id="'.$this->GetInputId($sf).'"',$tmp);
+ 		if($toself)
 		{
-			$ret .= $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id.'[]',1,0,
-				$this->GetCSSIdTag('_2'),'email').
-				'<label for="'.$this->GetCSSId('_2').'" class="label">'.
-				$this->GetOption('send_user_label',$mod->Lang('title_send_me_a_copy')).'</label>';
+			$tid = $this->GetInputId('_2');
+			$tmp = $mod->CreateInputCheckbox(
+				$id,$this->formdata->current_prefix.$this->Id.'[]',1,0);
+			$ret .= '<br />'.preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp).
+			'&nbsp;<label for="'.$tid.'">'.
+			$this->GetOption('send_user_label',$mod->Lang('title_send_me_a_copy')).'</label>';
 		}
 		return $ret;
 	}

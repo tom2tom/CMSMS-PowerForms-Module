@@ -65,10 +65,10 @@ class pwfYearPulldown extends pwfFieldBase
 
 		$mod = $this->formdata->formsmodule;
 		$choices = array($this->GetOption('select_one',$mod->Lang('select_one'))=>'') + $choices;
-		//TODO eliminate duplicate id tags 
-		return $mod->CreateInputDropdown(
+		$tmp = $mod->CreateInputDropdown(
 			$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
-			$this->GetIdTag().$this->GetScript());
+			$this->GetScript());
+		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
 	}
 
 }

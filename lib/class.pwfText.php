@@ -79,18 +79,23 @@ class pwfText extends pwfFieldBase
 
 		if($this->GetOption('html5',0))
 		{
-			return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,$this->Value,$this->GetOption('length')<25?$this->GetOption('length'):25,
-				$this->GetOption('length'),
-				' placeholder="'.$this->GetOption('default').'"'.$ro.$this->GetIdTag().$this->GetScript());
+			$tmp = $mod->CreateInputText(
+				$id,$this->formdata->current_prefix.$this->Id,$this->Value,
+				$this->GetOption('length')<25?$this->GetOption('length'):25,$this->GetOption('length'),
+				' placeholder="'.$this->GetOption('default').'"'.$ro.$this->GetScript());
 		}
 		else
 		{
 			$js = $this->GetScript();
 			if($this->GetOption('clear_default',0))
 				$js = ' onfocus="if(this.value==this.defaultValue) this.value=\'\';" onblur="if(this.value==\'\') this.value=this.defaultValue;"'.$js;
-			return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,($this->HasValue()?$this->Value:$this->GetOption('default')),$this->GetOption('length')<25?$this->GetOption('length'):25,$this->GetOption('length'),
-				$ro.$this->GetIdTag().$js);
+			$tmp = $mod->CreateInputText(
+				$id,$this->formdata->current_prefix.$this->Id,
+				($this->HasValue()?$this->Value:$this->GetOption('default')),
+				$this->GetOption('length')<25?$this->GetOption('length'):25,$this->GetOption('length'),
+				$ro.$js);
 		}
+		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
 	}
 
 	function Validate($id)

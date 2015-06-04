@@ -47,31 +47,41 @@ class pwfLink extends pwfFieldBase
 		$this->RemoveAdminField($mainArray,$mod->Lang('title_field_required'));
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
+		$js = $this->GetScript();
 
 		if($this->Value !== FALSE && is_array($this->Value))
 			$val = $this->Value;
 		else
 			$val = array($this->GetOption('default_link'),$this->GetOption('default_link_title'));
 
-		$fieldDisp = array();
-		$thisBox = new stdClass();
-		$thisBox->name = '<label for="'.$id.$this->formdata->current_prefix.$this->Id.'_1">'.$mod->Lang('link_destination').'</label>';
-		$thisBox->title = $mod->Lang('link_destination');
-//TODO was PowerForms::CreateCustomInputText(), but PowerForms::CustomCreateInputType() is sufficient?
-//does $val[0] need html_entity_decode()?
-		$thisBox->input = $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id.'[]',html_entity_decode($val[0]),'','',$js.$this->GetCSSIdTag('_1'));
-		$fieldDisp[] = $thisBox;
-		$thisBox = new stdClass();
-		$thisBox->name = '<label for="'.$id.$this->formdata->current_prefix.$this->Id.'_2">'.$mod->Lang('link_label').'</label>';
-		$thisBox->title = $mod->Lang('link_label');
+		$ret = array();
+		$oneset = new stdClass();
+		$tid = $this->GetInputId('_1');
+		$oneset->title = $mod->Lang('link_destination');
+		$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
+//TODO does $val[0] need html_entity_decode()?
+		$tmp = $mod->CreateInputText(
+			$id,$this->formdata->current_prefix.$this->Id.'[]',
+			html_entity_decode($val[0]),'','',
+			$js);
+		$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+		$ret[] = $oneset;
+		
+		$oneset = new stdClass();
+		$tid = $this->GetInputId('_2');
+		$oneset->title = $mod->Lang('link_label');
+		$oneset->name = '<label for="'.$tid'">'.$oneset->title.'</label>';
 //TODO ibid does $val[1] ever need html_entity_decode()?
-		$thisBox->input = $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id.'[]',$val[1],'','',$js.$this->GetCSSIdTag('_2'));
-		$fieldDisp[] = $thisBox;
-		return $fieldDisp;
+		$tmp = $mod->CreateInputText(
+			$id,$this->formdata->current_prefix.$this->Id.'[]',
+			$val[1],'','',
+			$js);
+		$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+		$ret[] = $oneset;
+		return $ret;
 	}
 
 }

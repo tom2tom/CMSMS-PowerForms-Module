@@ -66,10 +66,10 @@ class pwfStatePicker extends pwfFieldBase
 		$choices = array_merge(array($this->GetOption('select_one',$mod->Lang('select_one'))=>''),$this->States);
 		if(!$this->HasValue() && $this->GetOption('default_state'))
 			$this->SetValue($this->GetOption('default_state'));
-		//TODO eliminate duplicate id tags 
-		return $mod->CreateInputDropdown(
+		$tmp = $mod->CreateInputDropdown(
 			$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
-			$this->GetIdTag().$this->GetScript());
+			$this->GetScript());
+		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
 	}
 }
 

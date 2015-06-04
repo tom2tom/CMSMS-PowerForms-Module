@@ -69,10 +69,11 @@ class pwfEmailConfirmation extends pwfEmailBase
 
 	function Populate($id,&$params)
 	{
-		return $this->formdata->formsmodule->CustomCreateInputType(
+		$tmp = $this->formdata->formsmodule->CreateInputEmail(
 			$id,$this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($this->Value,ENT_QUOTES),25,80,
-			$this->GetIdTag().$this->GetScript(),'email');
+			$this->GetScript());
+		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
 	}
 
 	function Validate($id)

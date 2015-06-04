@@ -13,7 +13,7 @@ class pwfSiteAdmin extends pwfFieldBase
 		$this->Type = 'SiteAdmin';
 	}
 
-	function buildList()
+	function buildList($select=FALSE)
 	{
 		$mod = $this->formdata->formsmodule;
 		$userops = cmsms()->GetUserOperations();
@@ -28,8 +28,9 @@ class pwfSiteAdmin extends pwfFieldBase
 			$l = $this->GetOption('show_userlastname',0);
 			$u = $this->GetOption('show_username',0);
 			$choices = array();
-			$choices[' '.$this->GetOption('select_one',$mod->Lang('select_one'))] = '';
-			$ind = 1;
+			if($select)
+				$choices[' '.$this->GetOption('select_one',$mod->Lang('select_one'))] = '';
+			$indx = 1;
 			for($i=0; $i<$c; $i++)
 			{
 				$v = $userlist[$i];
@@ -40,16 +41,13 @@ class pwfSiteAdmin extends pwfFieldBase
 					if($l) $parts[] = $v->lastname;
 					if($u) $parts[] = '('.$v->username.')';
 					$name = implode(' ',$parts);
-					$choices[$name] = $ind;
-					$ind++;
+					$choices[$name] = $indx;
+					$indx++;
 				}
 			}
 			return $choices;
 		}
-		else
-		{
-			return $mod->Lang('TODO');
-		}
+		return FALSE;
 	}
 
 	function GetFieldStatus()
@@ -70,10 +68,12 @@ class pwfSiteAdmin extends pwfFieldBase
 
 	function GetHumanReadableValue($as_string=TRUE)
 	{
-		$userlist = array_flip($this->buildList());
-		if(isset($userlist[$this->Value]))
-			$ret = $userlist[$this->Value];
+		$admins = $this->buildList();
+		if($admins)
+			$ret = array_search($this->Value,$admins);
 		else
+			$ret = FALSE;
+		if(!$ret)
 			$ret = $this->GetFormOption('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
 
@@ -81,13 +81,6 @@ class pwfSiteAdmin extends pwfFieldBase
 			return $ret;
 		else
 			return array($ret);
-	}
-
-	function GetFieldInput($id,&$params)
-	{
-		$mod = $this->formdata->formsmodule;
-		$sorted = $this->buildList();
-		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$sorted,-1,$this->Value,$js.$this->GetCSSIdTag());
 	}
 
 	function PrePopulateAdminForm($id)
@@ -101,21 +94,21 @@ class pwfSiteAdmin extends pwfFieldBase
 				$mod->CreateInputText($id,'opt_select_one',
 				$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
 		$main[] = array($mod->Lang('title_show_userfirstname'),
-				$mod->CreateInputHidden($id,'opt_show_userfirstname','0').
-				$mod->CreateInputCheckbox($id,'opt_show_userfirstname','1',
-				$this->GetOption('show_userfirstname','1')));
+				$mod->CreateInputHidden($id,'opt_show_userfirstname',0).
+				$mod->CreateInputCheckbox($id,'opt_show_userfirstname',1,
+					$this->GetOption('show_userfirstname','1')));
 		$main[] = array($mod->Lang('title_show_userlastname'),
-				$mod->CreateInputHidden($id,'opt_show_userlastname','0').
-				$mod->CreateInputCheckbox($id,'opt_show_userlastname','1',
-				$this->GetOption('show_userlastname','1')));
+				$mod->CreateInputHidden($id,'opt_show_userlastname',0).
+				$mod->CreateInputCheckbox($id,'opt_show_userlastname',1,
+					$this->GetOption('show_userlastname','1')));
 		$main[] = array($mod->Lang('title_show_username'),
-				$mod->CreateInputHidden($id,'opt_show_username','0').
-				$mod->CreateInputCheckbox($id,'opt_show_username','1',
-				$this->GetOption('show_username','0')));
+				$mod->CreateInputHidden($id,'opt_show_username',0).
+				$mod->CreateInputCheckbox($id,'opt_show_username',1,
+					$this->GetOption('show_username','0')));
 		$main[] = array($mod->Lang('title_active_only'),
-				$mod->CreateInputHidden($id,'opt_active_only','0').
-				$mod->CreateInputCheckbox($id,'opt_active_only','1',
-				$this->GetOption('active_only','1')));
+				$mod->CreateInputHidden($id,'opt_active_only',0).
+				$mod->CreateInputCheckbox($id,'opt_active_only',1,
+					$this->GetOption('active_only','1')));
 
 		$items = array();
 		foreach($groups as $thisGroup)
@@ -126,11 +119,25 @@ class pwfSiteAdmin extends pwfFieldBase
 		$main[] = array($mod->Lang('title_restrict_to_group'),
 				$mod->CreateInputHidden($id,'opt_restrict_to_group',0).
 				$mod->CreateInputCheckbox($id,'opt_restrict_to_group',1,
-				$this->GetOption('restrict_to_group',0)).
+					$this->GetOption('restrict_to_group',0)).
 				$mod->CreateInputDropdown($id,'opt_group',$items,-1,$this->GetOption('group'))
 				);
 
 		return array('main'=>$main);
+	}
+
+	function Populate($id,&$params)
+	{
+		$choices = $this->buildList(TRUE);
+		if($choices)
+		{
+			$mod = $this->formdata->formsmodule;
+			$tmp = $mod->CreateInputDropdown(
+				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
+				$this->GetScript());
+			return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+		}
+		return '';
 	}
 
 	function Validate($id)

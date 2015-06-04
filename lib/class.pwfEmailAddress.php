@@ -68,13 +68,14 @@ class pwfEmailAddress extends pwfFieldBase
 
 	function Populate($id,&$params)
 	{
-		$html5 = $this->GetOption('html5','0') == '1' ? ' placeholder="'.$this->GetOption('default').'"' : '';
+		$html5 = $this->GetOption('html5',0) ? ' placeholder="'.$this->GetOption('default').'"' : '';
 		$default = $html5 ? '' : htmlspecialchars($this->GetOption('default'),ENT_QUOTES);
 
-		return $this->formdata->formsmodule->CustomCreateInputType(
+		$tmp = $this->formdata->formsmodule->CreateInputEmail(
 			$id,$this->formdata->current_prefix.$this->Id,
 			($this->HasValue()?htmlspecialchars($this->Value,ENT_QUOTES):$default),
-			25,128,$html5.$this->GetIdTag().$this->GetScript(),'email');
+			25,128,$html5.$this->GetScript());
+		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
 	}
 
 	function Validate($id)

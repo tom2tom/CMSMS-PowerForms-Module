@@ -80,19 +80,9 @@ class pwfCheckboxExtended extends pwfFieldBase
 
 	function Populate($id,&$params)
 	{
-		if($this->GetOption('box_label'))
-			$box_label = '<label for="'.$this->GetInputId('_0').'">'.$this->GetOption('box_label').'</label>';
-		else
-			$box_label = '';
-
-		if($this->Value)
-		{
-			$box_value = !empty($this->Value['box']);
-			if(!$box_value && $this->GetOption('is_checked',0))
-				$this->Value['box'] = 't';
-		}
-		else
-			$box_value = FALSE;
+		$show = $this->GetOption('show_textfield');
+		$sf = ($show)?'_0':'';
+		$tid = $this->GetInputId($sf);
 
 		$mod = $this->formdata->formsmodule;
 		$js = $this->GetScript();
@@ -100,32 +90,50 @@ class pwfCheckboxExtended extends pwfFieldBase
 
 		$oneset = new stdClass();
 		$oneset->title = '';
-		$oneset->name = $box_label;
+		$label = $this->GetOption('box_label');
+		if($label)
+			$label = '<label for="'.$tid.'">'.$label.'</label>';
+		$oneset->name = $label;
+
+		if($this->Value)
+		{
+			$hasvalue = !empty($this->Value['box']);
+			if(!$hasvalue && $this->GetOption('is_checked',0))
+			{
+				$this->Value['box'] = 't';
+				$hasvalue = TRUE;
+			}
+		}
+		else
+			$hasvalue = FALSE;
 		$tmp = $mod->CreateInputCheckbox(
-			$id,$this->formdata->current_prefix.$this->Id.'[box]','t',$this->Value['box'],
+			$id,$this->formdata->current_prefix.$this->Id.'[box]','t',
+			($hasvalue?$this->Value['box']:0),
 			$js);
-		$oneset->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_0').'"',$tmp);
+		$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
 		$ret[] = $oneset;
 
-		if($this->GetOption('show_textfield'))
+		if($show)
 		{
+			$tid = $this->GetInputId('_1');
 			if($this->GetOption('text_label'))
-				$text_label = '<label for="'.$this->GetInputId('_1').'">'.$this->GetOption('text_label').'</label>';
+				$label = '<label for="'.$tid.'">'.$this->GetOption('text_label').'</label>';
 			else
-				$text_label = '';
+				$label = '';
 
 			if($this->Value)
-				$text_value = !empty($this->Value['text']);
+				$hasvalue = !empty($this->Value['text']);
 			else
-				$text_value = FALSE;
+				$hasvalue = FALSE;
 
 			$oneset = new stdClass();
 			$oneset->title = '';
-			$oneset->name = $text_label;
-			$tmp = $mod->CustomCreateInputType(
-				$id,$this->formdata->current_prefix.$this->Id.'[text]',($text_value?$this->Value['text']:''),25,25,
+			$oneset->name = $label;
+			$tmp = $mod->CreateInputText(
+				$id,$this->formdata->current_prefix.$this->Id.'[text]',
+				($hasvalue?$this->Value['text']:''),25,25,
 				$js);
-			$oneset->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_1').'"',$tmp);
+			$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
 			$ret[] = $oneset;
 		}
 

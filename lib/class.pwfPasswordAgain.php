@@ -49,33 +49,33 @@ class pwfPasswordAgain extends pwfFieldBase
 				'opt_min_length',
 				$this->GetOption('min_length','8'),25,25)),
 			array($mod->Lang('title_hide'),
-				$mod->CreateInputHidden($id,'opt_hide','0').
-				$mod->CreateInputCheckbox($id,'opt_hide',
-				'1',$this->GetOption('hide','1')),
+				$mod->CreateInputHidden($id,'opt_hide',0).
+				$mod->CreateInputCheckbox($id,'opt_hide',1,
+					$this->GetOption('hide','1')),
 				$mod->Lang('title_hide_help')),
 		);
 
 		return array('main'=>$main);
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
 		if($this->GetOption('hide',1))
 		{
-			return $mod->CreateInputPassword($id,$this->formdata->current_prefix.$this->Id,
-				($this->Value?$this->Value:''),$this->GetOption('length'),
-				255,$js.$this->GetCSSIdTag());
+			$tmp = $mod->CreateInputPassword($id,$this->formdata->current_prefix.$this->Id,
+				($this->Value?$this->Value:''),
+				$this->GetOption('length',16),255,
+				$this->GetScript());
 		}
 		else
 		{
-			return $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id,
+			$tmp = $mod->CreateInputText($id,$this->formdata->current_prefix.$this->Id,
 				($this->Value?$this->Value:''),
-				$this->GetOption('length'),
-				255,
-				$js.$this->GetCSSIdTag());
+				$this->GetOption('length',16),255,
+				$this->GetScript());
 		}
+		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
 	}
 
 	function Validate($id)

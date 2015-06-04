@@ -41,14 +41,14 @@ class pwfCheckboxGroup extends pwfFieldBase
 	// Delete action
 	function DoOptionDelete(&$params)
 	{
-		foreach($params as $key=>$val)
+		if(isset($params['selected']))
 		{
-			if(strncmp($key,'opt_chkb',8) == 0)
+			foreach($params['selected'] as $indx)
 			{
-				$this->RemoveOptionElement('box_name',$val);
-				$this->RemoveOptionElement('box_checked',$val);
-				$this->RemoveOptionElement('box_unchecked',$val);
-				$this->RemoveOptionElement('box_is_set',$val);
+				$this->RemoveOptionElement('box_name',$indx);
+				$this->RemoveOptionElement('box_checked',$indx);
+				$this->RemoveOptionElement('box_unchecked',$indx);
+				$this->RemoveOptionElement('box_is_set',$indx);
 			}
 		}
 	}
@@ -68,20 +68,24 @@ class pwfCheckboxGroup extends pwfFieldBase
 		$names = $this->GetOptionRef('box_name');
 		if($names)
 		{
-			$checked = $this->GetOptionRef('box_checked');
-			$unchecked = $this->GetOptionRef('box_unchecked');
-
 			$ret = array();
 			foreach($names as $i=>&$one)
 			{
 				if($this->FindArrayValue($i) === FALSE) //TODO sequence
 				{
-					if(!$this->GetOption('no_empty',0) &&
-						isset($unchecked[$i]) && trim($unchecked[$i]))
-						$ret[$one] = $unchecked[$i];
+					if(!$this->GetOption('no_empty',0))
+					{
+						$unchecked = trim($this->GetOptionElement('box_unchecked',$i));
+						if($unchecked)
+							$ret[$one] = $unchecked;
+					}
 				}
-				elseif(isset($checked[$i]) && trim($checked[$i]))
-					$ret[$one] = $checked[$i];
+				else
+				{
+					$checked = trim($this->GetOptionElement('box_checked',$i));
+					if($checked)
+						$ret[$one] = $checked;
+				}
 			}
 			unset($one);
 
@@ -97,7 +101,7 @@ class pwfCheckboxGroup extends pwfFieldBase
 					$output = substr($output,0,strlen($output)-1);
 					return $output;
 				}
-				return join($this->GetFormOption('list_delimiter',','),$ret);
+				return implode($this->GetFormOption('list_delimiter',','),$ret);
 			}
 			else
 			{
@@ -143,7 +147,7 @@ class pwfCheckboxGroup extends pwfFieldBase
 					$mod->CreateInputText($id,'opt_box_checked'.$i,$this->GetOptionElement('box_checked',$i),20,128),
 					$mod->CreateInputText($id,'opt_box_unchecked'.$i,$this->GetOptionElement('box_unchecked',$i),20,128),
 					$mod->CreateInputDropdown($id,'opt_box_is_set'.$i,$yesNo,-1,$this->GetOptionElement('box_is_set',$i)),
-					$mod->CreateInputCheckbox($id,'opt_chkb'.$i,$i,-1,'style="margin-left:1em;"')
+					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
 			unset($one);
@@ -165,10 +169,9 @@ class pwfCheckboxGroup extends pwfFieldBase
 		$names = $this->GetOptionRef('box_name');
 		if($names)
 		{
-			$checked = $this->GetOptionRef('box_checked');
 			foreach($names as $i=>&$one)
 			{
-				if($one == '' && empty($checked[$i]))
+				if(!($one || $this->GetOptionElement('box_checked',$i)))
 				{
 					$this->RemoveOptionElement('box_name',$i); //should be ok in loop
 					$this->RemoveOptionElement('box_checked',$i);
@@ -185,17 +188,17 @@ class pwfCheckboxGroup extends pwfFieldBase
 		$names = $this->GetOptionRef('box_name');
 		if($names)
 		{
-			$is_set = $this->GetOptionRef('box_is_set');
 			$mod = $this->formdata->formsmodule;
 			$js = $this->GetScript();
 			$ret = array();
 			foreach($names as $i=>&$one)
 			{
 				$oneset = new stdClass();
+				$tid = $this->GetInputId('_'.$i);
 				if($one)
 				{
 					$oneset->title = $one;
-					$oneset->name = '<label for="'.$this->GetInputId('_'.$i).'">'.$one.'</label>';
+					$oneset->name = '<label for="'.$tid.'">'.$one.'</label>';
 				}
 				else
 				{
@@ -204,14 +207,14 @@ class pwfCheckboxGroup extends pwfFieldBase
 				}
 
 				if($this->Value !== FALSE)
-					$check_val = $this->FindArrayValue($i); //TODO
-				elseif(isset($is_set[$i]) && $is_set[$i] == 'y')
-					$check_val = TRUE;
+					$checked = $this->FindArrayValue($i) ? $i:-1; //TODO
+				elseif($this->GetOptionElement('box_is_set',$i) == 'y')
+					$checked = $i;
 				else
-					$check_val = FALSE;
+					$checked = -1;
 				$tmp = $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id.'[]',$i,
-					(($check_val)?$i:-1),$js);
-				$oneset->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_'.$i).'"',$tmp);
+					$checked,$js);
+				$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
 				$ret[] = $oneset;
 			}
 			unset($one);

@@ -33,13 +33,13 @@ class pwfTimePicker extends pwfFieldBase
 	{
 		if($this->HasValue())
 		{
-			if($this->GetOption('24_hour',0) == 0)
+			if($this->GetOption('24_hour',0))
+				$ret = $this->GetArrayValue(0).':'.
+					$this->GetArrayValue(1);
+			else
 				$ret = $this->GetArrayValue(0).':'.
 					$this->GetArrayValue(1).' '.
 					$this->GetArrayValue(2);
-			else
-				$ret = $this->GetArrayValue(0).':'.
-					$this->GetArrayValue(1);
 		}
 		else
 			$ret = $this->GetFormOption('unspecified',
@@ -51,10 +51,21 @@ class pwfTimePicker extends pwfFieldBase
 			return array($ret);
 	}
 
-	function GetFieldInput($id,&$params)
+	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
+		$main = array(
+			array($mod->Lang('title_24_hour'),
+				$mod->CreateInputHidden($id,'opt_24_hour',0).
+            	$mod->CreateInputCheckbox($id,'opt_24_hour',1,
+					$this->GetOption('24_hour',0))));
+		return array('main'=>$main);
+	}
+
+	function Populate($id,&$params)
+	{
+		$mod = $this->formdata->formsmodule;
+		$js = $this->GetScript();
 
 		$now = localtime(time(),TRUE);
 		$Mins = array();
@@ -63,11 +74,44 @@ class pwfTimePicker extends pwfFieldBase
 		for ($i=0; $i<60; $i++)
 		{
 			$mo = sprintf("%02d",$i);
-			$Mins[$mo]=$mo;
+			$Mins[$mo] = $mo;
 		}
-		if($this->GetOption('24_hour','0') == '0')
+		if($this->GetOption('24_hour',0))
 		{
-			for ($i=1; $i<13; $i++)
+			for($i=0; $i<24; $i++)
+			{
+				$mo = sprintf("%02d",$i);
+				$Hours[$mo] = $mo;
+			}
+
+			if($this->HasValue())
+			{
+				$now['tm_hour'] = $this->GetArrayValue(0);
+				$now['tm_min'] = $this->GetArrayValue(1);
+			}
+			$oneset = new stdClass();
+			$tid = $this->GetInputId('_hour');
+			$oneset->title = $mod->Lang('hour');
+			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
+			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+				$Hours,-1,$now['tm_hour'],$js);
+			$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+			$ret[] = $oneset;
+
+			$oneset = new stdClass();
+			$tid = $this->GetInputId('_min');
+			$oneset->title = $mod->Lang('min');
+			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
+			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+				$Mins,-1,$now['tm_min'],$js);
+			$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+			$ret[] = $oneset;
+
+			return $ret;
+		}
+		else
+		{
+			for($i=1; $i<13; $i++)
 			{
 				$mo = sprintf("%02d",$i);
 				$Hours[$mo]=$mo;
@@ -75,8 +119,8 @@ class pwfTimePicker extends pwfFieldBase
 			if($this->HasValue())
 			{
 				$now['tm_hour'] = $this->GetArrayValue(0);
-				$now['merid'] = $this->GetArrayValue(2);
 				$now['tm_min'] = $this->GetArrayValue(1);
+				$now['merid'] = $this->GetArrayValue(2);
 			}
 			else
 			{
@@ -92,67 +136,34 @@ class pwfTimePicker extends pwfFieldBase
 				}
 			}
 
-			$hr = new stdClass();
-			$hr->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
-				$Hours,-1,$now['tm_hour'],$js.$this->GetCSSIdTag('_hour'));
-			$hr->title = $mod->Lang('hour');
-			$hr->name = '<label for="'.$this->GetCSSId('_hour').'">'.$mod->Lang('hour').'</label>';
-			$ret[] = $hr;
+			$oneset = new stdClass();
+			$tid = $this->GetInputId('_hour');
+			$oneset->title = $mod->Lang('hour');
+			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
+			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+				$Hours,-1,$now['tm_hour'],$js);
+			$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+			$ret[] = $oneset;
 
-			$min = new stdClass();
-			$min->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
-				$Mins,-1,$now['tm_min'],$js.$this->GetCSSIdTag('_min'));
-			$min->title = $mod->Lang('min');
-			$min->name = '<label for="'.$this->GetCSSId('_min').'">'.$mod->Lang('min').'</label>';
-			$ret[] = $min;
+			$oneset = new stdClass();
+			$tid = $this->GetInputId('_min');
+			$oneset->title = $mod->Lang('min');
+			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
+			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+				$Mins,-1,$now['tm_min'],$js);
+			$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+			$ret[] = $oneset;
 
-			$mer = new stdClass();
-			$mer->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
-				$this->flag12hour,-1,$now['merid'],$js.$this->GetCSSIdTag('_meridian'));
-			$mer->name = '<label for="'.$this->GetCSSId('_meridian').'">'.$mod->Lang('merid').'</label>';
-			$mer->title = $mod->Lang('merid');
-			$ret[] = $mer;
+			$oneset = new stdClass();
+			$tid = $this->GetInputId('_meridian');
+			$oneset->title = $mod->Lang('merid');
+			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
+			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+				$this->flag12hour,-1,$now['merid'],$js);
+			$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+			$ret[] = $oneset;
 			return $ret;
 		}
-		else
-		{
-			for ($i=0; $i<24; $i++)
-			{
-				$mo = sprintf("%02d",$i);
-				$Hours[$mo]=$mo;
-			}
-
-			if($this->HasValue())
-			{
-				$now['tm_hour'] = $this->GetArrayValue(0);
-				$now['tm_min'] = $this->GetArrayValue(1);
-			}
-			$hr = new stdClass();
-			$hr->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
-				$Hours,-1,$now['tm_hour'],$js.$this->GetCSSIdTag('_hour'));
-			$hr->title = $mod->Lang('hour');
-			$hr->name = '<label for="'.$this->GetCSSId('_hour').'">'.$mod->Lang('hour').'</label>';
-			$ret[] = $hr;
-
-			$min = new stdClass();
-			$min->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
-				$Mins,-1,$now['tm_min'],$js.$this->GetCSSIdTag('_min'));
-			$min->title = $mod->Lang('min');
-			$min->name = '<label for="'.$this->GetCSSId('_min').'">'.$mod->Lang('min').'</label>';
-			$ret[] = $min;
-
-			return $ret;
-		}
-	}
-
-	function PrePopulateAdminForm($id)
-	{
-		$mod = $this->formdata->formsmodule;
-		$main = array(
-			array($mod->Lang('title_24_hour'),
-            		$mod->CreateInputCheckbox($id,'opt_24_hour',
-            		'1',$this->GetOption('24_hour','0'))));
-		return array('main'=>$main);
 	}
 
 }

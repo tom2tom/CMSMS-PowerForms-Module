@@ -137,7 +137,6 @@ class pwfDatePicker extends pwfFieldBase
 
 	function Populate($id,&$params)
 	{
-		$mod = $this->formdata->formsmodule;
 		$today = getdate();
 		$Days = array(''=>'');
 		for ($i=1; $i<32; $i++)
@@ -171,33 +170,38 @@ class pwfDatePicker extends pwfFieldBase
 			$today['year'] = $this->GetOption('default_year','-1');
 		}
 
-		$ret = array();
-		$day = new stdClass();
+		$mod = $this->formdata->formsmodule;
 		$js = $this->GetScript();
 
+		$day = new stdClass();
 		$day->title = $mod->Lang('day');
-		$day->name = '<label for="'.$this->GetInputId('_day').'">'.$mod->Lang('day').'</label>';
+		$tid = $this->GetInputId('_day');
+		$day->name = '<label for="'.$tid.'">'.$day->title.'</label>';
 		$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Days,-1,
 			$today['mday'],$js);
-		$day->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_day').'"',$tmp);
+		$day->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
 
 		$mon = new stdClass();
+		$tid = $this->GetInputId('_month');
 		$mon->title = $mod->Lang('mon');
-		$mon->name = '<label for="'.$this->GetInputId('_month').'">'.$mod->Lang('mon').'</label>';
+		$mon->name = '<label for="'.$tid.'">'.$mon->title.'</label>';
 		$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$this->Months,-1,
 			$today['mon'],$js);
-		$mon->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_month').'"',$tmp);
+		$mon->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
 
 		$yr = new stdClass();
+		$tid = $this->GetInputId('_year');
 		$yr->title = $mod->Lang('year');
-		$yr->name = '<label for="'.$this->GetInputId('_year').'">'.$mod->Lang('year').'</label>';
+		$yr->name = '<label for="'.$tid.'">'.$yr->title.'</label>';
 		$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Year,-1,
 			$today['year'],$js);
-		$yr->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_year').'"',$tmp);
+		$yr->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
 
 		$order = array('d' => $day,'m' => $mon,'y' => $yr);
 		$user_order = $this->GetOption('date_order','d-m-y');
 		$arrUserOrder = explode("-",$user_order);
+
+		$ret = array();
 		foreach($arrUserOrder as $key)
 			$ret[] = $order[$key];
 
