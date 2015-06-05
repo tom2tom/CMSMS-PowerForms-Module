@@ -46,6 +46,7 @@ pwfPulldown
 pwfRadioGroup
 pwfSequenceEnd
 pwfSequenceStart
+pwfSharedFile
 pwfSiteAdmin
 pwfStatePicker
 pwfStaticText
@@ -60,5 +61,4 @@ pwfTimePicker
 pwfUniqueFile
 pwfUniqueInteger
 pwfUserEmail
-pwfWriteFile
 pwfYearPulldown
