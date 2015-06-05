@@ -21,10 +21,10 @@ $message = '';
 if(isset($params['fieldupdate']) ||
 	(isset($params['fieldadd']) && $obfield->GetFieldType()))
 {
-	$val = $obfield->AdminValidate();
+	$obfield->PostAdminSubmitCleanup($params);
+	$val = $obfield->AdminValidate($id);
 	if($val[0])
 	{
-		$obfield->PostAdminSubmitCleanup($params);
 		$obfield->Store(TRUE);
 		$obfield->PostFieldSaveProcess($params);
 		$message = $this->Lang('field_op',$params['field_op']);
