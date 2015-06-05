@@ -10,8 +10,8 @@ class pwfCheckboxExtended extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->HasMultipleFormComponents = TRUE;
 		$this->IsInput = TRUE;
+		$this->MultiPopulate = TRUE;
 		$this->NonRequirableField = TRUE;
 		$this->Type = 'CheckboxExtended';
 		$mod = $formdata->formsmodule;
@@ -106,11 +106,10 @@ class pwfCheckboxExtended extends pwfFieldBase
 		}
 		else
 			$hasvalue = FALSE;
-		$tmp = $mod->CreateInputCheckbox(
+		$oneset->input = $mod->CreateInputCheckbox(
 			$id,$this->formdata->current_prefix.$this->Id.'[box]','t',
 			($hasvalue?$this->Value['box']:0),
-			$js);
-		$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+			'id="'.$tid.'"'.$js);
 		$ret[] = $oneset;
 
 		if($show)

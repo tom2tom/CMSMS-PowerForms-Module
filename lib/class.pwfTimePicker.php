@@ -12,9 +12,9 @@ class pwfTimePicker extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->HasMultipleFormComponents = TRUE;
 		$this->IsInput = TRUE;
 		$this->LabelSubComponents = FALSE;
+		$this->MultiPopulate = TRUE;
 		$this->Type = 'TimePicker';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array($mod->Lang('validation_none')=>'none');
@@ -26,7 +26,7 @@ class pwfTimePicker extends pwfFieldBase
 	function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		return ($this->GetOption('24_hour','0') == '0'?$mod->Lang('12_hour'):$mod->Lang('24_hour'));
+		return ($this->GetOption('24_hour',0)?$mod->Lang('24_hour'):$mod->Lang('12_hour'));
 	}
 
 	function GetHumanReadableValue($as_string=TRUE)
@@ -93,18 +93,16 @@ class pwfTimePicker extends pwfFieldBase
 			$tid = $this->GetInputId('_hour');
 			$oneset->title = $mod->Lang('hour');
 			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
-			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
-				$Hours,-1,$now['tm_hour'],$js);
-			$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+			$oneset->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+				$Hours,-1,$now['tm_hour'],'id="'.$tid.'"'.$js);
 			$ret[] = $oneset;
 
 			$oneset = new stdClass();
 			$tid = $this->GetInputId('_min');
 			$oneset->title = $mod->Lang('min');
 			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
-			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
-				$Mins,-1,$now['tm_min'],$js);
-			$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+			$oneset->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+				$Mins,-1,$now['tm_min'],'id="'.$tid.'"'.$js);
 			$ret[] = $oneset;
 
 			return $ret;
@@ -140,27 +138,24 @@ class pwfTimePicker extends pwfFieldBase
 			$tid = $this->GetInputId('_hour');
 			$oneset->title = $mod->Lang('hour');
 			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
-			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
-				$Hours,-1,$now['tm_hour'],$js);
-			$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+			$oneset->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+				$Hours,-1,$now['tm_hour'],'id="'.$tid.'"'.$js);
 			$ret[] = $oneset;
 
 			$oneset = new stdClass();
 			$tid = $this->GetInputId('_min');
 			$oneset->title = $mod->Lang('min');
 			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
-			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
-				$Mins,-1,$now['tm_min'],$js);
-			$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+			$oneset->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+				$Mins,-1,$now['tm_min'],'id="'.$tid.'"'.$js);
 			$ret[] = $oneset;
 
 			$oneset = new stdClass();
 			$tid = $this->GetInputId('_meridian');
 			$oneset->title = $mod->Lang('merid');
 			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
-			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
-				$this->flag12hour,-1,$now['merid'],$js);
-			$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+			$oneset->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+				$this->flag12hour,-1,$now['merid'],'id="'.$tid.'"'.$js);
 			$ret[] = $oneset;
 			return $ret;
 		}

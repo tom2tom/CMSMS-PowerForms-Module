@@ -68,15 +68,14 @@ class pwfCheckbox extends pwfFieldBase
 		if($this->Value === FALSE && $this->GetOption('is_checked',0))
 			$this->Value = 't';
 
+		$tid = $this->GetInputId();
 		$tmp = $this->formdata->formsmodule->CreateInputCheckbox(
 			$id,$this->formdata->current_prefix.$this->Id,'t',$this->Value,
-			$this->GetScript());
-
-		$tid = $this->GetInputId();
+			'id="'.$tid.'"'.$this->GetScript());
 		$label = $this->GetOption('label');
 		if($label)
 			$label = '&nbsp;<label for="'.$tid.'">'.$label.'</label>';
-		return preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp).$label;
+		return $tmp.$label;
 	}
 
 	function Validate($id)

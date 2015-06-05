@@ -30,7 +30,7 @@ class pwfFileUpload extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if(!pwfUtils::GetUploadsPath())
-			return $mod->Lang('TODO no uploads');
+			return $mod->Lang('error_uploads_dir');
 
 		$ms = $this->GetOption('max_size');
 		$exts = $this->GetOption('permitted_extensions');
@@ -177,11 +177,10 @@ class pwfFileUpload extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		$txt = '';
 		if($this->Value)
-			$txt .= $this->GetHumanReadableValue().'<br />';	// Value line
-		$tmp = $mod->CreateFileUploadInput(
+			$txt .= $this->GetHumanReadableValue().'<br />'; // Value line
+		$txt .= $mod->CreateFileUploadInput(
 			$id,$this->formdata->current_prefix.$this->Id,
-			$this->GetScript());
-		$txt .= preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp); // Input line
+			'id="'.$this->GetInputId().'"'.$this->GetScript()); // Input line
 		if($this->Value)
 			$txt .= $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.'delete__'.$this->Id,-1). //TODO is this used?
 				'&nbsp;'.$mod->Lang('delete').'<br />'; // Delete line
@@ -352,7 +351,7 @@ class pwfFileUpload extends pwfFieldBase
 			{
 				$ud = pwfUtils::GetUploadsPath();
 				if(!$ud)
-					return array(FALSE,'TODO');
+					return array(FALSE,'error_uploads_dir');
 				
 				$src = $thisFile['tmp_name'];
 				//$dest_path = $this->GetOption('file_destination',$config['uploads_path']);

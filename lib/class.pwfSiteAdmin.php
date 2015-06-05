@@ -132,10 +132,9 @@ class pwfSiteAdmin extends pwfFieldBase
 		if($choices)
 		{
 			$mod = $this->formdata->formsmodule;
-			$tmp = $mod->CreateInputDropdown(
+			return $mod->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
-				$this->GetScript());
-			return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+				'id="'.$this->GetInputId().'"'.$this->GetScript());
 		}
 		return '';
 	}

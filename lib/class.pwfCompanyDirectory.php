@@ -248,15 +248,15 @@ class pwfCompanyDirectory extends pwfFieldBase
 					$id,$this->formdata->current_prefix.$this->Id,
 					$companies,$val,'','&nbsp;&nbsp;');
 			 case 'Select List-single':
-				$tmp = $mod->CreateInputSelectList(
+				return $mod->CreateInputSelectList(
 					$id,$this->formdata->current_prefix.$this->Id.'[]',
-					$companies,$val,$size,$this->GetScript());
-				return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp); //TODO maybe multiple
+					$companies,$val,$size,
+					'id="'.$this->GetInputId().'"'.$this->GetScript(),FALSE);
 			 case 'Select List-multiple':
-				$tmp = $mod->CreateInputSelectList(
+				return $mod->CreateInputSelectList(
 					$id,$this->formdata->current_prefix.$this->Id.'[]',
-					$companies,$val,$size,$this->GetScript(),TRUE);
-				return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp); //TODO maybe multiple
+					$companies,$val,$size,
+					'id="'.$this->GetInputId().'"'.$this->GetScript());
 			}
 		}
 		return ''; // error

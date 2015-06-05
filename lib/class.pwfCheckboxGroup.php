@@ -14,9 +14,9 @@ class pwfCheckboxGroup extends pwfFieldBase
 		parent::__construct($formdata,$params);
 		$this->HasAddOp = TRUE;
 		$this->HasDeleteOp = TRUE;
-		$this->HasMultipleFormComponents = TRUE;
 		$this->IsInput = TRUE;
 		$this->IsSortable = FALSE;
+		$this->MultiPopulate = TRUE;
 		$this->Type = 'CheckboxGroup';
 	}
 
@@ -213,9 +213,9 @@ class pwfCheckboxGroup extends pwfFieldBase
 					$checked = $i;
 				else
 					$checked = -1;
-				$tmp = $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id.'[]',$i,
-					$checked,$js);
-				$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+				$oneset->input = $mod->CreateInputCheckbox(
+					$id,$this->formdata->current_prefix.$this->Id.'[]',$i,$checked,
+					'id="'.$tid.'"'.$js);
 				$ret[] = $oneset;
 			}
 			unset($one);

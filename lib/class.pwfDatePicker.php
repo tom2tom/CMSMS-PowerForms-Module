@@ -12,9 +12,9 @@ class pwfDatePicker extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->HasMultipleFormComponents = TRUE;
 		$this->IsInput = TRUE;
 		$this->LabelSubComponents = FALSE;
+		$this->MultiPopulate = TRUE;
 		$this->Type = 'DatePicker';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array($mod->Lang('validation_none')=>'none');
@@ -177,25 +177,22 @@ class pwfDatePicker extends pwfFieldBase
 		$day->title = $mod->Lang('day');
 		$tid = $this->GetInputId('_day');
 		$day->name = '<label for="'.$tid.'">'.$day->title.'</label>';
-		$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Days,-1,
-			$today['mday'],$js);
-		$day->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+		$day->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Days,-1,
+			$today['mday'],'id="'.$tid.'"'.$js);
 
 		$mon = new stdClass();
 		$tid = $this->GetInputId('_month');
 		$mon->title = $mod->Lang('mon');
 		$mon->name = '<label for="'.$tid.'">'.$mon->title.'</label>';
-		$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$this->Months,-1,
-			$today['mon'],$js);
-		$mon->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+		$mon->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$this->Months,-1,
+			$today['mon'],'id="'.$tid.'"'.$js);
 
 		$yr = new stdClass();
 		$tid = $this->GetInputId('_year');
 		$yr->title = $mod->Lang('year');
 		$yr->name = '<label for="'.$tid.'">'.$yr->title.'</label>';
-		$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Year,-1,
-			$today['year'],$js);
-		$yr->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+		$yr->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Year,-1,
+			$today['year'],'id="'.$tid.'"'.$js);
 
 		$order = array('d' => $day,'m' => $mon,'y' => $yr);
 		$user_order = $this->GetOption('date_order','d-m-y');

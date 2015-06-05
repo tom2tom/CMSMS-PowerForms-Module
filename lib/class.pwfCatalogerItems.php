@@ -231,9 +231,9 @@ class pwfCatalogerItems extends pwfFieldBase
 				if(!is_array($this->Value))
 					$val = array($this->Value);
 			}
-			$tmp = $mod->CreateInputSelectList(
-				$id,$this->formdata->current_prefix.$this->Id.'[]',$choices,$val,$size);
-			return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+			return $mod->CreateInputSelectList(
+				$id,$this->formdata->current_prefix.$this->Id.'[]',
+				$choices,$val,$size,'id="'.$this->GetInputId().'"');
 		}
 
 		return ''; // error

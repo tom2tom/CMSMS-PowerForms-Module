@@ -127,11 +127,9 @@ class pwfEmailFEUProperty extends pwfEmailBase
 		 case 5: // multiselect
 		 case 7: // radio button group
 			// rendered all as a dropdown field.
-			//TODO duplicate id's in created string
-			$tmp = $mod->CreateInputDropdown(
+			$res = $mod->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
-				$this->GetScript());
-			$res = preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+				'id="'.$this->GetInputId().'"'.$this->GetScript());
 			break;
 		 default:
 			$res = '';
