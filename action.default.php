@@ -131,7 +131,7 @@ if(isset($params[$prefix.'formdata']))
 		{
 			if(strncmp($key,'pwfp_',5) == 0)
 			{
-				$pid = substr($key,9);
+				$pid = substr($key,9); //ignore 'pwfp_NNN_' prefix
 				if(is_numeric($pid))
 				{
 					$fld = $formdata->Fields[$pid];
@@ -141,8 +141,8 @@ if(isset($params[$prefix.'formdata']))
 						{
 							if(isset($params['captcha_input']))
 								$val = $params['captcha_input'];
-	//						if(!$val)
-	//							$val = -.-; //ensure invalid-value if empty
+//							if(!$val)
+//								$val = -.-; //ensure invalid-value if empty
 						}
 						$fld->SetValue($val);
 					}
