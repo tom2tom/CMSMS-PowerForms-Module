@@ -162,16 +162,16 @@ function Get_FieldOpts(&$db,$pre,$oldfid,$newfid,$oldf,$newf,&$fieldrow)
 		//some field-types simply repeat the same option-name (relying on save-order for any reconciliation!)
 		//we are more careful!
 		$sequence = in_array($fieldrow['type'],array(
-		 'PulldownField',
-		 'RadioGroupField',
 		 'CheckboxGroupField',
-		 'MultiselectField',
 		 'DispositionDirector',
 		 'DispositionEmail',
 		 'DispositionEmailBasedFrontendFields',
 		 'DispositionFileDirector',
 		 'DispositionMultiselectFileDirector',
 		 'DispositionPageRedirector'
+		 'MultiselectField',
+		 'PulldownField',
+		 'RadioGroupField',
 		));
 		if($sequence)
 			$desc = '';
@@ -233,7 +233,7 @@ function Get_Fields(&$db,$pre,$oldfid,$newfid)
 		 'DispositionEmailConfirmation'=>'EmailConfirmation',
 		 'DispositionEmailFromFEUProperty'=>'EmailFEUProperty',
 		 'DispositionEmailSiteAdmin'=>'EmailSiteAdmin',
-		 'DispositionFile'=>'WriteFile',
+		 'DispositionFile'=>'SharedFile',
 		 'DispositionFileDirector'=>'FileDirector',
 		 'DispositionForm'=>'SubmitForm',
 		 'DispositionFormBrowser'=>'FormBrowser',
@@ -251,7 +251,7 @@ function Get_Fields(&$db,$pre,$oldfid,$newfid)
 		 'FromEmailSubjectField'=>'EmailSubject',
 		 'HiddenField'=>'Hidden',
 		 'LinkField'=>'Link',
-		 'ModuleInterfaceField'=>'ModuleInterface',
+		 'ModuleInterfaceField'=>'InputTemplate',
 		 'MultiselectField'=>'Multiselect',
 		 'OzStatePickerField'=>'OzStatePicker',
 		 'PageBreakField'=>'PageBreak',
