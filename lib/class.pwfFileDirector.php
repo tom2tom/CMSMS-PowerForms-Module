@@ -84,7 +84,7 @@ class pwfFileDirector extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if(!pwfUtils::GetUploadsPath())
-			return $mod->Lang('TODO_error'));
+			return $mod->Lang('error_uploads_dir'));
 		$opt = $this->GetOptionRef('destination_filename');
 		if($opt)
 			$fileCount = count($opt);
@@ -97,7 +97,7 @@ class pwfFileDirector extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if(!pwfUtils::GetUploadsPath())
-			return array('main'=>array($mod->Lang('TODO_error'),''));
+			return array('main'=>array($mod->Lang('error_uploads_dir'),''));
 
 		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
@@ -189,10 +189,9 @@ class pwfFileDirector extends pwfFieldBase
 			$mod = $this->formdata->formsmodule;
 			$choices = array(' '.$this->GetOption('select_one',$mod->Lang('select_one'))=>'')
 				+ array_flip($names);
-			$tmp = $mod->CreateInputDropdown(
+			return $mod->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
-				$this->GetScript());
-			return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+				'id="'.$this->GetInputId().'"'.$this->GetScript());
 		}
 		return '';
 	}
@@ -202,17 +201,11 @@ class pwfFileDirector extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		$ud = pwfUtils::GetUploadsPath();
 		if(!$ud)
-			return array(FALSE,$mod->Lang('errorTODO'));
+			return array(FALSE,$mod->Lang('error_uploads_dir'));
 
-//TODO mutex
-		$count = 0;
-		while (!pwfUtils::GetFileLock() && $count<200)
-		{
-			$count++;
-			usleep(500);
-		}
-		if($count == 200)
-			return array(FALSE,$mod->Lang('submission_error_file_lock'));
+		$mx = pwfMutex::Get($mod);
+		if(!$mx || !$mx->lock(uniqid($this->Type)))
+			return array(FALSE,$mod->Lang('error_lock'));
 
 		pwfUtils::SetupFormVars($this->formdata);
 
@@ -229,12 +222,13 @@ class pwfFileDirector extends pwfFieldBase
 			$template = $this->CreateSampleTemplate();
 
 		$newline = $mod->ProcessTemplateFromData($template);
-		$replchar = $this->GetOption('newlinechar');
+/*		$replchar = $this->GetOption('newlinechar');
 		if($replchar)
 		{
 			$newline = rtrim($newline,"\r\n");
 			$newline = preg_replace('/[\n\r]/',$replchar,$newline);
 		}
+*/
 		if(substr($newline,-1) != "\n")
 			$newline .= "\n";
 
@@ -252,18 +246,28 @@ class pwfFileDirector extends pwfFieldBase
 		else
 		{
 			//seek to footer
-			$rows = file($fp);
-			foreach($rows as $oneline)
+			if($footer)
 			{
-				if(substr($footer,0,strlen($oneline)) == $oneline)
-					break;
-				fwrite($fh,$oneline);
+				$rows = explode("\n",$footer);
+				$target = $rows[0];
 			}
+			else
+				$target = '';
+			$rows = file($fp);
+			foreach($rows as &$line)
+			{
+				$l = strlen($line);
+				if(strncmp($line,$target,$l) != 0)
+					fwrite($fh,$line);
+				else
+					break;
+			}
+			unset($line);
 			fwrite($fh,$newline.$footer);
 		}
 		fclose($fh);
-//TODO mutex
-		pwfUtils::ClearFileLock();
+
+		$mx->unlock();
 		return array(TRUE,'');
 	}
 
