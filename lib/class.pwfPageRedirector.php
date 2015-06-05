@@ -7,8 +7,7 @@
 
 class pwfPageRedirector extends pwfFieldBase
 {
-	var $addressAdd;
-	var $addressCount;
+	var $addressAdd = FALSE;
 
 	function __construct(&$formdata,&$params)
 	{
@@ -17,7 +16,6 @@ class pwfPageRedirector extends pwfFieldBase
 		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
 		$this->Type = 'PageRedirector';
-		$this->addressAdd = FALSE;
 	}
 
 	function GetOptionAddButton()
@@ -37,27 +35,14 @@ class pwfPageRedirector extends pwfFieldBase
 
 	function DoOptionDelete(&$params)
 	{
-		$delcount = 0;
-		foreach($params as $thisKey=>$thisVal)
+		if(isset($params['selected']))
 		{
-			if(substr($thisKey,0,8) == 'opt_sel_')
+			foreach($params['selected'] as $indx)
 			{
-				$this->RemoveOptionElement('destination_page',$thisVal - $delcount); //TODO
-				$this->RemoveOptionElement('destination_subject',$thisVal - $delcount);
-				$delcount++;
+				$this->RemoveOptionElement('destination_page',$indx);
+				$this->RemoveOptionElement('destination_subject',$indx);
 			}
 		}
-	}
-
-	function countAddresses()
-	{
-		$tmp = $this->GetOptionRef('destination_page');
-		if(is_array($tmp))
-			$this->addressCount = count($tmp);
-		elseif($tmp !== FALSE)
-			$this->addressCount = 1;
-		else
-			$this->addressCount = 0;
 	}
 
 	function GetFieldStatus()
@@ -69,14 +54,13 @@ class pwfPageRedirector extends pwfFieldBase
 			$num = 1;
 		else
 			$num = 0;
-
 		return $this->formdata->formsmodule->Lang('destination_count',$num);
 	}
 
 	function GetHumanReadableValue($as_string=TRUE)
 	{
 		if($this->HasValue())
-			$ret = $this->GetOptionElement('destination_page',($this->Value - 1)); //TODO index
+			$ret = $this->GetOptionElement('destination_page',$this->Value);
 		else
 			$ret = $this->GetFormOption('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
@@ -91,40 +75,62 @@ class pwfPageRedirector extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 
-		$this->countAddresses();
-		if($this->addressAdd > 0)
-		{
-			$this->addressCount += $this->addressAdd;
-			$this->addressAdd = 0;
-		}
 		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
 			$mod->CreateInputText($id,'opt_select_one',
 			$this->GetOption('select_one',$mod->Lang('select_one')),30,128));
 //		$main[] = array($mod->Lang('title_director_details'),$dests);
 		$dests = array();
-		$dests[] = array(
-			$mod->Lang('title_selection_subject'),
-			$mod->Lang('title_destination_page'),
-			$mod->Lang('title_select')
-			);
-		$contentops = cmsms()->GetContentOperations();
-		$num = ($this->addressCount>1) ? $this->addressCount:1;
-		for($i=0; $i<$num; $i++)
+
+		if($this->addressAdd)
+		{
+			$this->AddOptionElement('destination_page','');
+			$this->AddOptionElement('destination_subject','');
+			$this->addressAdd = FALSE;
+		}
+		$opt = $this->GetOptionRef('destination_page');
+		if($opt)
 		{
 			$dests[] = array(
-			$mod->CreateInputText($id,'opt_destination_subject[]',$this->GetOptionElement('destination_subject',$i),30,128),
-			$contentops->CreateHierarchyDropdown('',$this->GetOptionElement('destination_page',$i),$id.'opt_destination_page[]'),
-			$mod->CreateInputHidden($id,'opt_sel_'.$i,0).
-			$mod->CreateInputCheckbox($id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
-			);
+				$mod->Lang('title_selection_subject'),
+				$mod->Lang('title_destination_page'),
+				$mod->Lang('title_select')
+				);
+			$contentops = cmsms()->GetContentOperations();
+			foreach($opt as $i=>&$one)
+			{
+				$dests[] = array(
+				$mod->CreateInputText($id,'opt_destination_subject'.$i,$this->GetOptionElement('destination_subject',$i),30,128),
+				$contentops->CreateHierarchyDropdown('',$one,$i),$id.'opt_destination_page[]'),
+				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
+				);
+			}
+			unset($one);
 		}
 		return array('main'=>$main,'table'=>$dests);
 	}
 
 	function PostPopulateAdminForm(&$mainArray,&$advArray)
 	{
-		$this->OmitAdminCommon($mainArray,$advArray);
+		$this->OmitAdminVisible($mainArray,$advArray);
+	}
+
+	function PostAdminSubmitCleanup(&$params)
+	{
+		//cleanup empties
+		$pages = $this->GetOptionRef('destination_page');
+		if($pages)
+		{
+			foreach($pages as $i=>&$one)
+			{
+				if(!$one || !$this->GetOptionElement('destination_subject',$i))
+				{
+					$this->RemoveOptionElement('destination_page',$i);
+					$this->RemoveOptionElement('destination_subject',$i);
+				}
+			}
+			unset($one);
+		}
 	}
 
 	function AdminValidate($id)
@@ -144,32 +150,26 @@ class pwfPageRedirector extends pwfFieldBase
 	    return array($ret,$msg);
 	}
 
-	function GetFieldInput($id,&$params)
+	function Populate($id,&$params)
 	{
-		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
-
-		$choices = array();
-		$choices[' '.$this->GetOption('select_one',$mod->Lang('select_one'))] = '';
-
-		$subjects = $this->GetOptionRef('destination_subject');
-
-		if(count($subjects) > 1)
+		$pages = $this->GetOptionRef('destination_subject');
+		if($pages)
 		{
-			for($i=0; $i<count($subjects); $i++)
-				$choices[$subjects[$i]] = ($i+1);
+			$mod = $this->formdata->formsmodule;
+			$choices = array(' '.$this->GetOption('select_one',$mod->Lang('select_one')) => '')
+				+ array_flip($pages);
+			return $mod->CreateInputDropdown(
+				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
+				'id="'.$this->GetInputId().'"'.$this->GetScript());
 		}
-		else
-			$choices[$subjects] = '1';
-
-		return $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,$js.$this->GetCSSIdTag());
+		return '';
 	}
 
 	function Dispose($id,$returnid)
 	{
 		//TODO ensure all other dispositions are run before this
 		$mod = $this->formdata->formsmodule;
-		$mod->RedirectContent($this->GetOptionElement('destination_page',($this->Value - 1)));
+		$mod->RedirectContent($this->GetOptionElement('destination_page',$this->Value));
 		return array(TRUE,'');
 	}
 

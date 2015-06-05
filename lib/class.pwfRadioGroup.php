@@ -7,30 +7,16 @@
 
 class pwfRadioGroup extends pwfFieldBase
 {
-	var $optionAdd;
-	var $optionCount;
+	var $optionAdd = FALSE;
 
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->HasAddOp = TRUE;
 		$this->HasDeleteOp = TRUE;
-		$this->HasMultipleFormComponents = TRUE;
 		$this->IsInput = TRUE;
+		$this->MultiPopulate = TRUE;
 		$this->Type = 'RadioGroup';
-		$this->optionAdd = FALSE;
-		$this->optionCount = 0;
-	}
-
-	function countBoxes()
-	{
-		$tmp = $this->GetOptionRef('button_name');
-		if(is_array($tmp))
-			$this->optionCount = count($tmp);
-		elseif($tmp !== FALSE)
-			$this->optionCount = 1;
-		else
-			$this->optionCount = 0;
 	}
 
 	function GetOptionAddButton()
@@ -43,45 +29,32 @@ class pwfRadioGroup extends pwfFieldBase
 		return $this->formdata->formsmodule->Lang('delete_options');
 	}
 
-	function GetFieldInput($id,&$params)
+	function DoOptionAdd(&$params)
 	{
-		$mod = $this->formdata->formsmodule;
-		$names = $this->GetOptionRef('button_name');
-		$is_set = $this->GetOptionRef('button_is_set');
-		$js = $this->GetOption('javascript');
+		$this->optionAdd = TRUE;
+	}
 
-		$fieldDisp = array();
-		foreach($names as $i=>&$one)
+	function DoOptionDelete(&$params)
+	{
+		if(isset($params['selected']))
 		{
-			$label = '';
-			$thisBox = new stdClass();
-			if($one)
+			foreach($params['selected'] as $indx)
 			{
-				$thisBox->name = '<label for="'.$this->GetCSSId('_'.$i).'">'.$one.'</label>';
-				$thisBox->title = $one;
+				$this->RemoveOptionElement('button_name',$indx);
+				$this->RemoveOptionElement('button_checked',$indx);
+				$this->RemoveOptionElement('button_is_set',$indx);
 			}
-
-			if($this->Value !== FALSE)
-				$check_val = $this->FindArrayValue($i); //TODO
-			elseif(isset($is_set[$i]) && $is_set[$i] == 'y')
-				$check_val = TRUE;
-			else
-				$check_val = FALSE;
-
-			$thisBox->input = '<input type="radio" name="'.$id.$this->formdata->current_prefix.$this->Id.'" value="'.$i.'"';
-			if($check_val)
-				$thisBox->input .= ' checked="checked"';
-			$thisBox->input .= $js.$this->GetCSSIdTag('_'.$i).' />';
-			$fieldDisp[] = $thisBox;
 		}
-		unset($one);
-		return $fieldDisp;
 	}
 
 	function GetFieldStatus()
 	{
-		$this->countBoxes();
-		$ret = $this->formdata->formsmodule->Lang('options',$this->optionCount);
+		$opt = $this->GetOptionRef('button_name');
+		if($opt)
+			$optionCount = count($opt);
+		else
+			$optionCount = 0;
+		$ret = $this->formdata->formsmodule->Lang('options',$optionCount);
 		if($this->ValidationType)
 			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
 		return $ret;
@@ -101,75 +74,102 @@ class pwfRadioGroup extends pwfFieldBase
 			return array($ret);
 	}
 
-	function DoOptionAdd(&$params)
-	{
-		$this->optionAdd = 1;
-	}
-
-	function DoOptionDelete(&$params)
-	{
-		$delcount = 0;
-		foreach($params as $thisKey=>$thisVal)
-		{
-			if(substr($thisKey,0,8) == 'opt_sel_')
-			{
-				$this->RemoveOptionElement('button_name',$thisVal - $delcount);
-				$this->RemoveOptionElement('button_checked',$thisVal - $delcount);
-				$this->RemoveOptionElement('button_is_set',$thisVal - $delcount);
-				$delcount++;
-			}
-		}
-	}
-
 	function PrePopulateAdminForm($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		$yesNo = array($mod->Lang('no')=>'n',$mod->Lang('yes')=>'y');
 
-		$this->countBoxes();
-		if($this->optionAdd > 0)
-		{
-			$this->optionCount += $this->optionAdd;
-			$this->optionAdd = 0;
-		}
 //		$main = array();
 //		$main = array($mod->Lang('title_radiogroup_details'),$boxes);
 		$boxes = array();
-		$boxes = array(
-			$mod->Lang('title_radio_label'),
-			$mod->Lang('title_checked_value'),
-			$mod->Lang('title_default_set'),
-			$mod->Lang('title_select')
-			);
-		$num = ($this->optionCount>1) ? $this->optionCount:1;
-		for ($i=0; $i<$num; $i++)
+		if($this->optionAdd)
 		{
-			$boxes = array(
-			  $mod->CreateInputText($id,'opt_button_name[]',$this->GetOptionElement('button_name',$i),25,128),
-			  $mod->CreateInputText($id,'opt_button_checked[]',$this->GetOptionElement('button_checked',$i),25,128),
-			  $mod->CreateInputDropdown($id,'opt_button_is_set[]',$yesNo,-1,$this->GetOptionElement('button_is_set',$i)),
-			  $mod->CreateInputCheckbox($id,'sel_'.$i,$i,-1,'style="margin-left:1em;"')
-			 );
+			$this->AddOptionElement('button_name','');
+			$this->AddOptionElement('button_checked','');
+			$this->AddOptionElement('button_is_set','y');
+			$this->optionAdd = FALSE;
 		}
-
+		$names = $this->GetOptionRef('button_name');
+		if($names)
+		{
+			$boxes[] = array(
+				$mod->Lang('title_radio_label'),
+				$mod->Lang('title_checked_value'),
+				$mod->Lang('title_default_set'),
+				$mod->Lang('title_select')
+				);
+			$yesNo = array($mod->Lang('no')=>'n',$mod->Lang('yes')=>'y');
+			foreach($names as $i=>&$one)
+			{
+				$boxes[] = array(
+				  $mod->CreateInputText($id,'opt_button_name'.$i,$one,25,128),
+				  $mod->CreateInputText($id,'opt_button_checked'.$i,$this->GetOptionElement('button_checked',$i),25,128),
+				  $mod->CreateInputDropdown($id,'opt_button_is_set'.$i,$yesNo,-1,$this->GetOptionElement('button_is_set',$i)),
+				  $mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
+				 );
+			}
+			unset($one);
+		}
 		return array('table'=>$boxes);
 	}
 
 	function PostAdminSubmitCleanup(&$params)
 	{
+		//cleanup empties
 		$names = $this->GetOptionRef('button_name');
-		$checked = $this->GetOptionRef('button_checked');
-		for ($i=0; $i<count($names); $i++)
+		if($names)
 		{
-			if($names[$i] == '' && $checked[$i] == '')
+			foreach($names as $i=>&$one)
 			{
-				$this->RemoveOptionElement('button_name',$i);
-				$this->RemoveOptionElement('button_checked',$i);
-				$this->RemoveOptionElement('button_is_set',$i);
-				$i--;
+				if(!($one || $this->GetOptionElement('button_checked',$i)))
+				{
+					$this->RemoveOptionElement('button_name',$i); //should be ok in loop
+					$this->RemoveOptionElement('button_checked',$i);
+					$this->RemoveOptionElement('button_is_set',$i);
+				}
 			}
+			unset($one);
 		}
-		$this->countBoxes();
+	}
+
+	function Populate($id,&$params)
+	{
+		$names = $this->GetOptionRef('button_name');
+		if($names)
+		{
+			$ret = array();
+			$mod = $this->formdata->formsmodule;
+		
+			foreach($names as $i=>&$one)
+			{
+				$oneset = new stdClass();
+				if($one)
+				{
+					$oneset->title = $one;
+					$oneset->name = '<label for="'.$this->GetInputId('_'.$i).'">'.$one.'</label>';
+				}
+				else
+				{
+					$oneset->title = '';
+					$oneset->name = '';
+				}
+
+ 				$tmp = '<input type="radio" id="'.$this->GetInputId('_'.$i).'" name="'.
+					$id.$this->formdata->current_prefix.$this->Id.'[]" value="'.$i.'"';
+				if($this->Value !== FALSE)
+					$checked = $this->FindArrayValue($i); //TODO
+				elseif($this->GetOptionElement('button_is_set',$i) == 'y')
+					$checked = TRUE;
+				else
+					$checked = FALSE;
+				if($checked)
+					$tmp .= ' checked="checked"';
+				$oneset->input = $tmp.$this->GetScript().' />';
+				$ret[] = $oneset;
+			}
+			unset($one);
+			return $ret;
+		}
+		return '';
 	}
 }
 
