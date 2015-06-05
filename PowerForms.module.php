@@ -21,12 +21,13 @@ class PowerForms extends CMSModule
 {
 	//these are populated when first used
 	var $field_types = FALSE; //array of all usable field classnames
-	var $std_field_types = FALSE; //subset : classes for use in 'fast-adder' simple mode
+	var $std_field_types = FALSE; //subset of $field_types, classes for use in 'fast-adder' simple mode
 	//this regex is used by several field-types, not just email*
 	//pretty much everything is valid, provided there's an '@' in there!
 	//(we're concerned more about typo's than format!)
 	var $email_regex = '/.+@.+\..+/';
-	var $cache = NULL;	//object for persistent cacheing of formdata objects, setup @ 1st use
+	public static $mutex = NULL; //object for serialising access, setup @ 1st use
+	protected static $cache = NULL;	//object for cacheing of formdata objects, setup @ 1st use
 
 	function __construct()
 	{
@@ -323,69 +324,6 @@ class PowerForms extends CMSModule
 		for($i = 0; $i < $l; $i++)
 			$hash = $hash * 33 + $n[$i];
 		return substr($hash,-3);
-	}
-
-	// like API function CreateInputText() but doesn't throw in an ID that's the same as $name
-	function CustomCreateInputType($id,$name,$value='',$size=10,$maxlength=255,$addttext='',$type='text')
-	{
-		$id = cms_htmlentities($id);
-		$name = cms_htmlentities($name);
-		$value = cms_htmlentities($value);
-		$size = cms_htmlentities($size);
-		$maxlength = cms_htmlentities($maxlength);
-
-		$value = str_replace('"', '&quot;', $value);
-
-		$text = '<input type="'.$type.'" name="'.$id.$name.'" value="'.$value.'" size="'.$size.'" maxlength="'.$maxlength.'"';
-		if($addttext)
-			$text .= ' ' . $addttext;
-		$text .= " />\n";
-		return $text;
-	}
-
-	// imported from pwfFieldBase TODO used pwfLinkField (twice): reconcile
-	// like API function CreateInputText(), but doesn't throw in an ID that's the same as $name
-	// and $id,$name,$value may be htmlentitiesO()-ized
-/*	function CreateCustomInputText($id,$name,$value='',$size=10,$maxlength=255,$addttext='')
-	{
-		$id = cms_htmlentities(html_entity_decode($id));
-		$name = cms_htmlentities(html_entity_decode($name));
-		$value = cms_htmlentities(html_entity_decode($value));
-		$size = ($size!=''?cms_htmlentities($size):10);
-		$maxlength = ($maxlength!=''?cms_htmlentities($maxlength):255);
-
-		$value = str_replace('"','&quot;',$value);
-
-		$text = '<input type="text" name="'.$id.$name.'" value="'.$value.'" size="'.$size.'" maxlength="'.$maxlength.'"';
-		if($addttext)
-			$text .= ' ' . $addttext;
-		$text .= " />\n";
-		return $text;
-	}
-*/
-
-	function CustomCreateInputSubmit($id,$name,$value='',$addttext='',$image='',$confirmtext='')
-	{
-		$id = cms_htmlentities($id);
-		$name = cms_htmlentities($name);
-		$image = cms_htmlentities($image);
-		$text = '<input name="'.$id.$name.'" value="'.$value.'" type=';
-		if($image)
-		{
-			$text .= '"image"';
-			$config = cmsms()->GetConfig();
-			$img = $config['root_url'] . '/' . $image;
-			$text .= ' src="'.$img.'"';
-		}
-		else
-			$text .= '"submit"';
-
-		if($confirmtext)
-			$text .= ' onclick="return confirm(\''.$confirmtext.'\');"';
-		if($addttext)
-			$text .= ' '.$addttext;
-		$text .= ' />';
-		return $text . "\n";
 	}
 
 	function RegisterField($classfilepath)
