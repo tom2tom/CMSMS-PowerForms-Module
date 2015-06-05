@@ -10,7 +10,7 @@ class pwfLink extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->HasMultipleFormComponents = TRUE;
+		$this->MultiPopulate = TRUE;
 		$this->NonRequirableField = TRUE;
 		$this->Required = FALSE;
 		$this->Type = 'Link';

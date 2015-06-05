@@ -19,7 +19,6 @@ class pwfFieldBase
 	var $HasAddOp = FALSE;
 	var $HasDeleteOp = FALSE;
 	var $HasLabel = TRUE;
-	var $HasMultipleFormComponents = FALSE;
 	var $HasUserAddOp = FALSE;
 	var $HasUserDeleteOp = FALSE;
 	var $HideLabel = FALSE;
@@ -31,6 +30,7 @@ class pwfFieldBase
 	var $IsSortable = TRUE;
 	var $LabelSubComponents = TRUE;
 	var $ModifiesOtherFields = FALSE;
+	var $MultiPopulate = FALSE; //whether Populate() generates array of objects
 	var $Name = '';
 	var $NeedsDiv = TRUE;
 	var $NonRequirableField = FALSE;
@@ -39,10 +39,10 @@ class pwfFieldBase
 	var $Required = FALSE;
 	var $SmartyEval = FALSE; //TRUE for textinput field whose value is to be processed via smarty
 	var $Type = '';
-	var $ValidationMessage = '';
+	var $ValidationMessage = ''; //post-validation error message, or ''
 	var $ValidationType = 'none';
 	var $ValidationTypes;
-	var $Value = FALSE;
+	var $Value = FALSE; //scalar or array
 
 	function __construct(&$formdata,&$params)
 	{
@@ -81,7 +81,7 @@ class pwfFieldBase
 		//admin parameters present ?
 		foreach($params as $key=>$val)
 		{
-			if(substr($key,0,4) == 'opt_')
+			if(strncmp($key,'opt_',4) == 0)
 				$this->Options[substr($key,4)] = $val;
 		}
 		//frontend parameter present ? TODO captcha-field value has different type of key
@@ -99,9 +99,9 @@ class pwfFieldBase
 			return $default;
 	}
 
-	function HasMultipleFormComponents()
+	function GetMultiPopulate()
 	{
-		return $this->HasMultipleFormComponents;
+		return $this->MultiPopulate;
 	}
 
 	// Override this if appropriate
@@ -121,11 +121,11 @@ class pwfFieldBase
 		return 0;
 	}
 
-	function HasMultipleValues()
+/*	function HasMultipleValues()
 	{
-		return ($this->HasMultipleFormComponents || $this->HasUserAddOp);
+		return ($this->MultiPopulate || $this->HasUserAddOp); //TODO multipopulate not relevant
 	}
-
+*/
 	function ModifiesOtherFields()
 	{
 		return $this->ModifiesOtherFields;
@@ -162,7 +162,7 @@ class pwfFieldBase
 	* an xhtml string which constitutes the field-input(s) to be displayed in the
 	(frontend or backend) form. Only the input portion itself, any title and/or
 	container(s) will be provided by the form renderer
-	OR if the field->HasMultipleFormComponents, then
+	OR if the field->MultiPopulate, then
 	* an array of stdClass objects, each with properties:
 	->name, ->title, ->input, and optionally ->op 
 	Object-names must begin with $this->formdata->current_prefix, so as to not be
@@ -279,11 +279,11 @@ class pwfFieldBase
 		return trim($alias,'_');
 	}
 
-	function GetIdTag($suffix='')
+/*	function GetIdTag($suffix='')
 	{
 		return ' id="'.$this->ForceAlias().$suffix.'"';
 	}
-
+*/
 	function GetInputId($suffix='')
 	{
 		return $this->ForceAlias().$suffix;

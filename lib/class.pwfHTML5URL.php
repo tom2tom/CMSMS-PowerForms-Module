@@ -18,8 +18,8 @@ class pwfHTML5URL extends pwfFieldBase
 
 	function Populate($id,&$params)
 	{
-		return '<input type="url" name="'.$id.$this->formdata->current_prefix.$this->Id.
-		'"'.$this->GetIdTag().$this->GetScript().' />';
+		return '<input type="url" id="'.$this->GetInputId().'" name="'.
+		$id.$this->formdata->current_prefix.$this->Id.'"'.$this->GetScript().' />';
 	}
 
 /*	function Validate($id)

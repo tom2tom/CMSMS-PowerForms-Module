@@ -624,12 +624,11 @@ EOS;
 			foreach($fdata['options'] as $name=>&$one)
 			{
 				$option_id = $db->GenID($pre.'module_pwf_form_opt_seq');
-				if(substr($one,0,4) != ']][[')
+				if(strncmp($one,']][[',4) != 0)
 					$val = $one;
-				else
+				else //encoded value
 				{
-					$val = substr($one,4);
-					$val = urldecode($val); //TODO translate numbered fields in templates
+					$val = urldecode(substr($one,4)); //TODO translate numbered fields in templates
 					if($name == 'form_template')
 					{
 						$mod->SetTemplate('pwf_'.$form_id,$val);
@@ -653,9 +652,9 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 				foreach($fld['options'] as $name=>&$one)
 				{
 					$option_id = $db->GenID($pre.'module_pwf_field_opt_seq');
-					if(substr($one,0,4) != ']][[')
+					if(strncmp($one,']][[',4) != 0)
 						$val = $one;
-					else
+					else //encoded
 						$val = urldecode(substr($one,4)); //TODO translate numbered fields in templates
 					$db->Execute($sql2,array($option_id,$field_id,$form_id,$name,$val));
 				}

@@ -319,7 +319,7 @@ $mod->Crash;
 				if(!$ud)
 				{
 					$mail->reset();
-					return array(FALSE,$mod->Lang('TODO'));
+					return array(FALSE,$mod->Lang('error_uploads_dir'));
 				}
 
 				$thisAtt = $one->GetHumanReadableValue(FALSE);
@@ -342,10 +342,10 @@ $mod->Crash;
 
 						$thisNames = split('[/:\\]',$filepath);
 						$thisName = array_pop($thisNames);
-						if(!$mail->AddAttachment($filepath,$thisName,"base64",$thisType))
+						if(!$mail->AddAttachment($filepath,$thisName,'base64',$thisType))
 						{
 							$mail->reset();
-							return array(FALSE,$mod->Lang('upload_attach_error',
+							return array(FALSE,$mod->Lang('error_attach',
 									array($filepath,$filepath,$onefile)));
 						}
 					}
@@ -367,10 +367,10 @@ $mod->Crash;
 					$thisNames = split('[/:\\]',$filepath);
 					$thisName = array_pop($thisNames);
 
-					if(!$mail->AddAttachment($filepath,$thisName,"base64",$thisType))
+					if(!$mail->AddAttachment($filepath,$thisName,'base64',$thisType))
 					{
 						$mail->reset();
-						return array(FALSE,$mod->Lang('upload_attach_error',
+						return array(FALSE,$mod->Lang('error_attach',
 							array($filepath,$filepath,$thisType)));
 					}
 				}

@@ -65,7 +65,7 @@ class pwfSubmitForm extends pwfFieldBase
 
 	function PostPopulateAdminForm(&$mainArray,&$advArray)
 	{
-		$this->OmitAdminCommon($mainArray,$advArray);
+		$this->OmitAdminVisible($mainArray,$advArray);
 	}
 
 	function Dispose($id,$returnid)
@@ -80,7 +80,7 @@ class pwfSubmitForm extends pwfFieldBase
 
 		foreach($fields as &$one)
 		{
-			if($this->GetOption('sub_'.$one->GetId(),'0') == '1')
+			if($this->GetOption('sub_'.$one->GetId(),0))
 			{
 				$payload[] = urlencode($this->GetOption('fld_'.$one->GetId())).'='.
 				urlencode($one->GetHumanReadableValue());

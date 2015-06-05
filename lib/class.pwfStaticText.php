@@ -48,7 +48,7 @@ class pwfStaticText extends pwfFieldBase
 	
 	function PostPopulateAdminForm(&$mainArray,&$advArray)
 	{
-		$this->OmitAdminCommon($mainArray,$advArray);
+		$this->OmitAdminVisible($mainArray,$advArray);
 	}
 
 	function Populate($id,&$params)

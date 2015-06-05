@@ -24,8 +24,7 @@ class pwfEmailOne extends pwfEmailBase
 
 	function PrePopulateAdminForm($id)
 	{
-//		return $this->PrePopulateAdminFormCommonEmail($id); //TODO
-		return array();
+		return $this->PrePopulateAdminFormCommonEmail($id);
 	}
 
 	function Populate($id,&$params)

@@ -121,23 +121,24 @@ class pwfUserEmail extends pwfEmailBase
 
 	function Populate($id,&$params)
 	{
-//TODO support html5
 		$toself = ($this->GetOption('send_user_copy','n') == 'c');
 		$multi = ($toself) ? '[]':'';
 		$sf = ($toself) ? '_1':'';
+//TODO check this logic
+		$val = ($toself) ? $this->$this->Value[0] : $this->Value;
 		$mod = $this->formdata->formsmodule;
 		$tmp = $mod->CreateInputEmail(
-			$id,$this->formdata->current_prefix.$this->Id.$multi,
-			htmlspecialchars($this->Value[0],ENT_QUOTES),25,128,
+			$id,$this->formdata->current_prefix.$this->Id,
+			htmlspecialchars($val,ENT_QUOTES),25,128,
 			$this->GetScript());
 		$ret = preg_replace('/id="\S+"/','id="'.$this->GetInputId($sf).'"',$tmp);
+
  		if($toself)
 		{
 			$tid = $this->GetInputId('_2');
 			$tmp = $mod->CreateInputCheckbox(
-				$id,$this->formdata->current_prefix.$this->Id.'[]',1,0);
-			$ret .= '<br />'.preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp).
-			'&nbsp;<label for="'.$tid.'">'.
+				$id,$this->formdata->current_prefix.$this->Id.'[]',1,0,'id="'.$tid.'"');
+			$ret .= '<br />'.$tmp.'&nbsp;<label for="'.$tid.'">'.
 			$this->GetOption('send_user_label',$mod->Lang('title_send_me_a_copy')).'</label>';
 		}
 		return $ret;

@@ -13,9 +13,9 @@ class pwfCaptcha extends pwfFieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->DisplayInSubmission = FALSE;
-		$this->HasMultipleFormComponents = FALSE; //actually it does, but we don't generate content-objects in Populate()
 		$this->IsSortable = FALSE;
 		$this->IsRequired = TRUE;
+		$this->MultiPopulate = FALSE;
 		$this->Type = 'Captcha';
 	}
 

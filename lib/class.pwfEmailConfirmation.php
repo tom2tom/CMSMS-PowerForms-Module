@@ -41,10 +41,8 @@ class pwfEmailConfirmation extends pwfEmailBase
 		pwfUtils::AddTemplateVariable($this->formdata,'confirm_url',$mod->Lang('title_confirmation_url'));
 
 		$ret = $this->PrePopulateAdminFormCommonEmail($id);
-		$main = (isset($ret['main'])) ? $ret['main'] : array();
-		$main[] = array($mod->Lang('redirect_after_approval'),
+		$ret['main'][] = array($mod->Lang('redirect_after_approval'),
 				@$contentops->CreateHierarchyDropdown('',$this->GetOption('redirect_page','0'),$id.'opt_redirect_page'));
-		$ret['main'] = $main;
 		return $ret;
 	}
 
@@ -71,7 +69,7 @@ class pwfEmailConfirmation extends pwfEmailBase
 	{
 		$tmp = $this->formdata->formsmodule->CreateInputEmail(
 			$id,$this->formdata->current_prefix.$this->Id,
-			htmlspecialchars($this->Value,ENT_QUOTES),25,80,
+			htmlspecialchars($this->Value,ENT_QUOTES),25,128,
 			$this->GetScript());
 		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
 	}

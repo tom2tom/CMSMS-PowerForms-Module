@@ -65,8 +65,9 @@ class pwfHTML5Number extends pwfFieldBase
 		$max = $this->GetOption('max_number',500);
 		$step = $this->GetOption('step_number',50);
 
-		return '<input type="number" name="'.$id.$this->formdata->current_prefix.$this->Id.
-		'" min="'.$min.'" max="'.$max.'" step="'.$step.'"'.$this->GetIdTag().$this->GetScript().' />';
+		return '<input type="number" id="'.$this->GetInputId().'" name="'.
+			$id.$this->formdata->current_prefix.$this->Id.
+			'" min="'.$min.'" max="'.$max.'" step="'.$step.'"'.$this->GetScript().' />';
 	}
 }
 

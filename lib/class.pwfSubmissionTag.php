@@ -23,6 +23,30 @@ class pwfSubmissionTag extends pwfFieldBase
 		return $this->GetOption('udtname',$this->formdata->formsmodule->Lang('unspecified'));
 	}
 
+	function PrePopulateAdminForm($id)
+	{
+		$usertagops = cmsms()->GetUserTagOperations();
+		$usertags = $usertagops->ListUserTags();
+		$usertaglist = array();
+		foreach($usertags as $key => $value)
+			$usertaglist[$value] = $key;
+
+		$mod = $this->formdata->formsmodule;
+		$main = array();
+		$main[] = array($mod->Lang('title_udt_name'),
+			$mod->CreateInputDropdown($id,'opt_udtname',$usertaglist,-1,$this->GetOption('udtname')));
+		$main[] = array($mod->Lang('title_export_form_to_udt'),
+			$mod->CreateInputHidden($id,'opt_export_form',0).
+			$mod->CreateInputCheckbox($id,'opt_export_form',1,
+				$this->GetOption('export_form',0)));
+		return array('main'=>$main);
+	}
+
+	function PostPopulateAdminForm(&$mainArray,&$advArray)
+	{
+		$this->OmitAdminVisible($mainArray,$advArray);
+	}
+
 	function Dispose($id,$returnid)
 	{
 		$mod = $this->formdata->formsmodule;
@@ -50,36 +74,13 @@ class pwfSubmissionTag extends pwfFieldBase
 		}
 		unset($one);
 
-		pwfUtils::SetFinishedFormSmarty($this->formdata);
+		pwfUtils::SetupFormVars($this->formdata);
 		$usertagops = cmsms()->GetUserTagOperations();
 		$res = $usertagops->CallUserTag($this->GetOption('udtname'),$params);
 
 		if($res === FALSE)
 			return array(FALSE,$mod->Lang('error_usertag'));
 		return array(TRUE,'');
-	}
-
-	function PrePopulateAdminForm($id)
-	{
-		$usertagops = cmsms()->GetUserTagOperations();
-		$usertags = $usertagops->ListUserTags();
-		$usertaglist = array();
-		foreach($usertags as $key => $value)
-			$usertaglist[$value] = $key;
-
-		$mod = $this->formdata->formsmodule;
-		$main = array();
-		$main[] = array($mod->Lang('title_udt_name'),
-			$mod->CreateInputDropdown($id,'opt_udtname',$usertaglist,-1,$this->GetOption('udtname')));
-		$main[] = array($mod->Lang('title_export_form_to_udt'),
-			$mod->CreateInputHidden($id,'opt_export_form',0).
-			$mod->CreateInputCheckbox($id,'opt_export_form',1,$this->GetOption('export_form',0)));
-		return array('main'=>$main);
-	}
-
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		$this->OmitAdminCommon($mainArray,$advArray);
 	}
 }
 
