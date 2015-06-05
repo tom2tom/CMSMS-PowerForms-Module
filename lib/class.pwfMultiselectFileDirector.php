@@ -15,9 +15,9 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 		$this->DisplayInSubmission = FALSE;
 		$this->HasAddOp = TRUE;
 		$this->HasDeleteOp = TRUE;
-		$this->HasMultipleFormComponents = TRUE;
 		$this->IsDisposition = TRUE;
 		$this->IsSortable = FALSE;
+		$this->MultiPopulate = TRUE;
 		$this->Type = 'MultiselectFileDirector';
 	}
 
@@ -94,7 +94,7 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if(!pwfUtils::GetUploadsPath())
-			return $mod->Lang('TODO_error'));
+			return $mod->Lang('error_uploads_dir'));
 		$opt = $this->GetOptionRef('destination_filename');
 		if($opt)
 			$fileCount = count($opt);
@@ -107,7 +107,7 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if(!pwfUtils::GetUploadsPath())
-			return array('main'=>array($mod->Lang('TODO_error'),''));
+			return array('main'=>array($mod->Lang('error_uploads_dir'),''));
 
 		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
@@ -115,7 +115,11 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 			'opt_select_one',
 			$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
 //	    $main[] = array($mod->Lang('title_director_details'),$dests);
-
+/*		$main[] = array($mod->Lang('title_newline_replacement'),
+			$mod->CreateInputText($id,'opt_newlinechar',
+				$this->GetOption('newlinechar'),5,15),
+			$mod->Lang('help_newline_replacement'));
+*/
 		$dests = array();
 		if($this->fileAdd)
 		{
@@ -206,11 +210,10 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 				$oneset->title = $one;
 				$oneset->name = '<label for="'.$this->GetInputId('_'.$i).'">'.$one.'</label>';
 				$value = $this->GetOptionElement('destination_value',$i);
-				$tmp = $mod->CreateInputCheckbox(
+				$oneset->input = $mod->CreateInputCheckbox(
 					$id,$this->formdata->current_prefix.$this->Id.'[]',$value,
 					(is_array($this->Value) && in_array($value,$this->Value))?$value:-1,
-					$js);
-				$oneset->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_'.$i).'"',$tmp);
+					'id="'.$this->GetInputId('_'.$i).'"'.$js);
 				$ret[] = $oneset;
 			}
 			unset($one);
@@ -224,16 +227,11 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		$ud = pwfUtils::GetUploadsPath();
 		if(!$ud)
-			return array(FALSE,$mod->Lang('error'));
-//TODO mutex
-		$count = 0;
-		while (!pwfUtils::GetFileLock() && $count < 200)
-		{
-			$count++;
-			usleep(500);
-		}
-		if($count == 200)
-			return array(FALSE,$mod->Lang('submission_error_file_lock'));
+			return array(FALSE,$mod->Lang('error_uploads_dir'));
+
+		$mx = pwfMutex::Get($mod);
+		if(!$mx || !$mx->lock(uniqid($this->Type)))
+			return array(FALSE,$mod->Lang('error_lock'));
 
 		pwfUtils::SetupFormVars($this->formdata);
 
@@ -246,6 +244,13 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 		if(!$template)
 			$template = $this->CreateSampleTemplate();
 		$newline = $mod->ProcessTemplateFromData($template);
+/*		$replchar = $this->GetOption('newlinechar');
+		if($replchar)
+		{
+			$newline = rtrim($newline,"\r\n");
+			$newline = preg_replace('/[\n\r]/',$replchar,$newline);
+		}
+*/
 		if(substr($newline,-1) != "\n")
 			$newline .= "\n";
 
@@ -275,20 +280,30 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 				else
 				{
 					//seek to footer
-					$rows = file($fp);
-					foreach($rows as $oneline)
+					if($footer)
 					{
-						if(substr($footer,0,strlen($oneline)) == $oneline)
-							break;
-						fwrite($fh,$oneline);
+						$rows = explode("\n",$footer);
+						$target = $rows[0];
 					}
+					else
+						$target = '';
+					$rows = file($fp);
+					foreach($rows as &$line)
+					{
+						$l = strlen($line);
+						if(strncmp($line,$target,$l) != 0)
+							fwrite($fh,$line);
+						else
+							break;
+					}
+					unset($line);
 					fwrite($fh,$newline.$footer);
 				}
 				fclose($fh);
 			}
 		}
-//TODO mutex
-		pwfUtils::ClearFileLock();
+
+		$mx->unlock();
 		return array(TRUE,'');
 	}
 
