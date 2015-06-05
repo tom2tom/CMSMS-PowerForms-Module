@@ -561,63 +561,13 @@ EOS;
 		return FALSE;
 	}
 
-/*	private static function Encrypt($string,$key)
-	{
-		$key = substr(md5($key),0,24);
-		$td = mcrypt_module_open ('tripledes','','ecb','');
-		$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size ($td),MCRYPT_RAND);
-		mcrypt_generic_init ($td,$key,$iv);
-		$enc = base64_encode(mcrypt_generic ($td,$string));
-		mcrypt_generic_deinit ($td);
-		mcrypt_module_close ($td);
-		return $enc;
-	}
-TODO
-	public static function Decrypt($crypt,$key)
-	{
-		$crypt = base64_decode($crypt);
-		$td = mcrypt_module_open ('tripledes','','ecb','');
-		$key = substr(md5($key),0,24);
-		$iv = mcrypt_create_iv (mcrypt_enc_get_iv_size ($td),MCRYPT_RAND);
-		mcrypt_generic_init ($td,$key,$iv);
-		$plain = mdecrypt_generic ($td,$crypt);
-		mcrypt_generic_deinit ($td);
-		mcrypt_module_close ($td);
-		return $plain;
-	}
-*/
-
-/* see mutex for this stuff
-	//used by several file-related field-types
-	public static function GetFileLock()
-	{
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
-		
-		$sql = 'INSERT INTO '.$pre.'module_pwf_flock (flock_id,flock) VALUES (1,'.$db->sysTimeStamp.')';
-		if($db->Execute($sql))
-			return TRUE;
-/*		$sql = 'SELECT flock_id FROM '.$pre.
-TODO				'module_pwf_flock WHERE flock < '.$db->sysTimeStamp + 15;
-		if($db->GetOne($sql))
-			$db->Execute('DELETE FROM '.$pre.'module_pwf_flock');
-*/
-		return FALSE;
-	}
-
-	public static function ClearFileLock()
-	{
-		$db = cmsms()->GetDb();
-		$sql = 'DELETE FROM '.cms_db_prefix().'module_pwf_flock';
-		$db->Execute($sql);
-	}
-*/
-	public static function unmy_htmlentities($val)
+	//html_entity_decode() (with no encoding, flags ENT_COMPAT | ENT_XHTML) plus some other changes
+	public static function html_myentities_decode($val)
 	{
 		if($val == '')
 			return '';
 
-		$val = html_entity_decode($val);
+		$val = html_entity_decode($val,ENT_COMPAT|ENT_XHTML);
 		$val = str_replace(
 		array('&amp;','&#60;&#33;--','--&#62;','&gt;','&lt;','&quot;','&#39;','&#036;','&#33;'),
 		array('&'    ,'<!--'        ,'-->'    ,'>'   ,'<'   ,'"'     ,"'"    ,'$'     ,'!'    ),
