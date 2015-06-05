@@ -206,7 +206,7 @@ class pwfFileUpload extends pwfFieldBase
 		$smarty->assign('fld_'.$one->GetId(),$one->GetHumanReadableValue());
 		$hidden .= $this->CreateInputHidden($id,
 			$testIndex,
-			pwfUtils::unmy_htmlentities($one->GetHumanReadableValue()));
+			pwfUtils::html_myentities_decode($one->GetHumanReadableValue()));
 		$thisAtt = $one->GetHumanReadableValue(FALSE);
 		$smarty->assign('test_'.$one->GetId(),$thisAtt);
 		$smarty->assign('value_fld'.$one->GetId(),$thisAtt[0]);
@@ -390,7 +390,7 @@ class pwfFileUpload extends pwfFieldBase
 					return array(FALSE,$mod->Lang('illegal_file',array($thisFile['name'],$_SERVER['REMOTE_ADDR'])));
 				}
 
-				$dest = $$ud.DIRECTORY_SEPARATOR.$destination_name;
+				$dest = $ud.DIRECTORY_SEPARATOR.$destination_name;
 				if(file_exists($dest) && !$this->GetOption('allow_overwrite',0))
 				{
 					unlink($src);

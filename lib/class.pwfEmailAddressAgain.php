@@ -94,7 +94,7 @@ class pwfEmailAddressAgain extends pwfFieldBase
 			{
 				if($one->Name == $field_to_validate)
 				{
-					if($$one->GetValue() != $this->Value)
+					if($one->GetValue() != $this->Value)
 					{
 						$this->validated = FALSE;
 						$this->ValidationMessage = $this->formdata->formsmodule->Lang('email_address_does_not_match',$field_to_validate);

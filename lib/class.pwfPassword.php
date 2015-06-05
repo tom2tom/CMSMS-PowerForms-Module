@@ -63,7 +63,7 @@ class pwfPassword extends pwfFieldBase
 	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		if($this->GetOption('readonly'0))
+		if($this->GetOption('readonly',0))
 			$ro = ' readonly="readonly"';
 		else
 			$ro = '';

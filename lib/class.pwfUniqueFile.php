@@ -20,37 +20,6 @@ class pwfUniqueFile extends pwfFieldBase
 		$this->Type = 'UniqueFile';
 	}
 
-/*	function SetValue($value)
-	{
-		if($this->Value === FALSE)
-		{
-			if(is_array($value))
-			{
-				$this->Value = $value;
-				for ($i=0; $i<count($this->Value); $i++)
-					$this->Value[$i] = pwfUtils::unmy_htmlentities($this->Value[$i]);
-			}
-			else
-				$this->Value = pwfUtils::unmy_htmlentities($value);
-		}
-		else
-		{
-			if(is_array($value))
-			{
-				for ($i=0; $i<count($value); $i++)
-					$value[$i] = pwfUtils::unmy_htmlentities($value[$i]);
-				$this->Value = $value;
-			}
-			else
-			{
-				if(!is_array($this->Value))
-					$this->Value = array($this->Value);
-				$this->Value[] = pwfUtils::unmy_htmlentities($value);
-			}
-		}
-	}
-*/
-
 	function CreateSampleHeader()
 	{
 		$fields = array();
@@ -79,7 +48,7 @@ class pwfUniqueFile extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if(!pwfUtils::GetUploadsPath())
-			return $mod->Lang('error_uploads_dir'));
+			return $mod->Lang('error_uploads_dir');
 		return $this->GetOption('filespec',$mod->Lang('unspecified'));
 	}
 
@@ -138,7 +107,8 @@ class pwfUniqueFile extends pwfFieldBase
 	function Dispose($id,$returnid)
 	{
 		$mod = $formdata->formsmodule;
-		if(!$pwfUtils::GetUploadsPath())
+		$ud = $pwfUtils::GetUploadsPath();
+		if(!$ud)
 			return array(FALSE,$mod->Lang('error_uploads_dir'));
 
 		$mx = pwfMutex::Get($mod);

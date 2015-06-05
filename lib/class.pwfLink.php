@@ -73,7 +73,7 @@ class pwfLink extends pwfFieldBase
 		$oneset = new stdClass();
 		$tid = $this->GetInputId('_2');
 		$oneset->title = $mod->Lang('link_label');
-		$oneset->name = '<label for="'.$tid'">'.$oneset->title.'</label>';
+		$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
 //TODO ibid does $val[1] ever need html_entity_decode()?
 		$tmp = $mod->CreateInputText(
 			$id,$this->formdata->current_prefix.$this->Id.'[]',

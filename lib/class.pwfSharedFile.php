@@ -24,7 +24,7 @@ class pwfSharedFile extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if(!pwfUtils::GetUploadsPath())
-			return $mod->Lang('error_uploads_dir'));
+			return $mod->Lang('error_uploads_dir');
 		return $this->GetOption('filespec',$mod->Lang('unspecified'));
 	}
 
@@ -82,7 +82,8 @@ class pwfSharedFile extends pwfFieldBase
 	function Dispose($id,$returnid)
 	{
 		$mod = $formdata->formsmodule;
-		if(!$pwfUtils::GetUploadsPath())
+		$ud = $pwfUtils::GetUploadsPath();
+		if(!$ud)
 			return array(FALSE,$mod->Lang('error_uploads_dir'));
 
 		$mx = pwfMutex::Get($mod);

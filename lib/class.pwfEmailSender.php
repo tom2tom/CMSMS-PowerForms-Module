@@ -65,7 +65,7 @@ class pwfEmailSender extends pwfFieldBase
 		if($this->Value)
 		{
 			$htm = $this->GetOption('headers_to_modify','b');
-			foreach(this->formdata->Fields as &$one)
+			foreach($this->formdata->Fields as &$one)
 			{
 				if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
 				{

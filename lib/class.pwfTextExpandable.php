@@ -165,7 +165,7 @@ class pwfTextExpandable extends pwfFieldBase
 			$oneset->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_'.$i).'"',$tmp);
 			if(!$hidebuttons)
 			{
-`				$tmp = $mod->CreateInputSubmit($id,
+				$tmp = $mod->CreateInputSubmit($id,
 					$this->formdata->current_prefix.'FeD_'.$this->Id.'_'.$i,
 					$this->GetOption('del_button','X'),($vals==1?' disabled="disabled"':''));
 				$oneset->op = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_del_'.$i).'"',$tmp);

@@ -84,7 +84,7 @@ class pwfFileDirector extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if(!pwfUtils::GetUploadsPath())
-			return $mod->Lang('error_uploads_dir'));
+			return $mod->Lang('error_uploads_dir');
 		$opt = $this->GetOptionRef('destination_filename');
 		if($opt)
 			$fileCount = count($opt);

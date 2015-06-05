@@ -34,12 +34,13 @@ class pwfUserEmail extends pwfEmailBase
     	return $this->Value[0];
   	}
 
-	function SetValue($valStr)
+	//c.f. parent::SetValue() which calls html_myentities_decode()
+	function SetValue($newvalue)
 	{
-		if(!is_array($valStr))
-			$this->Value = array($valStr);
+		if(is_array($newvalue))
+			$this->Value = $newvalue;
 		else
-			$this->Value = $valStr;
+			$this->Value = array($newvalue);
  	}
 
 	function GetFieldStatus()
@@ -122,14 +123,16 @@ class pwfUserEmail extends pwfEmailBase
 	function Populate($id,&$params)
 	{
 		$toself = ($this->GetOption('send_user_copy','n') == 'c');
-		$multi = ($toself) ? '[]':'';
+//		$multi = ($toself) ? '[]':'';
 		$sf = ($toself) ? '_1':'';
 //TODO check this logic
-		$val = ($toself) ? $this->$this->Value[0] : $this->Value;
+//		$val = ($toself) ? $this->$this->Value[0] : $this->Value;
 		$mod = $this->formdata->formsmodule;
+
+		//returned value always array, even if 1 member(i.e. not $toself)
 		$tmp = $mod->CreateInputEmail(
-			$id,$this->formdata->current_prefix.$this->Id,
-			htmlspecialchars($val,ENT_QUOTES),25,128,
+			$id,$this->formdata->current_prefix.$this->Id.'[]',
+			htmlspecialchars($this->Value[0],ENT_QUOTES),25,128,
 			$this->GetScript());
 		$ret = preg_replace('/id="\S+"/','id="'.$this->GetInputId($sf).'"',$tmp);
 
