@@ -42,7 +42,7 @@ class pwfFieldBase
 	var $ValidationMessage = ''; //post-validation error message, or ''
 	var $ValidationType = 'none';
 	var $ValidationTypes;
-	var $Value = FALSE; //scalar or array
+	var $Value; //when set, can be scalar or array all content passed via pwfUtils::html_myentities_decode()
 
 	function __construct(&$formdata,&$params)
 	{
@@ -594,15 +594,27 @@ class pwfFieldBase
 	}
 
 	// Override this
-	// Returns field value, as a singleton or array (per $as_string), suitable for display in the form
+	// Returns field value as a scalar or array (per $as_string), suitable for display in the form
 	function GetHumanReadableValue($as_string=TRUE)
 	{
-		if($this->Value !== FALSE)
+		if(property_exists($this,$Value))
+		{
 			$ret = $this->Value;
+			if(is_array($ret))
+			{
+				if($as_string)
+					return implode($this->GetFormOption('list_delimiter',','),$ret);
+				else
+					return $ret; //assume array members are all displayable
+			}
+			else
+				$ret = (string)$ret;
+		}
 		else
+		{
 			$ret = $this->GetFormOption('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
-
+		}
 		if($as_string)
 			return $ret;
 		else
@@ -627,44 +639,61 @@ class pwfFieldBase
 	// especially if "FALSE" is a valid value!
 	function HasValue($deny_blank_responses=FALSE)
 	{
-		// fields with defaults
-		$type = $this->GetFieldType(); 
-		if($type =='TextField' || $type == 'TextAreaField')
+		if(property_exists($this,$Value))
 		{
-			$def = $this->GetOption('default');
-			if($this->Value !== FALSE && ($def == '' || $this->Value != $def))
+			if(isset($this->Options['default'])) // fields with defaults
 			{
-				return (!$deny_blank_responses || is_array($this->Value) || !preg_match('/^\s+$/',$this->Value));
+				$def = $this->Options['default'];
+				if($def && $this->Value == $def) //TODO if array
+					return FALSE;
 			}
-		}
-		else if($this->Value !== FALSE)
-		{
-			return (!$deny_blank_responses || is_array($this->Value) || !preg_match('/^\s+$/',$this->Value));
+			return (!$deny_blank_responses ||
+					is_array($this->Value) ||
+					trim($this->Value));
 		}
 		return FALSE;
 	}
 
 	// Override this if necessary to convert type or something
-	function SetValue($valStr)
+	function SetValue($newvalue)
 	{
-		if($this->Value === FALSE)
+		if(is_array($newvalue))
 		{
-			if(is_array($valStr))
-			{
-				$this->Value = $valStr;
-				for ($i=0; $i<count($this->Value); $i++)
-					$this->Value[$i] = pwfUtils::unmy_htmlentities($this->Value[$i]);
-			}
-			else
-				 $this->Value = pwfUtils::unmy_htmlentities($valStr);
+			$this->Value = array();
+			foreach($newvalue as &$one)
+				$this->Value[] = pwfUtils::html_myentities_decode($one);
+			unset($one);
 		}
 		else
+			 $this->Value = pwfUtils::html_myentities_decode($newvalue);
+	}
+
+/*	function ExpandValue($newvalue)
+	{
+		if(property_exists($this,$Value))
 		{
 			if(!is_array($this->Value))
 				$this->Value = array($this->Value);
-			$this->Value[] = pwfUtils::unmy_htmlentities($valStr);
+			if(is_array($newvalue))
+			{
+				foreach($newvalue as &$one)
+					$this->Value[] = pwfUtils::html_myentities_decode($one);
+				unset($one);
+			}
+			else
+				$this->Value[] = pwfUtils::html_myentities_decode($newvalue);
 		}
+		elseif(is_array($newvalue))
+		{
+			$this->Value = array();
+			foreach($newvalue as &$one)
+				$this->Value[] = pwfUtils::html_myentities_decode($one);
+			unset($one);
+		}
+		else
+			 $this->Value = pwfUtils::html_myentities_decode($newvalue);
 	}
+*/
 
 	// probably don't need to override this
 	function GetValue()
@@ -675,30 +704,27 @@ class pwfFieldBase
 	// Override this? Returns the (possibly converted) value of the field
 	function GetArrayValue($index)
 	{
-		if($this->Value !== FALSE)
+		if(property_exists($this,$Value))
 		{
 			if(is_array($this->Value))
 			{
 				if(isset($this->Value[$index]))
-				{
 					return $this->Value[$index];
-				}
 			}
 			elseif($index == 0)
-			{
 				return $this->Value;
-			}
 		}
 		return FALSE;
 	}
 
-	// Override this? Returns TRUE if the value is contained in the Value array
+	//Override this?
+	//Returns TRUE if $value is contained in array ::Value or matches scalar ::Value
 	function FindArrayValue($value)
 	{
-		if($this->Value !== FALSE)
+		if(property_exists($this,$Value))
 		{
 			if(is_array($this->Value))
-				return array_search($value,$this->Value);
+				return array_search($value,$this->Value) !== FALSE;
 			elseif($this->Value == $value)
 				return TRUE;
 		}
@@ -707,7 +733,7 @@ class pwfFieldBase
 
 	function ResetValue()
 	{
-		$this->Value = FALSE;
+		unset($this->Value);
 	}
 
 	function DoesFieldNameExist()
@@ -776,102 +802,6 @@ class pwfFieldBase
 		return array(TRUE,'');
 	}
 
-	//convert (some of) the field details to a corresponding xml string
-	function ExportXML($exportValues = FALSE)
-	{
-		$xmlstr = "\t<field id=\"".$this->Id."\"\n";
-		$xmlstr .= "\t\ttype=\"".$this->Type."\"\n";
-//		$xmlstr .= "\t\tname=\"".htmlspecialchars($this->Name)."\"\n";
-		$xmlstr .= "\t\tvalidation_type=\"".$this->ValidationType."\"\n";
-		$xmlstr .= "\t\torder_by=\"".$this->OrderBy."\"\n";
-		$xmlstr .= "\t\trequired=\"".$this->Required."\"\n";
-		$xmlstr .= "\t\thide_label=\"".$this->HideLabel."\"\n";
-		$xmlstr .= "\t\tdisplay_in_submission=\"".$this->DisplayInSubmission."\"";
-		$xmlstr .= ">\n";
-		$xmlstr .= "\t\t\t<field_name><![CDATA[".$this->Name."]]></field_name>\n"; //TODO
-		$xmlstr .= "\t\t\t<options>\n".$this->OptionsAsXML()."\t\t\t</options>\n";
-		if($exportValues)
-		{
-			$xmlstr .= "\t\t\t<human_readable_value><![CDATA[".
-			$this->GetHumanReadableValue().
-			"]]></human_readable_value>\n";
-		}
-
-		$xmlstr .= "</field>\n";
-		return $xmlstr;
-	}
-
-	// override as necessary
-	function OptionFromXML($theArray)
-	{
-		if($theArray['name'] != 'option')
-		{
-			return;
-		}
-		if(!isset($this->Options))
-		{
-			$this->Options = array();
-		}
-		if(isset($this->Options[$theArray['attributes']['name']]))
-		{
-			if(!is_array($this->Options[$theArray['attributes']['name']]))
-			{
-				$this->Options[$theArray['attributes']['name']] = array($this->Options[$theArray['attributes']['name']]);
-			}
-			array_push($this->Options[$theArray['attributes']['name']],$theArray['content']);
-		}
-		else
-		{
-//			$this->Options[$theArray['name']] = $theArray['attributes']['name'];
-			$this->Options[$theArray['attributes']['name']] = $theArray['content'];
-		}
-	}
-
-	// override as necessary
-	function OptionsAsXML()
-	{
-		$xmlstr = "";
-		foreach($this->Options as $name=>$value)
-		{
-			if(!is_array($value))
-			{
-				$value = array($value);
-			}
-			foreach($value as $thisVal)
-			{
-				$xmlstr .= "\t\t\t<option name=\"$name\"><![CDATA[".$thisVal.
-			   "]]></option>\n";
-			}
-		}
-		if(isset($this->Value))
-		{
-			if(!is_array($this->Value))
-			{
-				$thisVal = array($this->Value);
-			}
-			else
-			{
-				$thisVal = $this->Value;
-			}
-			foreach($thisVal as $thisValOut)
-			{
-				$xmlstr .= "\t\t\t<value><![CDATA[".$thisValOut."]]></value>\n";
-			}
-		}
-		return  $xmlstr;
-	}
-
-	function ExportObject()
-	{
-		$obj = new stdClass();
-		$obj->name = $this->Name;
-		$obj->type = $this->Type;
-		$obj->id = $this->Id;
-		$obj->value = $this->GetHumanReadableValue(TRUE);
-		$obj->valueArray = $this->GetHumanReadableValue(FALSE);
-		return $obj;
-	}
-
 	function SetOption($optionName,$optionValue)
 	{
 		$this->Options[$optionName] = $optionValue;
@@ -936,7 +866,7 @@ class pwfFieldBase
 			}
 		}
 		unset($one);
-		$index = ($max > -1) ? $max + 1 : 1
+		$index = ($max > -1) ? $max + 1 : 1;
 		$this->Options[$optionName.$index] = $value;
 	}
 
@@ -945,19 +875,31 @@ class pwfFieldBase
 		unset($this->Options[$optionName.$index]);
 	}
 
-	// Loads data for this field from database tables.
-	// $deep also loads all options for the field
-	// Returns boolean T/F per successful operation
+	/**
+	LoadField:
+	@params: array of parameters
+	Loads data for this field (if it's not new) and its options from database tables and/or @params
+	Returns: nothing
+	*/
 	function LoadField(&$params)
 	{
 		if($this->Id > 0)
-			$this->Load($this->Id,$params,TRUE);
+			$this->Load(0,$params,TRUE);
 	}
 
-	// Loads data for a specified field from database tables.
-	// $deep also loads all options for the field
-	// Returns boolean T/F per successful operation
-	function Load($id,&$params,$deep=FALSE)
+	/**
+	Load:
+	@id: module id, unused here but can be needed in sub-class
+	@params: array of parameters
+	@deep: optional boolean, whether to also load all options for the field, default=FALSE
+
+	Loads data for this field from database tables and possibly from @params.
+	@params['value_'.$this->Name] and/or @params['value_fld'.$this->Id]
+		set corresponding field value, superseding any value loaded from table
+	Only used by this->LoadField()
+	Returns: boolean T/F per successful operation
+	*/
+	protected function Load($id,&$params,$deep=FALSE)
 	{
 		$pre = cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
@@ -973,6 +915,7 @@ class pwfFieldBase
 			return FALSE;
 
 		$this->loaded = TRUE;
+
 		if($deep)
 		{
 			$sql = 'SELECT name,value FROM '.$pre.
@@ -984,18 +927,14 @@ class pwfFieldBase
 				while ($results = $rs->FetchRow())
 				{
 /* PROPERTIES MIGRATED TO OPTIONS
-			if(strlen($this->ValidationType) < 1)
-			{
-				$this->ValidationType = $result['validation_type'];
-			}
-			if($this->Required == -1)
-			{
-				$this->Required = $result['required'];
-			}
-			if($this->HideLabel == -1)
-			{
-				$this->HideLabel = $result['hide_label'];
-			}
+					if(!$this->ValidationType)
+						$this->ValidationType = $results['validation_type'];
+
+					if($this->Required == -1)
+						$this->Required = $results['required'];
+
+					if($this->HideLabel == -1)
+						$this->HideLabel = $results['hide_label'];
 */
 					if(isset($tmpOpts[$results['name']]))
 					{
@@ -1029,9 +968,14 @@ class pwfFieldBase
 		return TRUE;
 	}
 
-	// Stores (by insert or update) data for this field in database tables.
-	// $deep also stores all options for the field
-	// Returns boolean T/F per successful storage
+	/**
+	Store:
+	@deep: optional boolean, whether to also save all options for the field, default=FALSE
+	Stores (by insert or update) data for this field in database tables.
+	Multi-valued (array) options are saved merely as multiple records with same name
+	Sets field->Id to real value if it was -1 i.e. a new field
+	Returns: boolean T/F per success of executed db commands
+	*/
 	function Store($deep=FALSE)
 	{
 		$db = cmsms()->GetDb();
@@ -1057,31 +1001,33 @@ class pwfFieldBase
 
 		if($deep)
 		{
-			// drop old options
+			// drop all current options
 			$sql = 'DELETE FROM '.$pre.'module_pwf_field_opt where field_id=?';
 			$res = $db->Execute($sql,array($this->Id)) && $res;
-
-			foreach($this->Options as $thisOptKey=>$thisOptValueList)
+			// add back current ones
+			foreach($this->Options as $name=>$optvalue)
 			{
-				if(!is_array($thisOptValueList))
+				if(!is_array($optvalue))
+					$optvalue = array($optvalue);
+				$sql = 'INSERT INTO ' .$pre.
+				'module_pwf_field_opt (option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
+				foreach($optvalue as &$one)
 				{
-					$thisOptValueList = array($thisOptValueList);
-				}
-				foreach($thisOptValueList as $thisOptValue)
-				{
-					$optId = $db->GenID($pre.'module_pwf_field_opt_seq');
-					$sql = 'INSERT INTO ' .$pre.
-					  'module_pwf_field_opt (option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
+					$newid = $db->GenID($pre.'module_pwf_field_opt_seq');
 					$res = $db->Execute($sql,
-							array($optId,$this->Id,$this->FormId,$thisOptKey,$thisOptValue)) && $res;
+						array($newid,$this->Id,$this->FormId,$name,$one)) && $res;
 				}
+				unset($one);
 			}
 		}
 		return $res;
 	}
 
-	// Clears data for this field from database tables.
-	// Returns boolean T/F per successful deletion
+	/**
+	Delete:
+	Clears data for this field from database tables.
+	Returns: boolean T/F per success of last-executed db command
+	*/
 	function Delete()
 	{
 		if($this->Id == -1)
