@@ -81,7 +81,7 @@ foreach($formdata->Fields as &$one)
 				{
 					$hidden .= $this->CreateInputHidden($id,
 								$valueindx.'[]',
-								pwfUtils::unmy_htmlentities($val));
+								pwfUtils::html_myentities_decode($val));
 				}
 			}
 			else
@@ -89,7 +89,7 @@ foreach($formdata->Fields as &$one)
 				//hide the value
 				$hidden .= $this->CreateInputHidden($id,
 						   $valueindx,
-						   pwfUtils::unmy_htmlentities($params[$valueindx]));
+						   pwfUtils::html_myentities_decode($params[$valueindx]));
 			}
 */
 			if($one->DisplayInSubmission())
