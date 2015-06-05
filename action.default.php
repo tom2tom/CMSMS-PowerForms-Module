@@ -86,7 +86,7 @@ if($matched)
 	}
 	while($key = next($matched))
 	{
-		if(!strpos($key,$prefix) === 0)
+		if(strpos($key,$prefix) !== 0)
 		{
 			EarlyExit($this,$smarty,1);
 			return;
@@ -129,7 +129,7 @@ if(isset($params[$prefix.'formdata']))
 		//update cached field data from $params[]
 		foreach($params as $key=>$val)
 		{
-			if(strpos($key,'pwfp_') === 0)
+			if(strncmp($key,'pwfp_',5) == 0)
 			{
 				$pid = substr($key,9);
 				if(is_numeric($pid))
@@ -153,6 +153,45 @@ if(isset($params[$prefix.'formdata']))
 		if($donekey)
 		{
 /* TODO police spam	
+		if($mod->GetPreference('enable_antispam'))
+		{
+			if(!empty($_SERVER['REMOTE_ADDR']))
+			{
+				$db = cmsms()->GetDb();
+				$query = 'SELECT COUNT(src_ip) AS sent FROM '.cms_db_prefix().
+				'module_pwf_ip_log WHERE src_ip=? AND sent_time > ?';
+
+				$sent = $db->GetOne($query,array($_SERVER['REMOTE_ADDR'],
+					   trim($db->DBTimeStamp(time() - 3600),"'")));
+
+				if($sent > 9)
+				{
+					// too many from this IP address. Kill it.
+					$msg = '<hr />'.$mod->Lang('suspected_spam').'<hr />';
+//					audit(-1,$mod->GetName(),$mod->Lang('log_suspected_spam',$_SERVER['REMOTE_ADDR']));
+					return array(FALSE,$msg);
+				}
+			}
+		}
+
+TODO this is not just an email thing!!
+				if($mod->GetPreference('enable_antispam'))
+				{
+					if(!empty($_SERVER['REMOTE_ADDR']))
+					{
+//						$rec_id = $db->GenID(cms_db_prefix().'module_pwf_ip_log_seq');
+						$query = 'INSERT INTO '.cms_db_prefix().
+						'module_pwf_ip_log (sent_id,src_ip,sent_time) VALUES (?,?,?)';
+
+						$res = $db->Execute($query,array(
+							$rec_id,
+							$_SERVER['REMOTE_ADDR'],
+							trim($db->DBTimeStamp(time()),"'")
+							));
+					}
+				}
+*/
+ 
 			if(!empty($_SERVER['REMOTE_ADDR']))
 			{
 				$sql = 'SELECT howmany FROM '.cms_db_prefix().
@@ -198,7 +237,7 @@ $this->Crash2();
 				}
 				elseif($one->GetValue())
 				{
-					$res = $one->Validate();
+					$res = $one->Validate($id);
 					if($res[0])
 						$one->SetOption('is_valid',TRUE);
 					else
@@ -272,7 +311,7 @@ $this->Crash2();
 				{
 					if($one->IsDisposition() && $one->DispositionIsPermitted())
 					{
-						$res = $one->DisposeForm($returnid);
+						$res = $one->Dispose($id,$returnid);
 						if(!$res[0])
 						{
 							$alldisposed = FALSE;
@@ -299,7 +338,6 @@ $this->Crash2();
 					{
 						$message = pwfUtils::GetFormOption($formdata,'submission_template','');
 						pwfUtils::setFinishedFormSmarty($formdata,TRUE);
-						//process via smarty (no cacheing)
 						echo $this->ProcessTemplateFromData($message);
 						return;
 					}
@@ -324,7 +362,7 @@ $this->Crash4();
 				{
 					$this->SendEvent('OnFormSubmitError',$parms);
 //					$params['pwfp_error'] = ''; TODO what for?
-					$smarty->assign('submission_error',$this->Lang('submission_error'));
+					$smarty->assign('submission_error',$this->Lang('error_submission'));
 					$smarty->assign('submission_error_list',$message);
 					$smarty->assign('show_submission_errors',!$this->GetPreference('hide_errors'));
 				}
