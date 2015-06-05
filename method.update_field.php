@@ -167,7 +167,7 @@ if(isset($fieldList['extra']))
 	{
 		$funcs = new pwfFormOperations();
 		$formdata = $funcs->Load($this,$params['form_id'],$params,TRUE);
-		pwfUtils::SetupVarsHelp($this,$smarty,$formdata->Fields);
+		pwfUtils::SetupFormVarsHelp($this,$smarty,$formdata->Fields);
 	}
 }
 

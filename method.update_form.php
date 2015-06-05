@@ -390,7 +390,7 @@ $smarty->assign('help_globals',$this->Lang('help_globals'));
 $smarty->assign('help_attrs1',$this->Lang('help_attrs1'));
 $smarty->assign('help_attrs2',$this->Lang('help_attrs2'));
 
-pwfUtils::SetupVarsHelp($this,$smarty,$formdata->Fields);
+pwfUtils::SetupFormVarsHelp($this,$smarty,$formdata->Fields);
 
 $parms = array();
 $parms['submission_template']['general_button'] = TRUE; //TODO why this template ?

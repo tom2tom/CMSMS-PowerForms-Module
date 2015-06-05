@@ -129,11 +129,11 @@ foreach($formdata->Fields as &$one)
 	else
 		$oneset->hide_name = 0;
 	$oneset->id = $one->GetId();
-	$oneset->input = $one->GetFieldInput($id,$params);
-	$oneset->input_id = $one->GetCSSId();
+	$oneset->input = $one->Populate($id,$params); //flat xhtml or array of objects
+	$oneset->input_id = $one->GetInputId();
 	$oneset->label_parts = $one->LabelSubComponents()?1:0;
 	$oneset->logic = $one->GetFieldLogic();
-	$oneset->multiple_parts = $one->HasMultipleFormComponents()?1:0;
+	$oneset->multiple_parts = $one->GetMultiPopulate()?1:0;
 	$oneset->name = $one->GetName();
 	$oneset->needs_div = $one->NeedsDiv();
 	$oneset->required = $one->IsRequired()?1:0;
