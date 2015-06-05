@@ -10,8 +10,7 @@
 
 class pwfSystemEmail extends pwfEmailBase
 {
-	var $addressAdd;
-	var $addressCount;
+	var $addressAdd = FALSE;
 
 	function __construct(&$formdata,&$params)
 	{
@@ -23,7 +22,6 @@ class pwfSystemEmail extends pwfEmailBase
 		$this->IsDisposition = TRUE;
 		$this->NonRequirableField = TRUE;
 		$this->Type = 'SystemEmail';
-		$this->addressAdd = FALSE;
 	}
 
 	function GetOptionAddButton()
@@ -43,13 +41,11 @@ class pwfSystemEmail extends pwfEmailBase
 
 	function DoOptionDelete(&$params)
 	{
-		$delcount = 0;
-		foreach($params as $key=>$val)
+		if(isset($params['selected']))
 		{
-			if(substr($key,0,8) == 'opt_sel_')
+			foreach($params['selected'] as $indx)
 			{
-				$this->RemoveOptionElement('destination_address',$val - $delcount); //TODO
-				$delcount++;
+				$this->RemoveOptionElement('destination_address',$indx);
 			}
 		}
 	}
@@ -96,17 +92,6 @@ class pwfSystemEmail extends pwfEmailBase
         return $ret;
 	}
 
-	function countAddresses()
-	{
-		$tmp = $this->GetOptionRef('destination_address');
-		if(is_array($tmp))
-			$this->addressCount = count($tmp);
-		elseif($tmp !== FALSE)
-			$this->addressCount = 1;
-		else
-			$this->addressCount = 0;
-	}
-
 	function GetDests($id,$row,$sel)
 	{
 		$id = cms_htmlentities($id);
@@ -130,64 +115,78 @@ class pwfSystemEmail extends pwfEmailBase
 	{
 		$mod = $this->formdata->formsmodule;
 
-		$this->countAddresses();
-
-		if($this->addressAdd)
-		{
-			$this->addressCount += $this->addressAdd;
-			$this->addressAdd = FALSE;
-		}
-
 		$ret = $this->PrePopulateAdminFormCommonEmail($id);
 //		$ret['main'][] = array($mod->Lang('title_destination_address'),$dests);
-		$dests = array();
-		$dests[] = array(
-			$mod->Lang('title_destination_address'),
-			$mod->Lang('to'),
-			$mod->Lang('cc'),
-			$mod->Lang('bcc'),
-			$mod->Lang('title_select')
-			);
-		$num = ($this->addressCount > 1) ? $this->addressCount:1;
-		for($i=0; $i<$num; $i++)
+		if($this->addressAdd)
 		{
-			$addr = $this->GetOptionElement('destination_address',$i);
-			if($addr)
-			{
-				switch (substr($addr,0,4))
-				{
-				 case '|cc|':
-					$totype = 'cc';
-					$addr = substr($addr,4);
-					break;
-				 case '|bc|':
-					$totype = 'bc';
-					$addr = substr($addr,4);
-					break;
-				 default:
-					$totype = 'to';
-					break;
-				}
-			}
-			else
-				$totype = 'to';
-			$btns = self::GetDests($id,$i,$totype);
-
-			$dests[] = array(
-			$mod->CreateInputText($id,'opt_destination_address[]',$addr,50,128),
-			array_shift ($btns),
-			array_shift ($btns),
-			array_shift ($btns),
-			$mod->CreateInputCheckbox($id,'opt_sel_'.$i,$i,-1,'style="margin-left:1em;"')
-			);
+			$this->AddOptionElement('destination_address','');
+			$this->addressAdd = FALSE;
 		}
-		$ret['table']= $dests;
+		$opt = $this->GetOptionRef('destination_address');
+		if($opt)
+		{
+			$dests = array();
+			$dests[] = array(
+				$mod->Lang('title_destination_address'),
+				$mod->Lang('to'),
+				$mod->Lang('cc'),
+				$mod->Lang('bcc'),
+				$mod->Lang('title_select')
+				);
+			foreach($opt as $i=>&$one)
+			{
+				if(strncmp($one,'|cc|',4) == 0)
+				{
+					$totype = 'cc';
+					$addr = substr($one,4);
+				}
+				elseif(strncmp($one,'|bc|',4) == 0)
+				{
+					$totype = 'bc';
+					$addr = substr($one,4);
+				}
+				else
+				{
+					$totype = 'to';
+					$addr = $one; //maybe empty
+				}
+				$btns = self::GetDests($id,$i,$totype);
+
+				$dests[] = array(
+				$mod->CreateInputText($id,'opt_destination_address'.$i,$addr,50,128),
+				array_shift($btns),
+				array_shift($btns),
+				array_shift($btns),
+				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
+				);
+			}
+			unset($one);
+			$ret['table'] = $dests;
+		}
+		else
+			$ret['main'][] = array($mod->Lang('TODO_title_nodata'),'');			
 		return $ret;
 	}
 
 	function PostPopulateAdminForm(&$mainArray,&$advArray)
 	{
-		$this->OmitAdminCommon($mainArray,$advArray);
+		$this->OmitAdminVisible($mainArray,$advArray);
+	}
+
+	function PostAdminSubmitCleanup(&$params)
+	{
+		//cleanup empties
+		$addrs = $this->GetOptionRef('destination_address');
+		if($addrs)
+		{
+			foreach($addrs as $i=>&$one)
+			{
+				if(!$one)
+					$this->RemoveOptionElement('destination_address',$i);
+			}
+			unset($one);
+		}
+		$this->PostAdminSubmitCleanupEmail($params);
 	}
 
 	function AdminValidate($id)
@@ -217,18 +216,16 @@ class pwfSystemEmail extends pwfEmailBase
     	$dests = $this->GetOptionRef('destination_address');
 		if($dests)
 		{
-			if(!is_array($dests))
-				$dests = array($dests);
-			$num = count($dests);
-			for($i=0; $i<$num; $i++)
+			foreach($dests as &$one)
 			{
-				list($rv,$msg) = $this->validateEmailAddr($dests[$i]);
+				list($rv,$msg) = $this->validateEmailAddr($one);
 			 	if(!$rv)
 				{
 					$ret = FALSE;
 					$messages[] = $msg;
 				}
 			}
+			unset($one);
 		}
 		else
 		{
