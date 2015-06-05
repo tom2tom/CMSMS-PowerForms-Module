@@ -10,10 +10,10 @@ class pwfTextExpandable extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->HasMultipleFormComponents = TRUE;
 		$this->HasUserAddOp = TRUE;
 		$this->HasUserDeleteOp = TRUE;
 		$this->IsInput = TRUE;
+		$this->MultiPopulate = TRUE;
 		$this->Type = 'TextExpandable';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array(
@@ -26,71 +26,24 @@ class pwfTextExpandable extends pwfFieldBase
            );
 	}
 
-	function GetFieldInput($id,&$params)
+	// Gets all mirror fields of this field
+	function GetFieldSiblings()
 	{
-		$mod = $this->formdata->formsmodule;
-		$js = $this->GetOption('javascript');
-		$sibling_id = $this->GetOption('siblings');
-		$hidebuttons = $this->GetOption('hidebuttons');
+		$siblings = array();
 
-		if(!is_array($this->Value))
-			$vals = 1;
-		else
-			$vals = count($this->Value);
+		$siblings[$this->formdata->formsmodule->Lang('select_one')] = '';
 
-		$matched = preg_grep('/^pwfp_\d{3}_Fe[DX]_/',array_keys($params));
-		if($matched)
+		foreach($this->formdata->Fields as &$one)
 		{
-			foreach($matched as $key)
+			if($one->GetFieldType() == 'TextExpandable')
 			{
-				$pts = explode('_',$key);
-				if($pts[3] == $this->Id || $pts[3] == $sibling_id)
-				{
-					if($key[11] == 'X') //add row
-					{
-						$this->Value[$vals] = '';
-						$vals++;
-					}
-					else // $key[11] == 'D' delete row
-					{
-						if(isset($this->Value[$pts[3]]))
-							array_splice($this->Value,$pts[3],1);
-						$vals--;
-					}
-		    	}
+				$fid = $one->GetId();
+ 				if($fid != $this->GetId())
+					$siblings[$one->GetName()] = $fid;
 			}
 		}
-
-		// Input fields
-		$ret = array();
-		for ($i=0; $i<$vals; $i++)
-		{
-			$thisRow = new stdClass();
-
-			//$thisRow->name = '';
-			//$thisRow->title = '';
-			$thisRow->input = $mod->CustomCreateInputType($id,$this->formdata->current_prefix.$this->Id.'[]',$this->Value[$i],$this->GetOption('length')<25?$this->GetOption('length'):25,
-							$this->GetOption('length'),$js.$this->GetCSSIdTag('_'.$i));
-
-			if(!$hidebuttons) $thisRow->op = $mod->CustomCreateInputSubmit($id,
-				$this->formdata->current_prefix.'FeD_'.$this->Id.'_'.$i,
-				$this->GetOption('del_button','X'),$this->GetCSSIdTag('_del_'.$i).($vals==1?' disabled="disabled"':''));
-
-			$ret[] = $thisRow;
-		}
-
-		// Add button
-		$thisRow = new stdClass();
-		//$thisRow->name = '';
-		//$thisRow->title = '';
-		//$thisRow->input = '';
-		if(!$hidebuttons) $thisRow->op = $mod->CustomCreateInputSubmit($id,
-			$this->formdata->current_prefix.'FeX_'.$this->Id.'_'.$i,
-			$this->GetOption('add_button','+'),$this->GetCSSIdTag('_add_'.$i));
-
-		$ret[] = $thisRow;
-
-		return $ret;
+		unset($one);
+		return $siblings;
 	}
 
 	function GetFieldStatus()
@@ -160,6 +113,83 @@ class pwfTextExpandable extends pwfFieldBase
 	function LabelSubComponents()
 	{
 		return FALSE;
+	}
+
+	function Populate($id,&$params)
+	{
+		$mod = $this->formdata->formsmodule;
+		$sibling_id = $this->GetOption('siblings');
+		$hidebuttons = $this->GetOption('hidebuttons');
+
+		if(!is_array($this->Value))
+			$vals = 1;
+		else
+			$vals = count($this->Value);
+
+		$matched = preg_grep('/^pwfp_\d{3}_Fe[DX]_/',array_keys($params));
+		if($matched)
+		{
+			foreach($matched as $key)
+			{
+				$pts = explode('_',$key);
+				if($pts[3] == $this->Id || $pts[3] == $sibling_id)
+				{
+					if($key[11] == 'X') //add row
+					{
+						$this->Value[$vals] = '';
+						$vals++;
+					}
+					else // $key[11] == 'D' delete row
+					{
+						if(isset($this->Value[$pts[3]]))
+							array_splice($this->Value,$pts[3],1);
+						$vals--;
+					}
+		    	}
+			}
+		}
+
+		// Input fields
+		$ret = array();
+		for($i=0; $i<$vals; $i++)
+		{
+			$oneset = new stdClass();
+
+			$oneset->name = '';
+			$oneset->title = '';
+			$tmp = $mod->CreateInputText(
+				$id,$this->formdata->current_prefix.$this->Id.'[]',
+				$this->Value[$i],$this->GetOption('length')<25?$this->GetOption('length'):25,
+				$this->GetOption('length'),
+				$this->GetScript());
+			$oneset->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_'.$i).'"',$tmp);
+			if(!$hidebuttons)
+			{
+`				$tmp = $mod->CreateInputSubmit($id,
+					$this->formdata->current_prefix.'FeD_'.$this->Id.'_'.$i,
+					$this->GetOption('del_button','X'),($vals==1?' disabled="disabled"':''));
+				$oneset->op = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_del_'.$i).'"',$tmp);
+			}
+
+			$ret[] = $oneset;
+		}
+
+		if(!$hidebuttons)
+		{
+			// Add button
+			$oneset = new stdClass();
+			$oneset->name = '';
+			$oneset->title = '';
+			$oneset->input = '';
+			$tmp = $mod->CreateInputSubmit($id,
+				$this->formdata->current_prefix.'FeX_'.$this->Id.'_'.$i,
+				$this->GetOption('add_button','+'));
+			$oneset->op = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_add_'.$i).'"',$tmp);
+
+			$ret[] = $oneset;
+		}
+
+		return $ret;
 	}
 
 	function Validate($id)
@@ -234,25 +264,6 @@ class pwfTextExpandable extends pwfFieldBase
 		return array($this->validated,$this->ValidationMessage);
 	}
 
-	// Gets all mirror fields of this field
-	function GetFieldSiblings()
-	{
-		$siblings = array();
-
-		$siblings[$this->formdata->formsmodule->Lang('select_one')] = '';
-
-		foreach($this->formdata->Fields as &$one)
-		{
-			if($one->GetFieldType() == 'TextExpandable')
-			{
-				$fid = $one->GetId();
- 				if($fid != $this->GetId())
-					$siblings[$one->GetName()] = $fid;
-			}
-		}
-		unset($one);
-		return $siblings;
-	}
 }
 
 ?>
