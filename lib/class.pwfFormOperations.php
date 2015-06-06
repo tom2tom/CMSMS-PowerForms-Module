@@ -213,7 +213,7 @@ class pwfFormOperations
 			return array(FALSE,$mod->Lang('database_error'));
 
 		//store form options
-		//TODO incremental instead of junk priors & re-store
+		//TODO incremental instead of junk current then re-store
 		if(!$newform)
 		{
 			$sql = 'DELETE FROM '.$pre.'module_pwf_form_opt WHERE form_id=?';
@@ -234,31 +234,25 @@ class pwfFormOperations
 				return array(FALSE,$mod->Lang('database_error'));
 		}
 
-		//ensure reasonable field-order
-		//TODO Xstart before Xend
-		$keys = array_keys($orders);
-		usort($keys,
-		function($a,$b) use ($formdata,$orders) //TODO this needs PHP 5.3+?
+		//ensure reasonable field-order (mostly, non-displayed disposition-fields toward end)
+		$fids = array_flip($orders);
+		uasort($formdata->Fields,
+		function($fa,$fb) use ($fids) //TODO this needs PHP 5.3+?
 		{
-			$fa = $formdata->Fields[$orders[$a]];
-			$fb = $formdata->Fields[$orders[$b]];
 			if($fa->IsDisposition)
 			{
 				if($fb->IsDisposition)
 				{
-					if($fa->DisplayInForm)
-					{
-						if(!$fb->DisplayInForm)
-							return -1;
-					}
+					if($fb->Type == 'PageRedirector') //page redirect last
+						return -1;
 					elseif($fb->DisplayInForm)
 						return 1;
-					elseif($fb->Type == 'PageRedirector')
-						return -1;//page redirect last
 					elseif($fa->Type == 'PageRedirector')
 						return 1;
+					elseif($fa->DisplayInForm)
+						return -1;
 				}
-				elseif(!$fa->DisplayInForm)
+				elseif(!$fa->DisplayInForm)//includes $fa->Type == 'PageRedirector'
 					return 1;
 			}
 			elseif($fb->IsDisposition)
@@ -266,19 +260,19 @@ class pwfFormOperations
 				if(!$fb->DisplayInForm)
 					return 1;
 			}
-			return $a - $b;
+			//TODO field type '...start' before corresponding type '...end'
+			return $fids[$fa->Id] - $fids[$fb->Id]; //stet current order
 		});
 
-		//TODO update ->Fields[] order too (ready for next display)
 		// store form fields
 		$o = 1;
-		foreach($keys as $val)
+		foreach($formdata->Fields as &$one)
 		{
-			$obfld = $formdata->Fields[$orders[$val]];
-			$obfld->SetOrder($o);
-			$obfld->Store(TRUE);
+			$one->SetOrder($o);
+			$one->Store(TRUE);
 			$o++;
 		}
+		unset($one);
 
 		return array(TRUE,'');
 	}
