@@ -61,8 +61,7 @@ class pwfCache
 			$class = 'FastCache_'.$one;
 			try
 			{
-				$ob = new $class($settings);
-				$module->cache =& $ob;
+				$module->cache = new $class($settings);
 				return $module->cache;
 			}
 			catch(Exception $e) {}
