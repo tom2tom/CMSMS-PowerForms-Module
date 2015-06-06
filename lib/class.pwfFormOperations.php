@@ -66,7 +66,7 @@ class pwfFormOperations
 	function Delete(&$mod,$form_id)
 	{
 /*		$noparms = array();
-		$formdata = self::Load($mod,$form_id,$noparms,TRUE);
+		$formdata = self::Load($mod,$id,$noparms,$form_id);
 		if(!$formdata)
 			return FALSE;
 		foreach($formdata->Fields as &$one)
@@ -96,15 +96,16 @@ class pwfFormOperations
 	Copy:
 	Copy and store entire form
 	@mod: reference to the current PowerForms module object
-	@form_id: enumerator of form to be processed
+	@id: module id
 	@params: reference to array of parameters
+	@form_id: enumerator of form to be processed
 	Returns: new form id or FALSE
 	$params['form_name'] and $params['form_alias'] are set/updated
 	*/
-	function Copy(&$mod,$form_id,&$params)
+	function Copy(&$mod,$id,&$params,$form_id)
 	{
 		$noparms = array();
-		$formdata = self::Load($mod,$form_id,$noparms,TRUE);
+		$formdata = self::Load($mod,$id,$noparms,$form_id);
 		if(!$formdata)
 			return FALSE;
 		$tn = $mod->Lang('copy');
@@ -163,11 +164,10 @@ class pwfFormOperations
 		}
 		unset($one);
 
-		$funcs = new pwfFieldOperations();
 		$neworder = 1;
 		foreach($formdata->Fields as &$one)
 		{
-			if(!$funcs->CopyField((int)$one->GetId(),$newid,$neworder))
+			if(!pwfFieldOperations::CopyField((int)$one->GetId(),$newid,$neworder))
 			{
 				$params['message'] = $mod->Lang('database_error');
 				$res = FALSE;
@@ -181,26 +181,25 @@ class pwfFormOperations
 
 	/**
 	Store:
-	Updates tables: form, form_attr (by junking and re-insertion), field::order_by
+	Updates data in tables: form, form_opt, field, field_opt
+	 and stores form template as such
 	@mod: reference to the current PowerForms module object
-	@form_id: enumerator of form to be processed
-	@params: reference to array of parameters
+	@orders: reference to array of form-field-ids, ordered by current in-page position
+	@formdata: reference to form data object
+	Returns: boolean T/F indicating success, with $params['message'] set upon failure
 	*/
-	function Store(&$mod,$form_id,&$params)
+	function Store(&$mod,&$orders,&$formdata)
 	{
+		$form_id = $formdata->Id;
+		$newform = ($form_id <= 0);
 		// if it's a new form,check for duplicate name and/or alias
-		if($form_id == -1 && !self::NewID($params['form_name'],$params['form_alias']))
-		{
-			$params['message'] = $mod->Lang('duplicate_identifier');
-			return FALSE;
-		}
+		if($newform && !self::NewID($formdata->Name,$formdata->Alias))
+			return array(FALSE,$mod->Lang('duplicate_identifier'));
 
-		$formdata = $mod->GetFormData($params);
 		$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();
-		if($form_id == -1)
+		if($newform)
 		{
-			// new form
 			$form_id = $db->GenID($pre.'module_pwf_form_seq');
 			$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
 			$res = $db->Execute($sql,array($form_id,$formdata->Name,$formdata->Alias));
@@ -211,75 +210,89 @@ class pwfFormOperations
 			$res = $db->Execute($sql,array($formdata->Name,$formdata->Alias,$form_id));
 		}
 		if($res == FALSE)
-		{
-			$params['message'] = $mod->Lang('database_error');
-			return FALSE;
-		}
+			return array(FALSE,$mod->Lang('database_error'));
 
-		// store form options
-		$sql = 'DELETE FROM '.$pre.'module_pwf_form_opt WHERE form_id=?';
-		if($db->Execute($sql,array($form_id)) == FALSE)
+		//store form options
+		//TODO incremental instead of junk priors & re-store
+		if(!$newform)
 		{
-			$params['message'] = $mod->Lang('database_error');
-			return FALSE;
+			$sql = 'DELETE FROM '.$pre.'module_pwf_form_opt WHERE form_id=?';
+			if($db->Execute($sql,array($form_id)) == FALSE)
+				return array(FALSE,$mod->Lang('database_error'));
 		}
-
 		$sql = 'INSERT INTO '.$pre.'module_pwf_form_opt (option_id,form_id,name,value) VALUES (?,?,?,?)';
 		foreach($formdata->Options as $key=>$val)
 		{
-			$AttrId = $db->GenID($pre.'module_pwf_form_opt_seq');
 			if($key == 'form_template')
 			{
 				$mod->SetTemplate('pwf_'.$form_id,$val);
 				$val = 'pwf_'.$form_id;
 			}
-			if(!$db->Execute($sql,array($AttrId,$form_id,$key,$val)))
-			{
-				$params['message'] = $mod->Lang('database_error');
-				return FALSE;
-			}
+			//TODO submission template too
+			$newid = $db->GenID($pre.'module_pwf_form_opt_seq');
+			if(!$db->Execute($sql,array($newid,$form_id,$key,$val)))
+				return array(FALSE,$mod->Lang('database_error'));
 		}
 
-		// Update field position
-		//TODO all dispositions after all others
-		if(isset($params['sort_order']))
-			$order_list = explode(',',$params['sort_order']);
-		else
-			$order_list = FALSE;
-
-		if($order_list)
+		//ensure reasonable field-order
+		//TODO Xstart before Xend
+		$keys = array_keys($orders);
+		usort($keys,
+		function($a,$b) use ($formdata,$orders) //TODO this needs PHP 5.3+?
 		{
-			$count = 1;
-			$sql = 'UPDATE '.$pre.'module_pwf_field SET order_by=? WHERE field_id=?';
-
-			foreach($order_list as $onefldid)
+			$fa = $formdata->Fields[$orders[$a]];
+			$fb = $formdata->Fields[$orders[$b]];
+			if($fa->IsDisposition)
 			{
-				$fieldid = substr($onefldid,5); //CHECKME
-				if($db->Execute($sql,array($count,$fieldid)))
-					$count++;
-				else
+				if($fb->IsDisposition)
 				{
-					$params['message'] = $mod->Lang('database_error');
-					return FALSE;
+					if($fa->DisplayInForm)
+					{
+						if(!$fb->DisplayInForm)
+							return -1;
+					}
+					elseif($fb->DisplayInForm)
+						return 1;
+					elseif($fb->Type == 'PageRedirector')
+						return -1;//page redirect last
+					elseif($fa->Type == 'PageRedirector')
+						return 1;
 				}
+				elseif(!$fa->DisplayInForm)
+					return 1;
 			}
+			elseif($fb->IsDisposition)
+			{
+				if(!$fb->DisplayInForm)
+					return 1;
+			}
+			return $a - $b;
+		});
+
+		//TODO update ->Fields[] order too (ready for next display)
+		// store form fields
+		$o = 1;
+		foreach($keys as $val)
+		{
+			$obfld = $formdata->Fields[$orders[$val]];
+			$obfld->SetOrder($o);
+			$obfld->Store(TRUE);
+			$o++;
 		}
 
-		// Reload everything
-		self::Load($mod,$form_id,$params,TRUE);
-		return TRUE;
+		return array(TRUE,'');
 	}
 
 	/**
 	Load:
+	Populates a data object from tables or from suitably-keyed members of @params
 	@mod: reference to the current PowerForms module object
-	@form_id: enumerator of form to be processed
+	@id: module id
 	@params: reference to array of parameters
-	@deep: optional whether to also load field data,default FALSE
-	@loadResp: optional boolean,default FALSE
-	Returns: reference to pwfData object for the form,or FALSE
+	@form_id: enumerator of form to be processed
+	Returns: reference to a pwfData object for the form, or FALSE
 	*/
-	function &Load(&$mod,$form_id,&$params,$deep=FALSE,$loadResp=FALSE)
+	function &Load(&$mod,$id,&$params,$form_id)
 	{
 		$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();
@@ -293,54 +306,41 @@ class pwfFormOperations
 		
 		$formdata = $mod->GetFormData($params);
 		$formdata->Id = $row['form_id'];
-		//$params (if present) override stored values
+		//some form properties (if absent from $params) default to stored values
 		if(empty($params['form_name']))
 			$formdata->Name = $row['name'];
 		if(empty($params['form_alias']))
 			$formdata->Alias = $row['alias'];
 
+		//no form opt value is an array, so no records with same name
 		$sql = 'SELECT name,value FROM '.$pre.'module_pwf_form_opt WHERE form_id=?';
 		$formdata->Options = $db->GetAssoc($sql,array($form_id));
-		$formdata->loaded = 'summary';
 
-/*		if(isset($params['response_id']))
+		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
+		$fields = $db->GetArray($sql,array($form_id));
+		if($fields)
 		{
-			$deep = TRUE;
-			$loadResp = TRUE;
-		}
-*/
-		if($deep)
-		{
-			$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
-			$fields = $db->GetArray($sql,array($form_id));
-			if($fields)
+			foreach($fields as &$row)
 			{
-				$funcs = new pwfFieldOperations();
-				foreach($fields as &$row)
+				$fid = $row['field_id'];
+				// create the field object
+				if(isset($params[$formdata->current_prefix.$fid]) ||
+					isset($params[$formdata->prior_prefix.$fid]) ||
+					isset($params['value_'.$row['name']]) || 
+					isset($params['value_fld'.$fid]) ||
+					(isset($params['field_id']) && $params['field_id'] == $fid)
+				  )
 				{
-//					error_log("Instantiating Field. usage ".memory_get_usage());
-//					$className = pwfUtils::MakeClassName($row['type']);
-					$fid = $row['field_id'];
-					// create the field object
-					if(isset($params[$formdata->current_prefix.$fid]) ||
-						isset($params[$formdata->prior_prefix.$fid]) ||
-						isset($params['value_'.$row['name']]) || 
-						isset($params['value_fld'.$fid]) ||
-						(isset($params['field_id']) && $params['field_id'] == $fid)
-					  )
-					{
-						$row = array_merge($row,$params); //TODO
-					}
-					$obfield = $funcs->NewField($formdata,$row);
-					$obfield->Store(TRUE); //get an id
-					$formdata->Fields[$obfield->Id] = $obfield;
-					if($obfield->Type == 'PageBreakField')
-						$formdata->FormPagesCount++;
+					$row = array_merge($row,$params); //TODO
 				}
-				unset($row);
+				$obfield = pwfFieldOperations::NewField($formdata,$id,$row);
+				$obfield->Store(TRUE); //get an id
+				$formdata->Fields[$obfield->Id] = $obfield;
+				if($obfield->Type == 'PageBreakField')
+					$formdata->FormPagesCount++;
 			}
-			$formdata->loaded = 'full';
-		} //end of $deep
+			unset($row);
+		}
 
 		return $formdata;
 	}
@@ -671,7 +671,7 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 	@alias: optional form-alias string, default = FALSE
 	Returns TRUE if there's no form with matching name OR alias
 	*/
-	function NewID($name = FALSE,$alias = FALSE)
+	function NewID($name=FALSE,$alias=FALSE)
 	{
 		$where = array();
 		$vars = array();
@@ -762,7 +762,7 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 		contents B
 
 	/ **
-	Insert:
+	InsertData:
 	@form_id: identifier of form from which the data are sourced (<0 for FormBrowser forms)
 	@stamp: timestamp for form submission
 	@data: reference to array of plaintext form-data to be stored
@@ -770,7 +770,7 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 	@db: reference to database connection object
 	@pre: table-names prefix
 	* /
-	public function Insert($form_id,$stamp,&$data,&$pass,&$db,$pre)
+	public function InsertData($form_id,$stamp,&$data,&$pass,&$db,$pre)
 	{
 		$when = date('Y-m-d H:i:s',$stamp);
 		$cont = ($pass) ? self::Encrypt($data,$pass) : serialize($data);
@@ -780,14 +780,14 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 	}
 
 	/ **
-	Update:
+	UpdateData:
 	@record_id: identifier of record to which the data belong
 	@data: reference to array of plaintext form-data to be stored
 	@pass: refrence to password for data encryption, or FALSE
 	@db: reference to database connection object
 	@pre: table-names prefix
 	* /
-	public function Update($record_id,&$data,&$pass,&$db,$pre)
+	public function UpdateData($record_id,&$data,&$pass,&$db,$pre)
 	{
 		$when = date('Y-m-d H:i:s');
 		$cont = ($pass) ? self::Encrypt($data,$pass) : serialize($data);
@@ -797,7 +797,7 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 	}
 
 	/ **
-	Load:
+	LoadData:
 	@record_id: identifier of record to retrieve
 	@pass: refrence to password for data decryption, or FALSE
 	@mod: optional reference to PowerBrowse module (for error message), default NULL
@@ -806,7 +806,7 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 	Returns: 2-member array, in which 1st is submissiondate/time or FALSE,
 		2nd is array of data or error message
 	* /
-	public function Load($record_id,&$pass,&$mod=NULL,&$db=NULL,$pre='')
+	public function LoadData($record_id,&$pass,&$mod=NULL,&$db=NULL,$pre='')
 	{
 		if(!$db)
 			$db = cmsms()->GetDb();
