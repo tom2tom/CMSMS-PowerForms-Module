@@ -14,7 +14,6 @@ class pwfUserEmail extends pwfEmailBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsDisposition = TRUE;
-		$this->ModifiesOtherFields = TRUE;
 		$this->Type = 'UserEmail';
 		$this->ValidationType = 'email';
 		$mod = $formdata->formsmodule;
@@ -101,25 +100,6 @@ class pwfUserEmail extends pwfEmailBase
 		$this->RemoveAdminField($mainArray,$this->formdata->formsmodule->Lang('title_email_from_address'));
 	}
 
-	function ModifyOtherFields()
-	{
-		if($this->Value !== FALSE)
-		{
-			$htm = $this->GetOption('headers_to_modify','f');
-			foreach($this->formdata->Fields as &$one)
-			{
-				if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
-				{
-					if($htm == 'f' || $htm == 'b')
-						$one->SetOption('email_from_address',$this->Value[0]);
-					if($htm == 'r' || $htm == 'b')
-						$one->SetOption('email_reply_to_address',$this->Value[0]);
-				}
-			}
-			unset($one);
-		}
-	}
-
 	function Populate($id,&$params)
 	{
 		$toself = ($this->GetOption('send_user_copy','n') == 'c');
@@ -169,6 +149,25 @@ class pwfUserEmail extends pwfEmailBase
 			}
 		}
 		return array($this->validated,$this->ValidationMessage);
+	}
+
+	function PreDispositionAction()
+	{
+		if(property_exists($this,$Value))
+		{
+			$htm = $this->GetOption('headers_to_modify','f');
+			foreach($this->formdata->Fields as &$one)
+			{
+				if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
+				{
+					if($htm == 'f' || $htm == 'b')
+						$one->SetOption('email_from_address',$this->Value[0]);
+					if($htm == 'r' || $htm == 'b')
+						$one->SetOption('email_reply_to_address',$this->Value[0]);
+				}
+			}
+			unset($one);
+		}
 	}
 
 	function Dispose($id,$returnid)

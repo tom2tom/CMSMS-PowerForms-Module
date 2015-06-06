@@ -13,7 +13,6 @@ class pwfEmailBCCAddress extends pwfFieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->ModifiesOtherFields = TRUE;
 		$this->Type = 'EmailBCCAddress';
 		$this->ValidationType = 'email';
 		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_email_address')=>'email');
@@ -58,27 +57,6 @@ class pwfEmailBCCAddress extends pwfFieldBase
 		return array('main'=>$main);
 	}
 
-	function ModifyOtherFields()
-	{
-		if($this->Value !== FALSE)
-		{
-			foreach($this->formdata->Fields as &$one)
-			{
-				if($one->IsDisposition()
-               		&& is_subclass_of($one,'pwfEmailBase')
-					&& $one->GetId() == $this->GetOption('field_to_modify'))
-				{
-					$bc = $one->GetOption('email_bcc_address');
-					if($bc)
-						$bc .= ',';
-					$bc .= $this->Value;
-					$one->SetOption('email_bcc_address',$bc);
-				}
-			}
-			unset($one);
-		}
-	}
-
 	function Populate($id,&$params)
 	{
 		$tmp = $this->formdata->formsmodule->CreateInputEmail(
@@ -106,6 +84,28 @@ class pwfEmailBCCAddress extends pwfFieldBase
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}
+
+	function PreDispositionAction()
+	{
+		if(property_exists($this,$Value))
+		{
+			foreach($this->formdata->Fields as &$one)
+			{
+				if($one->IsDisposition()
+               		&& is_subclass_of($one,'pwfEmailBase')
+					&& $one->GetId() == $this->GetOption('field_to_modify'))
+				{
+					$bc = $one->GetOption('email_bcc_address');
+					if($bc)
+						$bc .= ',';
+					$bc .= $this->Value;
+					$one->SetOption('email_bcc_address',$bc);
+				}
+			}
+			unset($one);
+		}
+	}
+
 }
 
 ?>

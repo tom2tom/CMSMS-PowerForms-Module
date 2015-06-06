@@ -95,7 +95,7 @@ class pwfPassword extends pwfFieldBase
 		 case 'none':
 			break;
 		 case 'regex_match':
-			if($this->Value !== FALSE &&
+			if(property_exists($this,$Value) &&
 				!preg_match($this->GetOption('regex','/.*/'),$this->Value))
 			{
 				$this->validated = FALSE;
@@ -103,7 +103,7 @@ class pwfPassword extends pwfFieldBase
 			}
 			break;
 		 case 'regex_nomatch':
-			if($this->Value !== FALSE &&
+			if(property_exists($this,$Value) &&
 				preg_match($this->GetOption('regex','/.*/'),$this->Value))
 			{
 				$this->validated = FALSE;

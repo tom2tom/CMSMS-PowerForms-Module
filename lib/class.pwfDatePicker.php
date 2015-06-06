@@ -45,9 +45,8 @@ class pwfDatePicker extends pwfFieldBase
 
 	function HasValue($deny_blank_responses=FALSE)
 	{
-		if($this->Value === FALSE)
+		if(!property_exists($this,$Value))
 			return FALSE;
-
 		if(!is_array($this->Value))
 			return FALSE;
 
@@ -138,17 +137,18 @@ class pwfDatePicker extends pwfFieldBase
 	function Populate($id,&$params)
 	{
 		$today = getdate();
+
 		$Days = array(''=>'');
 		for ($i=1; $i<32; $i++)
-			$Days[$i]=$i;
+			$Days[$i] = $i;
 
-		$Year = array(''=>'');
+		$Years = array(''=>'');
 		$sty = $this->GetOption('start_year',($today['year']-10));
-		if($sty == -1)
+		if($sty <= 0)
 			$sty = $today['year'];
-
-		for ($i=$sty; $i<$this->GetOption('end_year',($today['year']+10))+1; $i++)
-			$Year[$i]=$i;
+		$ndy = $this->GetOption('end_year',($today['year']+10)) + 1;
+		for ($i=$sty; $i<$ndy; $i++)
+			$Years[$i] = $i;
 
 		if($this->HasValue())
 		{
@@ -165,9 +165,11 @@ class pwfDatePicker extends pwfFieldBase
 			$today['mon']='';
 			$today['year']='';
 		}
-		else if($this->GetOption('default_year',-1) != -1)
+		else
 		{
-			$today['year'] = $this->GetOption('default_year','-1');
+			$i = $this->GetOption('default_year',0);
+			if($i)
+				$today['year'] = $i;
 		}
 
 		$mod = $this->formdata->formsmodule;
@@ -191,7 +193,7 @@ class pwfDatePicker extends pwfFieldBase
 		$tid = $this->GetInputId('_year');
 		$yr->title = $mod->Lang('year');
 		$yr->name = '<label for="'.$tid.'">'.$yr->title.'</label>';
-		$yr->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Year,-1,
+		$yr->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Years,-1,
 			$today['year'],'id="'.$tid.'"'.$js);
 
 		$order = array('d' => $day,'m' => $mon,'y' => $yr);

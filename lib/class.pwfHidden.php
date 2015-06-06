@@ -46,7 +46,7 @@ class pwfHidden extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 
-		if($this->Value !== FALSE)
+		if(property_exists($this,$Value))
 			$val = $this->Value;
 		else
 			$val = $this->GetOption('value');

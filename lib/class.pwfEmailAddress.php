@@ -13,7 +13,6 @@ class pwfEmailAddress extends pwfFieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->ModifiesOtherFields = TRUE;
 		$this->Type = 'EmailAddress';
 		$this->ValidationType = 'email';
 		$mod = $formdata->formsmodule;
@@ -45,25 +44,6 @@ class pwfEmailAddress extends pwfFieldBase
 		);
 
 		return array('main'=>$main,'adv'=>$adv);
-	}
-
-	function ModifyOtherFields()
-	{
-		if($this->Value !== FALSE)
-		{
-			$htm = $this->GetOption('headers_to_modify','f');
-			foreach($this->formdata->Fields as &$one)
-			{
-				if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
-				{
-					if($htm == 'f' || $htm == 'b')
-						$one->SetOption('email_from_address',$this->Value);
-					if($htm == 'r' || $htm == 'b')
-						$one->SetOption('email_reply_to_address',$this->Value);
-				}
-			}
-			unset($one);
-		}
 	}
 
 	function Populate($id,&$params)
@@ -103,6 +83,26 @@ class pwfEmailAddress extends pwfFieldBase
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}
+
+	function PreDispositionAction()
+	{
+		if(property_exists($this,$Value))
+		{
+			$htm = $this->GetOption('headers_to_modify','f');
+			foreach($this->formdata->Fields as &$one)
+			{
+				if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
+				{
+					if($htm == 'f' || $htm == 'b')
+						$one->SetOption('email_from_address',$this->Value);
+					if($htm == 'r' || $htm == 'b')
+						$one->SetOption('email_reply_to_address',$this->Value);
+				}
+			}
+			unset($one);
+		}
+	}
+
 }
 
 ?>

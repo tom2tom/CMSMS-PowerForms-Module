@@ -19,10 +19,10 @@ class pwfLink extends pwfFieldBase
 
 	function GetHumanReadableValue($as_string=TRUE)
 	{
-		if($this->Value === FALSE || ! is_array($this->Value))
-			$ret = '';
-		else
+		if(property_exists($this,$Value) && is_array($this->Value))
 			$ret = '<a href="'.$this->Value[0].'">'.$this->Value[1].'</a>';
+		else
+			$ret = '';
 
 		if($as_string)
 			return $ret;
@@ -52,7 +52,7 @@ class pwfLink extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		$js = $this->GetScript();
 
-		if($this->Value !== FALSE && is_array($this->Value))
+		if(property_exists($this,$Value) && is_array($this->Value))
 			$val = $this->Value;
 		else
 			$val = array($this->GetOption('default_link'),$this->GetOption('default_link_title'));

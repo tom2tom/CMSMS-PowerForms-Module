@@ -155,7 +155,7 @@ class pwfRadioGroup extends pwfFieldBase
 
  				$tmp = '<input type="radio" id="'.$this->GetInputId('_'.$i).'" name="'.
 					$id.$this->formdata->current_prefix.$this->Id.'[]" value="'.$i.'"';
-				if($this->Value !== FALSE)
+				if(property_exists($this,$Value))
 					$checked = $this->FindArrayValue($i); //TODO
 				elseif($this->GetOptionElement('button_is_set',$i) == 'y')
 					$checked = TRUE;

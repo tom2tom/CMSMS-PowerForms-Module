@@ -143,7 +143,7 @@ class pwfMultiselect extends pwfFieldBase
 		if($choices)
 		{
 			$choices = array_flip($choices);
-			if($this->Value === FALSE)
+			if(!property_exists($this,$Value))
 				$val = array();
 			elseif(!is_array($this->Value))
 				$val = array($this->Value);

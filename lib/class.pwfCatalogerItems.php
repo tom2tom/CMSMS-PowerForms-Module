@@ -225,7 +225,7 @@ class pwfCatalogerItems extends pwfFieldBase
 			$size = min(50,$size); // maximum 50 lines, though this is probably big
 
 			$val = array();
-			if($this->Value !== FALSE)
+			if(property_exists($this,$Value))
 			{
 				$val = $this->Value;
 				if(!is_array($this->Value))

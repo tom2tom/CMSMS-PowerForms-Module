@@ -141,16 +141,17 @@ class pwfSiteAdmin extends pwfFieldBase
 
 	function Validate($id)
 	{
-		$result = TRUE;
-		$message = '';
-
-		if($this->Value == FALSE)
+		if(property_exists($this,$Value) && $this->Value)
 		{
-			$result = FALSE;
-			$mod = $this->formdata->formsmodule;
-			$message .= $mod->Lang('must_specify_one_admin').'<br />';
+			$this->validated = TRUE;
+			$this->ValidationMessage = '';
 		}
-		return array($result,$message);
+		else
+		{
+			$this->validated = FALSE;
+			$this->ValidationMessage = $this->formdata->formsmodule->Lang('must_specify_one_admin');
+		}
+		return array($this->validated,$this->ValidationMessage);
 	}
 
 }

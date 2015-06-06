@@ -207,7 +207,7 @@ class pwfCheckboxGroup extends pwfFieldBase
 					$oneset->name = '';
 				}
 
-				if($this->Value !== FALSE)
+				if(property_exists($this,$Value))
 					$checked = $this->FindArrayValue($i) ? $i:-1; //TODO
 				elseif($this->GetOptionElement('box_is_set',$i) == 'y')
 					$checked = $i;
