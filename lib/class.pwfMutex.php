@@ -10,7 +10,7 @@ class pwfMutex
 	Get:
 	@module: reference to current PowerForms module object
 	@storage: optional cache-type name, one (or more, ','-separated) of
-		auto,memcache,file,database,fake
+		auto,memcache,file,database
 		default = 'auto'
 	Returns: mutex-object $module->mutex (after creating it if not already done) or NULL
 	*/
@@ -26,7 +26,7 @@ class pwfMutex
 		else
 			$storage = 'auto';
 		if(strpos($storage,'auto') !== FALSE)
-			$storage = 'memcache,database,file,fake';
+			$storage = 'memcache,file,database';
 
 		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
 		require($path.'interface.Mutex.php');
@@ -40,8 +40,7 @@ class pwfMutex
 			$class = 'Mutex_'.$one;
 			try
 			{
-				$ob = new $class($settings);
-				$module->cache =& $ob;
+				$module->cache = new $class($settings);
 				return $module->cache;
 			}
 			catch(Exception $e) {}
