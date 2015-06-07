@@ -1087,6 +1087,11 @@ Such a field can be implemented by creating a suitable class for the field, and
 during installation/uninstallation of the other module, registering/deregistering
 that class. More specific requirements are provided for developers in a README file.
 The PowerBrowse module code provides an example of this process in use.<p>
+<h3>Requirements</h3>
+<ul>
+<li>TODO PHP 5.1+</li>
+<li></li>
+</ul>
 <h3>Support</h3>
 <p>This module is provided as-is. Please read the text of the license for the full disclaimer.
 Just to be clear, there's no guarantee of support. However, there are some resources available
