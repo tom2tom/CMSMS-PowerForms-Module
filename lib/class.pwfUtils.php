@@ -93,7 +93,7 @@ class pwfUtils
 			$mod->Lang('field_type_TextArea')=>'pwfTextArea',
 			$mod->Lang('field_type_Text')=>'pwfText',
 			$mod->Lang('field_type_SystemEmail')=>'pwfSystemEmail',
-			$mod->Lang('field_type_WriteFile')=>'pwfWriteFile');
+			$mod->Lang('field_type_SharedFile')=>'pwfSharedFile');
 		uksort($mod->std_field_types,array('pwfUtils','fieldcmp'));
 	}
 
@@ -438,7 +438,7 @@ EOS;
 	{
 		$smarty->assign('template_vars_title',$mod->Lang('title_template_variables'));
 		$smarty->assign('variable_title',$mod->Lang('variable'));
-		$smarty->assign('attribute_title',$mod->Lang('attribute'));
+		$smarty->assign('property_title',$mod->Lang('property'));
 
 		$sysfields = array();
 		foreach(array(
