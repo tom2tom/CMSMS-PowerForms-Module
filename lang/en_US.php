@@ -261,7 +261,6 @@ $lang['admin_desc'] = 'Add, edit and manage interactive forms';
 $lang['advanced'] = 'Advanced';
 $lang['anonymous'] = 'Anonymous';
 $lang['apply'] = 'Apply';
-$lang['attribute'] = 'Attribute';
 $lang['automatic'] = 'Automatic';
 
 $lang['back_form'] = 'Form';
@@ -316,42 +315,42 @@ $lang['delete'] = 'Delete';
 $lang['delete_destination'] = 'Delete Selected Destinations';
 $lang['delete_options'] = 'Delete Selected Options';
 $lang['desc_actionid'] = 'TODO';
-$lang['desc_alias'] = 'the alias specified for this field';
+$lang['desc_alias'] = 'the alias specified for the field';
 //$lang['desc_browser_id'] = 'Browser ID if form is being viewed or edited from PowerBrowse';
 $lang['desc_css_class'] = 'CSS class for the form';
-$lang['desc_css_class'] = 'the CSS class specified for this field';
-$lang['desc_display'] = '1 if the field should be displayed, otherwise 0';
-$lang['desc_error'] = 'text of the validation problem, in the event that this field did not validate';
-$lang['desc_field_helptext_id'] = 'a string including field->id';
-$lang['desc_form_id'] = 'Form identifier (number)';
-$lang['desc_form_name'] = 'Form name';
-$lang['desc_has_label'] = '1 if the field type has a label, otherwise 0';
-$lang['desc_help_icon'] = 'String to generate help/info icon displayed on the form';
+$lang['desc_cssf_class'] = 'the CSS class specified for the field';
+$lang['desc_display'] = 'true if the field is visible in the form';
+$lang['desc_error'] = 'error text, if the field did not validate';
+$lang['desc_helptext_id'] = 'DOM id of the DIV containing controls to show help for the field';
+$lang['desc_form_id'] = 'form identifier (number)';
+$lang['desc_form_name'] = 'form name';
+$lang['desc_has_label'] = 'true if the field type has a label';
+$lang['desc_help_icon'] = 'string to generate help/info icon displayed on the form';
 $lang['desc_helptext'] = 'the field\'s help text';
-$lang['desc_hidden'] = 'Collection of necessary hidden stuff';
-$lang['desc_hide_name'] = 'true if the field name should be hidden, otherwise 0';
-$lang['desc_id'] = 'the internal / opaque id PowerForms uses for this field';
+$lang['desc_hidden'] = 'collection of necessary hidden stuff';
+$lang['desc_hide_name'] = 'true if the field name is hidden';
+$lang['desc_id'] = 'the internal/opaque id PowerForms uses for the field';
 //$lang['desc_in_admin'] = 'true if the form is being viewed or edited from PowerBrowse';
 $lang['desc_in_browser'] = 'true if form is being viewed or edited from PowerBrowse';
-$lang['desc_input_id'] = 'the ID of the field\'s input (useful for label for="foo")';
-$lang['desc_input'] = 'the field\'s input control (e.g., the input field itself)';
-$lang['desc_jscript'] = 'Javascript to be included';
-$lang['desc_label_parts'] = '1 if the collection of controls has separate labels for each control';
+$lang['desc_input_id'] = 'the DOM id of the field\'s input (e.g. for a label: for="foo")';
+$lang['desc_input'] = 'the field\'s input control, or array of objects (see below)';
+$lang['desc_jscript'] = 'javascript to be included';
+$lang['desc_label_parts'] = 'true if the collection of controls has separate labels for each control';
 $lang['desc_logic'] = 'smarty data or logic associated with the field';
-$lang['desc_multiple_parts'] = '1 if the field->input is actually a collection of controls';
+$lang['desc_multiple_parts'] = 'true if the field->input is actually a collection of controls';
 $lang['desc_name'] = 'the field\'s name';
-$lang['desc_needs_div'] = '1 if the field needs to be wrapped in a DIV (or table row, if that\'s the way you swing)';
+$lang['desc_needs_div'] = 'true if the field needs to be wrapped in a DIV (or table row)';
 $lang['desc_prev'] = '"Back" button for multi-page forms';
-$lang['desc_required'] = '1 if the field is required, otherwise 0';
-$lang['desc_required_symbol'] = 'the symbol for required fields';
+$lang['desc_required'] = 'true if the field is required';
+$lang['desc_required_symbol'] = 'symbol shown in the title if the field is required';
 $lang['description'] = 'Description';
-$lang['desc_smarty_eval'] = '1 if the field value needs to be evaluated via smarty';
+$lang['desc_smarty_eval'] = 'true if the field value has been evaluated via smarty';
 $lang['desc_submit'] = '"Continue" or "Submit" button for multi-page forms (adjusts automatically)';
-$lang['desc_this_page'] = 'Number of the current page for multi-page forms';
-$lang['desc_title_page_x_of_y'] = 'Displays "page x of y" for multi-page forms';
-$lang['desc_total_pages'] = 'Number of pages for multi-page forms';
-$lang['desc_type'] = 'the field\'s data type';
-$lang['desc_valid'] = '1 if this field has passed validation, otherwise 0';
+$lang['desc_this_page'] = 'number of the current page for multi-page forms';
+$lang['desc_title_page_x_of_y'] = 'displays "page x of y" for multi-page forms';
+$lang['desc_total_pages'] = 'number of pages for multi-page forms';
+$lang['desc_type'] = 'the field\'s classname/type';
+$lang['desc_valid'] = 'true if the field has been validated successfully';
 $lang['desc_values'] = 'for a multiple-choice field, array of allowed values, otherwise FALSE';
 $lang['destination_count'] = '%s destinations';
 $lang['display_text'] = 'Display page constructed from post-submission template';
@@ -500,18 +499,6 @@ $lang['form_template_name'] = 'Template from %s';
 $lang['friendly_name'] = 'Power Forms';
 
 $lang['help'] = 'Help';
-$lang['help_attrs1'] = <<<EOS
-You can access form fields either using the <code>{\$fields}</code> array or by directly
-accessing fields by their names e.g. <code>{\$myfield->input}</code><br /><br />
-Alternate field names can be used interchangeably (especially useful if Smarty is choking on characters outside of ASCII 32-126).<br /><br />
-Each field has the following attributes:
-EOS;
-$lang['help_attrs2'] = <<<EOS
-In some cases, field->input is actually an array of objects rather than an input.
-This happens, for example, in CheckBoxGroups or RadioButtonGroups. For those, you
-can iterate through <code>field->input->name</code> and <code>field->input->input</code>
-and <code>field->input->op</code>.
-EOS;
 $lang['help_blank_invalid'] = 'Each required field must include at least one alphanumeric character';
 $lang['help_captcha_label'] =<<<EOS
 If checked, the Captcha image and prompt will substituted for the field label. Otherwise,
@@ -548,7 +535,7 @@ $lang['help_file_footer_template'] = 'For TXT, this will be placed at the bottom
 $lang['help_file_header_template'] = 'For TXT, this will be placed at the top of the file. For RTF, this will replace the %%HEADER%% string in the template file.';
 $lang['help_file_rename'] = 'To rename a file upon uploading, create the template here. Leave blank to preserve original filename';
 $lang['help_form_alias'] = 'If left blank, an alias will be derived from the form name';
-$lang['help_globals'] = <<<EOS
+$lang['help_form_vars'] = <<<EOS
 To make the form work, you'll need to always include the <code>{\$hidden}</code> and <code>{\$submit}</code> tags.
 EOS;
 $lang['help_ignored_if_upload'] = '(This field ignored if you use the Uploads module to manage files)';
@@ -654,6 +641,18 @@ and doesn't affect form dispositions. Disposition-specific templates are
 EOS;
 $lang['help_uploads_dir']='Filesystem path relative to website-host uploads directory. No leading or trailing path-separator, and any intermediate path-separator must be host-system-specific e.g. \'\\\' on Windows. If left blank, the default will be used.';
 $lang['help_url'] = 'Entire URL, including protocol and path (e.g. http://myhost.com/form_handler.cgi)';
+$lang['help_vars1'] = <<<EOS
+You can access form fields either using the <code>{\$fields}</code> array or by directly
+accessing fields by their names e.g. <code>{\$myfield->input}</code><br /><br />
+Alternate field names can be used interchangeably (especially useful if Smarty is choking on characters outside of ASCII 32-126).<br /><br />
+Each field has the following properties:
+EOS;
+$lang['help_vars2'] = <<<EOS
+When field->multiple_parts is TRUE, field->input is actually an array of objects rather than an input.
+This happens, for example, in CheckBoxGroups or RadioButtonGroups. For those, you
+can iterate through <code>field->input->name</code> and <code>field->input->input</code>
+and <code>field->input->op</code>.
+EOS;
 $lang['hour'] = 'Hour';
 
 $lang['illegal_file'] = 'Attempted upload of illegal file type (%s) from %s';
@@ -730,6 +729,7 @@ $lang['please_login'] = 'Please log in to use this form';
 $lang['post_install'] = 'Power Forms module installed. Please consult the module\'s help page for documentation.';
 $lang['post_uninstall'] = 'Power Forms module successfully uninstalled';
 $lang['previous'] = 'Previous page';
+$lang['property'] = 'Property';
 
 $lang['recipients'] = 'recipients';
 $lang['redirect_after_approval'] = 'Page to redirect after approval';
