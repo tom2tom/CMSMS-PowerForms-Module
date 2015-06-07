@@ -33,7 +33,7 @@ elseif(isset($params['save']))
 	$funcs = new pwfFormOperations();
 	if(isset($params['form_id']))
 	{
-		$newid = $funcs->Copy($this,$params['form_id'],$params);
+		$newid = $funcs->Copy($this,$id,$params,$params['form_id']);
 		if(!$newid)
 			$this->Redirect($id,'defaultadmin','',array(
 				'message'=>$this->PrettyMessage('error_copy2',FALSE)));

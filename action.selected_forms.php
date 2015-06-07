@@ -11,7 +11,7 @@ if(!empty($params['sel']))
 	{
 		if(!$this->CheckAccess('ModifyPFForms')) exit;
 		foreach ($params['sel'] as $fid)
-			$funcs->Copy($this,$fid,$params);
+			$funcs->Copy($this,$id,$params,$fid);
 	}
 	elseif(isset($params['delete']))
 	{

@@ -10,7 +10,7 @@ if(!isset($params['form_id']) && isset($params['form']))
 	// got the form by alias, not ID
 	$params['form_id'] = pwfUtils::GetFormIDFromAlias($params['form']);
 }
-if(empty($params['form_id']) || $params['form_id'] == -1) exit; //TODO feedback
+if(empty($params['form_id'])) exit; //TODO feedback
 
 $fn = $this->GetName().$this->Lang('export').'-'.
 	pwfUtils::GetFormNameFromID($params['form_id']).'-'.date('Y-m-d-H-i').'.xml';

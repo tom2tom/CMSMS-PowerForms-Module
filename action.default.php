@@ -64,7 +64,7 @@ if(!function_exists('EarlyExit'))
 
 if(!isset($params['form_id']) && isset($params['form'])) // got the form by alias
 	$params['form_id'] = pwfUtils::GetFormIDFromAlias($params['form']);
-if(empty($params['form_id']) || $params['form_id'] == -1)
+if(empty($params['form_id']))
 {
 	echo "<!-- no form -->\n";
 	return;
@@ -293,8 +293,7 @@ $this->Crash2();
 				$i = 0; //don't assume anything about fields-array key
 				foreach($formdata->Fields as &$one)
 				{
-					if($one->ModifiesOtherFields())
-						$one->ModifyOtherFields();
+					$one->PreDispositionAction();
 					if($one->ComputeOnSubmission())
 						$computes[$i] = $one->ComputeOrder();
 					$i++;
@@ -381,7 +380,7 @@ $this->Crash4();
 else //first time
 {
 	$funcs = new pwfFormOperations();
-	$formdata = $funcs->Load($this,$form_id,$params,TRUE);
+	$formdata = $funcs->Load($this,$id,$params,$form_id);
 	unset($funcs);
 	if(!$formdata)
 	{
