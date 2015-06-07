@@ -83,8 +83,8 @@ if($hasmain)
 	{
 		$oneset = new stdClass();
 		$oneset->title = (isset($item[0]))?$item[0]:'';
-		$oneset->input = (isset($item[1]))?$item[1]:'';
-		if(!empty($item[2])) $oneset->help = $item[2]; //optional
+		if(!empty($item[1])) $oneset->input = $item[1]; //optional
+		if(!empty($item[2])) $oneset->help = $item[2];
 		$mainList[] = $oneset;
 	}
 }
@@ -97,8 +97,8 @@ if($hasadv)
 	{
 		$oneset = new stdClass();
 		$oneset->title = (isset($item[0]))?$item[0]:'';
-		$oneset->input = (isset($item[1]))?$item[1]:'';
-		if(!empty($item[2])) $oneset->help = $item[2]; //optional
+		if(!empty($item[1])) $oneset->input = $item[1]; //optional
+		if(!empty($item[2])) $oneset->help = $item[2];
 		$advList[] = $oneset;
 	}
 }
@@ -108,7 +108,6 @@ if(isset($allOpts['table']))
 	$smarty->assign('mainTable',$allOpts['table']);
 if(isset($allOpts['funcs']))
 	$smarty->assign('jsfuncs',$allOpts['funcs']);
-$smarty->assign('incpath',$this->GetModuleURLPath().'/include/');
 
 if(isset($allOpts['extra']))
 {
