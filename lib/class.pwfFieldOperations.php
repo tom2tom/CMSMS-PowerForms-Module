@@ -269,42 +269,48 @@ class pwfFieldOperations
 		unset($one);
 	}
 */
-	// returns reference to field-object in $formdata and whose (0-based) array-index is $field_index
-	public static function &GetFieldByIndex(&$formdata,$field_index)
-	{
-		$keys = array_keys($formdata->Fields);
-		if(isset($keys[$field_index]))
-			return $formdata->Fields[$keys[$field_index]];
-		return NULL;
-	}
 
-	// swaps field display-orders 
+	// Swaps field display-orders
+	// This is intended for swapping adjacent fields but works more generally
 	public static function SwapFieldsByIndex($field_index1,$field_index2)
 	{
-		$Field1 = self::GetFieldByIndex($field_index1);
-		$Field2 = self::GetFieldByIndex($field_index2);
-		$tmp = $Field2->GetOrder();
-		$Field2->SetOrder($Field1->GetOrder());
-		$Field2->Store();
-		$Field1->SetOrder($tmp);
-		$Field1->Store();
+		$keys = array_keys($formdata->Fields);
+		if(isset($keys[$field_index1]) && isset($keys[$field_index2]))
+		{
+			$k1 = $keys[$field_index1];
+			$o1 = $formdata->Fields[$k1]->GetOrder();
+			$k2 = $keys[$field_index2];
+			$o2 = $formdata->Fields[$k2]->GetOrder();
+			$formdata->Fields[$k1]->SetOrder($o2);
+			$formdata->Fields[$k2]->SetOrder($o1);
+/* probably useless, cuz' associative array order is not guaranteed
+			$new = array();
+			foreach($formdata->Fields as $k=>&$f)
+			{
+				if($k == $k1)
+				{
+					$new[$k2] = $formdata->Fields[$k2];
+					$new[$k2]->SetOrder($o1);
+				}
+				elseif($k == $k2)
+				{
+					$new[$k1] = $formdata->Fields[$k1];
+					$new[$k1]->SetOrder($o2);
+				}
+				else
+					$new[$k] = $f;
+			}
+			unset($f);
+			$formdata->Fields = $new;
+*/
+		}
 	}
 
-	// returns index of first-found field in $formdata and with id matching $field_id
+	// Returns 0-based index of field in $formdata->Fields[] and with id matching $field_id
+	// Check returned value with !== FALSE
 	public static function GetFieldIndexFromId(&$formdata,$field_id)
 	{
-		$i = 0; //don't assume anything about fields-array key
-		foreach($formdata->Fields as &$fld)
-		{
-			if($fld->GetId() == $field_id)
-			{
-				unset($fld);
-				return $i;
-			}
-			$i++;
-		}
-		unset ($fld);
-		return -1;
+		return array_search($field_id,array_keys($formdata->Fields));
 	}
 
 }
