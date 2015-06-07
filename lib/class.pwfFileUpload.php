@@ -129,20 +129,18 @@ class pwfFileUpload extends pwfFieldBase
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-	function Load($id,&$params,$loadDeep=FALSE)
+	function Load($id,&$params)
 	{
-		$fname = FALSE;
+		$ret = parent::Load($id,$params);
 		if(isset($_FILES))
 		{
 			$key = $id.$this->formdata->current_prefix.$this->Id;
 			if(!isset($_FILES[$key]))
 				$key = $id.$this->formdata->prior_prefix.$this->Id;
 			if(isset($_FILES[$key]) && $_FILES[$key]['size'] > 0) // file was uploaded
-				$fname = $_FILES[$key]['name'];
+				$this->SetValue($_FILES[$key]['name']);
 		}
-		parent::Load($id,$params,$loadDeep);
-		if($fname)
-			$this->SetValue($fname);
+		return $ret;
 	}
 
 	function CreatePageDropdown($id,$name,$current='',$addtext='',$markdefault=TRUE)

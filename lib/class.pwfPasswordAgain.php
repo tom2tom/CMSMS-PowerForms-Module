@@ -11,7 +11,6 @@ class pwfPasswordAgain extends pwfFieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->ModifiesOtherFields = FALSE;
 		$this->Type = 'PasswordAgain';
 	}
 

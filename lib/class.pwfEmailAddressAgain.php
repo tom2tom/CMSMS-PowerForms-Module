@@ -11,7 +11,6 @@ class pwfEmailAddressAgain extends pwfFieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->ModifiesOtherFields = FALSE;
 		$this->Type = 'EmailAddressAgain';
 		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_email_address')=>'email');
 	}

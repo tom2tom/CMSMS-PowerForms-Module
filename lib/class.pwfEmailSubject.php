@@ -11,18 +11,7 @@ class pwfEmailSubject extends pwfFieldBase {
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->ModifiesOtherFields = TRUE;
 		$this->Type = 'EmailSubject';
-	}
-
-	function ModifyOtherFields()
-	{
-		foreach($this->formdata->Fields as &$one)
-		{
-			if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
-				$one->SetOption('email_subject',$this->Value);
-		}
-		unset($one);
 	}
 
 	function Populate($id,&$params)
@@ -48,6 +37,17 @@ class pwfEmailSubject extends pwfFieldBase {
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}
+
+	function PreDispositionAction()
+	{
+		foreach($this->formdata->Fields as &$one)
+		{
+			if($one->IsDisposition() && is_subclass_of($one,'pwfEmailBase'))
+				$one->SetOption('email_subject',$this->Value);
+		}
+		unset($one);
+	}
+
 }
 
 ?>

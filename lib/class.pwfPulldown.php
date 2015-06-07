@@ -18,23 +18,6 @@ class pwfPulldown extends pwfFieldBase
 		$this->Type = 'Pulldown';
 	}
 
-	function array_sort_by_key($input)
-	{
-		if(!is_array($input)) return;
-		$a1 = array();
-		foreach($input as $k => $v)
-		{
-			$a1[$v] = $k;
-		}
-		asort($a1);
-		$a2 = array();
-		foreach($a1 as $k => $v)
-		{
-			$a2[$v] = $k;
-		}
-		return $a2;
-	}
-
 	function GetOptionAddButton()
 	{
 		return $this->formdata->formsmodule->Lang('add_options');

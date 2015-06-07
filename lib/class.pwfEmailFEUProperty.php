@@ -94,16 +94,14 @@ class pwfEmailFEUProperty extends pwfEmailBase
 		}
 //TODO
 		$ret = $this->PrePopulateAdminFormCommonEmail($id,TRUE);
-		$main = $ret['main']; //assume it's there
-		$waslast = array_pop($main); //keep the email to-type selector for last
+		$waslast = array_pop($ret['main']); //keep the email to-type selector for last
 		$keys = array_keys($opts);
-		$main[] = array($mod->Lang('title_feu_property'),
+		$ret['main'][] = array($mod->Lang('title_feu_property'),
 				$mod->CreateInputDropdown($id,'opt_feu_property',
-						   array_flip($opts),-1,
-						   $this->GetOption('feu_property',$keys[0])),
+				   array_flip($opts),-1,
+				   $this->GetOption('feu_property',$keys[0])),
 				$mod->Lang('help_feu_property'));
-		$main[] = $waslast;
-		$ret['main'] = $main;
+		$ret['main'][] = $waslast;
 		return $ret;
 	}
 
@@ -119,13 +117,13 @@ class pwfEmailFEUProperty extends pwfEmailBase
 		$defn = $feu->GetPropertyDefn($prop);
 		if(!$defn) return '';
 
-		// get the property input field
-		$choices = $feu->GetSelectOptions($prop);
 		switch($defn['type'])
 		{
 		 case 4: // dropdown
 		 case 5: // multiselect
 		 case 7: // radio button group
+			// get the property input field
+			$choices = $feu->GetSelectOptions($prop);
 			// rendered all as a dropdown field.
 			$res = $mod->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,

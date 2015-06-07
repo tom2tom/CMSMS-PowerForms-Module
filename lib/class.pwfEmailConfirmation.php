@@ -13,7 +13,6 @@ class pwfEmailConfirmation extends pwfEmailBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsDisposition = TRUE;
-		$this->ModifiesOtherFields = TRUE;
 		$this->Type = 'EmailConfirmation';
 		$this->ValidationType = 'email';
 		$mod = $formdata->formsmodule;
@@ -44,25 +43,6 @@ class pwfEmailConfirmation extends pwfEmailBase
 		$ret['main'][] = array($mod->Lang('redirect_after_approval'),
 				@$contentops->CreateHierarchyDropdown('',$this->GetOption('redirect_page','0'),$id.'opt_redirect_page'));
 		return $ret;
-	}
-
-	function ModifyOtherFields()
-	{
-		if($this->formdata->FormState == 'update')
-		{
-			$this->approvedToGo = TRUE;
-			return;
-		}
-		// If we haven't been approved,inhibit all other dispositions!
-		foreach($this->formdata->Fields as &$one)
-		{
-			if($this->approvedToGo && $one->GetFieldType() == 'FormBrowser')
-				$one->SetApprovalName($this->GetValue());
-			elseif(!$this->approvedToGo && $one->IsDisposition())
-				$one->SetDispositionPermission(FALSE);
-		}
-		unset($one);
-		$this->SetDispositionPermission(TRUE);
 	}
 
 	function Populate($id,&$params)
@@ -98,6 +78,25 @@ class pwfEmailConfirmation extends pwfEmailBase
 			break;
 		}
 		return array($this->validated,$this->ValidationMessage);
+	}
+
+	function PreDispositionAction()
+	{
+		if($this->formdata->FormState == 'update')
+		{
+			$this->approvedToGo = TRUE;
+			return;
+		}
+		// If we haven't been approved,inhibit all other dispositions!
+		foreach($this->formdata->Fields as &$one)
+		{
+			if($this->approvedToGo && $one->GetFieldType() == 'FormBrowser')
+				$one->SetApprovalName($this->GetValue());
+			elseif(!$this->approvedToGo && $one->IsDisposition())
+				$one->SetDispositionPermission(FALSE);
+		}
+		unset($one);
+		$this->SetDispositionPermission(TRUE);
 	}
 
 	function Dispose($id,$returnid)

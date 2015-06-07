@@ -11,7 +11,6 @@ class pwfEmailSender extends pwfFieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->ModifiesOtherFields = TRUE;
 		$this->Type = 'EmailSender';
 	}
 
@@ -60,7 +59,7 @@ class pwfEmailSender extends pwfFieldBase
 		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
 	}
 
-	function ModifyOtherFields()
+	function PreDispositionAction()
 	{
 		if($this->Value)
 		{
