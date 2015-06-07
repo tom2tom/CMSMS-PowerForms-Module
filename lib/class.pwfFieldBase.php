@@ -29,20 +29,19 @@ class pwfFieldBase
 	var $IsInput = FALSE;
 	var $IsSortable = TRUE;
 	var $LabelSubComponents = TRUE;
-	var $ModifiesOtherFields = FALSE;
 	var $MultiPopulate = FALSE; //whether Populate() generates array of objects
 	var $Name = '';
 	var $NeedsDiv = TRUE;
 	var $NonRequirableField = FALSE;
 	var $Options = array();
-	var $OrderBy = '';
+	var $OrderBy = 0; //form display-order
 	var $Required = FALSE;
 	var $SmartyEval = FALSE; //TRUE for textinput field whose value is to be processed via smarty
 	var $Type = '';
 	var $ValidationMessage = ''; //post-validation error message, or ''
 	var $ValidationType = 'none';
-	var $ValidationTypes;
-	var $Value; //when set, can be scalar or array all content passed via pwfUtils::html_myentities_decode()
+	var $ValidationTypes; //if set, an array of choices suitable for populating pulldowns
+	var $Value; //when set, can be scalar or array, with all content processed by pwfUtils::html_myentities_decode()
 
 	function __construct(&$formdata,&$params)
 	{
@@ -61,19 +60,19 @@ class pwfFieldBase
 		if(isset($params['field_type']))
 			$this->Type = $params['field_type'];
 
-		if(isset($params['order_by']))
+		if(isset($params['order_by'])) //set in method.update_field
 			$this->OrderBy = $params['order_by'];
 
 		if(isset($params['hide_label']))
 			$this->HideLabel = $params['hide_label'];
-		elseif(isset($params['set_from_form']))
+		elseif(isset($params['set_from_form'])) //set in method.update_field
 			$this->HideLabel = FALSE;
 
 //done to here
 
 		if(isset($params['field_required']))
 			$this->Required = $params['field_required'];
-		elseif(isset($params['set_from_form']))
+		elseif(isset($params['set_from_form'])) //set in method.update_field
 			$this->Required = FALSE;
 
 		if(isset($params['validation_type']))
@@ -99,131 +98,6 @@ class pwfFieldBase
 			return $default;
 	}
 
-	function GetMultiPopulate()
-	{
-		return $this->MultiPopulate;
-	}
-
-	// Override this if appropriate
-	function LabelSubComponents()
-	{
-		return $this->LabelSubComponents;
-	}
-
-	function ComputeOnSubmission()
-	{
-		return $this->IsComputedOnSubmission;
-	}
-
-	// Override this if appropriate
-	function ComputeOrder()
-	{
-		return 0;
-	}
-
-/*	function HasMultipleValues()
-	{
-		return ($this->MultiPopulate || $this->HasUserAddOp); //TODO multipopulate not relevant
-	}
-*/
-	function ModifiesOtherFields()
-	{
-		return $this->ModifiesOtherFields;
-	}
-
-	// Get flag determining whether field can inhibit (other) dispositions
-	function DispositionIsPermitted()
-	{
-		return $this->DispositionPermitted;
-	}
-
-	// Set flag determining whether field can inhibit (other) dispositions
-	function SetDispositionPermission($permitted=TRUE)
-	{
-		$this->DispositionPermitted = $permitted;
-	}
-
-	// Override this to do something after the form has been disposed
-	function PostDispositionAction()
-	{
-	}
-
-	// Override this to adjust other field(s) before disposition
-	function ModifyOtherFields()
-	{
-	}
-
-/*	function GetFieldInputId($id,&$params)
-	{
-		return $id.$this->formdata->current_prefix.$this->Id;
-	}
-*/
-	/*Override this to generate content for the frontend form, either:
-	* an xhtml string which constitutes the field-input(s) to be displayed in the
-	(frontend or backend) form. Only the input portion itself, any title and/or
-	container(s) will be provided by the form renderer
-	OR if the field->MultiPopulate, then
-	* an array of stdClass objects, each with properties:
-	->name, ->title, ->input, and optionally ->op 
-	Object-names must begin with $this->formdata->current_prefix, so as to not be
-	dropped as 'unknown' frontend parameters (see PowerForms::InitializeFrontend())
-	and not be excluded as time-expired
-	*/
-	function Populate($id,&$params)
-	{
-		return '';
-	}
-
-	// Sends logic along with field, also allows smarty logic
-	// Doesn't need override in most cases
-	function GetFieldLogic()
-	{
-		$code = $this->GetOption('field_logic');
-		if(!empty($code))
-			return $this->formdata->formsmodule->ProcessTemplateFromData($code);
-		return '';
-	}
-
-	// Override this with something to show users
-	function GetFieldStatus()
-	{
-		return '';
-	}
-
-	//Whether to generate a submit-button labelled 'add',along with the field
-	function HasAddOp()
-	{
-		return $this->HasAddOp;
-	}
-
-	// Override this to generate appropriate add-button label
-	function GetOptionAddButton()
-	{
-		$mod = $this->formdata->formsmodule;
-		return $mod->Lang('add_options');
-	}
-
-	// Override this when necessary or useful (often, just set a flag)
-	function DoOptionAdd(&$params)
-	{
-	}
-	//Whether to generate a submit-button labelled 'delete',along with the field
-	function HasDeleteOp()
-	{
-		return $this->HasDeleteOp;
-	}
-	// Override this to generate appropriate delete-button label
-	function GetOptionDeleteButton()
-	{
-		$mod = $this->formdata->formsmodule;
-		return $mod->Lang('delete_options');
-	}
-
-	// Override this when necessary or useful to delete option-data
-	function DoOptionDelete(&$params)
-	{
-	}
-
 	// Gets the cached field-id
 	function GetId()
 	{
@@ -240,6 +114,33 @@ class pwfFieldBase
 	{
 		return $this->Name;
 	}
+
+	// Check whether this field has a name or doesn't need one
+	// Returns array, 1st member is T/F, 2nd is '' or message
+	function FieldIsNamed()
+	{
+		$mod = $this->formdata->formsmodule;
+		if($this->Name || !$mod->GetPreference('require_fieldnames'))
+			return array(TRUE,'');
+		return array(FALSE,$mod->Lang('field_no_name'));
+	 }
+
+	// Check whether this field's name is the same as anothter field's name
+	// Returns array, 1st member is T/F, 2nd is '' or message
+	function FieldNameInvalid()
+	{
+		foreach($this->Fields as &$one)
+		{
+			if($one->Name == $this->Name && $one->Id != $this->Id)
+			{
+				unset($one);
+				return array(TRUE,$this->formdata->formsmodule->Lang('field_name_in_use',$this->Name));
+			}
+		}
+		unset($one);
+		return array(FALSE,'');
+	}
+
 	// Caches a new field-alias
 	function SetAlias($alias)
 	{
@@ -338,6 +239,18 @@ class pwfFieldBase
 		return $this->IsEmailDisposition;
 	}
 
+	// Set flag determining whether this disposition field can inhibit (other) dispositions
+	function SetDispositionPermission($permitted=TRUE)
+	{
+		$this->DispositionPermitted = $permitted;
+	}
+
+	// Get flag determining whether this disposition field can inhibit (other) dispositions
+	function DispositionIsPermitted()
+	{
+		return $this->DispositionPermitted;
+	}
+
 	function IsInputField()
 	{
 		return $this->IsInput;
@@ -346,11 +259,6 @@ class pwfFieldBase
 	function HasLabel()
 	{
 		return $this->HasLabel;
-	}
-
-	function NeedsDiv()
-	{
-		return $this->NeedsDiv;
 	}
 
 	function SetHideLabel($hide)
@@ -370,8 +278,7 @@ class pwfFieldBase
 
 	function DisplayInSubmission()
 	{
-//		return ($this->DisplayInForm && $this->DisplayInSubmission);
-		return $this->DisplayInSubmission;
+		return $this->DisplayInSubmission; //&& $this->DisplayInForm
 	}
 
 	function IsNonRequirableField()
@@ -379,24 +286,24 @@ class pwfFieldBase
 		return $this->NonRequirableField;
 	}
 
-	function IsRequired()
-	{
-		return ($this->Required == 1);
-	}
-
 	function SetRequired($required)
 	{
-		$this->Required = $required?1:0;
+		$this->Required = $required;
+	}
+
+	function IsRequired()
+	{
+		return $this->Required;
 	}
 
 	function ToggleRequired()
 	{
-		$this->Required = ($this->Required?0:1);
+		$this->Required = !$this->Required;
 	}
 
-	function GetValidationTypes()
+	function SetValidationType($type)
 	{
-		return $this->ValidationTypes;
+		$this->ValidationType = $type;
 	}
 
 	function GetValidationType()
@@ -404,9 +311,14 @@ class pwfFieldBase
 		return $this->ValidationType;
 	}
 
-	function SetValidationType($theType)
+	function RequiresValidation()
 	{
-		$this->ValidationType = $theType;
+		return ($this->ValidationType != 'none');
+	}
+
+	function GetValidationTypes()
+	{
+		return $this->ValidationTypes;
 	}
 
 	function IsValid()
@@ -419,14 +331,358 @@ class pwfFieldBase
 		return $this->ValidationMessage;
 	}
 
-	// Override this with a displayable type
+	// Subclass this with a displayable type
 	function GetDisplayType()
 	{
 		return $this->formdata->formsmodule->Lang('field_type_'.$this->Type);
 	}
+
+	function GetMultiPopulate()
+	{
+		return $this->MultiPopulate;
+	}
+
+	// Subclass this if appropriate
+	function LabelSubComponents()
+	{
+		return $this->LabelSubComponents;
+	}
+
+	function ComputeOnSubmission()
+	{
+		return $this->IsComputedOnSubmission;
+	}
+
+	// Subclass this if appropriate
+	function ComputeOrder()
+	{
+		return 0;
+	}
+
+	function NeedsDiv()
+	{
+		return $this->NeedsDiv;
+	}
+
+/*	function HasMultipleValues()
+	{
+		return ($this->MultiPopulate || $this->HasUserAddOp); //TODO multipopulate not relevant
+	}
+*/
+	// Subclass this
+	// Returns field value as a scalar or array (per $as_string), suitable for display in the form
+	function GetHumanReadableValue($as_string=TRUE)
+	{
+		if(property_exists($this,$Value))
+		{
+			$ret = $this->Value;
+			if(is_array($ret))
+			{
+				if($as_string)
+					return implode($this->GetFormOption('list_delimiter',','),$ret);
+				else
+					return $ret; //assume array members are all displayable
+			}
+			else
+				$ret = (string)$ret;
+		}
+		else
+		{
+			$ret = $this->GetFormOption('unspecified',
+				$this->formdata->formsmodule->Lang('unspecified'));
+		}
+		if($as_string)
+			return $ret;
+		else
+			return array($ret);
+	}
+
+	// Subclass this
+	// Returns array of option values if the option is an array with member(s),
+	// or else FALSE
+	function GetAllHumanReadableValues()
+	{
+		if(array_key_exists('option_value',$this->Options))
+		{
+			if($this->GetOption('option_value')) //array with member(s)
+				return $this->GetOption('option_value');
+		}
+		return FALSE;
+	}
+
+	// Subclass this if necessary to convert type or something
+	function SetValue($newvalue)
+	{
+		if(is_array($newvalue))
+		{
+			$this->Value = array();
+			foreach($newvalue as &$one)
+				$this->Value[] = pwfUtils::html_myentities_decode($one);
+			unset($one);
+		}
+		else
+			 $this->Value = pwfUtils::html_myentities_decode($newvalue);
+	}
+
+/*	function LoadValue($newvalue)
+	{
+		if(property_exists($this,$Value))
+		{
+			if(!is_array($this->Value))
+				$this->Value = array($this->Value);
+			if(is_array($newvalue))
+			{
+				foreach($newvalue as &$one)
+					$this->Value[] = pwfUtils::html_myentities_decode($one);
+				unset($one);
+			}
+			else
+				$this->Value[] = pwfUtils::html_myentities_decode($newvalue);
+		}
+		elseif(is_array($newvalue))
+		{
+			$this->Value = array();
+			foreach($newvalue as &$one)
+				$this->Value[] = pwfUtils::html_myentities_decode($one);
+			unset($one);
+		}
+		else
+			 $this->Value = pwfUtils::html_myentities_decode($newvalue);
+	}
+*/
+	// Probably don't need to subclass this
+	function GetValue()
+	{
+		return $this->Value;
+	}
+
+	function ResetValue()
+	{
+		unset($this->Value);
+	}
+
+	// Subclass this if needed to support some unusual format for the value
+	// Returns boolean T/F indication whether the field value is present and non-default
+	function HasValue($deny_blank_responses=FALSE)
+	{
+		if(property_exists($this,$Value))
+		{
+			if(isset($this->Options['default'])) // fields with defaults
+			{
+				$def = $this->Options['default'];
+				if($def && $this->Value == $def) //TODO if array
+					return FALSE;
+			}
+			return (!$deny_blank_responses ||
+					is_array($this->Value) ||
+					trim($this->Value));
+		}
+		return FALSE;
+	}
+
+	// Returns a member of the field-value-array, or if $index == 0, the entire value, or FALSE
+	function GetArrayValue($index)
+	{
+		if(property_exists($this,$Value))
+		{
+			if(is_array($this->Value))
+			{
+				if(isset($this->Value[$index]))
+					return $this->Value[$index];
+			}
+			elseif($index == 0)
+				return $this->Value;
+		}
+		return FALSE;
+	}
+
+	// Subclass this?
+	// Returns TRUE if $value is contained in array $Value or matches scalar $Value
+	function FindArrayValue($value)
+	{
+		if(property_exists($this,$Value))
+		{
+			if(is_array($this->Value))
+				return array_search($value,$this->Value) !== FALSE;
+			elseif($this->Value == $value)
+				return TRUE;
+		}
+		return FALSE;
+	}
+
+	function SetOption($optionName,$optionValue)
+	{
+		$this->Options[$optionName] = $optionValue;
+	}
+
+	// Returns a field-option value, or $default if the option doesn't exist
+	function GetOption($optionName,$default='')
+	{
+		if(isset($this->Options[$optionName]))
+			return $this->Options[$optionName];
+
+		return $default;
+	}
+
+	// Returns array of option-values, or FALSE
+	// Each array-key is the numeric-suffix to $optionName, & array-value is the stored value
+	function GetOptionRef($optionName)
+	{
+		$len = strlen($optionName);
+		$matches = array();
+		foreach($this->Options as $key => &$val)
+		{
+			if(strpos($key,$optionName) === 0)
+			{
+				$o = (int)substr($key,$len);
+				$matches[$o] = $val;
+			}
+		}
+		unset($val);
+		return ($matches) ? ksort($matches) : FALSE;
+	  }
+
+	function SetOptionElement($optionName,$index,$value)
+	{
+		$this->Options[$optionName.$index] = $value;
+	}
+
+	function GetOptionElement($optionName,$index,$default='')
+	{
+		$so = $optionName.$index; 
+		if(isset($this->Options[$so]))
+			return $this->Options[$so];
+		elseif($index == 0)
+		{
+			if(isset($this->Options[$optionName]))
+				return $this->Options[$optionName];
+		}
+		return $default;
+	}
+
+	function AddOptionElement($optionName,$value)
+	{
+		$len = strlen($optionName);
+		$max = -1;
+		foreach($this->Options as $key => &$one)
+		{
+			if (strpos($key,$optionName) === 0)
+			{
+				$o = (int)substr($key,$len);
+				if($o > $max)
+					$max = $o;
+			}
+		}
+		unset($one);
+		$index = ($max > -1) ? $max + 1 : 1;
+		$this->Options[$optionName.$index] = $value;
+	}
+
+	function RemoveOptionElement($optionName,$index)
+	{
+		unset($this->Options[$optionName.$index]);
+	}
+
+	/**
+	Load:
+	@id: module id, unused here but is needed in subclass
+	@params: array of action-parameters, unused here but may be needed in some subclass
+
+	Loads data for this field from database tables
+	TODO OK? Field options are merged with any existing options
+	Returns: boolean T/F per successful operation
+	*/
+	function Load($id,&$params)
+	{
+		return pwfFieldOperations::LoadField($this);
+	}
+
+	/**
+	Store:
+	@deep: optional boolean, whether to also save all options for the field, default=FALSE
+	Stores (by insert or update) data for this field in database tables.
+	Multi-valued (array) options are saved merely as multiple records with same name
+	Sets field->Id to real value if it was -1 i.e. a new field
+	Returns: boolean T/F per success of executed db commands
+	*/
+	function Store($deep=FALSE)
+	{
+		return pwfFieldOperations::StoreField($this,$deep);
+	}
+
+	// Subclass this if needed to do stuff after the field is stored
+	function PostFieldSaveProcess(&$params)
+	{
+	}
+
+	/**
+	Delete:
+	Clears data for this field (if it's not new) from database tables
+	Returns: boolean T/F per success of executed db commands
+	*/
+	function Delete()
+	{
+		if($this->Id)
+			return pwfFieldOperations::RealDeleteField($this);
+		return FALSE;
+	}
+
+/*	function GetFieldInputId($id,&$params)
+	{
+		return $id.$this->formdata->current_prefix.$this->Id;
+	}
+*/
+	// Sends logic along with field, also allows smarty logic
+	// Doesn't need subclass in most cases
+	function GetFieldLogic()
+	{
+		$code = $this->GetOption('field_logic');
+		if(!empty($code))
+			return $this->formdata->formsmodule->ProcessTemplateFromData($code);
+		return '';
+	}
+
+	// Subclass this with something to show users
+	function GetFieldStatus()
+	{
+		return '';
+	}
+
+	//Whether to generate a submit-button labelled 'add',along with the field
+	function HasAddOp()
+	{
+		return $this->HasAddOp;
+	}
+
+	// Subclass this to generate appropriate add-button label
+	function GetOptionAddButton()
+	{
+		return $this->formdata->formsmodule->Lang('add_options');
+	}
+
+	// Subclass this when necessary or useful (often, just set a flag)
+	function DoOptionAdd(&$params)
+	{
+	}
+	//Whether to generate a submit-button labelled 'delete',along with the field
+	function HasDeleteOp()
+	{
+		return $this->HasDeleteOp;
+	}
+	// Subclass this to generate appropriate delete-button label
+	function GetOptionDeleteButton()
+	{
+		return $this->formdata->formsmodule->Lang('delete_options');
+	}
+
+	// Subclass this when necessary or useful to delete option-data
+	function DoOptionDelete(&$params)
+	{
+	}
+
 	/**
 	  PrePopulateAdminFormCommon:
-	  @module_id: id given to the PowerForms module on execution  
+	  @id: id given to the PowerForms module on execution  
 
 	  Generates 'base'/common content for editing a field.
 	  See also - comments below, for PrePopulateAdminForm()
@@ -525,7 +781,7 @@ class pwfFieldBase
 		}
 	}
 
-	// clear fields unused by invisible dispositions
+	// Clear fields not relevant for non-displayed disposition-field
 	function OmitAdminVisible(&$mainArray,&$advArray,$hideReq=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
@@ -545,242 +801,40 @@ class pwfFieldBase
 	}
 
 	/**
-	  PrePopulateAdminForm:
-	  @module_id: id given to the PowerForms module on execution  
-		
-	  Construct content for field add/edit. Override this.
-	  Array keys presently recognised are: 'main','adv','table','extra','funcs'.
-	  'main' and 'adv', if they exist, refer to arrays of content for the main and
-	  advanced settings tabs shown when adding/editing the field. Each member of
-	  those arrays is itself an array of title,input and (optionally) help values.
-	  That input should of course be a form input suitable for that field attribute/option.
+	PrePopulateAdminForm:
+	@id: id given to the PowerForms module on execution  
 
-	  Returns: an associative array with 0 or more keys recognised in method.update_field.php.
+	Construct content for field add/edit. Subclass this.
+	Array keys presently recognised are: 'main','adv','table','extra','funcs'.
+	'main' and 'adv', if they exist, refer to arrays of content for the main and
+	advanced settings tabs shown when adding/editing the field. Each member of
+	those arrays is itself an array of title,input and (optionally) help values.
+	That input should of course be a form input suitable for that field attribute/option.
+
+	Returns: associative array with 0 or more keys recognised in method.update_field.php.
 	*/
 	function PrePopulateAdminForm($id)
 	{
 		return array();
 	}
 
-	// Override this
+	// Subclass this if needed
 	// Opportunity to alter (but not add to) array contents before they get rendered
 	function PostPopulateAdminForm(&$mainArray,&$advArray)
 	{
 	}
 
-	// Override this as necessary (especially for cleanup of classes with HasAddOp=TRUE)
-	function PostAdminSubmitCleanup(&$params)
-	{
-	}
-
-	// Override this as necessary
-	function PostFieldSaveProcess(&$params)
-	{
-	}
-
-	function RequiresValidation()
-	{
-		return ($this->ValidationType != 'none');
-	}
-
-	// Override this
-	// Returns an array: first member is boolean TRUE or FALSE (indicating
-	// whether or not the value is valid), the second is error message or ''
-	function Validate($id)
-	{
-		$this->validated = TRUE;
-		$this->ValidationMessage = '';
-		return array(TRUE,'');
-	}
-
-	// Override this
-	// Returns field value as a scalar or array (per $as_string), suitable for display in the form
-	function GetHumanReadableValue($as_string=TRUE)
-	{
-		if(property_exists($this,$Value))
-		{
-			$ret = $this->Value;
-			if(is_array($ret))
-			{
-				if($as_string)
-					return implode($this->GetFormOption('list_delimiter',','),$ret);
-				else
-					return $ret; //assume array members are all displayable
-			}
-			else
-				$ret = (string)$ret;
-		}
-		else
-		{
-			$ret = $this->GetFormOption('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
-		}
-		if($as_string)
-			return $ret;
-		else
-			return array($ret);
-	}
-
-	// Override this
-	// Returns array of option values if the option is an array with member(s),
-	// or else FALSE
-	function GetAllHumanReadableValues()
-	{
-		if(array_key_exists('option_value',$this->Options))
-		{
-			if($this->GetOption('option_value')) //array with member(s)
-				return $this->GetOption('option_value');
-		}
-		return FALSE;
-	}
-
-	// Whether the field value is currenly valid.
-	// Override this if needed to support some unusual format for the value,
-	// especially if "FALSE" is a valid value!
-	function HasValue($deny_blank_responses=FALSE)
-	{
-		if(property_exists($this,$Value))
-		{
-			if(isset($this->Options['default'])) // fields with defaults
-			{
-				$def = $this->Options['default'];
-				if($def && $this->Value == $def) //TODO if array
-					return FALSE;
-			}
-			return (!$deny_blank_responses ||
-					is_array($this->Value) ||
-					trim($this->Value));
-		}
-		return FALSE;
-	}
-
-	// Override this if necessary to convert type or something
-	function SetValue($newvalue)
-	{
-		if(is_array($newvalue))
-		{
-			$this->Value = array();
-			foreach($newvalue as &$one)
-				$this->Value[] = pwfUtils::html_myentities_decode($one);
-			unset($one);
-		}
-		else
-			 $this->Value = pwfUtils::html_myentities_decode($newvalue);
-	}
-
-/*	function ExpandValue($newvalue)
-	{
-		if(property_exists($this,$Value))
-		{
-			if(!is_array($this->Value))
-				$this->Value = array($this->Value);
-			if(is_array($newvalue))
-			{
-				foreach($newvalue as &$one)
-					$this->Value[] = pwfUtils::html_myentities_decode($one);
-				unset($one);
-			}
-			else
-				$this->Value[] = pwfUtils::html_myentities_decode($newvalue);
-		}
-		elseif(is_array($newvalue))
-		{
-			$this->Value = array();
-			foreach($newvalue as &$one)
-				$this->Value[] = pwfUtils::html_myentities_decode($one);
-			unset($one);
-		}
-		else
-			 $this->Value = pwfUtils::html_myentities_decode($newvalue);
-	}
-*/
-
-	// probably don't need to override this
-	function GetValue()
-	{
-		return $this->Value;
-	}
-
-	// Override this? Returns the (possibly converted) value of the field
-	function GetArrayValue($index)
-	{
-		if(property_exists($this,$Value))
-		{
-			if(is_array($this->Value))
-			{
-				if(isset($this->Value[$index]))
-					return $this->Value[$index];
-			}
-			elseif($index == 0)
-				return $this->Value;
-		}
-		return FALSE;
-	}
-
-	//Override this?
-	//Returns TRUE if $value is contained in array ::Value or matches scalar ::Value
-	function FindArrayValue($value)
-	{
-		if(property_exists($this,$Value))
-		{
-			if(is_array($this->Value))
-				return array_search($value,$this->Value) !== FALSE;
-			elseif($this->Value == $value)
-				return TRUE;
-		}
-		return FALSE;
-	}
-
-	function ResetValue()
-	{
-		unset($this->Value);
-	}
-
-	function DoesFieldNameExist()
-	{
-		// field name in use??
-		if(self::HasFieldNamed($this->Name) != $this->Id)
-		{
-			$mod = $this->formdata->formsmodule;
-			return array(FALSE,$mod->Lang('field_name_in_use',$this->Name));
-		}
-		return array(TRUE,'');
-	}
-
-	private function HasFieldNamed($name)
-	{
-		foreach($this->Fields as &$one)
-		{
-			if($one->Name == $name)
-			{
-				$ret = $one->Id;
-				unset($one);
-				return $ret;
-			}
-		}
-		unset($one);
-		return -1;
-	}
-
-	function DoesFieldHaveName()
-	{
-		$mod = $this->formdata->formsmodule;
-		if($mod->GetPreference('require_fieldnames') && !$this->Name)
-			return array(FALSE,$mod->Lang('field_no_name'));
-		return array(TRUE,'');
-	 }
-
-	// Override this if needed.
-	//Returns: array,in which first member is a boolean TRUE or FALSE
-	//(indicating whether or not the value is valid),the second is a message
+	// Subclass this if needed
+	// Returns: array, in which 1st member is boolean T/F (indicating whether or
+	// not everythink is ok), 2nd member is a message
 	function AdminValidate($id)
 	{
 		$messages = array();
-  		list($ret,$msg) = $this->DoesFieldHaveName();
+  		list($ret,$msg) = $this->FieldIsNamed();
 		if($ret)
 		{
-			list($ret,$msg) = $this->DoesFieldNameExist();
-			if(!$ret)
+			list($ret,$msg) = $this->FieldNameInvalid();
+			if($ret)
 				$messages[] = $msg;
 		}
 		else
@@ -790,256 +844,60 @@ class pwfFieldBase
 	    return array($ret,$msg);
 	}
 
-	/* Override this for a Form Disposition pseudo-field
-	 This method can do just about anything you want it to,in order to handle
-	 form contents.
-	 Returns: array,in which the first member is a boolean TRUE or FALSE
-	(indicating whether or not the disposition succeeded),and the second member
-	is empty,or explanatory text about the failure
+	// Subclass this if needed (especially for cleanup of classes with HasAddOp=TRUE)
+	function PostAdminSubmitCleanup(&$params)
+	{
+	}
+
+
+	/*Subclass this to generate content for the frontend form, either:
+	* an xhtml string which constitutes the field-input(s) to be displayed in the
+	(frontend or backend) form. Only the input portion itself, any title and/or
+	container(s) will be provided by the form renderer
+	OR if the field->MultiPopulate, then
+	* an array of stdClass objects, each with properties:
+	->name, ->title, ->input, and optionally ->op 
+	Object-names must begin with $this->formdata->current_prefix, so as to not be
+	dropped as 'unknown' frontend parameters (see PowerForms::InitializeFrontend())
+	and not be excluded as time-expired
+	*/
+	function Populate($id,&$params)
+	{
+		return '';
+	}
+
+	// Subclass this for fields that need validation
+	// Sets 2 field properties
+	// Returns an array: 1st member is boolean T/F (indicating whether or not
+	// the value is valid), 2nd member is '' or error message
+	function Validate($id)
+	{
+		$this->validated = TRUE;
+		$this->ValidationMessage = '';
+		return array($this->validated,$this->ValidationMessage);
+	}
+
+	// Subclass this to do stuff (e.g. modify other fields) after validation
+	// and before (compute if relevant) and disposition
+	function PreDispositionAction()
+	{
+	}
+
+	/* Subclass this for a disposition field
+	This method can do just about anything you want it to, in order to handle
+	form contents.
+	Returns: array,in which the first member is a boolean TRUE or FALSE
+	(indicating whether or not the disposition succeeded), and the second member
+	is empty, or explanatory text about the failure
 	*/
 	function Dispose($id,$returnid)
 	{
 		return array(TRUE,'');
 	}
 
-	function SetOption($optionName,$optionValue)
+	// Subclass this to do stuff after the form has been disposed
+	function PostDispositionAction()
 	{
-		$this->Options[$optionName] = $optionValue;
-	}
-
-	// Returns a field-option value, or $default if the option doesn't exist
-	function GetOption($optionName,$default='')
-	{
-		if(isset($this->Options[$optionName]))
-			return $this->Options[$optionName];
-
-		return $default;
-	}
-
-	//returns array of option-values, or FALSE
-	//each array-key is the numeric-suffix to $optionName, & array-value is the stored value
-	function GetOptionRef($optionName)
-	{
-		$len = strlen($optionName);
-		$matches = array();
-		foreach($this->Options as $key => &$val)
-		{
-			if(strpos($key,$optionName) === 0)
-			{
-				$o = (int)substr($key,$len);
-				$matches[$o] = $val;
-			}
-		}
-		unset($val);
-		return ($matches) ? ksort($matches) : FALSE;
-	  }
-
-	function SetOptionElement($optionName,$index,$value)
-	{
-		$this->Options[$optionName.$index] = $value;
-	}
-
-	function GetOptionElement($optionName,$index,$default='')
-	{
-		$so = $optionName.$index; 
-		if(isset($this->Options[$so]))
-			return $this->Options[$so];
-		elseif($index == 0)
-		{
-			if(isset($this->Options[$optionName]))
-				return $this->Options[$optionName];
-		}
-		return $default;
-	}
-
-	function AddOptionElement($optionName,$value)
-	{
-		$len = strlen($optionName);
-		$max = -1;
-		foreach($this->Options as $key => &$one)
-		{
-			if (strpos($key,$optionName) === 0)
-			{
-				$o = (int)substr($key,$len);
-				if($o > $max)
-					$max = $o;
-			}
-		}
-		unset($one);
-		$index = ($max > -1) ? $max + 1 : 1;
-		$this->Options[$optionName.$index] = $value;
-	}
-
-	function RemoveOptionElement($optionName,$index)
-	{
-		unset($this->Options[$optionName.$index]);
-	}
-
-	/**
-	LoadField:
-	@params: array of parameters
-	Loads data for this field (if it's not new) and its options from database tables and/or @params
-	Returns: nothing
-	*/
-	function LoadField(&$params)
-	{
-		if($this->Id > 0)
-			$this->Load(0,$params,TRUE);
-	}
-
-	/**
-	Load:
-	@id: module id, unused here but can be needed in sub-class
-	@params: array of parameters
-	@deep: optional boolean, whether to also load all options for the field, default=FALSE
-
-	Loads data for this field from database tables and possibly from @params.
-	@params['value_'.$this->Name] and/or @params['value_fld'.$this->Id]
-		set corresponding field value, superseding any value loaded from table
-	Only used by this->LoadField()
-	Returns: boolean T/F per successful operation
-	*/
-	protected function Load($id,&$params,$deep=FALSE)
-	{
-		$pre = cms_db_prefix();
-		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
-		$db = cmsms()->GetDb();
-		if($row = $db->GetRow($sql,array($this->Id)))
-		{
-			if(!$this->Name)
-				$this->Name = $row['name'];
-			$this->Type = $row['type'];
-			$this->OrderBy = $row['order_by'];
-		}
-		else
-			return FALSE;
-
-		$this->loaded = TRUE;
-
-		if($deep)
-		{
-			$sql = 'SELECT name,value FROM '.$pre.
-			  'module_pwf_field_opt WHERE field_id=? ORDER BY option_id';
-			$rs = $db->Execute($sql,array($this->Id));
-			if($rs)
-			{
-				$tmpOpts = array();
-				while ($results = $rs->FetchRow())
-				{
-/* PROPERTIES MIGRATED TO OPTIONS
-					if(!$this->ValidationType)
-						$this->ValidationType = $results['validation_type'];
-
-					if($this->Required == -1)
-						$this->Required = $results['required'];
-
-					if($this->HideLabel == -1)
-						$this->HideLabel = $results['hide_label'];
-*/
-					if(isset($tmpOpts[$results['name']]))
-					{
-						if(!is_array($tmpOpts[$results['name']]))
-							$tmpOpts[$results['name']] = array($tmpOpts[$results['name']]);
-
-						$tmpOpts[$results['name']][] = $results['value'];
-					}
-					else
-						$tmpOpts[$results['name']] = $results['value'];
-				}
-				$rs->Close();
-				$this->Options = array_merge($tmpOpts,$this->Options);
-			}
-
-			if(isset($params['value_'.$this->Name]) &&
-				(is_array($params['value_'.$this->Name]) ||
-				 strlen($params['value_'.$this->Name]) > 0))
-			{
-				$this->SetValue($params['value_'.$this->Name]);
-			}
-
-			if(isset($params['value_fld'.$this->Id]) &&
-				(is_array($params['value_fld'.$this->Id]) ||
-				 strlen($params['value_fld'.$this->Id]) > 0))
-			{
-				$this->SetValue($params['value_fld'.$this->Id]);
-			}
-		}
-
-		return TRUE;
-	}
-
-	/**
-	Store:
-	@deep: optional boolean, whether to also save all options for the field, default=FALSE
-	Stores (by insert or update) data for this field in database tables.
-	Multi-valued (array) options are saved merely as multiple records with same name
-	Sets field->Id to real value if it was -1 i.e. a new field
-	Returns: boolean T/F per success of executed db commands
-	*/
-	function Store($deep=FALSE)
-	{
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
-		if($this->Id == -1)
-		{
-			$this->Id = $db->GenID($pre.'module_pwf_field_seq');
-			$sql = 'INSERT INTO '.$pre.'module_pwf_field (field_id,form_id,name,type,' .
-			  'required,validation_type,hide_label,order_by) VALUES (?,?,?,?,?,?,?,?)';
-			$res = $db->Execute($sql,
-					array($this->Id,$this->FormId,$this->Name,$this->Type,
-						($this->Required?1:0),$this->ValidationType,$this->HideLabel,
-						$this->OrderBy));
-		}
-		else
-		{
-			$sql = 'UPDATE ' .$pre.
-			  'module_pwf_field SET name=?,type=?,required=?,validation_type=?,order_by=?,hide_label=? WHERE field_id=?';
-			$res = $db->Execute($sql,
-					array($this->Name,$this->Type,($this->Required?1:0),
-						$this->ValidationType,$this->OrderBy,$this->HideLabel,$this->Id));
-		}
-
-		if($deep)
-		{
-			// drop all current options
-			$sql = 'DELETE FROM '.$pre.'module_pwf_field_opt where field_id=?';
-			$res = $db->Execute($sql,array($this->Id)) && $res;
-			// add back current ones
-			foreach($this->Options as $name=>$optvalue)
-			{
-				if(!is_array($optvalue))
-					$optvalue = array($optvalue);
-				$sql = 'INSERT INTO ' .$pre.
-				'module_pwf_field_opt (option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
-				foreach($optvalue as &$one)
-				{
-					$newid = $db->GenID($pre.'module_pwf_field_opt_seq');
-					$res = $db->Execute($sql,
-						array($newid,$this->Id,$this->FormId,$name,$one)) && $res;
-				}
-				unset($one);
-			}
-		}
-		return $res;
-	}
-
-	/**
-	Delete:
-	Clears data for this field from database tables.
-	Returns: boolean T/F per success of last-executed db command
-	*/
-	function Delete()
-	{
-		if($this->Id == -1)
-			return FALSE;
-
-		$pre = cms_db_prefix();
-		$db = cmsms()->GetDb();
-		$sql = 'DELETE FROM '.$pre.'module_pwf_field where field_id=?';
-		$res = $db->Execute($sql,array($this->Id));
-		$sql = 'DELETE FROM '.$pre.'module_pwf_field_opt where field_id=?';
-		$res = $db->Execute($sql,array($this->Id)) && $res;
-		return $res;
 	}
 
 }
