@@ -14,12 +14,11 @@ class pwfData
 	public $Alias = '';
 	public $Options = array();
 	public $Fields = array();
-	public $Id = -1;
+	public $Id = 0;
 	public $Name = '';
-	public $Page = -1;
+	public $Page = 0;
 	public $FormState = 'new';
 	public $FormPagesCount = 0;
-	public $loaded = 'not';
 //	public $sampleTemplateCode = '';
 	public $templateVariables;
 	//extra form-properties
