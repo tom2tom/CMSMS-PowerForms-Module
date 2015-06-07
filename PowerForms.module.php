@@ -26,8 +26,8 @@ class PowerForms extends CMSModule
 	//pretty much everything is valid, provided there's an '@' in there!
 	//(we're concerned more about typo's than format!)
 	var $email_regex = '/.+@.+\..+/';
-	public static $mutex = NULL; //object for serialising access, setup @ 1st use
-	protected static $cache = NULL;	//object for cacheing of formdata objects, setup @ 1st use
+	var $mutex = NULL; //object for serialising access, setup @ 1st use
+	var $cache = NULL;	//object for cacheing of formdata objects, setup @ 1st use
 
 	function __construct()
 	{
