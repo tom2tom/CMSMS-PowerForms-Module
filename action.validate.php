@@ -24,7 +24,8 @@ if(!pwfUtils::CheckResponse($form_id,$response_id,$code))
 }
 
 $funcs = new pwfFormOperations();
-$formdata = $funcs->Load($this,$form_id,$params,TRUE); //CHECKME safely cache form data somewhere ?
+//TODO get cached form data, including field values
+$formdata = $funcs->Load($this,$id,$params,$form_id);
 $field_id = $params[$key.'d'];
 $obfield = $formdata->Fields[$field_id];
 $obfield->ApproveToGo($response_id); //block another disposition of this field
