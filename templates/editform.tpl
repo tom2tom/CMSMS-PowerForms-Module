@@ -36,7 +36,7 @@
    {cycle name=fields values='row1,row2' assign=rowclass}
   	 <tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
    {if isset($title_field_id)}<td>{$entry->id}</td>{/if}
-     <td>{$entry->name}</td>
+     <td>{$entry->order}{$entry->name}</td>
    {if isset($title_field_alias)}<td>{$entry->alias}</td>{/if}
      <td>{$entry->type}</td>
      <td>{$entry->field_status}</td>
