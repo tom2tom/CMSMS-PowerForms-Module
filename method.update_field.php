@@ -13,9 +13,10 @@ $smarty->assign('backtoform_nav',$this->CreateLink($id,'update_form',$returnid,'
 $smarty->assign('form_start',$this->CreateFormStart($id,'update_field',$returnid,
 	'POST','',FALSE,'',array(
 	'form_id'=>$params['form_id'],
+	'formdata'=>$params['formdata'],
 	'field_id'=>$obfield->GetId(),
-	'order_by'=>$obfield->GetOrder(),
-	'set_from_form'=>1))); //TODO checkme param
+	'order_by'=>$obfield->GetOrder(), //TODO check used in pwfFieldBase::__construct()
+	'set_from_form'=>1))); //TODO check used in pwfFieldBase::__construct()
 $smarty->assign('form_end',$this->CreateFormEnd());
 
 $mainList = array();
@@ -52,7 +53,7 @@ if($hasadvanced)
 	$smarty->assign('advancedtab_start',$this->StartTab('advancedtab'));
 $smarty->assign('tab_end',$this->EndTab());
 
-if($obfield->GetId() != -1)
+if($obfield->GetId())
 {
 	$smarty->assign('op',$this->CreateInputHidden($id,'field_op',$this->Lang('updated')));
 	$smarty->assign('submit',$this->CreateInputSubmit($id,'fieldupdate',$this->Lang('update')));
@@ -145,30 +146,22 @@ else
 
 if(isset($fieldList['extra']))
 {
-	$showvars = FALSE;
 	switch($fieldList['extra'])
 	{
 	 case 'varshelpadv':
-		$showvars = TRUE;
 		$smarty->assign('advvarhelp',1);
+		pwfUtils::SetupFormVarsHelp($this,$smarty,$formdata->Fields);
 		break;
 	 case 'varshelpmain':
-		$showvars = FALSE;
 		$smarty->assign('mainvarhelp',1);
 		break;
 	 case 'varshelpboth':
-		$showvars = TRUE;
 		$smarty->assign('mainvarhelp',1);
 		$smarty->assign('advvarhelp',1);
+		pwfUtils::SetupFormVarsHelp($this,$smarty,$formdata->Fields);
 		break;
 	}
 
-	if($showvars)
-	{
-		$funcs = new pwfFormOperations();
-		$formdata = $funcs->Load($this,$params['form_id'],$params,TRUE);
-		pwfUtils::SetupFormVarsHelp($this,$smarty,$formdata->Fields);
-	}
 }
 
 $smarty->assign('incpath',$this->GetModuleURLPath().'/include/');
