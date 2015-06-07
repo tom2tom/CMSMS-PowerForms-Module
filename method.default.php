@@ -119,9 +119,9 @@ foreach($formdata->Fields as &$one)
 	$oneset->display = $one->DisplayInForm()?1:0;
 //	$oneset->error = $one->GetOption('is_valid',TRUE)?'':$one->ValidationMessage;
 	$oneset->error = $one->validated?'':$one->ValidationMessage;
-	$oneset->field_helptext_id = 'pwfp_ht_'.$one->GetID();
 	$oneset->has_label = $one->HasLabel();
 	$oneset->helptext = $one->GetOption('helptext');
+	$oneset->helptext_id = 'pwfp_ht_'.$one->GetID();
 	if ((!$one->HasLabel() || $one->GetHideLabel())
 /*	 && (!$one->GetOption('browser_edit',0) || empty($params['in_admin']))*/)
 		$oneset->hide_name = 1;

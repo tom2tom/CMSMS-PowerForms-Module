@@ -355,7 +355,7 @@ foreach(array(
 	'css_class',
 	'display',
 	'error',
-	'field_helptext_id',
+	'helptext_id',
 	'has_label',
 	'helptext',
 	'hide_name',
@@ -367,8 +367,8 @@ foreach(array(
 	'multiple_parts',
 	'name',
 	'needs_div',
-	'required_symbol',
 	'required',
+	'required_symbol',
 	'smarty_eval',
 	'type',
 	'valid',
@@ -377,17 +377,20 @@ foreach(array(
 {
 	$oneset = new stdClass();
 	$oneset->name = $name;
-	$oneset->description = $this->Lang('desc_'.$name);
+	if($name != 'css_class')
+		$oneset->description = $this->Lang('desc_'.$name);
+	else
+		$oneset->description = $this->Lang('desc_cssf_class'); //work around duplicate
 	$tplvars[] = $oneset;
 }
 $smarty->assign('fieldvars',$tplvars);
 
 $smarty->assign('variable',$this->Lang('variable'));
-$smarty->assign('attribute',$this->Lang('attribute'));
+$smarty->assign('property',$this->Lang('property'));
 $smarty->assign('description',$this->Lang('description'));
-$smarty->assign('help_globals',$this->Lang('help_globals'));
-$smarty->assign('help_attrs1',$this->Lang('help_attrs1'));
-$smarty->assign('help_attrs2',$this->Lang('help_attrs2'));
+$smarty->assign('help_formvars',$this->Lang('help_form_vars'));
+$smarty->assign('help_vars1',$this->Lang('help_vars1'));
+$smarty->assign('help_vars2',$this->Lang('help_vars2'));
 
 pwfUtils::SetupFormVarsHelp($this,$smarty,$formdata->Fields);
 

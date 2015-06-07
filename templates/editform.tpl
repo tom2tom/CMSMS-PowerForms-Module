@@ -93,23 +93,23 @@
   <p style="font-weight:bold;">{$title_form_vars}:</p>
 <table class="pwf_legend">
 <tr><th>{$variable}</th><th>{$description}</th></tr>
-{foreach from=$globalfields item=entry}
+{foreach from=$formvars item=entry}
 {cycle name=globals values='row1,row2' assign=rowclass}
  <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
  <td>{ldelim}${$entry->name}{rdelim}</td><td>{$entry->description}</td></tr>
 {/foreach}
 </table><br />
-  <p>{$help_globals}</p>
-  <p>{$help_attrs1}</p>
+  <p>{$help_formvars}</p>
+  <p>{$help_vars1}</p>
 <table class="pwf_legend">
-<tr><th>{$attribute}</th><th>{$description}</th></tr>
-{foreach from=$attrs item=entry}
-{cycle name=attrs values='row1,row2' assign=rowclass}
+<tr><th>{$property}</th><th>{$description}</th></tr>
+{foreach from=$fieldvars item=entry}
+{cycle name=fieldvars values='row1,row2' assign=rowclass}
 <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
 <td>field->{$entry->name}</td><td>{$entry->description}</td></tr>
 {/foreach}
 </table><br />
-  <p>{$help_attrs2}</p>
+  <p>{$help_vars2}</p>
   </div>
  </div>
 {$tab_end}{$udttab_start}

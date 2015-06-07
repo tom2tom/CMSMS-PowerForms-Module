@@ -1,7 +1,7 @@
 <p style="font-weight:bold;">{$template_vars_title}:</p>
 <table class="pwf_legend">
 <thead><tr>
-<th>{$variable_title}</th><th>{$attribute_title}</th>
+<th>{$variable_title}</th><th>{$property_title}</th>
 </tr></thead>
 <tbody>
 {foreach from=$sysfields item=entry}

@@ -60,8 +60,8 @@
 			{else}
 				{if $one->smarty_eval}{eval var=$one->input}{else}{$one->input}{/if}
 			{/if}
-			{if $one->helptext}&nbsp;<a href="javascript:help_toggle('{$one->field_helptext_id}')">{$help_icon}</a>
-			<span id="{$one->field_helptext_id}" class="pwf_helptext">{$one->helptext}</span>{/if}
+			{if $one->helptext}&nbsp;<a href="javascript:help_toggle('{$one->helptext_id}')">{$help_icon}</a>
+			<span id="{$one->helptext_id}" class="pwf_helptext">{$one->helptext}</span>{/if}
 			{if !$one->valid} &lt;--- {$one->error}{/if}
 			{if $one->needs_div}
 				</div>
