@@ -804,11 +804,12 @@ class pwfFieldBase
 	PrePopulateAdminForm:
 	@id: id given to the PowerForms module on execution  
 
-	Construct content for field add/edit. Subclass this.
+	Construct content for field edit. Subclass this.
 	Array keys presently recognised are: 'main','adv','table','extra','funcs'.
 	'main' and 'adv', if they exist, refer to arrays of content for the main and
 	advanced settings tabs shown when adding/editing the field. Each member of
-	those arrays is itself an array of title,input and (optionally) help values.
+	those arrays is itself an array of 1 to 3 members, for respectively generating
+	title, (optional) input and (optional) help.
 	That input should of course be a form input suitable for that field attribute/option.
 
 	Returns: associative array with 0 or more keys recognised in method.update_field.php.
@@ -826,7 +827,7 @@ class pwfFieldBase
 
 	// Subclass this if needed
 	// Returns: array, in which 1st member is boolean T/F (indicating whether or
-	// not everythink is ok), 2nd member is a message
+	// not everything is ok), 2nd member is '' or a message
 	function AdminValidate($id)
 	{
 		$messages = array();
