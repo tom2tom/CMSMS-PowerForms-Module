@@ -32,10 +32,9 @@ $inline = (!$in_browser && pwfUtils::GetFormOption($formdata,'inline',0));
 $smarty->assign('form_start',$this->CreateFormStart($id,'default',$returnid,
 	'POST','multipart/form-data',$inline,'',array(
 	'form_id'=>$form_id,
-	$formdata->current_prefix.'formpage'=>$formdata->Page,
-	$formdata->current_prefix.'formdata'=>$cache_key)));
+	$formdata->current_prefix.'formdata'=>$cache_key,
+	$formdata->current_prefix.'formpage'=>$formdata->Page)));
 $smarty->assign('form_end',$this->CreateFormEnd());
-
 
 //if($formdata->Page > 1)
 //	$hidden .= $this->CreateInputHidden($id,$formdata->current_prefix.'previous',($formdata->Page - 1)); //c.f. pwfp_NNN_prev for the button
