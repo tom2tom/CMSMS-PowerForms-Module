@@ -9,7 +9,10 @@ if(!empty($message))
 
 $smarty->assign('backtomod_nav',$this->CreateLink($id,'defaultadmin','','&#171; '.$this->Lang('back_top')));
 
-$smarty->assign('form_start',$this->CreateFormStart($id,'update_form',$returnid));
+$smarty->assign('form_start',$this->CreateFormStart($id,'update_form',$returnid,
+	'POST','',FALSE,'',array(
+	'form_id'=>$form_id,
+	'formdata'=>$params['formdata'])));
 
 $tab = $this->GetActiveTab($params);
 $t = $this->StartTabHeaders().
@@ -80,11 +83,7 @@ $theme = $gCms->variables['admintheme'];
 $smarty->assign('icon_info',
 	$theme->DisplayImage('icons/system/info.gif',$this->Lang('help_help'),'','','systemicon tipper'));
 
-$smarty->assign('hidden',
-	$this->CreateInputHidden($id,'form_id',$form_id),
-	$this->CreateInputHidden($id,'form_op',$this->Lang('updated')).
-	$this->CreateInputHidden($id,'sort_order').
-	$this->CreateInputHidden($id,'active_tab'));
+$smarty->assign('hidden',$this->CreateInputHidden($id,'active_tab'));
 $smarty->assign('save',$this->CreateInputSubmit($id,'submit',$this->Lang('save')));
 $smarty->assign('apply',$this->CreateInputSubmit($id,'submit',$this->Lang('apply'),
 		'title = "'.$this->Lang('save_and_continue').'" onclick="set_tab()"'));
@@ -106,6 +105,8 @@ foreach($formdata->Fields as &$one)
 	$oneset = new stdClass();
 	$fid = (int)$one->GetId();
 	$oneset->id = $fid;
+	$oneset->order = '<input type="hidden" name="'.$id.'orders[]" value="'.$fid.'" />';
+	$this->CreateInputHidden($id,'orders[]',$fid);
 	$oneset->name = $this->CreateLink($id,'update_field','',$one->GetName(),
 		array('field_id'=>$fid,'form_id'=>$form_id));
 	$oneset->alias = $one->ForceAlias();
