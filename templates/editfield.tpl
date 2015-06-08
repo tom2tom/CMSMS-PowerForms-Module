@@ -2,7 +2,9 @@
 
 {$backtomod_nav}&nbsp;{$backtoform_nav}<br />
 {$form_start}
+{if isset($tabs_start)}
 {$tabs_start}
+{if isset($maintab_start)}
 {$maintab_start}
  <div class="pageoverflow">
 {foreach from=$mainList item=entry}
@@ -35,6 +37,8 @@
  {/if}
  </div>
 {$tab_end}
+{/if}{*isset($maintab_start)*}
+{if isset($advancedtab_start)}
 {$advancedtab_start}
  <div class="pageoverflow">
 {foreach from=$advList item=entry}
@@ -45,7 +49,13 @@
 {if !empty($advvarhelp)}<br /><div class="pageinput">{$help_vars}</div>{/if}
  </div>
 {$tab_end}
+{/if}{*isset($advancedtab_start)*}
 {$tabs_end}
+{else}{*!isset($tabs_start)*}
+{if isset($mainitem->title)}<p class="pagetext">{$mainitem->title}:</p>{/if}
+{if isset($mainitem->input)}<div class="pageinput">{$mainitem->input}</div>{/if}
+{if isset($mainitem->help)}<p class="pageinput">{$mainitem->help}</p>{/if}
+{/if}
  <br />
  <p class="pageinput">{if isset($submit)}{$submit}&nbsp;{/if}{$cancel}</p>
 {$form_end}
