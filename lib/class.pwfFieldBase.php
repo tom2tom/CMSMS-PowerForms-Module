@@ -60,20 +60,11 @@ class pwfFieldBase
 		if(isset($params['field_type']))
 			$this->Type = $params['field_type'];
 
-		if(isset($params['order_by'])) //set in method.update_field
-			$this->OrderBy = $params['order_by'];
-
 		if(isset($params['hide_label']))
 			$this->HideLabel = $params['hide_label'];
-		elseif(isset($params['set_from_form'])) //set in method.update_field
-			$this->HideLabel = FALSE;
-
-//done to here
 
 		if(isset($params['field_required']))
 			$this->Required = $params['field_required'];
-		elseif(isset($params['set_from_form'])) //set in method.update_field
-			$this->Required = FALSE;
 
 		if(isset($params['validation_type']))
 			$this->ValidationType = $params['validation_type'];
@@ -703,68 +694,53 @@ class pwfFieldBase
 /*1*/	$main[] = array($mod->Lang('title_field_alias'),
 			$mod->CreateInputText($id,'opt_field_alias',$alias,30));
 
-//		if($this->Type)
-			$typeInput = $this->GetDisplayType().$mod->CreateInputHidden($id,'field_type',$this->Type);
-/*		else //field type can be chosen
-			$typeInput = $mod->CreateInputDropdown($id,'field_type',
-				array_merge(array($mod->Lang('select_type')=>''),$mod->field_types),
-				-1,'','onchange="this.form.submit()"');
-*/
 /*2*/	$main[] = array($mod->Lang('title_field_type'),
-			$typeInput);
+			$mod->CreateInputHidden($id,'field_type',$this->Type).$this->GetDisplayType());
+
+		if(!$this->IsNonRequirableField())
+		{
+/*3*/		$main[] = array($mod->Lang('title_field_required'),
+			$mod->CreateInputCheckbox($id,'field_required',1,$this->IsRequired()),
+			$mod->Lang('help_field_required'));
+		}
+		//choice of validation type ?
+		if(count($this->GetValidationTypes()) > 1)
+			$validInput = $mod->CreateInputDropdown($id,'validation_type',
+				$this->GetValidationTypes(),-1,$this->GetValidationType());
+		else
+			$validInput = $mod->Lang('automatic'); //or 'none' ?
+/*3or4*/$main[] = array($mod->Lang('title_field_validation'),$validInput);
+
+		if($this->DisplayInForm())
+		{
+/*4or5*/	$main[] = array($mod->Lang('title_field_helptext'),
+				$mod->CreateTextArea(FALSE,$id,$this->GetOption('helptext'),
+					'opt_helptext','pwf_shortarea','','','',50,8));
+		}
 
 		//init advanced tab content
 		$adv = array();
-
-/*		// if we know our type,we can load up with additional options
-		if($this->Type)
+		if($this->HasLabel)
 		{
-*/
-			if(!$this->IsNonRequirableField())
-			{
-				$main[] = array($mod->Lang('title_field_required'),
-				$mod->CreateInputCheckbox($id,'field_required',1,$this->IsRequired()),
-				$mod->Lang('help_field_required'));
-			}
-			//choice of validation type ?
-			if(count($this->GetValidationTypes()) > 1)
-				$validInput = $mod->CreateInputDropdown($id,'validation_type',
-					$this->GetValidationTypes(),-1,$this->GetValidationType());
-			else
-				$validInput = $mod->Lang('automatic'); //or 'none' ?
-			$main[] = array($mod->Lang('title_field_validation'),$validInput);
-
-			if($this->HasLabel)
-			{
-				$adv[] = array($mod->Lang('title_hide_label'),
-					$mod->CreateInputHidden($id,'hide_label',0).
-					$mod->CreateInputCheckbox($id,'hide_label',1,$this->HideLabel),
-					$mod->Lang('help_hide_label'));
-			}
-
-			if($this->DisplayInForm())
-			{
-				$main[] = array($mod->Lang('title_field_helptext'),
-					$mod->CreateTextArea(FALSE,$id,$this->GetOption('helptext'),
-						'opt_helptext','pwf_shortarea','','','',50,8));
-				$adv[] = array($mod->Lang('title_field_css_class'),
-					$mod->CreateInputText($id,'opt_css_class',$this->GetOption('css_class'),30));
-				$adv[] = array($mod->Lang('title_field_javascript'),
-					$mod->CreateTextArea(FALSE,$id,$this->GetOption('javascript'),
-						'opt_javascript','pwf_shortarea','','','',50,8,'','js'),
-					$mod->Lang('help_field_javascript'));
-				$adv[] = array($mod->Lang('title_field_logic'),
-					$mod->CreateTextArea(FALSE,$id,$this->GetOption('field_logic'),
-						'opt_field_logic','pwf_shortarea','','','',50,8),
-					$mod->Lang('help_field_logic'));
-			}
-/*		}
-		else
-		{
-			// no advanced options until we know our type
-			$adv[] = array($mod->Lang('tab_advanced'),$mod->Lang('notice_select_type'));
+			$adv[] = array($mod->Lang('title_hide_label'),
+				$mod->CreateInputHidden($id,'hide_label',0).
+				$mod->CreateInputCheckbox($id,'hide_label',1,$this->HideLabel),
+				$mod->Lang('help_hide_label'));
 		}
-*/
+		if($this->DisplayInForm())
+		{
+			$adv[] = array($mod->Lang('title_field_css_class'),
+				$mod->CreateInputText($id,'opt_css_class',$this->GetOption('css_class'),30));
+			$adv[] = array($mod->Lang('title_field_javascript'),
+				$mod->CreateTextArea(FALSE,$id,$this->GetOption('javascript'),
+					'opt_javascript','pwf_shortarea','','','',50,8,'','js'),
+				$mod->Lang('help_field_javascript'));
+			$adv[] = array($mod->Lang('title_field_logic'),
+				$mod->CreateTextArea(FALSE,$id,$this->GetOption('field_logic'),
+					'opt_field_logic','pwf_shortarea','','','',50,8),
+				$mod->Lang('help_field_logic'));
+		}
+
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -775,7 +751,7 @@ class pwfFieldBase
 		{
 			if(isset($array[$i]->title) && $array[$i]->title == $fieldname)
 			{
-				array_splice($array,$i,1);
+				unset($array[$i]);
 				return;
 			}
 		}
