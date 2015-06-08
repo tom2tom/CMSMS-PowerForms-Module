@@ -20,13 +20,12 @@ class pwfEmailBCCAddress extends pwfFieldBase
 
 	function GetFieldStatus()
 	{
-		$mod = $this->formdata->formsmodule;
-		$others = $this->formdata->Fields;
-	  	foreach($others as &$one)
+		$target = $this->GetOption('field_to_modify');
+	  	foreach($this->formdata->Fields as &$one)
 		{
-			if($one->GetId() == $this->GetOption('field_to_modify'))
+			if($one->GetId() == $target)
 			{
-				$ret = $mod->Lang('title_modifies',$one->GetName());
+				$ret = $this->formdata->formsmodule->Lang('title_modifies',$one->GetName());
 				unset($one);
 				return $ret;
 			}

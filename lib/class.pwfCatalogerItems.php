@@ -120,8 +120,7 @@ class pwfCatalogerItems extends pwfFieldBase
 		// put the hidden fields into smarty
 		if(!isset($gCms->variables['pwf_smarty_vars_set'])) //FIXME
 		{
-			$fields = $this->formdata->Fields;
-			foreach($fields as &$one)
+			foreach($this->formdata->Fields as &$one)
 			{
 				if($one->GetFieldType() != 'Hidden') continue;
 				$smarty->assign($one->ForceAlias(),$one->Value);

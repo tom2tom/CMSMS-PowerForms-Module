@@ -120,7 +120,7 @@ class pwfFieldBase
 	// Returns array, 1st member is T/F, 2nd is '' or message
 	function FieldNameInvalid()
 	{
-		foreach($this->Fields as &$one)
+		foreach($this->formdata->Fields as &$one)
 		{
 			if($one->Name == $this->Name && $one->Id != $this->Id)
 			{
