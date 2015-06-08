@@ -71,10 +71,10 @@ class pwfCaptcha extends pwfFieldBase
 
 	function PostPopulateAdminForm(&$mainArray,&$advArray)
 	{
-		unset($mainArray[4]); //no helptext
-		unset($advArray[0]); //no hide label
-		unset($advArray[2]); //no field javascript
-		unset($advArray[3]); //no field logic
+		$this->RemoveAdminField($mainArray,$mod->Lang('title_field_helptext'));
+		$this->RemoveAdminField($advArray,$mod->Lang('title_hide_label'));
+		$this->RemoveAdminField($advArray,$mod->Lang('title_field_javascript'));
+		$this->RemoveAdminField($advArray,$mod->Lang('title_field_resources'));
 	}
 
 	function AdminValidate($id)
