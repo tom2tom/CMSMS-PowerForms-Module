@@ -178,10 +178,18 @@ $t = $this->Lang('title_add_new_field');
 $smarty->assign('add_field_link',
 	$this->CreateLink($id,'update_field',$returnid,
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
-		array('field_id'=>-1,'form_id'=>$form_id),'',FALSE).' '.
-	$this->CreateLink($id,'update_field',$returnid,$t,array('field_id'=>-1,'form_id'=>$form_id),'',FALSE));
+		array('field_id'=>-1,
+		'form_id'=>$form_id,
+		'formdata'=>$params['formdata']),'',FALSE).' '.
+	$this->CreateLink($id,'update_field',$returnid,$t,
+		array('field_id'=>-1,
+		'form_id'=>$form_id,
+		'formdata'=>$params['formdata']),'',FALSE));
 
-$link = $this->CreateLink($id,'update_field',$returnid,'',array('field_id'=>-1,'form_id'=>$form_id),'',TRUE,TRUE);
+$link = $this->CreateLink($id,'update_field',$returnid,'',
+	array('field_id'=>-1,
+	'form_id'=>$form_id,
+	'formdata'=>$params['formdata']),'',TRUE,TRUE);
 $link = str_replace('&amp;','&',$link);
 $jsfuncs [] =<<<EOS
  function fast_add(field_type) {
@@ -191,8 +199,6 @@ $jsfuncs [] =<<<EOS
 }
 
 EOS;
-
-pwfUtils::Collect_Fields($this);
 
 $smarty->assign('title_fastadd',$t);
 if($this->GetPreference('adder_fields','basic') == 'basic')
@@ -206,6 +212,7 @@ if($this->GetPreference('adder_fields','basic') == 'basic')
 }
 else
 {
+	pwfUtils::Collect_Fields($this);
 	$smarty->assign('input_fastadd',$this->CreateInputDropdown($id,'field_type',
 		array_merge(array($this->Lang('select_type')=>''),$this->field_types),-1,'','onchange="fast_add(this)"'));
 	$smarty->assign('help_fastadd',
