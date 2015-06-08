@@ -735,10 +735,10 @@ class pwfFieldBase
 				$mod->CreateTextArea(FALSE,$id,$this->GetOption('javascript'),
 					'opt_javascript','pwf_shortarea','','','',50,8,'','js'),
 				$mod->Lang('help_field_javascript'));
-			$adv[] = array($mod->Lang('title_field_logic'),
+			$adv[] = array($mod->Lang('title_field_resources'),
 				$mod->CreateTextArea(FALSE,$id,$this->GetOption('field_logic'),
 					'opt_field_logic','pwf_shortarea','','','',50,8),
-				$mod->Lang('help_field_logic'));
+				$mod->Lang('help_field_resources'));
 		}
 
 		return array('main'=>$main,'adv'=>$adv);
@@ -761,19 +761,17 @@ class pwfFieldBase
 	function OmitAdminVisible(&$mainArray,&$advArray,$hideReq=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
-		// no "required" (maybe)
+		// (maybe) no "required"
 		if($hideReq)
 			$this->RemoveAdminField($mainArray,$mod->Lang('title_field_required'));
-		// no "help text"
+		// no help
 		$this->RemoveAdminField($mainArray,$mod->Lang('title_field_helptext'));
 		// no "hide name"
 		$this->RemoveAdminField($advArray,$mod->Lang('title_hide_label'));
-		// no "css"
+		// no styling
 		$this->RemoveAdminField($advArray,$mod->Lang('title_field_css_class'));
-		// no "javascript"
+		// no input-control script
 		$this->RemoveAdminField($advArray,$mod->Lang('title_field_javascript'));
-		// no "logic"
-		$this->RemoveAdminField($advArray,$mod->Lang('title_field_logic'));
 	}
 
 	/**
