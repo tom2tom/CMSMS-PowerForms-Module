@@ -27,7 +27,7 @@ class PowerForms extends CMSModule
 	//(we're concerned more about typo's than format!)
 	var $email_regex = '/.+@.+\..+/';
 	var $mutex = NULL; //object for serialising access, setup @ 1st use
-	var $cache = NULL;	//object for cacheing of formdata objects, setup @ 1st use
+	var $cache = NULL; //object for cacheing of formdata objects, setup @ 1st use
 
 	function __construct()
 	{
@@ -318,6 +318,7 @@ class PowerForms extends CMSModule
 
 	private function Hash($num)
 	{
+		//djb2 hash : see http://www.cse.yorku.ca/~oz/hash.html
 		$n = ''.$num;
 		$l = strlen($n);
 		$hash = 5381;
