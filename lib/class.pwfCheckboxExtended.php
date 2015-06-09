@@ -10,9 +10,9 @@ class pwfCheckboxExtended extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->IsInput = TRUE;
 		$this->MultiPopulate = TRUE;
-		$this->NonRequirableField = TRUE;
 		$this->Type = 'CheckboxExtended';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array(
@@ -49,33 +49,31 @@ class pwfCheckboxExtended extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main = array(
-			array($mod->Lang('title_checkbox_label'),
-           		$mod->CreateInputText($id,'opt_box_label',
-	           		$this->GetOption('box_label'),25,255)),
-            array($mod->Lang('title_checked_value'),
-           		$mod->CreateInputText($id,'opt_checked_value',
-	           		$this->GetOption('checked_value',$mod->Lang('yes')),25,255)),
-            array($mod->Lang('title_unchecked_value'),
-            		$mod->CreateInputText($id,'opt_unchecked_value',
-	            		$this->GetOption('unchecked_value',$mod->Lang('no')),25,255)),
-			array($mod->Lang('title_default_set'),
-				$mod->CreateInputHidden($id,'opt_is_checked',0).
-				$mod->CreateInputCheckbox($id,'opt_is_checked',1,
-					$this->GetOption('is_checked',0))),
-			array($mod->Lang('title_textfield_label'),
-           		$mod->CreateInputText($id,'opt_text_label',
-            		$this->GetOption('text_label'),25,255)),
-			array($mod->Lang('title_show_textfield'),
-				$mod->CreateInputHidden($id,'opt_show_textfield',0).
-				$mod->CreateInputCheckbox($id,'opt_show_textfield',1,
-					$this->GetOption('show_textfield',0)))
-		);
-
-		return array('main'=>$main);
+		$main[] = array($mod->Lang('title_checkbox_label'),
+						$mod->CreateInputText($id,'opt_box_label',
+							$this->GetOption('box_label'),25,255));
+		$main[] = array($mod->Lang('title_checked_value'),
+						$mod->CreateInputText($id,'opt_checked_value',
+							$this->GetOption('checked_value',$mod->Lang('yes')),25,255));
+		$main[] = array($mod->Lang('title_unchecked_value'),
+						$mod->CreateInputText($id,'opt_unchecked_value',
+							$this->GetOption('unchecked_value',$mod->Lang('no')),25,255));
+		$main[] = array($mod->Lang('title_default_set'),
+						$mod->CreateInputHidden($id,'opt_is_checked',0).
+						$mod->CreateInputCheckbox($id,'opt_is_checked',1,
+							$this->GetOption('is_checked',0)));
+		$main[] = array($mod->Lang('title_textfield_label'),
+						$mod->CreateInputText($id,'opt_text_label',
+							$this->GetOption('text_label'),25,255));
+		$main[] = array($mod->Lang('title_show_textfield'),
+						$mod->CreateInputHidden($id,'opt_show_textfield',0).
+						$mod->CreateInputCheckbox($id,'opt_show_textfield',1,
+							$this->GetOption('show_textfield',0)));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)

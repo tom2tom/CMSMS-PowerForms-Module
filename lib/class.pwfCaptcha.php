@@ -12,9 +12,10 @@ class pwfCaptcha extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->IsSortable = FALSE;
-		$this->IsRequired = TRUE;
+		$this->Required = TRUE;
 		$this->MultiPopulate = FALSE;
 		$this->Type = 'Captcha';
 	}
@@ -33,48 +34,42 @@ class pwfCaptcha extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
-		$main = array();
 		$mod = $this->formdata->formsmodule;
 		$captcha = $mod->getModuleInstance('Captcha');
 		if($captcha)
 		{
 			unset($captcha);
-			$main[] = array($mod->Lang('title_captcha_prompt'),
-				$mod->CreateInputText($id,'opt_prompt',
-					$this->GetOption('prompt',$mod->Lang('captcha_prompt')),60,120));
-			$main[] = array($mod->Lang('title_captcha_wrong'),
-				$mod->CreateInputText($id,'opt_wrongtext',
-					$this->GetOption('wrongtext',$mod->Lang('captcha_wrong')),60,120));
-
-			$adv[] = array($mod->Lang('title_captcha_label'),
-				$mod->CreateInputHidden($id,'opt_aslabel',0).
-				$mod->CreateInputCheckbox($id,'opt_aslabel',1,
-					$this->GetOption('aslabel',0)),
-				$mod->Lang('help_captcha_label')
-				);
-			$adv[] = array($mod->Lang('title_captcha_template'),
-				$mod->CreateTextArea(FALSE,$id,$this->GetOption('captcha_template',$this->defaulttemplate),
-					'opt_captcha_template','pwf_shortarea','','','',50,5),
-				$mod->Lang('help_captcha_template')
-				);
-			return array('main'=>$main,'adv'=>$adv);
 		}
-		else //should never happen
+		else
 		{
-			$main[] = array($mod->Lang('error_module_captcha'),
-				$mod->Lang('captcha_not_installed'));
-			return array('main'=>$main);
+			return array('<span style="color:red">'.$mod->Lang('error').'</span>',
+				'',$mod->Lang('captcha_not_installed'));
 		}
-	}
 
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		$this->RemoveAdminField($mainArray,$mod->Lang('title_field_helptext'));
-		$this->RemoveAdminField($advArray,$mod->Lang('title_hide_label'));
-		$this->RemoveAdminField($advArray,$mod->Lang('title_field_javascript'));
-		$this->RemoveAdminField($advArray,$mod->Lang('title_field_resources'));
+		list($main,$adv) = $this->AdminPopulateCommon($id);
+		$this->RemoveAdminField($main,$mod->Lang('title_field_helptext'));
+		$main[] = array($mod->Lang('title_captcha_prompt'),
+						$mod->CreateInputText($id,'opt_prompt',
+							$this->GetOption('prompt',$mod->Lang('captcha_prompt')),60,120));
+		$main[] = array($mod->Lang('title_captcha_wrong'),
+						$mod->CreateInputText($id,'opt_wrongtext',
+							$this->GetOption('wrongtext',$mod->Lang('captcha_wrong')),60,120));
+		$this->RemoveAdminField($adv,$mod->Lang('title_hide_label'));
+		$this->RemoveAdminField($adv,$mod->Lang('title_field_javascript'));
+		$this->RemoveAdminField($adv,$mod->Lang('title_field_resources'));
+		$adv[] = array($mod->Lang('title_captcha_label'),
+						$mod->CreateInputHidden($id,'opt_aslabel',0).
+						$mod->CreateInputCheckbox($id,'opt_aslabel',1,
+							$this->GetOption('aslabel',0)),
+						$mod->Lang('help_captcha_label'));
+		$adv[] = array($mod->Lang('title_captcha_template'),
+						$mod->CreateTextArea(FALSE,$id,$this->GetOption('captcha_template',$this->defaulttemplate),
+							'opt_captcha_template','pwf_shortarea','','','',50,5),
+						$mod->Lang('help_captcha_template'));
+		//TODO default template button
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function AdminValidate($id)

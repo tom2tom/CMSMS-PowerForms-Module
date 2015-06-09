@@ -102,36 +102,36 @@ class pwfDatePicker extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
-		$mod = $this->formdata->formsmodule;
 		$today = getdate();
-		$main = array(
-			array($mod->Lang('title_date_format'),
-				$mod->CreateInputText($id,'opt_date_format',
-					$this->GetOption('date_format','j F Y'),25,25),
-				$mod->Lang('help_date_format')),
-			array($mod->Lang('title_date_order'),
-				$mod->CreateInputText($id,'opt_date_order',
-					$this->GetOption('date_order','d-m-y'),5,5),
-				$mod->Lang('help_date_order')),
-			array($mod->Lang('title_default_blank'),
-				$mod->CreateInputHidden($id,'opt_default_blank',0).
-				$mod->CreateInputCheckbox($id,'opt_default_blank',1,
-					$this->GetOption('default_blank',0)),
-				$mod->Lang('help_default_today')),
-			array($mod->Lang('title_start_year'),
-				$mod->CreateInputText($id,'opt_start_year',
-					$this->GetOption('start_year',($today['year']-10)),10,10)),
-			array($mod->Lang('title_end_year'),
-				$mod->CreateInputText($id,'opt_end_year',
-					$this->GetOption('end_year',($today['year']+10)),10,10)),
-			array($mod->Lang('title_default_year'),
-				$mod->CreateInputText($id,'opt_default_year',
-					$this->GetOption('default_year','-1'),10,10),
-				$mod->Lang('help_default_year'))
-		);
-		return array('main'=>$main);
+
+		list($main,$adv) = $this->AdminPopulateCommon($id);
+		$mod = $this->formdata->formsmodule;
+		$main[] = array($mod->Lang('title_default_blank'),
+						$mod->CreateInputHidden($id,'opt_default_blank',0).
+						$mod->CreateInputCheckbox($id,'opt_default_blank',1,
+							$this->GetOption('default_blank',0)),
+						$mod->Lang('help_default_today'));
+		$main[] = array($mod->Lang('title_start_year'),
+						$mod->CreateInputText($id,'opt_start_year',
+							$this->GetOption('start_year',($today['year']-10)),10,10));
+		$main[] = array($mod->Lang('title_end_year'),
+						$mod->CreateInputText($id,'opt_end_year',
+							$this->GetOption('end_year',($today['year']+10)),10,10));
+		$main[] = array($mod->Lang('title_default_year'),
+						$mod->CreateInputText($id,'opt_default_year',
+							$this->GetOption('default_year','-1'),10,10),
+						$mod->Lang('help_default_year'));
+		$adv[] = array($mod->Lang('title_date_format'),
+						$mod->CreateInputText($id,'opt_date_format',
+							$this->GetOption('date_format','j F Y'),25,25),
+						$mod->Lang('help_date_format'));
+		$adv[] = array($mod->Lang('title_date_order'),
+						$mod->CreateInputText($id,'opt_date_order',
+							$this->GetOption('date_order','d-m-y'),5,5),
+						$mod->Lang('help_date_order'));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)

@@ -10,19 +10,20 @@ class pwfButton extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->IsSortable = FALSE;
-		$this->NonRequirableField = TRUE;
 		$this->Type = 'Button';
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main = array(
-			array($mod->Lang('title_button_text'),
-			$mod->CreateInputText($id,'opt_text',$this->GetOption('text'),40)));
-		return array('main'=>$main);
+		$main[] = array($mod->Lang('title_button_text'),
+						$mod->CreateInputText($id,'opt_text',
+							$this->GetOption('text'),40));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)

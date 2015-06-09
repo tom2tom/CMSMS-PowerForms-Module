@@ -56,21 +56,19 @@ class pwfCatalogerItems extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
-		$main = array();
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$cataloger = $mod->GetModuleInstance('Cataloger');
 		if($cataloger)
 		{
 			$main[] = array($mod->Lang('title_field_height'),
-					 $mod->CreateInputText($id,'opt_lines',$this->GetOption('lines','5'),3,3),
-					 $mod->Lang('help_field_height'));
-
+							$mod->CreateInputText($id,'opt_lines',$this->GetOption('lines','5'),3,3),
+							$mod->Lang('help_field_height'));
 			$main[] = array($mod->Lang('title_name_regex'),
-					 $mod->CreateInputText($id,'opt_nameregex',$this->GetOption('nameregex'),25,25),
-					 $mod->Lang('help_name_regex'));
-
+							$mod->CreateInputText($id,'opt_nameregex',$this->GetOption('nameregex'),25,25),
+							$mod->Lang('help_name_regex'));
 			$main[] = array('','',$mod->Lang('help_cataloger_attribute_fields'));
 
 			$attrs = cmsms()->variables['catalog_attrs']; //TODO bad module behaviour
@@ -80,15 +78,16 @@ class pwfCatalogerItems extends pwfFieldBase
 				{
 					$safeattr = strtolower(preg_replace('/\W/','',$one->attr));
 					$main[] = array($one->attr,
-						 $mod->CreateInputText($id,'opt_attr_'.$safeattr,$this->GetOption('attr_'.$safeattr),30,80));
+									$mod->CreateInputText($id,'opt_attr_'.$safeattr,
+									$this->GetOption('attr_'.$safeattr),30,80));
 				}
 			}
 			unset($one);
 		}
 		else
-			$main[] = array($mod->Lang('warning'),$mod->Lang('error_module_cataloger'));
+			$main[] = array($mod->Lang('warning'),$mod->Lang('error_module_cataloger')); //TODO c.f. FEU
 
-		return array('main'=>$main);
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)

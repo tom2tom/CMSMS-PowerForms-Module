@@ -33,7 +33,7 @@ class pwfEmailCCAddress extends pwfFieldBase
 	  	return '';
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
 		$choices = array();
 		foreach($this->formdata->Fields as &$one)
@@ -47,12 +47,12 @@ class pwfEmailCCAddress extends pwfFieldBase
 		}
 		unset($one);
 
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main = array();
 		$main[] = array($mod->Lang('title_field_to_modify'),
-			$mod->CreateInputDropdown($id,'opt_field_to_modify',$choices,-1,$this->GetOption('field_to_modify')));
-
-		return array('main'=>$main);
+						$mod->CreateInputDropdown($id,'opt_field_to_modify',$choices,-1,
+							$this->GetOption('field_to_modify')));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)
