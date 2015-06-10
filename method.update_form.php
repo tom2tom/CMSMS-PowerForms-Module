@@ -69,7 +69,7 @@ $smarty->assign('title_form_vars',$this->Lang('title_form_vars'));
 $smarty->assign('title_information',$this->Lang('information'));
 $smarty->assign('title_inline_form',$this->Lang('title_inline_form'));
 $smarty->assign('title_list_delimiter',$this->Lang('title_list_delimiter'));
-$smarty->assign('title_order',$this->Lang('order'));
+//$smarty->assign('title_order',$this->Lang('order'));
 $smarty->assign('title_redirect_page',$this->Lang('title_redirect_page'));
 $smarty->assign('title_submit_actions',$this->Lang('title_submit_actions'));
 $smarty->assign('title_submit_action',$this->Lang('title_submit_action'));
@@ -100,59 +100,60 @@ $fields = array();
 $count = 1;
 $last = count($formdata->Fields);
 
-foreach($formdata->Fields as &$one)
+foreach($formdata->FieldOrders as $one)
 {
+	$one = $formdata->Fields[$one];
 	$oneset = new stdClass();
 	$fid = (int)$one->GetId();
 	$oneset->id = $fid;
 	$oneset->order = '<input type="hidden" name="'.$id.'orders[]" value="'.$fid.'" />';
 	$this->CreateInputHidden($id,'orders[]',$fid);
 	$oneset->name = $this->CreateLink($id,'update_field','',$one->GetName(),
-		array('field_id'=>$fid,'form_id'=>$form_id));
+		array('field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']));
 	$oneset->alias = $one->ForceAlias();
 	$oneset->type = $one->GetDisplayType();
 
-	if(!$one->DisplayInForm() || $one->IsNonRequirableField())
-		$oneset->disposition = ''; //$this->Lang('not_available');
-	else if($one->IsRequired())
+	if(!$one->DisplayInForm() || !$one->GetChangeRequirement())
+		$oneset->disposition = '';
+	elseif($one->GetRequired())
 		$oneset->disposition = $this->CreateLink($id,'update_form','',
 			$icontrue,
-			array('form_id'=>$form_id,'field_id'=>$fid,'active'=>'off'),'','','',
-			'class="true" onclick="update_field_required();return false;"');
+			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'active'=>'off'),
+			'','','','class="true" onclick="update_field_required();return false;"');
 	else
 		$oneset->disposition = $this->CreateLink($id,'update_form','',
 			$iconfalse,
-			array('form_id'=>$form_id,'field_id'=>$fid,'active'=>'on'),'','','',
-			'class="false" onclick="update_field_required();return false;"');
+			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'active'=>'on'),
+			'','','','class="false" onclick="update_field_required();return false;"');
 
 	$oneset->field_status = $one->GetFieldStatus();
 	$oneset->editlink = $this->CreateLink($id,'update_field','',
 		$iconedit,
-		array('field_id'=>$fid,'form_id'=>$form_id));
+		array('field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']));
 	$oneset->copylink = $this->CreateLink($id,'update_form','',
 		$iconcopy,
-		array('fieldcopy'=>1,'field_id'=>$fid,'form_id'=>$form_id));
+		array('fieldcopy'=>1,'field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']));
 	$oneset->deletelink = $this->CreateLink($id,'update_form','',
 		$icondelete,
-		array('fielddelete'=>1,'field_id'=>$fid,'form_id'=>$form_id),'','','',
-		'onclick="delete_field(\''.$this->Lang('confirm_delete_field',htmlspecialchars($one->GetName())).'\'); return FALSE;"');
+		array('fielddelete'=>1,'field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']),
+		'','','',
+		'onclick="delete_field(\''.$this->Lang('confirm_delete_field',htmlspecialchars($one->GetName())).'\');return FALSE;"');
 	if($count > 1)
 		$oneset->up = $this->CreateLink($id,'update_form','',
 		$iconup,
-		array('form_id'=>$form_id,'field_id'=>$fid,'dir'=>'up'));
+		array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'up'));
 	else
 		$oneset->up = '';
 	if($count < $last)
 		$oneset->down = $this->CreateLink($id,'update_form','',
 		$icondown,
-		array('form_id'=>$form_id,'field_id'=>$fid,'dir'=>'down'));
+		array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'down'));
 	else
 		$oneset->down = '';
 
 	$fields[] = $oneset;
 	$count++;
 }
-unset ($one);
 
 if($fields)
 {
@@ -200,6 +201,8 @@ $jsfuncs [] =<<<EOS
 
 EOS;
 
+pwfUtils::Collect_Fields($this);
+
 $smarty->assign('title_fastadd',$t);
 if($this->GetPreference('adder_fields','basic') == 'basic')
 {
@@ -208,17 +211,16 @@ if($this->GetPreference('adder_fields','basic') == 'basic')
 	$smarty->assign('help_fastadd',
 		$this->Lang('title_switch_advanced').
 		$this->CreateLink($id,'update_form',$returnid,$this->Lang('title_switch_advanced_link'),
-		array('formedit'=>1,'form_id'=>$form_id,'active_tab'=>'fieldstab','set_field_level'=>'advanced')));
+		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'fieldstab','set_field_level'=>'advanced')));
 }
 else
 {
-	pwfUtils::Collect_Fields($this);
 	$smarty->assign('input_fastadd',$this->CreateInputDropdown($id,'field_type',
 		array_merge(array($this->Lang('select_type')=>''),$this->field_types),-1,'','onchange="fast_add(this)"'));
 	$smarty->assign('help_fastadd',
 		$this->Lang('title_switch_basic').
 		$this->CreateLink($id,'update_form',$returnid,$this->Lang('title_switch_basic_link'),
-		array('formedit'=>1,'form_id'=>$form_id,'active_tab'=>'fieldstab','set_field_level'=>'basic')));
+		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'fieldstab','set_field_level'=>'basic')));
 }
 
 $smarty->assign('cancel',$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel')));
@@ -287,31 +289,11 @@ $smarty->assign('input_list_delimiter',
 	$this->CreateInputText($id,'opt_list_delimiter',
 		pwfUtils::GetFormOption($formdata,'list_delimiter',','),5));
 
-$smarty->assign('input_form_template',
-	$this->CreateTextArea(FALSE,$id,$this->GetTemplate('pwf_'.$form_id),
-		'opt_form_template','pwf_tallarea','form_template','','',50,15));
-
 $smarty->assign('input_submit_javascript',
 	$this->CreateTextArea(FALSE,$id,
 		pwfUtils::GetFormOption($formdata,'submit_javascript',''),'opt_submit_javascript','pwf_shortarea','submit_javascript',
 		'','',50,8,'','').
 		'<br />'.$this->Lang('help_submit_javascript'));
-
-$postsubmits = array($this->Lang('redirect_to_page')=>'redir',$this->Lang('display_text')=>'text');
-$smarty->assign('input_submit_action',
-$this->CreateInputRadioGroup($id,'opt_submit_action',$postsubmits,
-	pwfUtils::GetFormOption($formdata,'submit_action','text'),'','&nbsp;&nbsp;'));
-
-$contentops = $gCms->GetContentOperations();
-$smarty->assign('input_redirect_page',
-	$contentops->CreateHierarchyDropdown('',pwfUtils::GetFormOption($formdata,'redirect_page','0'),$id.'opt_redirect_page'));
-
-$tpl = pwfUtils::GetFormOption($formdata,'submission_template');
-if(!$tpl)
-	$tpl = pwfUtils::CreateSampleTemplate($formdata,TRUE,FALSE);
-$smarty->assign('input_submit_template',
-	 $this->CreateTextArea(FALSE,$id,$tpl,
-		'opt_submission_template','pwf_tallarea','','','',50,15));
 
 $smarty->assign('title_load_template',$this->Lang('title_load_template'));
 $smarty->assign('security_key',CMS_SECURE_PARAM_NAME.'='.$_SESSION[CMS_USER_KEY]);
@@ -332,7 +314,42 @@ $thisLink = $this->CreateLink($id,'get_template',$returnid,'',array(),'',TRUE);
 $smarty->assign('input_load_template',$this->CreateInputDropdown($id,'template_load',
 	$templateList,-1,'','id="template_load" onchange="get_template(\''.$this->Lang('confirm_template').'\',\''.$thisLink.'\');"'));
 
-$tplvars = array();
+$smarty->assign('input_form_template',
+	$this->CreateTextArea(FALSE,$id,$this->GetTemplate('pwf_'.$form_id),
+		'opt_form_template','pwf_tallarea','form_template','','',50,15));
+
+$postsubmits = array($this->Lang('redirect_to_page')=>'redir',$this->Lang('display_text')=>'text');
+$smarty->assign('input_submit_action',
+	$this->CreateInputRadioGroup($id,'opt_submit_action',$postsubmits,
+		pwfUtils::GetFormOption($formdata,'submit_action','text'),'','&nbsp;&nbsp;'));
+
+$contentops = $gCms->GetContentOperations();
+$smarty->assign('input_redirect_page',
+	$contentops->CreateHierarchyDropdown('',pwfUtils::GetFormOption($formdata,'redirect_page','0'),$id.'opt_redirect_page'));
+
+$tpl = pwfUtils::GetFormOption($formdata,'submission_template');
+if(!$tpl)
+	$tpl = pwfUtils::CreateSampleTemplate($formdata,TRUE,FALSE);
+$smarty->assign('input_submit_template',
+	 $this->CreateTextArea(FALSE,$id,$tpl,
+		'opt_submission_template','pwf_tallarea','','','',50,15));
+//setup to revert to 'sample' submission-template
+$ctlData = array();
+$ctlData['opt_submission_template']['general_button'] = TRUE;
+list($buttons,$funcs) = pwfUtils::SampleTemplateActions($formdata,$id,$ctlData);
+$smarty->assign('sample_submit_template',$buttons[0]);
+$jsfuncs[] = $funcs[0];
+$smarty->assign('help_submit_template',$this->Lang('help_submit_template'));
+
+$smarty->assign('title_variable',$this->Lang('variable'));
+$smarty->assign('title_property',$this->Lang('property'));
+$smarty->assign('title_description',$this->Lang('description'));
+$smarty->assign('help_formvars',$this->Lang('help_form_vars'));
+$smarty->assign('help_fieldvars1',$this->Lang('help_fieldvars1'));
+$smarty->assign('help_fieldvars2',$this->Lang('help_fieldvars2'));
+
+//help for form-template
+$formvars = array();
 foreach(array(
 	'total_pages',
 	'this_page',
@@ -342,71 +359,85 @@ foreach(array(
 	'form_id',
 	'actionid',
 	'in_browser',
+	'form_start',
+	'form_end',
 	'hidden',
 	'help_icon',
 	'jscript',
 	'prev',
-	'submit'
+	'submit',
+	'form_done',
+	'submission_error',
+	'show_submission_errors',
+	'submission_error_list',
+	'form_has_validation_errors',
+	'form_validation_errors'
 	) as $name)
 {
 	$oneset = new stdClass();
 	$oneset->name = $name;
 	$oneset->description = $this->Lang('desc_'.$name);
-	$tplvars[] = $oneset;
+	$formvars[] = $oneset;
 }
-$smarty->assign('formvars',$tplvars);
-
-$tplvars = array();
-foreach(array(
-	'alias',
-	'css_class',
-	'display',
-	'error',
-	'helptext_id',
-	'has_label',
-	'helptext',
-	'hide_name',
-	'id',
-	'input_id',
-	'input',
-	'label_parts',
-	'logic',
-	'multiple_parts',
-	'name',
-	'needs_div',
-	'required',
-	'required_symbol',
-	'smarty_eval',
-	'type',
-	'valid',
-	'values'
-	) as $name)
+if($formdata->Fields)
 {
-	$oneset = new stdClass();
-	$oneset->name = $name;
-	if($name != 'css_class')
-		$oneset->description = $this->Lang('desc_'.$name);
-	else
-		$oneset->description = $this->Lang('desc_cssf_class'); //work around duplicate
-	$tplvars[] = $oneset;
+	foreach($formdata->Fields as &$one)
+	{
+		if($one->DisplayInSubmission())
+		{
+			$oneset = new stdClass();
+			$oneset->name = $one->GetVariableName().'} / {$fld_'.$one->GetId();
+			$oneset->description = $this->Lang('field_named',$one->GetName());
+			$formvars[] = $oneset;
+		}
+	}
+	unset($one);
 }
-$smarty->assign('fieldvars',$tplvars);
+$smarty->assign('formvars',$formvars);
 
-$smarty->assign('variable',$this->Lang('variable'));
-$smarty->assign('property',$this->Lang('property'));
-$smarty->assign('description',$this->Lang('description'));
-$smarty->assign('help_formvars',$this->Lang('help_form_vars'));
-$smarty->assign('help_vars1',$this->Lang('help_vars1'));
-$smarty->assign('help_vars2',$this->Lang('help_vars2'));
+if($formdata->Fields)
+{
+	$fieldprops = array();
+	foreach(array(
+		'alias',
+		'css_class',
+		'display',
+		'error',
+		'helptext_id',
+		'has_label',
+		'helptext',
+		'hide_name',
+		'id',
+		'input_id',
+		'input',
+		'label_parts',
+		'multiple_parts',
+		'name',
+		'needs_div',
+		'required',
+		'required_symbol',
+		'resources',
+		'smarty_eval',
+		'type',
+		'valid',
+		'values'
+		) as $name)
+	{
+		$oneset = new stdClass();
+		$oneset->name = $name;
+		if($name != 'css_class')
+			$oneset->description = $this->Lang('desc_'.$name);
+		else
+			$oneset->description = $this->Lang('desc_cssf_class'); //work around duplicate
+		$fieldprops[] = $oneset;
+	}
+	$smarty->assign('fieldprops',$fieldprops);
+}
 
-pwfUtils::SetupFormVarsHelp($this,$smarty,$formdata->Fields);
-
-$parms = array();
-$parms['submission_template']['general_button'] = TRUE; //TODO why this template ?
-list($popfuncs,$buttons) = pwfUtils::AdminTemplateActions($formdata,$id,$parms);
+//help for submission-template
+pwfUtils::SetupSubTemplateVarsHelp($formdata,$this,$smarty);
 
 $smarty->assign('incpath',$this->GetModuleURLPath().'/include/');
-$smarty->assign('jsfuncs',array_merge($jsfuncs,$popfuncs));
-$smarty->assign('buttons',$buttons);
+$smarty->assign('jsfuncs',$jsfuncs);
 
 ?>
