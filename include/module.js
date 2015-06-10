@@ -82,14 +82,28 @@ function set_tab () {
 }
 
 $(document).ready(function() {
-    $('.updown').hide();
+	$('.updown').hide();
 	$('.showhelp').hide();
 	$('img.tipper').css({'display':'inline','padding-left':'10px'}).click(function() {
 		$(this).parent().parent().find('.showhelp').slideToggle();
 	});
 	$('.reordermsg').show()
-    $('#addslow').hide();
-    $('#addfast').show();
+	$('#addslow').hide();
+	$('#addfast').show();
+	if($('input[name="m1_opt_submit_action"]:checked').val() == 'redir') {
+      $('#tplobjects').hide();
+	} else {
+      $('#pageobjects').hide();
+	}
+	$('input[name="m1_opt_submit_action"]').change(function() {
+	 if($(this).val() == 'redir') {
+	  $('#tplobjects').hide();
+	  $('#pageobjects').show();
+	 } else {
+	  $('#pageobjects').hide();
+	  $('#tplobjects').show();
+	 }
+	});
 	$('.tabledrag').tableDnD({
 		dragClass: 'row1hover',
 		onDrop: function(table,droprows) {
