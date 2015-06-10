@@ -85,7 +85,8 @@ class pwfCatalogerItems extends pwfFieldBase
 			unset($one);
 		}
 		else
-			$main[] = array($mod->Lang('warning'),$mod->Lang('error_module_cataloger')); //TODO c.f. FEU
+			$main[] = array('<span style="color:red">'.$mod->Lang('warning').'</span>',
+				'',$mod->Lang('error_module_cataloger'));
 
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -223,7 +224,7 @@ class pwfCatalogerItems extends pwfFieldBase
 			$size = min(50,$size); // maximum 50 lines, though this is probably big
 
 			$val = array();
-			if(property_exists($this,$Value))
+			if(property_exists($this,'Value'))
 			{
 				$val = $this->Value;
 				if(!is_array($this->Value))
