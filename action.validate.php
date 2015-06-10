@@ -14,10 +14,13 @@ if(count($matched) != 4)
 }
 $key = reset($matched);
 $key = substr($key,0,9); //prefix
-$code = $params[$key.'c'];
-$form_id = $params[$key.'f'];
+//$form_id = $params[$key.'f']; TODO
 $response_id = $params[$key.'r'];
-if(!pwfUtils::CheckResponse($form_id,$response_id,$code))
+
+$sql = 'SELECT code FROM '.cms_db_prefix().
+	'module_pwf_X WHERE response_id=?'; //TODO
+$code = $db->GetOne($sql,array($response_id));
+if($code != $params[$key.'c'])
 {
 	echo $this->Lang('validation_response_error');
 	return;
