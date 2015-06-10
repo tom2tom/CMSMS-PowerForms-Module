@@ -48,7 +48,7 @@ elseif(isset($params['save']))
 	}
 	unset($funcs);
 	$this->Redirect($id,'update_form','',array(
-		'formedit'=>1,'form_id'=>$newid,'active_tab'=>$seetab));
+		'formedit'=>1,'form_id'=>$newid,'active_tab'=>$seetab)); //no formdata parameter
 }
 
 if(isset($params['form_id']))
