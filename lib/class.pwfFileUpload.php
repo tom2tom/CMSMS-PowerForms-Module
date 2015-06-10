@@ -49,81 +49,73 @@ class pwfFileUpload extends pwfFieldBase
 		return $ret;
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
-		$config = cmsms()->GetConfig();
-		$mod = $this->formdata->formsmodule;
 		$ms = $this->GetOption('max_size');
 		$exts = $this->GetOption('permitted_extensions');
-		$show = $this->GetOption('show_details','0');
-		$sendto_uploads = $this->GetOption('sendto_uploads','FALSE');
+		$show = $this->GetOption('show_details',0);
+		$sendto_uploads = $this->GetOption('sendto_uploads',0);
 		$uploads_category = $this->GetOption('uploads_category');
 		$uploads_destpage = $this->GetOption('uploads_destpage');
 
-		$main = array(
-			array($mod->Lang('title_maximum_size'),
+		list($main,$adv) = $this->AdminPopulateCommon($id);
+		$mod = $this->formdata->formsmodule;
+		$main[] = array($mod->Lang('title_maximum_size'),
 				$mod->CreateInputText($id,'opt_max_size',$ms,5,5),
-				$mod->Lang('help_maximum_size')),
-			array($mod->Lang('title_permitted_extensions'),
+				$mod->Lang('help_maximum_size'));
+		$main[] = array($mod->Lang('title_permitted_extensions'),
 				$mod->CreateInputText($id,'opt_permitted_extensions',$exts,25,80),
-				$mod->Lang('help_permitted_extensions')),
-			array($mod->Lang('title_show_limitations'),
-				$mod->CreateInputHidden($id,'opt_show_details','0').
-				$mod->CreateInputCheckbox($id,
-					'opt_show_details','1',$show),
-				$mod->Lang('help_show_limitations')),
-			array($mod->Lang('title_allow_overwrite'),
-				$mod->CreateInputHidden($id,'opt_allow_overwrite','0').
-				$mod->CreateInputCheckbox($id,
-					'opt_allow_overwrite','1',$this->GetOption('allow_overwrite','0')),
-				$mod->Lang('help_allow_overwrite'))
-			);
+				$mod->Lang('help_permitted_extensions'));
+		$main[] = array($mod->Lang('title_show_limitations'),
+				$mod->CreateInputHidden($id,'opt_show_details',0).
+				$mod->CreateInputCheckbox($id,'opt_show_details',1,$show),
+				$mod->Lang('help_show_limitations'));
+		$main[] = array($mod->Lang('title_allow_overwrite'),
+				$mod->CreateInputHidden($id,'opt_allow_overwrite',0).
+				$mod->CreateInputCheckbox($id,'opt_allow_overwrite',1,
+					$this->GetOption('allow_overwrite',0)),
+				$mod->Lang('help_allow_overwrite'));
 
 		$uploads = $mod->GetModuleInstance('Uploads');
 		$sendto_uploads_list = array($mod->Lang('no')=>0,$mod->Lang('yes')=>1);
-		$adv = array();
 
 		$help_file_rename = $mod->Lang('help_file_rename').
 		pwfUtils::FormFieldsHelp($this->formdata,array('$ext'=>$mod->Lang('original_file_extension')));
 
 		$adv[] = array($mod->Lang('title_file_rename'),
-			$mod->CreateInputText($id,'opt_file_rename',
-				$this->GetOption('file_rename'),60,255),
-			$help_file_rename);
+						$mod->CreateInputText($id,'opt_file_rename',
+						$this->GetOption('file_rename'),60,255),
+						$help_file_rename);
 		$adv[] = array($mod->Lang('title_suppress_filename'),
-			$mod->CreateInputHidden($id,'opt_suppress_filename','0').
-			$mod->CreateInputCheckbox($id,
-				'opt_suppress_filename','1',
-				$this->GetOption('suppress_filename','0')));
-
+						$mod->CreateInputHidden($id,'opt_suppress_filename',0).
+						$mod->CreateInputCheckbox($id,'opt_suppress_filename',1,
+							$this->GetOption('suppress_filename',0)));
 		$adv[] = array($mod->Lang('title_suppress_attachment'),
-			$mod->CreateInputHidden($id,'opt_suppress_attachment',0).
-			$mod->CreateInputCheckbox($id,'opt_suppress_attachment',1,
-				$this->GetOption('suppress_attachment',1)));
-
-		$main[] = array($mod->Lang('title_remove_file_from_server'),
-			$mod->CreateInputHidden($id,'opt_remove_file',0).
-			$mod->CreateInputCheckbox($id,'opt_remove_file',1,
-				$this->GetOption('remove_file',0)),
-			$mod->Lang('help_ignored_if_upload'));
-/*		$main[] = array($mod->Lang('title_file_destination'),
-			$mod->CreateInputText($id,'opt_file_destination',
-				$this->GetOption('file_destination',$config['uploads_path']),60,255),
-			$mod->Lang('help_ignored_if_upload'));
+						$mod->CreateInputHidden($id,'opt_suppress_attachment',0).
+						$mod->CreateInputCheckbox($id,'opt_suppress_attachment',1,
+							$this->GetOption('suppress_attachment',1)));
+		$adv[] = array($mod->Lang('title_remove_file_from_server'),
+						$mod->CreateInputHidden($id,'opt_remove_file',0).
+						$mod->CreateInputCheckbox($id,'opt_remove_file',1,
+							$this->GetOption('remove_file',0)),
+						$mod->Lang('help_ignored_if_upload'));
+/*		$config = cmsms()->GetConfig();
+		$adv[] = array($mod->Lang('title_file_destination'),
+							$mod->CreateInputText($id,'opt_file_destination',
+							$this->GetOption('file_destination',$config['uploads_path']),60,255),
+							$mod->Lang('help_ignored_if_upload'));
 */
 		if($uploads)
 		{
 			$categorylist = $uploads->getCategoryList();
 			$adv[] = array($mod->Lang('title_sendto_uploads'),
-				 $mod->CreateInputDropdown($id,
-					'opt_sendto_uploads',$sendto_uploads_list,
-					 $sendto_uploads));
+				 			$mod->CreateInputDropdown($id,'opt_sendto_uploads',$sendto_uploads_list,
+							 $sendto_uploads));
 			$adv[] = array($mod->Lang('title_uploads_category'),
-				$mod->CreateInputDropdown($id,
-					'opt_uploads_category',$categorylist,'',
-					$uploads_category));
+							$mod->CreateInputDropdown($id,'opt_uploads_category',$categorylist,'',
+							$uploads_category));
 			$adv[] = array($mod->Lang('title_uploads_destpage'),
-				self::CreatePageDropdown($id,'opt_uploads_destpage',$uploads_destpage));
+							self::CreatePageDropdown($id,'opt_uploads_destpage',$uploads_destpage));
 		}
 
 		return array('main'=>$main,'adv'=>$adv);
@@ -222,7 +214,7 @@ class pwfFileUpload extends pwfFieldBase
 		if(empty($_FILES[$_id]))
 		{
 			$this->validated = FALSE;
-			$this->ValidationMessage = $mod->Lang('TODO');
+			$this->ValidationMessage = $mod->Lang('missing_type',$mod->Lang('file'));
 			return array($this->validated,$this->ValidationMessage);
 		}
 		if($_FILES[$_id]['size'] < 1 && ! $this->Required)
@@ -283,15 +275,8 @@ class pwfFileUpload extends pwfFieldBase
 			else
 			{
 				// build rename map
-				$mapId = array();
+				$mapId = array_flip(array_keys($this->formdata->Fields));
 				$eval_string = FALSE;
-				$i = 0;
-				foreach($this->formdata->Fields as &$one)
-				{
-					$mapId[$one->Id] = $i;
-					$i++;
-				}
-				unset($one);
 
 				$flds = array();
 				$destination_name = $this->GetOption('file_rename');
@@ -421,7 +406,7 @@ class pwfFileUpload extends pwfFieldBase
 		return array(TRUE,'');
 	}
 
-	function PostDispositionAction()
+	function PostDisposeAction()
 	{
 		if($this->GetOption('remove_file',0))
 		{

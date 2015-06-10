@@ -33,12 +33,12 @@ class pwfEmailSubject extends pwfFieldBase {
 		else
 		{
 			$this->validated = FALSE;
-			$this->ValidationMessage = $mod->Lang('please_enter_TODO',$this->Name);
+			$this->ValidationMessage = $mod->Lang('missing_type',$mod->Lang('subject'));
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}
 
-	function PreDispositionAction()
+	function PreDisposeAction()
 	{
 		foreach($this->formdata->Fields as &$one)
 		{

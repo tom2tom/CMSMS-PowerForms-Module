@@ -111,17 +111,21 @@ class pwfCheckboxGroup extends pwfFieldBase
 		return ''; //TODO upspecified
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main = array();
 		$main[] = array($mod->Lang('title_dont_submit_unchecked'),
-			$mod->CreateInputHidden($id,'opt_no_empty',0).
-			$mod->CreateInputCheckbox($id,'opt_no_empty',1,
-				$this->GetOption('no_empty',0)),
-			$mod->Lang('help_dont_submit_unchecked'));
-//		$main[] = array($mod->Lang('title_checkbox_details'),$boxes);
-		$boxes = array();
+						$mod->CreateInputHidden($id,'opt_no_empty',0).
+						$mod->CreateInputCheckbox($id,'opt_no_empty',1,
+							$this->GetOption('no_empty',0)),
+						$mod->Lang('help_dont_submit_unchecked'));
+		$adv[] = array($mod->Lang('title_field_includelabels'),
+						$mod->CreateInputHidden($id,'opt_include_labels',0).
+						$mod->CreateInputCheckbox($id,'opt_include_labels',1,
+							$this->GetOption('include_labels',0)),
+						$mod->Lang('help_field_includelabels'));
+
 		if($this->boxAdd)
 		{
 			$this->AddOptionElement('box_name','');
@@ -132,13 +136,14 @@ class pwfCheckboxGroup extends pwfFieldBase
 		$names = $this->GetOptionRef('box_name');
 		if($names)
 		{
+			$boxes = array();
 			$boxes[] = array(
 				$mod->Lang('title_checkbox_label'),
 				$mod->Lang('title_checked_value'),
 				$mod->Lang('title_unchecked_value'),
 				$mod->Lang('title_default_set'),
 				$mod->Lang('title_select')
-				);
+			);
 			$yesNo = array($mod->Lang('no')=>'n',$mod->Lang('yes')=>'y');
 			foreach($names as $i=>&$one)
 			{
@@ -151,20 +156,17 @@ class pwfCheckboxGroup extends pwfFieldBase
 				);
 			}
 			unset($one);
+//			$main[] = array('','',$mod->Lang('title_checkbox_details'),$boxes);
+			return array('main'=>$main,'adv'=>$adv,'table'=>$boxes);
 		}
-		
-		$adv = array(
-			array($mod->Lang('title_field_includelabels'),
-					$mod->CreateInputHidden($id,'opt_include_labels',0).
-					$mod->CreateInputCheckbox($id,'opt_include_labels',1,
-						$this->GetOption('include_labels',0)),
-					$mod->Lang('help_field_includelabels'))
-		);
-
-		return array('main'=>$main,'table'=>$boxes,'adv'=>$adv);
+		else
+		{
+			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('item')));
+			return array('main'=>$main,'adv'=>$adv);
+		}
 	}
 
-	function PostAdminSubmitCleanup(&$params)
+	function PostAdminAction(&$params)
 	{
 		//cleanup empties
 		$names = $this->GetOptionRef('box_name');
@@ -207,7 +209,7 @@ class pwfCheckboxGroup extends pwfFieldBase
 					$oneset->name = '';
 				}
 
-				if(property_exists($this,$Value))
+				if(property_exists($this,'Value'))
 					$checked = $this->FindArrayValue($i) ? $i:-1; //TODO
 				elseif($this->GetOptionElement('box_is_set',$i) == 'y')
 					$checked = $i;

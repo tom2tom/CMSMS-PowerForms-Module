@@ -74,13 +74,10 @@ class pwfRadioGroup extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-
-//		$main = array();
-//		$main = array($mod->Lang('title_radiogroup_details'),$boxes);
-		$boxes = array();
 		if($this->optionAdd)
 		{
 			$this->AddOptionElement('button_name','');
@@ -91,6 +88,7 @@ class pwfRadioGroup extends pwfFieldBase
 		$names = $this->GetOptionRef('button_name');
 		if($names)
 		{
+			$boxes = array();
 			$boxes[] = array(
 				$mod->Lang('title_radio_label'),
 				$mod->Lang('title_checked_value'),
@@ -101,18 +99,24 @@ class pwfRadioGroup extends pwfFieldBase
 			foreach($names as $i=>&$one)
 			{
 				$boxes[] = array(
-				  $mod->CreateInputText($id,'opt_button_name'.$i,$one,25,128),
-				  $mod->CreateInputText($id,'opt_button_checked'.$i,$this->GetOptionElement('button_checked',$i),25,128),
-				  $mod->CreateInputDropdown($id,'opt_button_is_set'.$i,$yesNo,-1,$this->GetOptionElement('button_is_set',$i)),
-				  $mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
+					$mod->CreateInputText($id,'opt_button_name'.$i,$one,25,128),
+					$mod->CreateInputText($id,'opt_button_checked'.$i,$this->GetOptionElement('button_checked',$i),25,128),
+					$mod->CreateInputDropdown($id,'opt_button_is_set'.$i,$yesNo,-1,$this->GetOptionElement('button_is_set',$i)),
+					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				 );
 			}
 			unset($one);
+//			$main[] = array($mod->Lang('title_radiogroup_details'),$boxes);
+			return array('main'=>$main,'adv'=>$adv,'table'=>$boxes);
 		}
-		return array('table'=>$boxes);
+		else
+		{
+			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('item')));
+			return array('main'=>$main,'adv'=>$adv);
+		}
 	}
 
-	function PostAdminSubmitCleanup(&$params)
+	function PostAdminAction(&$params)
 	{
 		//cleanup empties
 		$names = $this->GetOptionRef('button_name');
@@ -155,7 +159,7 @@ class pwfRadioGroup extends pwfFieldBase
 
  				$tmp = '<input type="radio" id="'.$this->GetInputId('_'.$i).'" name="'.
 					$id.$this->formdata->current_prefix.$this->Id.'[]" value="'.$i.'"';
-				if(property_exists($this,$Value))
+				if(property_exists($this,'Value'))
 					$checked = $this->FindArrayValue($i); //TODO
 				elseif($this->GetOptionElement('button_is_set',$i) == 'y')
 					$checked = TRUE;

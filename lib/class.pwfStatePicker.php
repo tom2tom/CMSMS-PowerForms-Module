@@ -44,19 +44,18 @@ class pwfStatePicker extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$choices = array_merge(array('No Default'=>''),$this->States);
-		$main = array(
-			array($mod->Lang('title_select_default_state'),
-            	$mod->CreateInputDropdown($id,'opt_default_state',
-            		$choices,-1,$this->GetOption('default_state'))),
-			array($mod->Lang('title_select_one_message'),
-            	$mod->CreateInputText($id,'opt_select_one',
-            		$this->GetOption('select_one',$mod->Lang('select_one'))))
-		);
-		return array('main'=>$main);
+		$main[] = array($mod->Lang('title_select_default_state'),
+						$mod->CreateInputDropdown($id,'opt_default_state',$choices,-1,
+							$this->GetOption('default_state')));
+		$main[] = array($mod->Lang('title_select_one_message'),
+						$mod->CreateInputText($id,'opt_select_one',
+							$this->GetOption('select_one',$mod->Lang('select_one'))));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)

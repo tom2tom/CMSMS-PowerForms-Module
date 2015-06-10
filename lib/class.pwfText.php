@@ -38,33 +38,33 @@ class pwfText extends pwfFieldBase
 		return $ret;
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-
-		$main = array(
-			array($mod->Lang('title_maximum_length'),
-				$mod->CreateInputText($id,'opt_length',$this->GetOption('length',80),25,25)),
-			array($mod->Lang('title_read_only'),
-				$mod->CreateInputHidden($id,'opt_readonly',0).
-				$mod->CreateInputCheckbox($id,'opt_readonly',1,$this->GetOption('readonly',0)))
-		);
-
-		$adv = array(
-			array($mod->Lang('title_field_regex'),
-				$mod->CreateInputText($id,'opt_regex',$this->GetOption('regex'),25,1024),
-				$mod->Lang('help_regex_use')),
-			array($mod->Lang('title_field_default_value'),
-				$mod->CreateInputText($id,'opt_default',$this->GetOption('default'),25,1024)),
-			array($mod->Lang('title_html5'),
-				$mod->CreateInputHidden($id,'opt_html5',0).
-				$mod->CreateInputCheckbox($id,'opt_html5',1,$this->GetOption('html5',0))),
-			array($mod->Lang('title_clear_default'),
-				$mod->CreateInputHidden($id,'opt_clear_default',0).
-				$mod->CreateInputCheckbox($id,'opt_clear_default',1,$this->GetOption('clear_default',0)),
-				$mod->Lang('help_clear_default'))
-		);
-
+		$main[] = array($mod->Lang('title_maximum_length'),
+						$mod->CreateInputText($id,'opt_length',
+							$this->GetOption('length',80),25,25));
+		$main[] = array($mod->Lang('title_read_only'),
+						$mod->CreateInputHidden($id,'opt_readonly',0).
+						$mod->CreateInputCheckbox($id,'opt_readonly',1,
+							$this->GetOption('readonly',0)));
+		$adv[] = array($mod->Lang('title_field_regex'),
+						$mod->CreateInputText($id,'opt_regex',
+							$this->GetOption('regex'),25,1024),
+						$mod->Lang('help_regex_use'));
+		$adv[] = array($mod->Lang('title_field_default_value'),
+						$mod->CreateInputText($id,'opt_default',
+							$this->GetOption('default'),25,1024));
+		$adv[] = array($mod->Lang('title_html5'),
+						$mod->CreateInputHidden($id,'opt_html5',0).
+						$mod->CreateInputCheckbox($id,'opt_html5',1,
+							$this->GetOption('html5',0)));
+		$adv[] = array($mod->Lang('title_clear_default'),
+						$mod->CreateInputHidden($id,'opt_clear_default',0).
+						$mod->CreateInputCheckbox($id,'opt_clear_default',1,
+							$this->GetOption('clear_default',0)),
+						$mod->Lang('help_clear_default'));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 

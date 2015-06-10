@@ -10,9 +10,9 @@ class pwfSystemLink extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->IsSortable = FALSE;
 		$this->MultiPopulate = TRUE;
-		$this->NonRequirableField = TRUE;
 		$this->Required = FALSE;
 		$this->Type = 'SystemLink';
 		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_none')=>'none');
@@ -38,21 +38,20 @@ class pwfSystemLink extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
+		$main[] = array($mod->Lang('title_link_autopopulate'),
+						$mod->CreateInputHidden($id,'opt_auto_link',0).
+						$mod->CreateInputCheckbox($id,'opt_auto_link',1,
+							$this->GetOption('auto_link',0)),
+						$mod->Lang('help_link_autopopulate'));
 		$contentops = cmsms()->GetContentOperations();
+		$main[] = array($mod->Lang('title_link_to_sitepage'),
+						$contentops->CreateHierarchyDropdown('',$this->GetOption('target_page'),$id.'opt_target_page'));
 
-		$main = array(
-			array($mod->Lang('title_link_autopopulate'),
-				$mod->CreateInputHidden($id,'opt_auto_link',0).
-				$mod->CreateInputCheckbox($id,'opt_auto_link',1,
-					$this->GetOption('auto_link',0)),
-				$mod->Lang('help_link_autopopulate')),
-			array($mod->Lang('title_link_to_sitepage'),
-				$contentops->CreateHierarchyDropdown('',$this->GetOption('target_page'),$id.'opt_target_page'))
-		);
-		return array('main'=>$main);
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)

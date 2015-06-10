@@ -22,9 +22,10 @@ class pwfEmailOne extends pwfEmailBase
 		return $this->TemplateStatus();
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
-		return $this->PrePopulateAdminFormCommonEmail($id);
+		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id);
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
 	}
 
 	function Populate($id,&$params)

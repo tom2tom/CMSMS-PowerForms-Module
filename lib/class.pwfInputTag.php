@@ -12,9 +12,9 @@ class pwfInputTag extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->IsSortable = FALSE;
-		$this->NonRequirableField = TRUE;
 //		$this->NeedsDiv = FALSE;
 		$this->Type = 'InputTag';
 	}
@@ -24,24 +24,23 @@ class pwfInputTag extends pwfFieldBase
 		return $this->GetOption('udtname',$this->formdata->formsmodule->Lang('unspecified'));
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
-		$usertagops = cmsms()->GetUserTagOperations();
-		$usertags = $usertagops->ListUserTags();
-		$usertaglist = array();
+		$usertags = cmsms()->GetUserTagOperations()->ListUserTags();
+		$choices = array();
 		foreach($usertags as $key => $value)
-			$usertaglist[$value] = $key;
+			$choices[$value] = $key;
 
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main = array();
 		$main[] = array($mod->Lang('title_udt_name'),
-			$mod->CreateInputDropdown($id,'opt_udtname',$usertaglist,-1,
-			  $this->GetOption('udtname')));
-		$main[] = array($mod->Lang('title_export_form_to_udt'),
-			$mod->CreateInputHidden($id,'opt_export_form',0).
-			$mod->CreateInputCheckbox($id,'opt_export_form',1,
-				$this->GetOption('export_form',0)));
-		return array('main'=>$main);
+						$mod->CreateInputDropdown($id,'opt_udtname',$choices,-1,
+							$this->GetOption('udtname')));
+		$adv[] = array($mod->Lang('title_export_form_to_udt'),
+						$mod->CreateInputHidden($id,'opt_export_form',0).
+						$mod->CreateInputCheckbox($id,'opt_export_form',1,
+							$this->GetOption('export_form',0)));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)

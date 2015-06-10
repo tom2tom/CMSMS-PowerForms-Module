@@ -71,33 +71,30 @@ class pwfUserEmail extends pwfEmailBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id);
 		$mod = $this->formdata->formsmodule;
-		$ret = $this->PrePopulateAdminFormCommonEmail($id);
+		$this->RemoveAdminField($main,$mod->Lang('title_email_from_address'));
+
 		$choices = array(
 			$mod->Lang('option_never')=>'n',
 			$mod->Lang('option_user_choice')=>'c',
 			$mod->Lang('option_always')=>'a');
-		$ret['main'][] = array($mod->Lang('title_send_user_copy'),
-			$mod->CreateInputDropdown($id,'opt_send_user_copy',$choices,-1,
-				$this->GetOption('send_user_copy','n')));
-		$ret['main'][] = array($mod->Lang('title_send_user_label'),
-			$mod->CreateInputText($id,'opt_send_user_label',
-				$this->GetOption('send_user_label',$mod->Lang('title_send_me_a_copy')),25,125));
+		$main[] = array($mod->Lang('title_send_user_copy'),
+						$mod->CreateInputDropdown($id,'opt_send_user_copy',$choices,-1,
+							$this->GetOption('send_user_copy','n')));
+		$main[] = array($mod->Lang('title_send_user_label'),
+						$mod->CreateInputText($id,'opt_send_user_label',
+							$this->GetOption('send_user_label',$mod->Lang('title_send_me_a_copy')),25,125));
 		$choices = array(
 			$mod->Lang('option_from')=>'f',
 			$mod->Lang('option_reply')=>'r',
 			$mod->Lang('option_both')=>'b');
-		$ret['main'][] = array($mod->Lang('title_headers_to_modify'),
-			$mod->CreateInputDropdown($id,'opt_headers_to_modify',$choices,-1,
-				$this->GetOption('headers_to_modify','f')));
-		return $ret;
-	}
-
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		$this->RemoveAdminField($mainArray,$this->formdata->formsmodule->Lang('title_email_from_address'));
+		$main[] = array($mod->Lang('title_headers_to_modify'),
+						$mod->CreateInputDropdown($id,'opt_headers_to_modify',$choices,-1,
+							$this->GetOption('headers_to_modify','f')));
+	 	return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
 	}
 
 	function Populate($id,&$params)
@@ -151,9 +148,9 @@ class pwfUserEmail extends pwfEmailBase
 		return array($this->validated,$this->ValidationMessage);
 	}
 
-	function PreDispositionAction()
+	function PreDisposeAction()
 	{
-		if(property_exists($this,$Value))
+		if(property_exists($this,'Value'))
 		{
 			$htm = $this->GetOption('headers_to_modify','f');
 			foreach($this->formdata->Fields as &$one)

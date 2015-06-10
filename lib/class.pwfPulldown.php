@@ -71,11 +71,11 @@ class pwfPulldown extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 
-		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
 			$mod->CreateInputText($id,'opt_select_one',
 			  $this->GetOption('select_one',$mod->Lang('select_one')),25,128));
@@ -83,9 +83,6 @@ class pwfPulldown extends pwfFieldBase
 			$mod->CreateInputDropdown($id,'opt_sort',
 			  array($mod->Lang('yes')=>1,$mod->Lang('no')=>0),-1,
 			  $this->GetOption('sort',0)));
-//		$main[] = array($mod->Lang('title_pulldown_details'),$dests);
-		$dests = array();
-			
 		if($this->optionAdd)
 		{
 			$this->AddOptionElement('option_name','');
@@ -95,12 +92,12 @@ class pwfPulldown extends pwfFieldBase
 		$opt = $this->GetOptionRef('option_name');
 		if($opt)
 		{
+			$dests = array();
 			$dests[] = array(
 				$mod->Lang('title_option_name'),
 				$mod->Lang('title_option_value'),
 				$mod->Lang('title_select')
 				);
-		
 			foreach($opt as $i=>&$one)
 			{
 				$dests[] = array(
@@ -110,11 +107,17 @@ class pwfPulldown extends pwfFieldBase
 				);
 			}
 			unset($one);
+//			$main[] = array($mod->Lang('title_pulldown_details'),$dests);
+			return array('main'=>$main,'adv'=>$adv,'table'=>$dests));
 		}
-		return array('main'=>$main,'table'=>$dests);
+		else
+		{
+			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('item')));
+			return array('main'=>$main,'adv'=>$adv);
+		}
 	}
 
-	function PostAdminSubmitCleanup(&$params)
+	function PostAdminAction(&$params)
 	{
 		//cleanup empties
 		$names = $this->GetOptionRef('option_name');

@@ -21,23 +21,24 @@ class pwfEmailBase extends pwfFieldBase
 		return $this->formdata->formsmodule->Lang('email_template_not_set');
 	}
 
-	function PrePopulateAdminFormCommonEmail($id,$totype = FALSE)
+	function AdminPopulateCommonEmail($id,$totype=FALSE,$visible=TRUE)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id,$visible);
+
 		$mod = $this->formdata->formsmodule;
 		$message = $this->GetOption('email_template');
 
-		/* main-tab items */
-		$main = array(
-				array($mod->Lang('title_email_subject'),$mod->CreateInputText($id,'opt_email_subject',
-						$this->GetOption('email_subject'),50),$mod->Lang('canuse_smarty')),
-
-				array($mod->Lang('title_email_from_name'),$mod->CreateInputText($id,'opt_email_from_name',
-						$this->GetOption('email_from_name',$mod->Lang('friendly_name')),40,128)),
-
-				array($mod->Lang('title_email_from_address'),$mod->CreateInputText($id,'opt_email_from_address',
-						$this->GetOption('email_from_address'),50,128),
-						$mod->Lang('email_from_addr_help',$_SERVER['SERVER_NAME']))
-			  );
+		//additional main-tab items
+		$main[] = array($mod->Lang('title_email_subject'),
+						$mod->CreateInputText($id,'opt_email_subject',
+							$this->GetOption('email_subject'),50),$mod->Lang('canuse_smarty'));
+		$main[] = array($mod->Lang('title_email_from_name'),
+						$mod->CreateInputText($id,'opt_email_from_name',
+							$this->GetOption('email_from_name',$mod->Lang('friendly_name')),40,128));
+		$main[] = array($mod->Lang('title_email_from_address'),
+						$mod->CreateInputText($id,'opt_email_from_address',
+							$this->GetOption('email_from_address'),50,128),
+						$mod->Lang('email_from_addr_help',$_SERVER['SERVER_NAME']));
 		//abandoned here: 'opt_email_cc_address','opt_use_bcc'
 		//code elsewhere assumes this is last in $main[]
 		if($totype)
@@ -48,33 +49,30 @@ class pwfEmailBase extends pwfFieldBase
 					$this->getOption('send_using','to'),'','&nbsp;&nbsp;'),
 					$mod->Lang('email_to_help'));
 
-		$parm = array();
-		$parm['opt_email_template']['html_button'] = TRUE;
-		$parm['opt_email_template']['text_button'] = TRUE;
-		$parm['opt_email_template']['is_email'] = TRUE;
-		list ($funcs,$buttons) = pwfUtils::AdminTemplateActions($this->formdata,$id,$parm);
-
-		/* advanced-tab items */
-		$adv = array(
-				array($mod->Lang('title_html_email'),
+		//additional advanced-tab items
+		$adv[] = array($mod->Lang('title_html_email'),
 					$mod->CreateInputHidden($id,'opt_html_email',0).
 					$mod->CreateInputCheckbox($id,'opt_html_email',1,
-						$this->GetOption('html_email','0'))),
-
-				array($mod->Lang('title_email_encoding'),$mod->CreateInputText($id,'opt_email_encoding',
-					$this->GetOption('email_encoding','utf-8'),15,128)),
-
-				array($mod->Lang('title_email_template'),
-					$mod->CreateTextArea(FALSE,$id,
-					/*($this->GetOption('html_email',0)?$message:htmlspecialchars($message))*/
-					$message,'opt_email_template','pwf_tallarea','','','',50,15,'','html').
-					'<br /><br />'.$buttons[0].'&nbsp'.$buttons[1])
-			  );
-		/*show variables-help on advanced tab*/
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>'varshelpadv');
+						$this->GetOption('html_email','0')));
+		$adv[] = array($mod->Lang('title_email_encoding'),
+					$mod->CreateInputText($id,'opt_email_encoding',
+						$this->GetOption('email_encoding','utf-8'),15,128));
+		//setup sample-template buttons and scripts
+		$ctldata = array();
+		$ctldata['opt_email_template']['html_button'] = TRUE;
+		$ctldata['opt_email_template']['text_button'] = TRUE;
+		$ctldata['opt_email_template']['is_email'] = TRUE;
+		list($buttons,$scripts) = pwfUtils::SampleTemplateActions($this->formdata,$id,$ctldata);
+		$adv[] = array($mod->Lang('title_email_template'),
+						$mod->CreateTextArea(FALSE,$id,
+						//($this->GetOption('html_email',0)?$message:htmlspecialchars($message))
+						$message,'opt_email_template','pwf_tallarea','','','',50,15,'','html'),
+						'<br /><br />'.$buttons[0].'&nbsp'.$buttons[1]);
+		//show variables-help on advanced tab
+		return array($main,$adv,$scripts,'varshelpadv');
 	}
 
-	function PostAdminSubmitCleanupEmail(&$params)
+	function PostAdminActionEmail(&$params)
 	{
 		if(!is_array($params['opt_destination_address']))
 			$params['opt_destination_address'] = array($params['opt_destination_address']);
@@ -157,7 +155,7 @@ $mod->Crash;
 	{
 		$mod = $this->formdata->formsmodule;
 		if($destination_array == FALSE || $subject == FALSE)
-			return array(FALSE,$mod->Lang('missing_TODO'));
+			return array(FALSE,$mod->Lang('missing_type',$mod->Lang('destination'))); //TODO if subject
 
 		$mail = $mod->GetModuleInstance('CMSMailer');
 		if(!$mail)

@@ -15,12 +15,12 @@ class pwfSystemEmail extends pwfEmailBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->HasAddOp = TRUE;
 		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
-		$this->NonRequirableField = TRUE;
 		$this->Type = 'SystemEmail';
 	}
 
@@ -111,12 +111,10 @@ class pwfSystemEmail extends pwfEmailBase
 		return $btns;
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
-
-		$ret = $this->PrePopulateAdminFormCommonEmail($id);
-//		$ret['main'][] = array($mod->Lang('title_destination_address'),$dests);
+		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,FALSE);
 		if($this->addressAdd)
 		{
 			$this->AddOptionElement('destination_address','');
@@ -153,27 +151,25 @@ class pwfSystemEmail extends pwfEmailBase
 				$btns = self::GetDests($id,$i,$totype);
 
 				$dests[] = array(
-				$mod->CreateInputText($id,'opt_destination_address'.$i,$addr,50,128),
-				array_shift($btns),
-				array_shift($btns),
-				array_shift($btns),
-				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
+					$mod->CreateInputText($id,'opt_destination_address'.$i,$addr,50,128),
+					array_shift($btns),
+					array_shift($btns),
+					array_shift($btns),
+					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
 			unset($one);
-			$ret['table'] = $dests;
+//			$main[] = array($mod->Lang('title_destination_address'),$dests);
+			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'funcs'=>$funcs,'extra'=>$extra);
 		}
 		else
-			$ret['main'][] = array($mod->Lang('TODO_title_nodata'),'');			
-		return $ret;
+		{
+			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('destination')));
+			return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
+		}
 	}
 
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		$this->OmitAdminVisible($mainArray,$advArray);
-	}
-
-	function PostAdminSubmitCleanup(&$params)
+	function PostAdminAction(&$params)
 	{
 		//cleanup empties
 		$addrs = $this->GetOptionRef('destination_address');
@@ -186,13 +182,13 @@ class pwfSystemEmail extends pwfEmailBase
 			}
 			unset($one);
 		}
-		$this->PostAdminSubmitCleanupEmail($params);
+		$this->PostAdminActionEmail($params);
 	}
 
 	function AdminValidate($id)
 	{
 		$messages = array();
-  		list($ret,$msg) = parent::AdminValidate($id);
+		list($ret,$msg) = parent::AdminValidate($id);
 		if(!ret)
 			$messages[] = $msg;
 
@@ -210,10 +206,10 @@ class pwfSystemEmail extends pwfEmailBase
 		else
 		{
 			$ret = FALSE;
-			$messages[] = $mod->Lang('must_specify_TODO');
+			$messages[] = $mod->Lang('missing_type',$mod->Lang('source'));
 		}
 
-    	$dests = $this->GetOptionRef('destination_address');
+		$dests = $this->GetOptionRef('destination_address');
 		if($dests)
 		{
 			foreach($dests as &$one)
@@ -230,11 +226,11 @@ class pwfSystemEmail extends pwfEmailBase
 		else
 		{
 			$ret = FALSE;
-			$messages[] = $mod->Lang('must_specify_one_destination');
+			$messages[] = $mod->Lang('missing_type',$mod->Lang('destination'));
 		}
 
 		$msg = ($ret)? '' : implode('<br />',$messages);
-    	return array($ret,$msg);
+		return array($ret,$msg);
 	}
 
 	function SetFromAddress()

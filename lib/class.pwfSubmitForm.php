@@ -10,10 +10,10 @@ class pwfSubmitForm extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->IsDisposition = TRUE;
 		$this->IsSortable = FALSE;
-		$this->NonRequirableField = TRUE;
 		$this->Type = 'SubmitForm';
 	}
 
@@ -22,14 +22,13 @@ class pwfSubmitForm extends pwfFieldBase
 		return $this->GetOption('method').' '.$this->GetOption('url');
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
-		$formdata = $this->formdata;
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE);
 		$mod = $formdata->formsmodule;
-		$main = array();
 		if(function_exists('curl_init'))
 		{
-			$adv = array();
+			$formdata = $this->formdata;
 			$methods = array('POST'=>'POST','GET'=>'GET');
 			$main[] = array($mod->Lang('title_method'),
 				$mod->CreateInputDropdown($id,'opt_method',$methods,-1,
@@ -54,31 +53,18 @@ class pwfSubmitForm extends pwfFieldBase
 				$mod->CreateInputText($id,'opt_additional',
 					$this->GetOption('additional'),40,255),
 				$mod->Lang('help_additional_payload'));
-			return array('main'=>$main,'adv'=>$adv);
 		}
 		else
 		{
 			$main[] = array('','',$mod->Lang('title_install_curl'));
-			return array('main'=>$main);
 		}
-	}
-
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		$this->OmitAdminVisible($mainArray,$advArray);
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Dispose($id,$returnid)
 	{
-		$formdata = $this->formdata;
-		$mod = $formdata->formsmodule;
-		$msg = '';
-		$submission = $this->GetOption('url');
 		$payload = array();
-		$fields = $formdata->Fields;
-		$unspec = $this->GetFormOption('unspecified',$mod->Lang('unspecified'));
-
-		foreach($fields as &$one)
+		foreach($this->formdata->Fields as &$one)
 		{
 			if($this->GetOption('sub_'.$one->GetId(),0))
 			{
@@ -89,8 +75,10 @@ class pwfSubmitForm extends pwfFieldBase
 		unset($one);
 		if($this->GetOption('additional'))
 			$payload[] = $this->GetOption('additional');
-
 		$send_payload = implode('&',$payload);
+
+		$msg = '';
+	
 		if($this->GetOption('method','POST') == 'POST')
 		{
 			$ch = curl_init($this->GetOption('url'));
@@ -109,22 +97,16 @@ class pwfSubmitForm extends pwfFieldBase
 		{
 			$url = $this->GetOption('url');
 			if(strpos($url,'?'))
-			{
 				$url .= '&'.$send_payload;
-			}
 			else
-			{
 				$url .= '?'.$send_payload;
-			}
 			$ch = curl_init($url);
 			curl_setopt($ch,CURLOPT_HTTPGET,1);
 			curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
 			curl_setopt($ch,CURLOPT_RETURNTRANSFER,0);
 			$res = curl_exec($ch);
 			if(!$res)
-			{
 				$msg = curl_error($ch);
-			}
 			curl_close($ch);
 		}
 		return array($res,$msg);

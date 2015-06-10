@@ -13,7 +13,7 @@ class pwfEmailFEUProperty extends pwfEmailBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->NonRequirableField = TRUE;
+		$this->ChangeRequirement = FALSE;
 		$this->Type = 'EmailFEUProperty';
 	}
 
@@ -39,10 +39,10 @@ class pwfEmailFEUProperty extends pwfEmailBase
 			if(array_key_exists($this->Value,$opts)) //TODO check logic
 				$ret = $opts[$this->Value]; //TODO if FALSE
 			else
-				$ret = $this->GetOption('unspecified',$mod->Lang('TODO'));
+				$ret = $this->GetOption('unspecified',$mod->Lang('unspecified'));
 		}
 		else
-			$ret = $this->GetOption('unspecified',$mod->Lang('TODO'));
+			$ret = $this->GetOption('unspecified',$mod->Lang('unspecified'));
 
 		if($as_string)
 			return $ret;
@@ -50,24 +50,18 @@ class pwfEmailFEUProperty extends pwfEmailBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$feu = $mod->GetModuleInstance('FrontEndUsers');
 		if(!$feu)
-		{
-			return array('main'=>array(array(
-			'<span style="color:red">'.$mod->Lang('error').'</span>',
-			$mod->Lang('error_module_feu'))));
-		}
+			return array('main'=>array('<span style="color:red">'.$mod->Lang('error').'</span>',
+			'',$mod->Lang('error_module_feu')));
 
 		$defns = $feu->GetPropertyDefns();
 		if(!is_array($defns))
-		{
-			return array('main'=>array(array(
-			'<span style="color:red">'.$mod->Lang('error').'</span>',
-			$mod->Lang('error_feudefns'))));
-		}
+			return array('main'=>array('<span style="color:red">'.$mod->Lang('error').'</span>',
+				'',$mod->Lang('error_feudefns')));
 
 		// check for dropdown or multiselect fields
 		$opts = array();
@@ -86,23 +80,18 @@ class pwfEmailFEUProperty extends pwfEmailBase
 			}
 		}
 		if(!count($opts))
-		{
-			// just act like a regular disposition...
-			return array('main'=>array(array(
-			'<span style="color:red">'.$mod->Lang('error').'</span>',
-			$mod->Lang('error_feudefns'))));
-		}
-//TODO
-		$ret = $this->PrePopulateAdminFormCommonEmail($id,TRUE);
+			return array('main'=>array('<span style="color:red">'.$mod->Lang('error').'</span>',
+				'',$mod->Lang('error_feudefns')));
+
+		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE);
 		$waslast = array_pop($ret['main']); //keep the email to-type selector for last
 		$keys = array_keys($opts);
-		$ret['main'][] = array($mod->Lang('title_feu_property'),
-				$mod->CreateInputDropdown($id,'opt_feu_property',
-				   array_flip($opts),-1,
-				   $this->GetOption('feu_property',$keys[0])),
+		$main[] = array($mod->Lang('title_feu_property'),
+				$mod->CreateInputDropdown($id,'opt_feu_property',array_flip($opts),-1,
+					$this->GetOption('feu_property',$keys[0])),
 				$mod->Lang('help_feu_property'));
-		$ret['main'][] = $waslast;
-		return $ret;
+		$main[] = $waslast;
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
 	}
 
 	function Populate($id,&$params)

@@ -16,17 +16,20 @@ class pwfHTML5Number extends pwfFieldBase
 		$this->Type = 'HTML5Number';
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main = array();
 		$main[] = array($mod->Lang('title_min_number'),
-			$mod->CreateInputText($id,'opt_min_number',$this->GetOption('min_number',0)));
+						$mod->CreateInputText($id,'opt_min_number',
+							$this->GetOption('min_number',0)));
 		$main[] = array($mod->Lang('title_max_number'),
-			$mod->CreateInputText($id,'opt_max_number',$this->GetOption('max_number',500)));
+						$mod->CreateInputText($id,'opt_max_number',
+							$this->GetOption('max_number',500)));
 		$main[] = array($mod->Lang('title_step_number'),
-			$mod->CreateInputText($id,'opt_step_number',$this->GetOption('step_number',50)));
-		return array('main'=>$main);
+						$mod->CreateInputText($id,'opt_step_number',
+							$this->GetOption('step_number',50)));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function AdminValidate($id)
@@ -41,19 +44,19 @@ class pwfHTML5Number extends pwfFieldBase
 		if(!$min || !is_numeric($min))
 		{
 			$ret = FALSE;
-			$messages[] = $mod->Lang('error_number',$mod->Lang('minumum')); //TODO translate
+			$messages[] = $mod->Lang('error_typed',$mod->Lang('minumum'));
 		}
 		$max = $this->GetOption('max_number');
 		if(!$max || !is_numeric($max) || $max <= $min))
 		{
 			$ret = FALSE;
-			$messages[] = $mod->Lang('error_number',$mod->Lang('maximum'));
+			$messages[] = $mod->Lang('error_typed',$mod->Lang('maximum'));
 		}
 		$step = $this->GetOption('step_number');
 		if(!$step || !is_numeric($step) || $step >= $max))
 		{
 			$ret = FALSE;
-			$messages[] = $mod->Lang('error_number',$mod->Lang('step'));
+			$messages[] = $mod->Lang('error_typed',$mod->Lang('increment'));
 		}
 		$msg = ($ret)?'':implode('<br />',$messages);
 		return array($ret,$msg);

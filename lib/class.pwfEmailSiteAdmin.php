@@ -62,42 +62,39 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
-		$mod = $this->formdata->formsmodule;
-
-		$ret = $this->PrePopulateAdminFormCommonEmail($id,TRUE);
-		$waslast = array_pop($ret['main']); //keep the email to-type selector for later
-		$ret['main'][] = array($mod->Lang('title_select_one_message'),
-				$mod->CreateInputText($id,'opt_select_one',
-				$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
-		$ret['main'][] = array($mod->Lang('title_show_userfirstname'),
-				$mod->CreateInputHidden($id,'opt_show_userfirstname',0).
-				$mod->CreateInputCheckbox($id,'opt_show_userfirstname',1,
-					$this->GetOption('show_userfirstname',1)));
-		$ret['main'][] = array($mod->Lang('title_show_userlastname'),
-				$mod->CreateInputHidden($id,'opt_show_userlastname',0).
-				$mod->CreateInputCheckbox($id,'opt_show_userlastname',1,
-					$this->GetOption('show_userlastname',1)));
-		$ret['main'][] = array($mod->Lang('title_show_username'),
-				$mod->CreateInputHidden($id,'opt_show_username',0).
-				$mod->CreateInputCheckbox($id,'opt_show_username',1,
-					$this->GetOption('show_username',0)));
-		$ret['main'][] = $waslast;
-
 		$choices = array();
-		$groupops = cmsms()->GetGroupOperations();
-		$groups = $groupops->LoadGroups();
+		$groups = cmsms()->GetGroupOperations()->LoadGroups();
 		foreach($groups as $one)
 			$choices[$one->name] = $one->id;
 
-		$ret['main'][] = array($mod->Lang('title_restrict_to_group'),
+		$mod = $this->formdata->formsmodule;
+
+		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE);
+		$waslast = array_pop($main); //keep the email to-type selector for later
+		$main[] = array($mod->Lang('title_select_one_message'),
+				$mod->CreateInputText($id,'opt_select_one',
+				$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
+		$main[] = array($mod->Lang('title_show_userfirstname'),
+				$mod->CreateInputHidden($id,'opt_show_userfirstname',0).
+				$mod->CreateInputCheckbox($id,'opt_show_userfirstname',1,
+					$this->GetOption('show_userfirstname',1)));
+		$main[] = array($mod->Lang('title_show_userlastname'),
+				$mod->CreateInputHidden($id,'opt_show_userlastname',0).
+				$mod->CreateInputCheckbox($id,'opt_show_userlastname',1,
+					$this->GetOption('show_userlastname',1)));
+		$main[] = array($mod->Lang('title_show_username'),
+				$mod->CreateInputHidden($id,'opt_show_username',0).
+				$mod->CreateInputCheckbox($id,'opt_show_username',1,
+					$this->GetOption('show_username',0)));
+		$main[] = $waslast;
+		$main[] = array($mod->Lang('title_restrict_to_group'),
 				$mod->CreateInputHidden($id,'opt_restrict_to_group',0).
 				$mod->CreateInputCheckbox($id,'opt_restrict_to_group',1,
 					$this->GetOption('restrict_to_group',0)).
-				$mod->CreateInputDropdown($id,'opt_group',$choices,-1,$this->GetOption('group'))
-				);
-		return $ret;
+				$mod->CreateInputDropdown($id,'opt_group',$choices,-1,$this->GetOption('group')));
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
 	}
 
 	function AdminValidate($id)
@@ -107,11 +104,10 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 		if(!ret)
 			$messages[] = $msg;
 
-		$mod = $this->formdata->formsmodule;
-    	$dest = $this->GetOption('email_from_address');
-		if($dest)
+    	$addr = $this->GetOption('email_from_address');
+		if($addr)
 		{
-			list($rv,$msg) = $this->validateEmailAddr($dest);
+			list($rv,$msg) = $this->validateEmailAddr($addr);
 			if(!$rv)
 			{
 				$ret = FALSE;
@@ -121,7 +117,8 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 		else
 		{
 			$ret = FALSE;
-			$messages[] = $mod->Lang('must_specify_TODO');
+			$mod = $this->formdata->formsmodule;
+			$messages[] = $mod->Lang('missing_type',$mod->Lang('source'));
 		}
 		$msg = ($ret)?'':implode('<br />',$messages);
 	    return array($ret,$msg);
@@ -159,7 +156,7 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 		}
 		else
 		{
-			return $mod->Lang('TODO');
+			return $mod->Lang('no_admins');
 		}
 	}
 
@@ -173,7 +170,8 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 		else
 		{
 			$this->validated = FALSE;
-			$this->ValidationMessage = $this->formdata->formsmodule->Lang('must_specify_one_destination'); //TODO person
+			$mod = $this->formdata->formsmodule;
+			$this->ValidationMessage = $mod->Lang('missing_type',$mod->Lang('admin'));
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}

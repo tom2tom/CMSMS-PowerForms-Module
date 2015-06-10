@@ -10,9 +10,9 @@ class pwfStaticText extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->HasLabel = FALSE;
-		$this->NonRequirableField = TRUE;
 		$this->Type = 'StaticText';
 	}
 
@@ -30,27 +30,21 @@ class pwfStaticText extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE);
+
 		$mod = $this->formdata->formsmodule;
-		$main = array(
-				array($mod->Lang('title_text'),
-				$mod->CreateTextArea((get_preference(get_userid(),'use_wysiwyg')=='1'),$id,$this->GetOption('text'),'opt_text','pageheadtags'))
-		);
-		$adv = array(
-				array($mod->Lang('title_smarty_eval'),
-				$mod->CreateInputHidden($id,'opt_smarty_eval',0).
-				$mod->CreateInputCheckbox($id,'opt_smarty_eval',1,
-					$this->GetOption('smarty_eval',0)))
-		);
+		$main[] = array($mod->Lang('title_text'),
+						$mod->CreateTextArea((get_preference(get_userid(),'use_wysiwyg')),$id,
+							$this->GetOption('text'),'opt_text','pageheadtags'));
+		$adv[] = array($mod->Lang('title_smarty_eval'),
+						$mod->CreateInputHidden($id,'opt_smarty_eval',0).
+						$mod->CreateInputCheckbox($id,'opt_smarty_eval',1,
+							$this->GetOption('smarty_eval',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 	
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		$this->OmitAdminVisible($mainArray,$advArray);
-	}
-
 	function Populate($id,&$params)
 	{
 		if($this->GetOption('smarty_eval',0))

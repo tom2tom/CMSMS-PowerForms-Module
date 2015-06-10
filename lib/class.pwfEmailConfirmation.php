@@ -7,7 +7,7 @@
 
 class pwfEmailConfirmation extends pwfEmailBase
 {
-	var $approvedToGo;
+	var $approvedToGo = FALSE;
 
 	function __construct(&$formdata,&$params)
 	{
@@ -17,7 +17,6 @@ class pwfEmailConfirmation extends pwfEmailBase
 		$this->ValidationType = 'email';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array($mod->Lang('validation_email_address')=>'email');
-		$this->approvedToGo = FALSE;
 	}
 
 	function GetFieldStatus()
@@ -28,21 +27,19 @@ class pwfEmailConfirmation extends pwfEmailBase
 	function ApproveToGo($response_id)
 	{
 		$this->approvedToGo = TRUE;
-//TODO 'REALLY' dispose the whole form (without further confirmation)
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
+		//log extra tag for use in template-help
+		pwfUtils::AddTemplateVariable($this->formdata,'confirm_url','title_confirmation_url');
 		$contentops = cmsms()->GetContentOperations();
 
-//TODO where should this be?
-		pwfUtils::AddTemplateVariable($this->formdata,'confirm_url',$mod->Lang('title_confirmation_url'));
-
-		$ret = $this->PrePopulateAdminFormCommonEmail($id);
-		$ret['main'][] = array($mod->Lang('redirect_after_approval'),
+		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id);
+		$adv[] = array($mod->Lang('redirect_after_approval'),
 				@$contentops->CreateHierarchyDropdown('',$this->GetOption('redirect_page','0'),$id.'opt_redirect_page'));
-		return $ret;
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
 	}
 
 	function Populate($id,&$params)
@@ -56,6 +53,9 @@ class pwfEmailConfirmation extends pwfEmailBase
 
 	function Validate($id)
 	{
+		//sneak this in, ahead of PreDisposeAction()
+		$this->approvedToGo = FALSE;
+
   		$this->validated = TRUE;
   		$this->ValidationMessage = '';
 		switch ($this->ValidationType)
@@ -80,53 +80,38 @@ class pwfEmailConfirmation extends pwfEmailBase
 		return array($this->validated,$this->ValidationMessage);
 	}
 
-	function PreDispositionAction()
+	//we assume (correctly) this field is first disposition on the form
+	function PreDisposeAction()
 	{
-		if($this->formdata->FormState == 'update')
-		{
-			$this->approvedToGo = TRUE;
-			return;
-		}
-		// If we haven't been approved,inhibit all other dispositions!
+		$val = $this->approvedToGo;
+		//inhibit/enable all dispositions
 		foreach($this->formdata->Fields as &$one)
 		{
-			if($this->approvedToGo && $one->GetFieldType() == 'FormBrowser')
-				$one->SetApprovalName($this->GetValue());
-			elseif(!$this->approvedToGo && $one->IsDisposition())
-				$one->SetDispositionPermission(FALSE);
+			if($one->IsDisposition())
+				$one->SetDispositionPermission($val);
 		}
 		unset($one);
-		$this->SetDispositionPermission(TRUE);
+		$this->SetDispositionPermission(!$val); //re-enable/inhibit this disposition
 	}
 
+	//only called when $this->approvedToGo is FALSE
 	function Dispose($id,$returnid)
 	{
-		if($this->approvedToGo)
-		{
-			return array(TRUE,'');
-		}
-		else
-		{
-//TODO cache form data, & abort disposition, pending confirmation
-			// create response URL
-			$handler = NULL;
-//TODO response store??? 
-			list($response_id,$code) = pwfUtils::StoreResponse($this->formdata,-1,'',$handler);
-			$smarty = cmsms()->GetSmarty();
-			$mod = $this->formdata->formsmodule;
-//TODO actually achieves anything?
-			pwfUtils::AddTemplateVariable($this->formdata,'confirm_url',$mod->Lang('title_confirmation_url'));
-			$pref = $this->formdata->current_prefix;
-//TODO setting URL actually achieves anything?
-			$smarty->assign('confirm_url',$mod->CreateFrontendLink('',$returnid,
-				'validate','',array(
-					$pref.'c'=>$code,
-					$pref.'d'=>$this->Id,
-					$pref.'f'=>$this->formdata->Id,
-					$pref.'r'=>$response_id),
-				'',TRUE,FALSE,'',TRUE));
-			return $this->SendForm($this->GetValue(),$this->GetOption('email_subject'));
-		}
+//TODO cache form data, pending confirmation
+		$code = 'TODO';
+		$response_id = 'TODO';
+		//set url variable for email template
+		$smarty = cmsms()->GetSmarty();
+		$pref = $this->formdata->current_prefix;
+		$smarty->assign('confirm_url',
+			$this->formdata->formsmodule->CreateFrontendLink('',$returnid,'validate','',
+			array(
+				$pref.'c'=>$code,
+				$pref.'d'=>$this->Id,
+//				$pref.'f'=>$this->formdata->Id,
+				$pref.'r'=>$response_id),
+			'',TRUE,FALSE,'',TRUE));
+		return $this->SendForm($this->GetValue(),$this->GetOption('email_subject'));
 	}
 }
 

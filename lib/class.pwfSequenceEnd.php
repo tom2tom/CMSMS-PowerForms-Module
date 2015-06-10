@@ -10,9 +10,10 @@ class pwfSequenceEnd extends pwfFieldBase
 	function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata, $params);
+		$this->ChangeRequirement = FALSE;
+		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->IsSortable = FALSE;
-		$this->NonRequirableField = TRUE;
 		$this->Type = 'SequenceEnd';
 	}
 
@@ -25,21 +26,18 @@ class pwfSequenceEnd extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main = array(
-			  array($mod->Lang('title_name'),
-					$mod->CreateInputText($id,'opt_sequencename',
-					  $this->GetOption('legend'), 50)));
-//TODO id of sequence start
-		return array('main'=>$main);
+		//TODO select sequence start field
+/*		$main[] = array($mod->Lang(''),
+						$mod->CreateInputDropdown($id,'opt_starter',
+							$this->GetOption('starter'),50));
+*/
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
-	function Populate($id,&$params)
-	{
-		return '';
-	}
 }
 
 ?>

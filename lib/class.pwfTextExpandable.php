@@ -26,19 +26,18 @@ class pwfTextExpandable extends pwfFieldBase
            );
 	}
 
-	// Gets all mirror fields of this field
+	// Gets all other 'TextExpandable' fields in the form
 	function GetFieldSiblings()
 	{
 		$siblings = array();
-
 		$siblings[$this->formdata->formsmodule->Lang('select_one')] = '';
-
+		$tid = $this->Id;
 		foreach($this->formdata->Fields as &$one)
 		{
 			if($one->GetFieldType() == 'TextExpandable')
 			{
-				$fid = $one->GetId();
- 				if($fid != $this->GetId())
+				$fid = $one->Id;
+ 				if($fid != $tid)
 					$siblings[$one->GetName()] = $fid;
 			}
 		}
@@ -80,33 +79,27 @@ class pwfTextExpandable extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-
-		$main = array(
-			array($mod->Lang('title_maximum_length'),
-				$mod->CreateInputText($id,'opt_length',$this->GetOption('length',80),25,25)),
-			array($mod->Lang('title_add_button_text'),
-				$mod->CreateInputText($id,'opt_add_button',$this->GetOption('add_button','+'),15,25)),
-			array($mod->Lang('title_del_button_text'),
-				$mod->CreateInputText($id,'opt_del_button',$this->GetOption('del_button','X'),15,25))
-		);
-
-		$adv = array(
-			array($mod->Lang('title_field_regex'),
-				$mod->CreateInputText($id,'opt_regex',$this->GetOption('regex'),25,255),
-				$mod->Lang('help_regex_use')),
-			array($mod->Lang('title_field_siblings'),
-				$mod->CreateInputDropdown($id,'opt_siblings',$this->GetFieldSiblings(),-1,
-					$this->GetOption('siblings')),
-				$mod->Lang('help_field_siblings')),
-			array($mod->Lang('title_field_hidebuttons'),
-				$mod->CreateInputHidden($id,'opt_hidebuttons',0).
-				$mod->CreateInputCheckbox($id,'opt_hidebuttons',1,$this->GetOption('hidebuttons',0)),
-				$mod->Lang('help_field_hidebuttons'))
-		);
-
+		$main[] = array($mod->Lang('title_maximum_length'),
+						$mod->CreateInputText($id,'opt_length',$this->GetOption('length',80),25,25));
+		$main[] = array($mod->Lang('title_add_button_text'),
+						$mod->CreateInputText($id,'opt_add_button',$this->GetOption('add_button','+'),15,25));
+		$main[] = array($mod->Lang('title_del_button_text'),
+						$mod->CreateInputText($id,'opt_del_button',$this->GetOption('del_button','X'),15,25));
+		$adv[] = array($mod->Lang('title_field_regex'),
+						$mod->CreateInputText($id,'opt_regex',$this->GetOption('regex'),25,255),
+						$mod->Lang('help_regex_use'));
+		$adv[] = array($mod->Lang('title_field_siblings'),
+						$mod->CreateInputDropdown($id,'opt_siblings',$this->GetFieldSiblings(),-1,
+							$this->GetOption('siblings')),
+						$mod->Lang('help_field_siblings'));
+		$adv[] = array($mod->Lang('title_field_hidebuttons'),
+						$mod->CreateInputHidden($id,'opt_hidebuttons',0).
+						$mod->CreateInputCheckbox($id,'opt_hidebuttons',1,$this->GetOption('hidebuttons',0)),
+						$mod->Lang('help_field_hidebuttons'));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 

@@ -71,17 +71,14 @@ class pwfPageRedirector extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE);
 		$mod = $this->formdata->formsmodule;
 
-		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
-			$mod->CreateInputText($id,'opt_select_one',
-			$this->GetOption('select_one',$mod->Lang('select_one')),30,128));
-//		$main[] = array($mod->Lang('title_director_details'),$dests);
-		$dests = array();
-
+						$mod->CreateInputText($id,'opt_select_one',
+							$this->GetOption('select_one',$mod->Lang('select_one')),30,128));
 		if($this->addressAdd)
 		{
 			$this->AddOptionElement('destination_page','');
@@ -91,6 +88,7 @@ class pwfPageRedirector extends pwfFieldBase
 		$opt = $this->GetOptionRef('destination_page');
 		if($opt)
 		{
+			$dests = array();
 			$dests[] = array(
 				$mod->Lang('title_selection_subject'),
 				$mod->Lang('title_destination_page'),
@@ -106,16 +104,17 @@ class pwfPageRedirector extends pwfFieldBase
 				);
 			}
 			unset($one);
+//			$main[] = array($mod->Lang('title_director_details'),$dests);
+			return array('main'=>$main,'adv'=>$adv,'table'=>$dests);
 		}
-		return array('main'=>$main,'table'=>$dests);
+		else
+		{
+			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('page')));
+			return array('main'=>$main,'adv'=>$adv);
+		}
 	}
 
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		$this->OmitAdminVisible($mainArray,$advArray);
-	}
-
-	function PostAdminSubmitCleanup(&$params)
+	function PostAdminAction(&$params)
 	{
 		//cleanup empties
 		$pages = $this->GetOptionRef('destination_page');
@@ -140,11 +139,11 @@ class pwfPageRedirector extends pwfFieldBase
 		if(!ret)
 			$messages[] = $msg;
 
-		$mod = $this->formdata->formsmodule;
 		if(!$this->GetOption('destination_page'))
 		{
 			$ret = FALSE;
-			$messages[] = $mod->Lang('must_specify_one_destination');
+			$mod = $this->formdata->formsmodule;
+			$messages[] = $mod->Lang('missing_type',$mod->Lang('page'));
 		}
 		$msg = ($ret)?'':implode('<br />',$messages);
 	    return array($ret,$msg);

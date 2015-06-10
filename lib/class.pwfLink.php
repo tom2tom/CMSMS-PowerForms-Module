@@ -10,8 +10,8 @@ class pwfLink extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->MultiPopulate = TRUE;
-		$this->NonRequirableField = TRUE;
 		$this->Required = FALSE;
 		$this->Type = 'Link';
 		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_none')=>'none');
@@ -19,7 +19,7 @@ class pwfLink extends pwfFieldBase
 
 	function GetHumanReadableValue($as_string=TRUE)
 	{
-		if(property_exists($this,$Value) && is_array($this->Value))
+		if(property_exists($this,'Value') && is_array($this->Value))
 			$ret = '<a href="'.$this->Value[0].'">'.$this->Value[1].'</a>';
 		else
 			$ret = '';
@@ -30,21 +30,20 @@ class pwfLink extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main = array(
-			array($mod->Lang('title_default_link'),$mod->CreateInputText($id,'opt_default_link',$this->GetOption('default_link'),25,128)),
-			array($mod->Lang('title_default_link_title'),$mod->CreateInputText($id,'opt_default_link_title',$this->GetOption('default_link_title'),25,128))
-		);
-		return array('main'=>$main);
-	}
+		// remove the "required" field TODO
+		$this->RemoveAdminField($main,$mod->Lang('title_field_required'));
 
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		$mod = $this->formdata->formsmodule;
-		// remove the "required" field,since this can only be done via validation
-		$this->RemoveAdminField($mainArray,$mod->Lang('title_field_required'));
+		$main[] = array($mod->Lang('title_default_link'),
+						$mod->CreateInputText($id,'opt_default_link',
+							$this->GetOption('default_link'),25,128));
+		$main[] = array($mod->Lang('title_default_link_title'),
+						$mod->CreateInputText($id,'opt_default_link_title',
+							$this->GetOption('default_link_title'),25,128));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)
@@ -52,7 +51,7 @@ class pwfLink extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		$js = $this->GetScript();
 
-		if(property_exists($this,$Value) && is_array($this->Value))
+		if(property_exists($this,'Value') && is_array($this->Value))
 			$val = $this->Value;
 		else
 			$val = array($this->GetOption('default_link'),$this->GetOption('default_link_title'));

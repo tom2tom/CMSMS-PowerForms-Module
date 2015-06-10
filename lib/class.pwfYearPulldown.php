@@ -28,25 +28,21 @@ class pwfYearPulldown extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-
-		$main = array();
 		$main[] = array($mod->Lang('title_select_one_message'),
-					$mod->CreateInputText($id,'opt_select_one',
+						$mod->CreateInputText($id,'opt_select_one',
 						  $this->GetOption('select_one',$mod->Lang('select_one')),25,128));
-
 		$main[] = array($mod->Lang('title_year_end_message'),
-					$mod->CreateInputText($id,'opt_year_start',
+						$mod->CreateInputText($id,'opt_year_start',
 						  $this->GetOption('year_start',1900),25,128));
-
 		$main[] = array($mod->Lang('sort_options'),
-					$mod->CreateInputDropdown($id,'opt_sort',
+						$mod->CreateInputDropdown($id,'opt_sort',
 						  array($mod->Lang('yes')=>1,$mod->Lang('no')=>0),-1,
 						  $this->GetOption('sort',0)));
-
-		return array('main'=>$main);
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)

@@ -10,22 +10,17 @@ class pwfPageBreak extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->IsSortable = FALSE;
-		$this->NonRequirableField = TRUE;
 		$this->Required = FALSE;
 		$this->Type = 'PageBreak';
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
-		return array();
-	}
-
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		$this->OmitAdminVisible($mainArray,$advArray);
+		return $this->AdminPopulateCommon($id,FALSE);
 	}
 
 }

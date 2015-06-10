@@ -31,32 +31,29 @@ class pwfPassword extends pwfFieldBase
 		return $ret;
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main = array(
-			array($mod->Lang('title_display_length'),
-				$mod->CreateInputText($id,'opt_length',
-					$this->GetOption('length',12),25,25)),
-			array($mod->Lang('title_minimum_length'),
-				$mod->CreateInputText($id,'opt_min_length',
-					$this->GetOption('min_length',8),25,25)),
-			array($mod->Lang('title_hide'),
-				$mod->CreateInputHidden($id,'opt_hide',0).
-        		$mod->CreateInputCheckbox($id,'opt_hide',1,
-					$this->GetOption('hide',1)),
-				$mod->Lang('title_hide_help')),
-			array($mod->Lang('title_read_only'),
-				$mod->CreateInputHidden($id,'opt_readonly',0).
-        		$mod->CreateInputCheckbox($id,'opt_readonly',1,
-					$this->GetOption('readonly',0)))
-		);
-		$adv = array(
-			array($mod->Lang('title_field_regex'),
-			      $mod->CreateInputText($id,'opt_regex',
-					  $this->GetOption('regex'),25,1024),
-			      $mod->Lang('help_regex_use')),
-		);
+		$main[] = array($mod->Lang('title_display_length'),
+						$mod->CreateInputText($id,'opt_length',
+							$this->GetOption('length',12),25,25));
+		$main[] = array($mod->Lang('title_minimum_length'),
+						$mod->CreateInputText($id,'opt_min_length',
+							$this->GetOption('min_length',8),25,25));
+		$main[] = array($mod->Lang('title_hide'),
+						$mod->CreateInputHidden($id,'opt_hide',0).
+						$mod->CreateInputCheckbox($id,'opt_hide',1,
+							$this->GetOption('hide',1)),
+					  $mod->Lang('title_hide_help'));
+		$main[] = array($mod->Lang('title_read_only'),
+						$mod->CreateInputHidden($id,'opt_readonly',0).
+						$mod->CreateInputCheckbox($id,'opt_readonly',1,
+							$this->GetOption('readonly',0)));
+		$adv[] = array($mod->Lang('title_field_regex'),
+						$mod->CreateInputText($id,'opt_regex',
+							$this->GetOption('regex'),25,1024),
+						$mod->Lang('help_regex_use'));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -95,7 +92,7 @@ class pwfPassword extends pwfFieldBase
 		 case 'none':
 			break;
 		 case 'regex_match':
-			if(property_exists($this,$Value) &&
+			if(property_exists($this,'Value') &&
 				!preg_match($this->GetOption('regex','/.*/'),$this->Value))
 			{
 				$this->validated = FALSE;
@@ -103,7 +100,7 @@ class pwfPassword extends pwfFieldBase
 			}
 			break;
 		 case 'regex_nomatch':
-			if(property_exists($this,$Value) &&
+			if(property_exists($this,'Value') &&
 				preg_match($this->GetOption('regex','/.*/'),$this->Value))
 			{
 				$this->validated = FALSE;

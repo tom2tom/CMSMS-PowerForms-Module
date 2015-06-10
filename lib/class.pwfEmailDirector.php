@@ -79,30 +79,31 @@ class pwfEmailDirector extends pwfEmailBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id);
 		$mod = $this->formdata->formsmodule;
-
-		$ret = $this->PrePopulateAdminFormCommonEmail($id);
-		$ret['main'][] = array($mod->Lang('title_select_one_message'),
+		// remove the "email subject" field
+		$this->RemoveAdminField($main,
+			$mod->Lang('title_email_subject'));
+		$main[] = array($mod->Lang('title_select_one_message'),
 			$mod->CreateInputText($id,'opt_select_one',
 			$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
-		$ret['main'][] = array($mod->Lang('title_allow_subject_override'),
+		$main[] = array($mod->Lang('title_allow_subject_override'),
 			$mod->CreateInputHidden($id,'opt_subject_override',0).
 			$mod->CreateInputCheckbox($id,'opt_subject_override',1,
 				$this->GetOption('subject_override',0)),
 			$mod->Lang('help_allow_subject_override'));
-//		$ret['main'][] = array($mod->Lang('title_director_details'),$dests);
-		$dests = array();
 		if($this->addressAdd)
 		{
 			$this->AddOptionElement('destination_subject','');
 			$this->AddOptionElement('destination_address','');
 			$this->addressAdd = FALSE;
 		}
-		$opt = $this->GetOptionRef('destination_subject');
+		$opt = $this->GetOptionRef('destination_address');
 		if($opt)
 		{
+			$dests = array();
 			$dests[] = array(
 				$mod->Lang('title_selection_subject'),
 				$mod->Lang('title_destination_address'),
@@ -111,27 +112,24 @@ class pwfEmailDirector extends pwfEmailBase
 			foreach($opt as $i=>&$one)
 			{
 				$dests[] = array(
-				$mod->CreateInputText($id,'opt_destination_subject'.$i,$one,40,128),
-				$mod->CreateInputText($id,'opt_destination_address'.$i,
-					$this->GetOptionElement('destination_address',$i),50,128),
+				$mod->CreateInputText($id,'opt_destination_subject'.$i,
+					$this->GetOptionElement('destination_subject',$i),40,128),
+				$mod->CreateInputText($id,'opt_destination_address'.$i,$one,50,128),
 				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
 			unset($one);
+//			$main[] = array($mod->Lang('title_director_details'),$dests);
+			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'funcs'=>$funcs,'extra'=>$extra);
 		}
-
-		$ret['table'] = $dests;
-		return $ret;
+		else
+		{
+			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('destination')));
+			return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
+		}
 	}
 
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		// remove the "email subject" field
-		$this->RemoveAdminField($mainArray,
-			$this->formdata->formsmodule->Lang('title_email_subject'));
-	}
-
-	function PostAdminSubmitCleanup(&$params)
+	function PostAdminAction(&$params)
 	{
 		//cleanup empties
 		$addrs = $this->GetOptionRef('destination_address');
@@ -147,7 +145,7 @@ class pwfEmailDirector extends pwfEmailBase
 			}
 			unset($one);
 		}
-		$this->PostAdminSubmitCleanupEmail($params);
+		$this->PostAdminActionEmail($params);
 	}
 
 	function AdminValidate($id)
@@ -181,7 +179,7 @@ class pwfEmailDirector extends pwfEmailBase
 		else
 		{
 			$ret = FALSE;
-			$messages[] = $mod->Lang('must_specify_one_destination');
+			$messages[] = $mod->Lang('missing_type',$mod->Lang('destination'));
 		}
 		$msg = ($ret)?'':implode('<br />',$messages);
 	    return array($ret,$msg);
@@ -212,7 +210,8 @@ class pwfEmailDirector extends pwfEmailBase
 		else
 		{
 	  		$this->validated = FALSE;
-  			$this->ValidationMessage = $this->formdata->formsmodule->Lang('must_specify_one_destination');
+			$mod = $this->formdata->formsmodule;
+  			$this->ValidationMessage = $mod->Lang('missing_type',$mod->Lang('destination'));
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}

@@ -28,7 +28,7 @@ class pwfCustomEmail extends pwfEmailBase
 		if($opt)
 			$ret = $mod->Lang('to').': '.count($opt).' '.$mod->Lang('fields');
 		else
-			$ret = $mod->Lang('no address TODO');
+			$ret = $mod->Lang('missing_type',$mod->Lang('destination'));
 		$status = $this->TemplateStatus();
 		if($status)
 			$ret .= '<br />'.$status;
@@ -75,9 +75,9 @@ class pwfCustomEmail extends pwfEmailBase
 		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
 	}
 
-	function PostAdminSubmitAction(&$params)
+	function PostAdminAction(&$params)
 	{
-		$this->PostAdminSubmitActionEmail($params);
+		$this->PostAdminActionEmail($params);
 	}
 
 	function AdminValidate($id)
@@ -104,7 +104,7 @@ class pwfCustomEmail extends pwfEmailBase
 			if(!$this->validateEmailAddr($opt))
 			{
 				$ret = FALSE;
-				$messages[] = $mod->Lang('invalid_TODO');
+				$messages[] = $mod->Lang('error_email_address',$opt);
 			}
 		}
 		else

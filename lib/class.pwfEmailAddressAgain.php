@@ -21,7 +21,7 @@ class pwfEmailAddressAgain extends pwfFieldBase
 		return $mod->Lang('title_field_id') . ': ' . $this->GetOption('field_to_validate');
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
 		$choices = array();
 		foreach($this->formdata->Fields as &$one)
@@ -33,31 +33,24 @@ class pwfEmailAddressAgain extends pwfFieldBase
 			}
 		}
 		unset($one);
-		$mod = $this->formdata->formsmodule;
-		$main = array(
-			array(
-				$mod->Lang('title_field_to_validate'),
-				$mod->CreateInputDropdown($id,
-					'opt_field_to_validate',$choices,-1,$this->GetOption('field_to_validate'))
-			)
-		);
-		$adv = array(
-			array(
-				$mod->Lang('title_field_default_value'),
-				$mod->CreateInputText($id,'opt_default',$this->GetOption('default'),25,1024)),
-			array(
-				$mod->Lang('title_html5'),
-				$mod->CreateInputHidden($id,'opt_html5',0).
-				$mod->CreateInputCheckbox($id,'opt_html5',1,
-					$this->GetOption('html5',0))),
-			array(
-				$mod->Lang('title_clear_default'),
-				$mod->CreateInputHidden($id,'opt_clear_default',0).
-				$mod->CreateInputCheckbox($id,'opt_clear_default',1,
-					$this->GetOption('clear_default',0)),
-				$mod->Lang('help_clear_default'))
-		);
 
+		list($main,$adv) = $this->AdminPopulateCommon($id);
+		$mod = $this->formdata->formsmodule;
+		$main[] = array($mod->Lang('title_field_to_validate'),
+						$mod->CreateInputDropdown($id,'opt_field_to_validate',$choices,-1,
+							$this->GetOption('field_to_validate')));
+		$adv[] = array($mod->Lang('title_field_default_value'),
+						$mod->CreateInputText($id,'opt_default',
+					  		$this->GetOption('default'),25,1024));
+		$adv[] = array($mod->Lang('title_clear_default'),
+						$mod->CreateInputHidden($id,'opt_clear_default',0).
+						$mod->CreateInputCheckbox($id,'opt_clear_default',1,
+							$this->GetOption('clear_default',0)),
+						$mod->Lang('help_clear_default'));
+		$adv[] = array($mod->Lang('title_html5'),
+						$mod->CreateInputHidden($id,'opt_html5',0).
+						$mod->CreateInputCheckbox($id,'opt_html5',1,
+							$this->GetOption('html5',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 

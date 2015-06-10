@@ -10,11 +10,11 @@ class pwfFieldsetStart extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->DisplayInSubmission = FALSE;
-		$this->HasLabel = 0;
+		$this->HasLabel = FALSE;
 		$this->IsSortable = FALSE;
-		$this->NeedsDiv = 0;
-		$this->NonRequirableField = TRUE;
+		$this->NeedsDiv = FALSE;
 		$this->Type = 'FieldsetStart';
 	}
 
@@ -27,19 +27,14 @@ class pwfFieldsetStart extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE);
 		$mod = $this->formdata->formsmodule;
-		$main = array(
-			  array($mod->Lang('title_legend'),
-					$mod->CreateInputText($id,'opt_legend',
-					  $this->GetOption('legend'),50)));
-		return array('main'=>$main);
-	}
-
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		$this->OmitAdminVisible($mainArray,$advArray);
+		$main[] = array($mod->Lang('title_legend'),
+						$mod->CreateInputText($id,'opt_legend',
+							$this->GetOption('legend'),50));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)

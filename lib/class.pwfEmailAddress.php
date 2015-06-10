@@ -19,30 +19,27 @@ class pwfEmailAddress extends pwfFieldBase
 		$this->ValidationTypes = array($mod->Lang('validation_email_address')=>'email');
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
-		$mod = $this->formdata->formsmodule;
-		$main = array();
-		$hopts = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
-		$main[] = array($mod->Lang('title_headers_to_modify'),
-			$mod->CreateInputDropdown($id,'opt_headers_to_modify',$hopts,-1,$this->GetOption('headers_to_modify','f')));
-		$adv = array(
-			array(
-				$mod->Lang('title_field_default_value'),
-				$mod->CreateInputText($id,'opt_default',$this->GetOption('default'),25,1024)),
-			array(
-				$mod->Lang('title_html5'),
-				$mod->CreateInputHidden($id,'opt_html5',0).
-				$mod->CreateInputCheckbox($id,'opt_html5',1,
-					$this->GetOption('html5',0))),
-			array(
-				$mod->Lang('title_clear_default'),
-				$mod->CreateInputHidden($id,'opt_clear_default',0).
-				$mod->CreateInputCheckbox($id,'opt_clear_default',1,
-					$this->GetOption('clear_default',0)),
-				$mod->Lang('help_clear_default'))
-		);
+		$choices = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
 
+		list($main,$adv) = $this->AdminPopulateCommon($id);
+		$mod = $this->formdata->formsmodule;
+		$main[] = array($mod->Lang('title_headers_to_modify'),
+						$mod->CreateInputDropdown($id,'opt_headers_to_modify',$choices,-1,
+							$this->GetOption('headers_to_modify','f')));
+		$adv[] = array($mod->Lang('title_field_default_value'),
+						$mod->CreateInputText($id,'opt_default',
+							$this->GetOption('default'),25,1024));
+		$adv[] = array($mod->Lang('title_clear_default'),
+						$mod->CreateInputHidden($id,'opt_clear_default',0).
+						$mod->CreateInputCheckbox($id,'opt_clear_default',1,
+							$this->GetOption('clear_default',0)),
+						$mod->Lang('help_clear_default'));
+		$adv[] = array($mod->Lang('title_html5'),
+						$mod->CreateInputHidden($id,'opt_html5',0).
+						$mod->CreateInputCheckbox($id,'opt_html5',1,
+							$this->GetOption('html5',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -84,9 +81,9 @@ class pwfEmailAddress extends pwfFieldBase
 		return array($this->validated,$this->ValidationMessage);
 	}
 
-	function PreDispositionAction()
+	function PreDisposeAction()
 	{
-		if(property_exists($this,$Value))
+		if(property_exists($this,'Value'))
 		{
 			$htm = $this->GetOption('headers_to_modify','f');
 			foreach($this->formdata->Fields as &$one)

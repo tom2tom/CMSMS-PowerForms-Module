@@ -83,15 +83,14 @@ class pwfMultiselect extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 
-		$main = array();
-		$main[] = array($mod->Lang('title_lines_to_show'),$mod->CreateInputText($id,'opt_lines',$this->GetOption('lines','3'),10,10));
-//		$main[] = array($mod->Lang('title_multiselect_details'),$dests);
-		$dests = array();
-			
+		$main[] = array($mod->Lang('title_lines_to_show'),
+						$mod->CreateInputText($id,'opt_lines',
+							$this->GetOption('lines','3'),10,10));
 		if($this->optionAdd)
 		{
 			$this->AddOptionElement('option_name','');
@@ -101,6 +100,7 @@ class pwfMultiselect extends pwfFieldBase
 		$names = $this->GetOptionRef('option_name');
 		if($names)
 		{
+			$dests = array();
 			$dests[] = array(
 				$mod->Lang('title_option_name'),
 				$mod->Lang('title_option_value'),
@@ -115,11 +115,17 @@ class pwfMultiselect extends pwfFieldBase
 				);
 			}
 			unset($one);
+//			$main[] = array($mod->Lang('title_multiselect_details'),$dests);
+			return array('main'=>$main,'adv'=>$adv,'table'=>$dests);
 		}
-		return array('main'=>$main,'table'=>$dests);
+		else
+		{
+			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('item')));
+			return array('main'=>$main,'adv'=>$adv);
+		}
 	}
 
-	function PostAdminSubmitCleanup(&$params)
+	function PostAdminAction(&$params)
 	{
 		//cleanup empties
 		$names = $this->GetOptionRef('option_name');
@@ -143,7 +149,7 @@ class pwfMultiselect extends pwfFieldBase
 		if($choices)
 		{
 			$choices = array_flip($choices);
-			if(!property_exists($this,$Value))
+			if(!property_exists($this,'Value'))
 				$val = array();
 			elseif(!is_array($this->Value))
 				$val = array($this->Value);

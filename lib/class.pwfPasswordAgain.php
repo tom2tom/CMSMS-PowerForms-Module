@@ -20,41 +20,36 @@ class pwfPasswordAgain extends pwfFieldBase
 			': '.$this->GetOption('field_to_validate');
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
-		$mod = $this->formdata->formsmodule;
-		$flds = $this->formdata->Fields;
-		$opts = array();
-		foreach($flds as $one)
+		$choices = array();
+		foreach($this->formdata->Fields as &$one)
 		{
 			if($one->GetFieldType() == 'Password')
 			{
 				$tn = $one->GetName();
-				$opts[$tn] = $tn;
+				$choices[$tn] = $tn;
 			}
 		}
-		$main = array(
-			array(
-				$mod->Lang('title_field_to_validate'),
-					$mod->CreateInputDropdown($id,
-					'opt_field_to_validate',$opts,-1,$this->GetOption('field_to_validate'))
-			),
-			array($mod->Lang('title_display_length'),
-				$mod->CreateInputText($id,
-				'opt_length',
-				$this->GetOption('length','12'),25,25)),
-			array($mod->Lang('title_minimum_length'),
-				$mod->CreateInputText($id,
-				'opt_min_length',
-				$this->GetOption('min_length','8'),25,25)),
-			array($mod->Lang('title_hide'),
-				$mod->CreateInputHidden($id,'opt_hide',0).
-				$mod->CreateInputCheckbox($id,'opt_hide',1,
-					$this->GetOption('hide','1')),
-				$mod->Lang('title_hide_help')),
-		);
-
-		return array('main'=>$main);
+		unset($one);
+		list($main,$adv) = $this->AdminPopulateCommon($id);
+		$mod = $this->formdata->formsmodule;
+		$main[] = array(
+					$mod->Lang('title_field_to_validate'),
+					$mod->CreateInputDropdown($id,'opt_field_to_validate',$choices,-1,
+						$this->GetOption('field_to_validate')));
+		$main[] = array($mod->Lang('title_display_length'),
+					$mod->CreateInputText($id,'opt_length',
+						$this->GetOption('length','12'),25,25));
+		$main[] = array($mod->Lang('title_minimum_length'),
+					$mod->CreateInputText($id,'opt_min_length',
+						$this->GetOption('min_length','8'),25,25));
+		$main[] = array($mod->Lang('title_hide'),
+					$mod->CreateInputHidden($id,'opt_hide',0).
+					$mod->CreateInputCheckbox($id,'opt_hide',1,
+						$this->GetOption('hide','1')),
+					$mod->Lang('title_hide_help'));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)
@@ -83,23 +78,20 @@ class pwfPasswordAgain extends pwfFieldBase
 		$this->ValidationMessage = '';
 
 		$field_to_validate = $this->GetOption('field_to_validate');
-
 		if($field_to_validate)
 		{
-			$mod = $this->formdata->formsmodule;
-			foreach($this->formdata->Fields as &$one_field)
+			foreach($this->formdata->Fields as &$one)
 			{
-				if($one_field->Name == $field_to_validate)
+				if($one->Name == $field_to_validate)
 				{
-					$value = $one_field->GetValue();
-					if($value != $this->Value)
+					if($one->GetValue() != $this->Value)
 					{
 						$this->validated = FALSE;
-						$this->ValidationMessage = $mod->Lang('password_does_not_match',$field_to_validate);
+						$this->ValidationMessage = $this->formdata->formsmodule->Lang('password_does_not_match',$field_to_validate);
 					}
 				}
 			}
-			unset ($one_field);
+			unset($one);
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}

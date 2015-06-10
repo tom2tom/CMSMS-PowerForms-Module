@@ -16,8 +16,32 @@ class pwfSharedFile extends pwfFieldBase
 		$this->DisplayInSubmission = FALSE;
 		$this->IsDisposition = TRUE;
 		$this->IsSortable = FALSE;
-		$this->NonRequirableField = TRUE;
+		$this->ChangeRequirement = FALSE;
 		$this->Type = 'SharedFile';
+	}
+
+	function CreateSampleHeader()
+	{
+		$fields = array();
+		foreach($this->formdata->Fields as &$one)
+		{
+			if($one->DisplayInSubmission())
+				$fields[] = $one->GetName();
+		}
+		unset($one);
+		return implode("\t",$fields);
+	}
+
+	function CreateSampleTemplate()
+	{
+		$fields = array();
+		foreach($this->formdata->Fields as &$one)
+		{
+			if($one->DisplayInSubmission())
+				$fields[] = '{$'.$one->GetVariableName().'}';
+		}
+		unset($one);
+		return implode("\t",$fields);
 	}
 
 	function GetFieldStatus()
@@ -28,13 +52,15 @@ class pwfSharedFile extends pwfFieldBase
 		return $this->GetOption('filespec',$mod->Lang('unspecified'));
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		if(!pwfUtils::GetUploadsPath())
-			return array('main'=>array($mod->Lang('error_uploads_dir'),''));
+			return array('main'=>array('<span style="color:red">'.$mod->Lang('error').'</span>',
+				'',$mod->Lang('error_uploads_dir')));
 
-		$main = array();
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE);
+
 		$main[] = array($mod->Lang('title_file_name'),
 			$mod->CreateInputText($id,'opt_filespec',
 				$this->GetOption('filespec','form_submissions.txt'),50,128));
@@ -44,41 +70,40 @@ class pwfSharedFile extends pwfFieldBase
 						$this->GetOption('newlinechar'),5,15),
 				$mod->Lang('help_newline_replacement'));
 */
-		$parmMain = array();
-		$parmMain['opt_file_template']['is_oneline'] = TRUE;
-		$parmMain['opt_file_header']['is_oneline'] = TRUE;
-		$parmMain['opt_file_header']['is_header'] = TRUE;
-		$parmMain['opt_file_footer']['is_oneline'] = TRUE;
-		$parmMain['opt_file_footer']['is_footer'] = TRUE;
-		list($funcs,$buttons) = pwfUtils::AdminTemplateActions($this->formdata,$id,$parmMain);
+		//setup sample-template buttons and scripts
+		$ctldata = array();
+		$ctldata['opt_file_template']['is_oneline'] = TRUE;
+		$ctldata['opt_file_header']['is_oneline'] = TRUE;
+		$ctldata['opt_file_header']['is_header'] = TRUE;
+		$ctldata['opt_file_footer']['is_oneline'] = TRUE;
+		$ctldata['opt_file_footer']['is_footer'] = TRUE;
+		list($buttons,$revertscripts) = pwfUtils::SampleTemplateActions($this->formdata,$id,$ctldata);
 
-		$adv = array();
 		$adv[] = array($mod->Lang('title_file_template'),
-			$mod->CreateTextArea(FALSE,$id,
-				htmlspecialchars($this->GetOption('file_template')),
-				'opt_file_template','pwf_tallarea','','','',50,15).
-			'<br /><br />'.$buttons[0]);
+						$mod->CreateTextArea(FALSE,$id,
+							htmlspecialchars($this->GetOption('file_template')),
+							'opt_file_template','pwf_tallarea','','','',50,15),
+						'<br /><br />'.$buttons[0]);
 
 		$adv[] = array($mod->Lang('title_file_header'),
-			$mod->CreateTextArea(FALSE,$id,
-				htmlspecialchars($this->GetOption('file_header')),
-				'opt_file_header','pwf_shortarea','','','',50,8).
-			'<br /><br />'.$buttons[1]);
+						$mod->CreateTextArea(FALSE,$id,
+							htmlspecialchars($this->GetOption('file_header')),
+							'opt_file_header','pwf_shortarea','','','',50,8),
+						'<br /><br />'.$buttons[1]);
 
 		$adv[] = array($mod->Lang('title_file_footer'),
-			$mod->CreateTextArea(FALSE,$id,
-				htmlspecialchars($this->GetOption('file_footer')),
-				'opt_file_footer','pwf_shortarea','','','',50,8).
-			'<br /><br />'.$buttons[2]);
-		/*show variables-help on advanced tab*/
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>'varshelpadv');
+						$mod->CreateTextArea(FALSE,$id,
+							htmlspecialchars($this->GetOption('file_footer')),
+							'opt_file_footer','pwf_shortarea','','','',50,8),
+						'<br /><br />'.$buttons[2]);
+
+		return array(
+			'main'=>$main,
+			'adv'=>$adv,
+			'funcs'=>$revertscripts,
+			'extra'=>'varshelpadv')); //show variables-help on advanced tab
 	}
 
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		$this->OmitAdminVisible($mainArray,$advArray);
-	}
-	
 	function Dispose($id,$returnid)
 	{
 		$mod = $formdata->formsmodule;
@@ -105,7 +130,7 @@ class pwfSharedFile extends pwfFieldBase
 
 		$template = $this->GetOption('file_template');
 		if(!$template)
-			$template = pwfUtils::CreateSampleTemplate($this->formdata);
+			$template = $this->CreateSampleTemplate();
 
 		$newline = $mod->ProcessTemplateFromData($template);
 /*		$replchar = $this->GetOption('newlinechar');
@@ -123,9 +148,10 @@ class pwfSharedFile extends pwfFieldBase
 		if($first)
 		{
 			$header = $this->GetOption('file_header');
-			if($header)
-				$header = $mod->ProcessTemplateFromData($header)."\n";
-			fwrite($fh,$header.$newline.$footer);
+			if(!$header)
+				$header = $this->CreateSampleHeader();
+			$header = $mod->ProcessTemplateFromData($header);
+			fwrite($fh,$header."\n".$newline.$footer);
 		}
 		else
 		{

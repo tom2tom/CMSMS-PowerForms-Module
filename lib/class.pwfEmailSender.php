@@ -14,29 +14,27 @@ class pwfEmailSender extends pwfFieldBase
 		$this->Type = 'EmailSender';
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		$choices = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
+
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main = array();
-		$hopts = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
 		$main[] = array($mod->Lang('title_headers_to_modify'),
-			$mod->CreateInputDropdown($id,'opt_headers_to_modify',$hopts,-1,$this->GetOption('headers_to_modify','b')));
-		$adv = array(
-			array(
-				$mod->Lang('title_field_default_value'),
-				$mod->CreateInputText($id,'opt_default',$this->GetOption('default'),25,1024)),
-			array(
-				$mod->Lang('title_html5'),
-				$mod->CreateInputHidden($id,'opt_html5',0).
-				$mod->CreateInputCheckbox($id,'opt_html5',1,
-					$this->GetOption('html5',0))),
-			array(
-				$mod->Lang('title_clear_default'),
-				$mod->CreateInputHidden($id,'opt_clear_default',0).
-				$mod->CreateInputCheckbox($id,'opt_clear_default',1,
-					$this->GetOption('clear_default',0)),
-				$mod->Lang('help_clear_default'))
-		);
+						$mod->CreateInputDropdown($id,'opt_headers_to_modify',$choices,-1,
+							$this->GetOption('headers_to_modify','b')));
+		$adv[] = array($mod->Lang('title_field_default_value'),
+						$mod->CreateInputText($id,'opt_default',
+							$this->GetOption('default'),25,1024));
+		$adv[] = array($mod->Lang('title_clear_default'),
+						$mod->CreateInputHidden($id,'opt_clear_default',0).
+						$mod->CreateInputCheckbox($id,'opt_clear_default',1,
+							$this->GetOption('clear_default',0)),
+						$mod->Lang('help_clear_default'));
+		$adv[] = array($mod->Lang('title_html5'),
+						$mod->CreateInputHidden($id,'opt_html5',0).
+						$mod->CreateInputCheckbox($id,'opt_html5',1,
+							$this->GetOption('html5',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -59,7 +57,7 @@ class pwfEmailSender extends pwfFieldBase
 		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
 	}
 
-	function PreDispositionAction()
+	function PreDisposeAction()
 	{
 		if($this->Value)
 		{

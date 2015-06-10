@@ -84,9 +84,9 @@ class pwfEmailBCCAddress extends pwfFieldBase
 		return array($this->validated,$this->ValidationMessage);
 	}
 
-	function PreDispositionAction()
+	function PreDisposeAction()
 	{
-		if(property_exists($this,$Value))
+		if(property_exists($this,'Value'))
 		{
 			foreach($this->formdata->Fields as &$one)
 			{

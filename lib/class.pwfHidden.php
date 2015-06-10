@@ -10,43 +10,37 @@ class pwfHidden extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->HasLabel = 0;
+		$this->ChangeRequirement = FALSE;
+		$this->HasLabel = FALSE;
 		$this->IsSortable = FALSE;
-		$this->NeedsDiv = 0;
-		$this->NonRequirableField = TRUE;
+		$this->NeedsDiv = FALSE;
 		$this->Type = 'Hidden';
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE); //TODO hidden field may use logic?
+
 		$mod = $this->formdata->formsmodule;
-		$main = array(
-				array($mod->Lang('title_value'),
-            		$mod->CreateInputText($id,'opt_value',$this->GetOption('value'),25,1024))
-		);
-		$adv = array(
-				array($mod->Lang('title_smarty_eval'),
-				$mod->CreateInputHidden($id,'opt_smarty_eval',0).
-				$mod->CreateInputCheckbox($id,'opt_smarty_eval',1,
-					$this->GetOption('smarty_eval',0))),
-				array($mod->Lang('title_browser_edit'),
-				$mod->CreateInputHidden($id,'opt_browser_edit',0).
-				$mod->CreateInputCheckbox($id,'opt_browser_edit',1,
-					$this->GetOption('browser_edit',0)))
-		);
+		$main[] = array($mod->Lang('title_value'),
+						$mod->CreateInputText($id,'opt_value',
+							$this->GetOption('value'),25,1024));
+		$adv[] = array($mod->Lang('title_smarty_eval'),
+						$mod->CreateInputHidden($id,'opt_smarty_eval',0).
+						$mod->CreateInputCheckbox($id,'opt_smarty_eval',1,
+							$this->GetOption('smarty_eval',0)));
+		$adv[] = array($mod->Lang('title_browser_edit'),
+						$mod->CreateInputHidden($id,'opt_browser_edit',0).
+						$mod->CreateInputCheckbox($id,'opt_browser_edit',1,
+							$this->GetOption('browser_edit',0)));
 		return array('main'=>$main,'adv'=>$adv);
-	}
-	
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
-	{
-		$this->OmitAdminVisible($mainArray,$advArray); //TODO hidden field may use logic?
 	}
 
 	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
 
-		if(property_exists($this,$Value))
+		if(property_exists($this,'Value'))
 			$val = $this->Value;
 		else
 			$val = $this->GetOption('value');

@@ -55,17 +55,18 @@ class pwfCompanyDirectory extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
 		$CompanyDirectory = $mod->GetModuleInstance('CompanyDirectory');
 		if($CompanyDirectory)
 			unset($CompanyDirectory);
 		else
-			return array('main'=>array($mod->Lang('error_module_CompanyDirectory'),''));
+			return array('main'=>array('<span style="color:red">'.$mod->Lang('error').'</span>',
+				'',$mod->Lang('error_module_CompanyDirectory')));
 
 		$Categories = array();
-		$Categories['All'] = $mod->Lang('all');	//TODO translate
+		$Categories['All'] = $mod->Lang('all');
 		$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();
 		$query = 'SELECT id,name FROM '.$pre.'module_compdir_categories';
@@ -82,7 +83,7 @@ class pwfCompanyDirectory extends pwfFieldBase
 			$CategorySelected = explode(',',$CategorySelected);
 
 		$FieldDefs = array();
-		$FieldDefs['none'] = $this->Lang('none'); //TODO translate
+		$FieldDefs['none'] = $this->Lang('none2');
 		$query = 'SELECT * FROM '.$pre.'module_compdir_fielddefs ORDER BY item_order';
 		$rs = $db->Execute($query);
 		if($rs)
@@ -95,25 +96,24 @@ class pwfCompanyDirectory extends pwfFieldBase
 		if(!is_array($FieldDefsSelected))
 			$FieldDefsSelected = explode(',',$FieldDefsSelected);
 
-		$main = array(
-				array($mod->Lang('help_company_field'),''),
-				array($mod->Lang('title_pick_categories'),
-					$mod->CreateInputSelectList($id,'opt_Category',$Categories,$CategorySelected,5,'',TRUE)
-				),
-				array($mod->Lang('title_pick_fielddef'),
-					$mod->CreateInputSelectList($id,'opt_FieldDefs',$FieldDefs,$FieldDefsSelected,5,'',FALSE)
-				)
+		$choices = array(
+			$mod->Lang('option_dropdown')=>'Dropdown',
+			$mod->Lang('option_selectlist_single')=>'Select List-single',
+			$mod->Lang('option_selectlist_multiple')=>'Select List-multiple',
+			$mod->Lang('option_radiogroup')=>'Radio Group'
 		);
-		$choices = array($mod->Lang('option_dropdown')=>'Dropdown',
-			   $mod->Lang('option_selectlist_single')=>'Select List-single',
-			   $mod->Lang('option_selectlist_multiple')=>'Select List-multiple',
-			   $mod->Lang('option_radiogroup')=>'Radio Group'
-			  );
-		$adv = array(
-				array($mod->Lang('title_choose_user_input'),
-					$mod->CreateInputDropdown ($id,'opt_UserInput',$choices,'-1',$this->GetOption('UserInput'))
-				)
-		);
+
+		list($main,$adv) = $this->AdminPopulateCommon($id);
+		$main[] = array('','',$mod->Lang('help_company_field'));
+		$main[] = array($mod->Lang('title_pick_categories'),
+						$mod->CreateInputSelectList($id,'opt_Category',$Categories,$CategorySelected,
+						5,'',TRUE));
+		$main[] = array($mod->Lang('title_pick_fielddef'),
+						$mod->CreateInputSelectList($id,'opt_FieldDefs',$FieldDefs,$FieldDefsSelected,
+						5,'',FALSE));
+		$adv[] = array($mod->Lang('title_choose_user_input'),
+						$mod->CreateInputDropdown($id,'opt_UserInput',$choices,'-1',
+							$this->GetOption('UserInput')));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -230,7 +230,7 @@ class pwfCompanyDirectory extends pwfFieldBase
 			$size = min(50,count($companies)); // maximum 50 lines,though this is probably big
 
 			$val = array();
-			if(property_exists($this,$Value))
+			if(property_exists($this,'Value'))
 			{
 				$val = $this->Value;
 				if(!is_array($this->Value))

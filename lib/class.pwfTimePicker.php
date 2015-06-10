@@ -51,15 +51,15 @@ class pwfTimePicker extends pwfFieldBase
 			return array($ret);
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main = array(
-			array($mod->Lang('title_24_hour'),
-				$mod->CreateInputHidden($id,'opt_24_hour',0).
-            	$mod->CreateInputCheckbox($id,'opt_24_hour',1,
-					$this->GetOption('24_hour',0))));
-		return array('main'=>$main);
+		$main[] = array($mod->Lang('title_24_hour'),
+						$mod->CreateInputHidden($id,'opt_24_hour',0).
+						$mod->CreateInputCheckbox($id,'opt_24_hour',1,
+							$this->GetOption('24_hour',0)));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)

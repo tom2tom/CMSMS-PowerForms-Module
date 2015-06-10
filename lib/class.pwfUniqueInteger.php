@@ -10,8 +10,8 @@ class pwfUniqueInteger extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->IsSortable = FALSE;
-		$this->NonRequirableField = TRUE;
 		$this->Type = 'UniqueInteger';
 	}
 
@@ -28,23 +28,22 @@ class pwfUniqueInteger extends pwfFieldBase
 		return $output;
 	}
 
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main = array(
-			array($mod->Lang('title_show_to_user'),
-				$mod->CreateInputHidden($id,'opt_show_to_user',0).
-				$mod->CreateInputCheckbox($id,'opt_show_to_user',1,
-					$this->GetOption('show_to_user',0))),
-			array($mod->Lang('title_use_random_generator'),
-				$mod->CreateInputHidden($id,'opt_use_random_generator',0).
-				$mod->CreateInputCheckbox($id,'opt_use_random_generator',1,
-					$this->GetOption('use_random_generator',0))),
-			array($mod->Lang('title_numbers_to_generate'),
-				$mod->CreateInputText($id,'opt_numbers_to_generate',
-					$this->GetOption('numbers_to_generate',5),25,25))
-		);
-		return array('main'=>$main);
+		$main[] = array($mod->Lang('title_show_to_user'),
+						$mod->CreateInputHidden($id,'opt_show_to_user',0).
+						$mod->CreateInputCheckbox($id,'opt_show_to_user',1,
+							this->GetOption('show_to_user',0)));
+		$adv[] = array($mod->Lang('title_use_random_generator'),
+						$mod->CreateInputHidden($id,'opt_use_random_generator',0).
+						$mod->CreateInputCheckbox($id,'opt_use_random_generator',1,
+							$this->GetOption('use_random_generator',0)));
+		$adv[] = array($mod->Lang('title_numbers_to_generate'),
+						$mod->CreateInputText($id,'opt_numbers_to_generate',
+							$this->GetOption('numbers_to_generate',5),25,25));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)
