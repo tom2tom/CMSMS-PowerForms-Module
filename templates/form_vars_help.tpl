@@ -4,17 +4,17 @@
 <th>{$variable_title}</th><th>{$property_title}</th>
 </tr></thead>
 <tbody>
-{foreach from=$sysfields item=entry}
-{cycle name=sysfields values='row1,row2' assign=rowclass}
+{foreach from=$globalvars item=entry}
+{cycle name=globalvars values='row1,row2' assign=rowclass}
 <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
 <td>{$entry->name}</td><td>{$entry->title}</td></tr>
 {/foreach}
-{if !empty($subfields)}
- {foreach from=$subfields item=entry}
+{if !empty($fieldvars)}
+ {foreach from=$fieldvars item=entry}
  {if $rowclass == 'row2'}
-  {cycle name=subfields values='row1,row2' assign=rowclass}
+  {cycle name=fieldvars values='row1,row2' assign=rowclass}
  {else}
-  {cycle name=subfields values='row2,row1' assign=rowclass}
+  {cycle name=fieldvars values='row2,row1' assign=rowclass}
  {/if}
 <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
 <td>{ldelim}${$entry->name}{rdelim} / {ldelim}$fld_{$entry->id}{rdelim}</td><td>{$entry->title}</td></tr>
