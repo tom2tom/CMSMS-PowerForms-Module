@@ -31,7 +31,7 @@ class pwfCheckbox extends pwfFieldBase
 	function GetHumanReadableValue($as_string=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
-		if(!property_exists($this,$Value) || !$this->Value)
+		if(!property_exists($this,'Value') || !$this->Value)
 			$ret = $this->GetOption('unchecked_value',$mod->Lang('value_unchecked'));
 		else
 			$ret = $this->GetOption('checked_value',$mod->Lang('value_checked'));
@@ -64,7 +64,7 @@ class pwfCheckbox extends pwfFieldBase
 
 	function Populate($id,&$params)
 	{
-		if((!property_exists($this,$Value) || !$this->Value) && $this->GetOption('is_checked',0))
+		if((!property_exists($this,'Value') || !$this->Value) && $this->GetOption('is_checked',0))
 			$this->Value = 't';
 
 		$tid = $this->GetInputId();
@@ -85,11 +85,11 @@ class pwfCheckbox extends pwfFieldBase
 		switch ($this->ValidationType)
 		{
 		 case 'checked':
-			if(!property_exists($this,$Value) || !$this->Value)
+			if(!property_exists($this,'Value') || !$this->Value)
 			{
 				$this->validated = FALSE;
 				$mod = $this->formdata->formsmodule;
-				$label = $this->GetOption('label',$mod->Lang('thisbox')); //TODO translation
+				$label = $this->GetOption('label',$mod->Lang('thebox'));
 				$this->ValidationMessage = $mod->Lang('you_must_check',$label);
 			}
 			break;
