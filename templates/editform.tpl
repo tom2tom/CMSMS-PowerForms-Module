@@ -92,7 +92,7 @@
    <div class="showhelp">
   <p style="font-weight:bold;">{$title_form_vars}:</p>
 <table class="pwf_legend">
-<tr><th>{$variable}</th><th>{$description}</th></tr>
+<tr><th>{$title_variable}</th><th>{$title_description}</th></tr>
 {foreach from=$formvars item=entry}
 {cycle name=globals values='row1,row2' assign=rowclass}
  <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
@@ -100,16 +100,18 @@
 {/foreach}
 </table><br />
   <p>{$help_formvars}</p>
-  <p>{$help_vars1}</p>
+{if !empty($fieldprops)}
+  <p>{$help_fieldvars1}</p>
 <table class="pwf_legend">
-<tr><th>{$property}</th><th>{$description}</th></tr>
-{foreach from=$fieldvars item=entry}
-{cycle name=fieldvars values='row1,row2' assign=rowclass}
+<tr><th>{$title_property}</th><th>{$title_description}</th></tr>
+{foreach from=$fieldprops item=entry}
+{cycle name=fieldprops values='row1,row2' assign=rowclass}
 <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
 <td>field->{$entry->name}</td><td>{$entry->description}</td></tr>
 {/foreach}
 </table><br />
-  <p>{$help_vars2}</p>
+  <p>{$help_fieldvars2}</p>
+{/if}{*!empty($fieldprops)*}
   </div>
  </div>
 {$tab_end}{$udttab_start}
@@ -131,21 +133,17 @@
   <p class="pageinput">{$input_submit_javascript}</p>
   <p class="pagetext">{$title_submit_action}:</p>
   <p class="pageinput">{$input_submit_action}</p>
+  <div id="pageobjects">
   <p class="pagetext">{$title_redirect_page}:</p>
   <p class="pageinput">{$input_redirect_page}</p>
- <div class="pageinput pageoverflow">
- {if !empty($buttons)}
-  <br />
-  {foreach from=$buttons item=one name=buttons}
-   {$one}{if !$smarty.foreach.buttons.last}&nbsp;{/if}
-  {/foreach}
-  <br />
- {/if}
-  <br />
-  <p style="font-weight:bold;">{$title_submit_template}:{$icon_info}</p>
-  {$input_submit_template}
-  <div class="showhelp"><br />{$help_vars}</div>
- </div>
+  </div>
+  <div id="tplobjects">
+  <p class="pagetext">{$title_submit_template}:{$icon_info}</p>
+  <div class="pageinput pageoverflow">{$input_submit_template}</div>
+  <p class="pageinput">{$help_submit_template}<br /><br />
+  {$sample_submit_template}</p>
+  <div class="pageinput showhelp"><br />{$help_subtplvars}</div>
+  </div>
  </div>
 {$tab_end}
 {$tabs_end}
