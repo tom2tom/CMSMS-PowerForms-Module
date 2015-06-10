@@ -1,15 +1,31 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
 # Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
+# Derived in part from FormBuilder-module (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 class pwfUtils
 {
 //	const MAILERMINVERSION = '1.73'; //minumum acceptable version of CMSMailer module
+	/**
+	GetForms:
+	@orderby: forms-table field name, optional, default 'name'
+	Returns: array of all content of the forms-table, sorted by @orderby
+	*/
+	public static function GetForms($orderby='name')
+	{
+		// DO NOT parameterise $orderby! If ADODB quotes it,the SQL is not valid
+		// instead,rudimentary security checks
+		$orderby = preg_replace('/\s/','',$orderby);
+		$orderby = preg_replace('/[^\w\-.]/','_',$orderby);
+		$sql = 'SELECT * FROM '.cms_db_prefix().'module_pwf_form ORDER BY '.$orderby;
+		$db = cmsms()->GetDb();
+		return $db->GetArray($sql);
+	}
 
-	private static function fieldcmp($a,$b)
+	//support for field-selection menu-item sorting
+	private static function labelcmp($a,$b)
 	{
 		$fa = $a[0];
 		$fb = $b[0];
@@ -39,7 +55,10 @@ class pwfUtils
 
 	/**
 	Collect_Fields:
-	@mod: reference to PowerForms module
+	Populates and caches full and abbreviated arrays of available field-types,
+	from file 'Fields.manifest' plus any 'imported' field(s), for use in any
+	add-field pulldown. Does nothing if the arrays are already cached.
+	@mod: reference to PowerForms module object
 	*/
 	public static function Collect_Fields(&$mod)
 	{
@@ -83,7 +102,7 @@ class pwfUtils
 				$mod->field_types[$mod->Lang($menukey)] = $classname;
 			}
 		}
-		uksort($mod->field_types,array('pwfUtils','fieldcmp'));
+		uksort($mod->field_types,array('pwfUtils','labelcmp'));
 
 		$mod->std_field_types = array(
 			$mod->Lang('field_type_Checkbox')=>'pwfCheckbox',
@@ -94,14 +113,15 @@ class pwfUtils
 			$mod->Lang('field_type_Text')=>'pwfText',
 			$mod->Lang('field_type_SystemEmail')=>'pwfSystemEmail',
 			$mod->Lang('field_type_SharedFile')=>'pwfSharedFile');
-		uksort($mod->std_field_types,array('pwfUtils','fieldcmp'));
+		uksort($mod->std_field_types,array('pwfUtils','labelcmp'));
 	}
 
 	/**
 	Show_Field:
-	@mod: reference to PowerForms module
-	@classname:
-	Include @classname in the array of fields used in the field-adder pulldown
+	Include @classname in the array of available fields (to be used in any add-field pulldown)
+	@mod: reference to PowerForms module object
+	@classname: name of class for the field to be added
+	@sort: optional boolean, whether to sort ... , defalut TRUE
 	*/
 	public static function Show_Field(&$mod,$classname,$sort=TRUE)
 	{
@@ -127,21 +147,10 @@ class pwfUtils
 	}
 
 	/**
-	GetForms:
-	@orderby: forms-table field name,optional, default 'name'
-	Returns: array of all content of the forms-table
+	FileClassName:
+	@ilename: name of a field-class file, like 'class.pwfSomething.php'
+	Returns: classname (the residual 'pwfSomething') after some checking
 	*/
-	public static function GetForms($orderby='name')
-	{
-		// DO NOT parameterise $orderby! If ADODB quotes it,the SQL is not valid
-		// instead,rudimentary security checks
-		$orderby = preg_replace('/\s/','',$orderby);
-		$orderby = preg_replace('/[^\w\-.]/','_',$orderby);
-		$sql = 'SELECT * FROM '.cms_db_prefix().'module_pwf_form ORDER BY '.$orderby;
-		$db = cmsms()->GetDb();
-		return $db->GetArray($sql);
-	}
-
 	public static function FileClassName($filename)
 	{
 		$shortname = str_replace(array('class.','.php'),array('',''),$filename);
@@ -150,8 +159,8 @@ class pwfUtils
 
 	/**
 	MakeClassName:
-	@type: 'core' part of class name
-	Returns: a namespaced class name
+	@type: 'core' part of a class name, with or without 'pwf' prefix
+	Returns: a class name 'pwfSomething', possibly a (useless) default 'pwfField'
 	*/
 	public static function MakeClassName($type)
 	{
@@ -167,6 +176,13 @@ class pwfUtils
 		return 'pwfField';
 	}
 
+	/**
+	MakeAlias:
+	Generate an alias from @string
+	@string: the source string
+	@maxlen: optional maximum length for the created alias, defualt 48
+	Returns: the alias string
+	*/
 	public static function MakeAlias($string,$maxlen=48)
 	{
 		if(!$string)
@@ -180,7 +196,12 @@ class pwfUtils
 		return trim($alias,'_');
 	}
 
-	//interrogates forms table to get name value for form whose id is $form_id, '' if not found
+	/**
+	GetFormNameFromID:
+	Interrogates the forms table to get the stored name for a form whose id is @form_id
+	@form_id: form id number
+	Returns: the name, or '' if record for the form is not found
+	*/
 	public static function GetFormNameFromID($form_id)
 	{
 		$db = cmsms()->GetDb();
@@ -191,7 +212,12 @@ class pwfUtils
 		return '';
 	}
 
-	//interrogates forms table to get alias value for form whose id is $form_id, '' if not found
+	/**
+	GetFormAliasFromID:
+	Interrogates the forms table to get the stored alias for form whose id is @form_id
+	@form_id: form id number
+	Returns: the alias, or '' if record for the form is not found
+	*/
 	public static function GetFormAliasFromID($form_id)
 	{
 		$db = cmsms()->GetDb();
@@ -202,7 +228,12 @@ class pwfUtils
 		return '';
 	}
 
-	//interrogates forms table to get id value for form whose alias is $form_alias, -1 if not found
+	/**
+	GetFormIDFromAlias:
+	Interrogates forms table to get the stored id value for form whose alias is @form_alias
+	@form_alias: form alias string
+	Returns: the id, or -1 if record for the form is not found
+	*/
 	public static function GetFormIDFromAlias($form_alias)
 	{
 		$db = cmsms()->GetDb();
@@ -213,7 +244,14 @@ class pwfUtils
 		return -1;
 	}
 
-	//returns value of (loaded/cached) form option, or $default
+	/**
+	GetFormOption:
+	Get the value of option @optname, in the Options array in @formdata
+	@formdata: reference to pwfData form data object
+	@optname: name of option to find
+	@default: optional value to return if the requested option value doesn't exist, default ''
+	Returns: value of form option, or @default
+	*/
 	public static function GetFormOption(&$formdata,$optname,$default='')
 	{
 		if(isset($formdata->Options[$optname]))
@@ -222,8 +260,11 @@ class pwfUtils
 			return $default;
 	}
 
-	//walk all form fields, return TRUE if a disposition field is found
-	//used in method.update_form
+	/**
+	HasDisposition:
+	@formdata: reference to pwfData form data object
+	Returns: boolean, TRUE if a disposition field is found among the fields in @formdata
+	*/
 	public static function HasDisposition(&$formdata)
 	{
 		foreach($formdata->Fields as &$one)
@@ -240,12 +281,12 @@ class pwfUtils
 
 	/**
 	CreateSampleTemplate:
-	@formdata: reference to form data object
-	@htmlish:  default FALSE
-	@email:  default TRUE
-	@oneline: default FALSE
-	@header: default FALSE
-	@footer: default FALSE
+	@formdata: reference to pwfData form data object
+	@htmlish: whether the template is to include html tags like <h1>, default FALSE
+	@email:  whether the template is to be for an email-control, default TRUE
+	@oneline: whether the template is to be ...  , default FALSE
+	@header: whether the template is to be ...  , default FALSE
+	@footer: whether the template is to be the end (of another template), default FALSE
 	*/
 	public static function CreateSampleTemplate(&$formdata,
 		$htmlish=FALSE,$email=TRUE,$oneline=FALSE,$header=FALSE,$footer=FALSE)
@@ -317,49 +358,82 @@ class pwfUtils
 		return $ret;
 	}
 
-	//called only from AdminTemplateActions()
-	//returns array, member[0] is js click-func for button member[1] 
-	private static function CreateAction(&$mod,$id,$fieldName='opt_email_template',$button_text='',$suffix='')
+	/**
+	CreateTemplateAction:
+	Setup to insert a defined (probably default) template into a html-control.
+	For use when editing a form or field containing a template.
+	@mod: reference to PowerForms module object
+	@id: id given to the Powerforms module on execution
+	@ctlName: name of the control, by convention like 'opt_'.field-opt-name,
+		here, it may have appended suffix 'text'
+	@$button_label: text for button label
+	@template: the template string to be inserted into the control, upon button-click
+	@altname: for use when multiple buttons populate the same control
+	Returns: 2-member array, 1st is a button, 2nd is js onclick-func for the button
+	*/
+	public static function CreateTemplateAction(&$mod,$id,$ctlName,$button_label,$template,$altName=FALSE)
 	{
-		$fldAlias = preg_replace('/[^\w\d]/','_',$fieldName).$suffix; //TODO check this alias still works
-		$msg = $mod->Lang('confirm');
-//TODO js goes to where ? |TEMPLATE| substitution where ?
-		$jsfunc = <<<EOS
-function populate_{$fldAlias}(formname) {
- if(confirm ('{$msg}')) {
-  formname['{$id}pwfp_{$fieldName}'].value=|TEMPLATE|;
+		$alias = ($altName)?$altName:$ctlName;
+		$button = <<<EOS
+<input type="button" class="cms_submit" value="{$button_label}" onclick="javascript:populate_{$alias}(this.form)" />
+EOS;
+		$prompt = $mod->Lang('confirm');
+		$func = <<<EOS
+function populate_{$alias}(formname) {
+ if(confirm('{$prompt}')) {
+  formname['{$id}{$ctlName}'].value={$template};
  }
 }
-
 EOS;
-		$btn = <<<EOS
-<input type="button" class="cms_submit" value="{$button_text}" onclick="javascript:populate_{$fldAlias}(this.form)" />
-
-EOS;
-		return (array($jsfunc,$btn));
+		return array($button,$func);
 	}
 
 	/**
-	AdminTemplateActions:
-	@formdata: reference to form data object
+	SampleTemplateActions:
+	@formdata: reference to pwfData formdata object
 	@id: The id given to the Powerforms module on execution
-	@fieldStruct: array of parameters ...
-	Returns: array($funcs,$buttons) $funcs = ... $buttons = ...
+	@ctlData: array of parameters naming the form-control(s) affected,
+		and aspects of the templates to be generated e.g. for 3 controls:
+		array (
+		  'opt_file_template' => array
+			  'is_oneline' => boolean true
+		  'opt_file_header' => array
+			  'is_oneline' => boolean true
+			  'is_header' => boolean true
+		  'opt_file_footer' => array
+			  'is_oneline' => boolean true
+			  'is_footer' => boolean true
+		)
+	Returns: array($buttons,$funcs: $funcs = array of scripts to be activated
+	 by clicking the corresponding button in the $buttons array. The scripts
+	 install a 'sample template' into the corresponding control.
+	 For some combinations of options, pairs of buttons & scripts are created.
 	*/
-	public static function AdminTemplateActions(&$formdata,$id,$fieldStruct)
+	public static function SampleTemplateActions(&$formdata,$id,$ctlData)
 	{
 		$mod = $formdata->formsmodule;
-		$funcs = array();
 		$buttons = array();
-		foreach($fieldStruct as $key=>$val)
+		$funcs = array();
+		foreach($ctlData as $ctlname=>$tpopts)
 		{
-			$gen_button = !empty($val['general_button']);
-			$html_button = !empty($val['html_button']);
-			$text_button = !empty($val['text_button']);
-			$is_email = !empty($val['is_email']);
-			$is_footer = !empty($val['is_footer']);
-			$is_header = !empty($val['is_header']);
-			$is_oneline = !empty($val['is_oneline']);
+			$gen_button = !empty($tpopts['general_button']);
+			$html_button = !empty($tpopts['html_button']);
+			$text_button = !empty($tpopts['text_button']);
+			$is_email = !empty($vtpopts['is_email']);
+			$is_oneline = !empty($tpopts['is_oneline']);
+			$is_footer = !empty($tpopts['is_footer']);
+			$is_header = !empty($tpopts['is_header']);
+
+			if($html_button && $text_button)
+			{
+				$sample = self::CreateSampleTemplate($formdata,FALSE,
+					$is_email,$is_oneline,$is_header,$is_footer);
+				$sample = "'".str_replace(array("'","\n"),array("\\'","\\n'+\n'"),$sample)."'";
+				list($b,$f) = self::CreateTemplateAction($mod,$id,$ctlname,
+					$mod->Lang('title_create_sample_template'),$sample,$ctlname.'_1');
+				$buttons[] = $b;
+				$funcs[] = $f;
+			}
 
 			if($html_button)
 				$button_text = $mod->Lang('title_create_sample_html_template');
@@ -370,33 +444,37 @@ EOS;
 			else
 				$button_text = $mod->Lang('title_create_sample_template');
 
-			if($html_button && $text_button)
-			{
-				$sample = self::CreateSampleTemplate($formdata,FALSE,$is_email,$is_oneline,$is_header,$is_footer);
-				$sample = str_replace(array("'","\n"),array("\\'","\\n'+\n'"),$sample);
-				list($func,$btn) = self::CreateAction($mod,$id,$key,$mod->Lang('title_create_sample_template'),'text');
-				$funcs[] = str_replace('|TEMPLATE|',"'".$sample."'",$func);
-				$buttons[] = $btn;
-			}
-
-			$sample = self::CreateSampleTemplate($formdata,$html_button || $gen_button,$is_email,$is_oneline,$is_header,$is_footer);
-			$sample = str_replace(array("'","\n"),array("\\'","\\n'+\n'"),$sample);
-			list($func,$btn) = self::CreateAction($mod,$id,$key,$button_text);
-			$funcs[] = str_replace('|TEMPLATE|',"'".$sample."'",$func);
-			$buttons[] = $btn;
+			$sample = self::CreateSampleTemplate($formdata,$html_button || $gen_button,
+				$is_email,$is_oneline,$is_header,$is_footer);
+			$sample = "'".str_replace(array("'","\n"),array("\\'","\\n'+\n'"),$sample)."'";
+			list($b,$f) = self::CreateTemplateAction($mod,$id,$ctlname,$button_text,$sample);
+			$buttons[] = $b;
+			$funcs[] = $f;
 		}
-		return array($funcs,$buttons);
+		return array($buttons,$funcs);
 	}
 
-	//adds a member to $formdata->templateVariables[]
-	//used by EmailConfirmation field to set url variable
-	public static function AddTemplateVariable(&$formdata,$name,$def)
+	/**
+	AddTemplateVariable:
+	Adds a member to the $templateVariables array in @formdata (to be used for variables-help)
+	@formdata: reference to pwfData object for form 
+	@name: variable name (excluding '$')
+	@langkey: lang-array key for variable description
+	*/
+	public static function AddTemplateVariable(&$formdata,$name,$langkey)
 	{
-		$key = '{$'.$name.'}';
-		$formdata->templateVariables[$key] = $def;
+		$formdata->templateVariables[$name] = $langkey;
 	}
 
-	//returns xhtml string which generates a tabular help description
+	/**
+	FormFieldsHelp:
+	Document contents of Fields array in @formdata, and append the contents of
+	array @extras
+	@formdata: reference to pwfData object for form 
+	@$extras: optional array of items to be appended to the output, each member
+		having key=id, value=name default = empty array
+	Returns: xhtml string which generates a tabular help description
+	*/
 	public static function FormFieldsHelp(&$formdata,&$extras=array())
 	{
 		$mod = $formdata->formsmodule;
@@ -429,18 +507,21 @@ EOS;
 	}
 
 	/**
-	SetupFormVarsHelp:
+	SetupSubTemplateVarsHelp:
+	Setup variables-help for a form's submission-template. Essentially, it sets
+	smarty variable 'help_subtplvars' to the output from processing the template
+	form_vars_help.tpl
+	@formdata: reference to pwfData object for form 
 	@mod: reference to current PowerBrowse module object
-	@smarty: referenced to smarty object
-	@fields: reference to array of form-fields e.g. pwfData::Fields() or empty array
+	@smarty: reference to smarty object
 	*/
-	public static function SetupFormVarsHelp(&$mod,&$smarty,&$formfields)
+	public static function SetupSubTemplateVarsHelp(&$formdata,&$mod,&$smarty)
 	{
 		$smarty->assign('template_vars_title',$mod->Lang('title_template_variables'));
 		$smarty->assign('variable_title',$mod->Lang('variable'));
 		$smarty->assign('property_title',$mod->Lang('property'));
 
-		$sysfields = array();
+		$globalvars = array();
 		foreach(array(
 		 'form_name' => 'title_form_name',
 		 'form_url' =>'help_form_url',
@@ -452,14 +533,21 @@ EOS;
 			$oneset = new stdClass();
 			$oneset->name = '{$'.$name.'}';
 			$oneset->title = $mod->Lang($langkey);
-			$sysfields[] = $oneset;
+			$globalvars[] = $oneset;
 		}
-		$smarty->assign('sysfields',$sysfields);
-
-		if($formfields)
+		foreach($formdata->templateVariables as $name=>$langkey)
 		{
-			$subfields = array();
-			foreach($formfields as &$one)
+			$oneset = new stdClass();
+			$oneset->name = '{$'.$name.'}';
+			$oneset->title = $mod->Lang($langkey);
+			$globalvars[] = $oneset;
+		}
+		$smarty->assign('globalvars',$globalvars);
+
+		if($formdata->Fields)
+		{
+			$fieldvars = array();
+			foreach($formdata->Fields as &$one)
 			{
 				if($one->DisplayInSubmission())
 				{
@@ -469,11 +557,11 @@ EOS;
 					$oneset->name = $one->GetVariableName();
 					$oneset->id = $one->GetId();
 					$oneset->escaped = str_replace("'","\\'",$oneset->title);
-					$subfields[] = $oneset;
+					$fieldvars[] = $oneset;
 				}
 			}
 			unset($one);
-			$smarty->assign('subfields',$subfields);
+			$smarty->assign('fieldvars',$fieldvars);
 		}
 
 /*		$obfields = array();
@@ -492,11 +580,12 @@ EOS;
 */
 		$smarty->assign('help_other_fields',$mod->Lang('help_other_fields'));
 
-		$smarty->assign('help_vars',$mod->ProcessTemplate('form_vars_help.tpl'));
+		$smarty->assign('help_subtplvars',$mod->ProcessTemplate('form_vars_help.tpl'));
 	}
 
 	/**
 	SetupFormVars:
+	Sets various smarty variables
 	@formdata: reference to form data object
 	@htmlemail: optional boolean, whether processing a form for html email, default FALSE
 	*/
@@ -561,7 +650,13 @@ EOS;
 		return FALSE;
 	}
 
-	//html_entity_decode() (with no encoding, flags ENT_COMPAT | ENT_XHTML) plus some other changes
+	/**
+	html_myentities_decode:
+	Essentially, html_entity_decode() (with no encoding, flags ENT_COMPAT | ENT_XHTML)
+	plus some other changes
+	@val: string to be decoded
+	Returns: decoded string
+	*/
 	public static function html_myentities_decode($val)
 	{
 		if($val == '')
@@ -577,11 +672,11 @@ EOS;
 
 	/**
 	CleanLog:
+	Removes from the ip_log table all records older than 30-minutes before @time
 	@module: reference to PowerTools module object
-	@time: timestamp,optional,default = 0
-	Removes from table records older than 30-minutes
+	@time: timestamp, optional, default 0 (meaning current time)
 	*/
-	public static function CleanLog(&$module,$time = 0)
+	public static function CleanLog(&$module,$time=0)
 	{
 		if(!$time) $time = time();
 		$time -= 900;
@@ -590,6 +685,10 @@ EOS;
 		$db->Execute('DELETE FROM '.cms_db_prefix().'module_pwf_ip_log WHERE basetime<'.$limit);
 	}
 
+	/**
+	GetUploadsPath:
+	Returns: absolute filepath, or FALSE
+	*/
 	public static function GetUploadsPath()
 	{
 		$config = cmsms()->GetConfig();
