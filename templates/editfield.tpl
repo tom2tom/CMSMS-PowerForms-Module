@@ -12,7 +12,7 @@
 {if isset($entry->input)}<div class="pageinput">{$entry->input}</div>{/if}
 {if isset($entry->help)}<p class="pageinput">{$entry->help}</p>{/if}
 {/foreach}
-{if !empty($mainvarhelp)}<br /><div class="pageinput">{$help_vars}</div>{/if}
+{if !empty($mainvarhelp)}<br /><div class="pageinput">{$help_subtplvars}</div>{/if}
 {if isset($mainTable)}
   <br />
   <div class="pageoverflow">
@@ -46,7 +46,7 @@
 {if isset($entry->input)}<div class="pageinput">{$entry->input}</div>{/if}
 {if isset($entry->help)}<p class="pageinput">{$entry->help}</p>{/if}
 {/foreach}
-{if !empty($advvarhelp)}<br /><div class="pageinput">{$help_vars}</div>{/if}
+{if !empty($advvarhelp)}<br /><div class="pageinput">{$help_subtplvars}</div>{/if}
  </div>
 {$tab_end}
 {/if}{*isset($advancedtab_start)*}
