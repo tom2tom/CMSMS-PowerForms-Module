@@ -261,25 +261,6 @@ class pwfUtils
 	}
 
 	/**
-	HasDisposition:
-	@formdata: reference to pwfData form data object
-	Returns: boolean, TRUE if a disposition field is found among the fields in @formdata
-	*/
-	public static function HasDisposition(&$formdata)
-	{
-		foreach($formdata->Fields as &$one)
-		{
-			if($one->IsDisposition())
-			{
-				unset($one);
-				return TRUE;
-			}
-		}
-		unset($one);
-		return FALSE;
-	}
-
-	/**
 	CreateSampleTemplate:
 	@formdata: reference to pwfData form data object
 	@htmlish: whether the template is to include html tags like <h1>, default FALSE
@@ -367,21 +348,24 @@ class pwfUtils
 	@ctlName: name of the control, by convention like 'opt_'.field-opt-name,
 		here, it may have appended suffix 'text'
 	@$button_label: text for button label
-	@template: the template string to be inserted into the control, upon button-click
-	@altname: for use when multiple buttons populate the same control
+	@template: template to be inserted into the control, upon button-click.
+		This becomes a single-quoted js string, so any embedded single-quote
+		must be escaped, and any js-unfriendly content must be resolved.
+	@funcName: identifier for use when multiple buttons populate the same control, default ''
 	Returns: 2-member array, 1st is a button, 2nd is js onclick-func for the button
 	*/
-	public static function CreateTemplateAction(&$mod,$id,$ctlName,$button_label,$template,$altName=FALSE)
+	public static function CreateTemplateAction(&$mod,$id,$ctlName,$button_label,$template,$funcName=FALSE)
 	{
-		$alias = ($altName)?$altName:$ctlName;
+		if(!$funcName)
+			$funcName = $ctlName;
 		$button = <<<EOS
-<input type="button" class="cms_submit" value="{$button_label}" onclick="javascript:populate_{$alias}(this.form)" />
+<input type="button" class="cms_submit" value="{$button_label}" onclick="javascript:populate_{$funcName}(this.form)" />
 EOS;
 		$prompt = $mod->Lang('confirm');
 		$func = <<<EOS
-function populate_{$alias}(formname) {
+function populate_{$funcName}(formname) {
  if(confirm('{$prompt}')) {
-  formname['{$id}{$ctlName}'].value={$template};
+  formname['{$id}{$ctlName}'].value='{$template}';
  }
 }
 EOS;
@@ -392,21 +376,28 @@ EOS;
 	SampleTemplateActions:
 	@formdata: reference to pwfData formdata object
 	@id: The id given to the Powerforms module on execution
-	@ctlData: array of parameters naming the form-control(s) affected,
-		and aspects of the templates to be generated e.g. for 3 controls:
-		array (
+	@ctlData: array of parameters in which keys are names of affected form-control(s),
+		values are arrays of parameters, any one or more of
+		 'general_button'
+		 'html_button'
+		 'text_button'
+		 'is_email'
+		 'is_oneline'
+		 'is_footer' (last, if used)
+		 'is_header'
+		e.g. for 3 controls:
+		array
 		  'opt_file_template' => array
-			  'is_oneline' => boolean true
+			  'is_oneline' => true
 		  'opt_file_header' => array
-			  'is_oneline' => boolean true
-			  'is_header' => boolean true
+			  'is_oneline' => true
+			  'is_header' => true
 		  'opt_file_footer' => array
-			  'is_oneline' => boolean true
-			  'is_footer' => boolean true
-		)
-	Returns: array($buttons,$funcs: $funcs = array of scripts to be activated
-	 by clicking the corresponding button in the $buttons array. The scripts
-	 install a 'sample template' into the corresponding control.
+			  'is_oneline' => true
+			  'is_footer' => true
+	Returns: array($buttons,$funcs), where $funcs = array of scripts to be
+	 activated by clicking the corresponding button in the $buttons array.
+	 The scripts install a 'sample template' into the corresponding control.
 	 For some combinations of options, pairs of buttons & scripts are created.
 	*/
 	public static function SampleTemplateActions(&$formdata,$id,$ctlData)
@@ -428,7 +419,7 @@ EOS;
 			{
 				$sample = self::CreateSampleTemplate($formdata,FALSE,
 					$is_email,$is_oneline,$is_header,$is_footer);
-				$sample = "'".str_replace(array("'","\n"),array("\\'","\\n'+\n'"),$sample)."'";
+				$sample = str_replace(array("'","\n"),array("\\'","\\n'+\n'"),$sample);
 				list($b,$f) = self::CreateTemplateAction($mod,$id,$ctlname,
 					$mod->Lang('title_create_sample_template'),$sample,$ctlname.'_1');
 				$buttons[] = $b;
@@ -446,7 +437,7 @@ EOS;
 
 			$sample = self::CreateSampleTemplate($formdata,$html_button || $gen_button,
 				$is_email,$is_oneline,$is_header,$is_footer);
-			$sample = "'".str_replace(array("'","\n"),array("\\'","\\n'+\n'"),$sample)."'";
+			$sample = str_replace(array("'","\n"),array("\\'","\\n'+\n'"),$sample);
 			list($b,$f) = self::CreateTemplateAction($mod,$id,$ctlname,$button_text,$sample);
 			$buttons[] = $b;
 			$funcs[] = $f;
@@ -635,19 +626,6 @@ EOS;
 //			$smarty->assign_by_ref('fld_'.$id.'_obj',$fldobj);
 		}
 		unset ($one);
-	}
-
-	//used by action.validate TODO
-	public static function CheckResponse($form_id,$response_id,$code)
-	{
-		$db = cmsms()->GetDb();
-		$sql = 'SELECT secret_code FROM '.cms_db_prefix().'module_pwf_browse WHERE form_id=? AND browser_id=?'; //TODO
-		if($result = $db->GetOne($sql,array($form_id,$response_id)))
-		{
-			if($result == $code)
-				return TRUE;
-		}
-		return FALSE;
 	}
 
 	/**
