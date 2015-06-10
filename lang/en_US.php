@@ -256,9 +256,11 @@ $lang['add_address'] = 'Add Another Address';
 $lang['add_checkboxes'] = 'Add Another Checkbox';
 $lang['add_destination'] = 'Add Another Destination';
 $lang['added'] = 'added';
+$lang['add_file'] = 'Add Another File';
 $lang['add_options'] = 'Add Another Option';
 $lang['admin_desc'] = 'Add, edit and manage interactive forms';
 $lang['advanced'] = 'Advanced';
+$lang['all'] = 'All';
 $lang['anonymous'] = 'Anonymous';
 $lang['apply'] = 'Apply';
 $lang['automatic'] = 'Automatic';
@@ -313,38 +315,45 @@ $lang['delete_address'] = 'Delete Selected Addresses';
 $lang['delete_checkboxes'] = 'Delete Selected Checkboxes';
 $lang['delete'] = 'Delete';
 $lang['delete_destination'] = 'Delete Selected Destinations';
+$lang['delete_file'] = 'Delete Selected Files';
 $lang['delete_options'] = 'Delete Selected Options';
+
 $lang['desc_actionid'] = 'TODO';
 $lang['desc_alias'] = 'the alias specified for the field';
-//$lang['desc_browser_id'] = 'Browser ID if form is being viewed or edited from PowerBrowse';
 $lang['desc_css_class'] = 'CSS class for the form';
 $lang['desc_cssf_class'] = 'the CSS class specified for the field';
 $lang['desc_display'] = 'true if the field is visible in the form';
 $lang['desc_error'] = 'error text, if the field did not validate';
-$lang['desc_helptext_id'] = 'DOM id of the DIV containing controls to show help for the field';
+$lang['desc_form_done'] = 'whether the form is complete';
+$lang['desc_form_end'] = 'html for form start';
+$lang['desc_form_has_validation_errors'] = 'whether any field on the form failed to validate';
 $lang['desc_form_id'] = 'form identifier (number)';
 $lang['desc_form_name'] = 'form name';
+$lang['desc_form_start'] = 'html for form start';
+$lang['desc_form_validation_errors'] = 'TODO';
 $lang['desc_has_label'] = 'true if the field type has a label';
 $lang['desc_help_icon'] = 'string to generate help/info icon displayed on the form';
 $lang['desc_helptext'] = 'the field\'s help text';
+$lang['desc_helptext_id'] = 'DOM id of the DIV containing controls to show help for the field';
 $lang['desc_hidden'] = 'collection of necessary hidden stuff';
 $lang['desc_hide_name'] = 'true if the field name is hidden';
 $lang['desc_id'] = 'the internal/opaque id PowerForms uses for the field';
-//$lang['desc_in_admin'] = 'true if the form is being viewed or edited from PowerBrowse';
 $lang['desc_in_browser'] = 'true if form is being viewed or edited from PowerBrowse';
-$lang['desc_input_id'] = 'the DOM id of the field\'s input (e.g. for a label: for="foo")';
 $lang['desc_input'] = 'the field\'s input control, or array of objects (see below)';
+$lang['desc_input_id'] = 'the DOM id of the field\'s input (e.g. for a label: for="foo")';
 $lang['desc_jscript'] = 'javascript to be included';
 $lang['desc_label_parts'] = 'true if the collection of controls has separate labels for each control';
-$lang['desc_logic'] = 'smarty data or logic associated with the field';
 $lang['desc_multiple_parts'] = 'true if the field->input is actually a collection of controls';
 $lang['desc_name'] = 'the field\'s name';
 $lang['desc_needs_div'] = 'true if the field needs to be wrapped in a DIV (or table row)';
 $lang['desc_prev'] = '"Back" button for multi-page forms';
 $lang['desc_required'] = 'true if the field is required';
 $lang['desc_required_symbol'] = 'symbol shown in the title if the field is required';
-$lang['description'] = 'Description';
+$lang['desc_resources'] = 'smarty tag(s), script etc associated with the field';
+$lang['desc_show_submission_errors'] = 'whether to describe errors';
 $lang['desc_smarty_eval'] = 'true if the field value has been evaluated via smarty';
+$lang['desc_submission_error'] = 'whether a error was found when processing the form';
+$lang['desc_submission_error_list'] = 'TODO';
 $lang['desc_submit'] = '"Continue" or "Submit" button for multi-page forms (adjusts automatically)';
 $lang['desc_this_page'] = 'number of the current page for multi-page forms';
 $lang['desc_title_page_x_of_y'] = 'displays "page x of y" for multi-page forms';
@@ -352,6 +361,9 @@ $lang['desc_total_pages'] = 'number of pages for multi-page forms';
 $lang['desc_type'] = 'the field\'s classname/type';
 $lang['desc_valid'] = 'true if the field has been validated successfully';
 $lang['desc_values'] = 'for a multiple-choice field, array of allowed values, otherwise FALSE';
+$lang['description'] = 'Description';
+//$lang['desc_browser_id'] = 'Browser ID if form is being viewed or edited from PowerBrowse';
+//$lang['desc_in_admin'] = 'true if the form is being viewed or edited from PowerBrowse';
 $lang['destination_count'] = '%s destinations';
 $lang['display_text'] = 'Display page constructed from post-submission template';
 $lang['duplicate_identifier'] = 'Form name or alias is already in use';
@@ -381,6 +393,7 @@ $lang['error_module_CompanyDirectory'] = 'The Company Directory module is not av
 $lang['error_module_upload'] = 'The Uploads module is not available';
 $lang['error_module_feu'] = 'The FrontEndUsers module is not available. This field will not function.';
 $lang['error_submission'] = 'Sorry! There was an error handling your form submission.';
+$lang['error_typed'] = 'Invalid %s';
 $lang['error_uploads_dir'] = 'Error! There is no uploads directory.';
 $lang['error_usertag'] = 'User defined tag returned an error';
 $lang['error_usertag_named'] = 'User defined tag %s returned an error.';
@@ -423,7 +436,7 @@ $lang['field_name_in_use'] = 'The field name "%s" is already in use. Please use 
 $lang['field_no_name'] = 'Fields must be named, unless you disable this in the Power Forms configuration.';
 $lang['field_order_updated'] = 'Field order updated.';
 $lang['field_requirement_updated'] = 'Field required state updated.';
-$lang['fields'] = 'fields';
+$lang['field_named'] = 'field named \'%s\'';
 $lang['field_op'] = 'Field %s';
 
 $lang['field_type_field'] = 'Field Type Not Set';
@@ -489,6 +502,7 @@ $lang['field_type_UniqueFile'] = '*Save submitted data in unique flat file';
 $lang['field_type_UniqueInteger'] = '-Unique integer (serial)';
 $lang['field_type_UserEmail'] = '*Send email according to user-specified parameters';
 $lang['field_type_YearPulldown'] = 'Year pulldown';
+$lang['fields'] = 'fields';
 
 $lang['file_count'] = '%s possible files';
 $lang['form_deleted'] = 'Form deleted.';
@@ -536,7 +550,7 @@ $lang['help_file_header_template'] = 'For TXT, this will be placed at the top of
 $lang['help_file_rename'] = 'To rename a file upon uploading, create the template here. Leave blank to preserve original filename';
 $lang['help_form_alias'] = 'If left blank, an alias will be derived from the form name';
 $lang['help_form_vars'] = <<<EOS
-To make the form work, you'll need to always include the <code>{\$hidden}</code> and <code>{\$submit}</code> tags.
+At a minimum, <code>{\$form_start}</code>, <code>{\$form_end}</code>, <code>{\$hidden}</code> and <code>{\$submit}</code> tags must be included in the template, or else the form cannot work.
 EOS;
 $lang['help_ignored_if_upload'] = '(This field ignored if you use the Uploads module to manage files)';
 $lang['help_import_alias'] = 'Optional replacement alias for the imported form';
@@ -599,9 +613,9 @@ $lang['help_browse_data'] = 'Data will be stored in an XML format in the [PREFIX
 $lang['help_can_drag'] = 'You can change the order by dragging any row, or double-click on any number of rows before dragging them all.';
 $lang['help_cert_key_match'] = 'Select the private key that is appropriate for the certificate you are using for encryption!';
 $lang['help_changing_triggers_reindex'] = 'Changing any of the above fields will trigger a reindex of *all* saved records, so it could take a while.';
-$lang['help_clear_default'] = 'Check this to clear the default value when the user clicks this field. Since this uses a javascript string compare, it will fail if you put single quotes in your default text. Other un-javascript-friendly characters may also cause it to fail.';
+$lang['help_clear_default'] = 'This uses a javascript string-compare, so it will fail if there is any single-quote in the default text. Other un-javascript-friendly characters may also cause it to fail.';
 $lang['help_company_field'] = 'Note: output will be in the form of<br />"company name"=>"value"';
-$lang['help_computed_order'] = 'If more than one Computed Field exists, they will be computed from lowest order number to highest order number';
+$lang['help_compute_order'] = 'If the form has more than one Computed Field, they will be computed from lowest order number to highest order number';
 $lang['help_default_today'] = 'If un-checked, default to today\'s date';
 $lang['help_default_year'] = 'Use -1 for the current year';
 $lang['help_dont_submit_unchecked'] = 'Check this if you only want checked boxes to return values';
@@ -635,23 +649,25 @@ $lang['help_submit_javascript'] = 'Make this the complete Javascript call, inclu
 $lang['help_submit_safety'] = 'Add Javascript to final \'Submit\' button that will help prevent multiple submissions';
 $lang['help_submit_tab'] = <<<EOS
 What the module does with submitted data is determined by "Disposition" fields (such as generated emails) in the form, not here.
-The template (if used) is for display to the user after the form is submitted,
-and doesn't affect form dispositions. Disposition-specific templates are
-(where appropriate) set in the "advanced" tab for the disposition field.
+EOS;
+$lang['help_submit_template'] = <<<EOS
+This template is to generate content displayed to the user after the form is submitted and processed.
+The template is not relevant to form-field disposition. Disposition-specific templates are (where appropriate)
+set in the "advanced" tab for the disposition field.
 EOS;
 $lang['help_uploads_dir']='Filesystem path relative to website-host uploads directory. No leading or trailing path-separator, and any intermediate path-separator must be host-system-specific e.g. \'\\\' on Windows. If left blank, the default will be used.';
 $lang['help_url'] = 'Entire URL, including protocol and path (e.g. http://myhost.com/form_handler.cgi)';
-$lang['help_vars1'] = <<<EOS
-You can access form fields either using the <code>{\$fields}</code> array or by directly
-accessing fields by their names e.g. <code>{\$myfield->input}</code><br /><br />
-Alternate field names can be used interchangeably (especially useful if Smarty is choking on characters outside of ASCII 32-126).<br /><br />
-Each field has the following properties:
+$lang['help_fieldvars1'] = <<<EOS
+Form fields can be accessed either using the <code>{\$fields}</code> array or by directly
+accessing fields by their name e.g. <code>{\$myfield}</code>. Alternate field names can
+be used interchangeably (especially useful if Smarty is choking on characters outside of ASCII 32-126).<br /><br />
+Each field has the following properties, accessible by e.g. <code>{\$myfield-&gt;input}</code>:
 EOS;
-$lang['help_vars2'] = <<<EOS
+$lang['help_fieldvars2'] = <<<EOS
 When field->multiple_parts is TRUE, field->input is actually an array of objects rather than an input.
 This happens, for example, in CheckBoxGroups or RadioButtonGroups. For those, you
-can iterate through <code>field->input->name</code> and <code>field->input->input</code>
-and <code>field->input->op</code>.
+can iterate through <code>\$field->input->name</code> and <code>\$field->input->input</code>
+and (in some cases) <code>\$field->input->op</code>.
 EOS;
 $lang['hour'] = 'Hour';
 
@@ -662,6 +678,7 @@ $lang['import'] = 'Import';
 
 $lang['import_fb'] = 'Import Forms';
 $lang['import_browsedata'] = 'Conform Browsers';
+$lang['increment'] = 'increment';
 $lang['information'] = 'Parameters';
 $lang['installed'] = 'Module version %s installed.';
 
@@ -669,25 +686,36 @@ $lang['lackpermission'] = 'Sorry! You don\'t have adequate privileges to access 
 $lang['link_destination'] = 'Link destination URL';
 $lang['link_label'] = 'Link Label';
 
+$lang['maximum'] = 'maximum';
 $lang['maximum_size'] = 'Max. Size';
 $lang['mcrypt'] = 'PHP mcrypt Library';
 $lang['merid'] = 'Meridian';
 $lang['min'] = 'Minute';
-$lang['missing_cms_mailer'] = 'PowerForms: Cannot find required module CMSMailer!';
+$lang['minumum'] = 'minimum';
+$lang['missing_cms_mailer'] = 'Cannot find required module CMSMailer!';
+$lang['missing_type'] = 'No %s';
 $lang['mon'] = 'Month';
 $lang['movedn'] = 'move down';
 $lang['moveup'] = 'move up';
-$lang['must_specify_one_admin'] = 'Must specify an admininstrator';
-$lang['must_specify_one_destination'] = 'You need to specify at least one destination address!';
+//missing types
+$lang['admin'] = 'admininstrator';
+$lang['destination'] = 'destination address';
+$lang['file'] = 'file';
+$lang['item'] = 'item';
+$lang['page'] = 'website page';
+$lang['source'] = 'source address';
+$lang['subject'] = 'email subject';
 
 $lang['next'] = 'Next page';
 $lang['no'] = 'No';
+$lang['no_admins'] = 'No site administrator is available';
 $lang['no_default'] = 'No Default';
 $lang['no_field_assigned'] = 'No field assigned for %s';
 $lang['no_fields'] = 'No field is registered';
 $lang['no_forms'] = 'No form is registered';
 $lang['no_referrer_info'] = 'No HTTP_REFERER info available (probably due to use of User Email Validation)';
 $lang['none'] = '(none)';
+$lang['none2'] = 'None';
 $lang['nooverwrite'] = 'No overwrite';
 $lang['not_available'] = 'Not available';
 $lang['not_required'] = 'Not required';
@@ -767,6 +795,7 @@ $lang['tab_udt'] = 'UDT Integration';
 $lang['taskdescription_clearlog'] = 'Clear old submitted-form records';
 $lang['text_length'] = '%s chars.';
 $lang['thanks'] = 'Thanks! Your submission has been received.';
+$lang['thebox'] = 'the box';
 $lang['tip_clonesel']='clone selected forms';
 $lang['tip_deletesel']='delete selected forms';
 $lang['tip_exportsel']='export selected forms';
@@ -797,6 +826,7 @@ $lang['title_captcha_prompt'] = 'Prompt';
 $lang['title_captcha_template'] = 'Template for displaying Captcha elements';
 $lang['title_captcha_wrong'] = 'Mismatch message';
 $lang['title_compute'] = 'Computed/PHP';
+$lang['title_compute_order'] = 'Interpretation order';
 $lang['title_compute_value'] = 'Value to compute';
 $lang['title_confirmation_url'] = 'URL to click for form confirmation';
 $lang['title_create_sample_footer_template'] = 'Create sample footer template';
@@ -928,7 +958,6 @@ $lang['title_numbers_to_generate'] = 'How many numbers to generate in process';
 $lang['title_numeric'] = 'Numeric';
 $lang['title_option_name'] = 'Option name';
 $lang['title_option_value'] = 'Value submitted';
-$lang['title_order'] = 'Interpretation order';
 $lang['title_page_tag'] = 'Page tag';
 $lang['title_page_x_of_y'] = 'Page %s of %s';
 $lang['title_permitted_extensions'] = 'Permitted extensions';
