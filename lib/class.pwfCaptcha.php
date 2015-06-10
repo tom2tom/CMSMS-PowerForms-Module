@@ -64,16 +64,20 @@ class pwfCaptcha extends pwfFieldBase
 						$mod->CreateInputCheckbox($id,'opt_aslabel',1,
 							$this->GetOption('aslabel',0)),
 						$mod->Lang('help_captcha_label'));
+		//setup to revert to default (a.k.a. 'sample') template
+		list($button,$func) = pwfUtils::CreateTemplateAction($mod,$id,
+			'opt_captcha_template',$mod->Lang('title_create_sample_template'),
+			$this->defaulttemplate);
 		$adv[] = array($mod->Lang('title_captcha_template'),
 						$mod->CreateTextArea(FALSE,$id,$this->GetOption('captcha_template',$this->defaulttemplate),
 							'opt_captcha_template','pwf_shortarea','','','',50,5),
-						$mod->Lang('help_captcha_template'));
-		//TODO default template button
-		return array('main'=>$main,'adv'=>$adv);
+						$mod->Lang('help_captcha_template').'<br /><br />'.$button);
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>[$func]);
 	}
 
 	function AdminValidate($id)
 	{
+		$mod = $this->formdata->formsmodule;
 		$messages = array();
   		list($ret,$msg) = parent::AdminValidate($id);
 		if(!ret)
@@ -82,19 +86,19 @@ class pwfCaptcha extends pwfFieldBase
 		if(!$opt)
 		{
 			$ret = FALSE;
-			$messages[] = $this->formdata->formsmodule->Lang('TODO must supply');
+			$messages[] = $mod->Lang('missing_type',$mod->Lang('captchatemplateTODO'));
 		}
 		$opt = $this->GetOption('prompt');
 		if(!$opt)
 		{
 			$ret = FALSE;
-			$messages[] = $this->formdata->formsmodule->Lang('TODO must supply');
+			$messages[] = $mod->Lang('missing_type',$mod->Lang('captchapromptTODO'));
 		}
 		$opt = $this->GetOption('wrongtext');
 		if(!$opt)
 		{
 			$ret = FALSE;
-			$messages[] = $this->formdata->formsmodule->Lang('TODO must supply');
+			$messages[] = $mod->Lang('missing_type',$mod->Lang('captchamsgTODO'));
 		}
 		$msg = ($ret)? '' : implode('<br />',$messages);
     	return array($ret,$msg);
