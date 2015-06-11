@@ -1,37 +1,46 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
 # Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 $paramkeys = array_keys($params);
-$matched = preg_grep('/^pwfp_\d{3}_[cdfr]$/',$paramkeys);
-if(count($matched) != 4)
+$matched = preg_grep('/^pwfp_\d{3}_[cdr]$/',$paramkeys);
+if(count($matched) != 3)
 {
 	echo $this->Lang('validation_param_error');
 	return;
 }
 $key = reset($matched);
 $key = substr($key,0,9); //prefix
-//$form_id = $params[$key.'f']; TODO
-$response_id = $params[$key.'r'];
+$record_id = $params[$key.'r'];
 
-$sql = 'SELECT code FROM '.cms_db_prefix().
-	'module_pwf_X WHERE response_id=?'; //TODO
-$code = $db->GetOne($sql,array($response_id));
-if($code != $params[$key.'c'])
+$pre = cms_db_prefix();
+$sql = 'SELECT code,content FROM '.$pre.'module_pwf_record WHERE record_id=?';
+$row = $db->GetRow($sql,array($record_id));
+$sql = 'DELETE FROM '.$pre.'module_pwf_record WHERE record_id=?';
+if(!$row || $row['code'] != $params[$key.'c'])
 {
+	if($row)
+		$db->Execute($sql,array($record_id));
 	echo $this->Lang('validation_response_error');
 	return;
 }
 
-$funcs = new pwfFormOperations();
-//TODO get cached form data, including field values
-$formdata = $funcs->Load($this,$id,$params,$form_id);
+$db->Execute($sql,array($record_id));
+
+$formdata = pwfUtils::Decrypt($row['content'],$row['code'].$this->GetPreference('default_phrase'));
+if($formdata === FALSE)
+{
+	echo $this->Lang('validation_response_error');
+	return;
+}
+$formdata->formsmodule = $this; //restore un-cached content
+
 $field_id = $params[$key.'d'];
 $obfield = $formdata->Fields[$field_id];
-$obfield->ApproveToGo($response_id); //block another disposition of this field
+$obfield->ApproveToGo($record_id); //block another disposition of this field
+
 $res = $whole-form-Dispose($returnid); //TODO 'really' dispose, this time
 if($res[0])
 {
