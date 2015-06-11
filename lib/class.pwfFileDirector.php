@@ -139,7 +139,7 @@ class pwfFileDirector extends pwfFieldBase
 		else
 		{
 			$dests = FALSE;
-			$main[] = array('','',$mod->Lang('TODOmissing'));
+			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('file')));
 		}
 
 		//setup sample-template buttons and scripts
