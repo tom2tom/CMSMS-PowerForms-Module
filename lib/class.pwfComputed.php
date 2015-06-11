@@ -127,20 +127,19 @@ class pwfComputed extends pwfFieldBase
 		if($val)
 		{
 			//TODO check $val sanity
-			if($this->GetOption('string_or_number_eval') == 'compute')
-			{
-			}
+//			$ret = FALSE;
+//			$messages[] = $mod->Lang('error_typed',$mod->Lang'TODO_eval'));
 		}
 		else
 		{
 			$ret = FALSE;
-			$messages[] = $mod->Lang('TODO_badeval'); //'title_bad_function'?
+			$messages[] = $mod->Lang('missing_type',$mod->Lang'TODO_eval'));
 		}
 		$val = $this->GetOption('compute_order');
 		if(!is_numeric($val) || $val < 1)
 		{
 			$ret = FALSE;
-			$messages[] = $mod->Lang('TODO_badnumber');
+			$messages[] = $mod->Lang('error_typed',$mod->Lang'TODO_order'));
 		}
 		$msg = ($ret)?'':implode('<br />',$messages);
 	    return array($ret,$msg);
