@@ -10,143 +10,140 @@ class pwfComputed extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
+		$this->DisplayInSubmission = FALSE;
 		$this->IsComputedOnSubmission = TRUE;
 		$this->IsSortable = FALSE;
 		$this->NeedsDiv = FALSE;
-		$this->NonRequirableField = TRUE;
 		$this->Type = 'Computed';
 		$this->ValidationTypes = array();
 	}
 
 	function ComputeOrder()
 	{
-		return $this->GetOption('order','1');
+		return $this->GetOption('order',1); //user-supplied number
 	}
 
 	function Compute()
 	{
-		$mod = $this->formdata->formsmodule;
-		$others = $this->formdata->Fields;
-
-		$mapId = array();
-		$eval_string = FALSE;
-
-		for($i=0; $i<count($others); $i++)
-		{
-			$mapId[$others[$i]->GetId()] = $i;
-		}
-
-		$flds = array();
+		$fids = array();
 		$procstr = $this->GetOption('value');
-		preg_match_all('/\$fld_(\d+)/',$procstr,$flds);
+		//TODO if fields not named like '$fld_N' in the string ?
+		preg_match_all('/\$fld_(\d+)/',$procstr,$fids);
+		$mapId = array_flip(array_keys($this->formdata->Fields)); //keys are field id's
 
-		if($this->GetOption('string_or_number_eval','numeric') == 'numeric')
+		$etype = $this->GetOption('string_or_number_eval','numeric');
+		switch($etype)
 		{
-			foreach($flds[1] as $tF)
+		 case 'numeric':
+			foreach($fids[1] as $field_id)
 			{
-				if(isset($mapId[$tF]))
+				if(array_key_exists($field_id,$mapId))
 				{
-					$ref = $mapId[$tF];
-					if(is_numeric($others[$ref]->GetHumanReadableValue()))
-					{
-						$procstr = str_replace('$fld_'.$tF,
-							$others[$ref]->GetHumanReadableValue(),$procstr);
-					}
-					else
-					{
-						$procstr = str_replace('$fld_'.$tF,
-							'0',$procstr);
-					}
+					$val = $this->formdata->Fields[$field_id]->GetHumanReadableValue();
+					if(!is_numeric($val))
+						$val = '0';
+					$procstr = str_replace('$fld_'.$field_id,$val,$procstr);
 				}
 			}
 			$eval_string = TRUE;
-		}
-		else if($this->GetOption('string_or_number_eval','numeric') == 'compute')
-		{
-			foreach($flds[1] as $tF)
+			break;
+		 case 'compute':
+			foreach($fids[1] as $field_id)
 			{
-				if(isset($mapId[$tF]))
+				if(array_key_exists($field_id,$mapId))
 				{
-					$ref = $mapId[$tF];
-					$procstr = str_replace('$fld_'.$tF,
-					 $this->sanitizeValue($others[$ref]->GetHumanReadableValue()),$procstr);
+					$val = $this->formdata->Fields[$field_id]->GetHumanReadableValue();
+					// strip any PHP function from submitted string
+					$arr = get_defined_functions(); // internal and user
+					$val = str_replace($arr['internal'],'',$val);
+					$val = str_replace($arr['user'],'',$val);
+					$procstr = str_replace('$fld_'.$field_id,$val,$procstr);
 				}
 			}
 			$eval_string = TRUE;
-		}
-		else
-		{
-			$thisValue = '';
-			foreach($flds[1] as $tF)
+			break;
+		 default:
+			$this->Value = '';
+			foreach($fids[1] as $field_id)
 			{
-				if(isset($mapId[$tF]))
+				if(array_key_exists($field_id,$mapId))
 				{
-					$ref = $mapId[$tF];
-					$this->Value .= $others[$ref]->GetValue();
-					if($this->GetOption('string_or_number_eval','numeric') != 'unstring')
-					{
+					$this->Value .= $this->formdata->Fields[$field_id]->GetValue();
+					if($etype != 'unstring')
 						$this->Value .= ' ';
-					}
 				}
 			}
+			$eval_string = FALSE;
+			break
 		}
 
 		if($eval_string)
 		{
-			$strToEval = "\$this->Value=$procstr;";
+			$val = "\$this->Value=$procstr;";
 			// see if we can trap an error
-			// this is all vulnerable to an evil form designer, but
-			// not an evil form user.
+			// this is vulnerable to an evil form designer, but not an evil form user
 			ob_start();
-			if(eval('function testcfield'.rand().'() {'.$strToEval.'}') === FALSE)
-			{
-				$this->Value = $mod->Lang('title_bad_function',$procstr);
-			}
+			if(eval('function testcfield'.rand().'() {'.$val.'}') === FALSE)
+				$this->Value = $this->formdata->formsmodule->Lang('title_bad_function',$procstr);
 			else
-			{
-				eval($strToEval);
-			}
+				eval($val);
 			ob_end_clean();
 		}
 	}
 
-	// strip any possible PHP function from submitted string
-	function sanitizeValue($val)
-	{
-		$arr = get_defined_functions(); // internal and user
-		$val = str_replace($arr['internal'],'',$val);
-		$val = str_replace($arr['user'],'',$val);
-		return $val;
-	}
-
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		$help = pwfUtils::FormFieldsHelp($this->formdata).'<br /><br />'.
-			$mod->Lang('help_operators');
-		$processType = array(
+		$help = pwfUtils::FormFieldsHelp($this->formdata). //TODO Compute() expects $fld_N, not field alias
+			'<br /><br />'.$mod->Lang('help_operators');
+		$choices = array(
 			$mod->Lang('title_numeric')=>'numeric',
-		    $mod->Lang('title_string')=>'string',
+			$mod->Lang('title_string')=>'string',
 			$mod->Lang('title_string_unspaced')=>'unstring',
 			$mod->Lang('title_compute')=>'compute');
 
-		$main = array(
-			 array(
-				$mod->Lang('title_compute_value'),
-				$mod->CreateInputText($id,'opt_value',$this->GetOption('value'),35,1024),
-				$help),
-			 array(
-				$mod->Lang('title_string_or_number_eval'),
-				$mod->CreateInputRadioGroup($id,'opt_string_or_number_eval',
-			    	$processType,
-			    	$this->GetOption('string_or_number_eval','numeric'),'&nbsp;&nbsp;')),
-			 array(
-				$mod->Lang('title_order'),
-				$mod->CreateInputText($id,'opt_order',$this->GetOption('order',1),5,10),
-				$mod->Lang('help_computed_order'))
-		);
-		return array('main'=>$main);
+		list($main,$adv) = $this->AdminPopulateCommon($id);
+		$main[] = array($mod->Lang('title_compute_value'),
+						$mod->CreateInputText($id,'opt_value',$this->GetOption('value'),35,1024),
+						$help);
+		$main[] = array($mod->Lang('title_string_or_number_eval'),
+						$mod->CreateInputRadioGroup($id,'opt_string_or_number_eval',$choices,
+						$this->GetOption('string_or_number_eval','numeric'),'&nbsp;&nbsp;'));
+		$main[] = array($mod->Lang('title_compute_order'),
+						$mod->CreateInputText($id,'opt_order',$this->GetOption('order',1),3),
+						$mod->Lang('help_compute_order'));
+		return array('main'=>$main,'adv'=>$adv);
+	}
+
+	function AdminValidate($id)
+	{
+		$messages = array();
+  		list($ret,$msg) = parent::AdminValidate($id);
+		if(!ret)
+			$messages[] = $msg;
+		$val = $this->GetOption('value');
+		if($val)
+		{
+			//TODO check $val sanity
+			if($this->GetOption('string_or_number_eval') == 'compute')
+			{
+			}
+		}
+		else
+		{
+			$ret = FALSE;
+			$messages[] = $mod->Lang('TODO_badeval'); //'title_bad_function'?
+		}
+		$val = $this->GetOption('compute_order');
+		if(!is_numeric($val) || $val < 1)
+		{
+			$ret = FALSE;
+			$messages[] = $mod->Lang('TODO_badnumber');
+		}
+		$msg = ($ret)?'':implode('<br />',$messages);
+	    return array($ret,$msg);
 	}
 
 }
