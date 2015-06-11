@@ -5,7 +5,49 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-//for filtering options for a field
+//for sorting field display-orders
+class SortOrdersClosure
+{
+    private $fields;
+	private $orders;
+
+    function __construct(&$fields,&$orders)
+	{
+        $this->fields = $fields;
+        $this->orders = $orders;
+    }
+
+    function compare($a,$b)
+	{
+		$fa = $this->fields[$this->orders[$a]];
+		$fb = $this->fields[$this->orders[$b]];
+		if($fa->IsDisposition)
+		{
+			if($fb->IsDisposition)
+			{
+				if($fb->Type == 'PageRedirector') //page redirect last
+					return -1;
+				elseif($fb->DisplayInForm) //email confirmation first
+					return 1;
+				elseif($fa->Type == 'PageRedirector')
+					return 1;
+				elseif($fa->DisplayInForm)
+					return -1;
+			}
+			elseif(!$fa->DisplayInForm)//includes $fa->Type == 'PageRedirector'
+				return 1;
+		}
+		elseif($fb->IsDisposition)
+		{
+			if(!$fb->DisplayInForm)
+				return 1;
+		}
+		//TODO field type '...start' before corresponding type '...end'
+		return $a - $b; //stet current order
+    }
+}
+
+//for filtering field options
 class IsFieldOption
 {
 	private $id;
@@ -184,11 +226,10 @@ class pwfFormOperations
 	Updates data in tables: form, form_opt, field, field_opt
 	 and stores form template as such
 	@mod: reference to the current PowerForms module object
-	@orders: reference to array of form-field-ids, ordered by current in-page position
 	@formdata: reference to form data object
 	Returns: boolean T/F indicating success, with $params['message'] set upon failure
 	*/
-	function Store(&$mod,&$orders,&$formdata)
+	function Store(&$mod,&$formdata)
 	{
 		$form_id = $formdata->Id;
 		$newform = ($form_id <= 0);
@@ -234,43 +275,10 @@ class pwfFormOperations
 				return array(FALSE,$mod->Lang('database_error'));
 		}
 
-		//ensure reasonable field-order (mostly, non-displayed disposition-fields toward end)
-		$fids = array_flip($orders);
-		uasort($formdata->Fields,
-		function($fa,$fb) use ($fids) //TODO this needs PHP 5.3+?
-		{
-			if($fa->IsDisposition)
-			{
-				if($fb->IsDisposition)
-				{
-					if($fb->Type == 'PageRedirector') //page redirect last
-						return -1;
-					elseif($fb->DisplayInForm)
-						return 1;
-					elseif($fa->Type == 'PageRedirector')
-						return 1;
-					elseif($fa->DisplayInForm)
-						return -1;
-				}
-				elseif(!$fa->DisplayInForm)//includes $fa->Type == 'PageRedirector'
-					return 1;
-			}
-			elseif($fb->IsDisposition)
-			{
-				if(!$fb->DisplayInForm)
-					return 1;
-			}
-			//TODO field type '...start' before corresponding type '...end'
-			return $fids[$fa->Id] - $fids[$fb->Id]; //stet current order
-		});
-
-		// store form fields
-		$o = 1;
+		// store fields
 		foreach($formdata->Fields as &$one)
 		{
-			$one->SetOrder($o);
 			$one->Store(TRUE);
-			$o++;
 		}
 		unset($one);
 
@@ -331,7 +339,7 @@ class pwfFormOperations
 				$obfield->Store(TRUE); //get an id
 				$formdata->Fields[$obfield->Id] = $obfield;
 				if($obfield->Type == 'PageBreakField')
-					$formdata->FormPagesCount++;
+					$formdata->PagesCount++;
 			}
 			unset($row);
 		}
@@ -660,6 +668,62 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 	}
 
 	/**
+	Arrange:
+	Ensure reasonable field-order (mostly, non-displayed disposition-fields toward end)
+	Updates @fields and @orders
+	@fields: reference to a formdata->Fields array
+	@orders: reference to array of id's for @fields, ordered by e.g.
+		current in-page position, or as-walked
+	*/
+	function Arrange(&$fields,&$orders)
+	{
+		$keys = array_keys($orders);
+		//old-PHP usort-with-extras
+		$soc = new SortOrdersClosure($fields,$orders);
+		usort($keys,array($soc,"compare"));
+		unset($soc);
+/*		usort($keys,
+		function($a,$b) use ($fields,$orders) //this syntax is for PHP 5.3+
+		{
+			$fa = $fields[$orders[$a]];
+			$fb = $fields[$orders[$b]];
+			if($fa->IsDisposition)
+			{
+				if($fb->IsDisposition)
+				{
+					if($fb->Type == 'PageRedirector') //page redirect last
+						return -1;
+					elseif($fb->DisplayInForm) //email confirmation first
+						return 1;
+					elseif($fa->Type == 'PageRedirector')
+						return 1;
+					elseif($fa->DisplayInForm)
+						return -1;
+				}
+				elseif(!$fa->DisplayInForm)//includes $fa->Type == 'PageRedirector'
+					return 1;
+			}
+			elseif($fb->IsDisposition)
+			{
+				if(!$fb->DisplayInForm)
+					return 1;
+			}
+			//TODO field type '...start' before corresponding type '...end'
+			return $a - $b; //stet current order
+		});
+*/
+		// update source-arrays accordingly
+		$neworder = array();
+		foreach($keys as $val)
+			$neworder[] = $orders[$val];
+		foreach($neworder as $i=>$val)
+		{
+			$fields[$val]->SetOrder($i+1);
+			$orders[$i] = $val;
+		}
+	}
+
+	/**
 	NewID:
 	@name: optional form-name string, default = FALSE
 	@alias: optional form-alias string, default = FALSE
@@ -692,7 +756,26 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 		return TRUE;
 	}
 
-	/* $params[] interpreters */
+	/**
+	HasDisposition:
+	@formdata: reference to pwfData form data object
+	Returns: boolean, TRUE if a disposition field is found among the fields in @formdata
+	*/
+	function HasDisposition(&$formdata)
+	{
+		foreach($formdata->Fields as &$one)
+		{
+			if($one->IsDisposition())
+			{
+				unset($one);
+				return TRUE;
+			}
+		}
+		unset($one);
+		return FALSE;
+	}
+
+	// $params[] interpreters
 
 	function GetId(&$params)
 	{
