@@ -12,6 +12,7 @@ class pwfFieldBase
 	var $loaded = FALSE;
 	var $validated = TRUE;
 	//field properties
+	var $ChangeRequirement = TRUE; //whether admin user may change $Required
 	var $DisplayInForm = TRUE;
 	var $DisplayInSubmission = TRUE;
 	var $DispositionPermitted = TRUE;
@@ -32,7 +33,6 @@ class pwfFieldBase
 	var $MultiPopulate = FALSE; //whether Populate() generates array of objects
 	var $Name = '';
 	var $NeedsDiv = TRUE;
-	var $NonRequirableField = FALSE;
 	var $Options = array();
 	var $OrderBy = 0; //form display-order
 	var $Required = FALSE;
@@ -272,9 +272,9 @@ class pwfFieldBase
 		return $this->DisplayInSubmission; //&& $this->DisplayInForm
 	}
 
-	function IsNonRequirableField()
+	function GetChangeRequirement()
 	{
-		return $this->NonRequirableField;
+		return $this->ChangeRequirement;
 	}
 
 	function SetRequired($required)
@@ -282,7 +282,7 @@ class pwfFieldBase
 		$this->Required = $required;
 	}
 
-	function IsRequired()
+	function GetRequired()
 	{
 		return $this->Required;
 	}
@@ -364,7 +364,7 @@ class pwfFieldBase
 	// Returns field value as a scalar or array (per $as_string), suitable for display in the form
 	function GetHumanReadableValue($as_string=TRUE)
 	{
-		if(property_exists($this,$Value))
+		if(property_exists($this,'Value'))
 		{
 			$ret = $this->Value;
 			if(is_array($ret))
@@ -417,7 +417,7 @@ class pwfFieldBase
 
 /*	function LoadValue($newvalue)
 	{
-		if(property_exists($this,$Value))
+		if(property_exists($this,'Value'))
 		{
 			if(!is_array($this->Value))
 				$this->Value = array($this->Value);
@@ -456,7 +456,7 @@ class pwfFieldBase
 	// Returns boolean T/F indication whether the field value is present and non-default
 	function HasValue($deny_blank_responses=FALSE)
 	{
-		if(property_exists($this,$Value))
+		if(property_exists($this,'Value'))
 		{
 			if(isset($this->Options['default'])) // fields with defaults
 			{
@@ -474,7 +474,7 @@ class pwfFieldBase
 	// Returns a member of the field-value-array, or if $index == 0, the entire value, or FALSE
 	function GetArrayValue($index)
 	{
-		if(property_exists($this,$Value))
+		if(property_exists($this,'Value'))
 		{
 			if(is_array($this->Value))
 			{
@@ -491,7 +491,7 @@ class pwfFieldBase
 	// Returns TRUE if $value is contained in array $Value or matches scalar $Value
 	function FindArrayValue($value)
 	{
-		if(property_exists($this,$Value))
+		if(property_exists($this,'Value'))
 		{
 			if(is_array($this->Value))
 				return array_search($value,$this->Value) !== FALSE;
@@ -515,7 +515,7 @@ class pwfFieldBase
 		return $default;
 	}
 
-	// Returns array of option-values, or FALSE
+	// Returns array of option-values (possibly just 0=>NULL), or FALSE
 	// Each array-key is the numeric-suffix to $optionName, & array-value is the stored value
 	function GetOptionRef($optionName)
 	{
@@ -523,14 +523,28 @@ class pwfFieldBase
 		$matches = array();
 		foreach($this->Options as $key => &$val)
 		{
-			if(strpos($key,$optionName) === 0)
+			if(strncmp($key,$optionName,$len) == 0)
 			{
 				$o = (int)substr($key,$len);
 				$matches[$o] = $val;
 			}
 		}
 		unset($val);
-		return ($matches) ? ksort($matches) : FALSE;
+		
+		if($matches)
+		{
+			if(count($matches) > 1)
+				ksort($matches);
+			elseif(key($matches) == 0)
+			{
+				$matches[1] = $matches[0];
+				unset($matches[0]);
+				$this->Options[$optionName.'1'] = $matches[1];
+				unset($this->Options[$optionName]);
+			}
+			return $matches;
+		}
+		return FALSE;
 	  }
 
 	function SetOptionElement($optionName,$index,$value)
@@ -672,36 +686,38 @@ class pwfFieldBase
 	}
 
 	/**
-	  PrePopulateAdminFormCommon:
-	  @id: id given to the PowerForms module on execution  
+	AdminPopulateCommon:
+	@id: id given to the PowerForms module on execution
+	@visible: whether to include some options irrelevant to non-displayed disposition-fields, default=TRUE
 
-	  Generates 'base'/common content for editing a field.
-	  See also - comments below, for PrePopulateAdminForm()
+	Generates 'base'/common content for editing a field.
+	See also - comments below, for AdminPopulate()
 
-	  Returns: array with keys 'main' and 'adv', for use by the relevant
-	  PrePopulateAdminForm(), and ultimately in method.update_field.php.
+	Returns: array with keys 'main' and  (possibly empty) 'adv', for use 
+		ultimately in method.update_field.php.
 	*/
-	function PrePopulateAdminFormCommon($id)
+	function AdminPopulateCommon($id,$visible=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
 		//init main tab content
 		$main = array();
-/*0*/	$main[] = array(
-			$mod->Lang('title_field_name'),
-			$mod->CreateInputText($id,'field_name',$this->GetName(),50));
-
+		$main[] = array($mod->Lang('title_field_name'),
+						$mod->CreateInputText($id,'field_name',$this->GetName(),50));
 		$alias = $this->ForceAlias();
-/*1*/	$main[] = array($mod->Lang('title_field_alias'),
-			$mod->CreateInputText($id,'opt_field_alias',$alias,30));
+		$main[] = array($mod->Lang('title_field_alias'),
+						$mod->CreateInputText($id,'opt_field_alias',$alias,30));
 
-/*2*/	$main[] = array($mod->Lang('title_field_type'),
-			$mod->CreateInputHidden($id,'field_type',$this->Type).$this->GetDisplayType());
+		$main[] = array($mod->Lang('title_field_type'),
+						$mod->CreateInputHidden($id,'field_type',$this->Type).
+						$this->GetDisplayType());
 
-		if(!$this->IsNonRequirableField())
+		if($this->ChangeRequirement && $visible)
 		{
-/*3*/		$main[] = array($mod->Lang('title_field_required'),
-			$mod->CreateInputCheckbox($id,'field_required',1,$this->IsRequired()),
-			$mod->Lang('help_field_required'));
+			$main[] = array($mod->Lang('title_field_required'),
+							$mod->CreateInputHidden($id,'field_required',0).
+							$mod->CreateInputCheckbox($id,'field_required',1,
+								$this->GetRequired()),
+							$mod->Lang('help_field_required'));
 		}
 		//choice of validation type ?
 		if(count($this->GetValidationTypes()) > 1)
@@ -709,47 +725,50 @@ class pwfFieldBase
 				$this->GetValidationTypes(),-1,$this->GetValidationType());
 		else
 			$validInput = $mod->Lang('automatic'); //or 'none' ?
-/*3or4*/$main[] = array($mod->Lang('title_field_validation'),$validInput);
+		$main[] = array($mod->Lang('title_field_validation'),
+						$validInput);
 
-		if($this->DisplayInForm())
+		if($this->DisplayInForm && $visible)
 		{
-/*4or5*/	$main[] = array($mod->Lang('title_field_helptext'),
-				$mod->CreateTextArea(FALSE,$id,$this->GetOption('helptext'),
-					'opt_helptext','pwf_shortarea','','','',50,8));
+			$main[] = array($mod->Lang('title_field_helptext'),
+							$mod->CreateTextArea(FALSE,$id,$this->GetOption('helptext'),
+							'opt_helptext','pwf_shortarea','','','',50,8));
 		}
 
 		//init advanced tab content
 		$adv = array();
-		if($this->HasLabel)
+		if($this->HasLabel && $visible)
 		{
 			$adv[] = array($mod->Lang('title_hide_label'),
-				$mod->CreateInputHidden($id,'hide_label',0).
-				$mod->CreateInputCheckbox($id,'hide_label',1,$this->HideLabel),
-				$mod->Lang('help_hide_label'));
+							$mod->CreateInputHidden($id,'hide_label',0).
+							$mod->CreateInputCheckbox($id,'hide_label',1,$this->HideLabel),
+							$mod->Lang('help_hide_label'));
 		}
 		if($this->DisplayInForm())
 		{
-			$adv[] = array($mod->Lang('title_field_css_class'),
-				$mod->CreateInputText($id,'opt_css_class',$this->GetOption('css_class'),30));
-			$adv[] = array($mod->Lang('title_field_javascript'),
-				$mod->CreateTextArea(FALSE,$id,$this->GetOption('javascript'),
-					'opt_javascript','pwf_shortarea','','','',50,8,'','js'),
-				$mod->Lang('help_field_javascript'));
+			if($visible)
+			{
+				$adv[] = array($mod->Lang('title_field_css_class'),
+								$mod->CreateInputText($id,'opt_css_class',$this->GetOption('css_class'),30));
+				$adv[] = array($mod->Lang('title_field_javascript'),
+								$mod->CreateTextArea(FALSE,$id,$this->GetOption('javascript'),
+								'opt_javascript','pwf_shortarea','','','',50,8,'','js'),
+								$mod->Lang('help_field_javascript'));
+			}
 			$adv[] = array($mod->Lang('title_field_resources'),
-				$mod->CreateTextArea(FALSE,$id,$this->GetOption('field_logic'),
-					'opt_field_logic','pwf_shortarea','','','',50,8),
-				$mod->Lang('help_field_resources'));
+							$mod->CreateTextArea(FALSE,$id,$this->GetOption('field_logic'),
+							'opt_field_logic','pwf_shortarea','','','',50,8),
+							$mod->Lang('help_field_resources'));
 		}
-
-		return array('main'=>$main,'adv'=>$adv);
+		return array($main,$adv);
 	}
 
-	function RemoveAdminField(&$array,$fieldname)
+	function RemoveAdminField(&$array,$fieldtitle)
 	{
 		$c = count($array);
 		for ($i=0; $i<$c; $i++)
 		{
-			if(isset($array[$i]->title) && $array[$i]->title == $fieldname)
+			if(isset($array[$i][0]) && $array[$i][0] == $fieldtitle)
 			{
 				unset($array[$i]);
 				return;
@@ -757,25 +776,8 @@ class pwfFieldBase
 		}
 	}
 
-	// Clear fields not relevant for non-displayed disposition-field
-	function OmitAdminVisible(&$mainArray,&$advArray,$hideReq=TRUE)
-	{
-		$mod = $this->formdata->formsmodule;
-		// (maybe) no "required"
-		if($hideReq)
-			$this->RemoveAdminField($mainArray,$mod->Lang('title_field_required'));
-		// no help
-		$this->RemoveAdminField($mainArray,$mod->Lang('title_field_helptext'));
-		// no "hide name"
-		$this->RemoveAdminField($advArray,$mod->Lang('title_hide_label'));
-		// no styling
-		$this->RemoveAdminField($advArray,$mod->Lang('title_field_css_class'));
-		// no input-control script
-		$this->RemoveAdminField($advArray,$mod->Lang('title_field_javascript'));
-	}
-
 	/**
-	PrePopulateAdminForm:
+	AdminPopulate:
 	@id: id given to the PowerForms module on execution  
 
 	Construct content for field edit. Subclass this.
@@ -788,14 +790,13 @@ class pwfFieldBase
 
 	Returns: associative array with 0 or more keys recognised in method.update_field.php.
 	*/
-	function PrePopulateAdminForm($id)
+	function AdminPopulate($id)
 	{
-		return array();
 	}
 
-	// Subclass this if needed
-	// Opportunity to alter (but not add to) array contents before they get rendered
-	function PostPopulateAdminForm(&$mainArray,&$advArray)
+	// Subclass this if needed (especially for cleanup of classes with HasAddOp=TRUE)
+	// called before AdminValidate()
+	function PostAdminAction(&$params)
 	{
 	}
 
@@ -818,12 +819,6 @@ class pwfFieldBase
 		$msg = ($ret)?'':implode('<br />',$messages);
 	    return array($ret,$msg);
 	}
-
-	// Subclass this if needed (especially for cleanup of classes with HasAddOp=TRUE)
-	function PostAdminSubmitCleanup(&$params)
-	{
-	}
-
 
 	/*Subclass this to generate content for the frontend form, either:
 	* an xhtml string which constitutes the field-input(s) to be displayed in the
@@ -854,7 +849,7 @@ class pwfFieldBase
 
 	// Subclass this to do stuff (e.g. modify other fields) after validation
 	// and before (compute if relevant) and disposition
-	function PreDispositionAction()
+	function PreDisposeAction()
 	{
 	}
 
@@ -871,7 +866,7 @@ class pwfFieldBase
 	}
 
 	// Subclass this to do stuff after the form has been disposed
-	function PostDispositionAction()
+	function PostDisposeAction()
 	{
 	}
 
