@@ -4,7 +4,7 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfClearLogTask implements CmsRegularTask
+class pwfClearTablesTask implements CmsRegularTask
 {
 	const MODNAME = 'PowerForms';
 
@@ -16,24 +16,22 @@ class pwfClearLogTask implements CmsRegularTask
 	public function get_description()
 	{
 		$module = cms_utils::get_module(self::MODNAME);
-		return $module->Lang('taskdescription_clearlog');
+		return $module->Lang('taskdescription_clearold');
 	}
 
 	public function test($time = '')
 	{
 		$module = cms_utils::get_module(self::MODNAME);
-		if(!$module->GetPreference('enable_antispam'))
-			return FALSE;
 		if(!$time) $time = time();
 		$last_cleared = $module->GetPreference('lastcleared',0);
-		return ($time >= $last_cleared + 86400);
+		return ($time >= $last_cleared + 1800);
 	}
 
 	public function execute($time = '')
 	{
 		$module = cms_utils::get_module(self::MODNAME);
 		if(!$time) $time = time();
-		pwfUtils::CleanLog($module,$time);
+		pwfUtils::CleanTables($module,$time);
 		return TRUE;
 	}
 

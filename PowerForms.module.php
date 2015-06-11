@@ -119,7 +119,7 @@ class PowerForms extends CMSModule
 
 	function get_tasks()
 	{
-		return new pwfClearLogTask();
+		return new pwfClearTablesTask();
 	}
 
 	function MinimumCMSVersion()
