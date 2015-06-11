@@ -65,50 +65,17 @@ $flds = "
 ";
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_flock',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
-/*
-$flds = "
-	resp_id I KEY,
-	form_id I,
-	feuser_id I,
-	user_approved ".CMS_ADODB_DT.",
-	secret_code C(36),
-	admin_approved ".CMS_ADODB_DT.",
-	submitted ".CMS_ADODB_DT;
-$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_resp',$flds,$taboptarray);
-$dict->ExecuteSQLArray($sqlarray);
-
-$db->CreateSequence($pre.'module_pwf_resp_seq');
 
 $flds = "
-	resp_attr_id I KEY,
-	resp_id I,
-	name C(36),
-	value X
-";
-$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_resp_attr',$flds,$taboptarray);
-$dict->ExecuteSQLArray($sqlarray);
-$db->CreateSequence($pre.'module_pwf_resp_attr_seq');
-
-$flds = "
-	resp_val_id I KEY,
-	resp_id I,
-	field_id I,
-	value X
-";
-$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_resp_val',$flds,$taboptarray);
-$dict->ExecuteSQLArray($sqlarray);
-
-$db->CreateSequence($pre.'module_pwf_resp_val_seq');
-*/
-
-$flds = "
-	record_id I(2) AUTO KEY,
-	form_id I,
+	record_id I(4) KEY,
+	code C(16),
 	submitted ".CMS_ADODB_DT.",
 	contents B
 ";
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_record',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
+
+$db->CreateSequence($pre.'module_pwf_record_seq');
 
 $flds = "
 	cache_id I(2) AUTO KEY,
@@ -126,8 +93,6 @@ $flds = "
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_ip_log',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-//$db->CreateSequence($pre.'module_pwf_ip_log_seq');
-
 $flds = "
 	trans_id I(2) AUTO KEY,
 	old_id I(2),
@@ -139,6 +104,7 @@ $dict->ExecuteSQLArray($sqlarray);
 
 $db->CreateSequence($pre.'module_pwf_uniquefield_seq');
 
+$this->SetPreference('default_phrase',uniqid('Enter at your own risk! Dangerous data!')); //TODO make this adjustable via UI
 $this->SetPreference('blank_invalid',0);
 $this->SetPreference('enable_antispam',1);
 $this->SetPreference('require_fieldnames',1);
