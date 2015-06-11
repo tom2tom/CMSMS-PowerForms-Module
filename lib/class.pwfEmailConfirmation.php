@@ -24,7 +24,7 @@ class pwfEmailConfirmation extends pwfEmailBase
         return $this->TemplateStatus();
 	}
 
-	function ApproveToGo($response_id)
+	function ApproveToGo($record_id)
 	{
 		$this->approvedToGo = TRUE;
 	}
@@ -97,9 +97,20 @@ class pwfEmailConfirmation extends pwfEmailBase
 	//only called when $this->approvedToGo is FALSE
 	function Dispose($id,$returnid)
 	{
-//TODO cache form data, pending confirmation
-		$code = 'TODO';
-		$response_id = 'TODO';
+		//cache form data, pending confirmation
+		$pre = cms_db_prefix();
+		$db = cmsms()->GetDb();
+		$record_id = $db->GenID($pre.'module_pwf_record_seq');
+		$t = time();
+		$code = substr(md5(session_id().$t),0,12);
+		$when = $db->DbTimeStamp($t);
+		$mod = $this->formdata->formsmodule;
+		$this->formdata->formsmodule = NULL; //exclude module-data from the record
+		$cont = pwfUtils::Encrypt($this->formdata,$code.$mod->GetPreference('default_phrase'));
+		$db->Execute('INSERT INTO '.$pre.
+		'module_pwf_record (record_id,code,submitted,contents) VALUES (?,?,?,?)',
+			array($record_id,$code,$when,$cont));
+		$this->formdata->formsmodule = $mod; //reinstate
 		//set url variable for email template
 		$smarty = cmsms()->GetSmarty();
 		$pref = $this->formdata->current_prefix;
@@ -109,7 +120,7 @@ class pwfEmailConfirmation extends pwfEmailBase
 				$pref.'c'=>$code,
 				$pref.'d'=>$this->Id,
 //				$pref.'f'=>$this->formdata->Id,
-				$pref.'r'=>$response_id),
+				$pref.'r'=>$record_id),
 			'',TRUE,FALSE,'',TRUE));
 		return $this->SendForm($this->GetValue(),$this->GetOption('email_subject'));
 	}
