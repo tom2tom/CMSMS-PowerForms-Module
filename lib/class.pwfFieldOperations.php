@@ -256,7 +256,8 @@ class pwfFieldOperations
 
 	public static function DeleteField(&$formdata,$field_id)
 	{
-		//clear tables - unless subclassed, it just calls RealDeleteField()
+		//clear table data
+		//unless subclassed, it just calls RealDeleteField()
 		$formdata->Fields[$field_id]->Delete();
 		unset($formdata->Fields[$field_id]);
 	}
@@ -283,26 +284,6 @@ class pwfFieldOperations
 			$o2 = $formdata->Fields[$k2]->GetOrder();
 			$formdata->Fields[$k1]->SetOrder($o2);
 			$formdata->Fields[$k2]->SetOrder($o1);
-/* probably useless, cuz' associative array order is not guaranteed
-			$new = array();
-			foreach($formdata->Fields as $k=>&$f)
-			{
-				if($k == $k1)
-				{
-					$new[$k2] = $formdata->Fields[$k2];
-					$new[$k2]->SetOrder($o1);
-				}
-				elseif($k == $k2)
-				{
-					$new[$k1] = $formdata->Fields[$k1];
-					$new[$k1]->SetOrder($o2);
-				}
-				else
-					$new[$k] = $f;
-			}
-			unset($f);
-			$formdata->Fields = $new;
-*/
 		}
 	}
 
