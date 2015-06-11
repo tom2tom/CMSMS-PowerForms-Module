@@ -12,15 +12,15 @@ class pwfData
 	public $prior_prefix = FALSE; //for prior-period
 	//known form-properties
 	public $Alias = '';
-	public $Options = array();
-	public $Fields = array();
+	public $Fields = array(); //array of field objects, each key = field->Id
+	public $FieldOrders = FALSE; //when needed, set to ordered array representing field->Orderby
 	public $Id = 0;
 	public $Name = '';
-	public $Page = 0;
-	public $FormState = 'new';
-	public $FormPagesCount = 0;
+	public $Options = array();
+	public $Page = 0; //current page in the form
+	public $PagesCount = 0; //no. of pages in the form
 //	public $sampleTemplateCode = '';
-	public $templateVariables;
+	public $templateVariables = array(); //extra 'global' items for template-help, each like 'var_name'=>'help_lang_key'
 	//extra form-properties
 	private $extradata = array();
 
