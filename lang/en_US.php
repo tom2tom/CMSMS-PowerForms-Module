@@ -792,7 +792,7 @@ $lang['tab_submissiontemplate'] = 'Submission Template';
 $lang['tab_submit'] = 'Submission';
 $lang['tab_templatelayout'] = 'Template';
 $lang['tab_udt'] = 'UDT Integration';
-$lang['taskdescription_clearlog'] = 'Clear old submitted-form records';
+$lang['taskdescription_clearold'] = 'Clear database records which are old';
 $lang['text_length'] = '%s chars.';
 $lang['thanks'] = 'Thanks! Your submission has been received.';
 $lang['thebox'] = 'the box';
@@ -1119,7 +1119,7 @@ The PowerBrowse module code provides an example of this process in use.<p>
 <h3>Requirements</h3>
 <ul>
 <li>TODO PHP 5.1+</li>
-<li></li>
+<li>The mcrypt extension is desirable for cacheing data when a 'EmailConfirmation' field is used</li>
 </ul>
 <h3>Support</h3>
 <p>This module is provided as-is. Please read the text of the license for the full disclaimer.
