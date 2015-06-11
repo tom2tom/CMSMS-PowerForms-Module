@@ -649,18 +649,79 @@ EOS;
 	}
 
 	/**
-	CleanLog:
+	Encrypt:
+	@source: string to be encrypted
+	@pass_phrase: en/de-crypt key
+	This function derived from work by Josh Hartman and others.
+	Reference: http://www.warpconduit.net/2013/04/14/highly-secure-data-encryption-decryption-made-easy-with-php-mcrypt-rijndael-256-and-cbc
+	*/
+	public static function Encrypt($source,$pass_phrase)
+	{
+		if(!$source)
+			return '';
+		elseif($pass_phrase && extension_loaded('mcrypt'))
+		{
+			$flag = (defined('MCRYPT_DEV_URANDOM')) ? MCRYPT_DEV_URANDOM : MCRYPT_RAND;
+			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128,MCRYPT_MODE_CBC),$flag);
+			$encrypt = serialize($source);
+			$key = hash('sha256', $pass_phrase); // $key is a 64-character hexadecimal string
+			$mac = hash_hmac('sha256', $encrypt, substr($key,-32));
+			$passcrypt = mcrypt_encrypt(MCRYPT_RIJNDAEL_128,substr($key,32),$encrypt.$mac,MCRYPT_MODE_CBC,$iv);
+			return base64_encode($passcrypt).'|'.base64_encode($iv);
+		}
+		else
+			return base64_encode(serialize($source));
+	}
+
+	/**
+	Decrypt:
+	@source: string to be encrypted
+	@pass_phrase: en/de-crypt key
+	This function derived from work by Josh Hartman and others.
+	Reference: http://www.warpconduit.net/2013/04/14/highly-secure-data-encryption-decryption-made-easy-with-php-mcrypt-rijndael-256-and-cbc
+	*/
+	public static function Decrypt($source,$pass_phrase)
+	{
+		if(!$source)
+			return '';
+		elseif($pass_phrase && extension_loaded('mcrypt'))
+		{
+			$decrypt = explode('|', $source.'|');
+			$decoded = base64_decode($decrypt[0]);
+			$iv = base64_decode($decrypt[1]);
+			if(strlen($iv) !== mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128,MCRYPT_MODE_CBC))
+				return FALSE;
+			$key = hash('sha256',$pass_phrase);
+			$decrypted = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128,substr($key,32),$decoded,MCRYPT_MODE_CBC,$iv));
+			$mac = substr($decrypted,-64);
+			$decrypted = substr($decrypted,0,-64);
+			$calcmac = hash_hmac('sha256',$decrypted,substr($key,-32));
+			if($calcmac === $mac)
+				return unserialize($decrypted);
+			return FALSE;
+		}
+		else
+			return unserialize(base64_decode($source));
+	}
+
+	/**
+	CleanTables:
 	Removes from the ip_log table all records older than 30-minutes before @time
+	Removes from the record table all records older than 24-hours before @time
+	Removes from the cache table all records older than 24-hours before @time
 	@module: reference to PowerTools module object
 	@time: timestamp, optional, default 0 (meaning current time)
 	*/
-	public static function CleanLog(&$module,$time=0)
+	public static function CleanTables(&$module,$time=0)
 	{
 		if(!$time) $time = time();
-		$time -= 900;
+		$pre = cms_db_prefix();
 		$db = cmsms()->GetDb();
-		$limit = $db->DbTimeStamp($time);
-		$db->Execute('DELETE FROM '.cms_db_prefix().'module_pwf_ip_log WHERE basetime<'.$limit);
+		$limit = $db->DbTimeStamp($time-1800);
+		$db->Execute('DELETE FROM '.$pre.'module_pwf_ip_log WHERE basetime<'.$limit);
+		$limit = $db->DbTimeStamp($time-86400);
+		$db->Execute('DELETE FROM '.$pre.'module_pwf_record WHERE submitted<'.$limit);
+		$db->Execute('DELETE FROM '.$pre.'module_pwf_cache WHERE save_time<'.$limit);
 	}
 
 	/**
