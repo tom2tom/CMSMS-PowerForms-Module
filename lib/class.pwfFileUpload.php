@@ -274,20 +274,16 @@ class pwfFileUpload extends pwfFieldBase
 				$destination_name = $thisFile['name'];
 			else
 			{
-				// build rename map
-				$mapId = array_flip(array_keys($this->formdata->Fields));
-				$eval_string = FALSE;
-
-				$flds = array();
+				$fids = array();
 				$destination_name = $this->GetOption('file_rename');
-				preg_match_all('/\$fld_(\d+)/',$destination_name,$flds);
-				foreach($flds[1] as $tF)
+				//TODO if fields not named like '$fld_N' in the string ?
+				preg_match_all('/\$fld_(\d+)/',$destination_name,$fids);
+				foreach($fids[1] as $field_id)
 				{
-					if(isset($mapId[$tF]))
+					if(array_key_exists($field_id,$this->formdata->Fields))
 					{
-						$fid = $mapId[$tF];
-						$destination_name = str_replace('$fld_'.$tF,
-							 $this->formdata->Fields[$fid]->GetHumanReadableValue(),$destination_name);
+						$destination_name = str_replace('$fld_'.$field_id,
+							 $this->formdata->Fields[$field_id]->GetHumanReadableValue(),$destination_name);
 					}
 				}
 				$destination_name = str_replace('$ext',$thisExt,$destination_name);
