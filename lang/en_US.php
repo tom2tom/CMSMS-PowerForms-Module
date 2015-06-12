@@ -540,6 +540,7 @@ To specify multiple values for an attribute use the syntax &quot;multi: value1|v
 To specify a value from a hidden field use the syntax {\$fld_id}<br />
 <br />
 EOS;
+$lang['help_confirm'] = 'An email has been sent to the address nominated for confirmation. After that email is processed, this form will be submitted.';
 $lang['help_date_format'] = 'See <a href="http://www.php.net/manual/en/function.date.php" target=_NEW>the PHP Manual</a> for formatting help.';
 $lang['help_date_order'] = 'Use "m" for Month, "d" for Day, and "y" for Year. Separate the items by hyphens.';
 $lang['help_enable_antispam'] = 'Limit to 10 form-submissions per hour per IP address';
@@ -829,6 +830,7 @@ $lang['title_captcha_wrong'] = 'Mismatch message';
 $lang['title_compute'] = 'Computed/PHP';
 $lang['title_compute_order'] = 'Interpretation order';
 $lang['title_compute_value'] = 'Value to compute';
+$lang['title_confirm'] = 'Confirmation request sent';
 $lang['title_confirmation_url'] = 'URL to click for form confirmation';
 $lang['title_create_sample_footer_template'] = 'Create sample footer template';
 $lang['title_create_sample_header'] = 'Create sample header';
