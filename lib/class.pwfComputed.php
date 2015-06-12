@@ -31,7 +31,6 @@ class pwfComputed extends pwfFieldBase
 		$procstr = $this->GetOption('value');
 		//TODO if fields not named like '$fld_N' in the string ?
 		preg_match_all('/\$fld_(\d+)/',$procstr,$fids);
-		$mapId = array_flip(array_keys($this->formdata->Fields)); //keys are field id's
 
 		$etype = $this->GetOption('string_or_number_eval','numeric');
 		switch($etype)
@@ -39,7 +38,7 @@ class pwfComputed extends pwfFieldBase
 		 case 'numeric':
 			foreach($fids[1] as $field_id)
 			{
-				if(array_key_exists($field_id,$mapId))
+				if(array_key_exists($field_id,$this->formdata->Fields))
 				{
 					$val = $this->formdata->Fields[$field_id]->GetHumanReadableValue();
 					if(!is_numeric($val))
@@ -52,7 +51,7 @@ class pwfComputed extends pwfFieldBase
 		 case 'compute':
 			foreach($fids[1] as $field_id)
 			{
-				if(array_key_exists($field_id,$mapId))
+				if(array_key_exists($field_id,$this->formdata->Fields))
 				{
 					$val = $this->formdata->Fields[$field_id]->GetHumanReadableValue();
 					// strip any PHP function from submitted string
@@ -68,7 +67,7 @@ class pwfComputed extends pwfFieldBase
 			$this->Value = '';
 			foreach($fids[1] as $field_id)
 			{
-				if(array_key_exists($field_id,$mapId))
+				if(array_key_exists($field_id,$this->formdata->Fields))
 				{
 					$this->Value .= $this->formdata->Fields[$field_id]->GetValue();
 					if($etype != 'unstring')
@@ -81,11 +80,10 @@ class pwfComputed extends pwfFieldBase
 
 		if($eval_string)
 		{
-			$val = "\$this->Value=$procstr;";
 			// see if we can trap an error
 			// this is vulnerable to an evil form designer, but not an evil form user
 			ob_start();
-			if(eval('function testcfield'.rand().'() {'.$val.'}') === FALSE)
+			if(eval('function testcfield'.mt_rand(100,200).'() {\$this->Value=$procstr;}') === FALSE)
 				$this->Value = $this->formdata->formsmodule->Lang('title_bad_function',$procstr);
 			else
 				eval($val);
@@ -126,9 +124,21 @@ class pwfComputed extends pwfFieldBase
 		$val = $this->GetOption('value');
 		if($val)
 		{
-			//TODO check $val sanity
-//			$ret = FALSE;
-//			$messages[] = $mod->Lang('error_typed',$mod->Lang'TODO_eval'));
+			//PROCESSING ARBITRARY INPUT WITH EVAL() IS NOT SAFE!!!
+			// but throw in a few checks for $val sanity
+			$se = new SaferEval();
+			$errs = $se->checkScript($val,FALSE);
+			if($errs)
+			{
+				$ret = FALSE;
+				foreach($errs as $edata)
+				{
+					$msg = $edata['name'];
+					if(!empty($edata['line']))
+						$msg .= ': line '.$edata['line'];
+					$messages[] = $msg;
+				}
+			}
 		}
 		else
 		{
