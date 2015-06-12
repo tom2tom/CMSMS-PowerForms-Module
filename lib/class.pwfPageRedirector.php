@@ -94,13 +94,13 @@ class pwfPageRedirector extends pwfFieldBase
 				$mod->Lang('title_destination_page'),
 				$mod->Lang('title_select')
 				);
-			$contentops = cmsms()->GetContentOperations();
 			foreach($opt as $i=>&$one)
 			{
 				$dests[] = array(
-				$mod->CreateInputText($id,'opt_destination_subject'.$i,$this->GetOptionElement('destination_subject',$i),30,128),
-				$contentops->CreateHierarchyDropdown('',$one,$id.'opt_destination_page[]'),
-				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
+					$mod->CreateInputText($id,'opt_destination_subject'.$i,
+						$this->GetOptionElement('destination_subject',$i),30,128),
+					pwfUtils::CreateHierarchyPulldown($mod,$id,'opt_destination_page'.$i,$one),
+					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
 			unset($one);
