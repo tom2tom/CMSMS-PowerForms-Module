@@ -705,14 +705,36 @@ EOS;
 	}
 
 	/**
+	CreateHierarchyPulldown:
+	Get site-pages selector, with first item 'select one'
+	@mod: reference to PowerTools module object
+	@id: module identifier
+	@name: control name
+	@current: id of currently selected content object
+	Returns: html string
+	*/
+	public static function CreateHierarchyPulldown(&$mod,$id,$name,$current)
+	{
+		$contentops = cmsms()->GetContentOperations();
+		$name = $id.$name;
+		$sel = $contentops->CreateHierarchyDropdown('',$selected,$name);
+		if($sel)
+		{
+			$srch = '<select name="'.$name.'" id="'.$name.'">';
+			$repl = $srch.'<option value="0">'.$mod->Lang('select_one').'</option>';
+			return str_replace($srch,$repl,$sel);
+		}
+		return '';
+	}
+
+	/**
 	CleanTables:
 	Removes from the ip_log table all records older than 30-minutes before @time
 	Removes from the record table all records older than 24-hours before @time
 	Removes from the cache table all records older than 24-hours before @time
-	@module: reference to PowerTools module object
 	@time: timestamp, optional, default 0 (meaning current time)
 	*/
-	public static function CleanTables(&$module,$time=0)
+	public static function CleanTables($time=0)
 	{
 		if(!$time) $time = time();
 		$pre = cms_db_prefix();
