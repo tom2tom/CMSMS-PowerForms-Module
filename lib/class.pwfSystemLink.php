@@ -28,7 +28,7 @@ class pwfSystemLink extends pwfFieldBase
 		else
 		{
 			$contentops = cmsms()->GetContentOperations();
-			$cobj = $contentops->LoadContentFromId($this->GetOption('target_page','0'));
+			$cobj = $contentops->LoadContentFromId($this->GetOption('target_page',0));
 			$ret = $this->formdata->formsmodule->CreateContentLink($cobj->Id(),$cobj->Name());
 		}
 
@@ -42,38 +42,43 @@ class pwfSystemLink extends pwfFieldBase
 	{
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_link_autopopulate'),
+		$main[] = array($mod->Lang('title_auto_link'),
 						$mod->CreateInputHidden($id,'opt_auto_link',0).
 						$mod->CreateInputCheckbox($id,'opt_auto_link',1,
 							$this->GetOption('auto_link',0)),
-						$mod->Lang('help_link_autopopulate'));
-		$contentops = cmsms()->GetContentOperations();
-		$main[] = array($mod->Lang('title_link_to_sitepage'),
-						$contentops->CreateHierarchyDropdown('',$this->GetOption('target_page'),$id.'opt_target_page'));
-
+						$mod->Lang('help_auto_link'));
+		$main[] = array($mod->Lang('title_target_page'),
+						pwfUtils::CreateHierarchyPulldown($mod,$id,'opt_target_page',
+							$this->GetOption('target_page',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	function Populate($id,&$params)
 	{
-		$oneset = new stdClass();
-		$gCms = cmsms();
 		if($this->GetOption('auto_link',0))
 		{
-			$pageinfo = $gCms->variables['pageinfo'];
+			$oneset = new stdClass();
+			$pageinfo = cmsms()->variables['pageinfo'];
 			$oneset->name = $pageinfo->content_title;
 			$oneset->title = $oneset->name;
 			$oneset->input = $this->formdata->formsmodule->CreateContentLink($pageinfo->content_id,$oneset->name);
+			return array($oneset);
 		}
 		else
 		{
-			$contentops = $gCms->GetContentOperations();
-			$cobj = $contentops->LoadContentFromId($this->GetOption('target_page',0));
-			$oneset->name = $cobj->Name();
-			$oneset->title = $oneset->name;
-			$oneset->input = $this->formdata->formsmodule->CreateContentLink($cobj->Id(),$oneset->name);
+			$page = $this->GetOption('target_page',0);
+			if($page > 0)
+			{
+				$oneset = new stdClass();
+				$contentops = cmsms()->GetContentOperations();
+				$cobj = $contentops->LoadContentFromId($page);
+				$oneset->name = $cobj->Name();
+				$oneset->title = $oneset->name;
+				$oneset->input = $this->formdata->formsmodule->CreateContentLink($cobj->Id(),$oneset->name);
+				return array($oneset);
+			}
 		}
-		return array($oneset);
+		return ''; //TODO OK?
 	}
 
 }
