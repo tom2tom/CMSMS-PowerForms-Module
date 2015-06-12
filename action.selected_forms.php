@@ -4,24 +4,24 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if(!empty($params['sel']))
+if(!empty($params['selected']))
 {
 	$funcs = new pwfFormOperations();
 	if(isset($params['clone']))
 	{
 		if(!$this->CheckAccess('ModifyPFForms')) exit;
-		foreach ($params['sel'] as $fid)
+		foreach ($params['selected'] as $fid)
 			$funcs->Copy($this,$id,$params,$fid);
 	}
 	elseif(isset($params['delete']))
 	{
 		if(!$this->CheckAccess('ModifyPFForms')) exit;
-		foreach ($params['sel'] as $fid)
+		foreach ($params['selected'] as $fid)
 			$funcs->Delete($this,$fid);
 	}
 	elseif(isset($params['export']))
 	{
-		$xmlstr = $funcs->CreateXML($this,$params['sel'],date('Y-m-d H:i:s'));
+		$xmlstr = $funcs->CreateXML($this,$params['selected'],date('Y-m-d H:i:s'));
 		if($xmlstr)
 		{
 			@ob_clean();
