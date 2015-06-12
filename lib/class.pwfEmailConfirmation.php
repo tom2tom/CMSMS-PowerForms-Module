@@ -8,6 +8,7 @@
 class pwfEmailConfirmation extends pwfEmailBase
 {
 	var $approvedToGo = FALSE;
+	var $realAction;
 
 	function __construct(&$formdata,&$params)
 	{
@@ -34,11 +35,12 @@ class pwfEmailConfirmation extends pwfEmailBase
 		$mod = $this->formdata->formsmodule;
 		//log extra tag for use in template-help
 		pwfUtils::AddTemplateVariable($this->formdata,'confirm_url','title_confirmation_url');
-		$contentops = cmsms()->GetContentOperations();
 
 		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id);
+
 		$adv[] = array($mod->Lang('redirect_after_approval'),
-				@$contentops->CreateHierarchyDropdown('',$this->GetOption('redirect_page','0'),$id.'opt_redirect_page'));
+						pwfUtils::CreateHierarchyPulldown($mod,$id,'opt_redirect_page',
+						$this->GetOption('redirect_page',0)));
 		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
 	}
 
@@ -84,6 +86,22 @@ class pwfEmailConfirmation extends pwfEmailBase
 	function PreDisposeAction()
 	{
 		$val = $this->approvedToGo;
+		if($val)
+		{
+			$page = $this->GetOption('redirect_page',0);
+			if($page > 0)
+			{
+				$this->formdata->Options['redirect_page'] = $page;
+				$this->formdata->Options['submit_action'] = 'redir';
+			}
+			else
+				$this->formdata->Options['submit_action'] = $this->realAction;
+		}
+		else
+		{
+			$this->realAction = $this->GetFormOption('submit_action','text');
+			$this->formdata->Options['submit_action'] = 'confirm';
+		}
 		//inhibit/enable all dispositions
 		foreach($this->formdata->Fields as &$one)
 		{
