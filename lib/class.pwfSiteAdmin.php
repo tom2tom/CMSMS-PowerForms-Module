@@ -98,19 +98,19 @@ class pwfSiteAdmin extends pwfFieldBase
 		$main[] = array($mod->Lang('title_show_userfirstname'),
 					$mod->CreateInputHidden($id,'opt_show_userfirstname',0).
 					$mod->CreateInputCheckbox($id,'opt_show_userfirstname',1,
-						$this->GetOption('show_userfirstname','1')));
+						$this->GetOption('show_userfirstname',1)));
 		$main[] = array($mod->Lang('title_show_userlastname'),
 					$mod->CreateInputHidden($id,'opt_show_userlastname',0).
 					$mod->CreateInputCheckbox($id,'opt_show_userlastname',1,
-						$this->GetOption('show_userlastname','1')));
+						$this->GetOption('show_userlastname',1)));
 		$main[] = array($mod->Lang('title_show_username'),
 					$mod->CreateInputHidden($id,'opt_show_username',0).
 					$mod->CreateInputCheckbox($id,'opt_show_username',1,
-						$this->GetOption('show_username','0')));
+						$this->GetOption('show_username',0)));
 		$main[] = array($mod->Lang('title_active_only'),
 					$mod->CreateInputHidden($id,'opt_active_only',0).
 					$mod->CreateInputCheckbox($id,'opt_active_only',1,
-						$this->GetOption('active_only','1')));
+						$this->GetOption('active_only',1)));
 		$main[] = array($mod->Lang('title_restrict_to_group'),
 					$mod->CreateInputHidden($id,'opt_restrict_to_group',0).
 					$mod->CreateInputCheckbox($id,'opt_restrict_to_group',1,

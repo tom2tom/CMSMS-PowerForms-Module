@@ -47,7 +47,7 @@ class pwfPasswordAgain extends pwfFieldBase
 		$main[] = array($mod->Lang('title_hide'),
 					$mod->CreateInputHidden($id,'opt_hide',0).
 					$mod->CreateInputCheckbox($id,'opt_hide',1,
-						$this->GetOption('hide','1')),
+						$this->GetOption('hide',1)),
 					$mod->Lang('title_hide_help'));
 		return array('main'=>$main,'adv'=>$adv);
 	}

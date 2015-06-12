@@ -53,7 +53,7 @@ class pwfEmailBase extends pwfFieldBase
 		$adv[] = array($mod->Lang('title_html_email'),
 					$mod->CreateInputHidden($id,'opt_html_email',0).
 					$mod->CreateInputCheckbox($id,'opt_html_email',1,
-						$this->GetOption('html_email','0')));
+						$this->GetOption('html_email',0)));
 		$adv[] = array($mod->Lang('title_email_encoding'),
 					$mod->CreateInputText($id,'opt_email_encoding',
 						$this->GetOption('email_encoding','utf-8'),15,128));
