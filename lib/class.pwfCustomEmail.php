@@ -101,10 +101,11 @@ class pwfCustomEmail extends pwfEmailBase
 		$opt = $this->GetOption('email_from_address');
 		if($opt)
 		{
-			if(!$this->validateEmailAddr($opt))
+			list($rv,$msg) = $this->validateEmailAddr($opt);
+			if(!$rv)
 			{
 				$ret = FALSE;
-				$messages[] = $mod->Lang('error_email_address',$opt);
+				$messages[] = $msg;
 			}
 		}
 		else
