@@ -143,6 +143,7 @@ $mod->Crash;
 				$ret = FALSE;
 				$messages[] = $mod->Lang('error_email_address',$to);
 			}
+			//TODO c.f. mailcheck.js for frontend addresses
 		}
 		$msg = ($ret) ? '':implode('<br />',$messages);
 		return array($ret,$msg);
