@@ -14,6 +14,7 @@ class pwfData
 	public $Alias = '';
 	public $Fields = array(); //array of field objects, each key = field->Id
 	public $FieldOrders = FALSE; //when needed, set to ordered array representing field->Orderby
+	public $HasEmailAddr = FALSE; //whether the form includes email-address field(s)
 	public $Id = 0;
 	public $Name = '';
 	public $Options = array();
