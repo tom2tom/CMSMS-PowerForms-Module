@@ -45,6 +45,7 @@ class pwfEmailAddress extends pwfFieldBase
 
 	function Populate($id,&$params)
 	{
+		$this->formdata->HasEmailAddr = TRUE; //flag to check address with frontend js
 		if($this->GetOption('html5',0))
 		{
 			$addr = ($this->HasValue()) ? $this->Value : '';
@@ -59,7 +60,10 @@ class pwfEmailAddress extends pwfFieldBase
 			$id,$this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($addr,ENT_QUOTES),25,128,
 			$place.$this->GetScript());
-		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+		return preg_replace(
+			array('/id="\S+"/','/class="(.*)"/'),
+			array('id="'.$this->GetInputId().'"','class="emailaddr $1"')
+			$tmp);
 	}
 
 	function Validate($id)

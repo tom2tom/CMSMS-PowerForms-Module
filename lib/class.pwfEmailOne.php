@@ -30,11 +30,15 @@ class pwfEmailOne extends pwfEmailBase
 
 	function Populate($id,&$params)
 	{
+		$this->formdata->HasEmailAddr = TRUE; //flag to check address with frontend js
 		$tmp = $this->formdata->formsmodule->CreateInputEmail(
 			$id,$this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($this->Value,ENT_QUOTES),25,128,
 			$this->GetScript());
-		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+		return preg_replace(
+			array('/id="\S+"/','/class="(.*)"/'),
+			array('id="'.$this->GetInputId().'"','class="emailaddr $1"')
+			$tmp);
 	}
 
 	function Validate($id)

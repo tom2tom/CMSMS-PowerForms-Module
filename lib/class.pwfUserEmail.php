@@ -99,6 +99,7 @@ class pwfUserEmail extends pwfEmailBase
 
 	function Populate($id,&$params)
 	{
+		$this->formdata->HasEmailAddr = TRUE; //flag to check address with frontend js
 		$toself = ($this->GetOption('send_user_copy','n') == 'c');
 //		$multi = ($toself) ? '[]':'';
 		$sf = ($toself) ? '_1':'';
@@ -111,8 +112,10 @@ class pwfUserEmail extends pwfEmailBase
 			$id,$this->formdata->current_prefix.$this->Id.'[]',
 			htmlspecialchars($this->Value[0],ENT_QUOTES),25,128,
 			$this->GetScript());
-		$ret = preg_replace('/id="\S+"/','id="'.$this->GetInputId($sf).'"',$tmp);
-
+		$ret = preg_replace(
+			array('/id="\S+"/','/class="(.*)"/'),
+			array('id="'.$this->GetInputId($sf).'"','class="emailaddr $1"')
+			$tmp);
  		if($toself)
 		{
 			$tid = $this->GetInputId('_2');
