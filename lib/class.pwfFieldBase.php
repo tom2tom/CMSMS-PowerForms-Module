@@ -116,20 +116,20 @@ class pwfFieldBase
 		return array(FALSE,$mod->Lang('field_no_name'));
 	 }
 
-	// Check whether this field's name is the same as anothter field's name
+	// Confirm this field's name is the not same as another field's name
 	// Returns array, 1st member is T/F, 2nd is '' or message
-	function FieldNameInvalid()
+	function FieldNameUnique()
 	{
 		foreach($this->formdata->Fields as &$one)
 		{
 			if($one->Name == $this->Name && $one->Id != $this->Id)
 			{
 				unset($one);
-				return array(TRUE,$this->formdata->formsmodule->Lang('field_name_in_use',$this->Name));
+				return array(FALSE,$this->formdata->formsmodule->Lang('field_name_in_use',$this->Name));
 			}
 		}
 		unset($one);
-		return array(FALSE,'');
+		return array(TRUE,'');
 	}
 
 	// Caches a new field-alias
@@ -809,13 +809,12 @@ class pwfFieldBase
   		list($ret,$msg) = $this->FieldIsNamed();
 		if($ret)
 		{
-			list($ret,$msg) = $this->FieldNameInvalid();
-			if($ret)
+			list($ret,$msg) = $this->FieldNameUnique();
+			if(!$ret)
 				$messages[] = $msg;
 		}
 		else
 			$messages[] = $msg;
-
 		$msg = ($ret)?'':implode('<br />',$messages);
 	    return array($ret,$msg);
 	}
