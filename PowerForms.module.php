@@ -78,7 +78,7 @@ class PowerForms extends CMSModule
 
 	function GetVersion()
 	{
-		return '0.7';
+		return '0.1';
 	}
 
 	function GetAuthor()
