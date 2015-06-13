@@ -26,22 +26,21 @@ class pwfMutex
 		else
 			$storage = 'auto';
 		if(strpos($storage,'auto') !== FALSE)
-			$storage = 'memcache,file,database';
+			$storage = 'memcache,semaphore,file,database';
 
 		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
 		require($path.'interface.Mutex.php');
-		require($path.'MutexBase.php');
 
 		$types = explode(',',$storage);
 		foreach($types as $one)
 		{
 			$one = trim($one);
 			require($path.$one.'.php');
-			$class = 'Mutex_'.$one;
+			$class = 'pwfMutex_'.$one;
 			try
 			{
-				$module->cache = new $class($settings);
-				return $module->cache;
+				$module->mutex = new $class();
+				return $module->mutex;
 			}
 			catch(Exception $e) {}
 		}

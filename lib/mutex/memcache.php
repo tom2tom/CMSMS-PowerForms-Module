@@ -4,11 +4,11 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class Mutex_memcache extends MutexBase implements Mutex
+class pwfMutex_memcache implements pwfMutex
 {
 	var $pause;
 	var $maxtries;
-	var $instant;
+	var $instance;
 	var $lockid;
 
 	function __construct($timeout=50,$tries=0)
@@ -17,9 +17,9 @@ class Mutex_memcache extends MutexBase implements Mutex
 		{
 			$this->pause = $timeout;
 			$this->maxtries = $tries;
-			$this->instant = new Memcache;
+			$this->instance = new Memcache;
 			$config = cmsms()->GetConfig();
-			$this->instant->connect($config['root_url'],11211);
+			$this->instance->connect($config['root_url'],11211);
 			$this->lockid = uniqid('pwf',TRUE);
 		}
 		else
@@ -36,12 +36,12 @@ class Mutex_memcache extends MutexBase implements Mutex
 		$count = 0;
 		do
 		{
-			if($this->instant->add($this->lockid,$token)) //only nominally atomic
+			if($this->instance->add($this->lockid,$token)) //only nominally atomic
 			{
 				$cas_token = 0.0;
-				if($this->instant->get($this->lockid,NULL,$cas_token) !== $token)
+				if($this->instance->get($this->lockid,NULL,$cas_token) !== $token)
 				{
-					$mc =& $this->instant;
+					$mc =& $this->instance;
 					while(!$mc->cas($cas_token,$this->lockid,$token) || 
 						   $mc->getResultCode() != Memcached::RES_SUCCESS)
 					{
@@ -51,7 +51,7 @@ class Mutex_memcache extends MutexBase implements Mutex
 				}
 				return TRUE;
 			}
-			elseif $this->instant->get($this->lockid) === $token)
+			elseif $this->instance->get($this->lockid) === $token)
 				return TRUE;
 			usleep($this->pause);
 		} while($this->maxtries == 0 || $count++ < $this->maxtries);
@@ -60,15 +60,15 @@ class Mutex_memcache extends MutexBase implements Mutex
 
 	function unlock()
 	{
-		$this->instant->delete($this->lockid);
+		$this->instance->delete($this->lockid);
 	}
 
 	function reset()
 	{
-		$this->instant->delete($this->lockid);
-/*		$this->instant = new Memcache;
+		$this->instance->delete($this->lockid);
+/*		$this->instance = new Memcache;
 		$config = cmsms()->GetConfig();
-		$this->instant->connect($config['root_url'],11211);
+		$this->instance->connect($config['root_url'],11211);
 		$this->lockid = uniqid('pwf',TRUE);
 */
 	}

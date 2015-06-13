@@ -4,7 +4,7 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class Mutex_database extends MutexBase implements Mutex
+class pwfMutex_database implements pwfMutex
 {
 	var $pause;
 	var $maxtries;
@@ -24,7 +24,6 @@ class Mutex_database extends MutexBase implements Mutex
 		$this->pause = $usec;
 	}
 
-	//c.f. pwfUtils::GetFileLock();
 	function lock($token)
 	{
 		$count = 0;
@@ -43,7 +42,6 @@ class Mutex_database extends MutexBase implements Mutex
 		return FALSE; //failed
 	}
 
-	//c.f. pwfUtils::ClearFileLock();
 	function unlock()
 	{
 		$this->dbhandle->Execute('DELETE FROM '.$this->table);
