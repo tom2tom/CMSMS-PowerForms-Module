@@ -135,7 +135,7 @@ class pwfFieldOperations
 	{
 		$db = cmsms()->GetDb();
 		$pre = cms_db_prefix();
-		if($obfield->Id == 0)
+		if($obfield->Id <= 0)
 		{
 			$obfield->Id = $db->GenID($pre.'module_pwf_field_seq');
 			$sql = 'INSERT INTO '.$pre.'module_pwf_field (field_id,form_id,name,type,' .
