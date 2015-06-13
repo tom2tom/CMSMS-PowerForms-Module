@@ -717,11 +717,12 @@ EOS;
 	{
 		$contentops = cmsms()->GetContentOperations();
 		$name = $id.$name;
-		$sel = $contentops->CreateHierarchyDropdown('',$selected,$name);
+		$sel = $contentops->CreateHierarchyDropdown('',$current,$name);
 		if($sel)
 		{
-			$srch = '<select name="'.$name.'" id="'.$name.'">';
-			$repl = $srch.'<option value="0">'.$mod->Lang('select_one').'</option>';
+			$srch = array('<select name="'.$name.'" id="'.$name.'">',
+						'<option value="-1">none</option>');
+			$repl = array($srch[0].'<option value="0">'.$mod->Lang('select_one').'</option>','');
 			return str_replace($srch,$repl,$sel);
 		}
 		return '';
