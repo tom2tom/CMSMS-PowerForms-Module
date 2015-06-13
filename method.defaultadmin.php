@@ -26,7 +26,7 @@ $smarty->assign('form_end',$this->CreateFormEnd());
 
 $smarty->assign('message',(isset($params['message']))?$params['message']:'');
 
-$theme = $gCms->variables['admintheme'];
+$theme = cmsms()->variables['admintheme'];
 
 //list all the extant forms
 $allforms = pwfUtils::GetForms();
@@ -72,7 +72,7 @@ if($allforms)
 			'{'.$modname.' form=\''.$one['alias'].'\'}' : $one['alias'];
 		$oneset->exportlink = $this->CreateLink($id,'export_form','',
 			$iconexport,array('form_id'=>$fid));
-		$oneset->selected = $this->CreateInputCheckbox($id,'sel[]',$fid,-1);
+		$oneset->selected = $this->CreateInputCheckbox($id,'selected[]',$fid,-1);
 		$data[] = $oneset;
 	}
 	$smarty->assign('forms',$data);
