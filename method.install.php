@@ -109,6 +109,10 @@ $this->SetPreference('blank_invalid',0);
 $this->SetPreference('enable_antispam',1);
 $this->SetPreference('require_fieldnames',1);
 $this->SetPreference('adder_fields','basic'); //or 'advanced'
+//for email address checking by mailcheck
+$this->SetPreference('email_topdomains','com,net,org');
+$this->SetPreference('email_domains','gmail.com,aol.com');
+$this->SetPreference('email_subdomains','hotmail');
 
 $fp = $config['uploads_path'];
 if($fp && is_dir($fp))
