@@ -1,5 +1,5 @@
 <p style="font-weight:bold;">{$template_vars_title}:</p>
-<table class="pwf_legend">
+<table class="legend">
 <thead><tr>
 <th>{$variable_title}</th><th>{$property_title}</th>
 </tr></thead>
