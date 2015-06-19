@@ -248,7 +248,7 @@ class PowerForms extends CMSModule
 				return TRUE;
 			$desc = $this->Lang('perm_any');
 		}
-		echo '<p class="error">'.$this->Lang('you_need_permission',$desc).'</p>';
+		echo '<p class="error_message">'.$this->Lang('you_need_permission',$desc).'</p>';
 		return FALSE;
 	}
 
