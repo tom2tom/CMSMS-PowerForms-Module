@@ -14,7 +14,6 @@ class pwfData
 	public $Alias = '';
 	public $Fields = array(); //array of field objects, each key = field->Id
 	public $FieldOrders = FALSE; //when needed, set to ordered array representing field->Orderby
-	public $HasEmailAddr = FALSE; //whether the form includes email-address field(s)
 	public $Id = 0;
 	public $Name = '';
 	public $Options = array();
@@ -22,6 +21,7 @@ class pwfData
 	public $PagesCount = 0; //no. of pages in the form
 //	public $sampleTemplateCode = '';
 	public $templateVariables = array(); //extra 'global' items for template-help, each like 'var_name'=>'help_lang_key'
+	public $jscripts; //associative array of funcs and/or instructions
 	//extra form-properties
 	private $extradata = array();
 
