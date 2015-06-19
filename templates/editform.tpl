@@ -17,7 +17,7 @@
  <div class="pageoverflow">
  {if !empty($fields)}
   <p class="pagetext">{$title_form_fields}</p>
-  <table class="pwf_table pagetable tabledrag">
+  <table id="fields" class="pagetable tabledrag">
    <thead><tr>
   {if isset($title_field_id)}<th>{$title_field_id}</th>{/if}
     <th style="width:15em;">{$title_field_name}</th>
@@ -91,7 +91,7 @@
   <p>{$input_form_template}</p>
    <div class="showhelp">
   <p style="font-weight:bold;">{$title_form_vars}:</p>
-<table class="pwf_legend">
+<table class="varshelp">
 <tr><th>{$title_variable}</th><th>{$title_description}</th></tr>
 {foreach from=$formvars item=entry}
 {cycle name=globals values='row1,row2' assign=rowclass}
@@ -102,7 +102,7 @@
   <p>{$help_formvars}</p>
 {if !empty($fieldprops)}
   <p>{$help_fieldvars1}</p>
-<table class="pwf_legend">
+<table class="varshelp">
 <tr><th>{$title_property}</th><th>{$title_description}</th></tr>
 {foreach from=$fieldprops item=entry}
 {cycle name=fieldprops values='row1,row2' assign=rowclass}

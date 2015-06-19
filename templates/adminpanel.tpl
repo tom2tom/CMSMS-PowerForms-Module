@@ -3,7 +3,7 @@
 {$formstab_start}
 {if !empty($forms)}
 {$start_formsform}
-<div style="overflow:auto;">
+<div class="pageoverflow">
 <table class="pagetable leftwards">
  <thead><tr>
   <th>{$title_name}</th>

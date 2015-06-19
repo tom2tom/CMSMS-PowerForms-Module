@@ -16,7 +16,7 @@
 {if isset($mainTable)}
   <br />
   <div class="pageoverflow">
-   <table class="leftwards pageoverflow">
+   <table class="leftwards">
  {section name=r loop=$mainTable}
   {if $smarty.section.r.first}
    <thead>

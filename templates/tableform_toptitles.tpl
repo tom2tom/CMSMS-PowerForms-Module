@@ -6,7 +6,7 @@
 	{if !empty($submission_error)}
 		<div class="error_message">{$submission_error}</div>
 		{if $show_submission_errors}
-			<table class="error">
+			<table class="error_list">
 			{foreach from=$submission_error_list item=one}
 				<tr><td>{$one}</td></tr>
 			{/foreach}
@@ -17,7 +17,7 @@
 	{* This section is for displaying the form *}
 	{* we start with validation errors *}
 	{if $form_has_validation_errors}
-		<div class="error_message">
+		<div class="error_list">
 		<ul>
 		{foreach from=$form_validation_errors item=one}
 			<li>{$one}</li>
@@ -26,8 +26,6 @@
 		</div>
 	{/if}
 	{* and now the form itself *}
-	{$form_start}
-	{$hidden}
 	<table{if $css_class} class="{$css_class}"{/if}>
 	{if $total_pages gt 1}<tr><td colspan="2">{$title_page_x_of_y}</td></tr>{/if}
 	{foreach from=$fields item=one}
@@ -35,17 +33,10 @@
 		{if $one->display && $one->type != 'FieldsetStart' && $one->type != 'FieldsetEnd'}
 		<tr>
 			<td style="vertical-align:top;"
-			{if $one->required || $one->css_class || !$one->valid} class=" 
-				{if $one->required}required {/if}
-				{if $one->css_class}{$one->css_class} {/if}
-				{if !$one->valid}fieldbad{/if}
-				"
-			{/if}
-			>
 			{if !$one->hide_name}{$one->name}
 			{if $one->required_symbol}{$one->required_symbol}{/if}
 			{/if}
-			</td></tr><tr><td style="text-align:left;vertical-align:top;"{if $one->css_class} class="{$one->css_class}"{/if}>
+			</td></tr><tr><td style="text-align:left;vertical-align:top;">
 			{if $one->multiple_parts}
 			<table>
 				<tr>
@@ -72,13 +63,11 @@
 			{/if}
 			{if !$one->valid} &lt;--- {$one->error}{/if}
 			{if $one->helptext}&nbsp;<a href="javascript:help_toggle('{$one->helptext_id}')">{$help_icon}</a>
-			<span id="{$one->helptext_id}" class="pwf_helptext">{$one->helptext}</span>{/if}
+			<span id="{$one->helptext_id}" class="help_display">{$one->helptext}</span>{/if}
 			</td></tr>
 		{/if}
 		{/strip}
 	{/foreach}
 	<tr><td>{$prev}</td></tr><tr><td>{$submit}</td></tr>
 	</table>
-	{$form_end}
-	{$jscript}
 {/if}
