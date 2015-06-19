@@ -494,14 +494,14 @@ EOS;
 		}
 		
 		$smarty->assign('rows',$rows);
-		return $mod->ProcessTemplate('form_vars_help.tpl');
+		return $mod->ProcessTemplate('varshelp.tpl');
 	}
 
 	/**
 	SetupSubTemplateVarsHelp:
 	Setup variables-help for a form's submission-template. Essentially, it sets
 	smarty variable 'help_subtplvars' to the output from processing the template
-	form_vars_help.tpl
+	varshelp.tpl
 	@formdata: reference to pwfData object for form 
 	@mod: reference to current PowerBrowse module object
 	@smarty: reference to smarty object
@@ -571,7 +571,7 @@ EOS;
 */
 		$smarty->assign('help_other_fields',$mod->Lang('help_other_fields'));
 
-		$smarty->assign('help_subtplvars',$mod->ProcessTemplate('form_vars_help.tpl'));
+		$smarty->assign('help_subtplvars',$mod->ProcessTemplate('varshelp.tpl'));
 	}
 
 	/**
