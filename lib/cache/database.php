@@ -5,7 +5,7 @@
  * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
  */
 
-class FastCache_database extends FastCacheBase implements FastCache  {
+class pwfCache_database extends pwfCacheBase implements pwfCache {
 
 	var $table;
 

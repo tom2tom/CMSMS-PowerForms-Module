@@ -5,7 +5,7 @@
  * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
  */
 
-interface FastCache {
+interface pwfCache {
 	/*
 	 * Check if this Cache driver is available for server or not
 	 */

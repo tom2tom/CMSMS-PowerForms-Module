@@ -8,7 +8,7 @@
  * http://pecl.php.net/package/redis
  */
 
-class FastCache_redis extends FastCacheBase implements FastCache {
+class pwfCache_redis extends pwfCacheBase implements pwfCache {
 
 	var $instant;
 	var $checked_redis = false;

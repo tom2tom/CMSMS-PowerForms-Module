@@ -58,7 +58,7 @@ class pwfCache
 		{
 			$one = trim($one);
 			require($path.$one.'.php');
-			$class = 'FastCache_'.$one;
+			$class = 'pwfCache_'.$one;
 			try
 			{
 				$module->cache = new $class($settings);

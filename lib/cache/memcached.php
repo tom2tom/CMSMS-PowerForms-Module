@@ -5,7 +5,7 @@
  * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
  */
 
-class FastCache_memcached extends FastCacheBase implements FastCache  {
+class pwfCache_memcached extends pwfCacheBase implements pwfCache  {
 
 	var $instant;
 
