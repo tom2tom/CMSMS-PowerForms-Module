@@ -61,10 +61,6 @@ textarea {
 	width: 196px;
 	margin-top: 0.5em
 }
-/* Just a bit more room for Submit buttons */
-.submit {
-	margin-top: 0.5em
-}
 .contactform input {
 	border: 1px solid #F60;
 }
@@ -90,7 +86,7 @@ textarea {
 	line-height: 1.3em;
 	padding: 0 0 8px 0;
 }
-.fieldbad {
+.invalid_field {
 	color: #F33;
 }
 /* Alternate table rows */
@@ -105,6 +101,10 @@ textarea {
 }
 .row2hover {
 	background-color:#CDCDCD;
+}
+/* More room for submit buttons */
+.submit_actions {
+	margin-top: 0.5em
 }
 /* Multi-page submit buttons */
 .submit_current {
