@@ -155,11 +155,12 @@ class pwfPageRedirector extends pwfFieldBase
 		if($pages)
 		{
 			$mod = $this->formdata->formsmodule;
-			$choices = array(' '.$this->GetOption('select_one',$mod->Lang('select_one')) => '')
+			$choices = array(' '.$this->GetOption('select_one',$mod->Lang('select_one')) => -1)
 				+ array_flip($pages);
-			return $mod->CreateInputDropdown(
+			$tmp = $mod->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
 				'id="'.$this->GetInputId().'"'.$this->GetScript());
+			return $this->SetClass($tmp);
 		}
 		return '';
 	}
@@ -167,9 +168,16 @@ class pwfPageRedirector extends pwfFieldBase
 	function Dispose($id,$returnid)
 	{
 		//TODO ensure all other dispositions are run before this
+//		$this->formdata->formsmodule->RedirectContent($this->GetOptionElement('destination_page',$this->Value));
+		$page = $this->GetOptionElement('destination_page',$this->Value);
+		if($page >= 0)
+		{
+			$this->formdata->Options['redirect_page'] = $page;
+			$this->formdata->Options['submit_action'] = 'redir';
+			return array(TRUE,'');
+		}
 		$mod = $this->formdata->formsmodule;
-		$mod->RedirectContent($this->GetOptionElement('destination_page',$this->Value));
-		return array(TRUE,'');
+		return array(FALSE,$mod->Lang('missing_type',$mod->Lang('page')));
 	}
 
 }
