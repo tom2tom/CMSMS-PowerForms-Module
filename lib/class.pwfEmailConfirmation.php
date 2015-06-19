@@ -8,7 +8,6 @@
 class pwfEmailConfirmation extends pwfEmailBase
 {
 	var $approvedToGo = FALSE;
-	var $realAction;
 
 	function __construct(&$formdata,&$params)
 	{
@@ -37,24 +36,18 @@ class pwfEmailConfirmation extends pwfEmailBase
 		pwfUtils::AddTemplateVariable($this->formdata,'confirm_url','title_confirmation_url');
 
 		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id);
-
-		$adv[] = array($mod->Lang('redirect_after_approval'),
-						pwfUtils::CreateHierarchyPulldown($mod,$id,'opt_redirect_page',
-						$this->GetOption('redirect_page',0)));
 		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
 	}
 
 	function Populate($id,&$params)
 	{
-		$this->formdata->HasEmailAddr = TRUE; //flag to check address with frontend js
+		$this->formdata->jscripts['mailcheck'] = 'construct'; //flag to generate & include js for this type of field
 		$tmp = $this->formdata->formsmodule->CreateInputEmail(
 			$id,$this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($this->Value,ENT_QUOTES),25,128,
 			$this->GetScript());
-		return preg_replace(
-			array('/id="\S+"/','/class="(.*)"/'),
-			array('id="'.$this->GetInputId().'"','class="emailaddr $1"')
-			$tmp);
+		$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+		return $this->SetClass($tmp,'emailaddr');
 	}
 
 	function Validate($id)
@@ -90,22 +83,6 @@ class pwfEmailConfirmation extends pwfEmailBase
 	function PreDisposeAction()
 	{
 		$val = $this->approvedToGo;
-		if($val)
-		{
-			$page = $this->GetOption('redirect_page',0);
-			if($page > 0)
-			{
-				$this->formdata->Options['redirect_page'] = $page;
-				$this->formdata->Options['submit_action'] = 'redir';
-			}
-			else
-				$this->formdata->Options['submit_action'] = $this->realAction;
-		}
-		else
-		{
-			$this->realAction = $this->GetFormOption('submit_action','text');
-			$this->formdata->Options['submit_action'] = 'confirm';
-		}
 		//inhibit/enable all dispositions
 		foreach($this->formdata->Fields as &$one)
 		{
