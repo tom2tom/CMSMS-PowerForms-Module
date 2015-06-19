@@ -115,11 +115,16 @@ class pwfCheckboxGroup extends pwfFieldBase
 	{
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_dont_submit_unchecked'),
+		$main[] = array($mod->Lang('title_no_empty'),
 						$mod->CreateInputHidden($id,'opt_no_empty',0).
 						$mod->CreateInputCheckbox($id,'opt_no_empty',1,
 							$this->GetOption('no_empty',0)),
-						$mod->Lang('help_dont_submit_unchecked'));
+						$mod->Lang('help_no_empty'));
+		$adv[] = array($mod->Lang('title_single_check'),
+						$mod->CreateInputHidden($id,'opt_single_check',0).
+						$mod->CreateInputCheckbox($id,'opt_single_check',1,
+							$this->GetOption('single_check',0)),
+						$mod->Lang('help_single_check'));
 		$adv[] = array($mod->Lang('title_field_includelabels'),
 						$mod->CreateInputHidden($id,'opt_include_labels',0).
 						$mod->CreateInputCheckbox($id,'opt_include_labels',1,
@@ -192,6 +197,21 @@ class pwfCheckboxGroup extends pwfFieldBase
 		if($names)
 		{
 			$mod = $this->formdata->formsmodule;
+			$limit = $this->GetOption('single_check',0);
+			if($limit)
+			{
+				$this->formdata->jscripts['checkboxgroup'] = <<<EOS
+function select_only(cb) {
+ if(cb.checked) {
+  $('input:checkbox[name="'+cb.name+'"]').attr('checked',false);
+  cb.checked = true;
+ }
+}
+EOS;
+				$jsl = ' onchange="select_only(this);"';
+			}
+			else
+				$jsl = '';
 			$js = $this->GetScript();
 			$ret = array();
 			foreach($names as $i=>&$one)
@@ -201,7 +221,8 @@ class pwfCheckboxGroup extends pwfFieldBase
 				if($one)
 				{
 					$oneset->title = $one;
-					$oneset->name = '<label for="'.$tid.'">'.$one.'</label>';
+					$tmp = '<label class= "" for="'.$tid.'">'.$one.'</label>';
+					$oneset->name = $this->SetClass($tmp);
 				}
 				else
 				{
@@ -215,14 +236,17 @@ class pwfCheckboxGroup extends pwfFieldBase
 					$checked = $i;
 				else
 					$checked = -1;
-				$oneset->input = $mod->CreateInputCheckbox(
+				$tmp = $mod->CreateInputCheckbox(
 					$id,$this->formdata->current_prefix.$this->Id.'[]',$i,$checked,
-					'id="'.$tid.'"'.$js);
+					'id="'.$tid.'"'.$jsl.$js);
+				$oneset->input = $this->SetClass($tmp);
 				$ret[] = $oneset;
 			}
 			unset($one);
+			$this->MultiPopulate = TRUE;
 			return $ret;
 		}
+		$this->MultiPopulate = FALSE;
 		return '';
 	}
 
