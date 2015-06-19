@@ -92,17 +92,21 @@ class pwfTimePicker extends pwfFieldBase
 			$oneset = new stdClass();
 			$tid = $this->GetInputId('_hour');
 			$oneset->title = $mod->Lang('hour');
-			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
-			$oneset->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+			$tmp = '<label for="'.$tid.'">'.$oneset->title.'</label>';
+			$oneset->name = $this->SetClass($tmp);
+			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
 				$Hours,-1,$now['tm_hour'],'id="'.$tid.'"'.$js);
+			$oneset->input = $this->SetClass($tmp);
 			$ret[] = $oneset;
 
 			$oneset = new stdClass();
 			$tid = $this->GetInputId('_min');
 			$oneset->title = $mod->Lang('min');
-			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
-			$oneset->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+			$tmp = '<label for="'.$tid.'">'.$oneset->title.'</label>';
+			$oneset->name = $this->SetClass($tmp);
+			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
 				$Mins,-1,$now['tm_min'],'id="'.$tid.'"'.$js);
+			$oneset->input = $this->SetClass($tmp);
 			$ret[] = $oneset;
 
 			return $ret;
@@ -137,25 +141,31 @@ class pwfTimePicker extends pwfFieldBase
 			$oneset = new stdClass();
 			$tid = $this->GetInputId('_hour');
 			$oneset->title = $mod->Lang('hour');
-			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
-			$oneset->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+			$tmp = '<label class= "" for="'.$tid.'">'.$oneset->title.'</label>';
+			$oneset->name = $this->SetClass($tmp);
+			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
 				$Hours,-1,$now['tm_hour'],'id="'.$tid.'"'.$js);
+			$oneset->input = $this->SetClass($tmp);
 			$ret[] = $oneset;
 
 			$oneset = new stdClass();
 			$tid = $this->GetInputId('_min');
 			$oneset->title = $mod->Lang('min');
-			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
-			$oneset->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+			$tmp = '<label class= "" for="'.$tid.'">'.$oneset->title.'</label>';
+			$oneset->name = $this->SetClass($tmp);
+			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
 				$Mins,-1,$now['tm_min'],'id="'.$tid.'"'.$js);
+			$oneset->input = $this->SetClass($tmp);
 			$ret[] = $oneset;
 
 			$oneset = new stdClass();
 			$tid = $this->GetInputId('_meridian');
 			$oneset->title = $mod->Lang('merid');
-			$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
-			$oneset->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
+			$tmp = '<label class= "" for="'.$tid.'">'.$oneset->title.'</label>';
+			$oneset->name = $this->SetClass($tmp);
+			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
 				$this->flag12hour,-1,$now['merid'],'id="'.$tid.'"'.$js);
+			$oneset->input = $this->SetClass($tmp);
 			$ret[] = $oneset;
 			return $ret;
 		}

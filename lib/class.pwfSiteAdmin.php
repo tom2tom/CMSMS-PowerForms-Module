@@ -29,7 +29,7 @@ class pwfSiteAdmin extends pwfFieldBase
 			$u = $this->GetOption('show_username',0);
 			$choices = array();
 			if($select)
-				$choices[' '.$this->GetOption('select_one',$mod->Lang('select_one'))] = '';
+				$choices[' '.$this->GetOption('select_one',$mod->Lang('select_one'))] = -1;
 			$indx = 1;
 			for($i=0; $i<$c; $i++)
 			{
@@ -126,9 +126,10 @@ class pwfSiteAdmin extends pwfFieldBase
 		if($choices)
 		{
 			$mod = $this->formdata->formsmodule;
-			return $mod->CreateInputDropdown(
+			$tmp = $mod->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
 				'id="'.$this->GetInputId().'"'.$this->GetScript());
+			return $this->SetClass($tmp);
 		}
 		return '';
 	}

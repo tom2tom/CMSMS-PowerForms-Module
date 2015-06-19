@@ -90,7 +90,10 @@ class pwfCheckboxExtended extends pwfFieldBase
 		$oneset->title = '';
 		$label = $this->GetOption('box_label');
 		if($label)
-			$label = '<label for="'.$tid.'">'.$label.'</label>';
+		{
+			$tmp = '<label for="'.$tid.'">'.$label.'</label>';
+			$label = $this->SetClass($tmp);
+		}
 		$oneset->name = $label;
 
 		if($this->Value)
@@ -104,17 +107,21 @@ class pwfCheckboxExtended extends pwfFieldBase
 		}
 		else
 			$hasvalue = FALSE;
-		$oneset->input = $mod->CreateInputCheckbox(
+		$tmp = $mod->CreateInputCheckbox(
 			$id,$this->formdata->current_prefix.$this->Id.'[box]','t',
 			($hasvalue?$this->Value['box']:0),
 			'id="'.$tid.'"'.$js);
+		$oneset->input = $this->SetClass($tmp);
 		$ret[] = $oneset;
 
 		if($show)
 		{
 			$tid = $this->GetInputId('_1');
 			if($this->GetOption('text_label'))
-				$label = '<label for="'.$tid.'">'.$this->GetOption('text_label').'</label>';
+			{
+				$tmp = '<label for="'.$tid.'">'.$this->GetOption('text_label').'</label>';
+				$label = $this->SetClass($tmp);
+			}
 			else
 				$label = '';
 
@@ -130,7 +137,9 @@ class pwfCheckboxExtended extends pwfFieldBase
 				$id,$this->formdata->current_prefix.$this->Id.'[text]',
 				($hasvalue?$this->Value['text']:''),25,25,
 				$js);
-			$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+			$tmp = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+			$oneset->input = $this->SetClass($tmp);
+			
 			$ret[] = $oneset;
 		}
 

@@ -50,14 +50,15 @@ class pwfProvincePicker extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 
-		$choices = array_merge(array($this->GetOption('select_one',$mod->Lang('select_one'))=>''),$this->Provinces);
+		$choices = array_merge(array($this->GetOption('select_one',$mod->Lang('select_one'))=>-1),$this->Provinces);
 
 		if(!$this->HasValue() && $this->GetOption('default_province'))
 			$this->SetValue($this->GetOption('default_province'));
 
-		return $mod->CreateInputDropdown(
+		$tmp = $mod->CreateInputDropdown(
 			$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
 			'id="'.$this->GetInputId().'"'.$this->GetScript());
+		return $this->SetClass($tmp);
 	}
 }
 

@@ -95,7 +95,8 @@ class pwfText extends pwfFieldBase
 				$this->GetOption('length')<25?$this->GetOption('length'):25,$this->GetOption('length'),
 				$ro.$js);
 		}
-		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+		$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+		return $this->SetClass($tmp);
 	}
 
 	function Validate($id)

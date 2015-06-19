@@ -206,11 +206,12 @@ class pwfFileDirector extends pwfFieldBase
 		if($names)
 		{
 			$mod = $this->formdata->formsmodule;
-			$choices = array(' '.$this->GetOption('select_one',$mod->Lang('select_one'))=>'')
+			$choices = array(' '.$this->GetOption('select_one',$mod->Lang('select_one'))=>-1)
 				+ array_flip($names);
-			return $mod->CreateInputDropdown(
+			$tmp = $mod->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
 				'id="'.$this->GetInputId().'"'.$this->GetScript());
+			return $this->SetClass($tmp);
 		}
 		return '';
 	}

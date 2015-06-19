@@ -71,9 +71,13 @@ class pwfCheckbox extends pwfFieldBase
 		$tmp = $this->formdata->formsmodule->CreateInputCheckbox(
 			$id,$this->formdata->current_prefix.$this->Id,'t',$this->Value,
 			'id="'.$tid.'"'.$this->GetScript());
+		$tmp = $this->SetClass($tmp);
 		$label = $this->GetOption('label');
 		if($label)
-			$label = '&nbsp;<label for="'.$tid.'">'.$label.'</label>';
+		{
+			$label = '<label for="'.$tid.'">'.$label.'</label>';
+			$label = '&nbsp;'.$this->SetClass($label);
+		}
 		return $tmp.$label;
 	}
 

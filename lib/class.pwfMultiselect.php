@@ -156,9 +156,10 @@ class pwfMultiselect extends pwfFieldBase
 			else
 				$val = $this->Value;
 
-			return $this->formdata->formsmodule->CreateInputSelectList(
+			$tmp = $this->formdata->formsmodule->CreateInputSelectList(
 				$id,$this->formdata->current_prefix.$this->Id.'[]',$choices,$val,$this->GetOption('lines',3),
 			 	'id="'.$this->GetInputId().'"'.$this->GetScript());
+			return $this->SetClass($tmp);
 		 }
 		 return '';
 	}

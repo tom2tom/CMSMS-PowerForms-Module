@@ -20,7 +20,8 @@ class pwfEmailSubject extends pwfFieldBase {
 			$id,$this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($this->Value,ENT_QUOTES),25,128,
 			$this->GetScript());
-		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+		$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+		return $this->SetClass($tmp);
 	}
 
 	function Validate($id)

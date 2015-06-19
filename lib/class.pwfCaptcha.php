@@ -110,7 +110,8 @@ class pwfCaptcha extends pwfFieldBase
 		$captcha = $mod->getModuleInstance('Captcha');
 		$smarty = cmsms()->GetSmarty();
 		$smarty->assign('captcha',$captcha->getCaptcha());
-		$smarty->assign('prompt',$this->GetOption('prompt',$mod->Lang('captcha_prompt')));
+		$smarty->assign('prompt',$this->GetOption('prompt',$mod->Lang('captcha_prompt')).
+			$this->GetFormOption('required_field_symbol','*'));
 		$test = method_exists($captcha,'NeedsInputField') ? $captcha->NeedsInputField() : TRUE;
 		if($test)
 		{
@@ -131,14 +132,16 @@ class pwfCaptcha extends pwfFieldBase
 		{
 			$this->HideLabel = FALSE;
 			$this->RealName = $this->Name;
-			$this->Name = $mod->ProcessTemplateFromData($tpl);
+			$tmp = $mod->ProcessTemplateFromData($tpl);
+			$this->Name = $this->SetClass($tmp);
 			return '';
 		}
 		else
 		{
 			$this->HideLabel = TRUE;
 			$this->RealName = FALSE;
-			return $mod->ProcessTemplateFromData($tpl);
+			$tmp = $mod->ProcessTemplateFromData($tpl);
+			return $this->SetClass($tmp);
 		}
 	}
 

@@ -178,23 +178,29 @@ class pwfDatePicker extends pwfFieldBase
 		$day = new stdClass();
 		$day->title = $mod->Lang('day');
 		$tid = $this->GetInputId('_day');
-		$day->name = '<label for="'.$tid.'">'.$day->title.'</label>';
-		$day->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Days,-1,
+		$tmp = '<label for="'.$tid.'">'.$day->title.'</label>';
+		$day->name = $this->SetClass($tmp);
+		$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Days,-1,
 			$today['mday'],'id="'.$tid.'"'.$js);
+		$day->input = $this->SetClass($tmp);
 
 		$mon = new stdClass();
 		$tid = $this->GetInputId('_month');
 		$mon->title = $mod->Lang('mon');
-		$mon->name = '<label for="'.$tid.'">'.$mon->title.'</label>';
-		$mon->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$this->Months,-1,
+		$tmp = '<label for="'.$tid.'">'.$mon->title.'</label>';
+		$mon->name = $this->SetClass($tmp);
+		$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$this->Months,-1,
 			$today['mon'],'id="'.$tid.'"'.$js);
+		$mon->input = $this->SetClass($tmp);
 
 		$yr = new stdClass();
 		$tid = $this->GetInputId('_year');
 		$yr->title = $mod->Lang('year');
-		$yr->name = '<label for="'.$tid.'">'.$yr->title.'</label>';
-		$yr->input = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Years,-1,
+		$tmp = '<label for="'.$tid.'">'.$yr->title.'</label>';
+		$yr->name = $this->SetClass($tmp);
+		$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$Years,-1,
 			$today['year'],'id="'.$tid.'"'.$js);
+		$yr->input = $this->SetClass($tmp);
 
 		$order = array('d' => $day,'m' => $mon,'y' => $yr);
 		$user_order = $this->GetOption('date_order','d-m-y');

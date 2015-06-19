@@ -165,27 +165,32 @@ class pwfFileUpload extends pwfFieldBase
 	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$txt = '';
 		if($this->Value)
-			$txt .= $this->GetHumanReadableValue().'<br />'; // Value line
-		$txt .= $mod->CreateFileUploadInput(
+			$ret = $this->GetHumanReadableValue().'<br />'; // Value line
+		else
+			$ret = '';
+		$tmp = $mod->CreateFileUploadInput(
 			$id,$this->formdata->current_prefix.$this->Id,
 			'id="'.$this->GetInputId().'"'.$this->GetScript()); // Input line
+		$ret .= $this->SetClass($tmp);
 		if($this->Value)
-			$txt .= $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.'delete__'.$this->Id,-1). //TODO is this used?
+		[
+			$tmp = $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.'delete__'.$this->Id,-1). //TODO is this used?
 				'&nbsp;'.$mod->Lang('delete').'<br />'; // Delete line
+			$ret .= $this->SetClass($tmp);
+		}
 
 		// Extras
 		if($this->GetOption('show_details',0))
 		{
-			$ms = $this->GetOption('max_size');
-			if($ms)
-				$txt .= ' '.$mod->Lang('maximum_size').': '.$ms.'kB';
-			$exts = $this->GetOption('permitted_extensions');
-			if($exts)
-				$txt .= ' '.$mod->Lang('permitted_extensions').': '.$exts;
+			$opt = $this->GetOption('max_size');
+			if($opt)
+				$ret .= ' '.$mod->Lang('maximum_size').': '.$opt.'kB';
+			$opt = $this->GetOption('permitted_extensions');
+			if($opt)
+				$ret .= ' '.$mod->Lang('permitted_extensions').': '.$opt;
 		}
-		return $txt;
+		return $ret;
 	}
 
 /* TODO

@@ -144,11 +144,12 @@ class pwfPulldown extends pwfFieldBase
 			if(count($choices) > 1 && $this->GetOption('sort'))
 				ksort($choices);
 			$mod = $this->formdata->formsmodule;
-			$choices = array(' '.$this->GetOption('select_one',$mod->Lang('select_one'))=>'') + $choices;
+			$choices = array(' '.$this->GetOption('select_one',$mod->Lang('select_one'))=>-1) + $choices;
 
-			return $mod->CreateInputDropdown(
+			$tmp = $mod->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
 				'id="'.$this->GetInputId().'"'.$this->GetScript());
+			return $this->SetClass($tmp);
 		}
 		return '';
 	}

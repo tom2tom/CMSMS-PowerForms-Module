@@ -79,7 +79,8 @@ class pwfPassword extends pwfFieldBase
 					$this->GetOption('length',16),255,
 					$ro.$this->GetScript());
 		}
-		return preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+		$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+		return $this->SetClass($tmp);
 	}
 
 	function Validate($id)

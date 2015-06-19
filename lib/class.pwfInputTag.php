@@ -71,9 +71,9 @@ class pwfInputTag extends pwfFieldBase
 
 		$usertagops = cmsms()->GetUserTagOperations();
 		$udt = $this->GetOption('udtname');
-		$res = $usertagops->CallUserTag($udt,$params);
-		if($res !== FALSE)
-			return $res;
+		$ret = $usertagops->CallUserTag($udt,$params);
+		if($ret !== FALSE)
+			return $this->SetClass($tmp);
 		return $mod->Lang('error_usertag_named',$udt);
 	}
 

@@ -240,24 +240,28 @@ class pwfCompanyDirectory extends pwfFieldBase
 			switch($this->GetOption('UserInput','Dropdown'))
 			{
 			 case 'Dropdown':
-				return $mod->CreateInputDropdown(
+				$tmp = $mod->CreateInputDropdown(
 					$id,$this->formdata->current_prefix.$this->Id,
 					$companies,'-1',$val);
 			 case 'Radio Group':
-				return $mod->CreateInputRadioGroup(
+				$tmp = $mod->CreateInputRadioGroup(
 					$id,$this->formdata->current_prefix.$this->Id,
 					$companies,$val,'','&nbsp;&nbsp;');
 			 case 'Select List-single':
-				return $mod->CreateInputSelectList(
+				$tmp = $mod->CreateInputSelectList(
 					$id,$this->formdata->current_prefix.$this->Id.'[]',
 					$companies,$val,$size,
 					'id="'.$this->GetInputId().'"'.$this->GetScript(),FALSE);
 			 case 'Select List-multiple':
-				return $mod->CreateInputSelectList(
+				$tmp = $mod->CreateInputSelectList(
 					$id,$this->formdata->current_prefix.$this->Id.'[]',
 					$companies,$val,$size,
 					'id="'.$this->GetInputId().'"'.$this->GetScript());
+			 default:
+			 	$tmp = FALSE;
 			}
+			if($tmp)
+				return $this->SetClass($tmp);
 		}
 		return ''; // error
 	}

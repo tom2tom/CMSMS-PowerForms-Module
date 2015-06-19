@@ -61,7 +61,9 @@ class pwfSystemLink extends pwfFieldBase
 			$pageinfo = cmsms()->variables['pageinfo'];
 			$oneset->name = $pageinfo->content_title;
 			$oneset->title = $oneset->name;
-			$oneset->input = $this->formdata->formsmodule->CreateContentLink($pageinfo->content_id,$oneset->name);
+			$tmp = $this->formdata->formsmodule->CreateContentLink($pageinfo->content_id,$oneset->name);
+			$oneset->input = $this->SetClass($tmp);
+			$this->MultiPopulate = TRUE;
 			return array($oneset);
 		}
 		else
@@ -74,11 +76,14 @@ class pwfSystemLink extends pwfFieldBase
 				$cobj = $contentops->LoadContentFromId($page);
 				$oneset->name = $cobj->Name();
 				$oneset->title = $oneset->name;
-				$oneset->input = $this->formdata->formsmodule->CreateContentLink($cobj->Id(),$oneset->name);
+				$tmp = $this->formdata->formsmodule->CreateContentLink($cobj->Id(),$oneset->name);
+				$oneset->input = $this->SetClass($tmp);
+				$this->MultiPopulate = TRUE;
 				return array($oneset);
 			}
 		}
-		return ''; //TODO OK?
+		$this->MultiPopulate = FALSE;
+		return '';
 	}
 
 }

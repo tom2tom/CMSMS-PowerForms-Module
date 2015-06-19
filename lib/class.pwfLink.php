@@ -60,25 +60,29 @@ class pwfLink extends pwfFieldBase
 		$oneset = new stdClass();
 		$tid = $this->GetInputId('_1');
 		$oneset->title = $mod->Lang('link_destination');
-		$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
+		$tmp = '<label for="'.$tid.'">'.$oneset->title.'</label>';
 //TODO does $val[0] need html_entity_decode()?
 		$tmp = $mod->CreateInputText(
 			$id,$this->formdata->current_prefix.$this->Id.'[]',
 			html_entity_decode($val[0]),'','',
 			$js);
-		$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+		$oneset->name = $this->SetClass($tmp);
+		$tmp = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+		$oneset->input = $this->SetClass($tmp);
 		$ret[] = $oneset;
 		
 		$oneset = new stdClass();
 		$tid = $this->GetInputId('_2');
 		$oneset->title = $mod->Lang('link_label');
-		$oneset->name = '<label for="'.$tid.'">'.$oneset->title.'</label>';
+		$tmp = '<label for="'.$tid.'">'.$oneset->title.'</label>';
+		$oneset->name = $this->SetClass($tmp);
 //TODO ibid does $val[1] ever need html_entity_decode()?
 		$tmp = $mod->CreateInputText(
 			$id,$this->formdata->current_prefix.$this->Id.'[]',
 			$val[1],'','',
 			$js);
-		$oneset->input = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+		$tmp = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
+		$oneset->input = $this->SetClass($tmp);
 		$ret[] = $oneset;
 		return $ret;
 	}

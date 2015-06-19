@@ -99,11 +99,11 @@ class pwfUserEmail extends pwfEmailBase
 
 	function Populate($id,&$params)
 	{
-		$this->formdata->HasEmailAddr = TRUE; //flag to check address with frontend js
+		$this->formdata->jscripts['mailcheck'] = 'construct'; //flag to generate & include js for this type of field
 		$toself = ($this->GetOption('send_user_copy','n') == 'c');
 //		$multi = ($toself) ? '[]':'';
-		$sf = ($toself) ? '_1':'';
 //TODO check this logic
+		$sf = ($toself) ? '_1':'';
 //		$val = ($toself) ? $this->$this->Value[0] : $this->Value;
 		$mod = $this->formdata->formsmodule;
 
@@ -112,17 +112,17 @@ class pwfUserEmail extends pwfEmailBase
 			$id,$this->formdata->current_prefix.$this->Id.'[]',
 			htmlspecialchars($this->Value[0],ENT_QUOTES),25,128,
 			$this->GetScript());
-		$ret = preg_replace(
-			array('/id="\S+"/','/class="(.*)"/'),
-			array('id="'.$this->GetInputId($sf).'"','class="emailaddr $1"')
-			$tmp);
+		$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId($sf).'"',$tmp);
+		$ret = $this->SetClass($tmp,'emailaddr');
  		if($toself)
 		{
 			$tid = $this->GetInputId('_2');
 			$tmp = $mod->CreateInputCheckbox(
 				$id,$this->formdata->current_prefix.$this->Id.'[]',1,0,'id="'.$tid.'"');
-			$ret .= '<br />'.$tmp.'&nbsp;<label for="'.$tid.'">'.
-			$this->GetOption('send_user_label',$mod->Lang('title_send_me_a_copy')).'</label>';
+			$ret .= '<br />'.$this->SetClass($tmp);
+			$tmp = '<label class ="" for="'.$tid.'">'.
+				$this->GetOption('send_user_label',$mod->Lang('title_send_me_a_copy')).'</label>';
+			$ret .= '&nbsp;'.$this->SetClass($tmp);
 		}
 		return $ret;
 	}

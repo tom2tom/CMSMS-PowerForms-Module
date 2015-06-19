@@ -39,20 +39,16 @@ class pwfFieldsetStart extends pwfFieldBase
 
 	function Populate($id,&$params)
 	{
-		$str = '<fieldset id="'.$this->GetInputId().'"';
-//TODO in general, class applied to parent (div, table-cell etc)
-/*		$opt = $this->GetOption('css_class');
-		if($opt)
-			$str .= ' class="'.$opt.'"';
-*/
+		$tmp = '<fieldset id="'.$this->GetInputId().'"';
+		$ret = $this->SetClass($tmp);
 		$opt = $this->GetScript();
 		if($opt)
-			$str .= ' '.$opt;
-		$str .= '>';
+			$ret .= ' '.$opt;
+		$ret .= '>';
 		$opt = $this->GetOption('legend');
 		if($opt)
-			$str .= '<legend>'.$opt.'</legend>';
-		return $str;
+			$ret .= '<legend>'.$opt.'</legend>';
+		return $ret;
 	}
 
 }

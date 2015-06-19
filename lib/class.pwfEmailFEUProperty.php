@@ -114,9 +114,10 @@ class pwfEmailFEUProperty extends pwfEmailBase
 			// get the property input field
 			$choices = $feu->GetSelectOptions($prop);
 			// rendered all as a dropdown field.
-			$res = $mod->CreateInputDropdown(
+			$tmp = $mod->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
 				'id="'.$this->GetInputId().'"'.$this->GetScript());
+			$res = $this->SetClass($tmp);
 			break;
 		 default:
 			$res = '';

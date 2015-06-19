@@ -226,17 +226,21 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 			{
 				$oneset = new stdClass();
 				$oneset->title = $one;
-				$oneset->name = '<label for="'.$this->GetInputId('_'.$i).'">'.$one.'</label>';
+				$tmp = '<label for="'.$this->GetInputId('_'.$i).'">'.$one.'</label>';
+				$oneset->name = $this->SetClass($tmp);
 				$value = $this->GetOptionElement('destination_value',$i);
-				$oneset->input = $mod->CreateInputCheckbox(
+				$tmp = $mod->CreateInputCheckbox(
 					$id,$this->formdata->current_prefix.$this->Id.'[]',$value,
 					(is_array($this->Value) && in_array($value,$this->Value))?$value:-1,
 					'id="'.$this->GetInputId('_'.$i).'"'.$js);
+				$oneset->input = $this->SetClass($tmp);
 				$ret[] = $oneset;
 			}
 			unset($one);
+			$this->MultiPopulate = TRUE;
 			return $ret;
 		}
+		$this->MultiPopulate = FALSE;
 		return '';
 	}
 

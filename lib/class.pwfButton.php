@@ -28,9 +28,10 @@ class pwfButton extends pwfFieldBase
 
 	function Populate($id,&$params)
 	{
-		return '<input type="button" id="'.$this->GetInputId().'" name="'.
+		$tmp = '<input type="button" id="'.$this->GetInputId().'" name="'.
 			$id.$this->formdata->current_prefix.$this->Id.
 			'" value="'.$this->GetOption('text').'"'.$this->GetScript().' />';
+		return $this->SetClass($tmp);
 	}
 
 }

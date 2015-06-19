@@ -53,8 +53,9 @@ class pwfHidden extends pwfFieldBase
 		else
 			$type = 'hidden';
 
-		return '<input type="'.$type.'" id="'.$this->GetInputId().'" name="'.
+		$tmp = '<input type="'.$type.'" id="'.$this->GetInputId().'" name="'.
 			$id.$this->formdata->current_prefix.$this->Id.'" value="'.$val.'" />';
+		return $this->SetClass($tmp);
 	}
 
 }

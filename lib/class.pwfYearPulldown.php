@@ -60,10 +60,11 @@ class pwfYearPulldown extends pwfFieldBase
 			ksort($choices);
 
 		$mod = $this->formdata->formsmodule;
-		$choices = array($this->GetOption('select_one',$mod->Lang('select_one'))=>'') + $choices;
-		return $mod->CreateInputDropdown(
+		$choices = array($this->GetOption('select_one',$mod->Lang('select_one'))=>-1) + $choices;
+		$tmp = $mod->CreateInputDropdown(
 			$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
 			'id="'.$this->GetInputId().'"'.$this->GetScript());
+		return $this->SetClass($tmp);
 	}
 
 }

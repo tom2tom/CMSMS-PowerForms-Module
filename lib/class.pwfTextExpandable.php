@@ -155,13 +155,15 @@ class pwfTextExpandable extends pwfFieldBase
 				$this->Value[$i],$this->GetOption('length')<25?$this->GetOption('length'):25,
 				$this->GetOption('length'),
 				$this->GetScript());
-			$oneset->input = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_'.$i).'"',$tmp);
+			$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_'.$i).'"',$tmp);
+			$oneset->input = $this->SetClass($tmp);
 			if(!$hidebuttons)
 			{
 				$tmp = $mod->CreateInputSubmit($id,
 					$this->formdata->current_prefix.'FeD_'.$this->Id.'_'.$i,
 					$this->GetOption('del_button','X'),($vals==1?' disabled="disabled"':''));
-				$oneset->op = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_del_'.$i).'"',$tmp);
+				$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_del_'.$i).'"',$tmp);
+				$oneset->op = $this->SetClass($tmp);
 			}
 
 			$ret[] = $oneset;
@@ -177,7 +179,8 @@ class pwfTextExpandable extends pwfFieldBase
 			$tmp = $mod->CreateInputSubmit($id,
 				$this->formdata->current_prefix.'FeX_'.$this->Id.'_'.$i,
 				$this->GetOption('add_button','+'));
-			$oneset->op = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_add_'.$i).'"',$tmp);
+			$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_add_'.$i).'"',$tmp);
+			$oneset->op = $this->SetClass($tmp);
 
 			$ret[] = $oneset;
 		}
