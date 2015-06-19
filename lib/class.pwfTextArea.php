@@ -48,11 +48,12 @@ class pwfTextArea extends pwfFieldBase
 						$mod->CreateInputCheckbox($id,'opt_wysiwyg',1,$this->GetOption('wysiwyg',0)));
 		$main[] = array($mod->Lang('title_textarea_rows'),
 						$mod->CreateInputText($id,'opt_rows',$this->GetOption('rows',15),5,5));
-		$main[] = array($mod->Lang('title_textarea_cols'),
-						$mod->CreateInputText($id,'opt_cols',$this->GetOption('cols',80),5,5));
+//TODO this is stupid - prefer 100%
+//		$main[] = array($mod->Lang('title_textarea_cols'),
+//						$mod->CreateInputText($id,'opt_cols',$this->GetOption('cols',80),5,5));
 		$main[] = array($mod->Lang('title_textarea_length'),
 						$mod->CreateInputText($id,'opt_length',$this->GetOption('length'),5,5));
-		//omit "javascript" TODO why ?
+		//omit "javascript" TODO why ? maybe justified if we add our own (for autogrow)
 		$this->RemoveAdminField($adv,$mod->Lang('title_field_javascript'));
 		$adv[] = array($mod->Lang('title_field_default_value'),
 						$mod->CreateTextArea(FALSE,$id,$this->GetOption('default'),'opt_default',
@@ -72,59 +73,50 @@ class pwfTextArea extends pwfFieldBase
 		$cols = $this->GetOption('cols',80);
 		$rows = $this->GetOption('rows',15);
 		$wysiwyg = $this->GetOption('wysiwyg',0);
-		$add = ($wysiwyg) ? '':' style="height:'.$rows.'em;width:'.$cols.'em;"';
-		$htmlid = $this->GetInputId(); //TODO check $htmlid use
+		$add = ($wysiwyg) ? ' style="width:100%;"':' style="overflow:auto;height:'.$rows.'em;width:100%;"';
+		$htmlid = $id.$this->GetInputId(); //html may get id="$id.$htmlid", or maybe not ...
+		$clear = $this->GetOption('clear_default',0);
+//TODO make this auto-grow see http://www.impressivewebs.com/textarea-auto-resize
 		$mod = $this->formdata->formsmodule;
 		if($this->GetOption('html5',0))
 		{
-			$ret = $mod->CreateTextArea($wysiwyg,$id,
+			$tmp = $mod->CreateTextArea($wysiwyg,$id,
 				$this->Value,
 				$this->formdata->current_prefix.$this->Id,
-				'', //classname == $htmlid?
-				$htmlid, //create_textarea() may ignore this, then js below can't work
-				'','',$cols,$rows,'','',
+				'',$htmlid,'','',$cols,$rows,'','',
 				' placeholder="'.$this->GetOption('default').'"'.$add);
 		}
 		else
 		{
-			$ret = $mod->CreateTextArea($wysiwyg,$id,
+			$tmp = $mod->CreateTextArea($wysiwyg,$id,
 				($this->Value?$this->Value:$this->GetOption('default')),
 				$this->formdata->current_prefix.$this->Id,
-				'', //classname == $htmlid?
-				$htmlid, //create_textarea() may ignore this, then js can't work
-				'','',$cols,$rows,'','',
-				$add);
+				'',$htmlid,'','',$cols,$rows,'','',$add);
 		}
 
 		if($this->GetOption('clear_default',0))
 		{
-			if(strpos($ret,$htmlid) !== FALSE)
-			{
-				$ret .= <<<EOS
-<script type="text/javascript">
-//<![CDATA[
+			//arrange for all such fields to be cleared
+			$this->formdata->jscripts['cleararea'] =<<<EOS
 $(document).ready(function() {
- var f = document.getElementById('{$htmlid}');
- if(f) {
-  f.onfocus = function() {
+ $('.formarea').each(function(index,element) {
+  $(element).focus(function() {
    if(this.value == this.defaultValue) {
     this.value = '';
    }
-  };
-  f.onblur = function() {
-   if(this.value == '') {
-    this.value = this.defaultValue;
+  }).blur(function() {
+   if(this.value === '') {
+     this.value = this.defaultValue;
    }
-  };
- }
+  });
+ });
 });
-//]]>
-</script>
-
 EOS;
-			}
+			$xclass = 'formarea';
 		}
-		return $ret;
+		else
+			$xclass = '';
+		return $this->SetClass($tmp,$xclass);
 	}
 
 	function Validate($id)
