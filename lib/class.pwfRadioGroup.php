@@ -78,6 +78,10 @@ class pwfRadioGroup extends pwfFieldBase
 	{
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
+		$main[] = array($mod->Lang('title_radio_separator'),
+						$mod->CreateInputText($id,'opt_radio_separator',
+							$this->GetOption('radio_separator','&nbsp;&nbsp'),15,25)
+						$mod->Lang('help_radio_separator'));
 		if($this->optionAdd)
 		{
 			$this->AddOptionElement('button_name','');
@@ -142,14 +146,19 @@ class pwfRadioGroup extends pwfFieldBase
 		{
 			$ret = array();
 			$mod = $this->formdata->formsmodule;
-		
+			$sep = $this->GetOption('radio_separator','&nbsp;&nbsp');
+			$cnt = count($names);
+			$b = 1;
 			foreach($names as $i=>&$one)
 			{
 				$oneset = new stdClass();
 				if($one)
 				{
 					$oneset->title = $one;
-					$oneset->name = '<label for="'.$this->GetInputId('_'.$i).'">'.$one.'</label>';
+					if($b == $cnt) //last button
+						$sep = '';
+					$tmp = '<label for="'.$this->GetInputId('_'.$i).'">'.$one.'</label>'.$sep;
+					$oneset->name = $this->SetClass($tmp);
 				}
 				else
 				{
@@ -167,12 +176,16 @@ class pwfRadioGroup extends pwfFieldBase
 					$checked = FALSE;
 				if($checked)
 					$tmp .= ' checked="checked"';
-				$oneset->input = $tmp.$this->GetScript().' />';
+				$tmp .= $this->GetScript().' />';
+				$oneset->input = $this->SetClass($tmp);
 				$ret[] = $oneset;
+				$b++;
 			}
 			unset($one);
+			$this->MultiPopulate = TRUE;
 			return $ret;
 		}
+		$this->MultiPopulate = FALSE;
 		return '';
 	}
 }
