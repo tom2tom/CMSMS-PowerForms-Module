@@ -89,6 +89,11 @@ class pwfFieldBase
 			return $default;
 	}
 
+	function SetId($fid)
+	{
+		$this->Id = (int)$fid;
+	}
+
 	// Gets the cached field-id
 	function GetId()
 	{
@@ -360,6 +365,36 @@ class pwfFieldBase
 		return ($this->MultiPopulate || $this->HasUserAddOp); //TODO multipopulate not relevant
 	}
 */
+	//apply frontend class(es) to string $html
+	function SetClass($html,$extra='') 
+	{
+		$html = preg_replace('/class *= *".*"/U','',$html);
+		$cls = $this->GetOption('css_class');
+		if($this->Required)
+			$cls .= ' required';
+		if(!$this->validated)
+			$cls .= ' invalid_field';
+		if($extra)
+			$cls .= ' '.$extra;
+		$cls = trim($cls);
+		if($cls)
+		{
+			$html = preg_replace(
+			array(
+			'/<input +type *= *"(\w+)"/U',
+			'/<label/',
+			'/<option/',
+			),
+			array(
+			$repl,
+			'<input type="($1)" class="'.$cls.'"',
+			'<label class="'.$cls.'"',
+			'<option class="'.$cls.'"',
+			),$html);
+		}
+		return $html;
+	}
+
 	// Subclass this
 	// Returns field value as a scalar or array (per $as_string), suitable for display in the form
 	function GetHumanReadableValue($as_string=TRUE)
@@ -825,7 +860,7 @@ class pwfFieldBase
 	container(s) will be provided by the form renderer
 	OR if the field->MultiPopulate, then
 	* an array of stdClass objects, each with properties:
-	->name, ->title, ->input, and optionally ->op 
+	->name, ->title and ->input (and for a couple of field-types, also ->op)
 	Object-names must begin with $this->formdata->current_prefix, so as to not be
 	dropped as 'unknown' frontend parameters (see PowerForms::InitializeFrontend())
 	and not be excluded as time-expired
