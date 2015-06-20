@@ -325,27 +325,23 @@ $lang['desc_cssf_class'] = 'the CSS class specified for the field';
 $lang['desc_display'] = 'true if the field is visible in the form';
 $lang['desc_error'] = 'error text, if the field did not validate';
 $lang['desc_form_done'] = 'whether the form is complete';
-$lang['desc_form_end'] = 'html for form start';
 $lang['desc_form_has_validation_errors'] = 'whether any field on the form failed to validate';
 $lang['desc_form_id'] = 'form identifier (number)';
 $lang['desc_form_name'] = 'form name';
-$lang['desc_form_start'] = 'html for form start';
 $lang['desc_form_validation_errors'] = 'TODO';
 $lang['desc_has_label'] = 'true if the field type has a label';
 $lang['desc_help_icon'] = 'string to generate help/info icon displayed on the form';
 $lang['desc_helptext'] = 'the field\'s help text';
-$lang['desc_helptext_id'] = 'DOM id of the DIV containing controls to show help for the field';
-$lang['desc_hidden'] = 'collection of necessary hidden stuff';
+$lang['desc_helptext_id'] = 'DOM id of the html div containing controls to show help for the field';
 $lang['desc_hide_name'] = 'true if the field name is hidden';
 $lang['desc_id'] = 'the internal/opaque id PowerForms uses for the field';
 $lang['desc_in_browser'] = 'true if form is being viewed or edited from PowerBrowse';
 $lang['desc_input'] = 'the field\'s input control, or array of objects (see below)';
 $lang['desc_input_id'] = 'the DOM id of the field\'s input (e.g. for a label: for="foo")';
-$lang['desc_jscript'] = 'javascript to be included';
 $lang['desc_label_parts'] = 'true if the collection of controls has separate labels for each control';
 $lang['desc_multiple_parts'] = 'true if the field->input is actually a collection of controls';
 $lang['desc_name'] = 'the field\'s name';
-$lang['desc_needs_div'] = 'true if the field needs to be wrapped in a DIV (or table row)';
+$lang['desc_needs_div'] = 'true if the field needs to be wrapped in a html div (or table row)';
 $lang['desc_prev'] = '"Back" button for multi-page forms';
 $lang['desc_required'] = 'true if the field is required';
 $lang['desc_required_symbol'] = 'symbol shown in the title if the field is required';
@@ -551,7 +547,7 @@ $lang['help_file_header_template'] = 'For TXT, this will be placed at the top of
 $lang['help_file_rename'] = 'To rename a file upon uploading, create the template here. Leave blank to preserve original filename';
 $lang['help_form_alias'] = 'If left blank, an alias will be derived from the form name';
 $lang['help_form_vars'] = <<<EOS
-At a minimum, <code>{\$form_start}</code>, <code>{\$form_end}</code>, <code>{\$hidden}</code> and <code>{\$submit}</code> tags must be included in the template, or else the form cannot work.
+At minimum, a <code>{\$submit}</code> tag must be included in the template, or else the form cannot work.
 EOS;
 $lang['help_ignored_if_upload'] = '(This field ignored if you use the Uploads module to manage files)';
 $lang['help_import_alias'] = 'Optional replacement alias for the imported form';
@@ -620,10 +616,12 @@ $lang['help_company_field'] = 'Note: output will be in the form of<br />"company
 $lang['help_compute_order'] = 'If the form has more than one Computed Field, they will be computed from lowest order number to highest order number';
 $lang['help_default_today'] = 'If un-checked, default to today\'s date';
 $lang['help_default_year'] = 'Use -1 for the current year';
-$lang['help_dont_submit_unchecked'] = 'Check this if you only want checked boxes to return values';
 //$lang['help_encrypt_database'] = 'Check this to encrypt stored data. This makes it more difficult (but not impossible) for hackers to view the information.';
 //$lang['help_encrypt_sortfields'] = 'This hashes the sort fields, but leaves the first few letters unencrypted. Cryptographically, this creates a vulnerability, but for most users it is an acceptable tradeoff between security and the ability to sort records. Sorting becomes approximate, but will remain pretty good. If you do not use this option, sort fields are stored in plaintext.';
 //$lang['help_encryption_key'] = 'Passphrase, or path to file containing passphrase. (If using OpenSSL, this is the passphrase for the private key)';
+$lang['help_email_domains'] = 'Comma-separated series of email domains, e.g. \'msn.com,gmail.com\' which will override the default values used by the mailcheck script for initial address-validation';
+$lang['help_email_subdomains'] = 'Comma-separated series of partial domains, e.g. \'yahoo,hotmail\' which will override the default values used by the mailcheck script for secondary address-validation';
+$lang['help_email_topdomains'] = 'Comma-separated series of top domains, e.g. \'com,com.tw,de,net,net.au\' which will override the default values used by the mailcheck script for final address-validation';
 $lang['help_feu_bind'] = 'Check this to lock front-end access to this form\'s data to the logged-in front-end user.';
 $lang['help_field_hidebuttons'] = 'Hides frontend control buttons of this field.';
 $lang['help_field_includelabels'] = 'Enabling this includes labels to output. example - label: value,label2: value2';
@@ -638,14 +636,17 @@ $lang['help_inline_form'] = 'Inline means any form followup replaces the {PowerF
 $lang['help_install_crypto'] = 'Please install the OpenSSL module or mcrypt support if you would like to enable database encryption.';
 $lang['help_maximum_size'] = 'This limitation is in addition to any limits set by the php or web server configuration';
 $lang['help_newline_replacement'] = 'Leave blank to allow newlines and carriage returns in output';
+$lang['help_no_empty'] = 'Check this if you want only checked boxes to return values';
 $lang['help_not_ready'] = 'please add disposition-field(s) to the form';
 $lang['help_permitted_extensions'] = 'Enter a comma-separated list, excluding the dot (e.g. "jpg,gif,jpeg"). Spaces will be ignored. Leaving this blank means there will be no restrictions.';
+$lang['help_radio_separator'] = 'Xhtml string, such as \' \' (unquoted) or &nbsp; or <br />';
 $lang['help_regex_use'] = 'This regular expression will only be used if "validation type" is set to a regex-related option. Include a full Perl-style regex, including the start/stop slashes and flags (e.g., "/image\.(\d+)/i")';
 $lang['help_save_order'] = 'You must click one of the "save" buttons to make the new field order permanent.';
 $lang['help_searchable'] = 'Checking this will make all submitted data accessible to the Search module. DO NOT use this if you encrypt your data -- the information gets exposed to search whether or not it is encrypted!';
 $lang['help_see_udt'] = '(Also take a look at the Form UDT tab if you want to set a UDT for form validation)';
 //$lang['help_show_fieldlevel'] = 'TODO';
 $lang['help_show_limitations'] = 'Display any size and extension restrictions with the upload field?';
+$lang['help_single_check'] = 'The boxes will together behave like a radio group, except that all of them may be unchecked';
 $lang['help_submit_javascript'] = 'Make this the complete Javascript call, including the event you want to trap, e.g., onclick="yourfn()".<br />This will probably not work well if you use the "safety script" option above.';
 $lang['help_submit_safety'] = 'Add Javascript to final \'Submit\' button that will help prevent multiple submissions';
 $lang['help_submit_tab'] = <<<EOS
@@ -665,10 +666,10 @@ be used interchangeably (especially useful if Smarty is choking on characters ou
 Each field has the following properties, accessible by e.g. <code>{\$myfield-&gt;input}</code>:
 EOS;
 $lang['help_fieldvars2'] = <<<EOS
-When field->multiple_parts is TRUE, field->input is actually an array of objects rather than an input.
+When field->multiple_parts is TRUE, field->input is actually an array of objects rather than a single input-control.
 This happens, for example, in CheckBoxGroups or RadioButtonGroups. For those, you
 can iterate through <code>\$field->input->name</code> and <code>\$field->input->input</code>
-and (in some cases) <code>\$field->input->op</code>.
+(and for a couple of field-types, <code>\$field->input->op</code>).
 EOS;
 $lang['hour'] = 'Hour';
 
@@ -778,6 +779,7 @@ $lang['settings_updated'] = 'Settings updated.';
 $lang['sort_options'] = 'Sort options on output';
 $lang['submit'] = 'Submit';
 $lang['submit_error'] = 'PowerForms submit error: %s';
+$lang['suggest'] = 'Did you mean';
 $lang['suspected_spam_log'] = 'Suspected spam from IP %s stopped.';
 $lang['suspected_spam'] = 'Too many emails generated from your IP address. Anti-Spam code has prevented delivery.';
 
@@ -854,7 +856,9 @@ $lang['title_destination_filename'] = 'Destination file name';
 $lang['title_destination_page'] = 'Destination page';
 $lang['title_director_details'] = 'Pulldown-based emailer details';
 $lang['title_display_length'] = 'Display length';
-$lang['title_dont_submit_unchecked'] = 'Don\'t submit values for unchecked boxes';
+$lang['title_email_domains'] = 'Email address check dom TODO';
+$lang['title_email_topdomains'] = 'Email address check top-level domains';
+$lang['title_email_subdomains'] = 'Email address check sub TODO';
 $lang['title_email_encoding'] = 'Email character-encoding';
 $lang['title_email_from_address'] = '"From" address';
 $lang['title_email_from_name'] = '"Sender" name';
@@ -949,6 +953,7 @@ $lang['title_name_regex'] = 'Cataloger item name regular expression';
 $lang['title_newform'] = 'New form';
 $lang['title_newline_replacement'] = 'Newline/Carriage Return replacement character';
 $lang['title_no_advanced_options'] = 'None for this field.';
+$lang['title_no_empty'] = 'Don\'t submit values for unchecked boxes';
 $lang['title_not_ready'] = 'Not ready';
 //$lang['title_not_ready1'] = 'Not ready';
 //$lang['title_not_ready2'] = 'Please add a field to the form so that the user\'s input gets handled. You can';
@@ -968,6 +973,7 @@ $lang['title_pick_fielddef'] = 'Pull a field definition\'s value (single) <em>op
 $lang['title_private_key'] = 'Private key to use for encrypting data';
 $lang['title_pulldown_details'] = 'Pulldown options';
 $lang['title_radio_label'] = 'Radio button label';
+$lang['title_radio_separator'] = 'Button separator';
 $lang['title_radiogroup_details'] = 'Radio button group details';
 $lang['title_read_only'] = 'Read Only';
 $lang['title_ready'] = 'Ready for deployment';
@@ -999,6 +1005,7 @@ $lang['title_show_to_user'] = 'Display to user';
 $lang['title_show_userfirstname'] = 'Display user\'s first name';
 $lang['title_show_userlastname'] = 'Display user\'s last name';
 $lang['title_show_username'] = 'Display user\'s login name';
+$lang['title_single_check'] = 'Limit to one selection';
 $lang['title_smarty_eval'] = 'Process smarty tags within field';
 //$lang['title_sortable_field'] = 'Sortable field #%s'; TODO
 $lang['title_start_year'] = 'Year range start';
@@ -1118,11 +1125,40 @@ Such a field can be implemented by creating a suitable class for the field, and
 during installation/uninstallation of the other module, registering/deregistering
 that class. More specific requirements are provided for developers in a README file.
 The PowerBrowse module code provides an example of this process in use.<p>
+<h3>Interactions</h3>
+<p>The following modules may be used in relevant contexts, if available:</p>
+<ul>
+<li>CMSMailer</li>
+<li>Captcha</li>
+<li>Cataloger</li>
+<li>CompanyDirectory</li>
+<li>FrontEndUsers</li>
+<li>Uploads</li>
+</ul>
+<p>Designer-specified UDT's may be called for particular fields, and/or before, during and/or after processing a form.</p>
+<h3>Styling</h3>
+<p>Classes applied in relevant contexts are:</p>
+<ul>
+<li>optional designer-specified class for div or table containing all controls in a form</li>
+<li>optional designer-specified class for controls in a field</li>
+<li>error_list - applied to html div's and tables containing a list of error messages</li>
+<li>error_message - applied to html div's containing controls to display an error message</li>
+<li>help_display - applied to displayable html div's containing controls to display help</li>
+<li>invalid_field - applied to controls in fields which have not validated successfully</li>
+<li>required - applied to controls for which some input is compulsory</li>
+<li>submit_actions - applied to html div containing submit/next/prev buttons</li>
+<li>submit_current - applied to submit button on current page of a form</li>
+<li>submit_next - applied to next-page-button on current page of a form</li>
+<li>submit_prev - applied to previous-page-button on current page of a form</li>
+</ul>
 <h3>Requirements</h3>
 <ul>
 <li>TODO PHP 5.1+</li>
 <li>The mcrypt extension is desirable for cacheing data when a 'EmailConfirmation' field is used</li>
+<li>TODO exensions for cache,mutex</li>
 </ul>
+<h3>Permissions</h3>
+TODO
 <h3>Support</h3>
 <p>This module is provided as-is. Please read the text of the license for the full disclaimer.
 Just to be clear, there's no guarantee of support. However, there are some resources available
