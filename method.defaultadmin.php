@@ -195,6 +195,24 @@ if($padm)
 	$oneset->help = $this->Lang('help_uploads_dir');
 	$cfgs[] = $oneset;
 
+	$oneset = new stdClass();
+	$oneset->title = $this->Lang('title_email_topdomains');
+	$oneset->input = $this->CreateInputText($id,'email_topdomains',$this->GetPreference('email_topdomains'),40,80);
+	$oneset->help = $this->Lang('help_email_topdomains');
+	$cfgs[] = $oneset;
+
+	$oneset = new stdClass();
+	$oneset->title = $this->Lang('title_email_domains');
+	$oneset->input = $this->CreateInputText($id,'email_domains',$this->GetPreference('email_domains'),40,80);
+	$oneset->help = $this->Lang('help_email_domains');
+	$cfgs[] = $oneset;
+
+	$oneset = new stdClass();
+	$oneset->title = $this->Lang('title_email_subdomains');
+	$oneset->input = $this->CreateInputText($id,'email_subdomains',$this->GetPreference('email_subdomains'),40,80);
+	$oneset->help = $this->Lang('help_email_subdomains');
+	$cfgs[] = $oneset;
+
 	$smarty->assign('configs',$cfgs);
 	$smarty->assign('start_configform',$this->CreateFormStart($id,'defaultadmin',$returnid));
 	$smarty->assign('submitcfg', $this->CreateInputSubmit($id,'submit',$this->Lang('save')));
@@ -204,13 +222,11 @@ else
 	$smarty->assign('padm',0);
 
 $js = <<<EOS
-function select_all(b) {
- var st = $(b).attr('checked');
- if(!st) st = false;
- $('input[name="{$id}sel[]"][type="checkbox"]').attr('checked',st);
+function select_all(cb) {
+ $('input[name="{$id}selected[]"][type="checkbox"]').attr('checked',cb.checked);
 }
 function sel_count() {
- var cb = $('input[name="{$id}sel[]"]:checked');
+ var cb = $('input[name="{$id}selected[]"]:checked');
  return cb.length;
 }
 function any_selected() {
