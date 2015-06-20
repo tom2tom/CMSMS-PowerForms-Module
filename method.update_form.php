@@ -78,7 +78,7 @@ $smarty->assign('title_submit_labels',$this->Lang('title_submit_labels'));
 $smarty->assign('title_submit_template',$this->Lang('title_submit_response'));
 
 $jsfuncs = array(); //script accumulator
-$theme = $gCms->variables['admintheme'];
+$theme = cmsms()->variables['admintheme'];
 
 $smarty->assign('icon_info',
 	$theme->DisplayImage('icons/system/info.gif',$this->Lang('help_help'),'','','systemicon tipper'));
@@ -158,7 +158,7 @@ foreach($formdata->FieldOrders as $one)
 if($fields)
 {
 	$smarty->assign('fields',$fields);
-	if(pwfUtils::HasDisposition($formdata))
+	if($funcs->HasDisposition($formdata))
 		$smarty->assign('text_ready',$this->Lang('title_ready'));
 	else
 	{
@@ -254,29 +254,24 @@ $smarty->assign('input_form_next_button',
 	$this->CreateInputText($id,'opt_next_button_text',
 		pwfUtils::GetFormOption($formdata,'next_button_text',$this->Lang('button_continue')),35,35));
 
-$smarty->assign('title_form_predisplay_udt',$this->Lang('title_form_predisplay_udt'));
-$smarty->assign('title_form_predisplay_each_udt',$this->Lang('title_form_predisplay_each_udt'));
-
-$usertagops = $gCms->GetUserTagOperations();
+$usertagops = cmsms()->GetUserTagOperations();
 $usertags = $usertagops->ListUserTags();
 $usertaglist = array();
 $usertaglist[$this->Lang('none')] = '';
 foreach($usertags as $key => $value)
 	$usertaglist[$value] = $key;
+
+$smarty->assign('title_form_predisplay_udt',$this->Lang('title_form_predisplay_udt'));
 $smarty->assign('input_form_predisplay_udt',
 	$this->CreateInputDropdown($id,'opt_predisplay_udt',$usertaglist,-1,
 		pwfUtils::GetFormOption($formdata,'predisplay_udt')));
+
+$smarty->assign('title_form_predisplay_each_udt',$this->Lang('title_form_predisplay_each_udt'));
 $smarty->assign('input_form_predisplay_each_udt',
 	$this->CreateInputDropdown($id,'opt_predisplay_each_udt',$usertaglist,-1,
 		pwfUtils::GetFormOption($formdata,'predisplay_each_udt')));
 
 $smarty->assign('title_form_validate_udt',$this->Lang('title_form_validate_udt'));
-$usertagops = $gCms->GetUserTagOperations();
-$usertags = $usertagops->ListUserTags();
-$usertaglist = array();
-$usertaglist[$this->Lang('none')] = '';
-foreach($usertags as $key => $value)
-	$usertaglist[$value] = $key;
 $smarty->assign('input_form_validate_udt',
 	$this->CreateInputDropdown($id,'opt_validate_udt',$usertaglist,-1,
 		pwfUtils::GetFormOption($formdata,'validate_udt')));
@@ -323,9 +318,9 @@ $smarty->assign('input_submit_action',
 	$this->CreateInputRadioGroup($id,'opt_submit_action',$postsubmits,
 		pwfUtils::GetFormOption($formdata,'submit_action','text'),'','&nbsp;&nbsp;'));
 
-$contentops = $gCms->GetContentOperations();
 $smarty->assign('input_redirect_page',
-	$contentops->CreateHierarchyDropdown('',pwfUtils::GetFormOption($formdata,'redirect_page','0'),$id.'opt_redirect_page'));
+	pwfUtils::CreateHierarchyPulldown($this,$id,'opt_redirect_page',
+		pwfUtils::GetFormOption($formdata,'redirect_page',0)));
 
 $tpl = pwfUtils::GetFormOption($formdata,'submission_template');
 if(!$tpl)
@@ -359,11 +354,7 @@ foreach(array(
 	'form_id',
 	'actionid',
 	'in_browser',
-	'form_start',
-	'form_end',
-	'hidden',
 	'help_icon',
-	'jscript',
 	'prev',
 	'submit',
 	'form_done',
