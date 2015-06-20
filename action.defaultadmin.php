@@ -16,6 +16,9 @@ if($padm)
 		$this->SetPreference('blank_invalid',!empty($params['blank_invalid']));
 		$this->SetPreference('enable_antispam',!empty($params['enable_antispam']));
 		$this->SetPreference('require_fieldnames',!empty($params['require_fieldnames']));
+		$this->SetPreference('email_topdomains',$params['email_topdomains']);
+		$this->SetPreference('email_domains',$params['email_domains']);
+		$this->SetPreference('email_subdomains',$params['email_subdomains']);
 		$t = trim($params['uploads_dir']);
 		if($t && $t[0] == DIRECTORY_SEPARATOR)
 			$t = substr($t,1);
