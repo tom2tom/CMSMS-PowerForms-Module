@@ -68,9 +68,9 @@ $dict->ExecuteSQLArray($sqlarray);
 
 $flds = "
 	record_id I(4) KEY,
-	code C(16),
+	pubkey C(16),
 	submitted ".CMS_ADODB_DT.",
-	contents B
+	content B
 ";
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_record',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
@@ -108,11 +108,11 @@ $this->SetPreference('default_phrase',uniqid('Enter at your own risk! Dangerous 
 $this->SetPreference('blank_invalid',0);
 $this->SetPreference('enable_antispam',1);
 $this->SetPreference('require_fieldnames',1);
-$this->SetPreference('adder_fields','basic'); //or 'advanced'
 //for email address checking by mailcheck
 $this->SetPreference('email_topdomains','com,net,org');
 $this->SetPreference('email_domains','gmail.com,aol.com');
 $this->SetPreference('email_subdomains','hotmail');
+$this->SetPreference('adder_fields','basic'); //or 'advanced'
 
 $fp = $config['uploads_path'];
 if($fp && is_dir($fp))
