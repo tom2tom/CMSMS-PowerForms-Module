@@ -25,16 +25,12 @@ class SortOrdersClosure
 		{
 			if($fb->IsDisposition)
 			{
-				if($fb->Type == 'PageRedirector') //page redirect last
-					return -1;
-				elseif($fb->DisplayInForm) //email confirmation first
-					return 1;
-				elseif($fa->Type == 'PageRedirector')
+				if($fb->DisplayInForm) //email confirmation first
 					return 1;
 				elseif($fa->DisplayInForm)
 					return -1;
 			}
-			elseif(!$fa->DisplayInForm)//includes $fa->Type == 'PageRedirector'
+			elseif(!$fa->DisplayInForm)
 				return 1;
 		}
 		elseif($fb->IsDisposition)
@@ -276,12 +272,20 @@ class pwfFormOperations
 		}
 
 		// store fields
-		foreach($formdata->Fields as &$one)
+		$newfields = array();
+		foreach($formdata->Fields as $key=>&$fld)
 		{
-			$one->Store(TRUE);
+			$fld->Store(TRUE);
+			if($key <= 0) //new field, after save it will include an actual id
+				$newfields[$key] = $fld->GetId();
 		}
-		unset($one);
-
+		unset($fld);
+		// conform array-keys of new fields
+		foreach($newfields as $key=>$newkey)
+		{
+			$formdata->Fields[$newkey] = $formdata->Fields[$key];
+			unset($formdata->Fields[$key]);
+		}
 		return array(TRUE,'');
 	}
 
