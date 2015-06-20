@@ -37,20 +37,29 @@ function Match_Browses(&$db,$pre)
 	$fld_X					$fld_Y
 	{$fb_form_header}		gone
 	{$fb_form_footer}		gone
-	{$fb_form_end}			{$form_end}{$jscript}
+	{$fb_form_start}		gone
+	{$fb_form_end}			gone
+	{$fb_hidden}			gone
+	$one->css_class			0
+	$one->required			0
+	$one->valid				0
+	$has_captcha			0
+	$captcha_error			0
 	$fb_*					$*
 	fbr_*					pwf_*
-	fb_invalid				fieldbad
+	fb_invalid				invalid_field
 	FormBuilder				PowerForms
 	$in_formbrowser			$in_browser
 	$fbr_id					$browser_id
-	//see above $fb_hidden	$hidden
 	$sub_form_name			$form_name
 	$sub_url				$form_url
 	$sub_host				$form_host
 	$sub_source_ip			$sub_source
 	$fb_version				$version
 	{$TAB}					"\t"
+	class="error"			class="error_list"
+	class="submit"			class="submit_actions"
+	class="fbr_helptext"	class="help_display"
 
 	$old_alias				$new_alias NEEDS manual update
 	{if ... $has_captcha .... {/if} NEEDS manual removal
@@ -67,9 +76,16 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 {
 	$finds = array(
 		'FormBuilder',
+		'$one->css_class',
+		'$one->required',
+		'$one->valid',
+		'$has_captcha',
+		'$captcha_error',
 		'{$fb_form_header}',
 		'{$fb_form_footer}',
+		'{$fb_form_start}',
 		'{$fb_form_end}',
+		'{$fb_hidden}',
 		'{$TAB}',
 		'$fb_version',
 		'fb_invalid',
@@ -80,16 +96,26 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		'$sub_form_name',
 		'$sub_url',
 		'$sub_host',
-		'$sub_source_ip'
+		'$sub_source_ip',
+		'class="error"',
+		'class="fbr_helptext",
+		'class="submit"'
 	);
 	$repls = array(
 		'PowerForms',
+		'0',
+		'0',
+		'0',
+		'0',
+		'0',
 		'',
 		'',
-		'{$form_end}{$jscript}',
+		'',
+		'',
+		'',
 		"\t",
 		'$version',
-		'fieldbad',
+		'invalid_field',
 		'$',
 		'$browser_id',
 		'pwf_',
@@ -97,7 +123,10 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		'$form_name',
 		'$form_url',
 		'$form_host',
-		'$sub_source'
+		'$sub_source',
+		'class="error_list"',
+		'class="help_display"'
+		'class="submit_actions"'
 	);
 
 	$sql = 'SELECT * FROM '.$pre.'module_pwf_trans WHERE NOT isform ORDER BY old_id';
