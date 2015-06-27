@@ -26,8 +26,6 @@ class PowerForms extends CMSModule
 	//pretty much everything is valid, provided there's an '@' in there!
 	//(we're concerned more about typo's than format!)
 	var $email_regex = '/.+@.+\..+/';
-	var $mutex = NULL; //object for serialising access, setup @ 1st use
-	var $cache = NULL; //object for cacheing of formdata objects, setup @ 1st use
 
 	function __construct()
 	{
@@ -375,6 +373,19 @@ class PowerForms extends CMSModule
 				$this->SetPreference('imported_fields',serialize($imports));
 			else
 				$this->SetPreference('imported_fields',FALSE);
+		}
+
+		$pre = cms_db_prefix();
+		$sql = 'SELECT field_id FROM '.$pre.'module_pwf_field WHERE type=?';
+		$classname = substr($classname,3); //strip 'pwf' namespace
+		$ids = $db->GetCol($sql,array($classname));
+		if($ids)
+		{
+			$join = implode(',',$ids);
+			$sql = 'DELETE FROM '.$pre.'module_pwf_field_opt WHERE field_id IN('.$join.')';
+			$db->Execute($sql);
+			$sql = 'DELETE FROM '.$pre.'module_pwf_field WHERE field_id IN('.$join.')';
+			$db->Execute($sql);
 		}
 	}
 
