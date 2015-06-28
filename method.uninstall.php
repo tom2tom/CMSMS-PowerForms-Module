@@ -56,6 +56,8 @@ $db->DropSequence($pre.'module_pwf_form_opt_seq');
 $db->DropSequence($pre.'module_pwf_record_seq');
 $db->DropSequence($pre.'module_pwf_uniquefield_seq');
 
+$this->DeleteTemplate();
+
 $fp = $config['uploads_path'];
 if($fp && is_dir($fp))
 {
@@ -75,9 +77,6 @@ $this->RemovePermission('ModifyPFSettings');
 $this->RemoveEvent('OnFormDisplay');
 $this->RemoveEvent('OnFormSubmit');
 $this->RemoveEvent('OnFormSubmitError');
-
-//CHECKME clean templates
-//$this->DeleteTemplate('pwf_*');
 
 $db->Execute('DELETE FROM '.$pre.'css WHERE css_name = ?', array('PowerForms Default Style'));
 
