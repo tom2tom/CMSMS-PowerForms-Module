@@ -112,10 +112,6 @@ class pwfUniqueFile extends pwfFieldBase
 		if(!$ud)
 			return array(FALSE,$mod->Lang('error_uploads_dir'));
 
-		$mx = pwfMutex::Get($mod);
-		if(!$mx || !$mx->lock(uniqid($this->Type)))
-			return array(FALSE,$mod->Lang('error_lock'));
-
 		pwfUtils::SetupFormVars($this->formdata);
 
 		$filespec = $this->GetOption('filespec');
@@ -123,6 +119,12 @@ class pwfUniqueFile extends pwfFieldBase
 			$fn = preg_replace('/[^\w\d\.]|\.\./','_',$mod->ProcessTemplateFromData($filespec));
 		else
 			$fn = 'form_submission_'.date('Y-m-d_His').'.txt';
+
+		$token = abs(crc32($fn.'mutex'));
+		$mx = pwfUtils::GetMutex();
+		if(!$mx || !$mx->lock($token))
+			return array(FALSE,$mod->Lang('error_lock'));
+
 		$fp = $ud.DIRECTORY_SEPARATOR.$fn;
 
 		$footer = $this->GetOption('file_footer');
@@ -178,7 +180,7 @@ class pwfUniqueFile extends pwfFieldBase
 		}
 		fclose($fh);
 
-		$mx->unlock();
+		$mx->unlock($token);
 		return array(TRUE,'');
 	}
 

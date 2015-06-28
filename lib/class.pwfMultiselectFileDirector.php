@@ -251,8 +251,10 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 		if(!$ud)
 			return array(FALSE,$mod->Lang('error_uploads_dir'));
 
-		$mx = pwfMutex::Get($mod);
-		if(!$mx || !$mx->lock(uniqid($this->Type)))
+		$fn = reset($this->Options['destination_filename']);
+		$token = abs(crc32($fn.'mutex'));
+		$mx = pwfUtils::GetMutex();
+		if(!$mx || !$mx->lock($token))
 			return array(FALSE,$mod->Lang('error_lock'));
 
 		pwfUtils::SetupFormVars($this->formdata);
@@ -325,7 +327,7 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 			}
 		}
 
-		$mx->unlock();
+		$mx->unlock($token);
 		return array(TRUE,'');
 	}
 
