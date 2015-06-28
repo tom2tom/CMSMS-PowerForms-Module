@@ -138,8 +138,8 @@ class pwfFieldOperations
 		if($obfield->Id <= 0)
 		{
 			$obfield->Id = $db->GenID($pre.'module_pwf_field_seq');
-			$sql = 'INSERT INTO '.$pre.'module_pwf_field (field_id,form_id,name,type,' .
-			  'required,validation_type,hide_label,order_by) VALUES (?,?,?,?,?,?,?,?)';
+			$sql = 'INSERT INTO '.$pre.
+'module_pwf_field (field_id,form_id,name,type,required,validation_type,hide_label,order_by) VALUES (?,?,?,?,?,?,?,?)';
 			$res = $db->Execute($sql,
 					array($obfield->Id,$obfield->FormId,$obfield->Name,$obfield->Type,
 						($obfield->Required?1:0),$obfield->ValidationType,$obfield->HideLabel,
@@ -147,8 +147,8 @@ class pwfFieldOperations
 		}
 		else
 		{
-			$sql = 'UPDATE ' .$pre.
-			  'module_pwf_field SET name=?,type=?,required=?,validation_type=?,order_by=?,hide_label=? WHERE field_id=?';
+			$sql = 'UPDATE '.$pre.
+'module_pwf_field SET name=?,type=?,required=?,validation_type=?,order_by=?,hide_label=? WHERE field_id=?';
 			$res = $db->Execute($sql,
 					array($obfield->Name,$obfield->Type,($obfield->Required?1:0),
 						$obfield->ValidationType,$obfield->OrderBy,$obfield->HideLabel,$obfield->Id));
@@ -164,8 +164,8 @@ class pwfFieldOperations
 			{
 				if(!is_array($optvalue))
 					$optvalue = array($optvalue);
-				$sql = 'INSERT INTO ' .$pre.
-				'module_pwf_field_opt (option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
+				$sql = 'INSERT INTO '.$pre.
+'module_pwf_field_opt (option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 				foreach($optvalue as &$one)
 				{
 					$newid = $db->GenID($pre.'module_pwf_field_opt_seq');
@@ -180,66 +180,62 @@ class pwfFieldOperations
 
 	/**
 	LoadField:
-	@obfield: reference to field data object
-	@deep: optional boolean, whether to also load all options for the field, default=TRUE
+	@obfield: reference to field data object, including (at least) the appropriate Id
 
-	Loads data for @obfield from database tables and possibly from @params.
-	Field options are merged with any existing options TODO OK?
-	TODO If @deep, sets field->Value from non-empty @params['value_'.$obfield->Name]
-	and/or @params['value_fld'.$obfield->Id]
+	Populates @obfield data from database tables.
+	Field data are merged with any existing data TODO OK?
 	Returns: boolean T/F per successful operation
 	*/
-	public static function LoadField(&$obfield) //,$deep=TRUE)
+	public static function LoadField(&$obfield)
 	{
 		$pre = cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
 		$db = cmsms()->GetDb();
 		if($row = $db->GetRow($sql,array($obfield->Id)))
 		{
+			$obfield->FormId = (int)$row['form_id'];
 			if(!$obfield->Name)
 				$obfield->Name = $row['name'];
 			$obfield->Type = $row['type'];
-			$obfield->OrderBy = $row['order_by'];
+			$obfield->OrderBy = (int)$row['order_by'];
 		}
 		else
 			return FALSE;
 
 		$obfield->loaded = TRUE;
 
-//		if($deep) never FALSE
-//		{
-			$sql = 'SELECT name,value FROM '.$pre.
-			  'module_pwf_field_opt WHERE field_id=? ORDER BY option_id';
-			$rs = $db->Execute($sql,array($obfield->Id));
-			if($rs)
+		$sql = 'SELECT name,value FROM '.$pre.
+		  'module_pwf_field_opt WHERE field_id=? ORDER BY option_id';
+		$rs = $db->Execute($sql,array($obfield->Id));
+		if($rs)
+		{
+			$newopts = array();
+			while ($row = $rs->FetchRow())
 			{
-				$newopts = array();
-				while ($row = $rs->FetchRow())
+				$nm = $row['name'];
+				//accumulate options with the same name into array
+				if(isset($newopts[$nm]))
 				{
-					$nm = $row['name'];
-					//accumulate options with the same name into array
-					if(isset($newopts[$nm]))
-					{
-						if(!is_array($newopts[$nm]))
-							$newopts[$nm] = array($newopts[$nm]);
-						$newopts[$nm][] = $row['value'];
-					}
-					else
-					{
-						$newopts[$nm] = $row['value'];
-						//TODO former properties, now migrated to options
-						if($nm == 'validation_type')
-							$obfield->ValidationType = $row['value'];
-						elseif($nm == 'required')
-							$obfield->Required = (int)$row['value'];
-						elseif($nm == 'hide_label')
-							$obfield->HideLabel = (int)$row['value'];
-					}
+					if(!is_array($newopts[$nm]))
+						$newopts[$nm] = array($newopts[$nm]);
+					$newopts[$nm][] = $row['value'];
 				}
-				$rs->Close();
-				$obfield->Options = array_merge($newopts,$obfield->Options);
+				else
+				{
+					$newopts[$nm] = $row['value'];
+					//TODO former properties, now migrated to options
+					if($nm == 'validation_type')
+						$obfield->ValidationType = $row['value'];
+					elseif($nm == 'required')
+						$obfield->Required = (int)$row['value'];
+					elseif($nm == 'hide_label')
+						$obfield->HideLabel = (int)$row['value'];
+				}
 			}
-//		}
+			$rs->Close();
+			$obfield->Options = array_merge($newopts,$obfield->Options);
+		}
+
 		return TRUE;
 	}
 
