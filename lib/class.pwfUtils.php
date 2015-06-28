@@ -7,6 +7,121 @@
 
 class pwfUtils
 {
+	private static $cache = NULL; //cache object
+	private static $mxtype = FALSE; //type of mutex in use - 'memcache' etc
+	private static $instance = NULL; //'instance' object for mutex class, if needed
+
+	/**
+	GetCache:
+	@storage: optional cache-type name, one (or more, ','-separated) of
+		auto,shmop,apc,memcached,wincache,xcache,memcache,redis,database
+		default = 'auto'
+	@settings: optional array of general and cache-type-specific parameters,
+		(e.g. see default array in this func)
+		default empty
+	Returns: cache-object self::cache (after creating it if not already done) or FALSE
+	*/
+	public static function GetCache($storage = 'auto', $settings = array())
+	{
+		if(self::cache)
+			return self::cache;
+
+		$config = cmsms()->GetConfig();
+		$url = $config['root_url'];
+		$settings = array_merge(
+			array(
+				'memcache' => array(
+					array($url,11211,1)
+				),
+				'redis' => array(
+					'host' => $url,
+					'port' => '',
+					'password' => '',
+					'database' => '',
+					'timeout' => ''
+				),
+				'database' => array(
+					'table' => cms_db_prefix().'module_pwf_cache'
+				)
+			), $settings);
+
+		if($storage)
+			$storage = strtolower($storage);
+		else
+			$storage = 'auto';
+		if(strpos($storage,'auto') !== FALSE)
+			$storage = 'shmop,apc,memcached,wincache,xcache,memcache,redis,database';
+
+		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR;
+		require($path.'interface.FastCache.php');
+		require($path.'FastCacheBase.php');
+
+		$types = explode(',',$storage);
+		foreach($types as $one)
+		{
+			$one = trim($one);
+			require($path.$one.'.php');
+			$class = 'pwfCache_'.$one;
+			try
+			{
+				self::cache = new $class($settings);
+				return self::cache;
+			}
+			catch(Exception $e) {}
+		}
+		return NULL;
+	}
+
+	/**
+	GetMutex:
+	@storage: optional cache-type name, one (or more, ','-separated) of
+		auto,memcache,semaphore,file,database, default = 'auto'
+	Returns: mutex-object or NULL
+	*/
+	public static function GetMutex($storage = 'auto')
+	{
+		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
+		require($path.'interface.Mutex.php');
+
+		if(self::mxtype)
+		{
+			$one = self::mxtype;
+			require($path.$one.'.php');
+			$class = 'pwbrMutex_'.$one;
+			$mutex = new $class(self::instance);
+			return $mutex;
+		}
+		else
+		{
+			if($storage)
+				$storage = strtolower($storage);
+			else
+				$storage = 'auto';
+			if(strpos($storage,'auto') !== FALSE)
+				$storage = 'memcache,semaphore,file,database';
+
+			$types = explode(',',$storage);
+			foreach($types as $one)
+			{
+				$one = trim($one);
+				$class = 'pwfMutex_'.$one;
+				try
+				{
+					require($path.$one.'.php');
+					$mutex = new $class();
+					self::$mxtype = $one;
+					if(isset($mutex->instance))
+						self::instance =& $mutex->instance;
+					else
+						self::instance = NULL;
+					return $mutex;
+				}
+				catch(Exception $e) {}
+			}
+			return NULL;
+		}
+	}
+
 //	const MAILERMINVERSION = '1.73'; //minumum acceptable version of CMSMailer module
 	/**
 	GetForms:
