@@ -112,6 +112,7 @@ class pwfFormOperations
 		unset($one);
 */
 		$mod->DeleteTemplate('pwf_'.$form_id);
+//		$mod->DeleteTemplate('pwf_sub_'.$form_id);
 		$pre = cms_db_prefix();
 		$db = cmsms()->GetDb();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_trans WHERE new_id=? AND isform=1';
@@ -124,7 +125,7 @@ class pwfFormOperations
 		$sql = 'DELETE FROM '.$pre.'module_pwf_form_opt WHERE form_id=?';
 		if(!$db->Execute($sql,array($form_id)))
 			$res = FALSE;
-		$sql = 'DELETE FROM '. $pre.'module_pwf_form WHERE form_id=?';
+		$sql = 'DELETE FROM '.$pre.'module_pwf_form WHERE form_id=?';
 		if(!$db->Execute($sql,array($form_id)))
 			$res = FALSE;
 		return ($res != FALSE);
@@ -186,21 +187,27 @@ class pwfFormOperations
 		$res = TRUE;
 		$sql = 'INSERT INTO '.$pre.
 		'module_pwf_form_opt (option_id,form_id,name,value) VALUES (?,?,?,?)';
-		foreach($formdata->Options as $key=>&$one)
+		foreach($formdata->Options as $key=>&$val)
 		{
 			$AttrId = $db->GenID($pre.'module_pwf_form_opt_seq');
 			if($key == 'form_template')
 			{
-				$mod->SetTemplate('pwf_'.$form_id,$one);
+				$mod->SetTemplate('pwf_'.$form_id,$val);
 				$val = 'pwf_'.$form_id;
 			}
-			if(!$db->Execute($sql,array($AttrId,$form_id,$key,$one)))
+/*			elseif($key == 'submission_template')
+			{
+				$mod->SetTemplate('pwf_sub_'.$form_id,$val);
+				$val = 'pwf_sub_'.$form_id;
+			}
+*/
+			if(!$db->Execute($sql,array($AttrId,$form_id,$key,$val)))
 			{
 				$params['message'] = $mod->Lang('database_error');
 				$res = FALSE;
 			}
 		}
-		unset($one);
+		unset($val);
 
 		$neworder = 1;
 		foreach($formdata->Fields as &$one)
@@ -265,7 +272,12 @@ class pwfFormOperations
 				$mod->SetTemplate('pwf_'.$form_id,$val);
 				$val = 'pwf_'.$form_id;
 			}
-			//TODO submission template too
+/*			elseif($key == 'submission_template')
+			{
+				$mod->SetTemplate('pwf_sub_'.$form_id,$val);
+				$val = 'pwf_sub_'.$form_id;
+			}
+*/
 			$newid = $db->GenID($pre.'module_pwf_form_opt_seq');
 			if(!$db->Execute($sql,array($newid,$form_id,$key,$val)))
 				return array(FALSE,$mod->Lang('database_error'));
@@ -322,6 +334,11 @@ class pwfFormOperations
 		$sql = 'SELECT name,value FROM '.$pre.'module_pwf_form_opt WHERE form_id=?';
 		$formdata->Options = $db->GetAssoc($sql,array($form_id));
 
+		$val = $formdata->Options['form_template'];
+		$formdata->Options['form_template'] = $mod->GetTemplate($val);
+//		$val = $formdata->Options['submission_template'];
+//		$formdata->Options['submission_template'] = $mod->GetTemplate($val);
+
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
 		$fields = $db->GetArray($sql,array($form_id));
 		if($fields)
@@ -347,7 +364,6 @@ class pwfFormOperations
 			}
 			unset($row);
 		}
-
 		return $formdata;
 	}
 
@@ -443,7 +459,10 @@ EOS;
 				else//smarty syntax can abort the xml-decoder - so mask it
 				{
 					if($name == 'form_template')
-						$value = $mod->GetTemplate('pwf_'.$form_id);
+						$value = $mod->GetTemplate($value);
+/*					elseif($name == 'submission_template')
+						$value = $mod->GetTemplate($value);
+*/
 					$xml[] = "\t\t\t<$name>]][[".urlencode(trim($value))."</$name>";
 				}
 			}
@@ -640,6 +659,12 @@ EOS;
 						$mod->SetTemplate('pwf_'.$form_id,$val);
 						$val = 'pwf_'.$form_id;
 					}
+/*					elseif($name == 'submission_template')
+					{
+						$mod->SetTemplate('pwf_sub_'.$form_id,$val);
+						$val = 'pwf_sub_'.$form_id;
+					}
+*/
 				}
 				$db->Execute($sql,array($option_id,$form_id,$name,$val));
 			}
