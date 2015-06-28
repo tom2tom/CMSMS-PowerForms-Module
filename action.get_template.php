@@ -14,6 +14,8 @@ else
     $sql = 'SELECT value FROM '.cms_db_prefix().
 		'module_pwf_form_opt WHERE form_id=? AND name=\'form_template\'';
 	$tplstr = $db->GetOne($sql,array($params['tid']));
+	if($tplstr && strncmp($tplstr,'pwf_',4) == 0)
+		$tplstr = $this->GetTemplate($tplstr);
 }
 
 if($tplstr)
