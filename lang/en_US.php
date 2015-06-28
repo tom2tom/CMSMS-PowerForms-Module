@@ -1151,14 +1151,23 @@ The PowerBrowse module code provides an example of this process in use.<p>
 <li>submit_next - applied to next-page-button on current page of a form</li>
 <li>submit_prev - applied to previous-page-button on current page of a form</li>
 </ul>
+<h3>Permissions</h3>
+<ul>
+<li>Modify Power Forms - add/delete/modify any form</li>
+<li>Modify PowerForms module settings - modify any configuration setting</li>
+</ul>
+<h3>Events</h3>
+<ul>
+<li>OnFormDisplay - triggered when a form is displayed</li>
+<li>OnFormSubmit - triggered when a form is submitted</li>
+<li>OnFormSubmitError - triggered if there is an error when a form is submitted</li>
+</ul>
 <h3>Requirements</h3>
 <ul>
 <li>TODO PHP 5.1+</li>
 <li>The mcrypt extension is desirable for cacheing data when a 'EmailConfirmation' field is used</li>
-<li>TODO exensions for cache,mutex</li>
+<li>TODO exensions for cache, mutex</li>
 </ul>
-<h3>Permissions</h3>
-TODO
 <h3>Support</h3>
 <p>This module is provided as-is. Please read the text of the license for the full disclaimer.
 Just to be clear, there's no guarantee of support. However, there are some resources available
