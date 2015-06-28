@@ -8,15 +8,16 @@ class pwfMutex_file implements pwfMutex
 {
 	var $pause;
 	var $maxtries;
-	var $fp; //lock-file path
-	var $fh; //file handle
+	var $fp; //lock-file directory path (with trailing separator)
+	var $fh; //opened-file handle
 
-	function __construct($timeout=200,$tries=200)
+	function __construct(&$instance=NULL,$timeout=200,$tries=200)
 	{
-		$ud = pwfUtils::GetUploadsPath();
-		if($ud == FALSE)
-			throw new Exception('Error getting file lock');
 		if(!function_exists('flock'))
+			throw new Exception('Error getting file lock');
+		$mod = cms_utils::get_module('PowerForms');
+		$ud = pwfUtils::GetUploadsPath($mod)
+		if($ud == FALSE)
 			throw new Exception('Error getting file lock');
 		$dir = $ud.DIRECTORY_SEPARATOR.'file_locks';
 		if(!file_exists($dir))
@@ -26,22 +27,17 @@ class pwfMutex_file implements pwfMutex
 		}
 		$this->pause = $timeout;
 		$this->maxtries = $tries;
-		$name = uniqid('pwf',TRUE);
-		$this->fp = $dir.DIRECTORY_SEPARATOR.$name.'.lock';
-		touch($this->fp,time());
+		$this->fp = $dir.DIRECTORY_SEPARATOR;
 		//TODO .htaccess for $dir
-	}
-
-	function timeout($msec=200)
-	{
-		$this->pause = $usec;
 	}
 
 	function lock($token)
 	{
-		$this->fh = fopen($this->fp,'r');
+		$fp = $this->fp.$token.'pwf.lock';
+		touch($fp,time());
+		$this->fh = fopen($fp,'r');
 		if($this->fh === FALSE)
-			throw new Exception("Error opening lock file {$this->fp}");
+			throw new Exception("Error opening lock file {$fp}");
 		$count = 0;
 		do
 		{
@@ -52,7 +48,7 @@ class pwfMutex_file implements pwfMutex
 		return FALSE; //failed
 	}
 
-	function unlock()
+	function unlock($token)
 	{
 		if(!flock($this->fh,LOCK_UN))
 			throw new Exception('Error unlocking mutex');
@@ -61,7 +57,9 @@ class pwfMutex_file implements pwfMutex
 
 	function reset()
 	{
-		$this->unlock();
+		$this->unlock('');
+		if(is_dir(dirname($this->fp)))
+			unlink($this->fp.'*pwf.lock');
 	}
 }
 
