@@ -19,12 +19,12 @@ class pwfUtils
 	@settings: optional array of general and cache-type-specific parameters,
 		(e.g. see default array in this func)
 		default empty
-	Returns: cache-object self::cache (after creating it if not already done) or FALSE
+	Returns: cache-object self::$cache (after creating it if not already done) or FALSE
 	*/
-	public static function GetCache($storage = 'auto', $settings = array())
+	public static function GetCache($storage='auto',$settings=array())
 	{
-		if(self::cache)
-			return self::cache;
+		if(self::$cache)
+			return self::$cache;
 
 		$config = cmsms()->GetConfig();
 		$url = $config['root_url'];
@@ -64,8 +64,8 @@ class pwfUtils
 			$class = 'pwfCache_'.$one;
 			try
 			{
-				self::cache = new $class($settings);
-				return self::cache;
+				self::$cache = new $class($settings);
+				return self::$cache;
 			}
 			catch(Exception $e) {}
 		}
@@ -78,17 +78,17 @@ class pwfUtils
 		auto,memcache,semaphore,file,database, default = 'auto'
 	Returns: mutex-object or NULL
 	*/
-	public static function GetMutex($storage = 'auto')
+	public static function GetMutex($storage='auto')
 	{
 		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
 		require($path.'interface.Mutex.php');
 
-		if(self::mxtype)
+		if(self::$mxtype)
 		{
-			$one = self::mxtype;
+			$one = self::$mxtype;
 			require($path.$one.'.php');
 			$class = 'pwbrMutex_'.$one;
-			$mutex = new $class(self::instance);
+			$mutex = new $class(self::$instance);
 			return $mutex;
 		}
 		else
@@ -111,9 +111,9 @@ class pwfUtils
 					$mutex = new $class();
 					self::$mxtype = $one;
 					if(isset($mutex->instance))
-						self::instance =& $mutex->instance;
+						self::$instance =& $mutex->instance;
 					else
-						self::instance = NULL;
+						self::$instance = NULL;
 					return $mutex;
 				}
 				catch(Exception $e) {}
