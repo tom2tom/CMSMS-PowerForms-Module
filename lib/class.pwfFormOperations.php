@@ -112,7 +112,7 @@ class pwfFormOperations
 		unset($one);
 */
 		$mod->DeleteTemplate('pwf_'.$form_id);
-//		$mod->DeleteTemplate('pwf_sub_'.$form_id);
+		$mod->DeleteTemplate('pwf_sub_'.$form_id);
 		$pre = cms_db_prefix();
 		$db = cmsms()->GetDb();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_trans WHERE new_id=? AND isform=1';
@@ -195,12 +195,11 @@ class pwfFormOperations
 				$mod->SetTemplate('pwf_'.$form_id,$val);
 				$val = 'pwf_'.$form_id;
 			}
-/*			elseif($key == 'submission_template')
+			elseif($key == 'submission_template')
 			{
 				$mod->SetTemplate('pwf_sub_'.$form_id,$val);
 				$val = 'pwf_sub_'.$form_id;
 			}
-*/
 			if(!$db->Execute($sql,array($AttrId,$form_id,$key,$val)))
 			{
 				$params['message'] = $mod->Lang('database_error');
@@ -236,7 +235,7 @@ class pwfFormOperations
 	{
 		$form_id = $formdata->Id;
 		$newform = ($form_id <= 0);
-		// if it's a new form,check for duplicate name and/or alias
+		// if it's a new form, check for duplicate name and/or alias
 		if($newform && !self::NewID($formdata->Name,$formdata->Alias))
 			return array(FALSE,$mod->Lang('duplicate_identifier'));
 
@@ -272,12 +271,11 @@ class pwfFormOperations
 				$mod->SetTemplate('pwf_'.$form_id,$val);
 				$val = 'pwf_'.$form_id;
 			}
-/*			elseif($key == 'submission_template')
+			elseif($key == 'submission_template')
 			{
 				$mod->SetTemplate('pwf_sub_'.$form_id,$val);
 				$val = 'pwf_sub_'.$form_id;
 			}
-*/
 			$newid = $db->GenID($pre.'module_pwf_form_opt_seq');
 			if(!$db->Execute($sql,array($newid,$form_id,$key,$val)))
 				return array(FALSE,$mod->Lang('database_error'));
@@ -357,7 +355,6 @@ class pwfFormOperations
 					$row = array_merge($row,$params); //TODO
 				}
 				$obfield = pwfFieldOperations::NewField($formdata,$id,$row);
-				$obfield->Store(TRUE); //get an id
 				$formdata->Fields[$obfield->Id] = $obfield;
 				if($obfield->Type == 'PageBreakField')
 					$formdata->PagesCount++;
@@ -659,12 +656,11 @@ EOS;
 						$mod->SetTemplate('pwf_'.$form_id,$val);
 						$val = 'pwf_'.$form_id;
 					}
-/*					elseif($name == 'submission_template')
+					elseif($name == 'submission_template')
 					{
 						$mod->SetTemplate('pwf_sub_'.$form_id,$val);
 						$val = 'pwf_sub_'.$form_id;
 					}
-*/
 				}
 				$db->Execute($sql,array($option_id,$form_id,$name,$val));
 			}

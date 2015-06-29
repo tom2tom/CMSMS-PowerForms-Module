@@ -322,7 +322,8 @@ $smarty->assign('input_redirect_page',
 	pwfUtils::CreateHierarchyPulldown($this,$id,'opt_redirect_page',
 		pwfUtils::GetFormOption($formdata,'redirect_page',0)));
 
-$tpl = pwfUtils::GetFormOption($formdata,'submission_template');
+//$tpl = pwfUtils::GetFormOption($formdata,'submission_template');
+$tpl = $this->GetTemplate('pwf_sub_'.$form_id);
 if(!$tpl)
 	$tpl = pwfUtils::CreateSampleTemplate($formdata,TRUE,FALSE);
 $smarty->assign('input_submit_template',

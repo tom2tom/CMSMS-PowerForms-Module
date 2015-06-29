@@ -147,6 +147,12 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		$tpl = str_replace($finds,$repls,$tpl);
 		$mod->SetTemplate('pwf_'.$newfid,$tpl);
 	}
+	$tpl = $mod->GetTemplate('pwf_sub_'.$newfid);
+	if($tpl)
+	{
+		$tpl = str_replace($finds,$repls,$tpl);
+		$mod->SetTemplate('pwf_sub_'.$newfid,$tpl);
+	}
 
 	$sql = 'SELECT option_id,value FROM '.$pre.'module_pwf_form_opt WHERE form_id=? AND name = \'submission_template\'';
 	$row = $db->GetOne($sql,array($newfid));
@@ -334,6 +340,11 @@ function Get_Opts(&$mod,&$db,$pre,$oldfid,$newfid)
 			{
 				$mod->SetTemplate('pwf_'.$newfid,$row['value']);
 				$row['value'] = 'pwf_'.$newfid;
+			}
+			elseif($row['name'] == 'submission_template')
+			{
+				$mod->SetTemplate('pwf_sub_'.$newfid,$row['value']);
+				$row['value'] = 'pwf_sub_'.$newfid;
 			}
 			$newopt = $db->GenID($pre.'module_pwf_form_opt_seq');
 			$db->Execute($sql,array($newopt,$newfid,$row['name'],$row['value']));
