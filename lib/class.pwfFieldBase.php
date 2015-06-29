@@ -235,13 +235,13 @@ class pwfFieldBase
 		return $this->IsEmailDisposition;
 	}
 
-	// Set flag determining whether this disposition field can inhibit (other) dispositions
+	// Set flag determining whether this disposition field is to be disposed (i.e. not inhibited)
 	function SetDispositionPermission($permitted=TRUE)
 	{
 		$this->DispositionPermitted = $permitted;
 	}
 
-	// Get flag determining whether this disposition field can inhibit (other) dispositions
+	// Get flag determining whether this disposition field is to be disposed
 	function DispositionIsPermitted()
 	{
 		return $this->DispositionPermitted;
@@ -647,6 +647,7 @@ class pwfFieldBase
 	*/
 	function Store($deep=FALSE)
 	{
+//	$this->DoNothing();
 		return pwfFieldOperations::StoreField($this,$deep);
 	}
 
