@@ -14,7 +14,7 @@ class pwfFieldBase
 	//field properties
 	var $ChangeRequirement = TRUE; //whether admin user may change $Required
 	var $DisplayInForm = TRUE;
-	var $DisplayInSubmission = TRUE;
+	var $DisplayInSubmission = TRUE; //whether field value is echoed in submission template (if used) (effectively ~ ::$IsInput)
 	var $DispositionPermitted = TRUE;
 	var $FormId = 0;
 	var $HasAddOp = FALSE;

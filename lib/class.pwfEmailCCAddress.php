@@ -20,7 +20,8 @@ class pwfEmailCCAddress extends pwfFieldBase
 
 	function GetFieldStatus()
 	{
-	  	foreach($this->formdata->Fields as &$one)
+//TODO advice about email addr
+		foreach($this->formdata->Fields as &$one)
 		{
 			if($one->GetId() == $this->GetOption('field_to_modify'))
 			{

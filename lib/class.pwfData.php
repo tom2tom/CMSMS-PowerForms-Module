@@ -12,7 +12,7 @@ class pwfData
 	public $prior_prefix = FALSE; //for prior-period
 	//known form-properties
 	public $Alias = '';
-	public $Fields = array(); //array of field objects, each key = field->Id
+	public $Fields = array(); //merged array of display and/or disposition field objects, each key = field->Id
 	public $FieldOrders = FALSE; //when needed, set to ordered array representing field->Orderby
 	public $Id = 0;
 	public $Name = '';
