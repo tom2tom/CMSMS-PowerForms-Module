@@ -781,12 +781,12 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 		return TRUE;
 	}
 
-	/**
+	/* *
 	HasDisposition:
 	@formdata: reference to pwfData form data object
 	Returns: boolean, TRUE if a disposition field is found among the fields in @formdata
 	*/
-	function HasDisposition(&$formdata)
+/*	function HasDisposition(&$formdata)
 	{
 		foreach($formdata->Fields as &$one)
 		{
@@ -799,7 +799,7 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 		unset($one);
 		return FALSE;
 	}
-
+*/
 	// $params[] interpreters
 
 	function GetId(&$params)
