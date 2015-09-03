@@ -75,7 +75,7 @@ class pwfComputed extends pwfFieldBase
 				}
 			}
 			$eval_string = FALSE;
-			break
+			break;
 		}
 
 		if($eval_string)
@@ -143,13 +143,13 @@ class pwfComputed extends pwfFieldBase
 		else
 		{
 			$ret = FALSE;
-			$messages[] = $mod->Lang('missing_type',$mod->Lang'TODO_eval'));
+			$messages[] = $mod->Lang('missing_type',$mod->Lang('TODO_eval'));
 		}
 		$val = $this->GetOption('compute_order');
 		if(!is_numeric($val) || $val < 1)
 		{
 			$ret = FALSE;
-			$messages[] = $mod->Lang('error_typed',$mod->Lang'TODO_order'));
+			$messages[] = $mod->Lang('error_typed',$mod->Lang('TODO_order'));
 		}
 		$msg = ($ret)?'':implode('<br />',$messages);
 	    return array($ret,$msg);

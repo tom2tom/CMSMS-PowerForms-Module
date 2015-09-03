@@ -35,7 +35,7 @@ class pwfUniqueInteger extends pwfFieldBase
 		$main[] = array($mod->Lang('title_show_to_user'),
 						$mod->CreateInputHidden($id,'opt_show_to_user',0).
 						$mod->CreateInputCheckbox($id,'opt_show_to_user',1,
-							this->GetOption('show_to_user',0)));
+							$this->GetOption('show_to_user',0)));
 		$adv[] = array($mod->Lang('title_use_random_generator'),
 						$mod->CreateInputHidden($id,'opt_use_random_generator',0).
 						$mod->CreateInputCheckbox($id,'opt_use_random_generator',1,

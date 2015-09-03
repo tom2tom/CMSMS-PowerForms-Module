@@ -80,7 +80,7 @@ class pwfRadioGroup extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_radio_separator'),
 						$mod->CreateInputText($id,'opt_radio_separator',
-							$this->GetOption('radio_separator','&nbsp;&nbsp'),15,25)
+							$this->GetOption('radio_separator','&nbsp;&nbsp'),15,25),
 						$mod->Lang('help_radio_separator'));
 		if($this->optionAdd)
 		{

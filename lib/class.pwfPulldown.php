@@ -108,7 +108,7 @@ class pwfPulldown extends pwfFieldBase
 			}
 			unset($one);
 //			$main[] = array($mod->Lang('title_pulldown_details'),$dests);
-			return array('main'=>$main,'adv'=>$adv,'table'=>$dests));
+			return array('main'=>$main,'adv'=>$adv,'table'=>$dests);
 		}
 		else
 		{

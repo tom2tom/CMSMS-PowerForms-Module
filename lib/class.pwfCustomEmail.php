@@ -70,7 +70,7 @@ class pwfCustomEmail extends pwfEmailBase
 							$this->GetOption('email_from_address')));
 		$main[] = array($mod->Lang('title_destination_field'),
 						$mod->CreateInputSelectList($id,'opt_destination_address'.$i,$displayfields,
-						$destfields,5)),
+							$destfields,5));
 		$main[] = $waslast;
 		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
 	}

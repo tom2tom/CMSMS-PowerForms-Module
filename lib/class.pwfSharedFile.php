@@ -101,7 +101,7 @@ class pwfSharedFile extends pwfFieldBase
 			'main'=>$main,
 			'adv'=>$adv,
 			'funcs'=>$revertscripts,
-			'extra'=>'varshelpadv')); //show variables-help on advanced tab
+			'extra'=>'varshelpadv'); //show variables-help on advanced tab
 	}
 
 	function Dispose($id,$returnid)

@@ -174,7 +174,7 @@ class pwfFileUpload extends pwfFieldBase
 			'id="'.$this->GetInputId().'"'.$this->GetScript()); // Input line
 		$ret .= $this->SetClass($tmp);
 		if($this->Value)
-		[
+		{
 			$tmp = $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.'delete__'.$this->Id,-1). //TODO is this used?
 				'&nbsp;'.$mod->Lang('delete').'<br />'; // Delete line
 			$ret .= $this->SetClass($tmp);
