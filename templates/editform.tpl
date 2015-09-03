@@ -40,7 +40,7 @@
    {if isset($title_field_alias)}<td>{$entry->alias}</td>{/if}
      <td>{$entry->type}</td>
      <td>{$entry->field_status}</td>
-     <td>{$entry->disposition}</td>
+     <td>{$entry->required}</td>
      <td class="updown">{$entry->up}</td>
      <td class="updown">{$entry->down}</td>
      <td>{$entry->editlink}</td>
@@ -57,11 +57,11 @@
  {else}
  <p class="pageinput">{$nofields}</p>
  {/if}
-	 <div id="addfast">
+	 <div class="addfast">
 	  <p class="pagetext">{$title_fastadd}</p>
 	  <div class="pageinput">{$input_fastadd}<br />{$help_fastadd}</div>
 	 </div>
-  	 <div id="addslow" class="pageinput">{$add_field_link}</div>
+  	 <div class="addslow pageinput">{$add_field_link}</div>
  </div>
 {$tab_end}{$designtab_start}
  <div class="pageoverflow">
@@ -125,12 +125,59 @@
   <p class="pageinput">{$input_form_validate_udt}</p>
  </div>
 {$tab_end}{$submittab_start}
-<p><strong>{$help_submit_tab}</strong></p>
  <div class="pageoverflow">
   <p class="pagetext">{$title_submit_button_safety}:</p>
   <p class="pageinput">{$input_submit_button_safety}</p>
   <p class="pagetext">{$title_submit_javascript}:</p>
   <p class="pageinput">{$input_submit_javascript}</p>
+  
+ {if !empty($dispositions)}
+  <p class="pagetext">{$title_form_dispositions}</p>
+  <table id="dispositions" class="pagetable tabledrag">
+   <thead><tr>
+  {if isset($title_field_id)}<th>{$title_field_id}</th>{/if}
+    <th style="width:15em;">{$title_field_name}</th>
+  {if isset($title_field_alias)}<th style="width:10em;">{$title_field_alias}</th>{/if}
+    <th style="width:20em;">{$title_field_type}</th>
+    <th style="width:25em;">{$title_information}</th>
+    <th class="updown" style="width:20px;">&nbsp;</th>
+    <th class="updown" style="width:20px;">&nbsp;</th>
+    <th class="pageicon"></th>
+    <th class="pageicon"></th>
+    <th class="pageicon"></th>
+   </tr></thead>
+   <tbody>
+  {foreach from=$dispositions item=entry}
+   {cycle name=fields values='row1,row2' assign=rowclass}
+  	 <tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
+   {if isset($title_field_id)}<td>{$entry->id}</td>{/if}
+     <td>{$entry->order}{$entry->name}</td>
+   {if isset($title_field_alias)}<td>{$entry->alias}</td>{/if}
+     <td>{$entry->type}</td>
+     <td>{$entry->field_status}</td>
+     <td class="updown">{$entry->up}</td>
+     <td class="updown">{$entry->down}</td>
+     <td>{$entry->editlink}</td>
+     <td>{$entry->copylink}</td>
+     <td>{$entry->deletelink}</td>
+     </tr>
+  {/foreach}
+   </tbody>
+  </table>
+  <div class="reordermsg pagemessage" style="margin-left:10%;display:none">
+  <p>{$help_can_drag}</p>
+  <div id="saveordermsg" style="display:none"><p>{$help_save_order}</p></div>
+  </div>
+ {else}
+ <p class="pageinput">{$nodispositions}</p>
+ {/if}
+	 <div class="addfast">
+	  <p class="pagetext">{$title_fastadd2}</p>
+	  <div class="pageinput">{$input_fastadd2}<br />{$help_fastadd2}</div>
+	 </div>
+  	 <div class="addslow pageinput">{$add_disposition_link}</div>
+  <br />
+  
   <p class="pagetext">{$title_submit_action}:</p>
   <p class="pageinput">{$input_submit_action}</p>
   <div id="pageobjects">
