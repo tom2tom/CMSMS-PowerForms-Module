@@ -10,7 +10,6 @@ class pwfHTML5Number extends pwfFieldBase
 	function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->DisplayInSubmission = FALSE;
 		$this->IsInput = TRUE;
 		$this->IsSortable = TRUE;
 		$this->Type = 'HTML5Number';
