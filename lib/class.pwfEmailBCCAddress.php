@@ -20,8 +20,9 @@ class pwfEmailBCCAddress extends pwfFieldBase
 
 	function GetFieldStatus()
 	{
+//TODO advice about email addr
 		$target = $this->GetOption('field_to_modify');
-	  	foreach($this->formdata->Fields as &$one)
+		foreach($this->formdata->Fields as &$one)
 		{
 			if($one->GetId() == $target)
 			{
@@ -50,7 +51,7 @@ class pwfEmailBCCAddress extends pwfFieldBase
 
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_field_to_modify'),
+		$main[] = array($mod->Lang('title_field_to_modify2'),
 						$mod->CreateInputDropdown($id,'opt_field_to_modify',$choices,-1,
 							$this->GetOption('field_to_modify')));
 		return array('main'=>$main,'adv'=>$adv);
