@@ -47,4 +47,4 @@ table.rightwards {
 //.captcha {}
 .dndhelp { display:none; } /* changed at runtime if js is available */
 img.tipper { display:none; } /* ditto */
-#addfast { display:none; } /* ditto */
+.addfast { display:none; } /* ditto */
