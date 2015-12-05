@@ -16,13 +16,13 @@ class pwfMutex_file implements pwfMutex
 		if(!function_exists('flock'))
 			throw new Exception('Error getting file lock');
 		$mod = cms_utils::get_module('PowerForms');
-		$ud = pwfUtils::GetUploadsPath($mod)
+		$ud = pwfUtils::GetUploadsPath($mod);
 		if($ud == FALSE)
 			throw new Exception('Error getting file lock');
 		$dir = $ud.DIRECTORY_SEPARATOR.'file_locks';
 		if(!file_exists($dir))
 		{
-			if(!@mkdir($dir) && !file_exists($dir)) 
+			if(!@mkdir($dir) && !file_exists($dir))
 				throw new Exception('Error getting file lock');
 		}
 		$this->pause = $timeout;
@@ -44,7 +44,7 @@ class pwfMutex_file implements pwfMutex
 			if(flock($this->fh,LOCK_EX))
 				return TRUE;
 			usleep($this->pause);
-		} while($this->maxtries == 0 || $count++ < $this->maxtries)
+		} while($this->maxtries == 0 || $count++ < $this->maxtries);
 		return FALSE; //failed
 	}
 

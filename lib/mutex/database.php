@@ -14,7 +14,7 @@ class pwfMutex_database implements pwfMutex
 	{
 		$this->pause = $timeout;
 		$this->maxtries = $tries;
-		$this->table = cms_db_prefix().'module_pwf_flock'; 
+		$this->table = cms_db_prefix().'module_pwf_flock';
 	}
 
 	function lock($token)
@@ -22,7 +22,7 @@ class pwfMutex_database implements pwfMutex
 		$flid = abs(crc32($token.'pwf.lock'));
 		$db = cmsms()->GetDb();
 		$stamp = $db->sysTimeStamp;
-		$sql = 'INSERT INTO '.$this->table.' (flock_id,flock) VALUES ('.$flid.','$stamp.')';
+		$sql = 'INSERT INTO '.$this->table.' (flock_id,flock) VALUES ('.$flid.','.$stamp.')';
 		$count = 0;
 		do
 		{
@@ -33,7 +33,7 @@ class pwfMutex_database implements pwfMutex
 				$db->Execute('DELETE FROM '.$this->table);
 */
 			usleep($this->pause);
-		} while(/*$this->maxtries == 0 || */$count++ < $this->maxtries)
+		} while(/*$this->maxtries == 0 || */$count++ < $this->maxtries);
 		return FALSE; //failed
 	}
 
