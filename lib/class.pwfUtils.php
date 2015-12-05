@@ -7,9 +7,9 @@
 
 class pwfUtils
 {
-	private static $cache = NULL; //cache object
-	private static $mxtype = FALSE; //type of mutex in use - 'memcache' etc
-	private static $instance = NULL; //'instance' object for mutex class, if needed
+	private $cache = NULL; //cache object
+	private $mxtype = FALSE; //type of mutex in use - 'memcache' etc
+	private $instance = NULL; //'instance' object for mutex class, if needed
 
 	/**
 	GetCache:
@@ -19,12 +19,14 @@ class pwfUtils
 	@settings: optional array of general and cache-type-specific parameters,
 		(e.g. see default array in this func)
 		default empty
-	Returns: cache-object self::$cache (after creating it if not already done) or FALSE
+	Returns: cache-object (after creating it if not already done) or FALSE
 	*/
 	public static function GetCache($storage='auto',$settings=array())
 	{
-		if(self::$cache)
-			return self::$cache;
+		if($this->cache == NULL && isset($_SESSION['pwfcache']))
+			$this->cache = $_SESSION['pwfcache'];
+		if($this->cache)
+			return $this->cache;
 
 		$config = cmsms()->GetConfig();
 		$url = $config['root_url'];
@@ -64,10 +66,15 @@ class pwfUtils
 			$class = 'pwfCache_'.$one;
 			try
 			{
-				self::$cache = new $class($settings);
-				return self::$cache;
+				$cache = new $class($settings);
 			}
-			catch(Exception $e) {}
+			catch(Exception $e)
+			{
+				continue;
+			}
+			$this->cache = $cache;
+			$_SESSION['pwfcache'] = $cache;
+			return $this->cache;
 		}
 		return NULL;
 	}
@@ -83,12 +90,16 @@ class pwfUtils
 		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
 		require($path.'interface.Mutex.php');
 
-		if(self::$mxtype)
+		if(!$this->$mxtype && isset($_SESSION['pwfmxtype']))
+			$this->$mxtype = $_SESSION['pwfmxtype'];
+		if($this->$mxtype)
 		{
-			$one = self::$mxtype;
+			$one = $this->mxtype;
 			require($path.$one.'.php');
 			$class = 'pwbrMutex_'.$one;
-			$mutex = new $class(self::$instance);
+			if(!$this->$instance && isset($_SESSION['pwfmxinstance']))
+				$this->$instance = $_SESSION['pwfmxinstance'];
+			$mutex = new $class($this->$instance);
 			return $mutex;
 		}
 		else
@@ -109,14 +120,19 @@ class pwfUtils
 				{
 					require($path.$one.'.php');
 					$mutex = new $class();
-					self::$mxtype = $one;
-					if(isset($mutex->instance))
-						self::$instance =& $mutex->instance;
-					else
-						self::$instance = NULL;
-					return $mutex;
 				}
-				catch(Exception $e) {}
+				catch(Exception $e)
+				{
+					continue;
+				}
+				$this->mxtype = $one;
+				$_SESSION['pwfmxtype'] = $one;
+				if(isset($mutex->instance))
+					$this->$instance =& $mutex->instance;
+				else
+					$this->$instance = NULL;
+				$_SESSION['pwfmxinstance'] = $this->$instance;
+				return $mutex;
 			}
 			return NULL;
 		}
@@ -140,7 +156,7 @@ class pwfUtils
 	}
 
 	//support for field-selection menu-item sorting
-	private static function labelcmp($a,$b)
+	private function labelcmp($a,$b)
 	{
 		$fa = $a[0];
 		$fb = $b[0];
@@ -217,7 +233,7 @@ class pwfUtils
 				$mod->field_types[$mod->Lang($menukey)] = $classname;
 			}
 		}
-		uksort($mod->field_types,array('pwfUtils','labelcmp'));
+		uksort($mod->field_types,array($this,'labelcmp'));
 
 		$mod->std_field_types = array(
 			$mod->Lang('field_type_Checkbox')=>'pwfCheckbox',
@@ -228,7 +244,7 @@ class pwfUtils
 			$mod->Lang('field_type_Text')=>'pwfText',
 			$mod->Lang('field_type_SystemEmail')=>'pwfSystemEmail',
 			$mod->Lang('field_type_SharedFile')=>'pwfSharedFile');
-		uksort($mod->std_field_types,array('pwfUtils','labelcmp'));
+		uksort($mod->std_field_types,array($this,'labelcmp'));
 	}
 
 	/**
@@ -256,7 +272,7 @@ class pwfUtils
 				$menulabel = $t.$obfld->mymodule->Lang($obfld->MenuKey);
 				$mod->field_types[$menulabel] = $classname;
 				if($sort)
-					uksort($mod->field_types,array('pwfUtils','fieldcmp'));
+					uksort($mod->field_types,array($this,'labelcmp'));
 			}
 		}
 	}
@@ -563,7 +579,7 @@ EOS;
 	/**
 	AddTemplateVariable:
 	Adds a member to the $templateVariables array in @formdata (to be used for variables-help)
-	@formdata: reference to pwfData object for form 
+	@formdata: reference to pwfData object for form
 	@name: variable name (excluding '$')
 	@langkey: lang-array key for variable description
 	*/
@@ -576,7 +592,7 @@ EOS;
 	FormFieldsHelp:
 	Document contents of Fields array in @formdata, and append the contents of
 	array @extras
-	@formdata: reference to pwfData object for form 
+	@formdata: reference to pwfData object for form
 	@$extras: optional array of items to be appended to the output, each member
 		having key=id, value=name default = empty array
 	Returns: xhtml string which generates a tabular help description
@@ -607,7 +623,7 @@ EOS;
 				$rows[] = $oneset;
 			}
 		}
-		
+
 		$smarty->assign('rows',$rows);
 		return $mod->ProcessTemplate('varshelp.tpl');
 	}
@@ -617,7 +633,7 @@ EOS;
 	Setup variables-help for a form's submission-template. Essentially, it sets
 	smarty variable 'help_subtplvars' to the output from processing the template
 	varshelp.tpl
-	@formdata: reference to pwfData object for form 
+	@formdata: reference to pwfData object for form
 	@mod: reference to current PowerBrowse module object
 	@smarty: reference to smarty object
 	*/
