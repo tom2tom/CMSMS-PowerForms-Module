@@ -649,13 +649,13 @@ $lang['help_show_limitations'] = 'Display any size and extension restrictions wi
 $lang['help_single_check'] = 'The boxes will together behave like a radio group, except that all of them may be unchecked';
 $lang['help_submit_javascript'] = 'Make this the complete Javascript call, including the event you want to trap, e.g., onclick="yourfn()".<br />This will probably not work well if you use the "safety script" option above.';
 $lang['help_submit_safety'] = 'Add Javascript to final \'Submit\' button that will help prevent multiple submissions';
-$lang['help_submit_tab'] = <<<EOS
-What the module does with submitted data is determined by "Disposition" fields (such as generated emails) in the form, not here.
-EOS;
+//$lang['help_submit_tab'] = <<<EOS
+//What the module does with submitted data is determined by "Disposition" fields (such as generated emails) in the form, not here.
+//EOS;
 $lang['help_submit_template'] = <<<EOS
 This template is to generate content displayed to the user after the form is submitted and processed.
 The template is not relevant to form-field disposition. Disposition-specific templates are (where appropriate)
-set in the "advanced" tab for the disposition field.
+set in the "advanced" tab displayed when editing a disposition field, as listed above.
 EOS;
 $lang['help_uploads_dir']='Filesystem path relative to website-host uploads directory. No leading or trailing path-separator, and any intermediate path-separator must be host-system-specific e.g. \'\\\' on Windows. If left blank, the default will be used.';
 $lang['help_url'] = 'Entire URL, including protocol and path (e.g. http://myhost.com/form_handler.cgi)';
@@ -712,6 +712,7 @@ $lang['next'] = 'Next page';
 $lang['no'] = 'No';
 $lang['no_admins'] = 'No site administrator is available';
 $lang['no_default'] = 'No Default';
+$lang['no_dispositions'] = 'No diposition-field is registered';
 $lang['no_field_assigned'] = 'No field assigned for %s';
 $lang['no_fields'] = 'No field is registered';
 $lang['no_forms'] = 'No form is registered';
@@ -792,7 +793,7 @@ $lang['table_left_template'] = 'Table Template, Titles on left';
 $lang['table_top_template'] = 'Table Template, Title on top';
 //$lang['tab_main'] = 'Main';
 $lang['tab_submissiontemplate'] = 'Submission Template';
-$lang['tab_submit'] = 'Submission';
+$lang['tab_submit'] = 'Processing';
 $lang['tab_templatelayout'] = 'Template';
 $lang['tab_udt'] = 'UDT Integration';
 $lang['taskdescription_clearold'] = 'Clear database records which are old';
@@ -808,6 +809,7 @@ $lang['title_24_hour'] = 'Use 24-hour clock';
 $lang['title_aborted'] = 'Cannot proceed';
 $lang['title_active_only'] = 'Only include active users?';
 $lang['title_add_button_text'] = 'Add button text';
+$lang['title_add_new_disposition'] = 'Add new disposition';
 $lang['title_add_new_field'] = 'Add new field';
 $lang['title_add_new_form'] = 'Add new form';
 $lang['title_additional'] = 'Additional submission';
@@ -892,7 +894,9 @@ $lang['title_field_required'] = 'Required';
 $lang['title_field_required_abbrev'] = 'Req\'d';
 $lang['title_field_resources'] = 'Extra content to accompany field';
 $lang['title_field_siblings'] = 'Link this field to its sibling';
+//TODO next 2 are stupid
 $lang['title_field_to_modify'] = 'Email field to add CC address';
+$lang['title_field_to_modify2'] = 'Email field to add BCC address';
 $lang['title_field_to_validate'] = 'Field to validate';
 $lang['title_field_type'] = 'Type';
 $lang['title_field_validation'] = 'Validation';
@@ -909,6 +913,7 @@ $lang['title_file_type'] = 'Choose a file type to use';
 $lang['title_form_alias'] = 'Alias';
 $lang['title_form_css_class'] = 'Form CSS class';
 $lang['title_form_displaytype'] = 'Form display Type';
+$lang['title_form_dispositions'] = 'Form dispositions';
 $lang['title_form_field'] = 'Field represented';
 $lang['title_form_fields'] = 'Form fields';
 $lang['title_form_main'] = 'Main form details';
@@ -1023,8 +1028,10 @@ $lang['title_submit_response'] = 'Post-submission template';
 $lang['title_suppress_attachment'] = 'Deny file to be attached with emails';
 $lang['title_suppress_filename'] = 'Suppress filename in emails and forms the end user will see';
 $lang['title_switch_advanced'] = 'Need more field types? ';
+$lang['title_switch_advanced2'] = 'Need more disposition types? ';
 $lang['title_switch_advanced_link'] = 'Switch to advanced mode';
 $lang['title_switch_basic'] = 'Too many confusing field types? ';
+$lang['title_switch_basic2'] = 'Too many confusing disposition types? ';
 $lang['title_switch_basic_link'] = 'Switch to simple mode';
 $lang['title_tag'] = 'Tag';
 $lang['title_target_page'] = 'Link to site page';
