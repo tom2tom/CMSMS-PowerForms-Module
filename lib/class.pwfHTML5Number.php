@@ -46,13 +46,13 @@ class pwfHTML5Number extends pwfFieldBase
 			$messages[] = $mod->Lang('error_typed',$mod->Lang('minumum'));
 		}
 		$max = $this->GetOption('max_number');
-		if(!$max || !is_numeric($max) || $max <= $min))
+		if(!$max || !is_numeric($max) || $max <= $min)
 		{
 			$ret = FALSE;
 			$messages[] = $mod->Lang('error_typed',$mod->Lang('maximum'));
 		}
 		$step = $this->GetOption('step_number');
-		if(!$step || !is_numeric($step) || $step >= $max))
+		if(!$step || !is_numeric($step) || $step >= $max)
 		{
 			$ret = FALSE;
 			$messages[] = $mod->Lang('error_typed',$mod->Lang('increment'));

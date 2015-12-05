@@ -98,7 +98,7 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		'$sub_host',
 		'$sub_source_ip',
 		'class="error"',
-		'class="fbr_helptext",
+		'class="fbr_helptext"',
 		'class="submit"'
 	);
 	$repls = array(
@@ -125,7 +125,7 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		'$form_host',
 		'$sub_source',
 		'class="error_list"',
-		'class="help_display"'
+		'class="help_display"',
 		'class="submit_actions"'
 	);
 
@@ -203,7 +203,7 @@ function Get_FieldOpts(&$db,$pre,$oldfid,$newfid,$oldf,$newf,&$fieldrow)
 		 'DispositionEmailBasedFrontendFields',
 		 'DispositionFileDirector',
 		 'DispositionMultiselectFileDirector',
-		 'DispositionPageRedirector'
+		 'DispositionPageRedirector',
 		 'MultiselectField',
 		 'PulldownField',
 		 'RadioGroupField',
