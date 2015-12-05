@@ -88,8 +88,8 @@ $(document).ready(function() {
 		$(this).parent().parent().find('.showhelp').slideToggle();
 	});
 	$('.reordermsg').show()
-	$('#addslow').hide();
-	$('#addfast').show();
+	$('.addslow').hide();
+	$('.addfast').show();
 	if($('input[name="m1_opt_submit_action"]:checked').val() == 'redir') {
       $('#tplobjects').hide();
 	} else {
