@@ -17,6 +17,10 @@
  <div class="pageoverflow">
  {if !empty($fields)}
   <p class="pagetext">{$title_form_fields}</p>
+  <div class="reordermsg pagemessage" style="display:none">
+  <p class="pageinput">{$help_can_drag}</p>
+  <div id="saveordermsg" style="display:none"><p class="pageinput">{$help_save_order}</p></div>
+  </div>
   <table id="fields" class="pagetable tabledrag">
    <thead><tr>
   {if isset($title_field_id)}<th>{$title_field_id}</th>{/if}
@@ -50,10 +54,6 @@
   {/foreach}
    </tbody>
   </table>
-  <div class="reordermsg pagemessage" style="margin-left:10%;display:none">
-  <p>{$help_can_drag}</p>
-  <div id="saveordermsg" style="display:none"><p>{$help_save_order}</p></div>
-  </div>
  {else}
  <p class="pageinput">{$nofields}</p>
  {/if}
@@ -130,14 +130,15 @@
   <p class="pageinput">{$input_submit_button_safety}</p>
   <p class="pagetext">{$title_submit_javascript}:</p>
   <p class="pageinput">{$input_submit_javascript}</p>
-  
  {if !empty($dispositions)}
   <p class="pagetext">{$title_form_dispositions}</p>
-  <table id="dispositions" class="pagetable tabledrag">
+  <div class="reordermsg pagemessage" style="display:none">
+  <p class="pageinput">{$help_can_drag}</p>
+  <div id="saveordermsg" style="display:none"><p class="pageinput">{$help_save_order}</p></div>
+  </div>
+  <table id="dispositions" class="pageinput tabledrag">
    <thead><tr>
-  {if isset($title_field_id)}<th>{$title_field_id}</th>{/if}
     <th style="width:15em;">{$title_field_name}</th>
-  {if isset($title_field_alias)}<th style="width:10em;">{$title_field_alias}</th>{/if}
     <th style="width:20em;">{$title_field_type}</th>
     <th style="width:25em;">{$title_information}</th>
     <th class="updown" style="width:20px;">&nbsp;</th>
@@ -150,9 +151,7 @@
   {foreach from=$dispositions item=entry}
    {cycle name=fields values='row1,row2' assign=rowclass}
   	 <tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
-   {if isset($title_field_id)}<td>{$entry->id}</td>{/if}
      <td>{$entry->order}{$entry->name}</td>
-   {if isset($title_field_alias)}<td>{$entry->alias}</td>{/if}
      <td>{$entry->type}</td>
      <td>{$entry->field_status}</td>
      <td class="updown">{$entry->up}</td>
@@ -164,10 +163,6 @@
   {/foreach}
    </tbody>
   </table>
-  <div class="reordermsg pagemessage" style="margin-left:10%;display:none">
-  <p>{$help_can_drag}</p>
-  <div id="saveordermsg" style="display:none"><p>{$help_save_order}</p></div>
-  </div>
  {else}
  <p class="pageinput">{$nodispositions}</p>
  {/if}
@@ -177,7 +172,6 @@
 	 </div>
   	 <div class="addslow pageinput">{$add_disposition_link}</div>
   <br />
-  
   <p class="pagetext">{$title_submit_action}:</p>
   <p class="pageinput">{$input_submit_action}</p>
   <div id="pageobjects">
