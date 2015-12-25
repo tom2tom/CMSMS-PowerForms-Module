@@ -19,17 +19,20 @@
 
 class PowerForms extends CMSModule
 {
+	public $before20;
 	//these are populated when first used
-	var $field_types = FALSE; //array of all usable field classnames
-	var $std_field_types = FALSE; //subset of $field_types, classes for use in 'fast-adder' simple mode
+	public $field_types = FALSE; //array of all usable field classnames
+	public $std_field_types = FALSE; //subset of $field_types, classes for use in 'fast-adder' simple mode
 	//this regex is used by several field-types, not just email*
 	//pretty much everything is valid, provided there's an '@' in there!
 	//(we're concerned more about typo's than format!)
-	var $email_regex = '/.+@.+\..+/';
+	public $email_regex = '/.+@.+\..+/';
 
 	function __construct()
 	{
 		parent::__construct();
+		global $CMS_VERSION;
+		$this->before20 = (version_compare($CMS_VERSION,'2.0') < 0);
 		require_once cms_join_path(dirname(__FILE__),'lib','class.pwfData.php');
 		$this->RegisterModulePlugin(TRUE);
 	}
@@ -40,6 +43,11 @@ class PowerForms extends CMSModule
 	}
 
 	function AllowAutoUpgrade()
+	{
+		return FALSE;
+	}
+
+	function AllowSmartyCaching()
 	{
 		return FALSE;
 	}
