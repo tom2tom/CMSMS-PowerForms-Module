@@ -8,19 +8,19 @@
  * http://pecl.php.net/package/redis
  */
 
-class pwfCache_redis extends pwfCacheBase implements pwfCache {
+class FastCache_redis extends FastCacheBase implements iFastCache {
 
-	var $instant;
+	var $instance;
 	var $checked_redis = false;
 
 	function __construct($config = array()) {
 		if($this->checkdriver()) {
-			$this->instant = new Redis();
+			$this->instance = new Redis();
 			$this->setup($config);
 			if($this->connectServer()) {
 				return;
 			}
-			unset($this->instant);
+			unset($this->instance);
 		}
 		throw new Exception('no redis storage');
 	}
@@ -71,12 +71,12 @@ class pwfCache_redis extends pwfCacheBase implements pwfCache {
 				$c['read_write_timeout'] = $read_write_timeout;
 			}
 
-			if(!$this->instant->connect($host,(int)$port,(int)$timeout)) {
+			if(!$this->instance->connect($host,(int)$port,(int)$timeout)) {
 				$this->checked_redis = true;
 				return false;
 			} else {
 				if($database!='') {
-					$this->instant->select((int)$database);
+					$this->instance->select((int)$database);
 				}
 				$this->checked_redis = true;
 				return true;
@@ -88,9 +88,9 @@ class pwfCache_redis extends pwfCacheBase implements pwfCache {
 	function driver_set($keyword, $value = '', $time = 300, $option = array() ) {
 		$value = $this->encode($value);
 		if (empty($option['skipExisting'])) {
-			$ret = $this->instant->set($keyword, $value, $time);
+			$ret = $this->instance->set($keyword, $value, $time);
 		} else {
-			$ret = $this->instant->set($keyword, $value, array('xx', 'ex' => $time));
+			$ret = $this->instance->set($keyword, $value, array('xx', 'ex' => $time));
 		}
 		if($ret) {
 			$this->index[$keyword] = 1;
@@ -100,7 +100,7 @@ class pwfCache_redis extends pwfCacheBase implements pwfCache {
 
 	// return cached value or null
 	function driver_get($keyword, $option = array()) {
-		$x = $this->instant->get($keyword);
+		$x = $this->instance->get($keyword);
 		if($x) {
 			return $this->decode($x);
 		} else {
@@ -113,7 +113,7 @@ class pwfCache_redis extends pwfCacheBase implements pwfCache {
 	}
 
 	function driver_delete($keyword, $option = array()) {
-		$this->instant->delete($keyword);
+		$this->instance->delete($keyword);
 		unset($this->index[$keyword]);
 		return true;
 	}
@@ -122,17 +122,17 @@ class pwfCache_redis extends pwfCacheBase implements pwfCache {
 		return array(
 			'info' => '',
 			'size' => count($this->index),
-			'data' => $this->instant->info(),
+			'data' => $this->instance->info(),
 		);
 	}
 
 	function driver_clean($option = array()) {
-		$this->instant->flushDB();
+		$this->instance->flushDB();
 		$this->index = array();
 	}
 
 	function driver_isExisting($keyword) {
-		return ($this->instant->exists($keyword) != null);
+		return ($this->instance->exists($keyword) != null);
 	}
 
 }

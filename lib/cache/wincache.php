@@ -5,7 +5,7 @@
  * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
  */
 
-class pwfCache_wincache extends pwfCacheBase implements pwfCache  {
+class FastCache_wincache extends FastCacheBase implements iFastCache {
 
 	function __construct($config = array()) {
 		if($this->checkdriver()) {

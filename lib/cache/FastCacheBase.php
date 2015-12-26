@@ -5,7 +5,7 @@
  * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
  */
 
-abstract class pwfCacheBase {
+abstract class FastCacheBase {
 
 	var $tmp = array();
 

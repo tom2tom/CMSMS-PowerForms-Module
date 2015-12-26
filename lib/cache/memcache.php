@@ -5,18 +5,18 @@
  * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
  */
 
-class pwfCache_memcache extends pwfCacheBase implements pwfCache {
+class FastCache_memcache extends FastCacheBase implements iFastCache {
 
-	var $instant;
+	var $instance;
 
 	function __construct($config = array()) {
 		if($this->checkdriver()) {
-			$this->instant = new Memcache();
+			$this->instance = new Memcache();
 			$this->setup($config);
 			if($this->connectServer()) {
 				return;
 			}
-			unset($this->instant);
+			unset($this->instance);
 		}
 		throw new Exception('no memcache storage');
 	}
@@ -38,7 +38,7 @@ class pwfCache_memcache extends pwfCacheBase implements pwfCache {
 			$name = $s[0].'_'.$s[1];
 			if(!isset($this->checked[$name])) {
 				try {
-					if($this->instant->addserver($s[0],$s[1])) {
+					if($this->instance->addserver($s[0],$s[1])) {
 						$this->checked[$name] = 1;
 						return true;
 					}
@@ -50,9 +50,9 @@ class pwfCache_memcache extends pwfCacheBase implements pwfCache {
 
 	function driver_set($keyword, $value = '', $time = 300, $option = array() ) {
 		if(empty($option['skipExisting'])) {
-			$ret = $this->instant->set($keyword, $value, false, $time );
+			$ret = $this->instance->set($keyword, $value, false, $time );
 		} else {
-			$ret = $this->instant->add($keyword, $value, false, $time );
+			$ret = $this->instance->add($keyword, $value, false, $time );
 		}
 		if($ret) {
 			$this->index[$keyword] = 1;
@@ -62,7 +62,7 @@ class pwfCache_memcache extends pwfCacheBase implements pwfCache {
 
 	// return cached value or null
 	function driver_get($keyword, $option = array()) {
-		$x = $this->instant->get($keyword);
+		$x = $this->instance->get($keyword);
 		if($x) {
 			return $x;
 		} else {
@@ -75,7 +75,7 @@ class pwfCache_memcache extends pwfCacheBase implements pwfCache {
 	}
 
 	function driver_delete($keyword, $option = array()) {
-		$this->instant->delete($keyword);
+		$this->instance->delete($keyword);
 		unset($this->index[$keyword]);
 		return true;
 	}
@@ -84,12 +84,12 @@ class pwfCache_memcache extends pwfCacheBase implements pwfCache {
 		return array(
 			'info' => '',
 			'size' => count($this->index),
-			'data' => $this->instant->getStats(),
+			'data' => $this->instance->getStats(),
 		);
 	}
 
 	function driver_clean($option = array()) {
-		$this->instant->flush();
+		$this->instance->flush();
 		$this->index = array();
 	}
 
