@@ -1,15 +1,15 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
-# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 class pwfUtils
 {
-	private $cache = NULL; //cache object
-	private $mxtype = FALSE; //type of mutex in use - 'memcache' etc
-	private $instance = NULL; //'instance' object for mutex class, if needed
+	private static $cache = NULL; //cache object
+	private static $mxtype = FALSE; //type of mutex in use - 'memcache' etc
+	private static $instance = NULL; //'instance' object for mutex class, if needed
 
 	/**
 	GetCache:
@@ -23,20 +23,24 @@ class pwfUtils
 	*/
 	public static function GetCache($storage='auto',$settings=array())
 	{
-		if($this->cache == NULL && isset($_SESSION['pwfcache']))
-			$this->cache = $_SESSION['pwfcache'];
+//		if($this->cache == NULL && isset($_SESSION['pwrcache']))
+//			$this->cache = $_SESSION['pwrcache'];
 		if($this->cache)
 			return $this->cache;
 
+		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR;
+		require($path.'interface.FastCache.php');
+		require($path.'FastCacheBase.php');
+
 		$config = cmsms()->GetConfig();
-		$url = $config['root_url'];
+		$rooturl = (empty($_SERVER['HTTPS'])) ? $config['root_url'] : $config['ssl_url'];
 		$settings = array_merge(
 			array(
 				'memcache' => array(
-					array($url,11211,1)
+					array($rooturl,11211,1)
 				),
 				'redis' => array(
-					'host' => $url,
+					'host' => $rooturl,
 					'port' => '',
 					'password' => '',
 					'database' => '',
@@ -54,16 +58,12 @@ class pwfUtils
 		if(strpos($storage,'auto') !== FALSE)
 			$storage = 'shmop,apc,memcached,wincache,xcache,memcache,redis,database';
 
-		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR;
-		require($path.'interface.FastCache.php');
-		require($path.'FastCacheBase.php');
-
 		$types = explode(',',$storage);
 		foreach($types as $one)
 		{
 			$one = trim($one);
 			require($path.$one.'.php');
-			$class = 'pwfCache_'.$one;
+			$class = 'Cache_'.$one;
 			try
 			{
 				$cache = new $class($settings);
@@ -73,7 +73,7 @@ class pwfUtils
 				continue;
 			}
 			$this->cache = $cache;
-			$_SESSION['pwfcache'] = $cache;
+//			$_SESSION['pwrcache'] = $cache;
 			return $this->cache;
 		}
 		return NULL;
@@ -81,25 +81,42 @@ class pwfUtils
 
 	/**
 	GetMutex:
+	@mod: reference to PowerForms module object
 	@storage: optional cache-type name, one (or more, ','-separated) of
 		auto,memcache,semaphore,file,database, default = 'auto'
 	Returns: mutex-object or NULL
 	*/
-	public static function GetMutex($storage='auto')
+	public static function GetMutex(&$mod,$storage='auto')
 	{
 		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
 		require($path.'interface.Mutex.php');
+/*
+		if(!self::$mxtype && isset($_SESSION['pwrmxtype']))
+			self::$mxtype = $_SESSION['pwrmxtype'];
+		if(!self::$instance && isset($_SESSION['pwrmxinstance']))
+			self::$instance = $_SESSION['pwrmxinstance'];
+*/
+		$settings = array(
+			'memcache'=>array(
+				'instance'=>((self::$mxtype=='memcache')?self::$instance:NULL)
+				),
+			'semaphore'=>array(
+				'instance'=>((self::$mxtype=='semaphore')?self::$instance:NULL)
+				),
+			'file'=>array(
+				'updir'=>self::GetUploadsPath($mod)
+				),
+			'database'=>array(
+				'table'=>cms_db_prefix().'module_pwf_flock'
+				)
+		);
 
-		if(!$this->$mxtype && isset($_SESSION['pwfmxtype']))
-			$this->$mxtype = $_SESSION['pwfmxtype'];
-		if($this->$mxtype)
+		if(self::$mxtype)
 		{
-			$one = $this->mxtype;
+			$one = self::$mxtype;
 			require($path.$one.'.php');
-			$class = 'pwbrMutex_'.$one;
-			if(!$this->$instance && isset($_SESSION['pwfmxinstance']))
-				$this->$instance = $_SESSION['pwfmxinstance'];
-			$mutex = new $class($this->$instance);
+			$class = 'Mutex_'.$one;
+			$mutex = new $class($settings[$one]);
 			return $mutex;
 		}
 		else
@@ -115,23 +132,23 @@ class pwfUtils
 			foreach($types as $one)
 			{
 				$one = trim($one);
-				$class = 'pwfMutex_'.$one;
+				$class = 'Mutex_'.$one;
 				try
 				{
 					require($path.$one.'.php');
-					$mutex = new $class();
+					$mutex = new $class($settings[$one]);
 				}
 				catch(Exception $e)
 				{
 					continue;
 				}
-				$this->mxtype = $one;
-				$_SESSION['pwfmxtype'] = $one;
+				self::$mxtype = $one;
+//				$_SESSION['pwrmxtype'] = $one;
 				if(isset($mutex->instance))
-					$this->$instance =& $mutex->instance;
+					self::$instance = &$mutex->instance;
 				else
-					$this->$instance = NULL;
-				$_SESSION['pwfmxinstance'] = $this->$instance;
+					self::$instance = NULL;
+//				$_SESSION['pwrmxinstance'] = self::$instance;
 				return $mutex;
 			}
 			return NULL;
