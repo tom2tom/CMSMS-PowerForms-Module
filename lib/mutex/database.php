@@ -1,32 +1,38 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
-# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfMutex_database implements pwfMutex
+class Mutex_database implements iMutex
 {
-	var $pause;
-	var $maxtries;
-	var $table;
+	private $pause;
+	private $maxtries;
+	private $table;
 
-	function __construct(&$instance=NULL,$timeout=500,$tries=200)
+	function __construct($config)
 	{
-		$this->pause = $timeout;
-		$this->maxtries = $tries;
-		$this->table = cms_db_prefix().'module_pwf_flock';
+		if(!empty($config['table']))
+			$this->table = $config['table'];
+		else
+			throw new Exception('no database cache');
+		$this->pause = (!empty($config['timeout'])) ? $config['timeout'] : 500;
+		$this->maxtries = (!empty($config['tries'])) ? $config['tries'] : 200;
 	}
 
 	function lock($token)
 	{
-		$flid = abs(crc32($token.'pwf.lock'));
 		$db = cmsms()->GetDb();
+		$flid = abs(crc32($token.'.mx.lock'));
 		$stamp = $db->sysTimeStamp;
 		$sql = 'INSERT INTO '.$this->table.' (flock_id,flock) VALUES ('.$flid.','.$stamp.')';
 		$count = 0;
 		do
 		{
-			if($db->Execute($sql))
+			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+			$db->StartTrans();
+			$db->Execute($sql);
+			if($db->CompleteTrans())
 				return TRUE; //success
 /*TODO		$sql = 'SELECT flock_id FROM '.$this->table.' WHERE flock < '.$stamp + 15;
 			if($db->GetOne($sql))
@@ -39,15 +45,30 @@ class pwfMutex_database implements pwfMutex
 
 	function unlock($token)
 	{
-		$flid = abs(crc32($token.'pwf.lock'));
 		$db = cmsms()->GetDb();
-		$db->Execute('DELETE FROM '.$this->table.' WHERE flock_id='.$flid);
+		$sql = 'DELETE FROM '.$this->table.' WHERE flock_id='.abs(crc32($token.'.mx.lock'));
+		while(1)
+		{
+			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+			$db->StartTrans();
+			$db->Execute($sql);
+			if($db->CompleteTrans())
+				return;
+		}
 	}
 
 	function reset()
 	{
 		$db = cmsms()->GetDb();
-		$db->Execute('DELETE FROM '.$this->table);
+		$sql = 'DELETE FROM '.$this->table;
+		while(1)
+		{
+			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+			$db->StartTrans();
+			$db->Execute($sql);
+			if($db->CompleteTrans())
+				return;
+		}
 	}
 }
 

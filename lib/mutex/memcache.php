@@ -1,19 +1,19 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
-# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwfMutex_memcache implements pwfMutex
+class Mutex_memcache implements iMutex
 {
-	var $pause;
-	var $maxtries;
-	var $instance;
+	public $instance;
+	private $pause;
+	private $maxtries;
 
-	function __construct(&$instance=NULL,$timeout=50,$tries=0)
+	function __construct($config)
 	{
-		if($instance)
-			$this->instance = $instance;
+		if($config['instance'])
+			$this->instance = $config['instance'];
 		else
 		{
 			if(class_exists('Memcache') && function_exists('memcache_connect'))
@@ -21,15 +21,16 @@ class pwfMutex_memcache implements pwfMutex
 			else
 				throw new Exception('no memcache storage');
 		}
-		$config = cmsms()->GetConfig();
-		$this->instance->connect($config['root_url'],11211);
-		$this->pause = $timeout;
-		$this->maxtries = $tries;
+		$sysconfig = cmsms()->GetConfig();
+		$rooturl = (empty($_SERVER['HTTPS'])) ? $sysconfig['root_url'] : $sysconfig['ssl_url'];
+		$this->instance->connect($rooturl,11211);
+		$this->pause = (!empty($config['timeout'])) ? $config['timeout'] : 50;
+		$this->maxtries = (!empty($config['tries'])) ? $config['tries'] : 10;
 	}
 
 	function lock($token)
 	{
-		$token .= 'pwf.lock';
+		$token .= '.mx.lock';
 		$count = 0;
 		do
 		{
@@ -57,7 +58,7 @@ class pwfMutex_memcache implements pwfMutex
 
 	function unlock($token)
 	{
-		$this->instance->delete($token.'pwf.lock');
+		$this->instance->delete($token.'.mx.lock');
 	}
 
 	function reset()

@@ -1,19 +1,19 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
-# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-class pwbrMutex_semaphore implements pwfMutex
+class Mutex_semaphore implements iMutex
 {
-	var $pause;
-	var $maxtries;
-	var $instance;
+	public $instance;
+	private $pause;
+	private $maxtries;
 
-	function __construct(&$instance=NULL,$timeout=200,$tries=200)
+	function __construct($config)
 	{
-		if($instance)
-			$this->instance = $instance;
+		if($config['instance'])
+			$this->instance = $config['instance'];
 		else
 		{
 			if(!function_exists('sem_get'))
@@ -24,8 +24,8 @@ class pwbrMutex_semaphore implements pwfMutex
 			if($this->instance === FALSE)
 				throw new Exception('Error getting semaphore');
 		}
-		$this->pause = $timeout;
-		$this->maxtries = $tries;
+		$this->pause = (!empty($config['timeout'])) ? $config['timeout'] : 200;
+		$this->maxtries = (!empty($config['tries'])) ? $config['tries'] : 200;
 	}
 
 	function lock($token)
