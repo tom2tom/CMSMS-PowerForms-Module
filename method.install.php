@@ -60,7 +60,7 @@ $db->CreateSequence($pre.'module_pwf_field_opt_seq');
 $db->Execute('CREATE INDEX '.$pre.'module_pwf_field_opt_idx ON '.$pre.'module_pwf_field_opt (field_id,form_id)');
 
 $flds = "
-	flock_id I KEY,
+	flock_id I(8) KEY,
 	flock T
 ";
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_flock',$flds,$taboptarray);
@@ -104,7 +104,7 @@ $dict->ExecuteSQLArray($sqlarray);
 
 $db->CreateSequence($pre.'module_pwf_uniquefield_seq');
 
-$this->SetPreference('default_phrase',uniqid('Enter at your own risk! Dangerous data!')); //TODO make this adjustable via UI
+$this->SetPreference('masterpass','MmFjNTW1Gak5TdWNrIGl0IHVwLCBjcmFja2VycyEgVHJ5IHRvIGd1ZXNz');
 $this->SetPreference('blank_invalid',0);
 $this->SetPreference('enable_antispam',1);
 $this->SetPreference('require_fieldnames',1);
