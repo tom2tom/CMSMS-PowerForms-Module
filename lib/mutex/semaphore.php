@@ -6,35 +6,54 @@
 
 class Mutex_semaphore implements iMutex
 {
-	public $instance;
+	private $keybase;
+	private $gets;
 	private $pause;
 	private $maxtries;
 
 	function __construct($config)
 	{
-		if($config['instance'])
-			$this->instance = $config['instance'];
-		else
-		{
-			if(!function_exists('sem_get')
-			 || version_compare(PHP_VERSION,'5.6.1') < 0) //need non-blocking mode
-				throw new Exception('No semaphore available');
-			$fp = dirname(__FILE__).get_class();
-			$key = ftok($fp) % 101 + PHP_INT_MAX / 2;
-			$this->instance = sem_get($key);
-			if($this->instance === FALSE)
-				throw new Exception('Error getting semaphore');
-		}
+		if(!function_exists('sem_get')
+		 || version_compare(PHP_VERSION,'5.6.1') < 0) //need non-blocking mode
+			throw new Exception('No semaphore available');
+		$this->keybase = PHP_INT_MAX / 2 + 1101;
+		$this->gets = array();
 		$this->pause = (!empty($config['timeout'])) ? $config['timeout'] : 200;
 		$this->maxtries = (!empty($config['tries'])) ? $config['tries'] : 200;
 	}
 
+	function __destruct()
+	{
+		$this->reset();
+	}
+
+	function hash($token)
+	{
+		$len = strlen($token);
+		$hash = 7;
+		for ($i = 0; $i < $len; $i++)
+		{
+			$hash = $hash * 31 + ord($token[$i]) + $i;
+		}
+		return $hash % 1011011; //limit the offset
+	}
+
 	function lock($token)
 	{
+		if(isset($this->gets[$token]))
+			$res = $this->gets[$token];
+		else
+		{
+			$offs = $this->hash($token);
+			$res = sem_get($this->keybase+$offs,1,0660,0); //preserve past end-of-request == LEAK ?
+			if($res == FALSE)
+				return FALSE;
+			$this->gets[$token] = $res;
+		}
 		$count = 0;
 		do
 		{
-			if(sem_acquire($this->instance,TRUE)) //non-blocking
+			if(sem_acquire($res,TRUE)) //non-blocking
 				return TRUE;
 			usleep($this->pause);
 		} while($this->maxtries == 0 || $count++ < $this->maxtries);
@@ -43,15 +62,20 @@ class Mutex_semaphore implements iMutex
 
 	function unlock($token)
 	{
-		if(!sem_release($this->instance))
-			throw new Exception('Error unlocking mutex');
+		if(isset($this->gets[$token]))
+		{
+			sem_release($this->gets[$token]);
+			unset($this->gets[$token]);
+		}
 	}
 
 	//as of 2014, "sem_remove() shouldn't be part of a normal cleanup/teardown
 	//	and should be called very rarely due to bugs in the implementation"
 	function reset()
 	{
-		$this->unlock('');
+		foreach($this->gets as $one)
+			sem_release($one);
+		$this->gets = array();
 	}
 }
 ?>
