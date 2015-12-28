@@ -93,7 +93,7 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 	function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		if(!pwfUtils::GetUploadsPath())
+		if(!pwfUtils::GetUploadsPath($mod))
 			return $mod->Lang('error_uploads_dir');
 		$opt = $this->GetOptionRef('destination_filename');
 		if($opt)
@@ -106,7 +106,7 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 	function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		if(!pwfUtils::GetUploadsPath())
+		if(!pwfUtils::GetUploadsPath($mod))
 			return array('main'=>array('<span style="color:red">'.$mod->Lang('error').'</span>',
 				'',$mod->Lang('error_uploads_dir')));
 
@@ -247,7 +247,7 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 	function Dispose($id,$returnid)
 	{
 		$mod = $this->formdata->formsmodule;
-		$ud = pwfUtils::GetUploadsPath();
+		$ud = pwfUtils::GetUploadsPath($mod);
 		if(!$ud)
 			return array(FALSE,$mod->Lang('error_uploads_dir'));
 		try

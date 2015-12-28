@@ -47,7 +47,7 @@ class pwfSharedFile extends pwfFieldBase
 	function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		if(!pwfUtils::GetUploadsPath())
+		if(!pwfUtils::GetUploadsPath($mod))
 			return $mod->Lang('error_uploads_dir');
 		return $this->GetOption('filespec',$mod->Lang('unspecified'));
 	}
@@ -55,7 +55,7 @@ class pwfSharedFile extends pwfFieldBase
 	function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		if(!pwfUtils::GetUploadsPath())
+		if(!pwfUtils::GetUploadsPath($mod))
 			return array('main'=>array('<span style="color:red">'.$mod->Lang('error').'</span>',
 				'',$mod->Lang('error_uploads_dir')));
 
@@ -107,7 +107,7 @@ class pwfSharedFile extends pwfFieldBase
 	function Dispose($id,$returnid)
 	{
 		$mod = $formdata->formsmodule;
-		$ud = $pwfUtils::GetUploadsPath();
+		$ud = $pwfUtils::GetUploadsPath($mod);
 		if(!$ud)
 			return array(FALSE,$mod->Lang('error_uploads_dir'));
 		try
