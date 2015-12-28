@@ -23,11 +23,11 @@ class FastCache_xcache extends FastCacheBase implements iFastCache {
 		return (extension_loaded('xcache') && function_exists('xcache_get'));
 	}
 
-	function driver_set($keyword, $value = "", $time = 300, $option = array() ) {
+	function driver_set($keyword, $parms, $duration = 0, $option = array() ) {
 		if(empty($option['skipExisting'])) {
-			$ret = xcache_set($keyword,$value,$time);
+			$ret = xcache_set($keyword,$parms['value'],$duration);
 		} else if(!$this->isExisting($keyword)) {
-			$ret = xcache_set($keyword,$value,$time);
+			$ret = xcache_set($keyword,$parms['value'],$duration);
 		} else {
 			$ret = false;
 		}
@@ -39,11 +39,15 @@ class FastCache_xcache extends FastCacheBase implements iFastCache {
 
 	// return cached value or null
 	function driver_get($keyword, $option = array()) {
-		$data = xcache_get($keyword);
-		if($data === false || $data == '') {
+		if(empty($option['all_keys'])) {
+			$data = xcache_get($keyword);
+			if($data !== null) {
+				return array('value'=>$data);
+			}
 			return null;
 		}
-		return $data;
+		//TODO array of 'all data' ?
+		return null;
 	}
 
 	function driver_getall($option = array()) {

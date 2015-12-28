@@ -13,7 +13,7 @@ class FastCache_redis extends FastCacheBase implements iFastCache {
 	var $instance;
 	var $checked_redis = false;
 
-	function __construct($config = array()) {
+	function __construct($config) {
 		if($this->checkdriver()) {
 			$this->instance = new Redis();
 			$this->setup($config);
@@ -85,12 +85,12 @@ class FastCache_redis extends FastCacheBase implements iFastCache {
 		return true;
 	}
 
-	function driver_set($keyword, $value = '', $time = 300, $option = array() ) {
-		$value = $this->encode($value);
-		if (empty($option['skipExisting'])) {
-			$ret = $this->instance->set($keyword, $value, $time);
+	function driver_set($keyword, $parms, $duration = 0, $option = array() ) {
+		$value = serialize($parms['value']);
+		if(empty($option['skipExisting'])) {
+			$ret = $this->instance->set($keyword, $value, $duration);
 		} else {
-			$ret = $this->instance->set($keyword, $value, array('xx', 'ex' => $time));
+			$ret = $this->instance->set($keyword, $value, array('nx', 'ex' => $duration));
 		}
 		if($ret) {
 			$this->index[$keyword] = 1;
@@ -100,12 +100,16 @@ class FastCache_redis extends FastCacheBase implements iFastCache {
 
 	// return cached value or null
 	function driver_get($keyword, $option = array()) {
-		$x = $this->instance->get($keyword);
-		if($x) {
-			return $this->decode($x);
-		} else {
-			return null;
+		if(empty($option['all_keys'])) {
+			$data = $this->instance->get($keyword);
+			if($data) {
+				return array('value'=>unserialize($data));
+			} else {
+				return null;
+			}
 		}
+		//TODO array of 'all data' ?
+		return null;
 	}
 
 	function driver_getall($option = array()) {

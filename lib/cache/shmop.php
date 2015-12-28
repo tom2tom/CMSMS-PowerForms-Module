@@ -7,7 +7,7 @@
 
 class FastCache_shmop extends FastCacheBase implements iFastCache {
 
-	function __construct($config = array()) {
+	function __construct($config) {
 		if($this->checkdriver()) {
 			$this->setup($config);
 		} else {
@@ -23,8 +23,8 @@ class FastCache_shmop extends FastCacheBase implements iFastCache {
 		return extension_loaded('shmop');
 	}
 
-	function driver_set($keyword, $value = '', $time = 300, $option = array() ) {
-		if (driver_isExisting($keyword)) {
+	function driver_set($keyword, $parms, $duration = 0, $option = array() ) {
+		if (array_key_exists($keyword, $this->index)) {
 			if(empty($option['skipExisting'])) {
 				driver_delete($keyword, $option);
 			} else {
@@ -32,6 +32,7 @@ class FastCache_shmop extends FastCacheBase implements iFastCache {
 			}
 		}
 		$sysid = md5(uniqid($keyword,TRUE));
+		$value = serialize($parms['value']);
 		$size = strlen($value); // byte-size of the segment
 		$shmid = shmop_open($sysid, 'c', 0644, $size);
 		if($shmid !== FALSE) {
@@ -44,11 +45,16 @@ class FastCache_shmop extends FastCacheBase implements iFastCache {
 	}
 
 	function driver_get($keyword, $option = array()) {
-		if(array_key_exists($keyword, $this->index)) {
-			$shmid = $this->index[$keyword];
-			$size = shmop_size($shmid);
-			return shmop_read($shmid, 0, $size);
+		if(empty($option['all_keys'])) {
+			if(array_key_exists($keyword, $this->index)) {
+				$shmid = $this->index[$keyword];
+				$size = shmop_size($shmid);
+				$data = shmop_read($shmid, 0, $size);
+				return array('value'=>unserialize($data));
+			}
+			return null;
 		}
+		//TODO array of 'all data' ?
 		return null;
 	}
 
@@ -78,11 +84,6 @@ class FastCache_shmop extends FastCacheBase implements iFastCache {
 			$this->driver_delete($key, $option);
 		}
 	}
-
-	function driver_isExisting($keyword) {
-		return array_key_exists($keyword, $this->index);
-	}
-
 }
 
 ?>

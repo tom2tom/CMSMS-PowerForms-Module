@@ -7,7 +7,7 @@
 
 class FastCache_wincache extends FastCacheBase implements iFastCache {
 
-	function __construct($config = array()) {
+	function __construct($config) {
 		if($this->checkdriver()) {
 			$this->setup($config);
 		} else {
@@ -23,11 +23,11 @@ class FastCache_wincache extends FastCacheBase implements iFastCache {
 		return (extension_loaded('wincache') && function_exists('wincache_ucache_set'));
 	}
 
-	function driver_set($keyword, $value = "", $time = 300, $option = array() ) {
+	function driver_set($keyword, $parms, $duration = 0, $option = array() ) {
 		if(empty($option['skipExisting'])) {
-			$ret = wincache_ucache_set($keyword, $value, $time);
+			$ret = wincache_ucache_set($keyword,$parms['value'],$duration);
 		} else {
-			$ret = wincache_ucache_add($keyword, $value, $time);
+			$ret = wincache_ucache_add($keyword,$parms['value'],$duration);
 		}
 		if($ret) {
 			$this->index[$keyword] = 1;
@@ -37,12 +37,16 @@ class FastCache_wincache extends FastCacheBase implements iFastCache {
 
 	// return cached value or null
 	function driver_get($keyword, $option = array()) {
-		$x = wincache_ucache_get($keyword,$suc);
-		if($suc) {
-			return $x;
-		} else {
-			return null;
+		if(empty($option['all_keys'])) {
+			$data = wincache_ucache_get($keyword,$suc);
+			if($suc) {
+				return array('value'=>$data);
+			} else {
+				return null;
+			}
 		}
+		//TODO array of 'all data' ?
+		return null;
 	}
 
 	function driver_getall($option = array()) {

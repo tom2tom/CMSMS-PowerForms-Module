@@ -7,7 +7,7 @@
 
 class pwrCache_apc extends FastCacheBase implements iFastCache {
 
-	function __construct($config = array()) {
+	function __construct($config) {
 		if($this->checkdriver()) {
 			$this->setup($config);
 		} else {
@@ -23,11 +23,11 @@ class pwrCache_apc extends FastCacheBase implements iFastCache {
 		return (extension_loaded('apc') && ini_get('apc.enabled'));
 	}
 
-	function driver_set($keyword, $value = '', $time = 300, $option = array()) {
+	function driver_set($keyword, $parms, $duration = 0, $option = array()) {
 		if(empty($option['skipExisting'])) {
-			$ret = apc_store($keyword,$value,$time);
+			$ret = apc_store($keyword,$parms['value'],$duration);
 		} else {
-			$ret = apc_add($keyword,$value,$time);
+			$ret = apc_add($keyword,$parms['value'],$duration);
 		}
 		if($ret) {
 			$this->index[$keyword] = 1;
@@ -36,10 +36,14 @@ class pwrCache_apc extends FastCacheBase implements iFastCache {
 	}
 
 	function driver_get($keyword, $option = array()) {
-		$data = apc_fetch($keyword,$bo);
-		if($bo !== false) {
-			return $data;
+		if(empty($option['all_keys'])) {
+			$data = apc_fetch($keyword,$bo);
+			if($bo !== false) {
+				return array('value'=>$data);
+			}
+			return null;
 		}
+		//TODO array of 'all data' ?
 		return null;
 	}
 

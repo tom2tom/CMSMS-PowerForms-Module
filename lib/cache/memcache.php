@@ -7,9 +7,9 @@
 
 class FastCache_memcache extends FastCacheBase implements iFastCache {
 
-	var $instance;
+	public $instance;
 
-	function __construct($config = array()) {
+	function __construct($config) {
 		if($this->checkdriver()) {
 			$this->instance = new Memcache();
 			$this->setup($config);
@@ -48,11 +48,14 @@ class FastCache_memcache extends FastCacheBase implements iFastCache {
 		return false;
 	}
 
-	function driver_set($keyword, $value = '', $time = 300, $option = array() ) {
+	function driver_set($keyword, $parms, $duration = 0, $option = array()) {
+		if($duration) {
+			$duration += time();
+		}
 		if(empty($option['skipExisting'])) {
-			$ret = $this->instance->set($keyword, $value, false, $time );
+			$ret = $this->instance->set($keyword,$parms['value'],0,$duration);
 		} else {
-			$ret = $this->instance->add($keyword, $value, false, $time );
+			$ret = $this->instance->add($keyword,$parms['value'],0,$duration);
 		}
 		if($ret) {
 			$this->index[$keyword] = 1;
@@ -62,12 +65,16 @@ class FastCache_memcache extends FastCacheBase implements iFastCache {
 
 	// return cached value or null
 	function driver_get($keyword, $option = array()) {
-		$x = $this->instance->get($keyword);
-		if($x) {
-			return $x;
-		} else {
-			return null;
+		if(empty($option['all_keys'])) {
+			$data = $this->instance->get($keyword);
+			if($data) {
+				return array('value'=>$data);
+			} else {
+				return null;
+			}
 		}
+		//TODO array of 'all data' ?
+		return null;
 	}
 
 	function driver_getall($option = array()) {
