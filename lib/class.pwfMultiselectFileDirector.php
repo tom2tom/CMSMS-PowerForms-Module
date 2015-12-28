@@ -250,11 +250,18 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 		$ud = pwfUtils::GetUploadsPath();
 		if(!$ud)
 			return array(FALSE,$mod->Lang('error_uploads_dir'));
+		try
+		{
+			$mx = pwfUtils::GetMutex($mod);
+		}
+		catch (Exception $e)
+		{
+			return array(FALSE,$this->Lang('error_system'));
+		}
 
 		$fn = reset($this->Options['destination_filename']);
 		$token = abs(crc32($fn.'mutex'));
-		$mx = pwfUtils::GetMutex();
-		if(!$mx || !$mx->lock($token))
+		if(!$mx->lock($token))
 			return array(FALSE,$mod->Lang('error_lock'));
 
 		pwfUtils::SetupFormVars($this->formdata);

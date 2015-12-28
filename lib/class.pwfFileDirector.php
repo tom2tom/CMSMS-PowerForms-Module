@@ -222,17 +222,24 @@ class pwfFileDirector extends pwfFieldBase
 		$ud = pwfUtils::GetUploadsPath();
 		if(!$ud)
 			return array(FALSE,$mod->Lang('error_uploads_dir'));
+		try
+		{
+			$mx = pwfUtils::GetMutex($mod);
+		}
+		catch (Exception $e)
+		{
+			return array(FALSE,$this->Lang('error_system'));
+		}
 
-		pwfUtils::SetupFormVars($this->formdata);
 		$fn = preg_replace('/[^\w\d\.]|\.\./','_',
 			   $this->GetOptionElement('destination_filename',$this->Value));
-
 		$token = abs(crc32($fn.'mutex'));
-		$mx = pwfUtils::GetMutex();
-		if(!$mx || !$mx->lock($token))
+		if(!$mx->lock($token))
 			return array(FALSE,$mod->Lang('error_lock'));
 
 		$fp = $ud.DIRECTORY_SEPARATOR.$fn;
+
+		pwfUtils::SetupFormVars($this->formdata);
 
 		$footer = $this->GetOption('file_footer');
 		if($footer)

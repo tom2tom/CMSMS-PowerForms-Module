@@ -111,6 +111,14 @@ class pwfUniqueFile extends pwfFieldBase
 		$ud = $pwfUtils::GetUploadsPath();
 		if(!$ud)
 			return array(FALSE,$mod->Lang('error_uploads_dir'));
+		try
+		{
+			$mx = pwfUtils::GetMutex($mod);
+		}
+		catch (Exception $e)
+		{
+			return array(FALSE,$this->Lang('error_system'));
+		}
 
 		pwfUtils::SetupFormVars($this->formdata);
 
@@ -121,8 +129,7 @@ class pwfUniqueFile extends pwfFieldBase
 			$fn = 'form_submission_'.date('Y-m-d_His').'.txt';
 
 		$token = abs(crc32($fn.'mutex'));
-		$mx = pwfUtils::GetMutex();
-		if(!$mx || !$mx->lock($token))
+		if(!$mx->lock($token))
 			return array(FALSE,$mod->Lang('error_lock'));
 
 		$fp = $ud.DIRECTORY_SEPARATOR.$fn;
