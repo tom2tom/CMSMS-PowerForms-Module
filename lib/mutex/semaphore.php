@@ -29,12 +29,11 @@ class Mutex_semaphore implements iMutex
 
 	function hash($token)
 	{
-		$len = strlen($token);
-		$hash = 7;
-		for ($i = 0; $i < $len; $i++)
-		{
-			$hash = $hash * 31 + ord($token[$i]) + $i;
-		}
+		//djb2 hash : see http://www.cse.yorku.ca/~oz/hash.html
+		$l = strlen($token);
+		$hash = 5381;
+		for($i = 0; $i < $l; $i++)
+			$hash = $hash * 33 + $token[$i] + $i;
 		return $hash % 1011011; //limit the offset
 	}
 
@@ -44,8 +43,8 @@ class Mutex_semaphore implements iMutex
 			$res = $this->gets[$token];
 		else
 		{
-			$offs = $this->hash($token);
-			$res = sem_get($this->keybase+$offs,1,0660,0); //preserve past end-of-request == LEAK ?
+			$key = $this->keybase + $this->hash(''.$token);
+			$res = sem_get($key,1,0660,0); //preserve past end-of-request == LEAK ?
 			if($res == FALSE)
 				return FALSE;
 			$this->gets[$token] = $res;
