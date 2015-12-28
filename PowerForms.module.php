@@ -383,6 +383,7 @@ class PowerForms extends CMSModule
 				$this->SetPreference('imported_fields',FALSE);
 		}
 
+		global $db;
 		$pre = cms_db_prefix();
 		$sql = 'SELECT field_id FROM '.$pre.'module_pwf_field WHERE type=?';
 		$classname = substr($classname,3); //strip 'pwf' namespace
