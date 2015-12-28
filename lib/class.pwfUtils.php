@@ -23,10 +23,10 @@ class pwfUtils
 	*/
 	public static function GetCache($storage='auto',$settings=array())
 	{
-//		if($this->cache == NULL && isset($_SESSION['pwrcache']))
-//			$this->cache = $_SESSION['pwrcache'];
-		if($this->cache)
-			return $this->cache;
+//		if(self::$cache == NULL && isset($_SESSION['pwrcache']))
+//			self::$cache = $_SESSION['pwrcache'];
+		if(self::$cache)
+			return self::$cache;
 
 		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR;
 		require($path.'interface.FastCache.php');
@@ -36,6 +36,11 @@ class pwfUtils
 		$rooturl = (empty($_SERVER['HTTPS'])) ? $config['root_url'] : $config['ssl_url'];
 		$settings = array_merge(
 			array(
+				'shmop' => array(),
+				'apc' => array(),
+				'memcached' => array(),
+				'wincache' => array(),
+				'xcache' => array(),
 				'memcache' => array(
 					array($rooturl,11211,1)
 				),
@@ -66,7 +71,7 @@ class pwfUtils
 			$class = 'Cache_'.$one;
 			try
 			{
-				$cache = new $class($settings);
+				$cache = new $class($settings[$one]);
 			}
 			catch(Exception $e)
 			{
@@ -76,7 +81,7 @@ class pwfUtils
 //			$_SESSION['pwrcache'] = $cache;
 			return $this->cache;
 		}
-		return NULL;
+		throw new Exception('Cache not working');
 	}
 
 	/**
@@ -151,7 +156,7 @@ class pwfUtils
 //				$_SESSION['pwrmxinstance'] = self::$instance;
 				return $mutex;
 			}
-			return NULL;
+			throw new Exception('Mutex not working');
 		}
 	}
 
@@ -897,15 +902,15 @@ EOS;
 
 	/**
 	GetUploadsPath:
+	@mod: reference to current module object
 	Returns: absolute filepath, or FALSE
 	*/
-	public static function GetUploadsPath()
+	public static function GetUploadsPath(&$mod)
 	{
 		$config = cmsms()->GetConfig();
 		$fp = $config['uploads_path'];
 		if($fp && is_dir($fp))
 		{
-			$mod = cms_utils::get_module('PowerForms');
 			$ud = $mod->GetPreference('uploads_dir');
 			if($ud)
 			{
