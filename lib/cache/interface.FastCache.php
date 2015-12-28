@@ -9,44 +9,50 @@ interface iFastCache {
 	/*
 	 * Check if this Cache driver is available for server or not
 	 */
-	 function __construct($config = array());
+	function __construct($config);
 
 //	 function __destruct();
 
-	 function checkdriver();
+	function checkdriver();
 
 	/*
 	 * SET
 	 * set a obj to cache
 	 */
-	 function driver_set($keyword, $value = "", $time = 300, $option = array() );
+	function driver_set($keyword, $parms, $duration, $option);
 
 	/*
 	 * GET
 	 * return null or value of cache
 	 */
-	 function driver_get($keyword, $option = array());
+	function driver_get($keyword, $option = array());
 
-	 function driver_getall($option = array());
+	function driver_getall($option = array());
+
+	/*
+	* isExisting
+	* check whether a key is cached
+	*/
+	function driver_isExisting($keyword);
 
 	/*
 	 * Stats
 	 * Show stats of caching
 	 * Return array ("info","size","data")
 	 */
-	 function driver_stats($option = array());
+	function driver_stats($option = array());
 
 	/*
 	 * Delete
-	 * Delete a cache
+	 * Delete a cached item
 	 */
-	 function driver_delete($keyword, $option = array());
+	function driver_delete($keyword, $option);
 
 	/*
 	 * clean
 	 * Clean up whole cache
 	 */
-	 function driver_clean($option = array());
+	function driver_clean($option);
 
 }
 

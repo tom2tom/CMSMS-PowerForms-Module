@@ -85,7 +85,27 @@ SELECT ?,?,NOW() FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
 	}
 
 	function driver_getall($option = array()) {
-		return array_keys($this->index); //CRAP past sessions too
+		$data = $this->db->GetCol('SELECT '.$this->fields[1].' FROM '.$this->table);
+		//take opportunity to conform
+		if($data) {
+			$this->index = array_fill_keys($data,1);
+		} else {
+			$this->index = array();
+		}
+		$return $data;
+	}
+
+	function driver_isExisting($keyword) {
+		$data = $this->db->GetOne('SELECT 1 FROM '.$this->table.' WHERE '.$this->fields[1].'=?',array($keyword));
+		return ($data == 1);
+	}
+
+	function driver_stats($option = array()) {
+		return array(
+			'info' => '',
+			'size' => count($this->index),
+			'data' => '',
+		);
 	}
 
 	function driver_delete($keyword, $option = array()) {
@@ -95,14 +115,6 @@ SELECT ?,?,NOW() FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
 		} else {
 			return false;
 		}
-	}
-
-	function driver_stats($option = array()) {
-		return array(
-			'info' => '',
-			'size' => count($this->index),
-			'data' => '',
-		);
 	}
 
 	function driver_clean($option = array()) {
