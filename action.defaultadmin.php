@@ -36,6 +36,36 @@ if($padm)
 		}
 		$this->SetPreference('uploads_dir',$t);
 
+		$old = $this->GetPreference('masterpass');
+		if($old)
+			$old = pwfUtils::Unfusc($oldpw);
+		$t = trim($params['masterpass']);
+		if($old != $t)
+		{
+			//re-encrypt all stored records
+			$pre = cms_db_prefix();
+			$rst = $db->Execute('SELECT record_id,content FROM '.$pre.'module_pwf_record');
+			if($rst)
+			{
+				$sql = 'UPDATE '.$pre.'module_pwf_record SET content=? WHERE record_id=?';
+				while(!$rst->EOF)
+				{
+					$val = pwfUtils::Decrypt($this,$rst->fields[1],$old);
+					$val = pwfUtils::Encrypt($this,$val,$t);
+					if(!pwfUtils::SafeExec($sql,array($val,$rst->fields[0])))
+					{
+						//TODO handle error
+					}
+					if(!$rst->MoveNext())
+						break;
+				}
+				$rst->Close();
+			}
+			if($t)
+				$t = pwfUtils::Fusc($t);
+			$this->SetPreference('masterpass',$t);
+		}
+
 		$params['message'] = $this->PrettyMessage('settings_updated');
 		$params['active_tab'] = 'settings';
 	}
