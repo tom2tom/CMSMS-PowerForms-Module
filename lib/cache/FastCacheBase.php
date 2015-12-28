@@ -9,7 +9,7 @@ abstract class FastCacheBase {
 
 	var $tmp = array();
 
-	// default options, this will be merge to Driver's Options
+	// default options, merged into driver's options
 	var $config = array();
 	// log of items in the cache
 	var $index = array();
@@ -18,15 +18,15 @@ abstract class FastCacheBase {
 	 * Basic Functions
 	 */
 
-	public function set($keyword, $value = '', $time = 0, $option = array() ) {
+	public function set($keyword, $value = '', $duration = 0, $option = array() ) {
 		/*
 		 * Infinity Time
 		 * Khoa. B
 		 */
-		if((int)$time <= 0) {
+		if((int)$duration < 0) {
 			// 5 years, however memcached or memory cached will gone when u restart it
 			// just recommended for sqlite. files
-			$time = 3600*24*365*5;
+			$duration = 3600*24*365*5;
 		}
 		/*
 		 * Temporary disabled phpFastCache::$disabled = true
@@ -35,14 +35,14 @@ abstract class FastCacheBase {
 //		if(phpFastCache::$disabled === true) {
 //			return false;
 //		}
-		$object = array(
+		$parms = array(
 			'value' => $value,
 			'write_time' => @date('U'),
-			'expired_in' => $time,
-			'expired_time' => @date('U') + (Int)$time,
+			'expired_in' => $duration,
+			'expired_time' => @date('U') + (int)$duration,
 		);
 
-		return $this->driver_set($keyword,$object,$time,$option);
+		return $this->driver_set($keyword,$parms,$duration,$option);
 	}
 
 	public function get($keyword, $option = array()) {
@@ -54,12 +54,12 @@ abstract class FastCacheBase {
 //			return null;
 //		}
 
-		$object = $this->driver_get($keyword,$option);
+		$parms = $this->driver_get($keyword,$option);
 
-		if($object == null) {
+		if($parms == null) {
 			return null;
 		}
-		return isset($option['all_keys']) && $option['all_keys'] ? $object : $object['value'];
+		return (empty($option['all_keys'])) ? $parms['value'] : $parms;
 	}
 
 	function getInfo($keyword, $option = array()) {
