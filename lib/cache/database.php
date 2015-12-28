@@ -81,7 +81,7 @@ SELECT ?,?,NOW() FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
 			return null;
 		}
 		//TODO array of 'all data' ?
-		return null; 
+		return null;
 	}
 
 	function driver_getall($option = array()) {
@@ -92,7 +92,7 @@ SELECT ?,?,NOW() FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
 		} else {
 			$this->index = array();
 		}
-		$return $data;
+		return $data;
 	}
 
 	function driver_isExisting($keyword) {
@@ -101,9 +101,10 @@ SELECT ?,?,NOW() FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
 	}
 
 	function driver_stats($option = array()) {
+		$num = $this->db->GetOne('SELECT COUNT(*) FROM '.$this->table);
 		return array(
 			'info' => '',
-			'size' => count($this->index),
+			'size' => $num,
 			'data' => '',
 		);
 	}
@@ -112,21 +113,13 @@ SELECT ?,?,NOW() FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
 		if($this->db->Execute('DELETE FROM '.$this->table.' WHERE '.$this->fields[1].'=?',array($keyword))) {
 			unset($this->index[$keyword]);
 			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	function driver_clean($option = array()) {
-		if($this->index) {
-//ADODB BUG prevents this
-//			$fillers = str_repeat('?,',count($this->index)-1).'?';
-//			$args = array_keys($this->index);
-//			$this->db->Execute('DELETE FROM '.$this->table.' WHERE '.$this->fields[1].' IN('.$fillers.')',$args);
-			$fillers = implode(',',array_keys($this->index));
-			$this->db->Execute('DELETE FROM '.$this->table.' WHERE '.$this->fields[1].' IN('.$fillers.')');
-			$this->index = array();
-		}
+		$this->db->Execute('DELETE FROM '.$this->table);
+		$this->index = array();
 	}
 
 }
