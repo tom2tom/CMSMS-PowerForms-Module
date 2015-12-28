@@ -15,8 +15,8 @@
 {if !empty($mainvarhelp)}<br /><div class="pageinput">{$help_subtplvars}</div>{/if}
 {if isset($mainTable)}
   <br />
-  <div class="pageoverflow">
-   <table class="leftwards">
+  <div class="pageinput pageoverflow">
+   <table class="pagetable leftwards">
  {section name=r loop=$mainTable}
   {if $smarty.section.r.first}
    <thead>
@@ -59,6 +59,10 @@
  <br />
  <p class="pageinput">{if isset($submit)}{$submit}&nbsp;{/if}{$cancel}</p>
 {$form_end}
+
+{if !empty($jsincs)}
+{foreach from=$jsincs item=file}{$file}
+{/foreach}{/if}
 {if !empty($jsfuncs)}
 <script type="text/javascript">
 //<![CDATA[

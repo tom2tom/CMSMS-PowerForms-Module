@@ -3,7 +3,7 @@
 {$formstab_start}
 {if !empty($forms)}
 {$start_formsform}
-<div class="pageoverflow">
+<div class="pageinput pageoverflow">
 <table class="pagetable leftwards">
  <thead><tr>
   <th>{$title_name}</th>
@@ -84,13 +84,16 @@
 <div class="pageinput">{$entry->input}{if isset($entry->help)}<br />{$entry->help}{/if}</div>
 {/foreach}
 <br />
-<div class="pageinput">{$submitcfg}</div>
+<div class="pageinput">{$submitcfg}&nbsp;{$cancel}</div>
 </div>
 {$form_end}
 {$tab_end}
 {/if}
 {$tabs_end}
 
+{if !empty($jsincs)}
+{foreach from=$jsincs item=file}{$file}
+{/foreach}{/if}
 {if !empty($jsfuncs)}
 <script type="text/javascript">
 //<![CDATA[

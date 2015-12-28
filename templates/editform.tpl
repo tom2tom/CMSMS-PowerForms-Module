@@ -14,14 +14,14 @@
   <p class="pageinput">{if $text_ready}{$text_ready}{else}<strong>{$text_notready}</strong> - {$help_notready}{/if}</p>
  </div>
 {$tab_end}{$fieldstab_start}
- <div class="pageoverflow">
+ <div class="pageinput pageoverflow">
  {if !empty($fields)}
   <p class="pagetext">{$title_form_fields}</p>
   <div class="reordermsg pagemessage" style="display:none">
-  <p class="pageinput">{$help_can_drag}</p>
-  <div id="saveordermsg" style="display:none"><p class="pageinput">{$help_save_order}</p></div>
+  <p>{$help_can_drag}</p>
+  <div id="saveordermsg" style="display:none"><p>{$help_save_order}</p></div>
   </div>
-  <table id="fields" class="pagetable tabledrag">
+  <table id="fields" class="pagetable leftwards tabledrag">
    <thead><tr>
   {if isset($title_field_id)}<th>{$title_field_id}</th>{/if}
     <th style="width:15em;">{$title_field_name}</th>
@@ -55,13 +55,13 @@
    </tbody>
   </table>
  {else}
- <p class="pageinput">{$nofields}</p>
+ <p>{$nofields}</p>
  {/if}
 	 <div class="addfast">
 	  <p class="pagetext">{$title_fastadd}</p>
-	  <div class="pageinput">{$input_fastadd}<br />{$help_fastadd}</div>
+	  <div>{$input_fastadd}<br />{$help_fastadd}</div>
 	 </div>
-  	 <div class="addslow pageinput">{$add_field_link}</div>
+  	 <div class="addslow">{$add_field_link}</div>
  </div>
 {$tab_end}{$designtab_start}
  <div class="pageoverflow">
@@ -125,16 +125,16 @@
   <p class="pageinput">{$input_form_validate_udt}</p>
  </div>
 {$tab_end}{$submittab_start}
- <div class="pageoverflow">
+ <div class="pageinput pageoverflow">
   <p class="pagetext">{$title_submit_button_safety}:</p>
-  <p class="pageinput">{$input_submit_button_safety}</p>
+  <p>{$input_submit_button_safety}</p>
   <p class="pagetext">{$title_submit_javascript}:</p>
-  <p class="pageinput">{$input_submit_javascript}</p>
+  <p>{$input_submit_javascript}</p>
  {if !empty($dispositions)}
   <p class="pagetext">{$title_form_dispositions}</p>
   <div class="reordermsg pagemessage" style="display:none">
-  <p class="pageinput">{$help_can_drag}</p>
-  <div id="saveordermsg" style="display:none"><p class="pageinput">{$help_save_order}</p></div>
+  <p>{$help_can_drag}</p>
+  <div id="saveordermsg" style="display:none"><p>{$help_save_order}</p></div>
   </div>
   <table id="dispositions" class="pageinput tabledrag">
    <thead><tr>
@@ -164,26 +164,26 @@
    </tbody>
   </table>
  {else}
- <p class="pageinput">{$nodispositions}</p>
+ <p>{$nodispositions}</p>
  {/if}
 	 <div class="addfast">
 	  <p class="pagetext">{$title_fastadd2}</p>
-	  <div class="pageinput">{$input_fastadd2}<br />{$help_fastadd2}</div>
+	  <div>{$input_fastadd2}<br />{$help_fastadd2}</div>
 	 </div>
-  	 <div class="addslow pageinput">{$add_disposition_link}</div>
+  	 <div class="addslow">{$add_disposition_link}</div>
   <br />
   <p class="pagetext">{$title_submit_action}:</p>
-  <p class="pageinput">{$input_submit_action}</p>
+  <p>{$input_submit_action}</p>
   <div id="pageobjects">
   <p class="pagetext">{$title_redirect_page}:</p>
-  <p class="pageinput">{$input_redirect_page}</p>
+  <p>{$input_redirect_page}</p>
   </div>
   <div id="tplobjects">
   <p class="pagetext">{$title_submit_template}:{$icon_info}</p>
-  <div class="pageinput pageoverflow">{$input_submit_template}</div>
-  <p class="pageinput">{$help_submit_template}<br /><br />
+  <div class="pageoverflow">{$input_submit_template}</div>
+  <p>{$help_submit_template}<br /><br />
   {$sample_submit_template}</p>
-  <div class="pageinput showhelp"><br />{$help_subtplvars}</div>
+  <div class="showhelp"><br />{$help_subtplvars}</div>
   </div>
  </div>
 {$tab_end}
@@ -193,8 +193,10 @@
   <p class="pageinput">{$save} {$cancel} {$apply}</p>
  </div>
 {$form_end}
-<script type="text/javascript" src="{$incpath}jquery.tablednd.min.js"></script>
-<script type="text/javascript" src="{$incpath}module.js"></script>
+
+{if !empty($jsincs)}
+{foreach from=$jsincs item=file}{$file}
+{/foreach}{/if}
 {if !empty($jsfuncs)}
 <script type="text/javascript">
 //<![CDATA[
