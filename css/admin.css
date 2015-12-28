@@ -1,5 +1,15 @@
 textarea.pwf_tallarea { width:50em;height:15em; }
 textarea.pwf_shortarea { width:50em;height:8em; }
+textarea.cloaked {
+ font-family:auto;
+ font-family:inherit;
+ font-size:1.2em;
+// font-size:inherit;
+ line-height:1.1;
+ width:40em;
+ height:2.4em;
+}
+
 .pwf_link { text-decoration:underline; }
 .pwf_fieldset { margin-bottom:2em; }
 .help_display { display:none; }
