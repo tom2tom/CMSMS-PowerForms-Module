@@ -16,11 +16,12 @@ class Mutex_semaphore implements iMutex
 			$this->instance = $config['instance'];
 		else
 		{
-			if(!function_exists('sem_get'))
+			if(!function_exists('sem_get')
+			 || version_compare(PHP_VERSION,'5.6.1') < 0) //need non-blocking mode
 				throw new Exception('No semaphore available');
 			$fp = dirname(__FILE__).get_class();
 			$key = ftok($fp) % 101 + PHP_INT_MAX / 2;
-			$this->instance = sem_get($key,1);
+			$this->instance = sem_get($key);
 			if($this->instance === FALSE)
 				throw new Exception('Error getting semaphore');
 		}
@@ -33,7 +34,7 @@ class Mutex_semaphore implements iMutex
 		$count = 0;
 		do
 		{
-			if(sem_acquire($this->instance))
+			if(sem_acquire($this->instance,TRUE)) //non-blocking
 				return TRUE;
 			usleep($this->pause);
 		} while($this->maxtries == 0 || $count++ < $this->maxtries);
