@@ -48,15 +48,11 @@ class pwrCache_apc extends FastCacheBase implements iFastCache {
 	}
 
 	function driver_getall($option = array()) {
-		return array_keys($this->index);
+		return array_keys($this->index); //CRAP past sessions too
 	}
 
-	function driver_delete($keyword, $option = array()) {
-		if(apc_delete($keyword)) {
-			unset($this->index[$keyword]);
-			return true;
-		}
-		return false;
+	function driver_isExisting($keyword) {
+		return apc_exists($keyword);
 	}
 
 	function driver_stats($option = array()) {
@@ -72,16 +68,19 @@ class pwrCache_apc extends FastCacheBase implements iFastCache {
 		return $res;
 	}
 
+	function driver_delete($keyword, $option = array()) {
+		if(apc_delete($keyword)) {
+			unset($this->index[$keyword]);
+			return true;
+		}
+		return false;
+	}
+
 	function driver_clean($option = array()) {
 		@apc_clear_cache();
 		@apc_clear_cache('user');
 		$this->index = array();
 	}
-
-	function driver_isExisting($keyword) {
-		return apc_exists($keyword);
-	}
-
 }
 
 ?>
