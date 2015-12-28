@@ -4,18 +4,37 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
+/*
+The database table must have (at least) two fields, the first of which will
+contain 64-bit integers (i.e. I(8) or better) and not allow duplicate values (KEY),
+and the second field will contain the result of $db->Timestamp() (T)
+*/
+
 class Mutex_database implements iMutex
 {
+	private $field1;
+	private $field2;
+	private $table;
 	private $pause;
 	private $maxtries;
-	private $table;
 
 	function __construct($config)
 	{
 		if(!empty($config['table']))
-			$this->table = $config['table'];
+		{
+			$db = cmsms()->GetDb();
+			$tbl = $config['table'];
+			$rst = $db->Execute('SELECT * FROM '.$tbl);
+			if(!$rst || $rst->FieldCount() < 2)
+				throw new Exception('no database mutex');
+			$rst->Close();
+			$rst = $db->GetCol('SELECT column_name FROM information_schema.columns WHERE table_name=\''.$tbl.'\'');
+			$this->field1 = $rst[0];
+			$this->field2 = $rst[1];
+			$this->table = $tbl;
+		}
 		else
-			throw new Exception('no database cache');
+			throw new Exception('no database mutex');
 		$this->pause = (!empty($config['timeout'])) ? $config['timeout'] : 500;
 		$this->maxtries = (!empty($config['tries'])) ? $config['tries'] : 200;
 	}
@@ -25,7 +44,7 @@ class Mutex_database implements iMutex
 		$db = cmsms()->GetDb();
 		$flid = abs(crc32($token.'.mx.lock'));
 		$stamp = $db->sysTimeStamp;
-		$sql = 'INSERT INTO '.$this->table.' (flock_id,flock) VALUES ('.$flid.','.$stamp.')';
+		$sql = 'INSERT INTO '.$this->table.' ('.$this->field1.','.$this->field2.') VALUES ('.$flid.','.$stamp.')';
 		$count = 0;
 		do
 		{
@@ -34,7 +53,7 @@ class Mutex_database implements iMutex
 			$db->Execute($sql);
 			if($db->CompleteTrans())
 				return TRUE; //success
-/*TODO		$sql = 'SELECT flock_id FROM '.$this->table.' WHERE flock < '.$stamp + 15;
+/*TODO		$sql = 'SELECT '.$this->field1'. FROM '.$this->table.' WHERE '.$this->field2.' < '.$stamp + 15;
 			if($db->GetOne($sql))
 				$db->Execute('DELETE FROM '.$this->table);
 */
@@ -46,7 +65,7 @@ class Mutex_database implements iMutex
 	function unlock($token)
 	{
 		$db = cmsms()->GetDb();
-		$sql = 'DELETE FROM '.$this->table.' WHERE flock_id='.abs(crc32($token.'.mx.lock'));
+		$sql = 'DELETE FROM '.$this->table.' WHERE '.$this->field1.'='.abs(crc32($token.'.mx.lock'));
 		while(1)
 		{
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
