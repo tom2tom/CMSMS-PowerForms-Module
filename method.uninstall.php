@@ -56,7 +56,25 @@ $db->DropSequence($pre.'module_pwf_form_opt_seq');
 $db->DropSequence($pre.'module_pwf_record_seq');
 $db->DropSequence($pre.'module_pwf_uniquefield_seq');
 
-$this->DeleteTemplate();
+if($this->before20)
+	$this->DeleteTemplate();
+else
+{
+	$types = CmsLayoutTemplateType::load_all_by_originator($this->GetName());
+	if($types)
+	{
+		foreach($types as $type)
+		{
+			$templates = $type->get_template_list();
+			if($templates)
+			{
+				foreach($templates as $tpl)
+					$tml->delete();
+			}
+			$type->delete();
+		}
+	}
+}
 
 $fp = $config['uploads_path'];
 if($fp && is_dir($fp))
