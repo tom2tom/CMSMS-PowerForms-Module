@@ -138,6 +138,19 @@ $css_id = $db->GenID($pre.'css_seq');
 $db->Execute('INSERT INTO '.$pre.'css (css_id,css_name,css_text,media_type,create_date) VALUES (?,?,?,?,?)',
 	array($css_id,'PowerForms Default Style',$css,'screen',date('Y-m-d')));
 
+if(!$this->before20)
+{
+	$ttype = new CmsLayoutTemplateType();
+	$ttype->set_originator($this->GetName());
+	$ttype->set_name('form');
+	$ttype->save();
+
+	$ttype = new CmsLayoutTemplateType();
+	$ttype->set_originator($this->GetName());
+	$ttype->set_name('submission');
+	$ttype->save();
+}
+
 $funcs = new pwfFormOperations();
 $path = cms_join_path(dirname(__FILE__),'include');
 $dir = opendir($path);
