@@ -9,7 +9,7 @@ textarea.cloaked {
  width:40em;
  height:2.4em;
 }
-
+div.pagecontainer .pagetext { margin-left:0 }
 .pwf_link { text-decoration:underline; }
 .pwf_fieldset { margin-bottom:2em; }
 .help_display { display:none; }
@@ -20,7 +20,7 @@ textarea.cloaked {
 table#fields
 {
  font-size:1em;
- margin-left:5%;
+ margin-left:0;
  width:auto;
  table-layout:auto;
  border-collapse:collapse;
@@ -37,12 +37,12 @@ table.varshelp
 table.varshelp th {background-color:#AAA;}
 
 table.leftwards {
- margin-left:5%;
+ margin-left:0;
  width:auto;
  table-layout:auto;
 }
 table.rightwards {
- margin-right:5%;
+ margin-right:0;
  width:auto;
  table-layout:auto;
 }
