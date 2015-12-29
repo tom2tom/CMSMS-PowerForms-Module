@@ -971,6 +971,7 @@ $lang['title_option_name'] = 'Option name';
 $lang['title_option_value'] = 'Value submitted';
 $lang['title_page_tag'] = 'Page tag';
 $lang['title_page_x_of_y'] = 'Page %s of %s';
+$lang['title_password'] = 'Pass-phrase for securing sensitive data';
 $lang['title_permitted_extensions'] = 'Permitted extensions';
 $lang['title_php_variable'] = 'PHP variable';
 $lang['title_pick_categories'] = 'Pick a category (multiple)';
