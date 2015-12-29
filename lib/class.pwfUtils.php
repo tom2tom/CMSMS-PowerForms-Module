@@ -23,8 +23,6 @@ class pwfUtils
 	*/
 	public static function GetCache($storage='auto',$settings=array())
 	{
-//		if(self::$cache == NULL && isset($_SESSION['pwrcache']))
-//			self::$cache = $_SESSION['pwrcache'];
 		if(self::$cache)
 			return self::$cache;
 
@@ -78,7 +76,6 @@ class pwfUtils
 				continue;
 			}
 			$this->cache = $cache;
-//			$_SESSION['pwrcache'] = $cache;
 			return $this->cache;
 		}
 		throw new Exception('Cache not working');
@@ -95,12 +92,7 @@ class pwfUtils
 	{
 		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
 		require($path.'interface.Mutex.php');
-/*
-		if(!self::$mxtype && isset($_SESSION['pwrmxtype']))
-			self::$mxtype = $_SESSION['pwrmxtype'];
-		if(!self::$instance && isset($_SESSION['pwrmxinstance']))
-			self::$instance = $_SESSION['pwrmxinstance'];
-*/
+
 		$settings = array(
 			'memcache'=>array(
 				'instance'=>((self::$mxtype=='memcache')?self::$instance:NULL)
@@ -148,16 +140,24 @@ class pwfUtils
 					continue;
 				}
 				self::$mxtype = $one;
-//				$_SESSION['pwrmxtype'] = $one;
 				if(isset($mutex->instance))
 					self::$instance = &$mutex->instance;
 				else
 					self::$instance = NULL;
-//				$_SESSION['pwrmxinstance'] = self::$instance;
 				return $mutex;
 			}
 			throw new Exception('Mutex not working');
 		}
+	}
+
+	public static function SafeExec()
+	{
+		$TODO;
+	}
+
+	public static function SafeGet()
+	{
+		$TODO;
 	}
 
 //	const MAILERMINVERSION = '1.73'; //minumum acceptable version of CMSMailer module
@@ -803,16 +803,21 @@ EOS;
 
 	/**
 	Encrypt:
+	@mod: reference to PowerForms module object
 	@source: string to be encrypted
-	@pass_phrase: en/de-crypt key
+	@pass_phrase: en/de-crypt key, if empty then the default will be used
 	This function derived from work by Josh Hartman and others.
 	Reference: http://www.warpconduit.net/2013/04/14/highly-secure-data-encryption-decryption-made-easy-with-php-mcrypt-rijndael-256-and-cbc
 	*/
-	public static function Encrypt($source,$pass_phrase)
+	public static function Encrypt(&$mod,$source,$pass_phrase='')
 	{
 		if(!$source)
 			return '';
-		elseif($pass_phrase && extension_loaded('mcrypt'))
+		if(!$pass_phrase)
+		{
+			$pass_phrase = self::Unfusc($mod->GetPreference('masterpass'));
+		}
+		if($pass_phrase && $mod->havemcrypt)
 		{
 			$flag = (defined('MCRYPT_DEV_URANDOM')) ? MCRYPT_DEV_URANDOM : MCRYPT_RAND;
 			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128,MCRYPT_MODE_CBC),$flag);
@@ -823,21 +828,26 @@ EOS;
 			return base64_encode($passcrypt).'|'.base64_encode($iv);
 		}
 		else
-			return base64_encode(serialize($source));
+			return self::Fusc($pass_phrase.$source);
 	}
 
 	/**
 	Decrypt:
+	@mod: reference to PowerForms module object
 	@source: string to be encrypted
-	@pass_phrase: en/de-crypt key
+	@pass_phrase: en/de-crypt key, if empty then the default will be used
 	This function derived from work by Josh Hartman and others.
 	Reference: http://www.warpconduit.net/2013/04/14/highly-secure-data-encryption-decryption-made-easy-with-php-mcrypt-rijndael-256-and-cbc
 	*/
-	public static function Decrypt($source,$pass_phrase)
+	public static function Decrypt(&$mod,$source,$pass_phrase='')
 	{
 		if(!$source)
 			return '';
-		elseif($pass_phrase && extension_loaded('mcrypt'))
+		if(!$pass_phrase)
+		{
+			$pass_phrase = self::Unfusc($mod->GetPreference('masterpass'));
+		}
+		if($pass_phrase && $mod->havemcrypt)
 		{
 			$decrypt = explode('|', $source.'|');
 			$decoded = base64_decode($decrypt[0]);
@@ -854,7 +864,37 @@ EOS;
 			return FALSE;
 		}
 		else
-			return unserialize(base64_decode($source));
+			return substr(strlen($pass_phrase),self::Unfusc($source));
+	}
+
+	/**
+	Fusc:
+	@str: string or FALSE
+	obfuscate @str
+	*/
+	public static function Fusc($str)
+	{
+		if($str)
+		{
+			$s = substr(base64_encode(md5(microtime())),0,5);
+			return $s.base64_encode($s.$str);
+		}
+		return '';
+	}
+
+	/**
+	Unfusc:
+	@str: string or FALSE
+	de-obfuscate @str
+	*/
+	public static function Unfusc($str)
+	{
+		if($str)
+		{
+			$s = base64_decode(substr($str,5));
+			return substr($s,5);
+		}
+		return '';
 	}
 
 	/**
