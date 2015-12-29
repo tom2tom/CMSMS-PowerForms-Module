@@ -1,7 +1,7 @@
 <?php
 #------------------------------------------------------------------------
 # This is CMS Made Simple module: PowerForms
-# Copyright (C) 2012-2015 Tom Phane <@>
+# Copyright (C) 2012-2016 Tom Phane <@>
 # Derived in part from FormBuilder module, copyright (C) 2005-2012, Samuel Goldstein <sjg@cmsmodules.com>
 # This project's forge-page is: http://dev.cmsmadesimple.org/projects/powerforms
 #
@@ -13,13 +13,17 @@
 # This module is distributed in the hope that it will be useful, but
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License (www.gnu.org/licenses/licenses.html#AGPL)
-# for more details.
+# GNU Affero General Public License for more details.
+# Read the License online: http://www.gnu.org/licenses/licenses.html#AGPL
 #-----------------------------------------------------------------------
 
 class PowerForms extends CMSModule
 {
 	public $before20;
+	public $havemcrypt;
+	private $mh = NULL; //curl_multi handle for async queue processing
+	private $ch = FALSE; //cached curl handle for unfinished process
+	private $Qurl;
 	//these are populated when first used
 	public $field_types = FALSE; //array of all usable field classnames
 	public $std_field_types = FALSE; //subset of $field_types, classes for use in 'fast-adder' simple mode
@@ -33,10 +37,31 @@ class PowerForms extends CMSModule
 		parent::__construct();
 		global $CMS_VERSION;
 		$this->before20 = (version_compare($CMS_VERSION,'2.0') < 0);
+		$this->havemcrypt = function_exists('mcrypt_encrypt');
+		//TODO curl check
+		$this->mh = curl_multi_init();
+		//bogus frontend link (i.e. no admin login needed)
+		$url = $this->CreateLink('_','run_queue',1,'',array(),'',TRUE);
+		//strip the (trailing) fake returnid, hence use the default
+		$sep = strpos($url,'&amp;');
+		$this->Qurl = substr($url,0,$sep);
+		//TODO mutex, cache checks
 		require_once cms_join_path(dirname(__FILE__),'lib','class.pwfData.php');
 		$this->RegisterModulePlugin(TRUE);
 	}
 
+/*	function __destruct()
+	{
+		if($this->ch)
+		{
+			curl_multi_remove_handle($this->mh,$this->ch);
+			curl_close($this->ch);
+		}
+		if($this->mh)
+			curl_multi_close($this->mh);
+//		parent::__destruct();
+	}
+*/
 	function AllowAutoInstall()
 	{
 		return FALSE;
@@ -47,24 +72,10 @@ class PowerForms extends CMSModule
 		return FALSE;
 	}
 
+	//for 1.11+
 	function AllowSmartyCaching()
 	{
 		return FALSE;
-	}
-
-	function InstallPostMessage()
-	{
-		return $this->Lang('post_install');
-	}
-
-	function UninstallPreMessage()
-	{
-		return $this->Lang('confirm_uninstall');
-	}
-
-	function UninstallPostMessage()
-	{
-		return $this->Lang('post_uninstall');
 	}
 
 	function GetName()
@@ -95,11 +106,6 @@ class PowerForms extends CMSModule
 	function GetAuthorEmail()
 	{
 		return 'tpgww@onepost.net';
-	}
-
-	function GetAdminDescription()
-	{
-		return $this->Lang('admin_desc');
 	}
 
 	function GetChangeLog()
@@ -133,9 +139,23 @@ class PowerForms extends CMSModule
 		return '1.10'; //need class autoloading
 	}
 
-	function MaximumCMSVersion()
+/*	function MaximumCMSVersion()
 	{
-		return '1.19.99';
+	}
+*/
+	function InstallPostMessage()
+	{
+		return $this->Lang('post_install');
+	}
+
+	function UninstallPreMessage()
+	{
+		return $this->Lang('confirm_uninstall');
+	}
+
+	function UninstallPostMessage()
+	{
+		return $this->Lang('post_uninstall');
 	}
 
 	function IsPluginModule()
@@ -158,16 +178,18 @@ class PowerForms extends CMSModule
 		return 'extensions';
 	}
 
-	function VisibleToAdminUser()
+	function GetAdminDescription()
 	{
-		return $this->CheckAccess();
+		return $this->Lang('admin_desc');
 	}
 
-/*	see AdminStyle()
-	function GetHeaderHTML()
+	function VisibleToAdminUser()
 	{
-		return '<link rel="stylesheet" type="text/css" href="'.
-			$this->GetModuleURLPath().'/css/admin.css" />';
+		return self::CheckAccess();
+	}
+
+/*	function GetHeaderHTML()
+	{
 	}
 */
 	function AdminStyle()
@@ -201,8 +223,8 @@ class PowerForms extends CMSModule
 	//setup for pre-1.10
 	function SetParameters()
 	{
-		$this->InitializeAdmin();
-		$this->InitializeFrontend();
+		self::InitializeAdmin();
+		self::InitializeFrontend();
 	}
 
 	//partial setup for pre-1.10, backend setup for 1.10+
