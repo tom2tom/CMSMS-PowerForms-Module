@@ -33,6 +33,19 @@ function Match_Browses(&$db,$pre)
 	}
 }
 
+//for CMSMS 2+
+function MySetTemplate($type,$id,$val)
+{
+	$tpl = new CmsLayoutTemplate();
+	$tpl->set_type($type);
+	$pref = ($type == 'form') ? 'pwf::':'pwf::sub_';
+	$tpl->set_name($pref.$id);
+	$tpl->set_owner(1);
+//	$tpl->set_additional_editors(-N); TODO array of group ids esp. for 'ModifyPFForms'
+	$tpl->set_content($val);
+	$tpl->save();
+}
+
 /* REPLACEMENTS ...
 	$fld_X					$fld_Y
 	{$fb_form_header}		gone
@@ -141,17 +154,42 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		unset($row);
 	}
 
-	$tpl = $mod->GetTemplate('pwf_'.$newfid);
-	if($tpl)
+	if($mod->before20)
+		$tpl = $mod->GetTemplate('pwf::'.$newfid);
+	else
 	{
-		$tpl = str_replace($finds,$repls,$tpl);
-		$mod->SetTemplate('pwf_'.$newfid,$tpl);
+		//CHECKME try/catch?
+		$ob = CmsLayoutTemplate::load('pwf::'.$newfid);
+		$tpl = $ob->get_content();
 	}
-	$tpl = $mod->GetTemplate('pwf_sub_'.$newfid);
 	if($tpl)
 	{
 		$tpl = str_replace($finds,$repls,$tpl);
-		$mod->SetTemplate('pwf_sub_'.$newfid,$tpl);
+		if($mod->before20)
+			$mod->SetTemplate('pwf::'.$newfid,$tpl);
+		else
+		{
+			$ob->set_content($tpl);
+			$ob->save();
+		}
+	}
+	if($mod->before20)
+		$tpl = $mod->GetTemplate('pwf::sub_'.$newfid);
+	else
+	{
+		$ob = CmsLayoutTemplate::load('pwf::sub_'.$newfid);
+		$tpl = $ob->get_content();
+	}
+	if($tpl)
+	{
+		$tpl = str_replace($finds,$repls,$tpl);
+		if($mod->before20)
+			$mod->SetTemplate('pwf::sub_'.$newfid,$tpl);
+		else
+		{
+			$ob->set_content($tpl);
+			$ob->save();
+		}
 	}
 
 	$sql = 'SELECT option_id,value FROM '.$pre.'module_pwf_form_opt WHERE form_id=? AND name = \'submission_template\'';
@@ -336,14 +374,21 @@ function Get_Opts(&$mod,&$db,$pre,$oldfid,$newfid)
 				continue;
 			if(strpos($row['name'],'udt') !== FALSE && ($row['value'] == FALSE || $row['value'] == -1))
 				continue;
+			//CHECKME template arrangements used by newer FormBuilder
 			if($row['name'] == 'form_template')
 			{
-				$mod->SetTemplate('pwf_'.$newfid,$row['value']);
+				if($mod->before20)
+					$mod->SetTemplate('pwf::'.$newfid,$row['value']);
+				else
+					MySetTemplate('form',$newfid,$row['value']);
 				$row['value'] = 'pwf_'.$newfid;
 			}
 			elseif($row['name'] == 'submission_template')
 			{
-				$mod->SetTemplate('pwf_sub_'.$newfid,$row['value']);
+				if($mod->before20)
+					$mod->SetTemplate('pwf::sub_'.$newfid,$row['value']);
+				else
+					MySetTemplate('submission',$newfid,$row['value']);
 				$row['value'] = 'pwf_sub_'.$newfid;
 			}
 			$newopt = $db->GenID($pre.'module_pwf_form_opt_seq');
