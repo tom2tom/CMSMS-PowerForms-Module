@@ -3,15 +3,15 @@
 {$form_start}{$hidden}
 {$tabs_start}
 {$maintab_start}
- <div class="pageoverflow">
+ <div class="pageinput pageoverflow">
   <p class="pagetext">{$title_form_name}:</p>
-  <div class="pageinput">{$input_form_name}</div>
+  <div>{$input_form_name}</div>
   <p class="pagetext">{$title_form_alias}:</p>
-  <div class="pageinput">{$input_form_alias}<br />{$help_form_alias}</div>
+  <div>{$input_form_alias}<br />{$help_form_alias}</div>
   <p class="pagetext">{$title_inline_form}:</p>
-  <p class="pageinput">{$input_inline_form}</p>
+  <p>{$input_inline_form}</p>
   <p class="pagetext">{$title_form_status}:</p>
-  <p class="pageinput">{if $text_ready}{$text_ready}{else}<strong>{$text_notready}</strong> - {$help_notready}{/if}</p>
+  <p>{if $text_ready}{$text_ready}{else}<strong>{$text_notready}</strong> - {$help_notready}{/if}</p>
  </div>
 {$tab_end}{$fieldstab_start}
  <div class="pageinput pageoverflow">
@@ -64,26 +64,26 @@
   	 <div class="addslow">{$add_field_link}</div>
  </div>
 {$tab_end}{$designtab_start}
- <div class="pageoverflow">
+ <div class="pageinput pageoverflow">
   <p class="pagetext">{$title_form_css_class}:</p>
-  <p class="pageinput">{$input_form_css_class}</p>
+  <p>{$input_form_css_class}</p>
   <p class="pagetext">{$title_form_required_symbol}:</p>
-  <p class="pageinput">{$input_form_required_symbol}</p>
+  <p>{$input_form_required_symbol}</p>
   <p class="pagetext">{$title_list_delimiter}:</p>
-  <p class="pageinput">{$input_list_delimiter}</p>
+  <p>{$input_list_delimiter}</p>
   <p class="pagetext">{$title_form_unspecified}:</p>
-  <p class="pageinput">{$input_form_unspecified}</p>
+  <p>{$input_form_unspecified}</p>
   <p class="pagetext">{$title_form_submit_button}:</p>
-  <p class="pageinput">{$input_form_submit_button}</p>
+  <p>{$input_form_submit_button}</p>
   <p class="pagetext">{$title_form_next_button}:</p>
-  <p class="pageinput">{$input_form_next_button}</p>
+  <p>{$input_form_next_button}</p>
   <p class="pagetext">{$title_form_prev_button}:</p>
-  <p class="pageinput">{$input_form_prev_button}</p>
+  <p>{$input_form_prev_button}</p>
  </div>
 {$tab_end}{$templatetab_start}
- <div class="pageoverflow">
+ <div class="pageinput pageoverflow">
   <p class="pagetext">{$title_load_template}:</p>
-  <p class="pageinput">{$input_load_template}</p>
+  <p>{$input_load_template}</p>
  </div>
  <br />
  <div class="pageinput pageoverflow">
@@ -115,14 +115,14 @@
   </div>
  </div>
 {$tab_end}{$udttab_start}
- <div class="pageoverflow">
+ <div class="pageinput pageoverflow">
 {*<p class="pagetext">{$help_see_udt}</p>*}
   <p class="pagetext">{$title_form_predisplay_udt}:</p>
-  <p class="pageinput">{$input_form_predisplay_udt}</p>
+  <p>{$input_form_predisplay_udt}</p>
   <p class="pagetext">{$title_form_predisplay_each_udt}:</p>
-  <p class="pageinput">{$input_form_predisplay_each_udt}</p>
+  <p>{$input_form_predisplay_each_udt}</p>
   <p class="pagetext">{$title_form_validate_udt}:</p>
-  <p class="pageinput">{$input_form_validate_udt}</p>
+  <p>{$input_form_validate_udt}</p>
  </div>
 {$tab_end}{$submittab_start}
  <div class="pageinput pageoverflow">
@@ -136,7 +136,7 @@
   <p>{$help_can_drag}</p>
   <div id="saveordermsg" style="display:none"><p>{$help_save_order}</p></div>
   </div>
-  <table id="dispositions" class="pageinput tabledrag">
+  <table id="dispositions" class="leftwards tabledrag">
    <thead><tr>
     <th style="width:15em;">{$title_field_name}</th>
     <th style="width:20em;">{$title_field_type}</th>

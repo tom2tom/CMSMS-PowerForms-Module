@@ -6,13 +6,13 @@
 {$tabs_start}
 {if isset($maintab_start)}
 {$maintab_start}
- <div class="pageoverflow">
+ <div class="pageinput pageoverflow">
 {foreach from=$mainList item=entry}
 {if isset($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
-{if isset($entry->input)}<div class="pageinput">{$entry->input}</div>{/if}
-{if isset($entry->help)}<p class="pageinput">{$entry->help}</p>{/if}
+{if isset($entry->input)}<div>{$entry->input}</div>{/if}
+{if isset($entry->help)}<p>{$entry->help}</p>{/if}
 {/foreach}
-{if !empty($mainvarhelp)}<br /><div class="pageinput">{$help_subtplvars}</div>{/if}
+{if !empty($mainvarhelp)}<br /><div>{$help_subtplvars}</div>{/if}
 {if isset($mainTable)}
   <br />
   <div class="pageinput pageoverflow">
@@ -40,13 +40,13 @@
 {/if}{*isset($maintab_start)*}
 {if isset($advancedtab_start)}
 {$advancedtab_start}
- <div class="pageoverflow">
+ <div class="pageinput pageoverflow">
 {foreach from=$advList item=entry}
 {if isset($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
-{if isset($entry->input)}<div class="pageinput">{$entry->input}</div>{/if}
-{if isset($entry->help)}<p class="pageinput">{$entry->help}</p>{/if}
+{if isset($entry->input)}<div>{$entry->input}</div>{/if}
+{if isset($entry->help)}<p>{$entry->help}</p>{/if}
 {/foreach}
-{if !empty($advvarhelp)}<br /><div class="pageinput">{$help_subtplvars}</div>{/if}
+{if !empty($advvarhelp)}<br /><div>{$help_subtplvars}</div>{/if}
  </div>
 {$tab_end}
 {/if}{*isset($advancedtab_start)*}

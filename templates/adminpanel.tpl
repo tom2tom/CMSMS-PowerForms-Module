@@ -50,7 +50,7 @@
 {$tab_end}
 {if $pmod}
 {$importstab_start}
-<div class="pageoverflow">
+<div class="pageinput pageoverflow">
 {if isset($submitfb)}
 	<fieldset>
 	<legend>{$legend_xmlimport}</legend>
@@ -58,17 +58,17 @@
 		{$start_importxmlform}
 		{foreach from=$xmls item=entry}
 		{if isset($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
-		<div class="pageinput">{$entry->input}{if isset($entry->help)}<br />{$entry->help}{/if}</div>
+		<div>{$entry->input}{if isset($entry->help)}<br />{$entry->help}{/if}</div>
 		{/foreach}
 		<br />
-		<div class="pageinput">{$submitxml}</div>
+		<div>{$submitxml}</div>
 		{$form_end}
 {if isset($submitfb)}
 	</fieldset>
 	<fieldset>
 	<legend>{$legend_fbimport}</legend>
 		{$start_importfbform}
-		<div class="pageinput">{$submitfb}{if isset($submitdata)} {$submitdata}{/if}</div>
+		<div>{$submitfb}{if isset($submitdata)} {$submitdata}{/if}</div>
 		{$form_end}
 	</fieldset>
 {/if}
@@ -78,13 +78,13 @@
 {if $padm}
 {$settingstab_start}
 {$start_configform}
-<div class="pageoverflow">
+<div class="pageinput pageoverflow">
 {foreach from=$configs item=entry}
 {if isset($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
-<div class="pageinput">{$entry->input}{if isset($entry->help)}<br />{$entry->help}{/if}</div>
+<div>{$entry->input}{if isset($entry->help)}<br />{$entry->help}{/if}</div>
 {/foreach}
 <br />
-<div class="pageinput">{$submitcfg}&nbsp;{$cancel}</div>
+<div>{$submitcfg}&nbsp;{$cancel}</div>
 </div>
 {$form_end}
 {$tab_end}
