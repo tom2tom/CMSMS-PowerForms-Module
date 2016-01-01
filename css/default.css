@@ -39,6 +39,12 @@ textarea {
 	width: 98%;
 	height: 6em
 }
+textarea.cloaked {
+	font-family:auto;
+	font-family:inherit;
+	font-size:1.2em;
+}
+
 /* Apply this class to text/select input fields with shorter labelsto help alignment */
 .short-label label {
 	float: left;

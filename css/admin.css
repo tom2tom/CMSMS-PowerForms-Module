@@ -1,5 +1,21 @@
-textarea.pwf_tallarea { width:50em;height:15em; }
-textarea.pwf_shortarea { width:50em;height:8em; }
+textarea.pwf_tallarea {
+ font-family:auto;
+ font-family:inherit;
+ font-size:1.1em;
+// font-size:inherit;
+ line-height:1.2;
+ width:50em;
+ height:16em;
+}
+textarea.pwf_shortarea {
+ font-family:auto;
+ font-family:inherit;
+ font-size:1.1em;
+// font-size:inherit;
+ line-height:1.2;
+ width:50em;
+ height:6em;
+}
 textarea.cloaked {
  font-family:auto;
  font-family:inherit;
@@ -36,6 +52,8 @@ table.varshelp
 }
 table.varshelp th {background-color:#AAA;}
 
+table.pagetable { padding:3px; border-spacing:0; margin-left:0; width:auto }
+
 table.leftwards {
  margin-left:0;
  width:auto;
@@ -58,3 +76,5 @@ table.rightwards {
 .dndhelp { display:none; } /* changed at runtime if js is available */
 img.tipper { display:none; } /* ditto */
 .addfast { display:none; } /* ditto */
+
+p.pagetext { margin-top:0.5em; margin-bottom:0.5em; }
