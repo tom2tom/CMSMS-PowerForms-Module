@@ -14,14 +14,14 @@ class pwfText extends pwfFieldBase
 		$this->Type = 'Text';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array(
-            $mod->Lang('validation_none')=>'none',
-            $mod->Lang('validation_numeric')=>'numeric',
-            $mod->Lang('validation_integer')=>'integer',
-            $mod->Lang('validation_usphone')=>'usphone',
-            $mod->Lang('validation_email_address')=>'email',
-            $mod->Lang('validation_regex_match')=>'regex_match',
-            $mod->Lang('validation_regex_nomatch')=>'regex_nomatch'
-           );
+			$mod->Lang('validation_none')=>'none',
+			$mod->Lang('validation_numeric')=>'numeric',
+			$mod->Lang('validation_integer')=>'integer',
+			$mod->Lang('validation_usphone')=>'usphone',
+			$mod->Lang('validation_email_address')=>'email',
+			$mod->Lang('validation_regex_match')=>'regex_match',
+			$mod->Lang('validation_regex_nomatch')=>'regex_nomatch'
+		);
 	}
 
 	function GetFieldStatus()
@@ -44,7 +44,7 @@ class pwfText extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_maximum_length'),
 						$mod->CreateInputText($id,'opt_length',
-							$this->GetOption('length',80),25,25));
+							$this->GetOption('length',80),3,3));
 		$main[] = array($mod->Lang('title_read_only'),
 						$mod->CreateInputHidden($id,'opt_readonly',0).
 						$mod->CreateInputCheckbox($id,'opt_readonly',1,

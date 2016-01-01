@@ -47,7 +47,7 @@ class pwfTextArea extends pwfFieldBase
 						$mod->CreateInputHidden($id,'opt_wysiwyg',0).
 						$mod->CreateInputCheckbox($id,'opt_wysiwyg',1,$this->GetOption('wysiwyg',0)));
 		$main[] = array($mod->Lang('title_textarea_rows'),
-						$mod->CreateInputText($id,'opt_rows',$this->GetOption('rows',15),5,5));
+						$mod->CreateInputText($id,'opt_rows',$this->GetOption('rows',15),2,2));
 //TODO this is stupid - prefer 100%
 //		$main[] = array($mod->Lang('title_textarea_cols'),
 //						$mod->CreateInputText($id,'opt_cols',$this->GetOption('cols',80),5,5));
@@ -106,7 +106,7 @@ $(document).ready(function() {
    }
   }).blur(function() {
    if(this.value === '') {
-     this.value = this.defaultValue;
+    this.value = this.defaultValue;
    }
   });
  });
