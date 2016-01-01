@@ -22,7 +22,7 @@ class Mutex_memcache implements iMutex
 				throw new Exception('no memcache storage');
 		}
 		$sysconfig = cmsms()->GetConfig();
-		$rooturl = (empty($_SERVER['HTTPS'])) ? $sysconfig['root_url'] : $sysconfig['ssl_url'];
+		$rooturl = (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') ? $sysconfig['root_url'] : $sysconfig['ssl_url'];
 		$this->instance->connect($rooturl,11211);
 		$this->pause = (!empty($config['timeout'])) ? $config['timeout'] : 50;
 		$this->maxtries = (!empty($config['tries'])) ? $config['tries'] : 10;
