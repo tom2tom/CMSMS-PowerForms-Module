@@ -15,7 +15,16 @@ else
 		'module_pwf_form_opt WHERE form_id=? AND name=\'form_template\'';
 	$tplstr = $db->GetOne($sql,array($params['tid']));
 	if($tplstr && strncmp($tplstr,'pwf_',4) == 0)
-		$tplstr = $this->GetTemplate($tplstr);
+	{
+		$name = 'tpl::'.substr($tplstr,4);
+		if($this->before20)
+			$tplstr = $this->GetTemplate($name);
+		else
+		{
+			$ob = CmsLayoutTemplate::load($name);
+			$tplstr = $ob->get_content();
+		}
+	}
 }
 
 if($tplstr)

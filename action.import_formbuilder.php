@@ -36,12 +36,48 @@ function Match_Browses(&$db,$pre)
 //for CMSMS 2+
 function MySetTemplate($type,$id,$val)
 {
+	static $editors = NULL;
+	if($editors === NULL)
+	{
+		$editors = array();
+		global $db;
+		$pre = cms_db_prefix();
+		$sql = <<<EOS
+SELECT G.group_id
+FROM {$pre}groups G
+JOIN {$pre}group_perms GP ON G.group_id = GP.group_id
+JOIN {$pre}permissions P on GP.permission_id = P.permission_id
+WHERE G.active=1 AND P.permission_name='ModifyPFSettings'
+EOS;
+		$all = $db->GetCol($sql);
+		if($all)
+		{
+			foreach($all as $id)
+				$editors[] = -$id;
+		}
+		$sql = <<<EOS
+SELECT DISTINCT U.user_id
+FROM {$pre}users U
+JOIN {$pre}user_groups UG ON U.user_id = UG.user_id
+JOIN {$pre}group_perms GP ON GP.group_id = UG.group_id
+JOIN {$pre}permissions P ON P.permission_id = GP.permission_id
+JOIN {$pre}groups GR ON GR.group_id = UG.group_id
+WHERE U.admin_access=1 AND U.active=1 AND GR.active=1 AND
+P.permission_name='ModifyPFSettings'
+EOS;
+		$all = $db->GetCol($sql);
+		if($all)
+		{
+			foreach($all as $id)
+				$editors[] = $id;
+		}
+	}
 	$tpl = new CmsLayoutTemplate();
 	$tpl->set_type($type);
 	$pref = ($type == 'form') ? 'pwf::':'pwf::sub_';
 	$tpl->set_name($pref.$id);
-	$tpl->set_owner(1);
-//	$tpl->set_additional_editors(-N); TODO array of group ids esp. for 'ModifyPFForms'
+	$tpl->set_owner(1); //original admin user
+	$tpl->set_additional_editors($editors); // !too bad if permissions change? or handle that event ?
 	$tpl->set_content($val);
 	$tpl->save();
 }
@@ -426,6 +462,35 @@ if(isset($params['import']))
 			$db->Execute($sql,array($fid,$row['name'],$alias));
 			$renums[(int)$row['form_id']] = $fid;
 		}
+
+		if(!$mod->before20)
+		{
+			$types = CmsLayoutTemplateType::load_all_by_originator('FormBuilder');
+			if($types)
+			{
+				foreach($types as $type)
+				{
+					$templates = $type->get_template_list();
+					if($templates)
+					{
+$this->Crash();
+/* as of 0.8.x at least, FormBuilder doesn't do new-style templates
+						foreach($templates as $tpl)
+						{
+							switch($type)
+							{
+							 default:
+								$txt = $tpl->get_content();
+								//TODO set type,id, migrate contents
+								MySetTemplate($mytype,$myid,$txt);
+							}
+						}
+*/
+					}
+				}
+			}
+		}
+
 		$sql = 'INSERT INTO '.$pre.'module_pwf_trans (old_id,new_id,isform) VALUES (?,?,1)';
 		foreach($renums as $old=>$new)
 		{
