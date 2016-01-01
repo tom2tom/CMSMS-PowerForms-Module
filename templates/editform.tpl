@@ -16,18 +16,17 @@
 {$tab_end}{$fieldstab_start}
  <div class="pageinput pageoverflow">
  {if !empty($fields)}
-  <p class="pagetext">{$title_form_fields}</p>
   <div class="reordermsg pagemessage" style="display:none">
   <p>{$help_can_drag}</p>
   <div id="saveordermsg" style="display:none"><p>{$help_save_order}</p></div>
   </div>
-  <table id="fields" class="pagetable leftwards tabledrag">
+  <table id="fields" class="pagetable tabledrag">
    <thead><tr>
   {if isset($title_field_id)}<th>{$title_field_id}</th>{/if}
-    <th style="width:15em;">{$title_field_name}</th>
+    <th style="max-width:15em;">{$title_field_name}</th>
   {if isset($title_field_alias)}<th style="width:10em;">{$title_field_alias}</th>{/if}
-    <th style="width:20em;">{$title_field_type}</th>
-    <th style="width:25em;">{$title_information}</th>
+    <th style="max-width:20em;">{$title_field_type}</th>
+    <th style="max-width:25em;">{$title_information}</th>
     <th class="pageicon">{$title_field_required_abbrev}</th>
     <th class="updown" style="width:20px;">&nbsp;</th>
     <th class="updown" style="width:20px;">&nbsp;</th>
@@ -81,7 +80,7 @@
   <p>{$input_form_prev_button}</p>
  </div>
 {$tab_end}{$templatetab_start}
- <div class="pageinput pageoverflow">
+ <div class="pageinput">
   <p class="pagetext">{$title_load_template}:</p>
   <p>{$input_load_template}</p>
  </div>
@@ -90,7 +89,7 @@
   <p style="font-weight:bold;">{$title_form_template}:{$icon_info}</p>
   <p>{$input_form_template}</p>
    <div class="showhelp">
-  <p style="font-weight:bold;">{$title_form_vars}:</p>
+  <p style="font-weight:bold;">{$title_tplvars}:</p>
 <table class="varshelp">
 <tr><th>{$title_variable}</th><th>{$title_description}</th></tr>
 {foreach from=$formvars item=entry}
@@ -99,7 +98,7 @@
  <td>{ldelim}${$entry->name}{rdelim}</td><td>{$entry->description}</td></tr>
 {/foreach}
 </table><br />
-  <p>{$help_formvars}</p>
+  <p>{$help_tplvars}</p>
 {if !empty($fieldprops)}
   <p>{$help_fieldvars1}</p>
 <table class="varshelp">
@@ -126,6 +125,8 @@
  </div>
 {$tab_end}{$submittab_start}
  <div class="pageinput pageoverflow">
+  <p class="pagetext">{$title_submit_limit}:</p>
+  <p>{$input_submit_limit}</p>
   <p class="pagetext">{$title_submit_button_safety}:</p>
   <p>{$input_submit_button_safety}</p>
   <p class="pagetext">{$title_submit_javascript}:</p>
@@ -138,9 +139,9 @@
   </div>
   <table id="dispositions" class="leftwards tabledrag">
    <thead><tr>
-    <th style="width:15em;">{$title_field_name}</th>
-    <th style="width:20em;">{$title_field_type}</th>
-    <th style="width:25em;">{$title_information}</th>
+    <th style="max-width:15em;">{$title_field_name}</th>
+    <th style="max-width:20em;">{$title_field_type}</th>
+    <th style="max-width:25em;">{$title_information}</th>
     <th class="updown" style="width:20px;">&nbsp;</th>
     <th class="updown" style="width:20px;">&nbsp;</th>
     <th class="pageicon"></th>
