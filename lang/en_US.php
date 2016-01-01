@@ -539,16 +539,12 @@ EOS;
 $lang['help_confirm'] = 'An email has been sent to the address nominated for confirmation. After that email is processed, this form will be submitted.';
 $lang['help_date_format'] = 'See <a href="http://www.php.net/manual/en/function.date.php" target=_NEW>the PHP Manual</a> for formatting help.';
 $lang['help_date_order'] = 'Use "m" for Month, "d" for Day, and "y" for Year. Separate the items by hyphens.';
-$lang['help_enable_antispam'] = 'Limit to 10 form-submissions per hour per IP address';
 $lang['help_field_height'] = 'The height of the multiselect field';
 //$lang['help_field_values'] = 'Another way of accessing field values is via $fieldname_obj, $alias_obj, or $fld_#_obj, where each field is an object with attributes';
 $lang['help_file_footer_template'] = 'For TXT, this will be placed at the bottom of the file. For RTF, this will replace the %%FOOTER%% string in the template file.';
 $lang['help_file_header_template'] = 'For TXT, this will be placed at the top of the file. For RTF, this will replace the %%HEADER%% string in the template file.';
 $lang['help_file_rename'] = 'To rename a file upon uploading, create the template here. Leave blank to preserve original filename';
 $lang['help_form_alias'] = 'If left blank, an alias will be derived from the form name';
-$lang['help_form_vars'] = <<<EOS
-At minimum, a <code>{\$submit}</code> tag must be included in the template, or else the form cannot work.
-EOS;
 $lang['help_ignored_if_upload'] = '(This field ignored if you use the Uploads module to manage files)';
 $lang['help_import_alias'] = 'Optional replacement alias for the imported form';
 $lang['help_import_name'] = 'Optional replacement name for the imported form';
@@ -594,6 +590,7 @@ You can still use the %%HEADER%% and %%FOOTER%% sections in the RTF file.
 EOS;
 $lang['help_server_name'] = 'Your server';
 $lang['help_submission_date'] = 'Date of submission';
+$lang['help_submit_limit'] = 'Primitive, secondary, spam management mechanism. This sets the default value for each form, 0 (no limit) or 1 to 250. Usually not needed, especially if the form includes a captcha field.';
 $lang['help_sub_source'] = 'IP address of form user';
 $lang['help_form_url'] = 'URL of page containing form';
 $lang['help_unique_file_template'] = <<<EOS
@@ -653,9 +650,12 @@ $lang['help_submit_safety'] = 'Add Javascript to final \'Submit\' button that wi
 //What the module does with submitted data is determined by "Disposition" fields (such as generated emails) in the form, not here.
 //EOS;
 $lang['help_submit_template'] = <<<EOS
-This template is to generate content displayed to the user after the form is submitted and processed.
-The template is not relevant to form-field disposition. Disposition-specific templates are (where appropriate)
+This template is to generate content displayed to the user after the form is submitted and processed.<br />
+The template is not relevant to form-field disposition.<br />Disposition-specific templates are (where appropriate)
 set in the "advanced" tab displayed when editing a disposition field, as listed above.
+EOS;
+$lang['help_tpl_vars'] = <<<EOS
+At minimum, a <code>{\$submit}</code> tag must be included in the template, or else the form cannot work.
 EOS;
 $lang['help_uploads_dir']='Filesystem path relative to website-host uploads directory. No leading or trailing path-separator, and any intermediate path-separator must be host-system-specific e.g. \'\\\' on Windows. If left blank, the default will be used.';
 $lang['help_url'] = 'Entire URL, including protocol and path (e.g. http://myhost.com/form_handler.cgi)';
@@ -741,7 +741,7 @@ $lang['original_file_extension'] = 'Original file extension (includes the ".")';
 $lang['overwrite'] = 'Allows Overwriting';
 
 $lang['param_form_alias'] = 'Form alias';
-$lang['param_passed_from_tag'] = 'Default field values; see module help';
+$lang['param_passed_from_tag'] = 'Default value for the form field named \'pwfp_*\' TODO';
 $lang['password_does_not_match'] = 'Password does not match %s';
 $lang['permitted_extensions'] = 'Extensions';
 $lang['permitted_filetypes'] = 'Allowed file types';
@@ -866,7 +866,6 @@ $lang['title_email_from_address'] = '"From" address';
 $lang['title_email_from_name'] = '"Sender" name';
 $lang['title_email_subject'] = 'Email subject';
 $lang['title_email_template'] = 'Email Template';
-$lang['title_enable_antispam'] = 'Enable primitive anti-spam features';
 $lang['title_encrypt_database_data'] = 'Encrypt data stored in database';
 $lang['title_encrypt_sortfields'] = 'Hash sort fields';
 $lang['title_encryption'] = 'Encryption';
@@ -928,7 +927,6 @@ $lang['title_form_submit_button'] = '"Submit" button label';
 $lang['title_form_template'] = 'Template for displaying form';
 $lang['title_form_unspecified'] = 'Text to return for unspecified field values';
 $lang['title_form_validate_udt'] = 'User-defined-tag to call during form validation';
-$lang['title_form_vars'] = 'Template variables';
 $lang['title_from_address_field'] = 'Field containing email sender address';
 $lang['title_from_field'] = 'Field containing email sender name';
 $lang['title_headers_to_modify'] = 'Which email headers should this input populate?';
@@ -1020,10 +1018,11 @@ $lang['title_string_or_number_eval'] = 'Interpret variables as being numbers or 
 $lang['title_string_unspaced'] = 'String (no spaces between fields)';
 $lang['title_subject_field'] = 'Field containing email subject';
 $lang['title_submit_action'] = 'After form is submitted';
-$lang['title_submit_actions'] = 'Form submission behavior';
+//$lang['title_submit_actions'] = 'Form submission behavior';
 $lang['title_submit_date'] = 'Date submitted';
 $lang['title_submit_javascript'] = 'Form submission javascript';
-$lang['title_submit_labels'] = 'Button labels';
+//$lang['title_submit_labels'] = 'Button labels';
+$lang['title_submit_limit'] = 'Maximum submissions per hour from any one source';
 $lang['title_submit_button_safety'] = 'Add safety script';
 $lang['title_submit_response'] = 'Post-submission template';
 $lang['title_suppress_attachment'] = 'Deny file to be attached with emails';
@@ -1042,6 +1041,7 @@ $lang['title_textarea_cols'] = 'Columns (note: this may be overridden by CSS)';
 $lang['title_textarea_length'] = 'Maximum length of field content (0 or blank means no limit)';
 $lang['title_textarea_rows'] = 'Rows (note: this may be overridden by CSS)';
 $lang['title_textfield_label'] = 'Textfield label'; // Remove?
+$lang['title_tpl_vars'] = 'Template variables';
 $lang['title_udt_name'] = 'User Defined Tag';
 $lang['title_unchecked_value'] = 'Value when not checked';
 $lang['title_unique_file_template'] = 'Template for output';
@@ -1172,9 +1172,13 @@ The PowerBrowse module code provides an example of this process in use.<p>
 </ul>
 <h3>Requirements</h3>
 <ul>
-<li>TODO PHP 5.1+</li>
-<li>The mcrypt extension is desirable for cacheing data when a 'EmailConfirmation' field is used</li>
-<li>TODO exensions for cache, mutex</li>
+<li>PHP 5.1+ TODO</li>
+<li>PHP curl extension</li>
+</ul>
+<h3>Desirables</h3>
+<ul>
+<li>PHP mcrypt extension for cacheing data when a 'EmailConfirmation' field is used</li>
+<li>Cache and mutex operations are faster if a suitable PHP extension is available: TODO</li>
 </ul>
 <h3>Support</h3>
 <p>This module is provided as-is. Please read the text of the license for the full disclaimer.
