@@ -60,13 +60,6 @@ $db->CreateSequence($pre.'module_pwf_field_opt_seq');
 $db->Execute('CREATE INDEX '.$pre.'module_pwf_field_opt_idx ON '.$pre.'module_pwf_field_opt (field_id,form_id)');
 
 $flds = "
-	flock_id I(8) KEY,
-	flock T
-";
-$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_flock',$flds,$taboptarray);
-$dict->ExecuteSQLArray($sqlarray);
-
-$flds = "
 	record_id I(4) KEY,
 	pubkey C(16),
 	submitted ".CMS_ADODB_DT.",
@@ -76,6 +69,13 @@ $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_record',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
 $db->CreateSequence($pre.'module_pwf_record_seq');
+
+$flds = "
+	flock_id I(8) KEY,
+	flock T
+";
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_flock',$flds,$taboptarray);
+$dict->ExecuteSQLArray($sqlarray);
 
 $flds = "
 	cache_id I(2) AUTO KEY,
@@ -104,15 +104,15 @@ $dict->ExecuteSQLArray($sqlarray);
 
 $db->CreateSequence($pre.'module_pwf_uniquefield_seq');
 
-$this->SetPreference('masterpass','MmFjNTW1Gak5TdWNrIGl0IHVwLCBjcmFja2VycyEgVHJ5IHRvIGd1ZXNz');
-$this->SetPreference('blank_invalid',0);
-$this->SetPreference('enable_antispam',1);
-$this->SetPreference('require_fieldnames',1);
-//for email address checking by mailcheck
-$this->SetPreference('email_topdomains','');
-$this->SetPreference('email_domains','');
-$this->SetPreference('email_subdomains','');
 $this->SetPreference('adder_fields','basic'); //or 'advanced'
+$this->SetPreference('blank_invalid',0);
+//for email address checking by mailcheck.js
+$this->SetPreference('email_domains',''); //specific/complete domains for initial check
+$this->SetPreference('email_subdomains',''); //partial domains for secondary check
+$this->SetPreference('email_topdomains','biz,co,com,edu,gov,info,mil,name,net,org'); //for final check
+$this->SetPreference('masterpass','MmFjNTW1Gak5TdWNrIGl0IHVwLCBjcmFja2VycyEgVHJ5IHRvIGd1ZXNz');
+$this->SetPreference('require_fieldnames',1);
+$this->SetPreference('submit_limit',0);
 
 $fp = $config['uploads_path'];
 if($fp && is_dir($fp))
