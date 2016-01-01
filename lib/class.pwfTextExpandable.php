@@ -17,13 +17,13 @@ class pwfTextExpandable extends pwfFieldBase
 		$this->Type = 'TextExpandable';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array(
-            $mod->Lang('validation_none')=>'none',
-            $mod->Lang('validation_numeric')=>'numeric',
-            $mod->Lang('validation_integer')=>'integer',
-            $mod->Lang('validation_email_address')=>'email',
-            $mod->Lang('validation_regex_match')=>'regex_match',
-            $mod->Lang('validation_regex_nomatch')=>'regex_nomatch'
-           );
+			$mod->Lang('validation_none')=>'none',
+			$mod->Lang('validation_numeric')=>'numeric',
+			$mod->Lang('validation_integer')=>'integer',
+			$mod->Lang('validation_email_address')=>'email',
+			$mod->Lang('validation_regex_match')=>'regex_match',
+			$mod->Lang('validation_regex_nomatch')=>'regex_nomatch'
+		);
 	}
 
 	// Gets all other 'TextExpandable' fields in the form
@@ -84,7 +84,7 @@ class pwfTextExpandable extends pwfFieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_maximum_length'),
-						$mod->CreateInputText($id,'opt_length',$this->GetOption('length',80),25,25));
+						$mod->CreateInputText($id,'opt_length',$this->GetOption('length',80),3,3));
 		$main[] = array($mod->Lang('title_add_button_text'),
 						$mod->CreateInputText($id,'opt_add_button',$this->GetOption('add_button','+'),15,25));
 		$main[] = array($mod->Lang('title_del_button_text'),
@@ -138,7 +138,7 @@ class pwfTextExpandable extends pwfFieldBase
 							array_splice($this->Value,$pts[3],1);
 						$vals--;
 					}
-		    	}
+				}
 			}
 		}
 
@@ -196,10 +196,10 @@ class pwfTextExpandable extends pwfFieldBase
 		$l = $this->GetOption('length',0);
 
 		if(!is_array($this->Value))
-		    $this->Value = array($this->Value);
+			$this->Value = array($this->Value);
 		foreach($this->Value as $one)
 		{
-		    switch ($this->ValidationType)
+			switch ($this->ValidationType)
 			{
 			 case 'none':
 				break;
