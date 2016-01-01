@@ -60,6 +60,58 @@ class IsFieldOption
 
 class pwfFormOperations
 {
+	//for CMSMS 2+
+	private static $editors = NULL;
+	private function SetTemplate($type,$id,$val)
+	{
+		if(self::$editors === NULL)
+		{
+			$editors = array();
+
+			$db = cmsms()->GetDb();
+			$pre = cms_db_prefix();
+			$sql = <<<EOS
+SELECT G.group_id
+FROM {$pre}groups G
+JOIN {$pre}group_perms GP ON G.group_id = GP.group_id
+JOIN {$pre}permissions P on GP.permission_id = P.permission_id
+WHERE G.active=1 AND P.permission_name='ModifyPFSettings'
+EOS;
+			$all = $db->GetCol($sql);
+			if($all)
+			{
+				foreach($all as $id)
+					$editors[] = -$id;
+			}
+			$sql = <<<EOS
+SELECT DISTINCT U.user_id
+FROM {$pre}users U
+JOIN {$pre}user_groups UG ON U.user_id = UG.user_id
+JOIN {$pre}group_perms GP ON GP.group_id = UG.group_id
+JOIN {$pre}permissions P ON P.permission_id = GP.permission_id
+JOIN {$pre}groups GR ON GR.group_id = UG.group_id
+WHERE U.admin_access=1 AND U.active=1 AND GR.active=1 AND
+P.permission_name='ModifyPFSettings'
+EOS;
+			$all = $db->GetCol($sql);
+			if($all)
+			{
+				foreach($all as $id)
+					$editors[] = $id;
+			}
+			self::$editors = $editors;
+		}
+		$tpl = new CmsLayoutTemplate();
+		$tpl->set_type($type);
+		$pref = ($type == 'form') ? 'pwf::':'pwf::sub_';
+		$tpl->set_name($pref.$id);
+		$tpl->set_owner(1); //original admin user
+		if($this->editors)
+			$tpl->set_additional_editors($this->editors); // !too bad if permissions change? or handle that event ?
+		$tpl->set_content($val);
+		$tpl->save();
+	}
+
 	/**
 	Add:
 	@mod: reference to the current PowerForms module object
@@ -111,8 +163,26 @@ class pwfFormOperations
 			$one->Delete();
 		unset($one);
 */
-		$mod->DeleteTemplate('pwf_'.$form_id);
-		$mod->DeleteTemplate('pwf_sub_'.$form_id);
+		if($mod->before20)
+		{
+			$mod->DeleteTemplate('pwf::'.$form_id);
+			$mod->DeleteTemplate('pwf::sub_'.$form_id);
+		}
+		else
+		{
+			try
+			{
+				$tpl = CmsLayoutTemplateType::load('pwf::'.$form_id);
+				$tpl->delete();
+			}
+			catch (Exception $e) {}
+			try
+			{
+				$tpl = CmsLayoutTemplateType::load('pwf::sub_'.$form_id);
+				$tpl->delete();
+			}
+			catch (Exception $e) {}
+		}
 		$pre = cms_db_prefix();
 		$db = cmsms()->GetDb();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_trans WHERE new_id=? AND isform=1';
@@ -192,12 +262,18 @@ class pwfFormOperations
 			$AttrId = $db->GenID($pre.'module_pwf_form_opt_seq');
 			if($key == 'form_template')
 			{
-				$mod->SetTemplate('pwf_'.$form_id,$val);
+				if($mod->before20)
+					$mod->SetTemplate('pwf::'.$form_id,$val);
+				else
+					self::SetTemplate('form',$form_id,$val);
 				$val = 'pwf_'.$form_id;
 			}
 			elseif($key == 'submission_template')
 			{
-				$mod->SetTemplate('pwf_sub_'.$form_id,$val);
+				if($mod->before20)
+					$mod->SetTemplate('pwf::sub_'.$form_id,$val);
+				else
+					self::SetTemplate('submission',$form_id,$val);
 				$val = 'pwf_sub_'.$form_id;
 			}
 			if(!$db->Execute($sql,array($AttrId,$form_id,$key,$val)))
@@ -268,12 +344,36 @@ class pwfFormOperations
 		{
 			if($key == 'form_template')
 			{
-				$mod->SetTemplate('pwf_'.$form_id,$val);
+				if($mod->before20)
+					$mod->SetTemplate('pwf::'.$form_id,$val);
+				else
+				{
+					if($newform)
+						self::SetTemplate('form',$form_id,$val);
+					else
+					{
+						$ob = CmsLayoutTemplate::load('pwf::'.$form_id);
+						$ob->set_content($val);
+						$ob->save();
+					}
+				}
 				$val = 'pwf_'.$form_id;
 			}
 			elseif($key == 'submission_template')
 			{
-				$mod->SetTemplate('pwf_sub_'.$form_id,$val);
+				if($mod->before20)
+					$mod->SetTemplate('pwf::sub_'.$form_id,$val);
+				else
+				{
+					if($newform)
+						self::SetTemplate('submission',$form_id,$val);
+					else
+					{
+						$ob = CmsLayoutTemplate::load('pwf::sub_'.$form_id);
+						$ob->set_content($val);
+						$ob->save();
+					}
+				}
 				$val = 'pwf_sub_'.$form_id;
 			}
 			$newid = $db->GenID($pre.'module_pwf_form_opt_seq');
@@ -333,7 +433,14 @@ class pwfFormOperations
 		$formdata->Options = $db->GetAssoc($sql,array($form_id));
 
 		$val = $formdata->Options['form_template'];
-		$formdata->Options['form_template'] = $mod->GetTemplate($val);
+		if($mod->before20)
+			$tpl = $mod->GetTemplate($val);
+		else
+		{
+			$ob = CmsLayoutTemplate::load($val);
+			$tpl = $ob->get_content();
+		}
+		$formdata->Options['form_template'] = $tpl;
 //		$val = $formdata->Options['submission_template'];
 //		$formdata->Options['submission_template'] = $mod->GetTemplate($val);
 
@@ -456,9 +563,25 @@ EOS;
 				else//smarty syntax can abort the xml-decoder - so mask it
 				{
 					if($name == 'form_template')
-						$value = $mod->GetTemplate($value);
+					{
+						if($mod->before20)
+							$value = $mod->GetTemplate($value);
+						else
+						{
+							$ob = CmsLayoutTemplate::load($value);
+							$value = $ob->get_content();
+						}
+					}
 /*					elseif($name == 'submission_template')
-						$value = $mod->GetTemplate($value);
+					{
+						if($mod->before20)
+							$value = $mod->GetTemplate($value);
+						else
+						{
+							$ob = CmsLayoutTemplate::load($value);
+							$value = $ob->get_content();
+						}
+					}
 */
 					$xml[] = "\t\t\t<$name>]][[".urlencode(trim($value))."</$name>";
 				}
@@ -503,10 +626,10 @@ EOS;
 \t\t</fields>
 \t</form>
 EOS;
-			$outxml[] = implode("\n",$xml);
+			$outxml[] = implode(PHP_EOL,$xml);
 		}
 		$outxml[] = '</powerforms>';
-		return implode("\n",$outxml);
+		return implode(PHP_EOL,$outxml);
 	}
 
 	private function ClearTags(&$array)
@@ -653,12 +776,18 @@ EOS;
 					$val = urldecode(substr($one,4)); //TODO translate numbered fields in templates
 					if($name == 'form_template')
 					{
-						$mod->SetTemplate('pwf_'.$form_id,$val);
+						if($mod->before20)
+							$mod->SetTemplate('pwf::'.$form_id,$val);
+						else
+							self::SetTemplate('form',$form_id,$val);
 						$val = 'pwf_'.$form_id;
 					}
 					elseif($name == 'submission_template')
 					{
-						$mod->SetTemplate('pwf_sub_'.$form_id,$val);
+						if($mod->before20)
+							$mod->SetTemplate('pwf::sub_'.$form_id,$val);
+						else
+							self::SetTemplate('submission',$form_id,$val);
 						$val = 'pwf_sub_'.$form_id;
 					}
 				}
