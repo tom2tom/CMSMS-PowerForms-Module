@@ -39,6 +39,7 @@ pwfMultiselectFileDirector
 pwfOzStatePicker
 pwfPageBreak
 pwfPageRedirector
+pwfPassphrase
 pwfPassword
 pwfPasswordAgain
 pwfProvincePicker
