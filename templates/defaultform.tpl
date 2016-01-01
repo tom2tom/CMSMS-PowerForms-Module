@@ -1,4 +1,3 @@
-{* DEFAULT FORM LAYOUT / pure CSS *}
 {if $form_done}
 	{* This section is for displaying submission-errors *}
 	{if !empty($submission_error)}
