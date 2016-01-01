@@ -14,8 +14,11 @@ if($padm)
 	if(isset($params['submit']))
 	{
 		$this->SetPreference('blank_invalid',!empty($params['blank_invalid']));
-		$this->SetPreference('enable_antispam',!empty($params['enable_antispam']));
 		$this->SetPreference('require_fieldnames',!empty($params['require_fieldnames']));
+		$t = $params['submit_limit'];
+		if($t > 250) $t = 250;
+		elseif($t < 0) $t = 0;
+		$this->SetPreference('submit_limit',$t);
 		$this->SetPreference('email_topdomains',$params['email_topdomains']);
 		$this->SetPreference('email_domains',$params['email_domains']);
 		$this->SetPreference('email_subdomains',$params['email_subdomains']);
