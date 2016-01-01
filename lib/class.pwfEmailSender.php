@@ -16,10 +16,10 @@ class pwfEmailSender extends pwfFieldBase
 
 	function AdminPopulate($id)
 	{
+		$mod = $this->formdata->formsmodule;
 		$choices = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
 
 		list($main,$adv) = $this->AdminPopulateCommon($id);
-		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_headers_to_modify'),
 						$mod->CreateInputDropdown($id,'opt_headers_to_modify',$choices,-1,
 							$this->GetOption('headers_to_modify','b')));
