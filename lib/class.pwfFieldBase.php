@@ -852,7 +852,7 @@ class pwfFieldBase
 		else
 			$messages[] = $msg;
 		$msg = ($ret)?'':implode('<br />',$messages);
-	    return array($ret,$msg);
+		return array($ret,$msg);
 	}
 
 	/*Subclass this to generate content for the frontend form, either:

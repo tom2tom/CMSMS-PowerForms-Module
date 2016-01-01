@@ -152,7 +152,7 @@ class pwfComputed extends pwfFieldBase
 			$messages[] = $mod->Lang('error_typed',$mod->Lang('TODO_order'));
 		}
 		$msg = ($ret)?'':implode('<br />',$messages);
-	    return array($ret,$msg);
+		return array($ret,$msg);
 	}
 
 }

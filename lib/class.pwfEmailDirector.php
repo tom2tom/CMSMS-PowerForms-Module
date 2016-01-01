@@ -159,14 +159,14 @@ class pwfEmailDirector extends pwfEmailBase
 		list($rv,$msg) = $this->validateEmailAddr($this->GetOption('email_from_address'));
 		if(!$rv)
 		{
-    	    $ret = FALSE;
-            $messages[] = $msg;
+			$ret = FALSE;
+			$messages[] = $msg;
 		}
-    	$dests = $this->GetOption('destination_address');
+		$dests = $this->GetOption('destination_address');
 		$c = count($dests);
 		if($c)
 		{
-		    for($i=0; $i<$c; $i++)
+			for($i=0; $i<$c; $i++)
 			{
 				list($rv,$msg) = $this->validateEmailAddr($dests[$i]);
 				if(!$rv)
@@ -182,7 +182,7 @@ class pwfEmailDirector extends pwfEmailBase
 			$messages[] = $mod->Lang('missing_type',$mod->Lang('destination'));
 		}
 		$msg = ($ret)?'':implode('<br />',$messages);
-	    return array($ret,$msg);
+		return array($ret,$msg);
 	}
 
 	function Populate($id,&$params)

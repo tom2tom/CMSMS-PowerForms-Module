@@ -30,7 +30,7 @@ class pwfUserEmail extends pwfEmailBase
 
   	function GetValue()
   	{
-    	return $this->Value[0];
+		return $this->Value[0];
   	}
 
 	//c.f. parent::SetValue() which calls html_myentities_decode()

@@ -101,7 +101,7 @@ class pwfCaptcha extends pwfFieldBase
 			$messages[] = $mod->Lang('missing_type',$mod->Lang('captchamsgTODO'));
 		}
 		$msg = ($ret)? '' : implode('<br />',$messages);
-    	return array($ret,$msg);
+		return array($ret,$msg);
 	}
 
 	function Populate($id,&$params)

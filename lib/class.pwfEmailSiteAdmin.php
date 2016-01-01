@@ -33,7 +33,7 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 			}
 		}
 		$status = $this->TemplateStatus();
-	    if($status)
+		if($status)
 		{
 			if($ret)
 				$ret .= '<br />';
@@ -104,7 +104,7 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 		if(!ret)
 			$messages[] = $msg;
 
-    	$addr = $this->GetOption('email_from_address');
+		$addr = $this->GetOption('email_from_address');
 		if($addr)
 		{
 			list($rv,$msg) = $this->validateEmailAddr($addr);
@@ -121,7 +121,7 @@ class pwfEmailSiteAdmin extends pwfEmailBase
 			$messages[] = $mod->Lang('missing_type',$mod->Lang('source'));
 		}
 		$msg = ($ret)?'':implode('<br />',$messages);
-	    return array($ret,$msg);
+		return array($ret,$msg);
 	}
 
 	function Populate($id,&$params)

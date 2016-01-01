@@ -94,8 +94,8 @@ class pwfEmailBCCAddress extends pwfFieldBase
 			foreach($this->formdata->Fields as &$one)
 			{
 				if($one->IsDisposition()
-               		&& is_subclass_of($one,'pwfEmailBase')
-					&& $one->GetId() == $this->GetOption('field_to_modify'))
+				 && is_subclass_of($one,'pwfEmailBase')
+				 && $one->GetId() == $this->GetOption('field_to_modify'))
 				{
 					$bc = $one->GetOption('email_bcc_address');
 					if($bc)

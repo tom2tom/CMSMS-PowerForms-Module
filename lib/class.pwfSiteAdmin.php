@@ -63,7 +63,7 @@ class pwfSiteAdmin extends pwfFieldBase
 				$ret .= $mod->Lang('restricted_to_group',$group->name);
 			}
 		}
-        return $ret;
+		return $ret;
 	}
 
 	function GetHumanReadableValue($as_string=TRUE)

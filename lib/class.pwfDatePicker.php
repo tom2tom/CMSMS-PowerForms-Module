@@ -20,18 +20,18 @@ class pwfDatePicker extends pwfFieldBase
 		$this->ValidationTypes = array($mod->Lang('validation_none')=>'none');
 		$this->Months = array(
 			''=>'',
-            $mod->Lang('date_january')=>1,
-            $mod->Lang('date_february')=>2,
-            $mod->Lang('date_march')=>3,
-            $mod->Lang('date_april')=>4,
-            $mod->Lang('date_may')=>5,
-            $mod->Lang('date_june')=>6,
-            $mod->Lang('date_july')=>7,
-            $mod->Lang('date_august')=>8,
-            $mod->Lang('date_september')=>9,
-            $mod->Lang('date_october')=>10,
-            $mod->Lang('date_november')=>11,
-            $mod->Lang('date_december')=>12);
+			$mod->Lang('date_january')=>1,
+			$mod->Lang('date_february')=>2,
+			$mod->Lang('date_march')=>3,
+			$mod->Lang('date_april')=>4,
+			$mod->Lang('date_may')=>5,
+			$mod->Lang('date_june')=>6,
+			$mod->Lang('date_july')=>7,
+			$mod->Lang('date_august')=>8,
+			$mod->Lang('date_september')=>9,
+			$mod->Lang('date_october')=>10,
+			$mod->Lang('date_november')=>11,
+			$mod->Lang('date_december')=>12);
 	}
 
 	function GetFieldStatus()
@@ -39,8 +39,8 @@ class pwfDatePicker extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		$today = getdate();
 		return $mod->Lang('date_range',array($this->GetOption('start_year',($today['year']-10)) ,
-         $this->GetOption('end_year',($today['year']+10)))).
-         ($this->GetOption('default_year','-1')!=='-1'?' ('.$this->GetOption('default_year','-1').')':'');
+		 $this->GetOption('end_year',($today['year']+10)))).
+		 ($this->GetOption('default_year','-1')!=='-1'?' ('.$this->GetOption('default_year','-1').')':'');
 	}
 
 	function HasValue($deny_blank_responses=FALSE)

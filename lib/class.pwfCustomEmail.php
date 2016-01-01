@@ -135,7 +135,7 @@ class pwfCustomEmail extends pwfEmailBase
 			$messages[] = $msg;
 		}
 		$msg = ($ret)?'':implode('<br />',$messages);
-	    return array($ret,$msg);
+		return array($ret,$msg);
 	}
 
 	function Dispose($id,$returnid)

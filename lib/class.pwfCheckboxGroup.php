@@ -57,7 +57,7 @@ class pwfCheckboxGroup extends pwfFieldBase
 	{
 		$opt = $this->GetOptionRef('box_name');
 		if($opt)
-	        $boxCount = count($opt);
+			$boxCount = count($opt);
 		else
 			$boxCount = 0;
 		return $this->formdata->formsmodule->Lang('boxes',$boxCount);

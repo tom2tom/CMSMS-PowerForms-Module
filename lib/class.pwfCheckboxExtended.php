@@ -16,9 +16,9 @@ class pwfCheckboxExtended extends pwfFieldBase
 		$this->Type = 'CheckboxExtended';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array(
-            $mod->Lang('validation_none')=>'none',
-            $mod->Lang('validation_must_check')=>'checked',
-            $mod->Lang('validation_empty')=>'empty');
+			$mod->Lang('validation_none')=>'none',
+			$mod->Lang('validation_must_check')=>'checked',
+			$mod->Lang('validation_empty')=>'empty');
 	}
 
 	function GetFieldStatus()

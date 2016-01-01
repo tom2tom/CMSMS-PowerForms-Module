@@ -89,7 +89,7 @@ class pwfSystemEmail extends pwfEmailBase
 		$status = $this->TemplateStatus();
 		if($status)
 			$ret.='<br />'.$status;
-        return $ret;
+		return $ret;
 	}
 
 	function GetDests($id,$row,$sel)

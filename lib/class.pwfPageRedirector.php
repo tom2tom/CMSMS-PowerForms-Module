@@ -146,7 +146,7 @@ class pwfPageRedirector extends pwfFieldBase
 			$messages[] = $mod->Lang('missing_type',$mod->Lang('page'));
 		}
 		$msg = ($ret)?'':implode('<br />',$messages);
-	    return array($ret,$msg);
+		return array($ret,$msg);
 	}
 
 	function Populate($id,&$params)

@@ -110,7 +110,7 @@ class pwfFileUpload extends pwfFieldBase
 			$categorylist = $uploads->getCategoryList();
 			$adv[] = array($mod->Lang('title_sendto_uploads'),
 				 			$mod->CreateInputDropdown($id,'opt_sendto_uploads',$sendto_uploads_list,
-							 $sendto_uploads));
+							$sendto_uploads));
 			$adv[] = array($mod->Lang('title_uploads_category'),
 							$mod->CreateInputDropdown($id,'opt_uploads_category',$categorylist,'',
 							$uploads_category));
