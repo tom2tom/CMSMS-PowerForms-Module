@@ -69,7 +69,7 @@ else
 			if($templates)
 			{
 				foreach($templates as $tpl)
-					$tml->delete();
+					$tpl->delete();
 			}
 			$type->delete();
 		}
