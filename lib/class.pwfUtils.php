@@ -31,7 +31,7 @@ class pwfUtils
 		require($path.'FastCacheBase.php');
 
 		$config = cmsms()->GetConfig();
-		$rooturl = (empty($_SERVER['HTTPS'])) ? $config['root_url'] : $config['ssl_url'];
+		$rooturl = (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') ? $config['root_url'] : $config['ssl_url'];
 		$settings = array_merge(
 			array(
 				'shmop' => array(),
@@ -66,7 +66,7 @@ class pwfUtils
 		{
 			$one = trim($one);
 			require($path.$one.'.php');
-			$class = 'Cache_'.$one;
+			$class = 'FastCache_'.$one;
 			try
 			{
 				$cache = new $class($settings[$one]);
@@ -75,8 +75,8 @@ class pwfUtils
 			{
 				continue;
 			}
-			$this->cache = $cache;
-			return $this->cache;
+			self::$cache = $cache;
+			return self::$cache;
 		}
 		throw new Exception('Cache not working');
 	}
@@ -96,6 +96,8 @@ class pwfUtils
 		$settings = array(
 			'memcache'=>array(
 				'instance'=>((self::$mxtype=='memcache')?self::$instance:NULL)
+				),
+			'shmop'=>array(
 				),
 			'semaphore'=>array(
 				'instance'=>((self::$mxtype=='semaphore')?self::$instance:NULL)
@@ -150,14 +152,76 @@ class pwfUtils
 		}
 	}
 
-	public static function SafeExec()
+	/**
+	SafeGet:
+	Execute SQL command(s) with minimal chance of data-race
+	@sql: SQL command
+	@args: array of arguments for @sql
+	@mode: optional type of get - 'one','row','col','assoc' or 'all', default 'all'
+	Returns: boolean indicating successful completion
+	*/
+	public static function SafeGet($sql,$args,$mode='all')
 	{
-		$TODO;
+		$db = cmsms()->GetDb();
+		$nt = 10;
+		while($nt > 0)
+		{
+			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
+			$db->StartTrans();
+			switch($mode)
+			{
+			 case 'one':
+				$ret = $db->GetOne($sql,$args);
+				break;
+			 case 'row':
+				$ret = $db->GetRow($sql,$args);
+				break;
+			 case 'col':
+				$ret = $db->GetCol($sql,$args);
+				break;
+			 case 'assoc':
+				$ret = $db->GetAssoc($sql,$args);
+				break;
+			 default:
+				$ret = $db->GetAll($sql,$args);
+				break;
+			}
+			if($db->CompleteTrans())
+				return $ret;
+			else
+				$nt--;
+		}
+		return FALSE;
 	}
 
-	public static function SafeGet()
+	/**
+	SafeExec:
+	Execute SQL command(s) with minimal chance of data-race
+	@sql: SQL command, or array of them
+	@args: array of arguments for @sql, or array of them
+	Returns: boolean indicating successful completion
+	*/
+	public static function SafeExec($sql,$args)
 	{
-		$TODO;
+		$db = cmsms()->GetDb();
+		$nt = 10;
+		while($nt > 0)
+		{
+			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'); //this isn't perfect!
+			$db->StartTrans();
+			if(is_array($sql))
+			{
+				foreach($sql as $i=>$cmd)
+					$db->Execute($cmd,$args[$i]);
+			}
+			else
+				$db->Execute($sql,$args);
+			if($db->CompleteTrans())
+				return TRUE;
+			else
+				$nt--;
+		}
+		return FALSE;
 	}
 
 //	const MAILERMINVERSION = '1.73'; //minumum acceptable version of CMSMailer module
@@ -168,7 +232,7 @@ class pwfUtils
 	*/
 	public static function GetForms($orderby='name')
 	{
-		// DO NOT parameterise $orderby! If ADODB quotes it,the SQL is not valid
+		// DO NOT parameterise $orderby! ADODB would quote it, then the SQL is not valid
 		// instead,rudimentary security checks
 		$orderby = preg_replace('/\s/','',$orderby);
 		$orderby = preg_replace('/[^\w\-.]/','_',$orderby);
@@ -178,7 +242,7 @@ class pwfUtils
 	}
 
 	//support for field-selection menu-item sorting
-	private function labelcmp($a,$b)
+	private static function labelcmp($a,$b)
 	{
 		$fa = $a[0];
 		$fb = $b[0];
@@ -255,7 +319,7 @@ class pwfUtils
 				$mod->field_types[$mod->Lang($menukey)] = $classname;
 			}
 		}
-		uksort($mod->field_types,array($this,'labelcmp'));
+		uksort($mod->field_types,array('pwfUtils','labelcmp'));
 
 		$mod->std_field_types = array(
 			$mod->Lang('field_type_Checkbox')=>'pwfCheckbox',
@@ -266,7 +330,7 @@ class pwfUtils
 			$mod->Lang('field_type_Text')=>'pwfText',
 			$mod->Lang('field_type_SystemEmail')=>'pwfSystemEmail',
 			$mod->Lang('field_type_SharedFile')=>'pwfSharedFile');
-		uksort($mod->std_field_types,array($this,'labelcmp'));
+		uksort($mod->std_field_types,array('pwfUtils','labelcmp'));
 	}
 
 	/**
@@ -294,7 +358,7 @@ class pwfUtils
 				$menulabel = $t.$obfld->mymodule->Lang($obfld->MenuKey);
 				$mod->field_types[$menulabel] = $classname;
 				if($sort)
-					uksort($mod->field_types,array($this,'labelcmp'));
+					uksort($mod->field_types,array('pwfUtils','labelcmp'));
 			}
 		}
 	}
@@ -414,15 +478,15 @@ class pwfUtils
 	}
 
 	/**
-	CreateSampleTemplate:
+	CreateDefaultTemplate:
 	@formdata: reference to pwfData form data object
 	@htmlish: whether the template is to include html tags like <h1>, default FALSE
-	@email:  whether the template is to be for an email-control, default TRUE
-	@oneline: whether the template is to be ...  , default FALSE
-	@header: whether the template is to be ...  , default FALSE
+	@email:  whether the template is to begin with email-specific stuff, default TRUE
+	@oneline: whether the template is to NOT begin with a 'thanks' line, (irrelevant if @email = TRUE) default FALSE
+	@header: whether the template is to include fieldnames, (irrelevant if @oneline = FALSE), default FALSE
 	@footer: whether the template is to be the end (of another template), default FALSE
 	*/
-	public static function CreateSampleTemplate(&$formdata,
+	public static function CreateDefaultTemplate(&$formdata,
 		$htmlish=FALSE,$email=TRUE,$oneline=FALSE,$header=FALSE,$footer=FALSE)
 	{
 		$mod = $formdata->formsmodule;
@@ -431,9 +495,9 @@ class pwfUtils
 		if($email)
 		{
 			if($htmlish)
-				$ret .= '<h1>'.$mod->Lang('email_default_template')."</h1>\n";
+				$ret .= '<h3>'.$mod->Lang('email_default_template').'</h3>'.PHP_EOL;
 			else
-				$ret .= $mod->Lang('email_default_template')."\n";
+				$ret .= $mod->Lang('email_default_template').PHP_EOL;
 
 			foreach(array(
 			 'form_name' => 'title_form_name',
@@ -447,25 +511,27 @@ class pwfUtils
 					$ret .= '<strong>'.$mod->Lang($val).'</strong>: {$'.$key.'}<br />';
 				else
 					$ret .= $mod->Lang($val).': {$'.$key.'}';
-				$ret .= "\n";
+				$ret .= PHP_EOL;
 			}
 
 			if($htmlish)
-				$ret .= "\n<hr />\n";
+				$ret .= PHP_EOL.'<hr />'.PHP_EOL;
 			else
-				$ret .= "\n-------------------------------------------------\n";
+				$ret .= PHP_EOL.'-------------------------------------------------'.PHP_EOL;
 		}
 		elseif(!$oneline)
 		{
 			if($htmlish)
-				$ret .= '<h2>';
-			$ret .= $mod->Lang('thanks');
-			if($htmlish)
-				$ret .= "</h2>\n";
+				$ret .= '<h4>'.$mod->Lang('thanks').'</h4>'.PHP_EOL;
+			else
+				$ret .= $mod->Lang('thanks').PHP_EOL;
 		}
 		elseif($footer)
 		{
-			 $ret .= "------------------------------------------\n<!--EOF-->\n";
+			if($htmlish)
+				$ret .= '<hr />'.PHP_EOL.'<!--EOF-->'.PHP_EOL;
+			else
+				$ret .= '-------------------------------------------------'.PHP_EOL;
 			 return $ret;
 		}
 
@@ -485,7 +551,7 @@ class pwfUtils
 					$ret .= $one->GetName()."\t";
 				else
 					$ret .= $one->GetName().': '.$fldref;
-				$ret .= "{/if}\n";
+				$ret .= '{/if}'.PHP_EOL;
 			}
 		}
 		unset ($one);
@@ -526,11 +592,11 @@ EOS;
 	}
 
 	/**
-	SampleTemplateActions:
+	TemplateActions:
 	@formdata: reference to pwfData formdata object
 	@id: The id given to the Powerforms module on execution
-	@ctlData: array of parameters in which keys are names of affected form-control(s),
-		values are arrays of parameters, any one or more of
+	@ctlData: array of parameters in which key(s) are respective names of affected form-control(s),
+		values are arrays of parameters, their key(s) being any one or more of
 		 'general_button'
 		 'html_button'
 		 'text_button'
@@ -538,6 +604,7 @@ EOS;
 		 'is_oneline'
 		 'is_footer' (last, if used)
 		 'is_header'
+		and their respective values being boolean
 		e.g. for 3 controls:
 		array
 		  'opt_file_template' => array
@@ -553,7 +620,7 @@ EOS;
 	 The scripts install a 'sample template' into the corresponding control.
 	 For some combinations of options, pairs of buttons & scripts are created.
 	*/
-	public static function SampleTemplateActions(&$formdata,$id,$ctlData)
+	public static function TemplateActions(&$formdata,$id,$ctlData)
 	{
 		$mod = $formdata->formsmodule;
 		$buttons = array();
@@ -568,13 +635,20 @@ EOS;
 			$is_footer = !empty($tpopts['is_footer']);
 			$is_header = !empty($tpopts['is_header']);
 
+			$nl = PHP_EOL;
+			$l = strlen($nl);
+			$breaker = '';
+			for($i=0;$i<$l;$i++)
+				$breaker .= (ord($nl[$i])==10) ? '\n':'\r';
+
 			if($html_button && $text_button)
 			{
-				$sample = self::CreateSampleTemplate($formdata,FALSE,
+				$tplstr = self::CreateDefaultTemplate($formdata,FALSE,
 					$is_email,$is_oneline,$is_header,$is_footer);
-				$sample = str_replace(array("'","\n"),array("\\'","\\n'+\n'"),$sample);
+				//adjust the string for js
+				$tplstr = str_replace(array("'",PHP_EOL),array("\\'",$breaker),$tplstr);
 				list($b,$f) = self::CreateTemplateAction($mod,$id,$ctlname,
-					$mod->Lang('title_create_sample_template'),$sample,$ctlname.'_1');
+					$mod->Lang('title_create_sample_template'),$tplstr,$ctlname.'_1');
 				$buttons[] = $b;
 				$funcs[] = $f;
 			}
@@ -588,10 +662,11 @@ EOS;
 			else
 				$button_text = $mod->Lang('title_create_sample_template');
 
-			$sample = self::CreateSampleTemplate($formdata,$html_button || $gen_button,
+			$tplstr = self::CreateDefaultTemplate($formdata,$html_button || $gen_button,
 				$is_email,$is_oneline,$is_header,$is_footer);
-			$sample = str_replace(array("'","\n"),array("\\'","\\n'+\n'"),$sample);
-			list($b,$f) = self::CreateTemplateAction($mod,$id,$ctlname,$button_text,$sample);
+			//adjust the string for js
+			$tplstr = str_replace(array("'",PHP_EOL),array("\\'",$breaker),$tplstr);
+			list($b,$f) = self::CreateTemplateAction($mod,$id,$ctlname,$button_text,$tplstr);
 			$buttons[] = $b;
 			$funcs[] = $f;
 		}
