@@ -11,6 +11,7 @@ class pwfPasswordAgain extends pwfFieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
+		$this->Required = TRUE;
 		$this->Type = 'PasswordAgain';
 	}
 
@@ -40,10 +41,10 @@ class pwfPasswordAgain extends pwfFieldBase
 						$this->GetOption('field_to_validate')));
 		$main[] = array($mod->Lang('title_display_length'),
 					$mod->CreateInputText($id,'opt_length',
-						$this->GetOption('length','12'),25,25));
+						$this->GetOption('length','12'),3,3));
 		$main[] = array($mod->Lang('title_minimum_length'),
 					$mod->CreateInputText($id,'opt_min_length',
-						$this->GetOption('min_length','8'),25,25));
+						$this->GetOption('min_length','8'),3,3));
 		$main[] = array($mod->Lang('title_hide'),
 					$mod->CreateInputHidden($id,'opt_hide',0).
 					$mod->CreateInputCheckbox($id,'opt_hide',1,
@@ -55,18 +56,17 @@ class pwfPasswordAgain extends pwfFieldBase
 	function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
+		$ln = $this->GetOption('length',16);
 		if($this->GetOption('hide',1))
 		{
 			$tmp = $mod->CreateInputPassword($id,$this->formdata->current_prefix.$this->Id,
-				($this->Value?$this->Value:''),
-				$this->GetOption('length',16),255,
+				($this->Value?$this->Value:''),$ln,$ln,
 				$this->GetScript());
 		}
 		else
 		{
 			$tmp = $mod->CreateInputText($id,$this->formdata->current_prefix.$this->Id,
-				($this->Value?$this->Value:''),
-				$this->GetOption('length',16),255,
+				($this->Value?$this->Value:''),$ln,$ln,
 				$this->GetScript());
 		}
 		$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);

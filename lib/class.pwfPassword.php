@@ -11,13 +11,15 @@ class pwfPassword extends pwfFieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
+		$this->Required = TRUE;
 		$this->Type = 'Password';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array(
-            $mod->Lang('validation_none')=>'none',
-            $mod->Lang('validation_regex_match')=>'regex_match',
-            $mod->Lang('validation_regex_nomatch')=>'regex_nomatch'
-           );
+			$mod->Lang('validation_none')=>'none',
+			$mod->Lang('validation_minlength')=>'length',
+			$mod->Lang('validation_regex_match')=>'regex_match',
+			$mod->Lang('validation_regex_nomatch')=>'regex_nomatch'
+		);
 	}
 
 	function GetFieldStatus()
@@ -37,10 +39,10 @@ class pwfPassword extends pwfFieldBase
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_display_length'),
 						$mod->CreateInputText($id,'opt_length',
-							$this->GetOption('length',12),25,25));
+							$this->GetOption('length',12),3,3));
 		$main[] = array($mod->Lang('title_minimum_length'),
 						$mod->CreateInputText($id,'opt_min_length',
-							$this->GetOption('min_length',8),25,25));
+							$this->GetOption('min_length',8),3,3));
 		$main[] = array($mod->Lang('title_hide'),
 						$mod->CreateInputHidden($id,'opt_hide',0).
 						$mod->CreateInputCheckbox($id,'opt_hide',1,
@@ -65,18 +67,17 @@ class pwfPassword extends pwfFieldBase
 		else
 			$ro = '';
 
+		$ln = $this->GetOption('length',16);
 		if($this->GetOption('hide',1))
 		{
 			$tmp = $mod->CreateInputPassword($id,$this->formdata->current_prefix.$this->Id,
-					($this->Value?$this->Value:''),
-					$this->GetOption('length',16),255,
+					($this->Value?$this->Value:''),$ln,$ln,
 					$ro.$this->GetScript());
 		}
 		else
 		{
 			$tmp = $mod->CreateInputText($id,$this->formdata->current_prefix.$this->Id,
-					($this->Value?$this->Value:''),
-					$this->GetOption('length',16),255,
+					($this->Value?$this->Value:''),$ln,$ln,
 					$ro.$this->GetScript());
 		}
 		$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
@@ -91,6 +92,14 @@ class pwfPassword extends pwfFieldBase
 		switch ($this->ValidationType)
 		{
 		 case 'none':
+			break;
+		 case 'length':
+		 	$ln = $this->GetOption('min_length',0);
+			if($ln > 0 && strlen($this->Value) < $ln)
+			{
+				$this->validated = FALSE;
+				$this->ValidationMessage = $mod->Lang('please_enter_at_least',$ln);
+			}
 			break;
 		 case 'regex_match':
 			if(property_exists($this,'Value') &&
@@ -108,11 +117,6 @@ class pwfPassword extends pwfFieldBase
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
 			}
 			break;
-		}
-		if($this->GetOption('min_length',0) > 0 && strlen($this->Value) < $this->GetOption('min_length',0))
-		{
-			$this->validated = FALSE;
-			$this->ValidationMessage = $mod->Lang('please_enter_at_least',$this->GetOption('min_length',0));
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}
