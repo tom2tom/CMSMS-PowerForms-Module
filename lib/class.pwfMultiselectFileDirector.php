@@ -60,7 +60,7 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 		return implode("\t",$fields);
 	}
 
-	function CreateSampleTemplate()
+	function CreateDefaultTemplate()
 	{
 		$fields = array();
 		foreach($this->formdata->Fields as &$one)
@@ -147,7 +147,7 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 				);
 			}
 			unset($one);
-//	    	$main[] = array($mod->Lang('title_director_details'),$dests);
+//		$main[] = array($mod->Lang('title_director_details'),$dests);
 		}
 		else
 		{
@@ -162,7 +162,7 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 		$ctldata['opt_file_header']['is_header']=TRUE;
 		$ctldata['opt_file_footer']['is_oneline']=TRUE;
 		$ctldata['opt_file_footer']['is_footer']=TRUE;
-		list($buttons,$revertscripts) = pwfUtils::SampleTemplateActions($this->formdata,$id,$ctldata);
+		list($buttons,$revertscripts) = pwfUtils::TemplateActions($this->formdata,$id,$ctldata);
 
 		$adv[] = array($mod->Lang('title_file_template'),
 			$mod->CreateTextArea(FALSE,$id,
@@ -273,17 +273,18 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 
 		$template = $this->GetOption('file_template');
 		if(!$template)
-			$template = $this->CreateSampleTemplate();
+			$template = $this->CreateDefaultTemplate();
 		$newline = $mod->ProcessTemplateFromData($template);
 /*		$replchar = $this->GetOption('newlinechar');
 		if($replchar)
 		{
 			$newline = rtrim($newline,"\r\n");
-			$newline = preg_replace('/[\n\r]/',$replchar,$newline);
+			$newline = preg_replace('/[\n\r]+/',$replchar,$newline);
 		}
 */
-		if(substr($newline,-1) != "\n")
-			$newline .= "\n";
+		$l = strlen(PHP_EOL);
+		if(substr($newline,-$l) != PHP_EOL)
+			$newline .= PHP_EOL;
 
 		$footer = $this->GetOption('file_footer');
 		if($footer)
@@ -306,14 +307,14 @@ class pwfMultiselectFileDirector extends pwfFieldBase
 				$fh = fopen($fp,'w');
 				if($first)
 				{
-					fwrite($fh,$header."\n".$newline.$footer);
+					fwrite($fh,$header.PHP_EOL.$newline.$footer);
 				}
 				else
 				{
 					//seek to footer
 					if($footer)
 					{
-						$rows = explode("\n",$footer);
+						$rows = explode(PHP_EOL,$footer);
 						$target = $rows[0];
 					}
 					else

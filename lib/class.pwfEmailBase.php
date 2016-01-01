@@ -62,7 +62,7 @@ class pwfEmailBase extends pwfFieldBase
 		$ctldata['opt_email_template']['html_button'] = TRUE;
 		$ctldata['opt_email_template']['text_button'] = TRUE;
 		$ctldata['opt_email_template']['is_email'] = TRUE;
-		list($buttons,$scripts) = pwfUtils::SampleTemplateActions($this->formdata,$id,$ctldata);
+		list($buttons,$scripts) = pwfUtils::TemplateActions($this->formdata,$id,$ctldata);
 		$adv[] = array($mod->Lang('title_email_template'),
 						$mod->CreateTextArea(FALSE,$id,
 						//($this->GetOption('html_email',0)?$message:htmlspecialchars($message))
@@ -290,9 +290,9 @@ $mod->Crash;
 		}
 		else
 		{
-			$message = pwfUtils::CreateSampleTemplate($this->formdata,FALSE);
+			$message = pwfUtils::CreateDefaultTemplate($this->formdata,FALSE);
 			if($htmlemail)
-				$message2 = pwfUtils::CreateSampleTemplate($this->formdata,TRUE);
+				$message2 = pwfUtils::CreateDefaultTemplate($this->formdata,TRUE);
 		}
 		$message = $mod->ProcessTemplateFromData($message);
 
@@ -374,7 +374,7 @@ $mod->Crash;
 					}
 				}
 			}
-    	}
+		}
 		unset($one);
 
 		// send the message
