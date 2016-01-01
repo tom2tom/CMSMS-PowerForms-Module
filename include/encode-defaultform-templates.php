@@ -10,7 +10,6 @@ After running, the results will need to be manually transcribed into the relevan
 $templates = array();
 
 $templates['Sample_form'] =<<<EOS
-{* DEFAULT FORM LAYOUT / pure CSS *}
 {if \$form_done}
 	{* This section is for displaying submission-errors *}
 	{if \$submission_error}
@@ -95,7 +94,6 @@ $templates['Sample_captcha'] =<<<EOS
 EOS;
 
 $templates['Contact_form'] =<<<EOS
-{* DEFAULT FORM LAYOUT / pure CSS *}
 {if \$form_done}
 	{* This section is for displaying submission errors *}
 	{if !empty(\$submission_error)}
@@ -200,7 +198,6 @@ $templates['Contact_captcha'] =<<<EOS
 EOS;
 
 $templates['Advanced_form'] =<<<EOS
-{* DEFAULT FORM LAYOUT / pure CSS *}
 {if \$form_done}
 	{* This section is for displaying submission errors *}
 	{if !empty(\$submission_error)}
