@@ -801,10 +801,9 @@ class pwfFieldBase
 
 	function RemoveAdminField(&$array,$fieldtitle)
 	{
-		$c = count($array);
-		for ($i=0; $i<$c; $i++)
+		foreach($array as $i=>$data)
 		{
-			if(isset($array[$i][0]) && $array[$i][0] == $fieldtitle)
+			if($data[0] == $fieldtitle)
 			{
 				unset($array[$i]);
 				return;
