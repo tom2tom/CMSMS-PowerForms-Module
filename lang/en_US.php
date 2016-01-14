@@ -1185,8 +1185,8 @@ The PowerBrowse module code provides an example of this process in use.<p>
 </ul>
 <h3>Desirables</h3>
 <ul>
-<li>PHP mcrypt extension for cacheing data when a 'EmailConfirmation' field is used</li>
-<li>Cache and mutex operations are faster if a suitable PHP extension is available: TODO</li>
+<li>PHP mcrypt extension for protecting cached data when a 'EmailConfirmation' field is used</li>
+<li>Cache operations are faster if a suitable PHP extension is available: TODO</li>
 </ul>
 <h3>Support</h3>
 <p>This module is provided as-is. Please read the text of the license for the full disclaimer.
