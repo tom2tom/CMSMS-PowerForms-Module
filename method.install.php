@@ -5,15 +5,22 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
+/*QUEUE
+if (!function_exists('curl_init'))
+	return 'PowerForms needs the PHP cURL extension';
+TODO mutex check
+*/
+//TODO cache check
+
 $pre = cms_db_prefix();
 $taboptarray = array('mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
 'mysqli' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci');
 $dict = NewDataDictionary($db);
 
 $flds = "
-	form_id I KEY,
-	name C(256),
-	alias C(32)
+form_id I KEY,
+name C(256),
+alias C(32)
 ";
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_form',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
@@ -22,10 +29,10 @@ $db->CreateSequence($pre.'module_pwf_form_seq');
 $db->Execute('create index '.$pre.'module_pwf_form_idx on '.$pre.'module_pwf_form (alias)');
 
 $flds = "
-	option_id I KEY,
-	form_id I,
-	name C(64),
-	value X
+option_id I KEY,
+form_id I,
+name C(64),
+value X
 ";
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_form_opt',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
@@ -34,11 +41,11 @@ $db->CreateSequence($pre.'module_pwf_form_opt_seq');
 $db->Execute('create index '.$pre.'module_pwf_form_opt_idx on '.$pre.'module_pwf_form_opt (form_id)');
 
 $flds = "
-	field_id I KEY,
-	form_id I,
-	name C(96),
-	type C(48),
-	order_by I(2)
+field_id I KEY,
+form_id I,
+name C(96),
+type C(48),
+order_by I(2)
 ";
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_field',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
@@ -47,11 +54,11 @@ $db->CreateSequence($pre.'module_pwf_field_seq');
 $db->Execute('CREATE INDEX '.$pre.'module_pwf_field_idx ON '.$pre.'module_pwf_field (form_id)');
 
 $flds = "
-	option_id I KEY,
-	field_id I,
-	form_id I,
-	name C(256),
-	value X
+option_id I KEY,
+field_id I,
+form_id I,
+name C(256),
+value X
 ";
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_field_opt',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
@@ -60,44 +67,46 @@ $db->CreateSequence($pre.'module_pwf_field_opt_seq');
 $db->Execute('CREATE INDEX '.$pre.'module_pwf_field_opt_idx ON '.$pre.'module_pwf_field_opt (field_id,form_id)');
 
 $flds = "
-	record_id I(4) KEY,
-	pubkey C(16),
-	submitted ".CMS_ADODB_DT.",
-	content B
+record_id I(4) KEY,
+pubkey C(16),
+submitted ".CMS_ADODB_DT.",
+content B
 ";
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_record',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
 $db->CreateSequence($pre.'module_pwf_record_seq');
 
+/*MUTEX
 $flds = "
-	flock_id I(8) KEY,
-	flock T
+flock_id I(8) KEY,
+flock T
 ";
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_flock',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
+*/
 
 $flds = "
-	cache_id I(2) AUTO KEY,
-	keyword C(48),
-	value B,
-	save_time ".CMS_ADODB_DT;
+cache_id I(2) AUTO KEY,
+keyword C(48),
+value B,
+save_time ".CMS_ADODB_DT;
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_cache',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
 $flds = "
-	log_id I(2) KEY AUTO,
-	src C(40),
-	howmany I(2) DEFAULT 1,
-	basetime ".CMS_ADODB_DT;
+log_id I(2) KEY AUTO,
+src C(40),
+howmany I(2) DEFAULT 1,
+basetime ".CMS_ADODB_DT;
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_ip_log',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
 $flds = "
-	trans_id I(2) AUTO KEY,
-	old_id I(2),
-	new_id I(2),
-	isform I(1)
+trans_id I(2) AUTO KEY,
+old_id I(2),
+new_id I(2),
+isform I(1)
 ";
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_trans',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);

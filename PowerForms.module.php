@@ -21,9 +21,11 @@ class PowerForms extends CMSModule
 {
 	public $before20;
 	public $havemcrypt;
+/*QUEUE
 	private $mh = NULL; //curl_multi handle for async queue processing
 	private $ch = FALSE; //cached curl handle for unfinished process
 	private $Qurl;
+*/
 	//these are populated when first used
 	public $field_types = FALSE; //array of all usable field classnames
 	public $std_field_types = FALSE; //subset of $field_types, classes for use in 'fast-adder' simple mode
@@ -38,14 +40,14 @@ class PowerForms extends CMSModule
 		global $CMS_VERSION;
 		$this->before20 = (version_compare($CMS_VERSION,'2.0') < 0);
 		$this->havemcrypt = function_exists('mcrypt_encrypt');
-		//TODO curl check
+/*QUEUE
 		$this->mh = curl_multi_init();
 		//bogus frontend link (i.e. no admin login needed)
 		$url = $this->CreateLink('_','run_queue',1,'',array(),'',TRUE);
 		//strip the (trailing) fake returnid, hence use the default
 		$sep = strpos($url,'&amp;');
 		$this->Qurl = substr($url,0,$sep);
-		//TODO mutex, cache checks
+*/
 		require_once cms_join_path(dirname(__FILE__),'lib','class.pwfData.php');
 		$this->RegisterModulePlugin(TRUE);
 	}
@@ -188,16 +190,15 @@ class PowerForms extends CMSModule
 		return self::CheckAccess();
 	}
 
-/*	function GetHeaderHTML()
+	function GetHeaderHTML()
+	{
+		return '<link rel="stylesheet" type="text/css" id="adminstyler" href="'.$this->GetModuleURLPath().'/css/admin.css" />';
+	}
+
+/*	function AdminStyle()
 	{
 	}
 */
-	function AdminStyle()
-	{
-		$fn = cms_join_path(dirname(__FILE__),'css','admin.css');
-		return ''.@file_get_contents($fn);
-	}
-
 	function SuppressAdminOutput(&$request)
 	{
 		if(isset($_SERVER['QUERY_STRING']))

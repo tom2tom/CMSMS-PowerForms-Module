@@ -34,8 +34,10 @@ $sqlarray = $dict->DropTableSQL($pre.'module_pwf_field');
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_field_opt');
 $dict->ExecuteSQLArray($sqlarray);
+/*MUTEX
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_flock');
 $dict->ExecuteSQLArray($sqlarray);
+*/
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_form');
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_form_opt');
