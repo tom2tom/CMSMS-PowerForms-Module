@@ -110,6 +110,7 @@ class pwfSharedFile extends pwfFieldBase
 		$ud = $pwfUtils::GetUploadsPath($mod);
 		if(!$ud)
 			return array(FALSE,$mod->Lang('error_uploads_dir'));
+/*MUTEX
 		try
 		{
 			$mx = pwfUtils::GetMutex($mod);
@@ -118,7 +119,7 @@ class pwfSharedFile extends pwfFieldBase
 		{
 			return array(FALSE,$this->Lang('error_system'));
 		}
-
+*/
 		pwfUtils::SetupFormVars($this->formdata);
 
 		$filespec = $this->GetOption('filespec');
@@ -126,11 +127,11 @@ class pwfSharedFile extends pwfFieldBase
 			$fn = preg_replace('/[^\w\d\.]|\.\./','_',$mod->ProcessTemplateFromData($filespec));
 		else
 			$fn = 'form_submissions.txt';
-
+/*MUTEX
 		$token = abs(crc32($fn.'mutex'));
 		if(!$mx->lock($token))
 			return array(FALSE,$mod->Lang('error_lock'));
-
+*/
 		$fp = $ud.DIRECTORY_SEPARATOR.$fn;
 
 		$footer = $this->GetOption('file_footer');
@@ -186,8 +187,9 @@ class pwfSharedFile extends pwfFieldBase
 			fwrite($fh,$newline.$footer);
 		}
 		fclose($fh);
-
+/*MUTEX
 		$mx->unlock($token);
+*/
 		return array(TRUE,'');
 	}
 	

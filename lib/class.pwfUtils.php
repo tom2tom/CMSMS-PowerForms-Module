@@ -8,9 +8,10 @@
 class pwfUtils
 {
 	private static $cache = NULL; //cache object
+/*MUTEX
 	private static $mxtype = FALSE; //type of mutex in use - 'memcache' etc
 	private static $instance = NULL; //'instance' object for mutex class, if needed
-
+*/
 	/**
 	GetCache:
 	@storage: optional cache-type name, one (or more, ','-separated) of
@@ -31,7 +32,7 @@ class pwfUtils
 		require($path.'FastCacheBase.php');
 
 		$config = cmsms()->GetConfig();
-		$rooturl = (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != 'on') ? $config['root_url'] : $config['ssl_url'];
+		$rooturl = (empty($_SERVER['HTTPS'])) ? $config['root_url'] : $config['ssl_url'];
 		$settings = array_merge(
 			array(
 				'shmop' => array(),
@@ -81,13 +82,14 @@ class pwfUtils
 		throw new Exception('Cache not working');
 	}
 
-	/**
+	/* *
 	GetMutex:
 	@mod: reference to PowerForms module object
 	@storage: optional cache-type name, one (or more, ','-separated) of
 		auto,memcache,semaphore,file,database, default = 'auto'
 	Returns: mutex-object or NULL
 	*/
+/*MUTEX
 	public static function GetMutex(&$mod,$storage='auto')
 	{
 		$path = dirname(__FILE__).DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
@@ -151,7 +153,7 @@ class pwfUtils
 			throw new Exception('Mutex not working');
 		}
 	}
-
+*/
 	/**
 	SafeGet:
 	Execute SQL command(s) with minimal chance of data-race
