@@ -4,10 +4,20 @@
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+Property $approvedToGo - set FALSE in Validate(), set TRUE in ApproveToGo(),
+which is called from action.validate.php
+PreDisposeAction() disables or enables all other disposition-fields, per $approvedToGo
+Dispose() called only when $approvedToGo = FALSE, caches form data in record-table,
+sends email requesting confirmation, setup to show 'email-sent' message
+When confirmation-link opened, action initiated get form data from record-table,
+process it as if on-screen
+*/
 
 class pwfEmailConfirmation extends pwfEmailBase
 {
-	var $approvedToGo = FALSE;
+	private $approvedToGo = FALSE;
+	private $blocked; //array of disposition-fields blocked here
 
 	function __construct(&$formdata,&$params)
 	{
@@ -21,7 +31,7 @@ class pwfEmailConfirmation extends pwfEmailBase
 
 	function GetFieldStatus()
 	{
-        return $this->TemplateStatus();
+//TODO advice about ? return $this->TemplateStatus();
 	}
 
 	function ApproveToGo($record_id)
@@ -31,7 +41,6 @@ class pwfEmailConfirmation extends pwfEmailBase
 
 	function AdminPopulate($id)
 	{
-		$mod = $this->formdata->formsmodule;
 		//log extra tag for use in template-help
 		pwfUtils::AddTemplateVariable($this->formdata,'confirm_url','title_confirmation_url');
 
@@ -79,36 +88,53 @@ class pwfEmailConfirmation extends pwfEmailBase
 		return array($this->validated,$this->ValidationMessage);
 	}
 
-	//we assume (correctly) this field is first disposition on the form
+	//assumes this field is first disposition on the form (sorted at runtime)
 	function PreDisposeAction()
 	{
-		$val = $this->approvedToGo;
-		//inhibit/enable all dispositions
-		foreach($this->formdata->Fields as &$one)
+		$val = $this->approvedToGo; //FALSE prior to confirmation
+		if($val)
 		{
-			if($one->IsDisposition())
-				$one->SetDispositionPermission($val);
+			//unblock dispositions
+			foreach($this->blocked as $fid)
+			{
+				$one = $this->formdata->Fields[$fid];
+				$one->DispositionPermitted = TRUE;
+			}
 		}
-		unset($one);
-		$this->SetDispositionPermission(!$val); //re-enable/inhibit this disposition
+		else
+		{
+			//block relevant dispositions (some may already be blocked for other reasons)
+			$this->blocked = array();
+			foreach($this->formdata->Fields as &$one)
+			{
+				if($one->IsDisposition && $one->DispositionPermitted)
+				{
+					$this->blocked[] = $one->Id;
+					$one->DispositionPermitted = FALSE;
+				}
+			}
+			unset($one);
+		}
+		$this->DispositionPermitted = !$val; //re-enable/inhibit this disposition
 	}
 
 	//only called when $this->approvedToGo is FALSE
 	function Dispose($id,$returnid)
 	{
+		$mod = $this->formdata->formsmodule;
 		//cache form data, pending confirmation
 		$pre = cms_db_prefix();
 		$db = cmsms()->GetDb();
 		$record_id = $db->GenID($pre.'module_pwf_record_seq');
 		$t = time();
-		$code = substr(md5(session_id().$t),0,12);
+		$pub = substr(md5(session_id().$t),0,12);
+		$pw = $pub.pwfUtils::Unfusc($mod->GetPreference('masterpass'));
 		$when = $db->DbTimeStamp($t);
-		$mod = $this->formdata->formsmodule;
 		$this->formdata->formsmodule = NULL; //exclude module-data from the record
-		$cont = pwfUtils::Encrypt($this->formdata,$code.$mod->GetPreference('default_phrase'));
+		$cont = pwfUtils::Encrypt($this->formdata,$pw);
 		$db->Execute('INSERT INTO '.$pre.
-		'module_pwf_record (record_id,code,submitted,contents) VALUES (?,?,?,?)',
-			array($record_id,$code,$when,$cont));
+		'module_pwf_record (record_id,pubkey,submitted,contents) VALUES (?,?,?,?)',
+			array($record_id,$pub,$when,$cont));
 		$this->formdata->formsmodule = $mod; //reinstate
 		//set url variable for email template
 		$smarty = cmsms()->GetSmarty();
