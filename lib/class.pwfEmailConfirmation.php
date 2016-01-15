@@ -137,17 +137,17 @@ class pwfEmailConfirmation extends pwfEmailBase
 			array($record_id,$pub,$when,$cont));
 		$this->formdata->formsmodule = $mod; //reinstate
 		//set url variable for email template
-		$smarty = cmsms()->GetSmarty();
+		$tplvars = array();
 		$pref = $this->formdata->current_prefix;
-		$smarty->assign('confirm_url',
+		$tplvars['confirm_url'] =
 			$this->formdata->formsmodule->CreateFrontendLink('',$returnid,'validate','',
 			array(
 				$pref.'c'=>$code,
 				$pref.'d'=>$this->Id,
 //				$pref.'f'=>$this->formdata->Id,
 				$pref.'r'=>$record_id),
-			'',TRUE,FALSE,'',TRUE));
-		return $this->SendForm($this->GetValue(),$this->GetOption('email_subject'));
+			'',TRUE,FALSE,'',TRUE);
+		return $this->SendForm($this->GetValue(),$this->GetOption('email_subject'),$tplvars);
 	}
 }
 

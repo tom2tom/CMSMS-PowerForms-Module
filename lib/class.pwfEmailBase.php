@@ -149,10 +149,12 @@ $mod->Crash;
 		return array($ret,$msg);
 	}
 
-	// send email(s)
-	// $subject is processed via smarty
-	// message body is generated from field-option 'email_template' (or a default template)
-	function SendForm($destination_array,$subject)
+	/*
+	send email(s)
+	$subject is processed via smarty
+	message body is generated from field-option 'email_template' (or a default template)
+	*/
+	function SendForm($destination_array,$subject,$tplvars=array())
 	{
 		$mod = $this->formdata->formsmodule;
 		if($destination_array == FALSE || $subject == FALSE)
@@ -277,9 +279,9 @@ $mod->Crash;
 
 		$htmlemail = $this->GetOption('html_email',0);
 
-		pwfUtils::SetupFormVars($this->formdata,$htmlemail);
+		pwfUtils::SetupFormVars($this->formdata,$htmlemail,$tplvars);
 
-		$subject = $mod->ProcessTemplateFromData($subject); //before20
+		$subject = pwfUtils::ProcessTemplateFromData($mod,$subject,$tplvars);
 		$mail->SetSubject($subject);
 
 		$message = $this->GetOption('email_template');
@@ -294,12 +296,12 @@ $mod->Crash;
 			if($htmlemail)
 				$message2 = pwfUtils::CreateDefaultTemplate($this->formdata,TRUE);
 		}
-		$message = $mod->ProcessTemplateFromData($message); //before20
+		$message = pwfUtils::ProcessTemplateFromData($mod,$message,$tplvars);
 
 		if($htmlemail)
 		{
 			$mail->IsHTML(TRUE);
-			$message2 = $mod->ProcessTemplateFromData($message2); //before20
+			$message2 = pwfUtils::ProcessTemplateFromData($mod,$message2,$tplvars);
 			$mail->SetAltBody(strip_tags(html_entity_decode($message)));
 			$mail->SetBody($message2);
 		}

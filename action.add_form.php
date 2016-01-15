@@ -69,7 +69,7 @@ else
 	$alias = '';
 }
 
-$smarty->assign(array(
+$tplvars = array(
 	'form_start' => $this->CreateFormStart($id,'add_form',$returnid),
 	'form_end' => $this->CreateFormEnd(),
 	'hidden' => $h,
@@ -81,8 +81,8 @@ $smarty->assign(array(
 	'help_form_alias' => $this->Lang('help_form_alias'),
 	'save' => $this->CreateInputSubmit($id,'save',$this->Lang('save')),
 	'cancel' => $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'))
-));
+);
 
-echo $this->ProcessTemplate('addform.tpl'); //before20
+echo pwfUtils::ProcessTemplate($this,'addform.tpl',$tplvars);
 
 ?>

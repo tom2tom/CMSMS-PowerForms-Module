@@ -78,8 +78,10 @@ if($padm)
 	}
 }
 
+$tplvars = array();
+
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 
-echo $this->ProcessTemplate('adminpanel.tpl'); //before20
+echo pwfUtils::ProcessTemplate($this,'adminpanel.tpl',$tplvars);
 
 ?>

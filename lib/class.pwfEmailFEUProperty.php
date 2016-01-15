@@ -142,7 +142,7 @@ class pwfEmailFEUProperty extends pwfEmailBase
 			return array(TRUE,'');
 		}
 
-		$smarty = cmsms()->GetSmarty();
+		$tplvars = array();
 		$smarty_users = array();
 		$destinations = array();
 		$ucount = count($users);
@@ -161,15 +161,15 @@ class pwfEmailFEUProperty extends pwfEmailBase
 				$destinations[] = $rec['email'];
 			}
 			$smarty_users[$rec['username']] = $rec;
-			$smarty->assign('users',$smarty_users);
+			$tplvars['users'] = $smarty_users;
 
 			if($ucount == 1)
 			{
-				$smarty->assign('user_info',$users[0]);
+				$tplvars['user_info'] = $users[0];
 			}
 		}
 		// send email(s)
-		return $this->SendForm($destinations,$this->GetOption('email_subject'));
+		return $this->SendForm($destinations,$this->GetOption('email_subject'),$tplvars);
 	}
 }
 

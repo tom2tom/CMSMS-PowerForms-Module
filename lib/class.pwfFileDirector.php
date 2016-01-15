@@ -239,19 +239,20 @@ class pwfFileDirector extends pwfFieldBase
 		if(!$mx->lock($token))
 			return array(FALSE,$mod->Lang('error_lock'));
 */
+		$tplvars = array();
 		$fp = $ud.DIRECTORY_SEPARATOR.$fn;
 
-		pwfUtils::SetupFormVars($this->formdata);
+		pwfUtils::SetupFormVars($this->formdata,$tplvars);
 
 		$footer = $this->GetOption('file_footer');
 		if($footer)
-			$footer = $mod->ProcessTemplateFromData($footer); //before20
+			$footer = pwfUtils::ProcessTemplateFromData($mod,$footer,$tplvars);
 
 		$template = $this->GetOption('file_template');
 		if(!$template)
 			$template = $this->CreateDefaultTemplate();
 
-		$newline = $mod->ProcessTemplateFromData($template); //before20
+		$newline = pwfUtils::ProcessTemplateFromData(mod,$template,$tplvars);
 /*		$replchar = $this->GetOption('newlinechar');
 		if($replchar)
 		{
@@ -270,7 +271,7 @@ class pwfFileDirector extends pwfFieldBase
 			$header = $this->GetOption('file_header');
 			if(!$header)
 				$header = $this->CreateSampleHeader();
-			$header = $mod->ProcessTemplateFromData($header); //before20
+			$header = pwfUtils::ProcessTemplateFromData($mod,$header,$tplvars);
 			fwrite($fh,$header.PHP_EOL.$newline.$footer);
 		}
 		else

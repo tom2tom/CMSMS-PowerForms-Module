@@ -699,13 +699,6 @@ EOS;
 	*/
 	public static function FormFieldsHelp(&$formdata,&$extras=array())
 	{
-		$mod = $formdata->formsmodule;
-		$smarty = cmsms()->GetSmarty();
-		$smarty->assign(array(
-			'title_variables' => $mod->Lang('title_variables_available'),
-			'title_name' => $mod->Lang('title_php_variable'),
-			'title_field' => $mod->Lang('title_form_field')
-		));
 		$rows = array();
 		foreach($formdata->Fields as &$one)
 		{
@@ -726,8 +719,15 @@ EOS;
 			}
 		}
 
-		$smarty->assign('rows',$rows);
-		return $mod->ProcessTemplate('varshelp.tpl'); //before20
+		$mod = $formdata->formsmodule;
+		$tplvars = array(
+			'title_variables' => $mod->Lang('title_variables_available'),
+			'title_name' => $mod->Lang('title_php_variable'),
+			'title_field' => $mod->Lang('title_form_field'),
+			'rows' => $rows
+		);
+
+		return self::ProcessTemplate($mod,'varshelp.tpl',$tplvars);
 	}
 
 	/**
@@ -737,15 +737,15 @@ EOS;
 	varshelp.tpl
 	@formdata: reference to pwfData object for form
 	@mod: reference to current PowerBrowse module object
-	@smarty: reference to smarty object
+	@tplvars: reference to template-variables array
 	*/
-	public static function SetupSubTemplateVarsHelp(&$formdata,&$mod,&$smarty)
+	public static function SetupSubTemplateVarsHelp(&$formdata,&$mod,&$tplvars)
 	{
-		$smarty->assign(array(
+		$tplvars = $tplvars + array(
 		 'template_vars_title' => $mod->Lang('title_template_variables'),
 		 'variable_title' => $mod->Lang('variable'),
 		 'property_title' => $mod->Lang('property')
-		));
+		);
 
 		$globalvars = array();
 		foreach(array(
@@ -768,7 +768,7 @@ EOS;
 			$oneset->title = $mod->Lang($langkey);
 			$globalvars[] = $oneset;
 		}
-		$smarty->assign('globalvars',$globalvars);
+		$tplvars['globalvars'] = $globalvars;
 
 		if($formdata->Fields)
 		{
@@ -787,7 +787,7 @@ EOS;
 				}
 			}
 			unset($one);
-			$smarty->assign('fieldvars',$fieldvars);
+			$tplvars['fieldvars'] = $fieldvars;
 		}
 
 /*		$obfields = array();
@@ -798,36 +798,36 @@ EOS;
 			$oneset->title = $mod->Lang('title_field_'.$name);
 			$obfields[] = $oneset;
 		}
-		$smarty->assign('obfields',$obfields);
+		$tplvars['obfields'] = $obfields;
 
 //		$oneset->title = $mod->Lang('title_field_id2');
-		$smarty->assign('help_field_values',$mod->Lang('help_field_values'));
-		$smarty->assign('help_object_example',$mod->Lang('help_object_example'));
+		$tplvars['help_field_values'] = $mod->Lang('help_field_values'));
+		$tplvars['help_object_example'] = $mod->Lang('help_object_example'));
 */
-		$smarty->assign('help_other_fields',$mod->Lang('help_other_fields'));
+		$tplvars['help_other_fields'] = $mod->Lang('help_other_fields');
 
-		$smarty->assign('help_subtplvars',$mod->ProcessTemplate('varshelp.tpl')); //before20
+		$tplvars['help_subtplvars'] = pwfUtils::ProcessTemplate($mod,'varshelp.tpl',$tplvars);
 	}
 
 	/**
 	SetupFormVars:
 	Sets various smarty variables
 	@formdata: reference to form data object
+	@tplvars: reference to template-variables array
 	@htmlemail: optional boolean, whether processing a form for html email, default FALSE
 	*/
-	public static function SetupFormVars(&$formdata,$htmlemail=FALSE)
+	public static function SetupFormVars(&$formdata,&$tplvars,$htmlemail=FALSE)
 	{
 		$mod = $formdata->formsmodule;
-		$smarty = cmsms()->GetSmarty();
 		// general variables
-		$smarty->assign(array(
-		'form_name' => $formdata->Name,
-		'form_url' => (empty($_SERVER['HTTP_REFERER'])?$mod->Lang('no_referrer_info'):$_SERVER['HTTP_REFERER']),
-		'form_host' => $_SERVER['SERVER_NAME'],
-		'sub_date' => date('r'),
-		'sub_source' => $_SERVER['REMOTE_ADDR'],
-		'version' => $mod->GetVersion()
-		));
+		$tplvars = $tplvars + array(
+			'form_name' => $formdata->Name,
+			'form_url' => (empty($_SERVER['HTTP_REFERER'])?$mod->Lang('no_referrer_info'):$_SERVER['HTTP_REFERER']),
+			'form_host' => $_SERVER['SERVER_NAME'],
+			'sub_date' => date('r'),
+			'sub_source' => $_SERVER['REMOTE_ADDR'],
+			'version' => $mod->GetVersion()
+		);
 
 		$unspec = self::GetFormOption($formdata,'unspecified',$mod->Lang('unspecified'));
 
@@ -853,16 +853,78 @@ EOS;
 
 			$name = $one->GetVariableName();
 //			$fldobj = $one->ExportObject();
-			$smarty->assign($name,$replVal);
-//			$smarty->assign_by_ref($name.'_obj',$fldobj);
+			$tplvars[$name] = $replVal;
+//			$tplvars[$name.'_obj'] = $fldobj;
 			$alias = $one->ForceAlias();
-			$smarty->assign($alias,$replVal);
-//			$smarty->assign_by_ref($alias.'_obj',$fldobj);
+			$tplvars[$alias] = $replVal;
+//			$tplvars[$alias.'_obj'] = $fldobj;
 			$id = $one->GetId();
-			$smarty->assign('fld_'.$id,$replVal);
-//			$smarty->assign_by_ref('fld_'.$id.'_obj',$fldobj);
+			$tplvars['fld_'.$id] = $replVal;
+//			$tplvars['fld_'.$id.'_obj'] = $fldobj;
 		}
 		unset ($one);
+	}
+
+	/**
+	ProcessTemplate:
+	@mod: reference to current PowerBrowse module object
+	@tplname:
+	@tplvars:
+	@cache: optional boolean, default FALSE
+	*/
+	public static function ProcessTemplate(&$mod,$tplname,$tplvars,$cache=FALSE)
+	{
+		if($mod->before20)
+		{
+			global $smarty;
+			$smarty->assign($tplvars);
+			return $mod->ProcessTemplate($tplname);
+		}
+		else
+		{
+		}
+	}
+
+	/**
+	ProcessTemplateFromDatabase:
+	@mod: reference to current PowerBrowse module object
+	@tplname:
+	@tplvars:
+	@cache: optional boolean, default FALSE
+	*/
+	public static function ProcessTemplateFromDatabase(&$mod,$tplname,$tplvars,$cache=FALSE)
+	{
+		if($mod->before20)
+		{
+			global $smarty;
+			$smarty->assign($tplvars);
+			echo $mod->ProcessTemplateFromDatabase($tplname);
+		}
+		else
+		{
+/*TODO
+$tpl = $smarty->CreateTemplate($this->GetTemplateResource('pwf::'.$form_id)[,$cache_id][,compile_id][,$parent][,$data]);
+$tpl->assign(stuff not already in $parent[chain] or $data)
+$tpl->display();
+*/
+		}
+	}
+
+	/**
+	ProcessTemplateFromData:
+	@mod: reference to current PowerBrowse module object
+	@tplname:
+	@tplvars:
+	@cache: optional boolean, default FALSE
+	*/
+	public static function ProcessTemplateFromData(&$mod,$tplname,$tplvars,$cache=FALSE)
+	{
+		if($mod->before20)
+		{
+		}
+		else
+		{
+		}
 	}
 
 	/**

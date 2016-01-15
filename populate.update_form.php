@@ -5,14 +5,14 @@
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 if(!empty($message))
-	$smarty->assign('message',$message);
+	$tplvars['message'] = $message;
 
-$smarty->assign('backtomod_nav',$this->CreateLink($id,'defaultadmin','','&#171; '.$this->Lang('back_top')));
+$tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$this->Lang('back_top'));
 
-$smarty->assign('form_start',$this->CreateFormStart($id,'update_form',$returnid,
+$tplvars['form_start'] = $this->CreateFormStart($id,'update_form',$returnid,
 	'POST','',FALSE,'',array(
 	'form_id'=>$form_id,
-	'formdata'=>$params['formdata'])));
+	'formdata'=>$params['formdata']));
 
 $tab = $this->GetActiveTab($params);
 $t = $this->StartTabHeaders().
@@ -25,10 +25,10 @@ $t .=
 	$this->SetTabHeader('udttab',$this->Lang('tab_udt'),($tab == 'udttab')).
 	$this->SetTabHeader('submittab',$this->Lang('tab_submit'),($tab == 'submittab')).
 	$this->EndTabHeaders().$this->StartTabContent();
-$smarty->assign('tabs_start',$t);
+$tplvars['tabs_start'] = $t;
 if($form_id > 0)
-	$smarty->assign('fieldstab_start',$this->StartTab('fieldstab'));
-$smarty->assign(array(
+	$tplvars['fieldstab_start'] = $this->StartTab('fieldstab');
+$tplvars = $tplvars + array(
 	'tabs_end' => $this->EndTabContent(),
 	'maintab_start' => $this->StartTab('maintab'),
 	'designtab_start' => $this->StartTab('designtab'),
@@ -43,10 +43,8 @@ $smarty->assign(array(
 	'title_form_alias' => $this->Lang('title_form_alias'),
 	'input_form_alias' => $this->CreateInputText($id,'form_alias',$formdata->Alias,50),
 	'help_form_alias' => $this->Lang('help_form_alias'),
-	'title_form_status' => $this->Lang('title_form_status')
-));
+	'title_form_status' => $this->Lang('title_form_status'),
 
-$smarty->assign(array(
 	'help_can_drag' => $this->Lang('help_can_drag'),
 	'help_save_order' => $this->Lang('help_save_order'),
 
@@ -58,10 +56,8 @@ $smarty->assign(array(
 
 	'title_form_css_class' => $this->Lang('title_form_css_class'),
 	'input_form_css_class' => $this->CreateInputText($id,'opt_css_class',
-		pwfUtils::GetFormOption($formdata,'css_class','powerform'),50,50)
-));
+		pwfUtils::GetFormOption($formdata,'css_class','powerform'),50,50),
 
-$smarty->assign(array(
 	'title_form_fields' => $this->Lang('title_form_fields'),
 	'title_form_main' => $this->Lang('title_form_main'),
 
@@ -75,7 +71,7 @@ $smarty->assign(array(
 //	'title_submit_actions' => $this->Lang('title_submit_actions'),
 //	'title_submit_labels' => $this->Lang('title_submit_labels'),
 //	'security_key' => CMS_SECURE_PARAM_NAME.'='.$_SESSION[CMS_USER_KEY]
-));
+);
 
 $theme = ($this->before20) ? cmsms()->variables['admintheme']:
 	cms_utils::get_theme_object();
@@ -85,13 +81,13 @@ $jsloads = array();
 $jsincs = array();
 $baseurl = $this->GetModuleURLPath();
 
-$smarty->assign('icon_info',
-	$theme->DisplayImage('icons/system/info.gif',$this->Lang('help_help'),'','','systemicon tipper'));
+$tplvars['icon_info'] =
+	$theme->DisplayImage('icons/system/info.gif',$this->Lang('help_help'),'','','systemicon tipper');
 
-$smarty->assign('hidden',$this->CreateInputHidden($id,'active_tab'));
-$smarty->assign('save',$this->CreateInputSubmit($id,'submit',$this->Lang('save')));
-$smarty->assign('apply',$this->CreateInputSubmit($id,'submit',$this->Lang('apply'),
-		'title = "'.$this->Lang('save_and_continue').'" onclick="set_tab()"'));
+$tplvars['hidden'] = $this->CreateInputHidden($id,'active_tab');
+$tplvars['save'] = $this->CreateInputSubmit($id,'submit',$this->Lang('save'));
+$tplvars['apply'] = $this->CreateInputSubmit($id,'submit',$this->Lang('apply'),
+	'title = "'.$this->Lang('save_and_continue').'" onclick="set_tab()"');
 
 $icontrue = $theme->DisplayImage('icons/system/true.gif',$this->Lang('true'),'','','systemicon');
 $iconfalse = $theme->DisplayImage('icons/system/false.gif',$this->Lang('false'),'','','systemicon');
@@ -196,38 +192,38 @@ foreach($formdata->FieldOrders as $one)
 
 if($fields)
 {
-	$smarty->assign('fields',$fields);
+	$tplvars['fields'] = $fields;
 }
 else
 {
-	$smarty->assign(array(
+	$tplvars = $tplvars + array(
 		'nofields' => $this->Lang('no_fields'),
 		'text_ready' => '',
 		'text_notready' => $this->Lang('title_not_ready'),
 		'help_notready' => $this->Lang('no_fields')
-	));
+	);
 }
 
 if($dispositions)
 {
-	$smarty->assign(array(
+	$tplvars = $tplvars + array(
 		'dispositions' => $dispositions,
 		'text_ready' => $this->Lang('title_ready')
-	));
+	);
 }
 else
 {
-	$smarty->assign(array(
+	$tplvars = $tplvars + array(
 		'nodispositions' => $this->Lang('no_dispositions'),
 		'text_ready' => '',
 		'text_notready' => $this->Lang('title_not_ready'),
 		'help_notready' => $this->Lang('help_not_ready')
-	));
+	);
 }
 
 $t = $this->Lang('title_add_new_field');
-$smarty->assign('title_fastadd',$t);
-$smarty->assign('add_field_link',
+$tplvars['title_fastadd'] = $t;
+$tplvars['add_field_link'] =
 	$this->CreateLink($id,'update_field',$returnid,
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
 		array('field_id'=>-1,
@@ -236,11 +232,11 @@ $smarty->assign('add_field_link',
 	$this->CreateLink($id,'update_field',$returnid,$t,
 		array('field_id'=>-1,
 		'form_id'=>$form_id,
-		'formdata'=>$params['formdata']),'',FALSE));
+		'formdata'=>$params['formdata']),'',FALSE);
 
 $t = $this->Lang('title_add_new_disposition');
-$smarty->assign('title_fastadd2',$t);
-$smarty->assign('add_disposition_link',
+$tplvars['title_fastadd2'] = $t;
+$tplvars['add_disposition_link'] =
 	$this->CreateLink($id,'update_field',$returnid,
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
 		array('field_id'=>-1,
@@ -249,7 +245,7 @@ $smarty->assign('add_disposition_link',
 	$this->CreateLink($id,'update_field',$returnid,$t,
 		array('field_id'=>-1,
 		'form_id'=>$form_id,
-		'formdata'=>$params['formdata']),'',FALSE));
+		'formdata'=>$params['formdata']),'',FALSE);
 
 $link = $this->CreateLink($id,'update_field',$returnid,'',
 	array('field_id'=>-1,
@@ -289,20 +285,20 @@ if($this->GetPreference('adder_fields','basic') == 'basic')
 			$displays[$l] = $t;
 	}
 	unset($one);
-	$smarty->assign('input_fastadd',$this->CreateInputDropdown($id,'field_type',
-		$displays,-1,'','onchange="fast_add(this)"'));
+	$tplvars['input_fastadd'] = $this->CreateInputDropdown($id,'field_type',
+		$displays,-1,'','onchange="fast_add(this)"');
 	$t = $this->Lang('title_switch_advanced');
-	$smarty->assign('help_fastadd',
+	$tplvars['help_fastadd'] =
 		$t.
 		$this->CreateLink($id,'update_form',$returnid,$this->Lang('title_switch_advanced_link'),
-		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'fieldstab','set_field_level'=>'advanced')));
-	$smarty->assign('input_fastadd2',$this->CreateInputDropdown($id,'disposition_type',
-		$dispositions,-1,'','onchange="fast_add(this)"'));
+		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'fieldstab','set_field_level'=>'advanced'));
+	$tplvars['input_fastadd2'] = $this->CreateInputDropdown($id,'disposition_type',
+		$dispositions,-1,'','onchange="fast_add(this)"');
 	$t = $this->Lang('title_switch_advanced2');
-	$smarty->assign('help_fastadd2',
+	$tplvars['help_fastadd2'] =
 		$t.
 		$this->CreateLink($id,'update_form',$returnid,$this->Lang('title_switch_advanced_link'),
-		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'submittab','set_field_level'=>'advanced')));
+		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'submittab','set_field_level'=>'advanced'));
 }
 else
 {
@@ -320,53 +316,53 @@ else
 			$displays[$l] = $t;
 	}
 	unset($one);
-	$smarty->assign('input_fastadd',$this->CreateInputDropdown($id,'field_type',
-		$displays,-1,'','onchange="fast_add(this)"'));
+	$tplvars['input_fastadd'] = $this->CreateInputDropdown($id,'field_type',
+		$displays,-1,'','onchange="fast_add(this)"');
 	$t = $this->Lang('title_switch_basic');
-	$smarty->assign('help_fastadd',
+	$tplvars['help_fastadd'] =
 		$t.
 		$this->CreateLink($id,'update_form',$returnid,$this->Lang('title_switch_basic_link'),
-		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'fieldstab','set_field_level'=>'basic')));
-	$smarty->assign('input_fastadd2',$this->CreateInputDropdown($id,'disposition_type',
-		$dispositions,-1,'','onchange="fast_add(this)"'));
+		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'fieldstab','set_field_level'=>'basic'));
+	$tplvars['input_fastadd2'] = $this->CreateInputDropdown($id,'disposition_type',
+		$dispositions,-1,'','onchange="fast_add(this)"');
 	$t = $this->Lang('title_switch_basic2');
-	$smarty->assign('help_fastadd2',
+	$tplvars['help_fastadd2'] =
 		$t.
 		$this->CreateLink($id,'update_form',$returnid,$this->Lang('title_switch_basic_link'),
-		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'submittab','set_field_level'=>'basic')));
+		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'submittab','set_field_level'=>'basic'));
 }
 
-$smarty->assign('cancel',$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel')));
+$tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
 
 //no scope for !empty() checks for boolean attrs, so we add hidden 0 for checkboxes
-$smarty->assign('title_inline_form',$this->Lang('title_inline_form'));
-$smarty->assign('input_inline_form',
+$tplvars['title_inline_form'] = $this->Lang('title_inline_form');
+$tplvars['input_inline_form'] =
 	$this->CreateInputHidden($id,'opt_inline',0).
 	$this->CreateInputCheckbox($id,'opt_inline',1,
 		pwfUtils::GetFormOption($formdata,'inline',0)).'<br />'.
-	$this->Lang('help_inline_form'));
+	$this->Lang('help_inline_form');
 
-$smarty->assign('title_form_submit_button',$this->Lang('title_form_submit_button'));
-$smarty->assign('input_form_submit_button',
+$tplvars['title_form_submit_button'] = $this->Lang('title_form_submit_button');
+$tplvars['input_form_submit_button'] =
 	$this->CreateInputText($id,'opt_submit_button_text',
-		pwfUtils::GetFormOption($formdata,'submit_button_text',$this->Lang('button_submit')),35,35));
+		pwfUtils::GetFormOption($formdata,'submit_button_text',$this->Lang('button_submit')),35,35);
 
-$smarty->assign('title_submit_button_safety',$this->Lang('title_submit_button_safety'));
-$smarty->assign('input_submit_button_safety',
+$tplvars['title_submit_button_safety'] = $this->Lang('title_submit_button_safety');
+$tplvars['input_submit_button_safety'] =
 	$this->CreateInputHidden($id,'opt_input_button_safety',0).
 	$this->CreateInputCheckbox($id,'opt_input_button_safety',1,
 		pwfUtils::GetFormOption($formdata,'input_button_safety',0)).'<br />'.
-	$this->Lang('help_submit_safety'));
+	$this->Lang('help_submit_safety');
 
-$smarty->assign('title_form_prev_button',$this->Lang('title_form_prev_button'));
-$smarty->assign('input_form_prev_button',
+$tplvars['title_form_prev_button'] = $this->Lang('title_form_prev_button');
+$tplvars['input_form_prev_button'] =
 	$this->CreateInputText($id,'opt_prev_button_text',
-		pwfUtils::GetFormOption($formdata,'prev_button_text',$this->Lang('button_previous')),35,35));
+		pwfUtils::GetFormOption($formdata,'prev_button_text',$this->Lang('button_previous')),35,35);
 
-$smarty->assign('title_form_next_button',$this->Lang('title_form_next_button'));
-$smarty->assign('input_form_next_button',
+$tplvars['title_form_next_button'] = $this->Lang('title_form_next_button');
+$tplvars['input_form_next_button'] =
 	$this->CreateInputText($id,'opt_next_button_text',
-		pwfUtils::GetFormOption($formdata,'next_button_text',$this->Lang('button_continue')),35,35));
+		pwfUtils::GetFormOption($formdata,'next_button_text',$this->Lang('button_continue')),35,35);
 
 $usertagops = cmsms()->GetUserTagOperations();
 $usertags = $usertagops->ListUserTags();
@@ -375,42 +371,42 @@ $usertaglist[$this->Lang('none')] = '';
 foreach($usertags as $key => $value)
 	$usertaglist[$value] = $key;
 
-$smarty->assign('title_form_predisplay_udt',$this->Lang('title_form_predisplay_udt'));
-$smarty->assign('input_form_predisplay_udt',
+$tplvars['title_form_predisplay_udt'] = $this->Lang('title_form_predisplay_udt');
+$tplvars['input_form_predisplay_udt'] =
 	$this->CreateInputDropdown($id,'opt_predisplay_udt',$usertaglist,-1,
-		pwfUtils::GetFormOption($formdata,'predisplay_udt')));
+		pwfUtils::GetFormOption($formdata,'predisplay_udt'));
 
-$smarty->assign('title_form_predisplay_each_udt',$this->Lang('title_form_predisplay_each_udt'));
-$smarty->assign('input_form_predisplay_each_udt',
+$tplvars['title_form_predisplay_each_udt'] = $this->Lang('title_form_predisplay_each_udt');
+$tplvars['input_form_predisplay_each_udt'] =
 	$this->CreateInputDropdown($id,'opt_predisplay_each_udt',$usertaglist,-1,
-		pwfUtils::GetFormOption($formdata,'predisplay_each_udt')));
+		pwfUtils::GetFormOption($formdata,'predisplay_each_udt'));
 
-$smarty->assign('title_form_validate_udt',$this->Lang('title_form_validate_udt'));
-$smarty->assign('input_form_validate_udt',
+$tplvars['title_form_validate_udt'] = $this->Lang('title_form_validate_udt');
+$tplvars['input_form_validate_udt'] =
 	$this->CreateInputDropdown($id,'opt_validate_udt',$usertaglist,-1,
-		pwfUtils::GetFormOption($formdata,'validate_udt')));
+		pwfUtils::GetFormOption($formdata,'validate_udt'));
 
-$smarty->assign('title_form_required_symbol',$this->Lang('title_form_required_symbol'));
-$smarty->assign('input_form_required_symbol',
+$tplvars['title_form_required_symbol'] = $this->Lang('title_form_required_symbol');
+$tplvars['input_form_required_symbol'] =
 	 $this->CreateInputText($id,'opt_required_field_symbol',
-		pwfUtils::GetFormOption($formdata,'required_field_symbol','*'),5));
+		pwfUtils::GetFormOption($formdata,'required_field_symbol','*'),5);
 
-$smarty->assign('title_list_delimiter',$this->Lang('title_list_delimiter'));
-$smarty->assign('input_list_delimiter',
+$tplvars['title_list_delimiter'] = $this->Lang('title_list_delimiter');
+$tplvars['input_list_delimiter'] =
 	$this->CreateInputText($id,'opt_list_delimiter',
-		pwfUtils::GetFormOption($formdata,'list_delimiter',','),5));
+		pwfUtils::GetFormOption($formdata,'list_delimiter',','),5);
 
-$smarty->assign('title_submit_javascript',$this->Lang('title_submit_javascript'));
-$smarty->assign('input_submit_javascript',
+$tplvars['title_submit_javascript'] = $this->Lang('title_submit_javascript');
+$tplvars['input_submit_javascript'] =
 	$this->CreateTextArea(FALSE,$id,pwfUtils::GetFormOption($formdata,'submit_javascript',''),
 		'opt_submit_javascript','pwf_shortarea','submit_javascript',
 		'','',50,8).
-		'<br />'.$this->Lang('help_submit_javascript'));
+		'<br />'.$this->Lang('help_submit_javascript');
 
-$smarty->assign('title_submit_limit',$this->Lang('title_submit_limit'));
-$smarty->assign('input_submit_limit',
+$tplvars['title_submit_limit'] = $this->Lang('title_submit_limit');
+$tplvars['input_submit_limit'] =
 	$this->CreateInputText($id,'opt_submit_limit',
-		pwfUtils::GetFormOption($formdata,'submit_limit',$this->GetPreference('submit_limit')),3,5));
+		pwfUtils::GetFormOption($formdata,'submit_limit',$this->GetPreference('submit_limit')),3,5);
 
 $templateList = array(''=>'',
 	$this->Lang('default_template')=>'defaultform.tpl',
@@ -425,9 +421,9 @@ foreach($allForms as $one)
 }
 
 $thisLink = $this->CreateLink($id,'get_template',$returnid,'',array(),'',TRUE);
-$smarty->assign('title_load_template',$this->Lang('title_load_template'));
-$smarty->assign('input_load_template',$this->CreateInputDropdown($id,'template_load',
-	$templateList,-1,'','id="template_load" onchange="get_template(\''.$this->Lang('confirm_template').'\',\''.$thisLink.'\');"'));
+$tplvars['title_load_template'] = $this->Lang('title_load_template');
+$tplvars['input_load_template'] = $this->CreateInputDropdown($id,'template_load',
+	$templateList,-1,'','id="template_load" onchange="get_template(\''.$this->Lang('confirm_template').'\',\''.$thisLink.'\');"');
 
 if($this->before20)
 	$tpl = $this->GetTemplate('pwf::'.$form_id);
@@ -436,22 +432,22 @@ else
 	$ob = CmsLayoutTemplate::load('pwf::'.$form_id);
 	$tpl = $ob->get_content();
 }
-$smarty->assign('title_form_template',$this->Lang('title_form_template'));
+$tplvars['title_form_template'] = $this->Lang('title_form_template');
 //note WYSIWYG is no good, the MCE editor stuffs around with the template contents
-$smarty->assign('input_form_template',
+$tplvars['input_form_template'] =
 	$this->CreateSyntaxArea($id,$tpl,'opt_form_template',
-	'pwf_tallarea','form_template','','',50,24,'','','style="height:30em;"'));
+	'pwf_tallarea','form_template','','',50,24,'','','style="height:30em;"');
 
 $postsubmits = array($this->Lang('redirect_to_page')=>'redir',$this->Lang('display_text')=>'text');
-$smarty->assign('title_submit_action',$this->Lang('title_submit_action'));
-$smarty->assign('input_submit_action',
+$tplvars['title_submit_action'] = $this->Lang('title_submit_action');
+$tplvars['input_submit_action'] =
 	$this->CreateInputRadioGroup($id,'opt_submit_action',$postsubmits,
-		pwfUtils::GetFormOption($formdata,'submit_action','text'),'','&nbsp;&nbsp;'));
+		pwfUtils::GetFormOption($formdata,'submit_action','text'),'','&nbsp;&nbsp;');
 
-$smarty->assign('title_redirect_page',$this->Lang('title_redirect_page'));
-$smarty->assign('input_redirect_page',
+$tplvars['title_redirect_page'] = $this->Lang('title_redirect_page');
+$tplvars['input_redirect_page'] =
 	pwfUtils::CreateHierarchyPulldown($this,$id,'opt_redirect_page',
-		pwfUtils::GetFormOption($formdata,'redirect_page',0)));
+		pwfUtils::GetFormOption($formdata,'redirect_page',0));
 
 if($this->before20)
 	$tpl = $this->GetTemplate('pwf::sub_'.$form_id);
@@ -462,17 +458,17 @@ else
 }
 if(!$tpl)
 	$tpl = pwfUtils::CreateDefaultTemplate($formdata,TRUE,FALSE); //? generate default for CmsLayoutTemplateType
-$smarty->assign('title_submit_template',$this->Lang('title_submit_response'));
+$tplvars['title_submit_template'] = $this->Lang('title_submit_response');
 //note WYSIWYG is no good, the MCE editor stuffs around with the template contents
-$smarty->assign('input_submit_template',
+$tplvars['input_submit_template'] =
 	 $this->CreateSyntaxArea($id,$tpl,'opt_submission_template',
-	 'pwf_tallarea','','','',50,15));
+	 'pwf_tallarea','','','',50,15);
 //setup to revert to 'sample' submission-template
 $ctlData = array();
 $ctlData['opt_submission_template']['general_button'] = TRUE;
 list($buttons,$funcs) = pwfUtils::TemplateActions($formdata,$id,$ctlData);
 $jsfuncs[] = $funcs[0];
-$smarty->assign(array(
+$tplvars = $tplvars + array(
 	'sample_submit_template' => $buttons[0],
 	'help_submit_template' => $this->Lang('help_submit_template'),
 	'title_variable' => $this->Lang('variable'),
@@ -482,7 +478,7 @@ $smarty->assign(array(
 	'help_tplvars' => $this->Lang('help_tpl_vars'),
 	'help_fieldvars1' => $this->Lang('help_fieldvars1'),
 	'help_fieldvars2' => $this->Lang('help_fieldvars2')
-));
+);
 
 //help for form-template
 $formvars = array();
@@ -525,7 +521,7 @@ if($formdata->Fields)
 	}
 	unset($one);
 }
-$smarty->assign('formvars',$formvars);
+$tplvars['formvars'] = $formvars;
 
 if($formdata->Fields)
 {
@@ -563,11 +559,11 @@ if($formdata->Fields)
 			$oneset->description = $this->Lang('desc_cssf_class'); //work around duplicate
 		$fieldprops[] = $oneset;
 	}
-	$smarty->assign('fieldprops',$fieldprops);
+	$tplvars['fieldprops'] = $fieldprops;
 }
 
 //help for submission-template
-pwfUtils::SetupSubTemplateVarsHelp($formdata,$this,$smarty);
+pwfUtils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
 
 $jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/include/jquery.tablednd.min.js"></script>
@@ -582,7 +578,7 @@ if($jsloads)
 	$jsfuncs[] = '});
 ';
 }
-$smarty->assign('jsfuncs',$jsfuncs);
-$smarty->assign('jsincs',$jsincs);
+$tplvars['jsfuncs'] = $jsfuncs;
+$tplvars['jsincs'] = $jsincs;
 
 ?>

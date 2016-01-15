@@ -116,15 +116,15 @@ class pwfCatalogerItems extends pwfFieldBase
 			}
 		}
 
-		$smarty = $gCms->GetSmarty();
+		$tplvars = array(); //TODO need global vars?
 		// put the hidden fields into smarty
 		if(!isset($gCms->variables['pwf_smarty_vars_set'])) //FIXME
 		{
 			foreach($this->formdata->Fields as &$one)
 			{
 				if($one->GetFieldType() != 'Hidden') continue;
-				$smarty->assign($one->ForceAlias(),$one->Value);
-				$smarty->assign('fld_'.$one->GetId(),$one->Value);
+				$tplvars[$one->ForceAlias()] = $one->Value;
+				$tplvars['fld_'.$one->GetId()] = $one->Value;
 			}
 			unset($one);
 			$gCms->variables['pwf_smarty_vars_set'] = 1; //TODO BAD MODULE BEHAVIOUR 
@@ -155,8 +155,8 @@ class pwfCatalogerItems extends pwfFieldBase
 			$passed = TRUE;
 			foreach($attrs as $oneattr)
 			{
-				// parse the field value through smarty,without cacheing (->fetch() fails)
-				$expr = $mod->ProcessTemplateFromData($oneattr->input); //before20
+				// parse the field value through smarty, without cacheing
+				$expr = pwfUtils::ProcessTemplateFromData($mod,$oneattr->input,$tplvars);
 				if(empty($expr)) continue; // no expression for this field. pass
 
 				// get the value for this attribute for this content

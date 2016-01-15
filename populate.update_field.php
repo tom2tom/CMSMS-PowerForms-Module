@@ -5,11 +5,11 @@
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 if(!empty($message))
-	$smarty->assign('message',$message);
+	$tplvars['message'] = $message;
 
-$smarty->assign('backtomod_nav',$this->CreateLink($id,'defaultadmin','','&#171; '.$this->Lang('back_top')));
-$smarty->assign('backtoform_nav',$this->CreateLink($id,'update_form',$returnid,'&#171; '.$this->Lang('back_form'),
-	array('formedit'=>1,'form_id'=>$params['form_id'],'formdata'=>$params['formdata'])));
+$tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$this->Lang('back_top'));
+$tplvars['backtoform_nav'] = $this->CreateLink($id,'update_form',$returnid,'&#171; '.$this->Lang('back_form'),
+	array('formedit'=>1,'form_id'=>$params['form_id'],'formdata'=>$params['formdata']));
 
 if($obfield) //field data are loaded
 {
@@ -27,25 +27,22 @@ if($obfield) //field data are loaded
 	if($hasadv)
 		$t .= $this->SetTabHeader('advancedtab',$this->Lang('tab_advanced'),($tab == 'advancedtab'));
 	$t .= $this->EndTabHeaders().$this->StartTabContent();
+	$tplvars['tabs_start'] = $t;
 
-	$smarty->assign('tabs_start',$t);
-	$smarty->assign('tabs_end',$this->EndTabContent());
+	$tplvars['tabs_end'] = $this->EndTabContent();
 	if($hasmain)
-		$smarty->assign('maintab_start',$this->StartTab('maintab'));
+		$tplvars['maintab_start'] = $this->StartTab('maintab');
 	if($hasadv)
-		$smarty->assign('advancedtab_start',$this->StartTab('advancedtab'));
-	$smarty->assign('tab_end',$this->EndTab());
+		$tplvars['advancedtab_start'] = $this->StartTab('advancedtab');
+	$tplvars['tab_end'] = $this->EndTab();
 
-	$t = ($obfield->HasAddOp())?
+	$tplvars['add'] = ($obfield->HasAddOp())?
 		$this->CreateInputSubmit($id,'optionadd',$obfield->GetOptionAddButton()):'';
-	$smarty->assign('add',$t);
 
-	$t = ($obfield->HasDeleteOp())?
+	$tplvars['del'] = ($obfield->HasDeleteOp())?
 		$this->CreateInputSubmit($id,'optiondel',$obfield->GetOptionDeleteButton()):'';
-	$smarty->assign('del',$t);
 
-	$t = (/*!$obfield->IsDisposition() && */!$obfield->GetChangeRequirement())?1:0;
-	$smarty->assign('requirable',$t);
+	$tplvars['requirable'] = (/*!$obfield->IsDisposition() && */!$obfield->GetChangeRequirement())?1:0;
 
 	$mainList = array();
 	if($hasmain)
@@ -59,7 +56,7 @@ if($obfield) //field data are loaded
 			$mainList[] = $oneset;
 		}
 	}
-	$smarty->assign('mainList',$mainList);
+	$tplvars['mainList'] = $mainList;
 
 	$advList = array();
 	if($hasadv)
@@ -73,12 +70,12 @@ if($obfield) //field data are loaded
 			$advList[] = $oneset;
 		}
 	}
-	$smarty->assign('advList',$advList);
+	$tplvars['advList'] = $advList;
 
 	if(isset($allOpts['table']))
-		$smarty->assign('mainTable',$allOpts['table']);
+		$tplvars['mainTable'] = $allOpts['table'];
 	if(isset($allOpts['funcs']))
-		$smarty->assign('jsfuncs',$allOpts['funcs']);
+		$tplvars['jsfuncs'] = $allOpts['funcs'];
 
 	if(isset($allOpts['extra']))
 	{
@@ -86,22 +83,22 @@ if($obfield) //field data are loaded
 		{
 		 case 'varshelpmain':
 			if($hasmain)
-				$smarty->assign('mainvarhelp',1);
+				$tplvars['mainvarhelp'] = 1;
 			break;
 		 case 'varshelpadv':
 			if($hasadv)
 			{
-				$smarty->assign('advvarhelp',1);
-				pwfUtils::SetupSubTemplateVarsHelp($formdata,$this,$smarty);
+				$tplvars['advvarhelp'] = 1;
+				pwfUtils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
 			}
 			break;
 		 case 'varshelpboth':
 			if($hasmain)
-				$smarty->assign('mainvarhelp',1);
+				$tplvars['mainvarhelp'] = 1;
 			if($hasadv)
 			{
-				$smarty->assign('advvarhelp',1);
-				pwfUtils::SetupSubTemplateVarsHelp($formdata,$this,$smarty);
+				$tplvars['advvarhelp'] = 1;
+				pwfUtils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
 			}
 			break;
 		}
@@ -118,18 +115,18 @@ else //no field
 	$oneset->input = $this->CreateInputDropdown($id,'field_type',
 		array_merge(array($this->Lang('select_type')=>''),$this->field_types),-1,'');
 //	$oneset->help = ;
-	$smarty->assign('mainitem',$oneset);
+	$tplvars['mainitem'] = $oneset;
 }
 
-$smarty->assign('form_start',$this->CreateFormStart($id,'update_field',$returnid,
+$tplvars['form_start'] = $this->CreateFormStart($id,'update_field',$returnid,
 	'POST','',FALSE,'',array(
 	'form_id'=>$params['form_id'],
 	'formdata'=>$params['formdata'],
-	'field_id'=>$fid)));
-$smarty->assign('form_end',$this->CreateFormEnd());
+	'field_id'=>$fid));
+$tplvars['form_end'] = $this->CreateFormEnd();
 
 $t = ($fid > 0) ? 'update':'add'; //field edit or add
-$smarty->assign('submit',$this->CreateInputSubmit($id,$nm,$this->Lang($t)));
-$smarty->assign('cancel',$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel')));
+$tplvars['submit'] = $this->CreateInputSubmit($id,$nm,$this->Lang($t));
+$tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
 
 ?>

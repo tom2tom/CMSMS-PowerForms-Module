@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-$smarty->assign(array(
+$tplvars = $tplvars + array(
 	'total_pages' => $formdata->PagesCount,
 	'this_page' => $formdata->Page,
 	'title_page_x_of_y' => $this->Lang('title_page_x_of_y',array($formdata->Page,$formdata->PagesCount)),
@@ -13,7 +13,7 @@ $smarty->assign(array(
 	'form_name' => $formdata->Name,
 	'form_id' => $formdata->Id,
 	'actionid' => $id
-));
+);
 
 // Build hidden (see also the form parameters, below)
 $hidden = '';
@@ -21,14 +21,14 @@ $hidden = '';
 if(!empty($params['in_browser']))
 {
 	$in_browser = 1;
-//	$smarty->assign('browser_id',(int)$params['browser_id']);
+//	$tplvars['browser_id'] = (int)$params['browser_id'];
 	$hidden .= $this->CreateInputHidden($id,'in_browser',1);
 //	.$this->CreateInputHidden($id,'browser_id',$params['browser_id']);
 }
 else
 	$in_browser = 0;
-$smarty->assign('in_browser',$in_browser);
-$smarty->assign('in_admin',$in_browser); //deprecated template var
+$tplvars['in_browser'] = $in_browser;
+$tplvars['in_admin'] = $in_browser; //deprecated template var
 
 $inline = (!$in_browser && pwfUtils::GetFormOption($formdata,'inline',0));
 $form_start = $this->CreateFormStart($id,'default',$returnid,
@@ -100,8 +100,8 @@ foreach($formdata->FieldOrders as $one)
 				{
 					$oneset = new stdClass();
 					$oneset->value = $one->GetHumanReadableValue();
-					$smarty->assign_by_ref($one->GetName(),$oneset);
-					$smarty->assign_by_ref($one->ForceAlias(),$oneset); //CHECKME by ref ? persistence!
+					$tplvars[$one->GetName()] = $oneset;
+					$tplvars[$one->ForceAlias()] = $oneset;
 					$prev[] = $oneset;
 				}
 */
@@ -110,7 +110,7 @@ foreach($formdata->FieldOrders as $one)
 					$oneset->values = $params[$valueindx]; //CHECKME readable-version?
 				else
 					$oneset->values = array($params[$valueindx]);
-				$smarty->assign_by_ref($alias,$oneset); //CHECKME by ref ? persistence!
+				$tplvars[$alias] = $oneset;
 			}
 		}
 		continue; //only current-page fields get the full suite of data
@@ -150,19 +150,18 @@ foreach($formdata->FieldOrders as $one)
 	$oneset->valid = $one->validated?1:0;
 	$oneset->values = $one->GetAllHumanReadableValues();
 
-	$smarty->assign_by_ref($alias,$oneset); //CHECKME by ref ?
+	$tplvars[$alias] = $oneset;
 	$fields[$oneset->input_id] = $oneset;
 }
 
 $formdata->PagesCount = $WalkPage;
 
-$smarty->assign('fields',$fields);
-//$smarty->assign('previous',$prev);
+$tplvars['fields'] = $fields;
+//$tplvars['previous'] = $prev;
 $baseurl = $this->GetModuleURLPath();
 
-$smarty->assign('help_icon',
-'<img src="'.$baseurl.'/images/info-small.gif" alt="'.
-	$this->Lang('help').'" title="'.$this->Lang('help_help').'" />');
+$tplvars['help_icon'] = '<img src="'.$baseurl.'/images/info-small.gif" alt="'.
+	$this->Lang('help').'" title="'.$this->Lang('help_help').'" />';
 
 //script accumulators
 $jsincs = array();
@@ -289,29 +288,26 @@ EOS;
 
 //TODO id="*pwfp_prev" NOW id="*prev"
 if($formdata->Page > 1)
-	$smarty->assign('prev',
-	'<input type="submit" id="'.$id.'prev" class="cms_submit submit_prev" name="'.
+	$tplvars['prev'] = '<input type="submit" id="'.$id.'prev" class="cms_submit submit_prev" name="'.
 	$id.$formdata->current_prefix.'prev" value="'.
 	pwfUtils::GetFormOption($formdata,'prev_button_text',$this->Lang('previous')).'" '.
-	$buttonjs.' />');
+	$buttonjs.' />';
 else
-	$smarty->assign('prev','');
+	$tplvars['prev'] = NULL;
 
 if($formdata->Page < $formdata->PagesCount)
 {
-	$smarty->assign('submit',
-	'<input type="submit" id="'.$id.'submit" class="cms_submit submit_next" name="'.
+	$tplvars['submit'] = '<input type="submit" id="'.$id.'submit" class="cms_submit submit_next" name="'.
 	$id.$formdata->current_prefix.'submit" value="'.
 	pwfUtils::GetFormOption($formdata,'next_button_text',$this->Lang('next')).'" '.
-	$buttonjs.' />');
+	$buttonjs.' />';
 }
 else
 {
-	$smarty->assign('submit',
-	'<input type="submit" id="'.$id.'submit" class="cms_submit submit_current" name="'.
+	$tplvars['submit'] = '<input type="submit" id="'.$id.'submit" class="cms_submit submit_current" name="'.
 	$id.$formdata->current_prefix.'done" value="'.
 	pwfUtils::GetFormOption($formdata,'submit_button_text',$this->Lang('submit')).'" '.
-	$buttonjs.' />');
+	$buttonjs.' />';
 }
 
 if($jsloads)
@@ -322,6 +318,6 @@ if($jsloads)
 	$jsfuncs[] = '});
 ';
 }
-//don't bother pushing $js* to smarty - will echo directly
+//don't bother pushing $js* to $tplvars - will echo directly
 
 ?>

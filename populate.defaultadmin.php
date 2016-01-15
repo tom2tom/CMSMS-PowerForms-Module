@@ -14,19 +14,19 @@ if($padm)
 	$starts .= $this->SetTabHeader('settings',$this->Lang('settings'),($tab == 'settings'));
 $starts .= $this->EndTabHeaders().$this->StartTabContent();
 
-$smarty->assign('tabs_start',$starts);
+$tplvars['tabs_start'] = $starts;
 if($pmod)
-	$smarty->assign('importstab_start',$this->StartTab('import'));
+	$tplvars['importstab_start'] = $this->StartTab('import');
 if($padm)
-	$smarty->assign('settingstab_start',$this->StartTab('settings'));
+	$tplvars['settingstab_start'] = $this->StartTab('settings');
 
-$smarty->assign(array(
+$tplvars = $tplvars + array(
 	'formstab_start' => $this->StartTab('maintab'),
 	'form_end' => $this->CreateFormEnd(),
 	'tabs_end' => $this->EndTabContent(),
 	'tab_end' => $this->EndTab(), //CMSMS 2+ can't cope if this is before EndTabContent() !!
-	'message' => ((isset($params['message']))?$params['message']:'')
-));
+);
+$tplvars['message'] = (isset($params['message']))?$params['message']:'';
 
 $theme = ($this->before20) ? cmsms()->variables['admintheme']:
 	cms_utils::get_theme_object();
@@ -40,11 +40,9 @@ $baseurl = $this->GetModuleURLPath();
 $allforms = pwfUtils::GetForms();
 if($allforms)
 {
-	$smarty->assign('title_name',$this->Lang('title_form_name'));
-	if($pdev)
-		$smarty->assign('title_alias',$this->Lang('title_page_tag'));
-	else
-		$smarty->assign('title_alias',$this->Lang('title_alias'));
+	$tplvars['title_name'] = $this->Lang('title_form_name');
+	$tplvars['title_alias'] = ($pdev) ? $this->Lang('title_page_tag'):
+		$this->Lang('title_alias');
 
 	if($pmod)
 	{
@@ -83,36 +81,36 @@ if($allforms)
 		$oneset->selected = $this->CreateInputCheckbox($id,'selected[]',$fid,-1);
 		$data[] = $oneset;
 	}
-	$smarty->assign('forms',$data);
+	$tplvars['forms'] = $data;
 
 	if(count($data) > 1)
 		$t = $this->CreateInputCheckbox($id,'item',TRUE,FALSE,'onclick="select_all(this);"');
 	else
 		$t = '';
-	$smarty->assign('selectall_forms',$t);
-	$smarty->assign('start_formsform',$this->CreateFormStart($id,'selected_forms',$returnid));
-	$smarty->assign('exportbtn',$this->CreateInputSubmit($id,'export',$this->Lang('export'),
-		'title="'.$this->Lang('tip_exportsel').'" onclick="return any_selected();"'));
+	$tplvars['selectall_forms'] = $t;
+	$tplvars['start_formsform'] = $this->CreateFormStart($id,'selected_forms',$returnid);
+	$tplvars['exportbtn'] = $this->CreateInputSubmit($id,'export',$this->Lang('export'),
+		'title="'.$this->Lang('tip_exportsel').'" onclick="return any_selected();"');
 	if($pmod)
 	{
-		$smarty->assign('clonebtn',$this->CreateInputSubmit($id,'clone',$this->Lang('copy'),
-			'title="'.$this->Lang('tip_clonesel').'" onclick="return any_selected();"'));
-		$smarty->assign('deletebtn',$this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
+		$tplvars['clonebtn'] = $this->CreateInputSubmit($id,'clone',$this->Lang('copy'),
+			'title="'.$this->Lang('tip_clonesel').'" onclick="return any_selected();"');
+		$tplvars['deletebtn'] = $this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
 			'title="'.$this->Lang('tip_deletesel').'" onclick="return confirm_selected(\''.
-			$this->Lang('confirm').'\');"'));
+			$this->Lang('confirm').'\');"');
 	}
 }
 else
 {
-	$smarty->assign('noforms',$this->Lang('no_forms'));
+	$tplvars['noforms'] = $this->Lang('no_forms');
 }
 
 if($pmod)
 {
-	$smarty->assign('addlink',$this->CreateLink($id,'add_form','',
-		$theme->DisplayImage('icons/system/newobject.gif',$this->Lang('title_add_new_form'),'','','systemicon')));
-	$smarty->assign('addform',$this->CreateLink($id,'add_form','',
-		$this->Lang('title_add_new_form')));
+	$tplvars['addlink'] = $this->CreateLink($id,'add_form','',
+		$theme->DisplayImage('icons/system/newobject.gif',$this->Lang('title_add_new_form'),'','','systemicon'));
+	$tplvars['addform'] = $this->CreateLink($id,'add_form','',
+		$this->Lang('title_add_new_form'));
 
 	$xmls = array();
 
@@ -133,22 +131,22 @@ if($pmod)
 	$oneset->help = $this->Lang('help_import_alias');
 	$xmls[] = $oneset;
 
-	$smarty->assign(array(
+	$tplvars = $tplvars + array(
 		'legend_xmlimport' => $this->Lang('title_importxml_legend'),
 		'start_importxmlform' => $this->CreateFormStart($id,'import_formfile',$returnid,'POST','multipart/form-data'),
 		'xmls' => $xmls,
 		'submitxml' => $this->CreateInputSubmit($id,'submitxml',$this->Lang('upload'))
-	));
+	);
 
 	$ob = $this->GetModuleInstance('FormBuilder');
 	if($ob)
 	{
 		unset($ob);
-		$smarty->assign('legend_fbimport',$this->Lang('title_importfb_legend'));
-		$smarty->assign('start_importfbform',$this->CreateFormStart($id,'import_formbuilder',$returnid));
-		$smarty->assign('submitfb',$this->CreateInputSubmit($id,'import',
+		$tplvars['legend_fbimport'] = $this->Lang('title_importfb_legend');
+		$tplvars['start_importfbform'] = $this->CreateFormStart($id,'import_formbuilder',$returnid);
+		$tplvars['submitfb'] = $this->CreateInputSubmit($id,'import',
 			$this->Lang('import_fb'),
-			'title="'.$this->Lang('tip_import_fb').'"'));
+			'title="'.$this->Lang('tip_import_fb').'"');
 		$pre = cms_db_prefix();
 		$rs = $db->SelectLimit('SELECT trans_id FROM '.$pre.'module_pwf_trans',1);
 		if($rs)
@@ -161,9 +159,9 @@ if($pmod)
 				{
 					if(!$rs->EOF)
 					{
-						$smarty->assign('submitdata',$this->CreateInputSubmit($id,'conform',
+						$tplvars['submitdata'] = $this->CreateInputSubmit($id,'conform',
 							$this->Lang('import_browsedata'),
-							'title="'.$this->Lang('tip_import_browsedata').'"'));
+							'title="'.$this->Lang('tip_import_browsedata').'"');
 					}
 					$rs->Close();
 				}
@@ -172,10 +170,10 @@ if($pmod)
 				$rs->Close();
 		}
 	}
-	$smarty->assign('pmod',1);
+	$tplvars['pmod'] = 1;
 }
 else
-	$smarty->assign('pmod',0);
+	$tplvars['pmod'] = 0;
 
 if($padm)
 {
@@ -241,16 +239,16 @@ if($padm)
 
 EOS;
 
-	$smarty->assign(array(
+	$tplvars = $tplvars + array(
 		'configs' => $cfgs,
 		'start_configform' => $this->CreateFormStart($id,'defaultadmin',$returnid),
 		'submitcfg' => $this->CreateInputSubmit($id,'submit',$this->Lang('save')),
 		'cancel' => $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel')),
 		'padm' => 1
-	));
+	);
 }
 else
-	$smarty->assign('padm',0);
+	$tplvars['padm'] = 0;
 
 $jsfuncs[] = <<<EOS
 function select_all(cb) {
@@ -281,7 +279,7 @@ if($jsloads)
 	$jsfuncs[] = '});
 ';
 }
-$smarty->assign('jsfuncs',$jsfuncs);
-$smarty->assign('jsincs',$jsincs);
+$tplvars['jsfuncs'] = $jsfuncs;
+$tplvars['jsincs'] = $jsincs;
 
 ?>

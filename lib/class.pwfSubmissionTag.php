@@ -70,7 +70,13 @@ class pwfSubmissionTag extends pwfFieldBase
 		}
 		unset($one);
 
-		pwfUtils::SetupFormVars($this->formdata);
+		$tplvars = array();
+		pwfUtils::SetupFormVars($this->formdata,$tplvars);
+		if($tplvars)
+		{
+			$smarty = cmsms()->GetSmarty();
+			$smarty->assign($tplvars);
+		}
 		$usertagops = cmsms()->GetUserTagOperations();
 		$res = $usertagops->CallUserTag($this->GetOption('udtname'),$params);
 

@@ -61,14 +61,14 @@ class pwfInputTemplate extends pwfFieldBase
 
 	function Populate($id,&$params)
 	{
-		$smarty = cmsms()->GetSmarty();
-		$smarty->assign('FBid',$id.$this->formdata->current_prefix.$this->Id);
+		$tplvars = array();
+		$tplvars['FBid'] = $id.$this->formdata->current_prefix.$this->Id;
 		// for selected... what to do here TODO
 		// for things like checked="checked" on the back page
-		$smarty->assign('FBvalue',$this->Value);
+		$tplvars['FBvalue'] = $this->Value;
 
 		$val = $this->GetOption('value');
-		return $this->formdata->formsmodule->ProcessTemplateFromData($val); //before20
+		return pwfUtils::ProcessTemplateFromData($this->formdata->formsmodule,$val,$tplvars);
 	}
 
 }

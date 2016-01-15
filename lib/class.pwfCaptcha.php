@@ -108,10 +108,11 @@ class pwfCaptcha extends pwfFieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$captcha = $mod->getModuleInstance('Captcha');
-		$smarty = cmsms()->GetSmarty();
-		$smarty->assign('captcha',$captcha->getCaptcha());
-		$smarty->assign('prompt',$this->GetOption('prompt',$mod->Lang('captcha_prompt')).
-			$this->GetFormOption('required_field_symbol','*'));
+		$tplvars = array(
+			'captcha' => $captcha->getCaptcha(),
+			'prompt' => $this->GetOption('prompt',$mod->Lang('captcha_prompt')).
+				$this->GetFormOption('required_field_symbol','*')
+		);
 		$test = method_exists($captcha,'NeedsInputField') ? $captcha->NeedsInputField() : TRUE;
 		if($test)
 		{
@@ -119,20 +120,18 @@ class pwfCaptcha extends pwfFieldBase
 //			$tmp = $mod->CreateInputText($id,'captcha_input','',10,10);
 			$tmp = $mod->CreateInputText(
 				$id,$this->formdata->current_prefix.$this->Id,'',10,10);
-			$input = preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
-			$smarty->assign('captcha_input',$input);
+			$tplvars['captcha_input'] = preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
 		}
 		else
 		{
-			$hidden = $mod->CreateInputHidden($id,$this->formdata->current_prefix.$this->Id,1); //include field in post-submit walk
-			$smarty->assign('captcha_input',$hidden);
+			$tplvars['captcha_input'] = $mod->CreateInputHidden($id,$this->formdata->current_prefix.$this->Id,1); //include field in post-submit walk
 		}
 		$tpl = $this->GetOption('captcha_template',$this->defaulttemplate);
 		if($this->GetOption('aslabel',0))
 		{
 			$this->HideLabel = FALSE;
 			$this->RealName = $this->Name;
-			$tmp = $mod->ProcessTemplateFromData($tpl); //before20
+			$tmp = pwfUtils::ProcessTemplateFromData($mod,$tpl,$tplvars);
 			$this->Name = $this->SetClass($tmp);
 			return '';
 		}
@@ -140,7 +139,7 @@ class pwfCaptcha extends pwfFieldBase
 		{
 			$this->HideLabel = TRUE;
 			$this->RealName = FALSE;
-			$tmp = $mod->ProcessTemplateFromData($tpl); //before20
+			$tmp = pwfUtils::ProcessTemplateFromData($mod,$tpl,$tplvars);
 			return $this->SetClass($tmp);
 		}
 	}

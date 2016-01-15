@@ -679,7 +679,10 @@ class pwfFieldBase
 	{
 		$code = $this->GetOption('field_logic');
 		if(!empty($code))
-			return $this->formdata->formsmodule->ProcessTemplateFromData($code); //before20
+		{
+			$tplvars = array();
+			return pwfUtils::ProcessTemplateFromData($this->formdata->formsmodule,$code,$tplvars);
+		}
 		return '';
 	}
 

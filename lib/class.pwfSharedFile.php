@@ -120,11 +120,12 @@ class pwfSharedFile extends pwfFieldBase
 			return array(FALSE,$this->Lang('error_system'));
 		}
 */
-		pwfUtils::SetupFormVars($this->formdata);
+		$tplvars = array();
+		pwfUtils::SetupFormVars($this->formdata,$tplvars);
 
 		$filespec = $this->GetOption('filespec');
 		if($filespec)
-			$fn = preg_replace('/[^\w\d\.]|\.\./','_',$mod->ProcessTemplateFromData($filespec)); //before20
+			$fn = preg_replace('/[^\w\d\.]|\.\./','_',pwfUtils::ProcessTemplateFromData($mod,$filespec,$tplvars));
 		else
 			$fn = 'form_submissions.txt';
 /*MUTEX
@@ -136,13 +137,13 @@ class pwfSharedFile extends pwfFieldBase
 
 		$footer = $this->GetOption('file_footer');
 		if($footer)
-			$footer = $mod->ProcessTemplateFromData($footer); //before20
+			$footer = pwfUtils::ProcessTemplateFromData($mod,$footer,$tplvars);
 
 		$template = $this->GetOption('file_template');
 		if(!$template)
 			$template = $this->CreateDefaultTemplate();
 
-		$newline = $mod->ProcessTemplateFromData($template); //before20
+		$newline = pwfUtils::ProcessTemplateFromData($mod,$template,$tplvars);
 /*		$replchar = $this->GetOption('newlinechar');
 		if($replchar)
 		{
@@ -161,7 +162,7 @@ class pwfSharedFile extends pwfFieldBase
 			$header = $this->GetOption('file_header');
 			if(!$header)
 				$header = $this->CreateSampleHeader();
-			$header = $mod->ProcessTemplateFromData($header); //before20
+			$header = pwfUtils::ProcessTemplateFromData($mod,$header,$tplvars);
 			fwrite($fh,$header.PHP_EOL.$newline.$footer);
 		}
 		else

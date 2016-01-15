@@ -198,13 +198,13 @@ class pwfFileUpload extends pwfFieldBase
 	// We should figure out why this field wasn't populating its Smarty variable
 	if($one->GetFieldType() == 'FileUpload') //TODO
 	{
-		$smarty->assign('fld_'.$one->GetId(),$one->GetHumanReadableValue());
+		$tplvars['fld_'.$one->GetId()] = $one->GetHumanReadableValue();
 		$hidden .= $this->CreateInputHidden($id,
 			$testIndex,
 			pwfUtils::html_myentities_decode($one->GetHumanReadableValue()));
 		$thisAtt = $one->GetHumanReadableValue(FALSE);
-		$smarty->assign('test_'.$one->GetId(),$thisAtt);
-		$smarty->assign('value_fld'.$one->GetId(),$thisAtt[0]);
+		$tplvars['test_'.$one->GetId()] = $thisAtt;
+		$tplvars['value_fld'.$one->GetId()] = $thisAtt[0];
 	}
 */
 
