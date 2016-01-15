@@ -158,38 +158,16 @@ $formdata->PagesCount = $WalkPage;
 
 $smarty->assign('fields',$fields);
 //$smarty->assign('previous',$prev);
+$baseurl = $this->GetModuleURLPath();
+
 $smarty->assign('help_icon',
-'<img src="'.$this->GetModuleURLPath().'/images/info-small.gif" alt="'.
+'<img src="'.$baseurl.'/images/info-small.gif" alt="'.
 	$this->Lang('help').'" title="'.$this->Lang('help_help').'" />');
 
 //script accumulators
 $jsincs = array();
 $jsfuncs = array();
 $jsloads = array();
-$baseurl = $this->GetModuleURLPath();
-
-$jsb = pwfUtils::GetFormOption($formdata,'submit_javascript');
-//if($jsb)
-//	$jsfuncs[] = $jsb;
-if(pwfUtils::GetFormOption($formdata,'input_button_safety'))
-{
-	$jsfuncs[] = <<<EOS
-var submitted = 0;
-function LockButton () {
- var ret = false;
- if(!submitted) {
-  var item = document.getElementById("{$id}submit");
-  if(item != NULL) {
-   setTimeout(function() {item.disabled = true},0);
-  }
-  submitted = 1;
-  ret = true;
- }
- return ret;
-}
-EOS;
-	$jsb .= ' onclick="return LockButton();"';
-}
 
 foreach($formdata->jscripts as $key=>$val)
 {
@@ -286,6 +264,28 @@ EOS;
 		}
 	}
 }
+unset($formdata->jscripts); //finished with this
+
+$buttonjs = pwfUtils::GetFormOption($formdata,'submit_javascript');
+
+if(pwfUtils::GetFormOption($formdata,'input_button_safety'))
+{
+	$buttonjs .= ' onclick="return LockButton();"';
+	$jsfuncs[] = <<<EOS
+var submitted = false;
+function LockButton () {
+ if(!submitted) {
+  submitted = true;
+  var item = document.getElementById("{$id}submit");
+  if(item != NULL) {
+   setTimeout(function() {item.disabled = true},0);
+  }
+  return true;
+ }
+ return false;
+}
+EOS;
+}
 
 //TODO id="*pwfp_prev" NOW id="*prev"
 if($formdata->Page > 1)
@@ -293,7 +293,7 @@ if($formdata->Page > 1)
 	'<input type="submit" id="'.$id.'prev" class="cms_submit submit_prev" name="'.
 	$id.$formdata->current_prefix.'prev" value="'.
 	pwfUtils::GetFormOption($formdata,'prev_button_text',$this->Lang('previous')).'" '.
-	$jsb.' />');
+	$buttonjs.' />');
 else
 	$smarty->assign('prev','');
 
@@ -303,7 +303,7 @@ if($formdata->Page < $formdata->PagesCount)
 	'<input type="submit" id="'.$id.'submit" class="cms_submit submit_next" name="'.
 	$id.$formdata->current_prefix.'submit" value="'.
 	pwfUtils::GetFormOption($formdata,'next_button_text',$this->Lang('next')).'" '.
-	$jsb.' />');
+	$buttonjs.' />');
 }
 else
 {
@@ -311,14 +311,9 @@ else
 	'<input type="submit" id="'.$id.'submit" class="cms_submit submit_current" name="'.
 	$id.$formdata->current_prefix.'done" value="'.
 	pwfUtils::GetFormOption($formdata,'submit_button_text',$this->Lang('submit')).'" '.
-	$jsb.' />');
+	$buttonjs.' />');
 }
 
-echo $form_start.$hidden;
-echo $this->ProcessTemplateFromDatabase('pwf_'.$form_id);
-echo $form_end;
-
-//inject constructed js near end of page (pity we can't get to </body> or </html>)
 if($jsloads)
 {
 	$jsfuncs[] = '$(document).ready(function() {
@@ -327,23 +322,6 @@ if($jsloads)
 	$jsfuncs[] = '});
 ';
 }
-
-if($jsincs)
-{
-	echo implode(PHP_EOL,$jsincs);
-//	echo PHP_EOL;
-}
-if($jsfuncs)
-{
-	echo <<<EOS
-<script type="text/javascript">
-//<![CDATA[
-EOS;
-	echo implode(PHP_EOL,$jsfuncs);
-	echo <<<EOS
-//]]>
-</script>
-EOS;
-}
+//don't bother pushing $js* to smarty - will echo directly
 
 ?>
