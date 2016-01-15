@@ -6,36 +6,71 @@
 
 if(!$this->CheckAccess('ModifyPFForms')) exit;
 
-$form_id = (int)$params['form_id'];
-$funcs = FALSE;
+try
+{
+	$cache = pwfUtils::GetCache();
+}
+catch (Exception $e)
+{
+	echo $this->Lang('error_system');
+	exit;
+}
 if(isset($params['cancel']))
 {
+	$cache->delete($params['formdata']);
 	$this->Redirect($id,'defaultadmin');
 }
-elseif(isset($params['submit']))
+
+$form_id = (int)$params['form_id'];
+$funcs = new pwfFormOperations();
+
+if(isset($params['formdata']))
 {
-	$funcs = new pwfFormOperations();
-	if($funcs->Store($this,$form_id,$params))
+	$formdata = $cache->get($params['formdata']);
+	if(is_null($formdata) || !$formdata->Fields)
 	{
-		$msg = $this->Lang('form_op',$params['form_op']); //updated or added
-		$msg = $this->PrettyMessage($msg,TRUE,FALSE,FALSE);
+		$formdata = $funcs->Load($this,$id,$params,$form_id);
+		$params['formdata'] = base64_encode($formdata->Id.session_id()); //must persist across requests
+	}
+	else
+		$formdata->formsmodule = &$this;
+}
+else //first time
+{
+	$formdata = $funcs->Load($this,$id,$params,$form_id);
+	$params['formdata'] = base64_encode($formdata->Id.session_id());
+}
+
+if(isset($params['submit']))
+{
+	$funcs->Arrange($formdata->Fields,$params['orders'],TRUE);
+	list($res,$message) = $funcs->Store($this,$formdata); //may alter $formdata (field-order)
+	if($res)
+	{
+		$message = $this->Lang('form_op',$this->Lang('updated'));
+		$message = $this->PrettyMessage($message,TRUE,FALSE,FALSE);
 	}
 	else
 	{
-		$msg = $this->PrettyMessage($message,FALSE,FALSE,FALSE);
+		$message = $this->PrettyMessage($message,FALSE,FALSE,FALSE);
 	}
-	$this->Redirect($id,'defaultadmin','',array('message'=> $msg));
+	$cache->delete($params['formdata']);
+	$this->Redirect($id,'defaultadmin','',array('message'=> $message));
 }
 elseif(isset($params['apply']))
 {
-	$funcs = new pwfFormOperations();
-	if(!$funcs->Store($this,$form_id,$params))
+	$funcs->Arrange($formdata->Fields,$params['orders'],TRUE);
+	list($res,$message) = $funcs->Store($this,$params['orders'],$formdata); //may alter $formdata (field-order)
+	if($res)
+	{
+		$message = $this->Lang('form_op',$this->Lang('updated'));
+		$message = $this->PrettyMessage($message,TRUE,FALSE,FALSE);
+	}
+	else
 	{
 		$this->Redirect($id,'defaultadmin','',array(
 		'message' => $this->PrettyMessage($message,FALSE,FALSE,FALSE)));
 	}
-	$msg = $this->Lang('form_op',$params['form_op']);//updated or added
-	$message = $this->PrettyMessage($msg,TRUE,FALSE,FALSE);
 }
 elseif(isset($params['formedit']))
 {
@@ -45,22 +80,23 @@ elseif(isset($params['formedit']))
 }
 elseif(isset($params['fielddelete']))
 {
-	$ops = new pwfFieldOperations();
-//TODO formdata
-	$ops->DeleteField($formdata,$params['field_id']);
+	pwfFieldOperations::DeleteField($formdata,$params['field_id']);
 	$message = $this->PrettyMessage('field_deleted');
 }
 elseif(isset($params['fieldcopy']))
 {
-	$ops = new pwfFieldOperations();
-//TODO formdata
-	$obfield = $ops->Replicate($formdata,$params['field_id');
+	$obfield = pwfFieldOperations::Replicate($formdata,$params['field_id']);
 	if($obfield)
 	{
 		$obfield->Store(TRUE);
 		$formdata->Fields[$obfield->Id] = $obfield;
+		//update cache ready for next use
+		$formdata->formsmodule = NULL;
+		$cache->set($params['formdata'],$formdata);
 		$this->Redirect($id,'update_field',$returnid,
-			array('field_id'=>$params['field_id'],'form_id'=>$fid));
+			array('field_id'=>$params['field_id'],
+				'form_id'=>$fid,
+				'formdata'=>$params['formdata']));
 	}
 	else
 	{
@@ -69,16 +105,13 @@ elseif(isset($params['fieldcopy']))
 }
 elseif(isset($params['dir']))
 {
-	$ops = new pwfFieldOperations();
-//TODO formdata
-	$srcIndex = $ops->GetFieldIndexFromId($formdata,$params['field_id']); //TODO conform index or id
+	$srcIndex = pwfFieldOperations::GetFieldIndexFromId($formdata,$params['field_id']);
 	$destIndex = ($params['dir'] == 'up') ? $srcIndex - 1 : $srcIndex + 1;
-	$ops->SwapFieldsByIndex($srcIndex,$destIndex);
+	pwfFieldOperations::SwapFieldsByIndex($srcIndex,$destIndex);
 	$message = $this->PrettyMessage('field_order_updated');
 }
 elseif(isset($params['active']))
 {
-//TODO formdata
 	$obfield = $formdata->Fields[$params['field_id']];
 	if($obfield !== FALSE)
 	{
@@ -95,10 +128,19 @@ elseif(isset($params['active']))
 else
 	exit;
 
-if(!$funcs)
-	$funcs = new pwfFormOperations();
+$orders = array();
+foreach($formdata->Fields as $fid=>&$one)
+{
+	$orders[] = $fid;
+}
+unset($one);
+$formdata->FieldOrders = $orders;
+$funcs->Arrange($formdata->Fields,$formdata->FieldOrders);
 
-require dirname(__FILE__).DIRECTORY_SEPARATOR.'method.update_form.php';
+require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.update_form.php';
+
+$formdata->formsmodule = NULL; //no need to cache this
+$cache->set($params['formdata'],$formdata);
 
 echo $this->ProcessTemplate('editform.tpl');
 
