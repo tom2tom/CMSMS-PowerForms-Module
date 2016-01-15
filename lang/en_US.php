@@ -376,13 +376,16 @@ $lang['error_address'] = 'Missing or bad email address \'%s\'';
 $lang['error_attach'] = 'Attachment error - file %s (tmp_name: %s, of type %s)';
 $lang['error_copy'] = 'Field copy error';
 $lang['error_copy2'] = 'Form copy error';
+$lang['error_data'] = 'Data missing or invalid';
 $lang['error_email_address'] = '"%s" does not appear to be a valid email address!';
 $lang['error_feudefns'] = 'No dropdown, multiselect or radiobutton FEU property found. This field will not function.';
 $lang['error_file_exists'] = 'File %s already exists, and cannot be overwritten.';
 $lang['error_form_import'] = 'Form import failed! There was a problem with the format of the XML file.';
 $lang['error_large_file'] = 'Uploaded file is too large! Maximum size is:';
 //$lang['error_no_browser_field'] = 'Error! Either the form has no Form Browser Disposition, or it failed to instantiate (due to memory issues?)';
+/*QUEUE
 $lang['error_lock'] = 'Error. Unable to obtain exclusive access.';
+*/
 $lang['error_module_captcha'] = 'The Captcha module is not available';
 $lang['error_module_cataloger'] = 'The Cataloger module is not available.';
 $lang['error_module_CompanyDirectory'] = 'The Company Directory module is not available!';
