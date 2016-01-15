@@ -8,8 +8,6 @@
   <div>{$input_form_name}</div>
   <p class="pagetext">{$title_form_alias}:</p>
   <div>{$input_form_alias}<br />{$help_form_alias}</div>
-  <p class="pagetext">{$title_inline_form}:</p>
-  <p>{$input_inline_form}</p>
   <p class="pagetext">{$title_form_status}:</p>
   <p>{if $text_ready}{$text_ready}{else}<strong>{$text_notready}</strong> - {$help_notready}{/if}</p>
  </div>
@@ -186,6 +184,8 @@
   {$sample_submit_template}</p>
   <div class="showhelp"><br />{$help_subtplvars}</div>
   </div>
+  <p class="pagetext">{$title_inline_form}:</p>
+  <p>{$input_inline_form}</p>
  </div>
 {$tab_end}
 {$tabs_end}
