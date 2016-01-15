@@ -392,6 +392,7 @@ $lang['error_module_CompanyDirectory'] = 'The Company Directory module is not av
 $lang['error_module_upload'] = 'The Uploads module is not available';
 $lang['error_module_feu'] = 'The FrontEndUsers module is not available. This field will not function.';
 $lang['error_submission'] = 'Sorry! There was an error handling your form submission.';
+$lang['error_system'] = 'System error';
 $lang['error_typed'] = 'Invalid %s';
 $lang['error_uploads_dir'] = 'Error! There is no uploads directory.';
 $lang['error_usertag'] = 'User defined tag returned an error';
