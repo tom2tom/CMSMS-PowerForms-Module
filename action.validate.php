@@ -4,6 +4,15 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
+try
+{
+	$cache = pwfUtils::GetCache();
+}
+catch (Exception $e)
+{
+	echo $this->Lang('error_system');
+	return;
+}
 $paramkeys = array_keys($params);
 $matched = preg_grep('/^pwfp_\d{3}_[cdr]$/',$paramkeys);
 if(count($matched) != 3)
@@ -16,10 +25,10 @@ $key = substr($key,0,9); //prefix
 $record_id = $params[$key.'r'];
 
 $pre = cms_db_prefix();
-$sql = 'SELECT code,content FROM '.$pre.'module_pwf_record WHERE record_id=?';
+$sql = 'SELECT pubkey,content FROM '.$pre.'module_pwf_record WHERE record_id=?';
 $row = $db->GetRow($sql,array($record_id));
 $sql = 'DELETE FROM '.$pre.'module_pwf_record WHERE record_id=?';
-if(!$row || $row['code'] != $params[$key.'c'])
+if(!$row || $row['pubkey'] != $params[$key.'c'])
 {
 	if($row)
 		$db->Execute($sql,array($record_id));
@@ -29,33 +38,34 @@ if(!$row || $row['code'] != $params[$key.'c'])
 
 $db->Execute($sql,array($record_id));
 
-$formdata = pwfUtils::Decrypt($row['content'],$row['code'].$this->GetPreference('default_phrase'));
+$pw = $row['pubkey'].pwfUtils::Unfusc($this->GetPreference('masterpass'));
+$formdata = pwfUtils::Decrypt($row['content'],$pw);
 if($formdata === FALSE)
 {
 	echo $this->Lang('validation_response_error');
 	return;
 }
-$formdata->formsmodule = $this; //restore un-cached content
+$formdata->formsmodule = &$this; //restore un-cached content
 
 $field_id = $params[$key.'d'];
 $obfield = $formdata->Fields[$field_id];
-$obfield->ApproveToGo($record_id); //block another disposition of this field
+$obfield->ApproveToGo($record_id); //setup to 'really' dispose the form
 
-$res = $whole-form-Dispose($returnid); //TODO 'really' dispose, this time
-if($res[0])
-{
-	$ret = $obfield->GetOption('redirect_page',-1);
-	if($ret != -1)
-		$this->RedirectContent($ret);
-	else
-	{
-$this->Crash();
-	}
-}
+//cache data for next action
+if(!empty($_SERVER['SERVER_ADDR']))
+	$token = $_SERVER['SERVER_ADDR'];
 else
-{
-	$msg = $this->Lang('error').'<br />'.implode('<br />',$res[1]);
-	echo $msg;
-}
+	$token = mt_rand(0,999999).'.'.mt_rand(0,999999);
+$token .= 'SERVER_ADDR'.uniqid().mt_rand(1100,2099).reset($_SERVER).key($_SERVER).end($_SERVER).key($_SERVER);
+$cache_key = md5($token);
+$formdata->formsmodule = NULL;
+$cache->set($cache_key,$formdata);
+
+$prefix = $formdata->current_prefix;
+$this->Redirect($id,'default',$returnid,array(
+	'form_id'=>$formdata->Id,
+	$prefix.'formdata'=>$cache_key,
+	$prefix.'done'=>1
+	));
 
 ?>
