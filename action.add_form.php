@@ -69,17 +69,19 @@ else
 	$alias = '';
 }
 
-$smarty->assign('form_start',$this->CreateFormStart($id,'add_form',$returnid));
-$smarty->assign('form_end',$this->CreateFormEnd());
-$smarty->assign('hidden',$h);
-$smarty->assign('title_newform',$this->Lang('title_newform'));
-$smarty->assign('title_form_name',$this->Lang('title_form_name'));
-$smarty->assign('input_form_name',$this->CreateInputText($id,'form_name',$name,50,200));
-$smarty->assign('title_form_alias',$this->Lang('title_form_alias'));
-$smarty->assign('input_form_alias',$this->CreateInputText($id,'form_alias',$alias,50,100));
-$smarty->assign('help_form_alias',$this->Lang('help_form_alias'));
-$smarty->assign('save',$this->CreateInputSubmit($id,'save',$this->Lang('save')));
-$smarty->assign('cancel',$this->CreateInputSubmit($id,'cancel',$this->Lang('cancel')));
+$smarty->assign(array(
+	'form_start' => $this->CreateFormStart($id,'add_form',$returnid),
+	'form_end' => $this->CreateFormEnd(),
+	'hidden' => $h,
+	'title_newform' => $this->Lang('title_newform'),
+	'title_form_name' => $this->Lang('title_form_name'),
+	'input_form_name' => $this->CreateInputText($id,'form_name',$name,50,200),
+	'title_form_alias' => $this->Lang('title_form_alias'),
+	'input_form_alias' => $this->CreateInputText($id,'form_alias',$alias,50,100),
+	'help_form_alias' => $this->Lang('help_form_alias'),
+	'save' => $this->CreateInputSubmit($id,'save',$this->Lang('save')),
+	'cancel' => $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'))
+));
 
 echo $this->ProcessTemplate('addform.tpl');
 
