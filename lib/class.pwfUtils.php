@@ -313,6 +313,7 @@ class pwfUtils
 				continue;
 			if($feu == FALSE && strpos($classname,'FEU') !== FALSE)
 				continue;
+			//TODO pre-req checks e.g. 'SubmitForm' needs cURL extension
 			if($imports && in_array($imports,$classname))
 				self::Show_Field($mod,$classname,FALSE);
 			else
