@@ -20,7 +20,7 @@ if($pmod)
 if($padm)
 	$smarty->assign('settingstab_start',$this->StartTab('settings'));
 
-$smarty->assign(array
+$smarty->assign(array(
 	'formstab_start' => $this->StartTab('maintab'),
 	'form_end' => $this->CreateFormEnd(),
 	'tabs_end' => $this->EndTabContent(),
@@ -96,10 +96,10 @@ if($allforms)
 	if($pmod)
 	{
 		$smarty->assign('clonebtn',$this->CreateInputSubmit($id,'clone',$this->Lang('copy'),
-			'title="'.$this->Lang('tip_clonesel').'" onclick="return any_selected();"'));		
+			'title="'.$this->Lang('tip_clonesel').'" onclick="return any_selected();"'));
 		$smarty->assign('deletebtn',$this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
 			'title="'.$this->Lang('tip_deletesel').'" onclick="return confirm_selected(\''.
-			$this->Lang('confirm').'\');"'));		
+			$this->Lang('confirm').'\');"'));
 	}
 }
 else
