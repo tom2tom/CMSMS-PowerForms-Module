@@ -1181,7 +1181,7 @@ The PowerBrowse module code provides an example of this process in use.<p>
 <h3>Requirements</h3>
 <ul>
 <li>PHP 5.1+ TODO</li>
-<li>PHP curl extension</li>
+<li>PHP curl extension is needed if a 'SubmitForm' field is used</li>
 </ul>
 <h3>Desirables</h3>
 <ul>
