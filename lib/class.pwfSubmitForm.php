@@ -19,7 +19,9 @@ class pwfSubmitForm extends pwfFieldBase
 
 	function GetFieldStatus()
 	{
-		return $this->GetOption('method').' '.$this->GetOption('url');
+		if(function_exists('curl_init'))
+			return $this->GetOption('method').' '.$this->GetOption('url');
+		return $this->Lang('missing_type','PHP cURL extension');
 	}
 
 	function AdminPopulate($id)
