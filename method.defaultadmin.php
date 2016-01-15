@@ -15,18 +15,26 @@ if($padm)
 $starts .= $this->EndTabHeaders().$this->StartTabContent();
 
 $smarty->assign('tabs_start',$starts);
-$smarty->assign('formstab_start',$this->StartTab('maintab'));
 if($pmod)
 	$smarty->assign('importstab_start',$this->StartTab('import'));
 if($padm)
 	$smarty->assign('settingstab_start',$this->StartTab('settings'));
-$smarty->assign('tab_end',$this->EndTab());
-$smarty->assign('tabs_end',$this->EndTabContent());
-$smarty->assign('form_end',$this->CreateFormEnd());
 
-$smarty->assign('message',(isset($params['message']))?$params['message']:'');
+$smarty->assign(array
+	'formstab_start' => $this->StartTab('maintab'),
+	'form_end' => $this->CreateFormEnd(),
+	'tabs_end' => $this->EndTabContent(),
+	'tab_end' => $this->EndTab(), //CMSMS 2+ can't cope if this is before EndTabContent() !!
+	'message' => ((isset($params['message']))?$params['message']:'')
+));
 
-$theme = cmsms()->variables['admintheme'];
+$theme = ($this->before20) ? cmsms()->variables['admintheme']:
+	cms_utils::get_theme_object();
+//script accumulators
+$jsfuncs = array();
+$jsloads = array();
+$jsincs = array();
+$baseurl = $this->GetModuleURLPath();
 
 //list all the extant forms
 $allforms = pwfUtils::GetForms();
@@ -125,10 +133,12 @@ if($pmod)
 	$oneset->help = $this->Lang('help_import_alias');
 	$xmls[] = $oneset;
 
-	$smarty->assign('legend_xmlimport',$this->Lang('title_importxml_legend'));
-	$smarty->assign('start_importxmlform',$this->CreateFormStart($id,'import_formfile',$returnid,'POST','multipart/form-data'));
-	$smarty->assign('xmls',$xmls);
-	$smarty->assign('submitxml', $this->CreateInputSubmit($id,'submitxml', $this->Lang('upload')));
+	$smarty->assign(array(
+		'legend_xmlimport' => $this->Lang('title_importxml_legend'),
+		'start_importxmlform' => $this->CreateFormStart($id,'import_formfile',$returnid,'POST','multipart/form-data'),
+		'xmls' => $xmls,
+		'submitxml' => $this->CreateInputSubmit($id,'submitxml',$this->Lang('upload'))
+	));
 
 	$ob = $this->GetModuleInstance('FormBuilder');
 	if($ob)
@@ -184,15 +194,9 @@ if($padm)
 	$cfgs[] = $oneset;
 
 	$oneset = new stdClass();
-	$oneset->title = $this->Lang('title_enable_antispam');
-	$oneset->input = $this->CreateInputCheckbox($id,'enable_antispam',1,$this->GetPreference('enable_antispam'));
-	$oneset->help = $this->Lang('help_enable_antispam');
-	$cfgs[] = $oneset;
-
-	$oneset = new stdClass();
-	$oneset->title = $this->Lang('title_uploads_dir');
-	$oneset->input = $this->CreateInputText($id,'uploads_dir',$this->GetPreference('uploads_dir'),40,80);
-	$oneset->help = $this->Lang('help_uploads_dir');
+	$oneset->title = $this->Lang('title_submit_limit');
+	$oneset->input = $this->CreateInputText($id,'submit_limit',$this->GetPreference('submit_limit'),3,5);
+	$oneset->help = $this->Lang('help_submit_limit');
 	$cfgs[] = $oneset;
 
 	$oneset = new stdClass();
@@ -213,15 +217,42 @@ if($padm)
 	$oneset->help = $this->Lang('help_email_subdomains');
 	$cfgs[] = $oneset;
 
-	$smarty->assign('configs',$cfgs);
-	$smarty->assign('start_configform',$this->CreateFormStart($id,'defaultadmin',$returnid));
-	$smarty->assign('submitcfg', $this->CreateInputSubmit($id,'submit',$this->Lang('save')));
-	$smarty->assign('padm',1);
+	$oneset = new stdClass();
+	$oneset->title = $this->Lang('title_uploads_dir');
+	$oneset->input = $this->CreateInputText($id,'uploads_dir',$this->GetPreference('uploads_dir'),40,80);
+	$oneset->help = $this->Lang('help_uploads_dir');
+	$cfgs[] = $oneset;
+
+	$t = $this->GetPreference('masterpass');
+	if($t)
+		$t = pwfUtils::Unfusc($t);
+	$oneset = new stdClass();
+	$oneset->title = $this->Lang('title_password');
+	$oneset->input = $this->CreateTextArea(false,$id,$t,'masterpass','cloaked',
+		$id.'passwd','','',50,3);
+	$cfgs[] = $oneset;
+
+	$jsincs[] = '<script type="text/javascript" src="'.$baseurl.'/include/jquery-inputCloak.min.js"></script>';
+	$jsloads[] =<<<EOS
+ $('#{$id}passwd').inputCloak({
+  type:'see4',
+  symbol:'\u2022'
+ });
+
+EOS;
+
+	$smarty->assign(array(
+		'configs' => $cfgs,
+		'start_configform' => $this->CreateFormStart($id,'defaultadmin',$returnid),
+		'submitcfg' => $this->CreateInputSubmit($id,'submit',$this->Lang('save')),
+		'cancel' => $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel')),
+		'padm' => 1
+	));
 }
 else
 	$smarty->assign('padm',0);
 
-$js = <<<EOS
+$jsfuncs[] = <<<EOS
 function select_all(cb) {
  $('input[name="{$id}selected[]"][type="checkbox"]').attr('checked',cb.checked);
 }
@@ -242,6 +273,15 @@ function confirm_selected(msg) {
 
 EOS;
 
-$smarty->assign('jsfuncs',$js);
+if($jsloads)
+{
+	$jsfuncs[] = '$(document).ready(function() {
+';
+	$jsfuncs = array_merge($jsfuncs,$jsloads);
+	$jsfuncs[] = '});
+';
+}
+$smarty->assign('jsfuncs',$jsfuncs);
+$smarty->assign('jsincs',$jsincs);
 
 ?>

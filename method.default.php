@@ -5,13 +5,15 @@
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-$smarty->assign('total_pages',$formdata->FormPagesCount);
-$smarty->assign('this_page',$formdata->Page);
-$smarty->assign('title_page_x_of_y',$this->Lang('title_page_x_of_y',array($formdata->Page,$formdata->FormPagesCount)));
-$smarty->assign('css_class',pwfUtils::GetFormOption($formdata,'css_class'));
-$smarty->assign('form_name',$formdata->Name);
-$smarty->assign('form_id',$formdata->Id);
-$smarty->assign('actionid',$id);
+$smarty->assign(array(
+	'total_pages' => $formdata->PagesCount,
+	'this_page' => $formdata->Page,
+	'title_page_x_of_y' => $this->Lang('title_page_x_of_y',array($formdata->Page,$formdata->PagesCount)),
+	'css_class' => pwfUtils::GetFormOption($formdata,'css_class'),
+	'form_name' => $formdata->Name,
+	'form_id' => $formdata->Id,
+	'actionid' => $id
+));
 
 // Build hidden (see also the form parameters, below)
 $hidden = '';
@@ -29,16 +31,16 @@ $smarty->assign('in_browser',$in_browser);
 $smarty->assign('in_admin',$in_browser); //deprecated template var
 
 $inline = (!$in_browser && pwfUtils::GetFormOption($formdata,'inline',0));
-$smarty->assign('form_start',$this->CreateFormStart($id,'default',$returnid,
+$form_start = $this->CreateFormStart($id,'default',$returnid,
 	'POST','multipart/form-data',$inline,'',array(
 	'form_id'=>$form_id,
 	$formdata->current_prefix.'formdata'=>$cache_key,
-	$formdata->current_prefix.'formpage'=>$formdata->Page)));
-$smarty->assign('form_end',$this->CreateFormEnd());
+	$formdata->current_prefix.'formpage'=>$formdata->Page));
+$form_end = $this->CreateFormEnd();
 
 //if($formdata->Page > 1)
 //	$hidden .= $this->CreateInputHidden($id,$formdata->current_prefix.'previous',($formdata->Page - 1)); //c.f. pwfp_NNN_prev for the button
-//if($formdata->Page < $formdata->FormPagesCount) //TODO c.f. $WalkPage in field-walker
+//if($formdata->Page < $formdata->PagesCount) //TODO c.f. $WalkPage in field-walker
 //	$hidden .= $this->CreateInputHidden($id,$formdata->current_prefix.'continue',($formdata->Page + 1));
 
 $reqSymbol = pwfUtils::GetFormOption($formdata,'required_field_symbol','*');
@@ -47,8 +49,9 @@ $fields = array();
 //$prev = array(); //make other-page field-values available to templates
 $WalkPage = 1; //'current' page for field-walk purposes
 
-foreach($formdata->Fields as &$one)
+foreach($formdata->FieldOrders as $one)
 {
+	$one = $formdata->Fields[$one];
 	$alias = $one->ForceAlias();
 
 	if($one->GetFieldType() == 'PageBreak')
@@ -113,14 +116,18 @@ foreach($formdata->Fields as &$one)
 		continue; //only current-page fields get the full suite of data
 	}
 
+	$formdata->jscripts = array(); //for accumulating js, during Populate()
+
 	$oneset = new stdClass();
 	$oneset->alias = $alias;
-	$oneset->css_class = $one->GetOption('css_class');
+//	$oneset->css_class = $one->GetOption('css_class');
 	$oneset->display = $one->DisplayInForm()?1:0;
 //	$oneset->error = $one->GetOption('is_valid',TRUE)?'':$one->ValidationMessage;
 	$oneset->error = $one->validated?'':$one->ValidationMessage;
 	$oneset->has_label = $one->HasLabel();
 	$oneset->helptext = $one->GetOption('helptext');
+	if($oneset->helptext)
+		$formdata->jscripts['helptoggle'] = 'construct';
 	$oneset->helptext_id = 'pwfp_ht_'.$one->GetID();
 	if ((!$one->HasLabel() || $one->GetHideLabel())
 /*	 && (!$one->GetOption('browser_edit',0) || empty($params['in_admin']))*/)
@@ -135,8 +142,8 @@ foreach($formdata->Fields as &$one)
 	$oneset->multiple_parts = $one->GetMultiPopulate()?1:0;
 	$oneset->name = $one->GetName();
 	$oneset->needs_div = $one->NeedsDiv();
-	$oneset->required = $one->IsRequired()?1:0;
-	$oneset->required_symbol = $one->IsRequired()?$reqSymbol:'';
+	$oneset->required = $one->GetRequired()?1:0;
+	$oneset->required_symbol = $one->GetRequired()?$reqSymbol:'';
 	$oneset->smarty_eval = $one->GetSmartyEval()?1:0;
 	$oneset->type = $one->GetDisplayType();
 //	$oneset->valid = $one->GetOption('is_valid',TRUE)?1:0;
@@ -146,40 +153,27 @@ foreach($formdata->Fields as &$one)
 	$smarty->assign_by_ref($alias,$oneset); //CHECKME by ref ?
 	$fields[$oneset->input_id] = $oneset;
 }
-unset($one);
 
-$formdata->FormPagesCount = $WalkPage;
+$formdata->PagesCount = $WalkPage;
 
-$smarty->assign('hidden',$hidden);
 $smarty->assign('fields',$fields);
 //$smarty->assign('previous',$prev);
 $smarty->assign('help_icon',
 '<img src="'.$this->GetModuleURLPath().'/images/info-small.gif" alt="'.
 	$this->Lang('help').'" title="'.$this->Lang('help_help').'" />');
 
-$jsfuncs = <<<EOS
-<script type="text/javascript">
-//<![CDATA[{literal}
-function help_toggle(htid) {
- var help_container=document.getElementById(htid);
- if(help_container) {
-  if(help_container.style.display == 'none') {
-	help_container.style.display = 'inline';
-  } else {
-	help_container.style.display = 'none';
-  }
- }
-}
+//script accumulators
+$jsincs = array();
+$jsfuncs = array();
+$jsloads = array();
+$baseurl = $this->GetModuleURLPath();
 
-EOS;
-
-$js = pwfUtils::GetFormOption($formdata,'submit_javascript');
-if(!$js) //TODO make both js options work
+$jsb = pwfUtils::GetFormOption($formdata,'submit_javascript');
+//if($jsb)
+//	$jsfuncs[] = $jsb;
+if(pwfUtils::GetFormOption($formdata,'input_button_safety'))
 {
-	if(pwfUtils::GetFormOption($formdata,'input_button_safety',0))
-	{
-		$js = ' onclick="return LockButton();"';
-		$jsfuncs .= <<<EOS
+	$jsfuncs[] = <<<EOS
 var submitted = 0;
 function LockButton () {
  var ret = false;
@@ -194,14 +188,104 @@ function LockButton () {
  return ret;
 }
 EOS;
-	}
+	$jsb .= ' onclick="return LockButton();"';
 }
 
-$jsfuncs .= <<<EOS
-//]]>{/literal}
-</script>
+foreach($formdata->jscripts as $key=>$val)
+{
+	if($val != 'construct')
+		$jsfuncs[] = $val;
+	else
+	{
+		switch($key)
+		{
+		 case 'helptoggle':
+			$jsfuncs[] =<<<EOS
+function help_toggle(htid) {
+ var help_container=document.getElementById(htid);
+ if(help_container) {
+  if(help_container.style.display == 'none') {
+   help_container.style.display = 'inline';
+  } else {
+   help_container.style.display = 'none';
+  }
+ }
+}
 EOS;
-$smarty->assign('jscript',$jsfuncs);
+			break;
+		case 'cloak':
+			$jsincs[] =<<< EOS
+<script type="text/javascript" src="{$baseurl}/include/jquery-inputCloak.min.js"></script>
+EOS;
+			break;
+		case 'mailcheck':
+			$jsincs[] =<<< EOS
+<script type="text/javascript" src="{$baseurl}/include/mailcheck.min.js"></script>
+<script type="text/javascript" src="{$baseurl}/include/levenshtein.min.js"></script>
+EOS;
+			if(!function_exists('ConvertDomains'))
+			{
+			 function ConvertDomains($pref)
+			 {
+				if(!$pref)
+					return '""';
+				$v3 = array();
+				$v2 = explode(',',$pref);
+				foreach($v2 as $one)
+				{
+					$v3[] = '\''.trim($one).'\'';
+				}
+				return implode(',',$v3);
+			 }
+			}
+			$pref = $this->GetPreference('email_topdomains');
+			$topdomains = ConvertDomains($pref);
+			if($topdomains)
+				$topdomains = '  topLevelDomains: ['.$topdomains.'],'.PHP_EOL;
+			else
+				$topdomains = '';
+			$pref = $this->GetPreference('email_domains');
+			$domains = ConvertDomains($pref);
+			if($domains)
+				$domains = '  domains: ['.$domains.'],'.PHP_EOL;
+			else
+				$domains = '';
+			$pref = $this->GetPreference('email_subdomains');
+			$l2domains = ConvertDomains($pref);
+			if($l2domains)
+				$l2domains = '  secondLevelDomains: ['.$l2domains.'],'.PHP_EOL;
+			else
+				$l2domains = '';
+			$intro = $this->Lang('suggest');
+			$empty = $this->Lang('missing_type',$this->Lang('destination'));
+
+			$jsloads[] =<<<EOS
+ $('.emailaddr').blur(function() {
+  $(this).mailcheck({
+{$domains}{$l2domains}{$topdomains}
+   distanceFunction: function(string1,string2) {
+    var lv = Levenshtein;
+    return lv.get(string1,string2);
+   },
+   suggested: function(element,suggestion) {
+    if(confirm('{$intro} <strong><em>' + suggestion.full + '</em></strong>?')) {
+     element.innerHTML = suggestion.full;
+    } else {
+     element.focus();
+    }
+   },
+   empty: function(element) {
+    alert('{$empty}');
+    element.focus();
+   }
+  });
+ });
+
+EOS;
+			break;
+		}
+	}
+}
 
 //TODO id="*pwfp_prev" NOW id="*prev"
 if($formdata->Page > 1)
@@ -209,17 +293,17 @@ if($formdata->Page > 1)
 	'<input type="submit" id="'.$id.'prev" class="cms_submit submit_prev" name="'.
 	$id.$formdata->current_prefix.'prev" value="'.
 	pwfUtils::GetFormOption($formdata,'prev_button_text',$this->Lang('previous')).'" '.
-	$js.' />');
+	$jsb.' />');
 else
 	$smarty->assign('prev','');
 
-if($formdata->Page < $formdata->FormPagesCount)
+if($formdata->Page < $formdata->PagesCount)
 {
 	$smarty->assign('submit',
 	'<input type="submit" id="'.$id.'submit" class="cms_submit submit_next" name="'.
 	$id.$formdata->current_prefix.'submit" value="'.
 	pwfUtils::GetFormOption($formdata,'next_button_text',$this->Lang('next')).'" '.
-	$js.' />');
+	$jsb.' />');
 }
 else
 {
@@ -227,8 +311,39 @@ else
 	'<input type="submit" id="'.$id.'submit" class="cms_submit submit_current" name="'.
 	$id.$formdata->current_prefix.'done" value="'.
 	pwfUtils::GetFormOption($formdata,'submit_button_text',$this->Lang('submit')).'" '.
-	$js.' />');
+	$jsb.' />');
 }
 
-$formdata->formsmodule = NULL; //no need to cache this
-$cache->driver_set($cache_key,serialize($formdata));
+echo $form_start.$hidden;
+echo $this->ProcessTemplateFromDatabase('pwf_'.$form_id);
+echo $form_end;
+
+//inject constructed js near end of page (pity we can't get to </body> or </html>)
+if($jsloads)
+{
+	$jsfuncs[] = '$(document).ready(function() {
+';
+	$jsfuncs = array_merge($jsfuncs,$jsloads);
+	$jsfuncs[] = '});
+';
+}
+
+if($jsincs)
+{
+	echo implode(PHP_EOL,$jsincs);
+//	echo PHP_EOL;
+}
+if($jsfuncs)
+{
+	echo <<<EOS
+<script type="text/javascript">
+//<![CDATA[
+EOS;
+	echo implode(PHP_EOL,$jsfuncs);
+	echo <<<EOS
+//]]>
+</script>
+EOS;
+}
+
+?>
