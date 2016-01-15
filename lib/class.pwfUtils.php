@@ -700,9 +700,11 @@ EOS;
 	{
 		$mod = $formdata->formsmodule;
 		$smarty = cmsms()->GetSmarty();
-		$smarty->assign('title_variables',$mod->Lang('title_variables_available'));
-		$smarty->assign('title_name',$mod->Lang('title_php_variable'));
-		$smarty->assign('title_field',$mod->Lang('title_form_field'));
+		$smarty->assign(array(
+			'title_variables' => $mod->Lang('title_variables_available'),
+			'title_name' => $mod->Lang('title_php_variable'),
+			'title_field' => $mod->Lang('title_form_field')
+		));
 		$rows = array();
 		foreach($formdata->Fields as &$one)
 		{
@@ -738,9 +740,11 @@ EOS;
 	*/
 	public static function SetupSubTemplateVarsHelp(&$formdata,&$mod,&$smarty)
 	{
-		$smarty->assign('template_vars_title',$mod->Lang('title_template_variables'));
-		$smarty->assign('variable_title',$mod->Lang('variable'));
-		$smarty->assign('property_title',$mod->Lang('property'));
+		$smarty->assign(array(
+		 'template_vars_title' => $mod->Lang('title_template_variables'),
+		 'variable_title' => $mod->Lang('variable'),
+		 'property_title' => $mod->Lang('property')
+		));
 
 		$globalvars = array();
 		foreach(array(
@@ -815,12 +819,14 @@ EOS;
 		$mod = $formdata->formsmodule;
 		$smarty = cmsms()->GetSmarty();
 		// general variables
-		$smarty->assign('form_name',$formdata->Name);
-		$smarty->assign('form_url',(empty($_SERVER['HTTP_REFERER'])?$mod->Lang('no_referrer_info'):$_SERVER['HTTP_REFERER']));
-		$smarty->assign('form_host',$_SERVER['SERVER_NAME']);
-		$smarty->assign('sub_date',date('r'));
-		$smarty->assign('sub_source',$_SERVER['REMOTE_ADDR']);
-		$smarty->assign('version',$mod->GetVersion());
+		$smarty->assign(array(
+		'form_name' => $formdata->Name,
+		'form_url' => (empty($_SERVER['HTTP_REFERER'])?$mod->Lang('no_referrer_info'):$_SERVER['HTTP_REFERER']),
+		'form_host' => $_SERVER['SERVER_NAME'],
+		'sub_date' => date('r'),
+		'sub_source' => $_SERVER['REMOTE_ADDR'],
+		'version' => $mod->GetVersion()
+		));
 
 		$unspec = self::GetFormOption($formdata,'unspecified',$mod->Lang('unspecified'));
 
