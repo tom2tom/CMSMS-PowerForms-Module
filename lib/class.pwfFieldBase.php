@@ -679,7 +679,7 @@ class pwfFieldBase
 	{
 		$code = $this->GetOption('field_logic');
 		if(!empty($code))
-			return $this->formdata->formsmodule->ProcessTemplateFromData($code);
+			return $this->formdata->formsmodule->ProcessTemplateFromData($code); //before20
 		return '';
 	}
 

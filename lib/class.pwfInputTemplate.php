@@ -68,7 +68,7 @@ class pwfInputTemplate extends pwfFieldBase
 		$smarty->assign('FBvalue',$this->Value);
 
 		$val = $this->GetOption('value');
-		return $this->formdata->formsmodule->ProcessTemplateFromData($val);
+		return $this->formdata->formsmodule->ProcessTemplateFromData($val); //before20
 	}
 
 }

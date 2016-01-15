@@ -46,7 +46,7 @@ class pwfHidden extends pwfFieldBase
 			$val = $this->GetOption('value');
 
 		if($this->GetOption('smarty_eval',0))
-			$val = $mod->ProcessTemplateFromData($val);
+			$val = $mod->ProcessTemplateFromData($val); //before20
 
 		if($this->GetOption('browser_edit',0) && !empty($params['in_admin'])) //TODO deprecated
 			$type = 'text';

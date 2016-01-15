@@ -156,7 +156,7 @@ class pwfCatalogerItems extends pwfFieldBase
 			foreach($attrs as $oneattr)
 			{
 				// parse the field value through smarty,without cacheing (->fetch() fails)
-				$expr = $mod->ProcessTemplateFromData($oneattr->input);
+				$expr = $mod->ProcessTemplateFromData($oneattr->input); //before20
 				if(empty($expr)) continue; // no expression for this field. pass
 
 				// get the value for this attribute for this content

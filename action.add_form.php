@@ -83,6 +83,6 @@ $smarty->assign(array(
 	'cancel' => $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'))
 ));
 
-echo $this->ProcessTemplate('addform.tpl');
+echo $this->ProcessTemplate('addform.tpl'); //before20
 
 ?>

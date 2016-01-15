@@ -132,7 +132,7 @@ class pwfCaptcha extends pwfFieldBase
 		{
 			$this->HideLabel = FALSE;
 			$this->RealName = $this->Name;
-			$tmp = $mod->ProcessTemplateFromData($tpl);
+			$tmp = $mod->ProcessTemplateFromData($tpl); //before20
 			$this->Name = $this->SetClass($tmp);
 			return '';
 		}
@@ -140,7 +140,7 @@ class pwfCaptcha extends pwfFieldBase
 		{
 			$this->HideLabel = TRUE;
 			$this->RealName = FALSE;
-			$tmp = $mod->ProcessTemplateFromData($tpl);
+			$tmp = $mod->ProcessTemplateFromData($tpl); //before20
 			return $this->SetClass($tmp);
 		}
 	}

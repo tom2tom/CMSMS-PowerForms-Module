@@ -727,7 +727,7 @@ EOS;
 		}
 
 		$smarty->assign('rows',$rows);
-		return $mod->ProcessTemplate('varshelp.tpl');
+		return $mod->ProcessTemplate('varshelp.tpl'); //before20
 	}
 
 	/**
@@ -806,7 +806,7 @@ EOS;
 */
 		$smarty->assign('help_other_fields',$mod->Lang('help_other_fields'));
 
-		$smarty->assign('help_subtplvars',$mod->ProcessTemplate('varshelp.tpl'));
+		$smarty->assign('help_subtplvars',$mod->ProcessTemplate('varshelp.tpl')); //before20
 	}
 
 	/**

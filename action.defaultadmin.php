@@ -80,6 +80,6 @@ if($padm)
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 
-echo $this->ProcessTemplate('adminpanel.tpl');
+echo $this->ProcessTemplate('adminpanel.tpl'); //before20
 
 ?>

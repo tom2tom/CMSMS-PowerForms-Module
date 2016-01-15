@@ -150,6 +150,6 @@ require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.update_field.php';
 $formdata->formsmodule = NULL; //no need to cache this
 $cache->set($params['formdata'],$formdata);
 
-echo $this->ProcessTemplate('editfield.tpl');
+echo $this->ProcessTemplate('editfield.tpl'); //before20
 
 ?>

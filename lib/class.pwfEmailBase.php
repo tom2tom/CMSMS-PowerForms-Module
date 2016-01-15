@@ -279,7 +279,7 @@ $mod->Crash;
 
 		pwfUtils::SetupFormVars($this->formdata,$htmlemail);
 
-		$subject = $mod->ProcessTemplateFromData($subject);
+		$subject = $mod->ProcessTemplateFromData($subject); //before20
 		$mail->SetSubject($subject);
 
 		$message = $this->GetOption('email_template');
@@ -294,12 +294,12 @@ $mod->Crash;
 			if($htmlemail)
 				$message2 = pwfUtils::CreateDefaultTemplate($this->formdata,TRUE);
 		}
-		$message = $mod->ProcessTemplateFromData($message);
+		$message = $mod->ProcessTemplateFromData($message); //before20
 
 		if($htmlemail)
 		{
 			$mail->IsHTML(TRUE);
-			$message2 = $mod->ProcessTemplateFromData($message2);
+			$message2 = $mod->ProcessTemplateFromData($message2); //before20
 			$mail->SetAltBody(strip_tags(html_entity_decode($message)));
 			$mail->SetBody($message2);
 		}

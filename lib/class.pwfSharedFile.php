@@ -124,7 +124,7 @@ class pwfSharedFile extends pwfFieldBase
 
 		$filespec = $this->GetOption('filespec');
 		if($filespec)
-			$fn = preg_replace('/[^\w\d\.]|\.\./','_',$mod->ProcessTemplateFromData($filespec));
+			$fn = preg_replace('/[^\w\d\.]|\.\./','_',$mod->ProcessTemplateFromData($filespec)); //before20
 		else
 			$fn = 'form_submissions.txt';
 /*MUTEX
@@ -136,13 +136,13 @@ class pwfSharedFile extends pwfFieldBase
 
 		$footer = $this->GetOption('file_footer');
 		if($footer)
-			$footer = $mod->ProcessTemplateFromData($footer);
+			$footer = $mod->ProcessTemplateFromData($footer); //before20
 
 		$template = $this->GetOption('file_template');
 		if(!$template)
 			$template = $this->CreateDefaultTemplate();
 
-		$newline = $mod->ProcessTemplateFromData($template);
+		$newline = $mod->ProcessTemplateFromData($template); //before20
 /*		$replchar = $this->GetOption('newlinechar');
 		if($replchar)
 		{
@@ -161,7 +161,7 @@ class pwfSharedFile extends pwfFieldBase
 			$header = $this->GetOption('file_header');
 			if(!$header)
 				$header = $this->CreateSampleHeader();
-			$header = $mod->ProcessTemplateFromData($header);
+			$header = $mod->ProcessTemplateFromData($header); //before20
 			fwrite($fh,$header.PHP_EOL.$newline.$footer);
 		}
 		else
