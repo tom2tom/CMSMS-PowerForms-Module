@@ -806,7 +806,7 @@ EOS;
 */
 		$tplvars['help_other_fields'] = $mod->Lang('help_other_fields');
 
-		$tplvars['help_subtplvars'] = pwfUtils::ProcessTemplate($mod,'varshelp.tpl',$tplvars);
+		$tplvars['help_subtplvars'] = self::ProcessTemplate($mod,'varshelp.tpl',$tplvars);
 	}
 
 	/**
@@ -868,62 +868,91 @@ EOS;
 	/**
 	ProcessTemplate:
 	@mod: reference to current PowerBrowse module object
-	@tplname:
-	@tplvars:
-	@cache: optional boolean, default FALSE
+	@tplname: template identifier
+	@tplvars: associative array of template variables
+	@cache: optional boolean, default TRUE
+	Returns: string, processed template
 	*/
-	public static function ProcessTemplate(&$mod,$tplname,$tplvars,$cache=FALSE)
+	public static function ProcessTemplate(&$mod,$tplname,$tplvars,$cache=TRUE)
 	{
+		global $smarty;
 		if($mod->before20)
 		{
-			global $smarty;
 			$smarty->assign($tplvars);
 			return $mod->ProcessTemplate($tplname);
 		}
 		else
 		{
+			if($cache)
+			{
+				$cache_id = md5('pwf|'.$tplname.serialize(array_keys($tplvars)));
+				$compile_id = NULL; //TODO md5('pwf|'.$tplname.current lang
+				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),$cache_id,compile_id,$smarty);
+				if(!$tpl->isCached())
+					$tpl->assign($tplvars);
+			}
+			else
+			{
+				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),NULL,NULL,$smarty,$tplvars);
+			}
+			return $tpl->fetch();
 		}
 	}
 
 	/**
 	ProcessTemplateFromDatabase:
 	@mod: reference to current PowerBrowse module object
-	@tplname:
-	@tplvars:
-	@cache: optional boolean, default FALSE
+	@tplname: template identifier
+	@tplvars: associative array of template variables
+	@cache: optional boolean, default TRUE
+	Returns: nothing
 	*/
-	public static function ProcessTemplateFromDatabase(&$mod,$tplname,$tplvars,$cache=FALSE)
+	public static function ProcessTemplateFromDatabase(&$mod,$tplname,$tplvars,$cache=TRUE)
 	{
+		global $smarty;
 		if($mod->before20)
 		{
-			global $smarty;
 			$smarty->assign($tplvars);
 			echo $mod->ProcessTemplateFromDatabase($tplname);
 		}
 		else
 		{
-/*TODO
-$tpl = $smarty->CreateTemplate($this->GetTemplateResource('pwf::'.$form_id)[,$cache_id][,compile_id][,$parent][,$data]);
-$tpl->assign(stuff not already in $parent[chain] or $data)
-$tpl->display();
-*/
+			if($cache)
+			{
+				$cache_id = md5('pwf|'.$tplname.serialize(array_keys($tplvars)));
+				$compile_id = NULL; //TODO
+				$tpl = $smarty->CreateTemplate($mod->GetTemplateResource($tplname),$cache_id,compile_id,$smarty);
+				if(!$tpl->isCached())
+					$tpl->assign($tplvars);
+			}
+			else
+			{
+				$tpl = $smarty->CreateTemplate($mod->GetTemplateResource($tplname),NULL,NULL,$smarty,$tplvars);
+			}
+			$tpl->display();
 		}
 	}
 
 	/**
 	ProcessTemplateFromData:
 	@mod: reference to current PowerBrowse module object
-	@tplname:
-	@tplvars:
-	@cache: optional boolean, default FALSE
+	@data: string
+	@tplvars: associative array of template variables
+	No cacheing.
+	Returns: string, processed template
 	*/
-	public static function ProcessTemplateFromData(&$mod,$tplname,$tplvars,$cache=FALSE)
+	public static function ProcessTemplateFromData(&$mod,$data,$tplvars)
 	{
+		global $smarty;
 		if($mod->before20)
 		{
+			$smarty->assign($tplvars);
+			return $mod->ProcessTemplateFromData($data);
 		}
 		else
 		{
+			$tpl = $smarty->CreateTemplate('eval:'.$data,NULL,NULL,$smarty,$tplvars);
+			return $tpl->fetch();
 		}
 	}
 
