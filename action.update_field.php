@@ -91,7 +91,7 @@ if(isset($params['submit']))
 			$formdata->FieldOrders = FALSE; //trigger re-sort
 		}
 		//update cache ready for next use
-		$formdata->formsmodule = NULL;
+		unset($formdata->formsmodule);
 		$cache->set($params['formdata'],$formdata);
 		$t = ($newfield) ? 'added':'updated';
 		$message = $this->Lang('field_op',$this->Lang($t));
@@ -149,7 +149,7 @@ $tplvars = array();
 
 require dirname(__FILE__).DIRECTORY_SEPARATOR.'populate.update_field.php';
 
-$formdata->formsmodule = NULL; //no need to cache this
+unset($formdata->formsmodule); //no need to cache this
 $cache->set($params['formdata'],$formdata);
 
 echo pwfUtils::ProcessTemplate($this,'editfield.tpl',$tplvars);

@@ -58,7 +58,7 @@ else
 	$token = mt_rand(0,999999).'.'.mt_rand(0,999999);
 $token .= 'SERVER_ADDR'.uniqid().mt_rand(1100,2099).reset($_SERVER).key($_SERVER).end($_SERVER).key($_SERVER);
 $cache_key = md5($token);
-$formdata->formsmodule = NULL;
+unset($formdata->formsmodule);
 $cache->set($cache_key,$formdata);
 
 $prefix = $formdata->current_prefix;
