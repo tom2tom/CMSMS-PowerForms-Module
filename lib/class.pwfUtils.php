@@ -867,7 +867,7 @@ EOS;
 
 	/**
 	ProcessTemplate:
-	@mod: reference to current PowerBrowse module object
+	@mod: reference to current PowerForms module object
 	@tplname: template identifier
 	@tplvars: associative array of template variables
 	@cache: optional boolean, default TRUE
@@ -885,8 +885,9 @@ EOS;
 		{
 			if($cache)
 			{
-				$cache_id = md5('pwf|'.$tplname.serialize(array_keys($tplvars)));
-				$compile_id = NULL; //TODO md5('pwf|'.$tplname.current lang
+				$cache_id = md5('pwf'.$tplname.serialize(array_keys($tplvars)));
+				$lang = CmsNlsOperations::get_current_language();
+				$compile_id = md5('pwf'.$tplname.$lang);
 				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),$cache_id,compile_id,$smarty);
 				if(!$tpl->isCached())
 					$tpl->assign($tplvars);
@@ -901,7 +902,7 @@ EOS;
 
 	/**
 	ProcessTemplateFromDatabase:
-	@mod: reference to current PowerBrowse module object
+	@mod: reference to current PowerForms module object
 	@tplname: template identifier
 	@tplvars: associative array of template variables
 	@cache: optional boolean, default TRUE
@@ -919,8 +920,9 @@ EOS;
 		{
 			if($cache)
 			{
-				$cache_id = md5('pwf|'.$tplname.serialize(array_keys($tplvars)));
-				$compile_id = NULL; //TODO
+				$cache_id = md5('pwf'.$tplname.serialize(array_keys($tplvars)));
+				$lang = CmsNlsOperations::get_current_language();
+				$compile_id = md5('pwf'.$tplname.$lang);
 				$tpl = $smarty->CreateTemplate($mod->GetTemplateResource($tplname),$cache_id,compile_id,$smarty);
 				if(!$tpl->isCached())
 					$tpl->assign($tplvars);
@@ -935,7 +937,7 @@ EOS;
 
 	/**
 	ProcessTemplateFromData:
-	@mod: reference to current PowerBrowse module object
+	@mod: reference to current PowerForms module object
 	@data: string
 	@tplvars: associative array of template variables
 	No cacheing.
