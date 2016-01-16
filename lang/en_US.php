@@ -318,7 +318,7 @@ $lang['delete_destination'] = 'Delete Selected Destinations';
 $lang['delete_file'] = 'Delete Selected Files';
 $lang['delete_options'] = 'Delete Selected Options';
 
-$lang['desc_actionid'] = 'TODO';
+$lang['desc_actionid'] = 'id given to the module on execution';
 $lang['desc_alias'] = 'the alias specified for the field';
 $lang['desc_css_class'] = 'CSS class for the form';
 $lang['desc_cssf_class'] = 'the CSS class specified for the field';
