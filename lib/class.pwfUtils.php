@@ -191,7 +191,10 @@ class pwfUtils
 			if($db->CompleteTrans())
 				return $ret;
 			else
+			{
 				$nt--;
+				usleep(50000);
+			}
 		}
 		return FALSE;
 	}
@@ -221,7 +224,10 @@ class pwfUtils
 			if($db->CompleteTrans())
 				return TRUE;
 			else
+			{
 				$nt--;
+				usleep(50000);
+			}
 		}
 		return FALSE;
 	}
@@ -888,7 +894,7 @@ EOS;
 				$cache_id = md5('pwf'.$tplname.serialize(array_keys($tplvars)));
 				$lang = CmsNlsOperations::get_current_language();
 				$compile_id = md5('pwf'.$tplname.$lang);
-				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),$cache_id,compile_id,$smarty);
+				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),$cache_id,$compile_id,$smarty);
 				if(!$tpl->isCached())
 					$tpl->assign($tplvars);
 			}
@@ -918,12 +924,13 @@ EOS;
 		}
 		else
 		{
+			//TODO handle old template if new one N/A
 			if($cache)
 			{
 				$cache_id = md5('pwf'.$tplname.serialize(array_keys($tplvars)));
 				$lang = CmsNlsOperations::get_current_language();
 				$compile_id = md5('pwf'.$tplname.$lang);
-				$tpl = $smarty->CreateTemplate($mod->GetTemplateResource($tplname),$cache_id,compile_id,$smarty);
+				$tpl = $smarty->CreateTemplate($mod->GetTemplateResource($tplname),$cache_id,$compile_id,$smarty);
 				if(!$tpl->isCached())
 					$tpl->assign($tplvars);
 			}
