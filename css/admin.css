@@ -25,7 +25,12 @@ textarea.cloaked {
  width:40em;
  height:2.4em;
 }
-div.pagecontainer .pagetext { margin-left:0 }
+p.pagetext {
+ margin-top:0.5em;
+ margin-bottom:0.5em;
+ margin-left:0 !important
+}
+
 .pwf_link { text-decoration:underline; }
 .pwf_fieldset { margin-bottom:2em; }
 .help_display { display:none; }
@@ -76,5 +81,3 @@ table.rightwards {
 .dndhelp { display:none; } /* changed at runtime if js is available */
 img.tipper { display:none; } /* ditto */
 .addfast { display:none; } /* ditto */
-
-p.pagetext { margin-top:0.5em; margin-bottom:0.5em; }
