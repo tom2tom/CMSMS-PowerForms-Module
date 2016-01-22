@@ -25,11 +25,8 @@ textarea.cloaked {
  width:40em;
  height:2.4em;
 }
-p.pagetext {
- margin-top:0.5em;
- margin-bottom:0.5em;
- margin-left:0 !important
-}
+
+.leftwards { margin-left:0 !important }
 
 .pwf_link { text-decoration:underline; }
 .pwf_fieldset { margin-bottom:2em; }
@@ -57,15 +54,19 @@ table.varshelp
 }
 table.varshelp th {background-color:#AAA;}
 
-table.pagetable { padding:3px; border-spacing:0; margin-left:0; width:auto }
-
-table.leftwards {
+table.leftside {
  margin-left:0;
+ padding:3px;
+ border-spacing:0;
+ border-collapse:collapse;
  width:auto;
  table-layout:auto;
 }
-table.rightwards {
+table.rightside {
  margin-right:0;
+ padding:3px;
+ border-spacing:0;
+ border-collapse:collapse;
  width:auto;
  table-layout:auto;
 }
