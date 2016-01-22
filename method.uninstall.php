@@ -58,9 +58,8 @@ $db->DropSequence($pre.'module_pwf_form_opt_seq');
 $db->DropSequence($pre.'module_pwf_record_seq');
 $db->DropSequence($pre.'module_pwf_uniquefield_seq');
 
-if($this->before20)
-	$this->DeleteTemplate();
-else
+$this->DeleteTemplate(); //old-style templates can be for any version
+if(!$this->before20)
 {
 	$types = CmsLayoutTemplateType::load_all_by_originator($this->GetName());
 	if($types)
