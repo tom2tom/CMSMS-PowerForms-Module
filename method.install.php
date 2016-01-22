@@ -149,15 +149,16 @@ $db->Execute('INSERT INTO '.$pre.'css (css_id,css_name,css_text,media_type,creat
 
 if(!$this->before20)
 {
-	$ttype = new CmsLayoutTemplateType();
-	$ttype->set_originator($this->GetName());
-	$ttype->set_name('form');
-	$ttype->save();
-
-	$ttype = new CmsLayoutTemplateType();
-	$ttype->set_originator($this->GetName());
-	$ttype->set_name('submission');
-	$ttype->save();
+	$myname = $this->GetName();
+//	$me = get_userid(false);
+	foreach(array('form','submission') as $name)
+	{
+		$ttype = new CmsLayoutTemplateType();
+		$ttype->set_originator($myname);
+		$ttype->set_name($name);
+//		$ttype->set_owner($me);
+		$ttype->save();
+	}
 }
 
 $funcs = new pwfFormOperations();
