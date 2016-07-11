@@ -20,7 +20,7 @@ class Cache_apc extends CacheBase implements CacheInterface
 */
 	public function use_driver()
 	{
-		return (extension_loaded('apc') && ini_get('apc.enabled'));
+		return (extension_loaded('apcu') && ini_get('apc.enabled'));
 	}
 
 	public function connectServer()
@@ -33,23 +33,23 @@ class Cache_apc extends CacheBase implements CacheInterface
 		if ($this->_has($keyword)) {
 			return FALSE;
 		}
-		$ret = apc_add($keyword,$value,(int)$lifetime);
+		$ret = apcu_add($keyword,$value,(int)$lifetime);
 		return $ret;
 	}
 
 	public function _upsert($keyword, $value, $lifetime=FALSE)
 	{
 		$lifetime = (int)$lifetime;
-		$ret = apc_add($keyword,$value,$lifetime);
+		$ret = apcu_add($keyword,$value,$lifetime);
 		if (!$ret) {
-			$ret = apc_store($keyword,$value,$lifetime);
+			$ret = apcu_store($keyword,$value,$lifetime);
 		}
 		return $ret;
 	}
 
 	public function _get($keyword)
 	{
-		$value = apc_fetch($keyword,$suxs);
+		$value = apcu_fetch($keyword,$suxs);
 		if ($suxs !== FALSE) {
 			return $value;
 		}
@@ -59,7 +59,7 @@ class Cache_apc extends CacheBase implements CacheInterface
 	public function _getall($filter)
 	{
 		$items = array();
-		$iter = new \APCIterator();
+		$iter = new \APCUIterator();
 		if ($iter) {
 			foreach ($iter as $keyword=>$value) {
 				$again = is_object($value); //get it again, in case the filter played with it!
@@ -78,27 +78,27 @@ class Cache_apc extends CacheBase implements CacheInterface
 
 	public function _has($keyword)
 	{
-		return apc_exists($keyword);
+		return apcu_exists($keyword);
 	}
 
 	public function _delete($keyword)
 	{
-		return apc_delete($keyword);
+		return apcu_delete($keyword);
 	}
 
 	public function _clean($filter)
 	{
-		$iter = new \APCIterator();
+		$iter = new \APCUIterator();
 		if ($iter) {
 			$items = array();
 			foreach ($iter as $keyword=>$value) {
 				if ($this->filterKey($filter,$keyword,$value)) {
-					$items[] = $keyword;
+					$items[] = $key;
 				}
 			}
 			$ret = TRUE;
-			foreach ($items as $keyword) {
-				$ret = $ret && apc_delete($keyword);
+			foreach ($items as $key) {
+				$ret = $ret && apcu_delete($key);
 			}
 			return $ret;
 		}

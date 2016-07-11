@@ -1,86 +1,98 @@
 <?php
-/*
- * khoaofgod@gmail.com
- * Website: http://www.phpfastcache.com
- * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
- */
+namespace MultiCache;
 
-class FastCache_wincache extends FastCacheBase implements iFastCache {
-
-	function __construct($config) {
-		if($this->checkdriver()) {
-			$this->setup($config);
-		} else {
-			throw new Exception('no wincache storage');
+class Cache_wincache extends CacheBase implements CacheInterface
+{
+	public function __construct($config=array())
+	{
+		if ($this->use_driver()) {
+			parent::__construct($config);
+			if ($this->connectServer()) {
+				return;
+			}
 		}
+		throw new \Exception('no wincache storage');
 	}
 
-/*	function __destruct() {
-		$this->driver_clean();
+/*	public function __destruct()
+	{
 	}
 */
-	function checkdriver() {
+	public function use_driver()
+	{
 		return (extension_loaded('wincache') && function_exists('wincache_ucache_set'));
 	}
 
-	function driver_set($keyword, $parms, $duration = 0, $option = array() ) {
-		if(empty($option['skipExisting'])) {
-			$ret = wincache_ucache_set($keyword,$parms['value'],$duration);
-		} else {
-			$ret = wincache_ucache_add($keyword,$parms['value'],$duration);
-		}
-		if($ret) {
-			$this->index[$keyword] = 1;
+	public function connectServer()
+	{
+		return TRUE; //TODO connect
+	}
+
+	public function _newsert($keyword, $value, $lifetime=FALSE)
+	{
+		return wincache_ucache_add($keyword, $value, (int)$lifetime);
+	}
+
+	public function _upsert($keyword, $value, $lifetime=FALSE)
+	{
+		$ret = wincache_ucache_add($keyword, $value, (int)$lifetime);
+		if (!$ret) {
+			$ret = wincache_ucache_set($keyword, $value, (int)$lifetime);
 		}
 		return $ret;
 	}
 
-	// return cached value or null
-	function driver_get($keyword, $option = array()) {
-		if(empty($option['all_keys'])) {
-			$data = wincache_ucache_get($keyword,$suc);
-			if($suc) {
-				return array('value'=>$data);
-			} else {
-				return null;
+	public function _get($keyword)
+	{
+		$value = wincache_ucache_get($keyword,$suxs);
+		if ($suxs) {
+			return $value;
+		}
+		return NULL;
+	}
+
+	public function _getall($filter)
+	{
+		$items = array();
+		$info = wincache_ucache_info();
+		foreach ($info['ucache_entries'] as $one) {
+			$keyword = $one['key_name'];
+			$value = $this->_get($keyword);
+			$again = is_object($value); //get it again, in case the filter played with it!
+			if ($this->filterKey($filter,$keyword,$value)) {
+				if ($again) {
+					$value = $this->_get($keyword);
+				}
+				if ($value !== NULL) {
+					$items[$keyword] = $value;
+				}
 			}
 		}
-		//TODO array of 'all data' ?
-		return null;
+		return $items;
 	}
 
-	function driver_getall($option = array()) {
-		return array_keys($this->index);
-	}
-
-	function driver_delete($keyword, $option = array()) {
-		if(wincache_ucache_delete($keyword)) {
-			unset($this->index[$keyword]);
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	function driver_stats($option = array()) {
-		$res = array(
-			'info' => '',
-			'size' => count($this->index),
-			'data' => wincache_scache_info(),
-		);
-		return $res;
-	}
-
-	function driver_clean($option = array()) {
-		wincache_ucache_clear();
-		$this->index = array();
-		return true;
-	}
-
-	function driver_isExisting($keyword) {
+	public function _has($keyword)
+	{
 		return wincache_ucache_exists($keyword);
 	}
 
-}
+	public function _delete($keyword)
+	{
+		return wincache_ucache_delete($keyword);
+	}
 
-?>
+	public function _clean($filter)
+	{
+		$ret = TRUE;
+		$info = wincache_ucache_info();
+		foreach ($info['ucache_entries'] as $one) {
+			$keyword = $one['key_name'];
+			$value = $this->_get($keyword);
+			if ($this->filterKey($filter,$keyword,$value)) {
+				$ret = $ret && wincache_ucache_delete($keyword);
+			}
+		}
+		return $ret;
+	}
+
+}

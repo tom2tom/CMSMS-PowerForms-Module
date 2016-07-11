@@ -1,94 +1,111 @@
 <?php
-/*
- * khoaofgod@gmail.com
- * Website: http://www.phpfastcache.com
- * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
- */
+namespace MultiCache;
 
-class FastCache_xcache extends FastCacheBase implements iFastCache {
+class Cache_xcache extends CacheBase implements CacheInterface
+{
+    protected $client;
 
-	function __construct($config = array()) {
-		if($this->checkdriver()) {
-			$this->setup($config);
-		} else {
-			throw new Exception('no xcache storage');
+	public function __construct($config=array())
+	{
+		if ($this->use_driver()) {
+			parent::__construct($config);
+			if ($this->connectServer()) {
+				return;
+			}
 		}
+		throw new \Exception('no xcache storage');
 	}
 
-/*	function __destruct() {
-		$this->driver_clean();
+/*	public function __destruct()
+	{
 	}
 */
-	function checkdriver() {
+	public function use_driver()
+	{
 		return (extension_loaded('xcache') && function_exists('xcache_get'));
 	}
 
-	function driver_set($keyword, $parms, $duration = 0, $option = array() ) {
-		if(empty($option['skipExisting'])) {
-			$ret = xcache_set($keyword,$parms['value'],$duration);
-		} else if(!$this->isExisting($keyword)) {
-			$ret = xcache_set($keyword,$parms['value'],$duration);
-		} else {
-			$ret = false;
+	public function connectServer()
+	{
+        $this->client = new \XCache();
+//     $adbg = xcache_info(XC_TYPE_VAR, int id);
+		return TRUE;  //TODO connect
+	}
+
+	public function _newsert($keyword, $value, $lifetime=FALSE)
+	{
+		if (xcache_isset($keyword)) {
+			return FALSE;
 		}
-		if($ret) {
-			$this->index[$keyword] = 1;
+		if ($lifetime) {
+			$ret = xcache_set($keyword,$value,(int)$lifetime);
+		} else {
+			$ret = xcache_set($keyword,$value);
 		}
 		return $ret;
 	}
 
-	// return cached value or null
-	function driver_get($keyword, $option = array()) {
-		if(empty($option['all_keys'])) {
-			$data = xcache_get($keyword);
-			if($data !== null) {
-				return array('value'=>$data);
-			}
-			return null;
-		}
-		//TODO array of 'all data' ?
-		return null;
-	}
-
-	function driver_getall($option = array()) {
-		return array_keys($this->index);
-	}
-
-	function driver_delete($keyword, $option = array()) {
-		if(xcache_unset($keyword)) {
-			unset($this->index[$keyword]);
-			return true;
+	public function _upsert($keyword, $value, $lifetime=FALSE)
+	{
+		if ($lifetime) {
+			$ret = xcache_set($keyword,$value,(int)$lifetime);
 		} else {
-			return false;
+			$ret = xcache_set($keyword,$value);
 		}
+		return $ret;
 	}
 
-	function driver_stats($option = array()) {
-		$res = array(
-			'info' => '',
-			'size' => count($this->index)
-		);
-		try {
-			$res['data'] = xcache_list(XC_TYPE_VAR,100);
-		} catch(Exception $e) {
-			$res['data'] = array();
+	public function _get($keyword)
+	{
+		$data = xcache_get($keyword);
+		if ($data !== FALSE) {
+			return $data;
 		}
-		return $res;
+		return NULL;
 	}
 
-	function driver_clean($option = array()) {
+	public function _getall($filter)
+	{
+		$items = array();
 		$cnt = xcache_count(XC_TYPE_VAR);
 		for ($i=0; $i<$cnt; $i++) {
-			xcache_clear_cache(XC_TYPE_VAR, $i);
+			$keyword = $TODO;
+			$value = $this->_get($keyword);
+			$again = is_object($value); //get it again, in case the filter played with it!
+			if ($this->filterKey($filter,$keyword,$value)) {
+				if ($again) {
+					$value = $this->_get($keyword);
+				}
+				if ($value !== NULL) {
+					$items[$keyword] = $value;
+				}
+			}
 		}
-		$this->index = array();
-		return true;
+		return $items;
 	}
 
-	function driver_isExisting($keyword) {
+	public function _has($keyword)
+	{
 		return xcache_isset($keyword);
 	}
 
-}
+	public function _delete($keyword)
+	{
+		return xcache_unset($keyword);
+	}
 
-?>
+	public function _clean($filter)
+	{
+		$ret = TRUE;
+		$count = xcache_count(XC_TYPE_VAR);
+		for ($i=0; $i<$count; $i++) {
+			$keyword = $TODO;
+			$value = $this->_get($keyword);
+			if ($this->filterKey($filter,$keyword,$value)) {
+				$ret = $ret && xcache_unset($keyword);
+			}
+		}
+		return $ret;
+	}
+
+}

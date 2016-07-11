@@ -1,127 +1,148 @@
 <?php
-/*
- * khoaofgod@gmail.com
- * Website: http://www.phpfastcache.com
- * Example at our website, any bugs, problems, please visit http://faster.phpfastcache.com
- */
-/*
-This class is CMSMS-specific.
-The database table must (first) have (at least) four fields:
- I(2) AUTO KEY = unique identifier
- C = cache key
- B = cache value
- CMS_ADODB_DT = stamp for when stored
-*/
-class FastCache_database extends FastCacheBase implements iFastCache {
+namespace MultiCache;
 
-	private $db;
-	private $table;
-	private $fields;
+class Cache_database extends CacheBase implements CacheInterface
+{
+	protected $table;
 
-	function __construct($config) {
-		if(!empty($config['table'])) {
-			$this->table = $config['table'];
-			$this->db = cmsms()->GetDb();
-			if($this->checkdriver()) {
-				$this->setup($config);
-				$this->fields = $this->db->GetCol('SELECT column_name FROM information_schema.columns WHERE table_name=\''.$this->table.'\'');
-				return;
-			}
+	public function __construct($config=array())
+	{
+		$this->table = $config['table'];
+		if ($this->use_driver()) {
+			parent::__construct($config);
+		} else {
+			throw new \Exception('no database storage');
 		}
-		throw new Exception('no database storage');
 	}
 
-/*	function __destruct() {
-		$this->driver_clean();
-	}
-*/
-	function checkdriver() {
-		$rst = $this->db->Execute('SELECT * FROM '.$this->table);
-		if($rst) {
-			$ret = ($rst->FieldCount() >= 4);
-			$rst->Close();
+	public function use_driver()
+	{
+		$db = cmsms()->GetDb();
+		$rs = $db->Execute("SHOW TABLES LIKE '".$this->table."'");
+		if ($rs) {
+			$ret = ($rs->RecordCount() == 1);
+			$rs->Close();
 			return $ret;
 		}
-		return false;
+		return FALSE;
 	}
 
-	function driver_set($keyword, $parms, $duration = 0, $option = array()) {
-		$ret = false;
-		$value = serialize($parms['value']);
-		if(empty($option['skipExisting'])) {
-			//upsert, sort-of
-			$sql = 'UPDATE '.$this->table.' SET '.$this->fields[2].'=? WHERE '.$this->fields[1].'=?';
-			$ret = $this->db->Execute($sql,array($value,$keyword));
-			$sql = 'INSERT INTO '.$this->table.' ('.$this->fields[1].','.$this->fields[2].','.$this->fields[3].')
-SELECT ?,?,NOW() FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
-			$this->table.' T WHERE T.'.$this->fields[1].'=?)';
-			$ret = $this->db->Execute($sql,array($keyword,$value,$keyword));
+	public function _newsert($keyword, $value, $lifetime=FALSE)
+	{
+		$db = cmsms()->GetDb();
+		$sql = 'SELECT cache_id FROM '.$this->table.' WHERE keyword=?';
+		$id = $db->GetOne($sql,array($keyword));
+		if (!$id) {
+			$value = serialize($value);
+			$lifetime = (int)$lifetime;
+			if ($lifetime <= 0) {
+				$lifetime = NULL;
+			}
+			$sql = 'INSERT INTO '.$this->table.' (keyword,value,savetime,lifetime) VALUES (?,?,?,?)';
+			$ret = $db->Execute($sql,array($keyword,$value,time(),$lifetime));
+			return $ret;
+		}
+		return FALSE;
+	}
+
+	public function _upsert($keyword, $value, $lifetime=FALSE)
+	{
+		$db = cmsms()->GetDb();
+		$sql = 'SELECT cache_id FROM '.$this->table.' WHERE keyword=?';
+		$id = $db->GetOne($sql,array($keyword));
+		$value = serialize($value);
+		$lifetime = (int)$lifetime;
+		if ($lifetime <= 0) {
+			$lifetime = NULL;
+		}
+		//upsert, sort-of
+		if ($id) {
+			$sql = 'UPDATE '.$this->table.' SET value=?,savetime=?,lifetime=? WHERE cache_id=?';
+			$ret = $db->Execute($sql,array($value,time(),$lifetime,$id));
 		} else {
-			// skip driver
-			$sql = 'SELECT '.$this->fields[0].' FROM '.$this->table.' WHERE '.$this->fields[1].'=?';
-			$id = $this->db->GetOne($sql,array($keyword));
-			if(!$id)
-			{
-				$sql = 'INSERT INTO '.$this->table.' ('.$this->fields[1].','.$this->fields[2].','.$this->fields[3].') VALUES (?,?,NOW())';
-				$ret = $this->db->Execute($sql,array($keyword,$value));
+			$sql = 'INSERT INTO '.$this->table.' (keyword,value,savetime,lifetime) VALUES (?,?,?,?)';
+			$ret = $db->Execute($sql,array($keyword,$value,time(),$lifetime));
+		}
+		return ($ret != FALSE);
+	}
+
+	public function _get($keyword)
+	{
+		$db = cmsms()->GetDb();
+		$row = $db->GetRow('SELECT value,savetime,lifetime FROM '.$this->table.' WHERE keyword=?',array($keyword));
+		if ($row) {
+			if (is_null($row['lifetime']) ||
+				 time() <= $row['savetime'] + $row['lifetime']) {
+				if (!is_null($row['value'])) {
+					return unserialize($row['value']);
+				}
 			}
 		}
-		if($ret) {
-			$this->index[$keyword] = 1;
-		}
-		return ($ret != false);
+		return NULL;
 	}
 
-	function driver_get($keyword, $option = array()) {
-		if(empty($option['all_keys'])) {
-			$data = $this->db->GetOne('SELECT '.$this->fields[2].' FROM '.$this->table.' WHERE '.$this->fields[1].'=?',array($keyword));
-			if ($data !== FALSE) {
-				return array('value'=>unserialize($data));
+	public function _getall($filter)
+	{
+		$items = array();
+		$db = cmsms()->GetDb();
+		$info = $db->GetAll('SELECT * FROM '.$this->table);
+		if ($info) {
+			foreach ($info as $row) {
+				$keyword = $row['keyword'];
+				$value = (!is_null($row['value'])) ? unserialize($row['value']) : NULL;
+				$again = is_object($value); //get it again, in case the filter played with it!
+				if ($this->filterKey($filter,$keyword,$value)) {
+					if ($again) {
+						$value = unserialize($row['value']);
+					}
+					if (!is_null($value)) {
+						$items[$keyword] = $value;
+					}
+				}
 			}
-			return null;
 		}
-		//TODO array of 'all data' ?
-		return null;
+		return $items[];
 	}
 
-	function driver_getall($option = array()) {
-		$data = $this->db->GetCol('SELECT '.$this->fields[1].' FROM '.$this->table);
-		//take opportunity to conform
-		if($data) {
-			$this->index = array_fill_keys($data,1);
+	public function _has($keyword)
+	{
+		$db = cmsms()->GetDb();
+		$sql = 'SELECT cache_id,savetime,lifetime FROM '.$this->table.' WHERE keyword=?';
+		$row = $db->GetRow($sql,array($keyword));
+		if ($row) {
+			if (is_null($row['lifetime']) ||
+			  time() <= $row['savetime'] + $row['lifetime']) {
+				return TRUE;
+			}
+		}
+		return FALSE;
+	}
+
+	public function _delete($keyword)
+	{
+		$db = cmsms()->GetDb();
+		if ($db->Execute('DELETE FROM '.$this->table.' WHERE keyword=?',array($keyword))) {
+			return TRUE;
 		} else {
-			$this->index = array();
+			return FALSE;
 		}
-		return $data;
 	}
 
-	function driver_isExisting($keyword) {
-		$data = $this->db->GetOne('SELECT 1 FROM '.$this->table.' WHERE '.$this->fields[1].'=?',array($keyword));
-		return ($data == 1);
-	}
-
-	function driver_stats($option = array()) {
-		$num = $this->db->GetOne('SELECT COUNT(*) FROM '.$this->table);
-		return array(
-			'info' => '',
-			'size' => $num,
-			'data' => '',
-		);
-	}
-
-	function driver_delete($keyword, $option = array()) {
-		if($this->db->Execute('DELETE FROM '.$this->table.' WHERE '.$this->fields[1].'=?',array($keyword))) {
-			unset($this->index[$keyword]);
-			return true;
+	public function _clean($filter)
+	{
+		$ret = TRUE;
+		$info = $db->GetAll('SELECT cache_id,keyword,value FROM '.$this->table);
+		if ($info) {
+			$sql = 'DELETE FROM '.$this->table.' WHERE cache_id=?';
+			foreach ($info as $row) {
+				$keyword = $row['keyword'];
+				$value = (!is_null($row['value'])) ? unserialize($row['value']) : NULL;
+				if ($this->filterKey($filter,$keyword,$value)) {
+					$ret = $ret && $db->Execute($sql,array($row['cache_id']));
+				}
+			}
 		}
-		return false;
-	}
-
-	function driver_clean($option = array()) {
-		$this->db->Execute('DELETE FROM '.$this->table);
-		$this->index = array();
+		return $ret;
 	}
 
 }
-
-?>

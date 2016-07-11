@@ -1,11 +1,11 @@
 <?php
 /*
- * Redis extension:
- * https://github.com/phpredis/phpredis
+ * Predis extension:
+ * https://github.com/nrk/predis
  */
 namespace MultiCache;
 
-class Cache_redis extends CacheBase implements CacheInterface
+class Cache_predis extends CacheBase implements CacheInterface
 {
 	protected $client;
 
@@ -16,8 +16,9 @@ class Cache_redis extends CacheBase implements CacheInterface
 	'password' => string
 	'database' => int
 	'timeout' => float seconds
+	'read_write_timeout' => float seconds
 	*/
-	public function __construct($config=array())
+	public function __construct($config = array())
 	{
 		if ($this->use_driver()) {
 			parent::__construct($config);
@@ -26,12 +27,15 @@ class Cache_redis extends CacheBase implements CacheInterface
 			}
 			unset($this->client);
 		}
-		throw new \Exception('no redis storage');
+		throw new \Exception('no predis storage');
 	}
 
 	public function use_driver()
 	{
-		return class_exists('Redis');
+		if (extension_loaded('Redis')) {
+			return FALSE; //native Redis extension is installed, prefer Redis to increase performance
+		}
+        return class_exists('Predis\Client');
 	}
 
 	public function connectServer()
@@ -40,20 +44,35 @@ class Cache_redis extends CacheBase implements CacheInterface
 			'host' => '127.0.0.1',
 			'port'  => 6379,
 			'password' => '',
-			'database' => 0,
-			'timeout' => 0.0,
+			'database' => 0
 			), $this->config);
 
-		$this->client = new \Redis();
-		if (!$this->client->connect($params['host'],(int)$params['port'],(float)$params['timeout'])) {
-			return FALSE;
-		} elseif ($params['password'] && !$this->client->auth($params['password'])) {
-			return FALSE;
+		$c = array('host' => $params['host']);
+
+		if ($params['port']) {
+			$c['port'] = (int)$params['port'];
 		}
+
+		if ($params['password']) {
+			$c['password'] = $params['password'];
+		}
+
 		if ($params['database']) {
-			return $this->client->select((int)$params['database']);
+			$c['database'] = (int)$params['database'];
 		}
-		return TRUE;
+
+		$p = isset($params['timeout']) ? $params['timeout'] : '';
+		if ($p) {
+			$c['timeout'] = (float)$p;
+		}
+
+		$p = isset($params['read_write_timeout']) ? $params['read_write_timeout'] : '';
+		if ($p) {
+			$c['read_write_timeout'] = (float)$p;
+		}
+
+		$this->client = new \Predis\Client($c);
+		return $this->client !== NULL;
 	}
 
 	public function _newsert($keyword, $value, $lifetime=FALSE)
@@ -96,8 +115,7 @@ class Cache_redis extends CacheBase implements CacheInterface
 
 	public function _delete($keyword)
 	{
-		$this->client->delete($keyword);
-		return TRUE;
+		return $this->client->delete($keyword);
 	}
 
 	public function _clean($filter)
