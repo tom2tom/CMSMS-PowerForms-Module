@@ -1184,13 +1184,13 @@ The PowerBrowse module code provides an example of this process in use.<p>
 </ul>
 <h3>Requirements</h3>
 <ul>
-<li>PHP 5.1+ TODO</li>
+<li>PHP 5.3+</li>
 <li>PHP curl extension is needed if a 'SubmitForm' field is used</li>
 </ul>
 <h3>Desirables</h3>
 <ul>
 <li>PHP mcrypt extension for protecting cached data when a 'EmailConfirmation' field is used</li>
-<li>Cache operations are faster if a suitable PHP extension is available: TODO</li>
+<li>Cache operations are faster if at least one of these PHP cache modules: apc[u],[p]redis,wincache,xcache,yac is available</li>
 </ul>
 <h3>Support</h3>
 <p>This module is provided as-is. Please read the text of the license for the full disclaimer.
@@ -1205,7 +1205,7 @@ to help you with it:</p>
 </li>
 </ul>
 <h3>Copyright and license</h3>
-<p>Copyright &copy; 2012-2015 Tom Phane &lt;tpgww@onepost.net&gt;<br />
+<p>Copyright &copy; 2012-2016 Tom Phane &lt;tpgww@onepost.net&gt;<br />
 Derived from code copyright &copy; 2006-2012 Samuel Goldstein &lt;sjg@cmsmodules.com&gt;<br />
 All rights reserved.</p>
 <p>This module has been released under version 3 of the
@@ -1213,4 +1213,3 @@ All rights reserved.</p>
 The module must not be used otherwise than in acccordance with that license.</p>
 EOS;
 
-?>
