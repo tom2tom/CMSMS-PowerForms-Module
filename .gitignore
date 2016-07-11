@@ -1,3 +1,5 @@
 UNUSED*
 PowerForms*.project*
 PowerForms*.tags*
+.settings
+nbproject
