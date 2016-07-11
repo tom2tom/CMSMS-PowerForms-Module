@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
-# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
@@ -8,16 +8,16 @@ $tab = $this->GetActiveTab($params);
 
 $starts = $this->StartTabHeaders().
 	$this->SetTabHeader('maintab',$this->Lang('forms'),($tab == 'maintab'));
-if($pmod)
+if ($pmod)
 	$starts .= $this->SetTabHeader('import',$this->Lang('import'),($tab == 'import'));
-if($padm)
+if ($padm)
 	$starts .= $this->SetTabHeader('settings',$this->Lang('settings'),($tab == 'settings'));
 $starts .= $this->EndTabHeaders().$this->StartTabContent();
 
 $tplvars['tabs_start'] = $starts;
-if($pmod)
+if ($pmod)
 	$tplvars['importstab_start'] = $this->StartTab('import');
-if($padm)
+if ($padm)
 	$tplvars['settingstab_start'] = $this->StartTab('settings');
 
 $tplvars = $tplvars + array(
@@ -37,29 +37,25 @@ $jsincs = array();
 $baseurl = $this->GetModuleURLPath();
 
 //list all the extant forms
-$allforms = pwfUtils::GetForms();
-if($allforms)
-{
+$allforms = PowerForms\Utils::GetForms();
+if ($allforms) {
 	$tplvars['title_name'] = $this->Lang('title_form_name');
 	$tplvars['title_alias'] = ($pdev) ? $this->Lang('title_page_tag'):
 		$this->Lang('title_alias');
 
-	if($pmod)
-	{
+	if ($pmod) {
 		$iconedit = $theme->DisplayImage('icons/system/edit.gif',$this->Lang('edit'),'','','systemicon');
 		$iconcopy = $theme->DisplayImage('icons/system/copy.gif',$this->Lang('copy'),'','','systemicon');
 		$icondelete = $theme->DisplayImage('icons/system/delete.gif',$this->Lang('delete'),'','','systemicon');
 	}
 	$iconexport = '<img src="'.$this->GetModuleURLPath().'/images/xml.gif" class="systemicon" title="'.$this->Lang('export').'" alt="'.$this->Lang('export_tip').'" />';
-	if($pdev)
+	if ($pdev)
 		$modname = $this->GetName();
 	$data = array();
-	foreach($allforms as $one)
-	{
+	foreach ($allforms as $one) {
 		$fid = (int)$one['form_id'];
 		$oneset = new stdClass();
-		if($pmod)
-		{
+		if ($pmod) {
 			$oneset->name = $this->CreateLink($id,'update_form','',
 				$one['name'],array('formedit'=>1,'form_id'=>$fid)); //no formdata
 			$oneset->editlink = $this->CreateLink($id,'update_form','',
@@ -69,9 +65,7 @@ if($allforms)
 			$oneset->deletelink = $this->CreateLink($id,'delete_form','',
 				$icondelete,array('form_id'=>$fid),
 				$this->Lang('confirm_delete_form',$one['name']));
-		}
-		else
-		{
+		} else {
 			$oneset->name = $one['name'];
 		}
 		$oneset->alias = ($pdev) ?
@@ -83,7 +77,7 @@ if($allforms)
 	}
 	$tplvars['forms'] = $data;
 
-	if(count($data) > 1)
+	if (count($data) > 1)
 		$t = $this->CreateInputCheckbox($id,'item',TRUE,FALSE,'onclick="select_all(this);"');
 	else
 		$t = '';
@@ -91,22 +85,18 @@ if($allforms)
 	$tplvars['start_formsform'] = $this->CreateFormStart($id,'selected_forms',$returnid);
 	$tplvars['exportbtn'] = $this->CreateInputSubmit($id,'export',$this->Lang('export'),
 		'title="'.$this->Lang('tip_exportsel').'" onclick="return any_selected();"');
-	if($pmod)
-	{
+	if ($pmod) {
 		$tplvars['clonebtn'] = $this->CreateInputSubmit($id,'clone',$this->Lang('copy'),
 			'title="'.$this->Lang('tip_clonesel').'" onclick="return any_selected();"');
 		$tplvars['deletebtn'] = $this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
 			'title="'.$this->Lang('tip_deletesel').'" onclick="return confirm_selected(\''.
 			$this->Lang('confirm').'\');"');
 	}
-}
-else
-{
+} else {
 	$tplvars['noforms'] = $this->Lang('no_forms');
 }
 
-if($pmod)
-{
+if ($pmod) {
 	$tplvars['addlink'] = $this->CreateLink($id,'add_form','',
 		$theme->DisplayImage('icons/system/newobject.gif',$this->Lang('title_add_new_form'),'','','systemicon'));
 	$tplvars['addform'] = $this->CreateLink($id,'add_form','',
@@ -139,8 +129,7 @@ if($pmod)
 	);
 
 	$ob = $this->GetModuleInstance('FormBuilder');
-	if($ob)
-	{
+	if ($ob) {
 		unset($ob);
 		$tplvars['legend_fbimport'] = $this->Lang('title_importfb_legend');
 		$tplvars['start_importfbform'] = $this->CreateFormStart($id,'import_formbuilder',$returnid);
@@ -149,34 +138,27 @@ if($pmod)
 			'title="'.$this->Lang('tip_import_fb').'"');
 		$pre = cms_db_prefix();
 		$rs = $db->SelectLimit('SELECT trans_id FROM '.$pre.'module_pwf_trans',1);
-		if($rs)
-		{
-			if(!$rs->EOF)
-			{
+		if ($rs) {
+			if (!$rs->EOF) {
 				$rs->Close();
 				$rs = $db->SelectLimit('SELECT * FROM '.$pre.'module_pwbr_browser',1);
-				if($rs)
-				{
-					if(!$rs->EOF)
-					{
+				if ($rs) {
+					if (!$rs->EOF) {
 						$tplvars['submitdata'] = $this->CreateInputSubmit($id,'conform',
 							$this->Lang('import_browsedata'),
 							'title="'.$this->Lang('tip_import_browsedata').'"');
 					}
 					$rs->Close();
 				}
-			}
-			else
+			} else
 				$rs->Close();
 		}
 	}
 	$tplvars['pmod'] = 1;
-}
-else
+} else
 	$tplvars['pmod'] = 0;
 
-if($padm)
-{
+if ($padm) {
 	$cfgs = array();
 
 	$oneset = new stdClass();
@@ -222,8 +204,8 @@ if($padm)
 	$cfgs[] = $oneset;
 
 	$t = $this->GetPreference('masterpass');
-	if($t)
-		$t = pwfUtils::Unfusc($t);
+	if ($t)
+		$t = PowerForms\Utils::Unfusc($t);
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_password');
 	$oneset->input = $this->CreateTextArea(false,$id,$t,'masterpass','cloaked',
@@ -246,8 +228,7 @@ EOS;
 		'cancel' => $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel')),
 		'padm' => 1
 	);
-}
-else
+} else
 	$tplvars['padm'] = 0;
 
 $jsfuncs[] = <<<EOS
@@ -262,7 +243,7 @@ function any_selected() {
  return (sel_count() > 0);
 }
 function confirm_selected(msg) {
- if(sel_count() > 0) {
+ if (sel_count() > 0) {
   return confirm(msg);
  } else {
   return false;
@@ -271,8 +252,7 @@ function confirm_selected(msg) {
 
 EOS;
 
-if($jsloads)
-{
+if ($jsloads) {
 	$jsfuncs[] = '$(document).ready(function() {
 ';
 	$jsfuncs = array_merge($jsfuncs,$jsloads);
@@ -281,5 +261,3 @@ if($jsloads)
 }
 $tplvars['jsfuncs'] = $jsfuncs;
 $tplvars['jsincs'] = $jsincs;
-
-?>

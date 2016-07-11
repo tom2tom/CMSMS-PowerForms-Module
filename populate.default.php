@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
-# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module files (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -9,7 +9,7 @@ $tplvars = $tplvars + array(
 	'total_pages' => $formdata->PagesCount,
 	'this_page' => $formdata->Page,
 	'title_page_x_of_y' => $this->Lang('title_page_x_of_y',array($formdata->Page,$formdata->PagesCount)),
-	'css_class' => pwfUtils::GetFormOption($formdata,'css_class'),
+	'css_class' => PowerForms\Utils::GetFormOption($formdata,'css_class'),
 	'form_name' => $formdata->Name,
 	'form_id' => $formdata->Id,
 	'actionid' => $id
@@ -18,19 +18,17 @@ $tplvars = $tplvars + array(
 // Build hidden (see also the form parameters, below)
 $hidden = '';
 //TODO how/when should these be originally set ?
-if(!empty($params['in_browser']))
-{
+if (!empty($params['in_browser'])) {
 	$in_browser = 1;
 //	$tplvars['browser_id'] = (int)$params['browser_id'];
 	$hidden .= $this->CreateInputHidden($id,'in_browser',1);
 //	.$this->CreateInputHidden($id,'browser_id',$params['browser_id']);
-}
-else
+} else
 	$in_browser = 0;
 $tplvars['in_browser'] = $in_browser;
 $tplvars['in_admin'] = $in_browser; //deprecated template var
 
-$inline = (!$in_browser && pwfUtils::GetFormOption($formdata,'inline',0));
+$inline = (!$in_browser && PowerForms\Utils::GetFormOption($formdata,'inline',0));
 $form_start = $this->CreateFormStart($id,'default',$returnid,
 	'POST','multipart/form-data',$inline,'',array(
 	'form_id'=>$form_id,
@@ -38,66 +36,56 @@ $form_start = $this->CreateFormStart($id,'default',$returnid,
 	$formdata->current_prefix.'formpage'=>$formdata->Page));
 $form_end = $this->CreateFormEnd();
 
-//if($formdata->Page > 1)
+//if ($formdata->Page > 1)
 //	$hidden .= $this->CreateInputHidden($id,$formdata->current_prefix.'previous',($formdata->Page - 1)); //c.f. pwfp_NNN_prev for the button
-//if($formdata->Page < $formdata->PagesCount) //TODO c.f. $WalkPage in field-walker
+//if ($formdata->Page < $formdata->PagesCount) //TODO c.f. $WalkPage in field-walker
 //	$hidden .= $this->CreateInputHidden($id,$formdata->current_prefix.'continue',($formdata->Page + 1));
 
-$reqSymbol = pwfUtils::GetFormOption($formdata,'required_field_symbol','*');
+$reqSymbol = PowerForms\Utils::GetFormOption($formdata,'required_field_symbol','*');
 // Start building fields
 $fields = array();
 //$prev = array(); //make other-page field-values available to templates
 $WalkPage = 1; //'current' page for field-walk purposes
 
-foreach($formdata->FieldOrders as $one)
-{
+foreach ($formdata->FieldOrders as $one) {
 	$one = $formdata->Fields[$one];
 	$alias = $one->ForceAlias();
 
-	if($one->GetFieldType() == 'PageBreak')
+	if ($one->GetFieldType() == 'PageBreak')
 		$WalkPage++;
 
-	if($WalkPage != $formdata->Page)
-	{
+	if ($WalkPage != $formdata->Page) {
 		// not processing the 'current' form-page
 		// remember other-page field-values which haven't yet been saved ?
 		//TODO checkme double-underscore use ?
 		//FormBuilder uses 'fbrp__' lots (apparently for all 'input' fields)
 //		$valueindx = 'pwfp__'.$one->GetId();
-//		if(isset($params[$valueindx]))
-		if($one->IsInputField()) //TODO check logic
-		{
+//		if (isset($params[$valueindx]))
+		if ($one->IsInputField()) { //TODO check logic
 /*			$valueindx = $formdata->current_prefix.$one->GetId();
-			if(empty($params[$valueindx]))
-			{
+			if (empty($params[$valueindx])) {
 				$valueindx2 = $formdata->prior_prefix.$one->GetId();
-				if(empty($params[$valueindx2]))
+				if (empty($params[$valueindx2]))
 					$params[$valueindx] = 0; //assume an unchecked checkbox
 				else
 					$params[$valueindx] = $params[$valueindx2]; //prior-period-form value
 			}
-			if(is_array($params[$valueindx]))
-			{
+			if (is_array($params[$valueindx])) {
 				//hide all members of the value
-				foreach($params[$valueindx] as $val)
-				{
+				foreach ($params[$valueindx] as $val) {
 					$hidden .= $this->CreateInputHidden($id,
 								$valueindx.'[]',
-								pwfUtils::html_myentities_decode($val));
+								PowerForms\Utils::html_myentities_decode($val));
 				}
-			}
-			else
-			{
+			} else {
 				//hide the value
 				$hidden .= $this->CreateInputHidden($id,
 						   $valueindx,
-						   pwfUtils::html_myentities_decode($params[$valueindx]));
+						   PowerForms\Utils::html_myentities_decode($params[$valueindx]));
 			}
 */
-			if($one->DisplayInSubmission())
-			{
-/*TODO			if($WalkPage < $formdata->Page)
-				{
+			if ($one->DisplayInSubmission()) {
+/*TODO			if ($WalkPage < $formdata->Page) {
 					$oneset = new stdClass();
 					$oneset->value = $one->GetHumanReadableValue();
 					$tplvars[$one->GetName()] = $oneset;
@@ -106,7 +94,7 @@ foreach($formdata->FieldOrders as $one)
 				}
 */
 				$oneset = new stdClass();
-				if(is_array($params[$valueindx]))
+				if (is_array($params[$valueindx]))
 					$oneset->values = $params[$valueindx]; //CHECKME readable-version?
 				else
 					$oneset->values = array($params[$valueindx]);
@@ -126,7 +114,7 @@ foreach($formdata->FieldOrders as $one)
 	$oneset->error = $one->validated?'':$one->ValidationMessage;
 	$oneset->has_label = $one->HasLabel();
 	$oneset->helptext = $one->GetOption('helptext');
-	if($oneset->helptext)
+	if ($oneset->helptext)
 		$formdata->jscripts['helptoggle'] = 'construct';
 	$oneset->helptext_id = 'pwfp_ht_'.$one->GetID();
 	if ((!$one->HasLabel() || $one->GetHideLabel())
@@ -168,20 +156,17 @@ $jsincs = array();
 $jsfuncs = array();
 $jsloads = array();
 
-foreach($formdata->jscripts as $key=>$val)
-{
-	if($val != 'construct')
+foreach ($formdata->jscripts as $key=>$val) {
+	if ($val != 'construct')
 		$jsfuncs[] = $val;
-	else
-	{
-		switch($key)
-		{
+	else {
+		switch ($key) {
 		 case 'helptoggle':
 			$jsfuncs[] =<<<EOS
 function help_toggle(htid) {
  var help_container=document.getElementById(htid);
- if(help_container) {
-  if(help_container.style.display == 'none') {
+ if (help_container) {
+  if (help_container.style.display == 'none') {
    help_container.style.display = 'inline';
   } else {
    help_container.style.display = 'none';
@@ -200,16 +185,14 @@ EOS;
 <script type="text/javascript" src="{$baseurl}/include/mailcheck.min.js"></script>
 <script type="text/javascript" src="{$baseurl}/include/levenshtein.min.js"></script>
 EOS;
-			if(!function_exists('ConvertDomains'))
-			{
+			if (!function_exists('ConvertDomains')) {
 			 function ConvertDomains($pref)
 			 {
-				if(!$pref)
+				if (!$pref)
 					return '""';
 				$v3 = array();
 				$v2 = explode(',',$pref);
-				foreach($v2 as $one)
-				{
+				foreach ($v2 as $one) {
 					$v3[] = '\''.trim($one).'\'';
 				}
 				return implode(',',$v3);
@@ -217,19 +200,19 @@ EOS;
 			}
 			$pref = $this->GetPreference('email_topdomains');
 			$topdomains = ConvertDomains($pref);
-			if($topdomains)
+			if ($topdomains)
 				$topdomains = '  topLevelDomains: ['.$topdomains.'],'.PHP_EOL;
 			else
 				$topdomains = '';
 			$pref = $this->GetPreference('email_domains');
 			$domains = ConvertDomains($pref);
-			if($domains)
+			if ($domains)
 				$domains = '  domains: ['.$domains.'],'.PHP_EOL;
 			else
 				$domains = '';
 			$pref = $this->GetPreference('email_subdomains');
 			$l2domains = ConvertDomains($pref);
-			if($l2domains)
+			if ($l2domains)
 				$l2domains = '  secondLevelDomains: ['.$l2domains.'],'.PHP_EOL;
 			else
 				$l2domains = '';
@@ -245,7 +228,7 @@ EOS;
     return lv.get(string1,string2);
    },
    suggested: function(element,suggestion) {
-    if(confirm('{$intro} <strong><em>' + suggestion.full + '</em></strong>?')) {
+    if (confirm('{$intro} <strong><em>' + suggestion.full + '</em></strong>?')) {
      element.innerHTML = suggestion.full;
     } else {
      element.focus();
@@ -265,18 +248,17 @@ EOS;
 }
 unset($formdata->jscripts); //finished with this
 
-$buttonjs = pwfUtils::GetFormOption($formdata,'submit_javascript');
+$buttonjs = PowerForms\Utils::GetFormOption($formdata,'submit_javascript');
 
-if(pwfUtils::GetFormOption($formdata,'input_button_safety'))
-{
+if (PowerForms\Utils::GetFormOption($formdata,'input_button_safety')) {
 	$buttonjs .= ' onclick="return LockButton();"';
 	$jsfuncs[] = <<<EOS
 var submitted = false;
 function LockButton () {
- if(!submitted) {
+ if (!submitted) {
   submitted = true;
   var item = document.getElementById("{$id}submit");
-  if(item != NULL) {
+  if (item != NULL) {
    setTimeout(function() {item.disabled = true},0);
   }
   return true;
@@ -287,31 +269,27 @@ EOS;
 }
 
 //TODO id="*pwfp_prev" NOW id="*prev"
-if($formdata->Page > 1)
+if ($formdata->Page > 1)
 	$tplvars['prev'] = '<input type="submit" id="'.$id.'prev" class="cms_submit submit_prev" name="'.
 	$id.$formdata->current_prefix.'prev" value="'.
-	pwfUtils::GetFormOption($formdata,'prev_button_text',$this->Lang('previous')).'" '.
+	PowerForms\Utils::GetFormOption($formdata,'prev_button_text',$this->Lang('previous')).'" '.
 	$buttonjs.' />';
 else
 	$tplvars['prev'] = NULL;
 
-if($formdata->Page < $formdata->PagesCount)
-{
+if ($formdata->Page < $formdata->PagesCount) {
 	$tplvars['submit'] = '<input type="submit" id="'.$id.'submit" class="cms_submit submit_next" name="'.
 	$id.$formdata->current_prefix.'submit" value="'.
-	pwfUtils::GetFormOption($formdata,'next_button_text',$this->Lang('next')).'" '.
+	PowerForms\Utils::GetFormOption($formdata,'next_button_text',$this->Lang('next')).'" '.
 	$buttonjs.' />';
-}
-else
-{
+} else {
 	$tplvars['submit'] = '<input type="submit" id="'.$id.'submit" class="cms_submit submit_current" name="'.
 	$id.$formdata->current_prefix.'done" value="'.
-	pwfUtils::GetFormOption($formdata,'submit_button_text',$this->Lang('submit')).'" '.
+	PowerForms\Utils::GetFormOption($formdata,'submit_button_text',$this->Lang('submit')).'" '.
 	$buttonjs.' />';
 }
 
-if($jsloads)
-{
+if ($jsloads) {
 	$jsfuncs[] = '$(document).ready(function() {
 ';
 	$jsfuncs = array_merge($jsfuncs,$jsloads);
@@ -319,5 +297,3 @@ if($jsloads)
 ';
 }
 //don't bother pushing $js* to $tplvars - will echo directly
-
-?>

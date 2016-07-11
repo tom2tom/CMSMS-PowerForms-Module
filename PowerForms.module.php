@@ -34,7 +34,7 @@ class PowerForms extends CMSModule
 	//(we're concerned more about typo's than format!)
 	public $email_regex = '/.+@.+\..+/';
 
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 		global $CMS_VERSION;
@@ -48,188 +48,186 @@ class PowerForms extends CMSModule
 		$sep = strpos($url,'&amp;');
 		$this->Qurl = substr($url,0,$sep);
 */
-		require_once cms_join_path(dirname(__FILE__),'lib','class.pwfData.php');
+		require_once cms_join_path(__DIR__,'lib','class.Data.php');
 		$this->RegisterModulePlugin(TRUE);
 	}
 
-/*	function __destruct()
+/*	public function __destruct()
 	{
-		if($this->ch)
-		{
+		if ($this->ch) {
 			curl_multi_remove_handle($this->mh,$this->ch);
 			curl_close($this->ch);
 		}
-		if($this->mh)
+		if ($this->mh)
 			curl_multi_close($this->mh);
 //		parent::__destruct();
 	}
 */
-	function AllowAutoInstall()
+	public function AllowAutoInstall()
 	{
 		return FALSE;
 	}
 
-	function AllowAutoUpgrade()
+	public function AllowAutoUpgrade()
 	{
 		return FALSE;
 	}
 
 	//for 1.11+
-	function AllowSmartyCaching()
+	public function AllowSmartyCaching()
 	{
 		return FALSE;
 	}
 
-	function GetName()
+	public function GetName()
 	{
 		return 'PowerForms';
 	}
 
-	function GetFriendlyName()
+	public function GetFriendlyName()
 	{
 		return $this->Lang('friendly_name');
 	}
 
-	function GetHelp()
+	public function GetHelp()
 	{
 		return $this->Lang('help_module');
 	}
 
-	function GetVersion()
+	public function GetVersion()
 	{
 		return '0.1';
 	}
 
-	function GetAuthor()
+	public function GetAuthor()
 	{
 		return 'tomphantoo';
 	}
 
-	function GetAuthorEmail()
+	public function GetAuthorEmail()
 	{
 		return 'tpgww@onepost.net';
 	}
 
-	function GetChangeLog()
+	public function GetChangeLog()
 	{
-		$fn = cms_join_path(dirname(__FILE__),'include','changelog.inc');
+		$fn = cms_join_path(__DIR__,'include','changelog.inc');
 		return ''.@file_get_contents($fn);
 	}
 
-	function GetDependencies()
+	public function GetDependencies()
 	{
 		return array();
 	}
 
-	function GetEventDescription($eventname)
+	public function GetEventDescription($eventname)
 	{
 		return $this->Lang('event_info_'.$eventname);
 	}
 
-	function GetEventHelp($eventname)
+	public function GetEventHelp($eventname)
 	{
 		return $this->Lang('event_help_'.$eventname);
 	}
 
-	function get_tasks()
+	public function get_tasks()
 	{
-		return new pwfClearTablesTask();
+		return new PowerForms\ClearTablesTask();
 	}
 
-	function MinimumCMSVersion()
+	public function MinimumCMSVersion()
 	{
 		return '1.10'; //need class autoloading
 	}
 
-/*	function MaximumCMSVersion()
+/*	public function MaximumCMSVersion()
 	{
 	}
 */
-	function InstallPostMessage()
+	public function InstallPostMessage()
 	{
 		return $this->Lang('post_install');
 	}
 
-	function UninstallPreMessage()
+	public function UninstallPreMessage()
 	{
 		return $this->Lang('confirm_uninstall');
 	}
 
-	function UninstallPostMessage()
+	public function UninstallPostMessage()
 	{
 		return $this->Lang('post_uninstall');
 	}
 
-	function IsPluginModule()
+	public function IsPluginModule()
 	{
 		return TRUE;
 	}
 
-	function HasAdmin()
+	public function HasAdmin()
 	{
 		return TRUE;
 	}
 
-	function LazyLoadAdmin()
+	public function LazyLoadAdmin()
 	{
 		return FALSE;
 	}
 
-	function GetAdminSection()
+	public function GetAdminSection()
 	{
 		return 'extensions';
 	}
 
-	function GetAdminDescription()
+	public function GetAdminDescription()
 	{
 		return $this->Lang('admin_desc');
 	}
 
-	function VisibleToAdminUser()
+	public function VisibleToAdminUser()
 	{
 		return self::CheckAccess();
 	}
 
-	function GetHeaderHTML()
+	public function GetHeaderHTML()
 	{
 		return '<link rel="stylesheet" type="text/css" id="adminstyler" href="'.$this->GetModuleURLPath().'/css/admin.css" />';
 	}
 
-/*	function AdminStyle()
+/*	public function AdminStyle()
 	{
 	}
 */
-	function SuppressAdminOutput(&$request)
+	public function SuppressAdminOutput(&$request)
 	{
-		if(isset($_SERVER['QUERY_STRING']))
-		{
-			if(strpos($_SERVER['QUERY_STRING'],'export_form') !== FALSE)
+		if (isset($_SERVER['QUERY_STRING'])) {
+			if (strpos($_SERVER['QUERY_STRING'],'export_form') !== FALSE)
 				return TRUE;
-			if(strpos($_SERVER['QUERY_STRING'],'get_template') !== FALSE)
+			if (strpos($_SERVER['QUERY_STRING'],'get_template') !== FALSE)
 				return TRUE;
 		}
 		return FALSE;
 	}
 
-/*	function SupportsLazyLoading()
+/*	public function SupportsLazyLoading()
 	{
 		return TRUE;
 	}
 */
-	function LazyLoadFrontend()
+	public function LazyLoadFrontend()
 	{
 		return FALSE;
 	}
 
 	//setup for pre-1.10
-	function SetParameters()
+	public function SetParameters()
 	{
 		self::InitializeAdmin();
 		self::InitializeFrontend();
 	}
 
 	//partial setup for pre-1.10, backend setup for 1.10+
-	function InitializeFrontend()
+	public function InitializeFrontend()
 	{
 		$this->RestrictUnknownParams();
 		$this->SetParameterType('form',CLEAN_STRING);
@@ -244,7 +242,7 @@ class PowerForms extends CMSModule
 	/**
 	Partial setup for 1.10+
 	*/
-	function InitializeAdmin()
+	public function InitializeAdmin()
 	{
 		//document only the parameters relevant for external (page-tag) usage
 		$this->CreateParameter('form','',$this->Lang('param_form_alias'),FALSE);
@@ -257,22 +255,21 @@ class PowerForms extends CMSModule
 
 // ~~~~~~~~~~~~~~~~~~~~~ NON-CMSModule METHODS ~~~~~~~~~~~~~~~~~~~~~
 
-	function CheckAccess($permission='')
+	public function CheckAccess($permission='')
 	{
-		switch($permission)
-		{
+		switch ($permission) {
 		 case 'ModifyPFForms':
- 			if($this->CheckPermission('ModifyPFForms'))
+ 			if ($this->CheckPermission('ModifyPFForms'))
 				return TRUE;
 			$desc = '"'.$this->Lang('perm_modify').'"';
 			break;
 		 case 'ModifyPFSettings':
-			if($this->CheckPermission('ModifyPFSettings'))
+			if ($this->CheckPermission('ModifyPFSettings'))
 				return TRUE;
 			$desc = '"'.$this->Lang('perm_admin').'"';
 			break;
 		 default:
-			if($this->CheckPermission('ModifyPFForms')
+			if ($this->CheckPermission('ModifyPFForms')
 			|| $this->CheckPermission('ModifyPFSettings'))
 				return TRUE;
 			$desc = $this->Lang('perm_any');
@@ -281,24 +278,22 @@ class PowerForms extends CMSModule
 		return FALSE;
 	}
 
-	function GetActiveTab(&$params)
+	public function GetActiveTab(&$params)
 	{
-		if(!empty($params['active_tab']))
+		if (!empty($params['active_tab']))
 		    return $params['active_tab'];
 		else
 			return 'maintab';
 	}
 
-	function PrettyMessage($text,$success=TRUE,$faillink=FALSE,$key=TRUE)
+	public function PrettyMessage($text,$success=TRUE,$faillink=FALSE,$key=TRUE)
 	{
 		$base = ($key) ? $this->Lang($text) : $text;
 		if ($success)
 			return $this->ShowMessage($base);
-		else
-		{
+		else {
 			$msg = $this->ShowErrors($base);
-			if ($faillink == FALSE)
-			{
+			if ($faillink == FALSE) {
 				//strip the link
 				$pos = strpos($msg,'<a href=');
 				$part1 = ($pos !== FALSE) ? substr($msg,0,$pos) : '';
@@ -310,19 +305,19 @@ class PowerForms extends CMSModule
 		}
 	}
 
-	function &GetFormData(&$params=NULL)
+	public function &GetFormData(&$params=NULL)
 	{
-		$fd = new pwfData();
+		$fd = new PowerForms\Data();
 
 		$fd->formsmodule =& $this;
 		list($fd->current_prefix,$fd->prior_prefix) = $this->GetTokens();
 
-		if($params == NULL)
+		if ($params == NULL)
 			return $fd;
 
-		if(isset($params['form_id']))
+		if (isset($params['form_id']))
 			$fd->Id = (int)$params['form_id'];
-		if(isset($params['form_alias']))
+		if (isset($params['form_alias']))
 			$fd->Alias = trim($params['form_alias']);
 		return $fd;
 	}
@@ -334,7 +329,7 @@ class PowerForms extends CMSModule
 	Submitted data will be accepted if the parameter-keys of that data include
 	either the 'current-period' prefix or the 'previous-period' one
 	*/
-	function GetTokens()
+	public function GetTokens()
 	{
 		$now = time();
 		$base = floor($now / (84600 * 1800)) * 1800; //start of current 30-mins
@@ -351,56 +346,51 @@ class PowerForms extends CMSModule
 		$n = ''.$num;
 		$l = strlen($n);
 		$hash = 5381;
-		for($i = 0; $i < $l; $i++)
+		for ($i = 0; $i < $l; $i++)
 			$hash = $hash * 33 + $n[$i];
 		return substr($hash,-3);
 	}
 
-	function RegisterField($classfilepath)
+	public function RegisterField($classfilepath)
 	{
 		$basename = basename($classfilepath);
 		$fp = cms_join_path($this->GetModulePath(),'lib',$basename);
 		copy($classfilepath,$fp);
 		
-		$classname = pwfUtils::FileClassName($basename);
+		$classname = PowerForms\Utils::FileClassName($basename);
 		//cache field data to be ready for restarts
 		$imports = $this->GetPreference('imported_fields');
-		if($imports)
-		{
+		if ($imports) {
 			$imports = unserialize($imports);
 			$imports[] = $classname;
-		}
-		else
-		{
+		} else {
 			$imports = array($classname);
 		}
 		$this->SetPreference('imported_fields',serialize($imports));
-		if($this->field_types)
-			pwfUtils::Show_Field($this,$classname);
+		if ($this->field_types)
+			PowerForms\Utils::Show_Field($this,$classname);
 	}
 	
-	function DeregisterField($classfilepath)
+	public function DeregisterField($classfilepath)
 	{
 		$basename = basename($classfilepath);
-		$classname = pwfUtils::FileClassName($basename);
+		$classname = PowerForms\Utils::FileClassName($basename);
 		$fp = cms_join_path($this->GetModulePath(),'lib',$basename);
-		if(is_file($fp))
+		if (is_file($fp))
 			unlink($fp);
-		if($this->field_types)
-		{
+		if ($this->field_types) {
 			$menuname = array_search($classname,$this->field_types);
-			if($menuname !== FALSE)
+			if ($menuname !== FALSE)
 				unset($this->field_types[$menuname]);
 		}
 		//uncache this data
 		$imports = $this->GetPreference('imported_fields');
-		if($imports)
-		{
+		if ($imports) {
 			$imports = unserialize($imports);
 			$key = array_search($classname,$imports);
-			if($key !== FALSE)
+			if ($key !== FALSE)
 				unset($imports[$key]);
-			if($imports)
+			if ($imports)
 				$this->SetPreference('imported_fields',serialize($imports));
 			else
 				$this->SetPreference('imported_fields',FALSE);
@@ -411,8 +401,7 @@ class PowerForms extends CMSModule
 		$sql = 'SELECT field_id FROM '.$pre.'module_pwf_field WHERE type=?';
 		$classname = substr($classname,3); //strip 'pwf' namespace
 		$ids = $db->GetCol($sql,array($classname));
-		if($ids)
-		{
+		if ($ids) {
 			$join = implode(',',$ids);
 			$sql = 'DELETE FROM '.$pre.'module_pwf_field_opt WHERE field_id IN('.$join.')';
 			$db->Execute($sql);
@@ -420,7 +409,4 @@ class PowerForms extends CMSModule
 			$db->Execute($sql);
 		}
 	}
-
 }
-
-?>

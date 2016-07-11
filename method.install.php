@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
-# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -124,14 +124,12 @@ $this->SetPreference('require_fieldnames',1);
 $this->SetPreference('submit_limit',0);
 
 $fp = $config['uploads_path'];
-if($fp && is_dir($fp))
-{
+if ($fp && is_dir($fp)) {
 	$ud = $this->GetName();
 	$fp = $fp.DIRECTORY_SEPARATOR.$ud;
-	if(!(is_dir($fp) || mkdir($fp,0644)))
+	if (!(is_dir($fp) || mkdir($fp,0644)))
 		$ud = '';
-}
-else
+} else
 	$ud = '';
 $this->SetPreference('uploads_dir',$ud); //path relative to host uploads dir
 
@@ -142,17 +140,15 @@ $this->CreateEvent('OnFormDisplay');
 $this->CreateEvent('OnFormSubmit');
 $this->CreateEvent('OnFormSubmitError');
 
-$css = @file_get_contents(cms_join_path(dirname(__FILE__),'css','default.css'));
+$css = @file_get_contents(cms_join_path(__DIR__,'css','default.css'));
 $css_id = $db->GenID($pre.'css_seq');
 $db->Execute('INSERT INTO '.$pre.'css (css_id,css_name,css_text,media_type,create_date) VALUES (?,?,?,?,?)',
 	array($css_id,'PowerForms Default Style',$css,'screen',date('Y-m-d')));
 
-if(!$this->before20)
-{
+if (!$this->before20) {
 	$myname = $this->GetName();
 //	$me = get_userid(false);
-	foreach(array('form','submission') as $name)
-	{
+	foreach (array('form','submission') as $name) {
 		$ttype = new CmsLayoutTemplateType();
 		$ttype->set_originator($myname);
 		$ttype->set_name($name);
@@ -161,17 +157,12 @@ if(!$this->before20)
 	}
 }
 
-$funcs = new pwfFormOperations();
-$path = cms_join_path(dirname(__FILE__),'include');
+$funcs = new PowerForms\FormOperations();
+$path = cms_join_path(__DIR__,'include');
 $dir = opendir($path);
-while($filespec = readdir($dir))
-{
-	if(preg_match('/.xml$/',$filespec) > 0)
-	{
+while ($filespec = readdir($dir)) {
+	if (preg_match('/.xml$/',$filespec) > 0) {
 		$fp = cms_join_path($path,$filespec);
 		$funcs->ImportXML($this,$fp);
 	}
 }
-
-
-?>

@@ -1,10 +1,10 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
-# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if(!empty($message))
+if (!empty($message))
 	$tplvars['message'] = $message;
 
 $tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$this->Lang('back_top'));
@@ -17,7 +17,7 @@ $tplvars['form_start'] = $this->CreateFormStart($id,'update_form',$returnid,
 $tab = $this->GetActiveTab($params);
 $t = $this->StartTabHeaders().
 	$this->SetTabHeader('maintab',$this->Lang('tab_form'),($tab == 'maintab'));
-if($form_id > 0)
+if ($form_id > 0)
 	$t .= $this->SetTabHeader('fieldstab',$this->Lang('tab_fields'),($tab == 'fieldstab'));
 $t .=
 	$this->SetTabHeader('designtab',$this->Lang('tab_design'),($tab == 'designtab')).
@@ -26,7 +26,7 @@ $t .=
 	$this->SetTabHeader('submittab',$this->Lang('tab_submit'),($tab == 'submittab')).
 	$this->EndTabHeaders().$this->StartTabContent();
 $tplvars['tabs_start'] = $t;
-if($form_id > 0)
+if ($form_id > 0)
 	$tplvars['fieldstab_start'] = $this->StartTab('fieldstab');
 $tplvars = $tplvars + array(
 	'tabs_end' => $this->EndTabContent(),
@@ -56,14 +56,14 @@ $tplvars = $tplvars + array(
 
 	'title_form_css_class' => $this->Lang('title_form_css_class'),
 	'input_form_css_class' => $this->CreateInputText($id,'opt_css_class',
-		pwfUtils::GetFormOption($formdata,'css_class','powerform'),50,50),
+		PowerForms\Utils::GetFormOption($formdata,'css_class','powerform'),50,50),
 
 	'title_form_fields' => $this->Lang('title_form_fields'),
 	'title_form_main' => $this->Lang('title_form_main'),
 
 	'title_form_unspecified' => $this->Lang('title_form_unspecified'),
 	'input_form_unspecified' =>	$this->CreateInputText($id,'opt_unspecified',
-		pwfUtils::GetFormOption($formdata,'unspecified',$this->Lang('unspecified')),30),
+		PowerForms\Utils::GetFormOption($formdata,'unspecified',$this->Lang('unspecified')),30),
 
 	'title_information' => $this->Lang('information'),
 //	'title_order' => $this->Lang('order'),
@@ -103,19 +103,16 @@ $count = 1;
 $dcount = 1;
 $total = count($formdata->Fields);
 $dtotal = 0;
-if($total > 0)
-{
-	foreach($formdata->Fields as &$one)
-	{
-		if($one->IsDisposition())
+if ($total > 0) {
+	foreach ($formdata->Fields as &$one) {
+		if ($one->IsDisposition())
 			$dtotal++;
 	}
 	unset($one);
 	$total -= $dtotal;
 }
 
-foreach($formdata->FieldOrders as $one)
-{
+foreach ($formdata->FieldOrders as $one) {
 	$one = $formdata->Fields[$one];
 	$oneset = new stdClass();
 	$fid = (int)$one->GetId();
@@ -139,15 +136,14 @@ foreach($formdata->FieldOrders as $one)
 		'','','',
 		'onclick="delete_field(\''.$this->Lang('confirm_delete_field',htmlspecialchars($one->GetName())).'\');return FALSE;"');
 
-	if($one->IsDisposition())
-	{
-		if($dcount > 1)
+	if ($one->IsDisposition()) {
+		if ($dcount > 1)
 			$oneset->up = $this->CreateLink($id,'update_form','',
 			$iconup,
 			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'up'));
 		else
 			$oneset->up = '';
-		if($dcount < $dtotal)
+		if ($dcount < $dtotal)
 			$oneset->down = $this->CreateLink($id,'update_form','',
 			$icondown,
 			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'down'));
@@ -156,12 +152,10 @@ foreach($formdata->FieldOrders as $one)
 
 		$dispositions[] = $oneset;
 		$dcount++;
-	}
-	else
-	{
-		if(!$one->DisplayInForm() || !$one->GetChangeRequirement())
+	} else {
+		if (!$one->DisplayInForm() || !$one->GetChangeRequirement())
 			$oneset->required = '';
-		elseif($one->GetRequired())
+		elseif ($one->GetRequired())
 			$oneset->required = $this->CreateLink($id,'update_form','',
 				$icontrue,
 				array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'active'=>'off'),
@@ -172,13 +166,13 @@ foreach($formdata->FieldOrders as $one)
 				array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'active'=>'on'),
 				'','','','class="false" onclick="update_field_required();return false;"');
 
-		if($count > 1)
+		if ($count > 1)
 			$oneset->up = $this->CreateLink($id,'update_form','',
 			$iconup,
 			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'up'));
 		else
 			$oneset->up = '';
-		if($count < $total)
+		if ($count < $total)
 			$oneset->down = $this->CreateLink($id,'update_form','',
 			$icondown,
 			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'down'));
@@ -190,12 +184,9 @@ foreach($formdata->FieldOrders as $one)
 	}
 }
 
-if($fields)
-{
+if ($fields) {
 	$tplvars['fields'] = $fields;
-}
-else
-{
+} else {
 	$tplvars = $tplvars + array(
 		'nofields' => $this->Lang('no_fields'),
 		'text_ready' => '',
@@ -204,15 +195,12 @@ else
 	);
 }
 
-if($dispositions)
-{
+if ($dispositions) {
 	$tplvars = $tplvars + array(
 		'dispositions' => $dispositions,
 		'text_ready' => $this->Lang('title_ready')
 	);
-}
-else
-{
+} else {
 	$tplvars = $tplvars + array(
 		'nodispositions' => $this->Lang('no_dispositions'),
 		'text_ready' => '',
@@ -264,24 +252,20 @@ EOS;
 //CmsLayoutTemplate::get_designs() TODO
 //CmsLayoutTemplate::set_designs()
 
-pwfUtils::Collect_Fields($this);
+PowerForms\Utils::Collect_Fields($this);
 
 $displays = array($this->Lang('select_type')=>''); //non-disposition fields
 $dispositions = $displays; //non-disposition field
 
-if($this->GetPreference('adder_fields','basic') == 'basic')
-{
-	foreach($this->std_field_types as $l=>$t)
-	{
+if ($this->GetPreference('adder_fields','basic') == 'basic') {
+	foreach ($this->std_field_types as $l=>$t) {
 		$one = new $t($formdata,$params);
-		if($one->IsDisposition())
-		{
-			if($one->IsInput)
+		if ($one->IsDisposition()) {
+			if ($one->IsInput)
 				$displays[$l] = $t;
 			else
 				$dispositions[$l] = $t;
-		}
-		else
+		} else
 			$displays[$l] = $t;
 	}
 	unset($one);
@@ -299,20 +283,15 @@ if($this->GetPreference('adder_fields','basic') == 'basic')
 		$t.
 		$this->CreateLink($id,'update_form',$returnid,$this->Lang('title_switch_advanced_link'),
 		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'submittab','set_field_level'=>'advanced'));
-}
-else
-{
-	foreach($this->field_types as $l=>$t)
-	{
+} else {
+	foreach ($this->field_types as $l=>$t) {
 		$one = new $t($formdata,$params);
-		if($one->IsDisposition())
-		{
-			if($one->IsInput)
+		if ($one->IsDisposition()) {
+			if ($one->IsInput)
 				$displays[$l] = $t;
 			else
 				$dispositions[$l] = $t;
-		}
-		else
+		} else
 			$displays[$l] = $t;
 	}
 	unset($one);
@@ -339,66 +318,66 @@ $tplvars['title_inline_form'] = $this->Lang('title_inline_form');
 $tplvars['input_inline_form'] =
 	$this->CreateInputHidden($id,'opt_inline',0).
 	$this->CreateInputCheckbox($id,'opt_inline',1,
-		pwfUtils::GetFormOption($formdata,'inline',0)).'<br />'.
+		PowerForms\Utils::GetFormOption($formdata,'inline',0)).'<br />'.
 	$this->Lang('help_inline_form');
 
 $tplvars['title_form_submit_button'] = $this->Lang('title_form_submit_button');
 $tplvars['input_form_submit_button'] =
 	$this->CreateInputText($id,'opt_submit_button_text',
-		pwfUtils::GetFormOption($formdata,'submit_button_text',$this->Lang('button_submit')),35,35);
+		PowerForms\Utils::GetFormOption($formdata,'submit_button_text',$this->Lang('button_submit')),35,35);
 
 $tplvars['title_submit_button_safety'] = $this->Lang('title_submit_button_safety');
 $tplvars['input_submit_button_safety'] =
 	$this->CreateInputHidden($id,'opt_input_button_safety',0).
 	$this->CreateInputCheckbox($id,'opt_input_button_safety',1,
-		pwfUtils::GetFormOption($formdata,'input_button_safety',0)).'<br />'.
+		PowerForms\Utils::GetFormOption($formdata,'input_button_safety',0)).'<br />'.
 	$this->Lang('help_submit_safety');
 
 $tplvars['title_form_prev_button'] = $this->Lang('title_form_prev_button');
 $tplvars['input_form_prev_button'] =
 	$this->CreateInputText($id,'opt_prev_button_text',
-		pwfUtils::GetFormOption($formdata,'prev_button_text',$this->Lang('button_previous')),35,35);
+		PowerForms\Utils::GetFormOption($formdata,'prev_button_text',$this->Lang('button_previous')),35,35);
 
 $tplvars['title_form_next_button'] = $this->Lang('title_form_next_button');
 $tplvars['input_form_next_button'] =
 	$this->CreateInputText($id,'opt_next_button_text',
-		pwfUtils::GetFormOption($formdata,'next_button_text',$this->Lang('button_continue')),35,35);
+		PowerForms\Utils::GetFormOption($formdata,'next_button_text',$this->Lang('button_continue')),35,35);
 
 $usertagops = cmsms()->GetUserTagOperations();
 $usertags = $usertagops->ListUserTags();
 $usertaglist = array();
 $usertaglist[$this->Lang('none')] = '';
-foreach($usertags as $key => $value)
+foreach ($usertags as $key => $value)
 	$usertaglist[$value] = $key;
 
 $tplvars['title_form_predisplay_udt'] = $this->Lang('title_form_predisplay_udt');
 $tplvars['input_form_predisplay_udt'] =
 	$this->CreateInputDropdown($id,'opt_predisplay_udt',$usertaglist,-1,
-		pwfUtils::GetFormOption($formdata,'predisplay_udt'));
+		PowerForms\Utils::GetFormOption($formdata,'predisplay_udt'));
 
 $tplvars['title_form_predisplay_each_udt'] = $this->Lang('title_form_predisplay_each_udt');
 $tplvars['input_form_predisplay_each_udt'] =
 	$this->CreateInputDropdown($id,'opt_predisplay_each_udt',$usertaglist,-1,
-		pwfUtils::GetFormOption($formdata,'predisplay_each_udt'));
+		PowerForms\Utils::GetFormOption($formdata,'predisplay_each_udt'));
 
 $tplvars['title_form_validate_udt'] = $this->Lang('title_form_validate_udt');
 $tplvars['input_form_validate_udt'] =
 	$this->CreateInputDropdown($id,'opt_validate_udt',$usertaglist,-1,
-		pwfUtils::GetFormOption($formdata,'validate_udt'));
+		PowerForms\Utils::GetFormOption($formdata,'validate_udt'));
 
 $tplvars['title_form_required_symbol'] = $this->Lang('title_form_required_symbol');
 $tplvars['input_form_required_symbol'] =
 	 $this->CreateInputText($id,'opt_required_field_symbol',
-		pwfUtils::GetFormOption($formdata,'required_field_symbol','*'),5);
+		PowerForms\Utils::GetFormOption($formdata,'required_field_symbol','*'),5);
 
 $tplvars['title_list_delimiter'] = $this->Lang('title_list_delimiter');
 $tplvars['input_list_delimiter'] =
 	$this->CreateInputText($id,'opt_list_delimiter',
-		pwfUtils::GetFormOption($formdata,'list_delimiter',','),5);
+		PowerForms\Utils::GetFormOption($formdata,'list_delimiter',','),5);
 
 $tplvars['title_submit_javascript'] = $this->Lang('title_submit_javascript');
 $tplvars['input_submit_javascript'] =
-	$this->CreateTextArea(FALSE,$id,pwfUtils::GetFormOption($formdata,'submit_javascript',''),
+	$this->CreateTextArea(FALSE,$id,PowerForms\Utils::GetFormOption($formdata,'submit_javascript',''),
 		'opt_submit_javascript','pwf_shortarea','submit_javascript',
 		'','',50,8).
 		'<br />'.$this->Lang('help_submit_javascript');
@@ -406,17 +385,16 @@ $tplvars['input_submit_javascript'] =
 $tplvars['title_submit_limit'] = $this->Lang('title_submit_limit');
 $tplvars['input_submit_limit'] =
 	$this->CreateInputText($id,'opt_submit_limit',
-		pwfUtils::GetFormOption($formdata,'submit_limit',$this->GetPreference('submit_limit')),3,5);
+		PowerForms\Utils::GetFormOption($formdata,'submit_limit',$this->GetPreference('submit_limit')),3,5);
 
 $templateList = array(''=>'',
 	$this->Lang('default_template')=>'defaultform.tpl',
 	$this->Lang('table_left_template')=>'tableform_lefttitles.tpl',
 	$this->Lang('table_top_template')=>'tableform_toptitles.tpl');
 
-$allForms = pwfUtils::GetForms();
-foreach($allForms as $one)
-{
-	if($one['form_id'] != $form_id)
+$allForms = PowerForms\Utils::GetForms();
+foreach ($allForms as $one) {
+	if ($one['form_id'] != $form_id)
 		$templateList[$this->Lang('form_template_name',$one['name'])] = $one['form_id'];
 }
 
@@ -425,10 +403,9 @@ $tplvars['title_load_template'] = $this->Lang('title_load_template');
 $tplvars['input_load_template'] = $this->CreateInputDropdown($id,'template_load',
 	$templateList,-1,'','id="template_load" onchange="get_template(\''.$this->Lang('confirm_template').'\',\''.$thisLink.'\');"');
 
-if($this->before20)
+if ($this->before20)
 	$tpl = $this->GetTemplate('pwf::'.$form_id);
-else
-{
+else {
 	$ob = CmsLayoutTemplate::load('pwf::'.$form_id);
 	$tpl = $ob->get_content();
 }
@@ -442,22 +419,21 @@ $postsubmits = array($this->Lang('redirect_to_page')=>'redir',$this->Lang('displ
 $tplvars['title_submit_action'] = $this->Lang('title_submit_action');
 $tplvars['input_submit_action'] =
 	$this->CreateInputRadioGroup($id,'opt_submit_action',$postsubmits,
-		pwfUtils::GetFormOption($formdata,'submit_action','text'),'','&nbsp;&nbsp;');
+		PowerForms\Utils::GetFormOption($formdata,'submit_action','text'),'','&nbsp;&nbsp;');
 
 $tplvars['title_redirect_page'] = $this->Lang('title_redirect_page');
 $tplvars['input_redirect_page'] =
-	pwfUtils::CreateHierarchyPulldown($this,$id,'opt_redirect_page',
-		pwfUtils::GetFormOption($formdata,'redirect_page',0));
+	PowerForms\Utils::CreateHierarchyPulldown($this,$id,'opt_redirect_page',
+		PowerForms\Utils::GetFormOption($formdata,'redirect_page',0));
 
-if($this->before20)
+if ($this->before20)
 	$tpl = $this->GetTemplate('pwf::sub_'.$form_id);
-else
-{
+else {
 	$ob = CmsLayoutTemplate::load('pwf::sub_'.$form_id);
 	$tpl = $ob->get_content();
 }
-if(!$tpl)
-	$tpl = pwfUtils::CreateDefaultTemplate($formdata,TRUE,FALSE); //? generate default for CmsLayoutTemplateType
+if (!$tpl)
+	$tpl = PowerForms\Utils::CreateDefaultTemplate($formdata,TRUE,FALSE); //? generate default for CmsLayoutTemplateType
 $tplvars['title_submit_template'] = $this->Lang('title_submit_response');
 //note WYSIWYG is no good, the MCE editor stuffs around with the template contents
 $tplvars['input_submit_template'] =
@@ -466,7 +442,7 @@ $tplvars['input_submit_template'] =
 //setup to revert to 'sample' submission-template
 $ctlData = array();
 $ctlData['opt_submission_template']['general_button'] = TRUE;
-list($buttons,$funcs) = pwfUtils::TemplateActions($formdata,$id,$ctlData);
+list($buttons,$funcs) = PowerForms\Utils::TemplateActions($formdata,$id,$ctlData);
 $jsfuncs[] = $funcs[0];
 $tplvars = $tplvars + array(
 	'sample_submit_template' => $buttons[0],
@@ -482,7 +458,7 @@ $tplvars = $tplvars + array(
 
 //help for form-template
 $formvars = array();
-foreach(array(
+foreach (array(
 	'total_pages',
 	'this_page',
 	'title_page_x_of_y',
@@ -507,12 +483,9 @@ foreach(array(
 	$oneset->description = $this->Lang('desc_'.$name);
 	$formvars[] = $oneset;
 }
-if($formdata->Fields)
-{
-	foreach($formdata->Fields as &$one)
-	{
-		if($one->DisplayInSubmission())
-		{
+if ($formdata->Fields) {
+	foreach ($formdata->Fields as &$one) {
+		if ($one->DisplayInSubmission()) {
 			$oneset = new stdClass();
 			$oneset->name = $one->GetVariableName().'} / {$fld_'.$one->GetId();
 			$oneset->description = $this->Lang('field_named',$one->GetName());
@@ -523,10 +496,9 @@ if($formdata->Fields)
 }
 $tplvars['formvars'] = $formvars;
 
-if($formdata->Fields)
-{
+if ($formdata->Fields) {
 	$fieldprops = array();
-	foreach(array(
+	foreach (array(
 		'alias',
 		'css_class',
 		'display',
@@ -553,7 +525,7 @@ if($formdata->Fields)
 	{
 		$oneset = new stdClass();
 		$oneset->name = $name;
-		if($name != 'css_class')
+		if ($name != 'css_class')
 			$oneset->description = $this->Lang('desc_'.$name);
 		else
 			$oneset->description = $this->Lang('desc_cssf_class'); //work around duplicate
@@ -563,15 +535,14 @@ if($formdata->Fields)
 }
 
 //help for submission-template
-pwfUtils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
+PowerForms\Utils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
 
 $jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/include/jquery.tablednd.min.js"></script>
 <script type="text/javascript" src="{$baseurl}/include/module.js"></script>
 EOS;
 
-if($jsloads)
-{
+if ($jsloads) {
 	$jsfuncs[] = '$(document).ready(function() {
 ';
 	$jsfuncs = array_merge($jsfuncs,$jsloads);
@@ -580,5 +551,3 @@ if($jsloads)
 }
 $tplvars['jsfuncs'] = $jsfuncs;
 $tplvars['jsincs'] = $jsincs;
-
-?>

@@ -1,48 +1,38 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
-# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if(isset($params['cancel']))
-{
+if (isset($params['cancel'])) {
 	$this->Redirect($id,'defaultadmin');
-}
-elseif(isset($params['save']))
-{
+} elseif (isset($params['save'])) {
 	$name = trim($params['form_name']);
 	$alias = trim($params['form_alias']);
-	if(!$alias)
-	{
-		if($name)
-			$alias = pwfUtils::MakeAlias($name);
+	if (!$alias) {
+		if ($name)
+			$alias = PowerForms\Utils::MakeAlias($name);
 		else
 			$name = '<'.$this->Lang('tab_form').'>'; //alias stays empty
 		$seetab = 'maintab';
-	}
-	elseif(!$name)
-	{
+	} elseif (!$name) {
 		$name = $alias;
 		$seetab = 'maintab';
-	}
-	else
+	} else
 		$seetab = 'fieldstab';
 	$params['form_name'] = $name;
 	$params['form_alias'] = $alias;
 
-	$funcs = new pwfFormOperations();
-	if(isset($params['form_id']))
-	{
+	$funcs = new PowerForms\FormOperations();
+	if (isset($params['form_id'])) {
 		$newid = $funcs->Copy($this,$id,$params,$params['form_id']);
-		if(!$newid)
+		if (!$newid)
 			$this->Redirect($id,'defaultadmin','',array(
 				'message'=>$this->PrettyMessage('error_copy2',FALSE)));
 		$seetab = 'maintab'; //name/alias will be different
-	}
-	else
-	{
+	} else {
 		$newid = $funcs->Add($this,$params);
-		if(!$newid)
+		if (!$newid)
 			$this->Redirect($id,'defaultadmin','',array(
 				'message'=>$this->PrettyMessage('error_name',FALSE)));
 	}
@@ -51,19 +41,16 @@ elseif(isset($params['save']))
 		'formedit'=>1,'form_id'=>$newid,'active_tab'=>$seetab)); //no formdata parameter
 }
 
-if(isset($params['form_id']))
-{
+if (isset($params['form_id'])) {
 	$h = $this->CreateInputHidden($id,'form_id',$params['form_id']); //remember what to copy
 	$t = $this->Lang('copy');
-	$name = pwfUtils::GetFormNameFromID($params['form_id']);
-	if($name)
+	$name = PowerForms\Utils::GetFormNameFromID($params['form_id']);
+	if ($name)
 		$name .= ' '.$t;
-	$alias = pwfUtils::GetFormAliasFromID($params['form_id']);
-	if($alias)
-		$alias .= '_'.pwfUtils::MakeAlias($t);
-}
-else
-{
+	$alias = PowerForms\Utils::GetFormAliasFromID($params['form_id']);
+	if ($alias)
+		$alias .= '_'.PowerForms\Utils::MakeAlias($t);
+} else {
 	$h = '';
 	$name = '';
 	$alias = '';
@@ -83,6 +70,4 @@ $tplvars = array(
 	'cancel' => $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'))
 );
 
-echo pwfUtils::ProcessTemplate($this,'addform.tpl',$tplvars);
-
-?>
+echo PowerForms\Utils::ProcessTemplate($this,'addform.tpl',$tplvars);

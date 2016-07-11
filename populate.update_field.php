@@ -1,18 +1,17 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
-# Copyright(C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Copyright(C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if(!empty($message))
+if (!empty($message))
 	$tplvars['message'] = $message;
 
 $tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$this->Lang('back_top'));
 $tplvars['backtoform_nav'] = $this->CreateLink($id,'update_form',$returnid,'&#171; '.$this->Lang('back_form'),
 	array('formedit'=>1,'form_id'=>$params['form_id'],'formdata'=>$params['formdata']));
 
-if($obfield) //field data are loaded
-{
+if ($obfield) { //field data are loaded
 	$fid = $obfield->GetId(); //maybe <= 0, if adding
 	$nm = 'submit'; //submit-control name
 
@@ -22,17 +21,17 @@ if($obfield) //field data are loaded
 
 	$tab = $this->GetActiveTab($params);
 	$t = $this->StartTabHeaders();
-	if($hasmain)
+	if ($hasmain)
 		$t .= $this->SetTabHeader('maintab',$this->Lang('tab_field'),($tab == 'maintab'));
-	if($hasadv)
+	if ($hasadv)
 		$t .= $this->SetTabHeader('advancedtab',$this->Lang('tab_advanced'),($tab == 'advancedtab'));
 	$t .= $this->EndTabHeaders().$this->StartTabContent();
 	$tplvars['tabs_start'] = $t;
 
 	$tplvars['tabs_end'] = $this->EndTabContent();
-	if($hasmain)
+	if ($hasmain)
 		$tplvars['maintab_start'] = $this->StartTab('maintab');
-	if($hasadv)
+	if ($hasadv)
 		$tplvars['advancedtab_start'] = $this->StartTab('advancedtab');
 	$tplvars['tab_end'] = $this->EndTab();
 
@@ -45,73 +44,63 @@ if($obfield) //field data are loaded
 	$tplvars['requirable'] = (/*!$obfield->IsDisposition() && */!$obfield->GetChangeRequirement())?1:0;
 
 	$mainList = array();
-	if($hasmain)
-	{
-		foreach($allOpts['main'] as $item)
-		{
+	if ($hasmain) {
+		foreach ($allOpts['main'] as $item) {
 			$oneset = new stdClass();
 			$oneset->title = (isset($item[0]))?$item[0]:'';
-			if(!empty($item[1])) $oneset->input = $item[1]; //optional
-			if(!empty($item[2])) $oneset->help = $item[2];
+			if (!empty($item[1])) $oneset->input = $item[1]; //optional
+			if (!empty($item[2])) $oneset->help = $item[2];
 			$mainList[] = $oneset;
 		}
 	}
 	$tplvars['mainList'] = $mainList;
 
 	$advList = array();
-	if($hasadv)
-	{
-		foreach($allOpts['adv'] as $item)
-		{
+	if ($hasadv) {
+		foreach ($allOpts['adv'] as $item) {
 			$oneset = new stdClass();
 			$oneset->title = (isset($item[0]))?$item[0]:'';
-			if(!empty($item[1])) $oneset->input = $item[1]; //optional
-			if(!empty($item[2])) $oneset->help = $item[2];
+			if (!empty($item[1])) $oneset->input = $item[1]; //optional
+			if (!empty($item[2])) $oneset->help = $item[2];
 			$advList[] = $oneset;
 		}
 	}
 	$tplvars['advList'] = $advList;
 
-	if(isset($allOpts['table']))
+	if (isset($allOpts['table']))
 		$tplvars['mainTable'] = $allOpts['table'];
-	if(isset($allOpts['funcs']))
+	if (isset($allOpts['funcs']))
 		$tplvars['jsfuncs'] = $allOpts['funcs'];
 
-	if(isset($allOpts['extra']))
-	{
-		switch($allOpts['extra'])
-		{
+	if (isset($allOpts['extra'])) {
+		switch ($allOpts['extra']) {
 		 case 'varshelpmain':
-			if($hasmain)
+			if ($hasmain)
 				$tplvars['mainvarhelp'] = 1;
 			break;
 		 case 'varshelpadv':
-			if($hasadv)
-			{
+			if ($hasadv) {
 				$tplvars['advvarhelp'] = 1;
-				pwfUtils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
+				PowerForms\Utils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
 			}
 			break;
 		 case 'varshelpboth':
-			if($hasmain)
+			if ($hasmain)
 				$tplvars['mainvarhelp'] = 1;
-			if($hasadv)
-			{
+			if ($hasadv) {
 				$tplvars['advvarhelp'] = 1;
-				pwfUtils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
+				PowerForms\Utils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
 			}
 			break;
 		}
 	}
-}
-else //no field
-{
+} else { //no field
 	$fid = 0;
 	$nm = 'add';
 	//setup to select a type, then come back to edit it
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_add_new_field');
-	pwfUtils::Collect_Fields($this);
+	PowerForms\Utils::Collect_Fields($this);
 	$oneset->input = $this->CreateInputDropdown($id,'field_type',
 		array_merge(array($this->Lang('select_type')=>''),$this->field_types),-1,'');
 //	$oneset->help = ;
@@ -128,5 +117,3 @@ $tplvars['form_end'] = $this->CreateFormEnd();
 $t = ($fid > 0) ? 'update':'add'; //field edit or add
 $tplvars['submit'] = $this->CreateInputSubmit($id,$nm,$this->Lang($t));
 $tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
-
-?>
