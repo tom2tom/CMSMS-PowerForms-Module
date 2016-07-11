@@ -1,147 +1,129 @@
 <?php
 # This file is part of CMS Made Simple module: PowerForms
-# Copyright (C) 2012-2015 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PowerForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if(!function_exists('EarlyExit'))
-{
- function EarlyExit(&$mod,&$smarty,$mode=0)
+if (!function_exists('EarlyExit')) {
+ function ExitAdvise(&$mod,$mode=0)
  {
- 	switch($mode)
-	{
+	$tplvars = array();
+ 	switch ($mode) {
 	 case 1:
-		SubmitLog(1000);
-		$smarty->assign('message',$mod->Lang('comeback_expired'));
+		$tplvars['message'] = $mod->Lang('comeback_expired');
 		break;
 	 case 2:
-		SubmitLog(1000);
-		$smarty->assign('message',$mod->Lang('comeback_toomany'));
+		$tplvars['message'] = $mod->Lang('comeback_toomany');
 		break;
 	}
-	$smarty->assign('title',$mod->Lang('title_aborted'));
-	echo $mod->ProcessTemplate('message.tpl');
+	$tplvars['title'] = $mod->Lang('title_aborted');
+	echo PowerForms\Utils::ProcessTemplate($mod,'message.tpl',$tplvars);
  }
 
- function SubmitLog($number=0)
+ function BlockSource()
  {
-	if(empty($_SERVER['REMOTE_ADDR']))
-	{
-		//TODO
-		return FALSE;
+	if (!empty($_SERVER['REMOTE_ADDR'])) {
+		$t = $time();
+		$t2 = trim($db->DBTimeStamp($t-900),"'"); //after 900 more seconds, it will be erased
+		$src = $_SERVER['REMOTE_ADDR'];
+	 	global $db;
+		$pre = cms_db_prefix();
+		$query = array('UPDATE '.$pre.'module_pwf_ip_log SET howmany=255,basetime=? WHERE src=?');
+		$args = array(array($t2,$src));
+		$query[] = 'INSERT INTO '.$pre.
+'module_pwf_ip_log (src,howmany,basetime) SELECT ?,255,? FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
+		$pre.'module_pwf_ip_log T WHERE T.src=?)';
+		$args[] = array($src,$t2,$src);
+		PowerForms\Utils::SafeExec($query,$args);
 	}
-	$db = cmsms()->GetDb();
-	$pre = cms_db_prefix();
-	//try to update
-	if($number)
-	{
-		$sql = 'UPDATE '.$pre.
-			'module_pwf_ip_log SET basetime=?,howmany=? WHERE src=?'; //TODO fields
-		$when = trim($db->DBTimeStamp(time()+900),"'");
-		$res = $db->Execute($sql,array($when,$number,$_SERVER['REMOTE_ADDR']));
-	}
-	else
-	{
-		$sql = 'UPDATE '.$pre.
-			'module_pwf_ip_log SET basetime=?,howmany=howmany+1 WHERE src=?'; //TODO fields
-		$when = trim($db->DBTimeStamp(time()),"'");
-		$res = $db->Execute($sql,array($when,$_SERVER['REMOTE_ADDR']));
-	}
-	if(!$res)
-	{
-		//revert to insert
-		if($number < 1)
-			$number = 1;
-//		$id = $db->GenID($pre.'module_pwf_ip_log_seq');
-		$sql = 'INSERT INTO '.$pre.
-			'module_pwf_ip_log (src,howmany,basetime) VALUES (?,?,?)'; //TODO fields
-		$db->Execute($sql,array($_SERVER['REMOTE_ADDR'],$number,$when));
-	}
-	return TRUE;
  }
 }
 
-if(!isset($params['form_id']) && isset($params['form'])) // got the form by alias
-	$params['form_id'] = pwfUtils::GetFormIDFromAlias($params['form']);
-if(empty($params['form_id']))
-{
-	echo "<!-- no form -->\n";
+if (!isset($params['form_id']) && isset($params['form'])) // got the form by alias
+	$params['form_id'] = PowerForms\Utils::GetFormIDFromAlias($params['form']);
+if (empty($params['form_id'])) {
+	echo '<!-- no form -->'.PHP_EOL;
 	return;
 }
 list($current,$prior) = $this->GetTokens(); //fresh pair of fieldname-prefixes
 //check that we're current
 $matched = preg_grep('/^pwfp_\d{3}_/',array_keys($params));
-if($matched)
-{
+if ($matched) {
 	$key = reset($matched);
-	if(strpos($key,$current) === 0)
+	if (strpos($key,$current) === 0)
 		$prefix = $current;
-	elseif(strpos($key,$prior) === 0)
+	elseif (strpos($key,$prior) === 0)
 		$prefix = $prior;
-	else
-	{
-		EarlyExit($this,$smarty,1);
+	else {
+		BlockSource();
+		ExitAdvise($this,1);
 		return;
 	}
-	while($key = next($matched))
-	{
-		if(strpos($key,$prefix) !== 0)
-		{
-			EarlyExit($this,$smarty,1);
+	while ($key = next($matched)) {
+		if (strpos($key,$prefix) !== 0) {
+			BlockSource();
+			ExitAdvise($this,1);
 			return;
 		}
 	}
-}
-else
+} else
 	$prefix = $current;
 
 $form_id = (int)$params['form_id'];
 $validerr = 0; //default no validation error
-$cache = pwfCache::Get($this);
+try {
+	$cache = PowerForms\Utils::GetCache($this);
+} catch (Exception $e) {
+	echo $this->Lang('error_system').' NO CACHE MECHANISM';
+	return;
+}
+/*QUEUE
+try {
+	$mx = PowerForms\Utils::GetMutex($this);
+} catch (Exception $e) {
+	echo $this->Lang('error_system').' NO MUTEX MECHANISM';
+	return;
+}
+*/
+$tplvars = array();
 
-if(isset($params[$prefix.'formdata']))
-{
+if (isset($params[$prefix.'formdata'])) {
 	$firsttime = FALSE; //this is a return-visit
 
 	$cache_key = $params[$prefix.'formdata'];
-	$formdata = unserialize($cache->driver_get($cache_key));
-	$formdata->formsmodule =& $this;
-//	$formdata = $this->cache[$cache_key];
+	$formdata = $cache->get($cache_key);
+	if (is_null($formdata)) {
+		echo $this->Lang('error_data');
+		return;
+	}
+	$formdata->formsmodule = &$this;
 
 	$matched = preg_grep('/^pwfp_\d{3}_Fe[DX]_/',array_keys($params)); //expanding or shrinking a field
-	if(!$matched)
-	{
+	if (!$matched) {
 		$donekey = (isset($params[$prefix.'done'])) ? $prefix.'done' : FALSE;
 
-		if(isset($params[$prefix.'continue']))
+		if (isset($params[$prefix.'continue']))
 			$formdata->Page++;
-		elseif(isset($params[$prefix.'previous']))
-		{
+		elseif (isset($params[$prefix.'previous'])) {
 			$formdata->Page--;
-			if($donekey)
-			{
+			if ($donekey) {
 				unset($params[$donekey]);
 				$donekey = FALSE;
 			}
 		}
 
 		//update cached field data from $params[]
-		foreach($params as $key=>$val)
-		{
-			if(strncmp($key,'pwfp_',5) == 0)
-			{
+		foreach ($params as $key=>$val) {
+			if (strncmp($key,'pwfp_',5) == 0) {
 				$pid = substr($key,9); //ignore 'pwfp_NNN_' prefix
-				if(is_numeric($pid))
-				{
-					$fld = $formdata->Fields[$pid];
-					if($fld)
-					{
-						if($fld->Type == 'Captcha')
-						{
-							if(isset($params['captcha_input']))
+				if (is_numeric($pid)) {
+					if (isset($formdata->Fields[$pid])) {
+						$fld = $formdata->Fields[$pid];
+						if ($fld->Type == 'Captcha') {
+							if (isset($params['captcha_input']))
 								$val = $params['captcha_input'];
-//							if(!$val)
+//							if (!$val)
 //								$val = -.-; //ensure invalid-value if empty
 						}
 						$fld->SetValue($val);
@@ -150,124 +132,142 @@ if(isset($params[$prefix.'formdata']))
 			}
 		}
 
-		if($donekey)
-		{
-/* TODO police spam	
-		if($mod->GetPreference('enable_antispam'))
-		{
-			if(!empty($_SERVER['REMOTE_ADDR']))
-			{
-				$db = cmsms()->GetDb();
-				$query = 'SELECT COUNT(src_ip) AS sent FROM '.cms_db_prefix().
-				'module_pwf_ip_log WHERE src_ip=? AND sent_time > ?';
+		if ($donekey) {
+/*			// rate-limit?
+			$num = PowerForms\Utils::GetFormOption($formdata,'submit_limit',0);
+			if ($num > 0) {
+				if (!empty($_SERVER['REMOTE_ADDR'])) {
+					$src = $_SERVER['REMOTE_ADDR'];
+					$t = $time();
+					$t2 = trim($db->DBTimeStamp($t-3600),"'");
+					$t = trim($db->DBTimeStamp($t),"'");
 
-				$sent = $db->GetOne($query,array($_SERVER['REMOTE_ADDR'],
-					   trim($db->DBTimeStamp(time() - 3600),"'")));
+					$pre = cms_db_prefix();
+					$query = array('DELETE FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<?');
+					$args = array(array($src,$t2));
+					$query[] = 'UPDATE '.$pre.'module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?';
+					$args[] = array($src,$num+1);
+					$query[] = 'INSERT INTO '.$pre.
+'module_pwf_ip_log (src,howmany,basetime) SELECT ?,1,? FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
+					$pre.'module_pwf_ip_log T WHERE T.src=?)';
+					$args[] = array($src,$t,$src);
+					PowerForms\Utils::SafeExec($query,$args);
 
-				if($sent > 9)
-				{
-					// too many from this IP address. Kill it.
-					$msg = '<hr />'.$mod->Lang('suspected_spam').'<hr />';
-//					audit(-1,$mod->GetName(),$mod->Lang('log_suspected_spam',$_SERVER['REMOTE_ADDR']));
-					return array(FALSE,$msg);
-				}
-			}
-		}
-
-TODO this is not just an email thing!!
-				if($mod->GetPreference('enable_antispam'))
-				{
-					if(!empty($_SERVER['REMOTE_ADDR']))
-					{
-//						$rec_id = $db->GenID(cms_db_prefix().'module_pwf_ip_log_seq');
-						$query = 'INSERT INTO '.cms_db_prefix().
-						'module_pwf_ip_log (sent_id,src_ip,sent_time) VALUES (?,?,?)';
-
-						$res = $db->Execute($query,array(
-							$rec_id,
-							$_SERVER['REMOTE_ADDR'],
-							trim($db->DBTimeStamp(time()),"'")
-							));
+					$sql = 'SELECT COUNT(src_ip) AS sent FROM '.$pre.'module_pwf_ip_log WHERE src_ip=?';
+					$sent = PowerForms\Utils::SafeGet($sql,array($src),'one');
+					if ($sent > $num) {
+						EarlyExit($this,2);
+						return;
 					}
 				}
+			} else {
+				//TODO check for blocked after EarlyExit::expired
+			}
 */
- 
-			if(!empty($_SERVER['REMOTE_ADDR']))
-			{
-				$sql = 'SELECT howmany FROM '.cms_db_prefix().
-				'module_pwf_ip_log where src=? AND basetime > ?';
+			if (!empty($_SERVER['REMOTE_ADDR'])) {
+				$src = $_SERVER['REMOTE_ADDR'];
+				$t = $time();
+				$t2 = trim($db->DBTimeStamp($t-3600),"'");
+				$t = trim($db->DBTimeStamp($t),"'");
+				$num = 0;
+				$pre = cms_db_prefix();
+				$query = 'DELETE FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<?';
+				$args = array($src,$t2);
+				$query2 = 'SELECT COUNT(*) AS num FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<=?';
+				$args2 = array(array($src,$t));
 
-				$num = $db->GetOne($sql,array(
-					$_SERVER['REMOTE_ADDR'],
-					trim($db->DBTimeStamp(time() - 3600),"'")
-					));
-
-				if($num > X)
-				{
-					EarlyExit($this,$smarty,2);
+				$nt = 10;
+				while ($nt > 0) {
+					$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'); //this isn't perfect!
+					$db->StartTrans();
+					$db->Execute($query,$args);
+					$num = $db->GetOne($query2,$args2);
+					if ($db->CompleteTrans())
+						break;
+					else {
+						$nt--;
+						usleep(50000);
+					}
+				}
+				if ($nt == 0) {
+	$this->Crash();
+					echo $this->Lang('system_data');
 					return;
 				}
+				if ($num) {
+					if ($num == 255) { //blocked due to expiry
+						BlockSource(); //again!
+						ExitAdvise($this,1);
+						return;
+					}
+					//rate-limit?
+					$limit = PowerForms\Utils::GetFormOption($formdata,'submit_limit',0);
+					if ($limit) {
+						if ($num <= $limit) {
+							$query = array('UPDATE '.$pre.'module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?');
+							$args = array(array($src,$num+1));
+							$query[] = 'INSERT INTO '.$pre.
+'module_pwf_ip_log (src,howmany,basetime) SELECT ?,1,? FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
+							$pre.'module_pwf_ip_log T WHERE T.src=?)';
+							$args[] = array($src,$t,$src);
+							PowerForms\Utils::SafeExec($query,$args);
+						} else {
+							ExitAdvise($this,2);
+							return;
+						}
+					}
+				}
 			}
-*/	
+
 			// validate form
 			$allvalid = TRUE;
 			$message = array();
 			$formPageCount = 1;
 			$valPage = $formdata->Page - 1; //TODO off by 1 ?
-			foreach($formdata->Fields as &$one)
-			{
-				if($one->GetFieldType() == 'PageBreak')
+			foreach ($formdata->FieldOrders as $one) {
+				$one = $formdata->Fields($one);
+				if ($one->GetFieldType() == 'PageBreak')
 					$formPageCount++;
-		/*TODO logic? if($valPage != $formPageCount)
-				{
-		$Crash1;
+/*TODO logic? if ($valPage != $formPageCount) {
+$Crash1;
 					continue; //ignore pages before the current? last? one
 				}
-		*/
+*/
 				$deny_space_validation = !!$this->GetPreference('blank_invalid');
-				if(// !$one->IsNonRequirableField() &&
-					$one->IsRequired() && !$one->HasValue($deny_space_validation))
-				{
+				if (// $one->GetChangeRequirement() &&
+					$one->GetRequired() && !$one->HasValue($deny_space_validation)) {
 $this->Crash2();
 					$allvalid = FALSE;
 					$one->SetOption('is_valid',FALSE);
 					$one->validated = FALSE;
 					$one->ValidationMessage = $this->Lang('please_enter_a_value',$one->GetName());
 					$message[] = $one->ValidationMessage;
-				}
-				elseif($one->GetValue())
-				{
+				} elseif ($one->GetValue()) {
 					$res = $one->Validate($id);
-					if($res[0])
+					if ($res[0])
 						$one->SetOption('is_valid',TRUE);
-					else
-					{
+					else {
 						$allvalid = FALSE;
 						$one->SetOption('is_valid',FALSE);
 						$message[] = $res[1];
 					}
 				}
 			}
-			unset($one);
 
-			if($allvalid)
-			{
-				$udt = pwfUtils::GetFormOption($formdata,'validate_udt');
-				if(!empty($udt))
-				{
+			if ($allvalid) {
+				$udt = PowerForms\Utils::GetFormOption($formdata,'validate_udt');
+				if (!empty($udt)) {
 					$usertagops = cmsms()->GetUserTagOperations(); //TODO ok here ?
-					$unspec = pwfUtils::GetFormOption($formdata,'unspecified',$this->Lang('unspecified'));
+					$unspec = PowerForms\Utils::GetFormOption($formdata,'unspecified',$this->Lang('unspecified'));
 
 					$parms = $params;
-					foreach($formdata->Fields as &$one)
-					{
-						if($one->DisplayInSubmission())
-						{
+					foreach ($formdata->FieldOrders as $one) {
+						$one = $formdata->Fields($one);
+						if ($one->DisplayInSubmission()) {
 							$val = $one->GetHumanReadableValue();
-							if($val == '')
+							if ($val == '')
 								$val = $unspec;
-						}
-						else
+						} else
 							$val = '';
 						$name = $one->GetVariableName();
 						$parms[$name] = $val;
@@ -276,145 +276,202 @@ $this->Crash2();
 						$id = $one->GetId();
 						$parms['fld_'.$id] = $val;
 					}
-					unset($one);
+
 					$res = $usertagops->CallUserTag($udt,$parms);
-					if(!$res[0])
-					{
+					if (!$res[0]) {
 						$allvalid = FALSE;
 						$message[] = $res[1];
 					}
 				}
 			}
 
-			if($allvalid)
-			{
+			if ($allvalid) {
+/*QUEUE (php with async post-callback is bogus !?
+				$token = abs(crc32($this->GetName().'Qmutex')); //same token as in action.run_queue.php
+				if (!$mx->lock($token)) {
+					echo $this->Lang('error_lock');
+					exit;
+				}
+				$queue = $cache->get('pwfQarray');
+				if (!$queue)
+					$queue = array();
+				unset($formdata->formsmodule); //no need to cache this
+				$queue[] = array(
+					'data' => $formdata, //CHECKME encrypted?
+					'submitted' => time(),
+					'pageid' => $id);
+				$cache->set('pwfQarray',$queue,0); //no expiry
+				$formdata->formsmodule = &$this;
+				$mx->unlock($token);
+				if (!$cache->get('pwfQrunning')) {
+					//initiate async queue processing
+					if ($this->ch) {
+						while (curl_multi_info_read($this->mh))
+							usleep(20000);
+						curl_multi_remove_handle($this->mh,$this->ch);
+						curl_close($this->ch);
+						$this->ch = FALSE;
+					}
+
+					$ch = curl_init($this->Qurl);
+					curl_setopt($ch,CURLOPT_FAILONERROR,TRUE);
+					curl_setopt($ch,CURLOPT_FOLLOWLOCATION,TRUE);
+					curl_setopt($ch,CURLOPT_FORBID_REUSE,TRUE);
+					curl_setopt($ch,CURLOPT_FRESH_CONNECT,TRUE);
+					curl_setopt($ch,CURLOPT_HEADER,FALSE);
+					curl_setopt($ch,CURLOPT_RETURNTRANSFER,TRUE);
+					curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,FALSE);	//in case ...
+
+					curl_multi_add_handle($this->mh,$ch);
+					$runcount = 0;
+					do
+					{
+						$mrc = curl_multi_exec($this->mh,$runcount);
+					} while ($mrc == CURLM_CALL_MULTI_PERFORM); //irrelevant for curl 7.20.0+ (2010-02-11)
+//					if ($mrc != CURLM_OK) i.e. CURLM_OUT_OF_MEMORY, CURLM_INTERNAL_ERROR
+					if ($runcount) {
+						$this->ch = $ch; //cache for later cleanup
+					} else {
+						curl_multi_remove_handle($this->mh,$ch);
+						curl_close($ch);
+					}
+				}
+*/
 				// run all field methods that modify other fields
 				$computes = array();
-				$i = 0; //don't assume anything about fields-array key
-				foreach($formdata->Fields as &$one)
-				{
-					$one->PreDispositionAction();
-					if($one->ComputeOnSubmission())
-						$computes[$i] = $one->ComputeOrder();
-					$i++;
+				foreach ($formdata->FieldOrders as $one) {
+					$obfld = $formdata->Fields($one);
+					$obfld->PreDisposeAction();
+					if ($obfld->ComputeOnSubmission())
+						$computes[$one] = $obfld->ComputeOrder();
 				}
 
-				asort($computes);
-				foreach($computes as $cKey=>$cVal)
-					$formdata->Fields[$cKey]->Compute(); //TODO ensure $cKey is field_id
+				if ($computes) {
+					asort($computes);
+					foreach ($computes as $fid=>$one)
+						$formdata->Fields[$fid]->Compute();
+				}
 
 				$alldisposed = TRUE;
 				$message = array();
 				// dispose TODO handle 'blocked' notices
-				foreach($formdata->Fields as &$one)
-				{
-					if($one->IsDisposition() && $one->DispositionIsPermitted())
-					{
+				foreach ($formdata->FieldOrders as $one) {
+					$one = $formdata->Fields($one);
+					if ($one->IsDisposition() && $one->DispositionIsPermitted()) {
 						$res = $one->Dispose($id,$returnid);
-						if(!$res[0])
-						{
+						if (!$res[0]) {
 							$alldisposed = FALSE;
 							$message[] = $res[1];
 						}
 					}
 				}
 				// cleanups
-				foreach($formdata->Fields as &$one)
-					$one->PostDispositionAction();
-				unset($one);
+				foreach ($formdata->FieldOrders as $one) {
+					$one = $formdata->Fields($one);
+					$one->PostDisposeAction();
+				}
 
 				$parms = array();
 				$parms['form_id'] = $form_id;
-				$parms['form_name'] = pwfUtils::GetFormNameFromID($form_id);
+				$parms['form_name'] = PowerForms\Utils::GetFormNameFromID($form_id);
 
-				$smarty->assign('form_done',1);
-				if($alldisposed)
-				{
-					$this->SendEvent('OnFormSubmit',$parms);
-					$cache->driver_delete($cache_key);
-					$act = pwfUtils::GetFormOption($formdata,'submit_action','text');
-					if($act == 'text')
-					{
-						$message = pwfUtils::GetFormOption($formdata,'submission_template','');
-						pwfUtils::setFinishedFormSmarty($formdata,TRUE);
-						echo $this->ProcessTemplateFromData($message);
+				$tplvars['form_done'] = 1;
+				if ($alldisposed) {
+					$cache->delete($cache_key);
+					$act = PowerForms\Utils::GetFormOption($formdata,'submit_action','text');
+					switch ($act) {
+					 case 'text':
+						$this->SendEvent('OnFormSubmit',$parms);
+						PowerForms\Utils::setFinishedFormSmarty($formdata,TRUE);
+						PowerForms\Utils::ProcessTemplateFromDatabase($this,'pwf::sub_'.$form_id,$tplvars,TRUE);
 						return;
-					}
-					elseif($act == 'redir')
-					{
-						$ret = pwfUtils::GetFormOption($formdata,'redirect_page',-1);
-						if($ret != -1)
+					 case 'redir':
+						$this->SendEvent('OnFormSubmit',$parms);
+						$ret = PowerForms\Utils::GetFormOption($formdata,'redirect_page',0);
+						if ($ret > 0)
 							$this->RedirectContent($ret);
-						else
-						{
-$this->Crash3();
-							exit;
+						else {
+							$tplvars = $tplvars + array(
+								'title' => $this->Lang('missing_type',$this->Lang('page')),
+								'message' => $this->Lang('cannot_show_TODO'),
+								'error' => 1
+							);
+							echo PowerForms\Utils::ProcessTemplate($this,'message.tpl',$tplvars);
+							return;
 						}
-					}
-					else
-					{
-$this->Crash4();
+					 case 'confirm':
+					 	//confirmation needed before submission
+						//after confirmation, formdata will be different
+						$tplvars = $tplvars + array(
+							'title' => $this->Lang('title_confirm'),
+							'message' => $this->Lang('help_confirm')
+						);
+						echo PowerForms\Utils::ProcessTemplate($this,'message.tpl',$tplvars);
+						return;
+					 default:
 						exit;
 					}
-				}
-				else
-				{
+				} else {
 					$this->SendEvent('OnFormSubmitError',$parms);
-//					$params['pwfp_error'] = ''; TODO what for?
-					$smarty->assign('submission_error',$this->Lang('error_submission'));
-					$smarty->assign('submission_error_list',$message);
-					$smarty->assign('show_submission_errors',!$this->GetPreference('hide_errors'));
+					$tplvars = $tplvars + array(
+						'submission_error' => $this->Lang('error_submission'),
+						'submission_error_list' => $message,
+						'show_submission_errors' => !$this->GetPreference('hide_errors')
+					);
 				}
 				unset($parms);
-			}
-			else // validation error(s)
-			{
+// end of synchronous processing
+			} else { // validation error(s)
 				$validerr = 1;
-				$smarty->assign('form_validation_errors',$message);
+				$tplvars['form_validation_errors'] = $message;
 				$formdata->Page--; //TODO why
 			}
 		}
-	//$Crash10;
 	}
-}
-else //first time
-{
-	$funcs = new pwfFormOperations();
+} else { //first time
+	$funcs = new PowerForms\FormOperations();
 	$formdata = $funcs->Load($this,$id,$params,$form_id);
 	unset($funcs);
-	if(!$formdata)
-	{
-		echo "<!-- no form -->\n";
+	if (!$formdata) {
+		echo '<!-- no form -->'.PHP_EOL;
 		return;
 	}
 	$firsttime = TRUE;
 	$formdata->Page = 1;
-	$formdata->FormPagesCount = 1; //we will count
+	$formdata->PagesCount = 1; //we will count
 
 	//TODO if $in_browser && $form_edit, import & store field data
-	
+
 	//construct sufficiently-unique cache key
-	if(!empty($_SERVER['SERVER_ADDR']))
+	if (!empty($_SERVER['SERVER_ADDR']))
 		$token = $_SERVER['SERVER_ADDR'];
 	else
 		$token = mt_rand(0,999999).'.'.mt_rand(0,999999);
 	$token .= 'SERVER_ADDR'.uniqid().mt_rand(1100,2099).reset($_SERVER).key($_SERVER).end($_SERVER).key($_SERVER);
 	$cache_key = md5($token);
+
+	$orders = array();
+	foreach ($formdata->Fields as $fid=>&$one) {
+		$orders[] = $fid;
+	}
+	unset($one);
+	$formdata->FieldOrders = $orders;
+	$funcs = new PowerForms\FormOperations();
+	$funcs->Arrange($formdata->Fields,$formdata->FieldOrders);
 }
 
-$smarty->assign('form_has_validation_errors',$validerr);
-$smarty->assign('show_submission_errors',0);
+$tplvars['form_has_validation_errors'] = $validerr;
+$tplvars['show_submission_errors'] = 0;
 
-$udtonce = $firsttime && pwfUtils::GetFormOption($formdata,'predisplay_udt');
-$udtevery = pwfUtils::GetFormOption($formdata,'predisplay_each_udt');
-if($udtonce || $udtevery)
-{
+$udtonce = $firsttime && PowerForms\Utils::GetFormOption($formdata,'predisplay_udt');
+$udtevery = PowerForms\Utils::GetFormOption($formdata,'predisplay_each_udt');
+if ($udtonce || $udtevery) {
 	$parms = $params;
 	$parms['FORM'] =& $formdata;
 	$usertagops = cmsms()->GetUserTagOperations();
-	if($udtonce)
+	if ($udtonce)
 		$usertagops->CallUserTag($udtonce,$parms);
-	if($udtevery)
+	if ($udtevery)
 		$usertagops->CallUserTag($udtevery,$parms);
 	unset($parms);
 	unset($usertagops);
@@ -422,17 +479,34 @@ if($udtonce || $udtevery)
 
 $parms = array();
 $parms['form_id'] = $form_id;
-$parms['form_name'] = pwfUtils::GetFormNameFromID($form_id);
+$parms['form_name'] = PowerForms\Utils::GetFormNameFromID($form_id);
 $this->SendEvent('OnFormDisplay',$parms);
 unset($parms);
 
-$smarty->assign('form_done',0);
+$tplvars['form_done'] = 0;
 
-require dirname(__FILE__).DIRECTORY_SEPARATOR.'method.default.php';
+require __DIR__.DIRECTORY_SEPARATOR.'populate.default.php';
 
-//$adbg = $this->cache;
-//$this->Crash();
+unset($formdata->formsmodule); //no need to cache this
+$cache->set($cache_key,$formdata);
 
-echo $this->ProcessTemplateFromDatabase('pwf_'.$form_id);
-
-?>
+//we've got a form-template to display, don't bother with another 'parent'
+echo $form_start.$hidden;
+PowerForms\Utils::ProcessTemplateFromDatabase($this,'pwf::'.$form_id,$tplvars,TRUE);
+echo $form_end;
+//inject constructed js near end of page (pity we can't get to </body> or </html>)
+if ($jsincs) {
+	echo implode(PHP_EOL,$jsincs);
+//	echo PHP_EOL;
+}
+if ($jsfuncs) {
+	echo <<<EOS
+<script type="text/javascript">
+//<![CDATA[
+EOS;
+	echo implode(PHP_EOL,$jsfuncs);
+	echo <<<EOS
+//]]>
+</script>
+EOS;
+}
