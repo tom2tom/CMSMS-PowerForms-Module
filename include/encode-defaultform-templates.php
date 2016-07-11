@@ -302,13 +302,10 @@ $templates['Advanced_captcha'] =<<<EOS
 {\$prompt}<br />{\$captcha_input}<br />{\$captcha}
 EOS;
 
-$fh = fopen(dirname(__FILE__).DIRECTORY_SEPARATOR.'encoded-templates.xml','w');
-foreach ($templates as $key=>&$value)
-{
+$fh = fopen(__DIR__.DIRECTORY_SEPARATOR.'encoded-templates.xml','w');
+foreach ($templates as $key=>&$value) {
 	fwrite($fh,'<'.$key.'_template>]][['.urlencode($value).'</'.$key.'_template>'.PHP_EOL.PHP_EOL);
 }
 
 unset($value);
 fclose($fh);
-
-?>
