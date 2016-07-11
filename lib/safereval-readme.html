@@ -1,0 +1,107 @@
+<h1>Safer eval()</h1>
+<h2>Version 0.2</h2>
+
+<h3>Restrictions</h3>
+<h4>Allowed</h4>
+<ul>
+  <li>Basic syntax</li>
+  <li>Types:</li>
+    <ul>
+      <li>Booleans</li>
+      <li>Integers</li>
+      <li>Floating point numbers</li>
+      <li>Strings</li>
+      <li>Arrays</li>
+      <li>NULL</li>
+    </ul>
+  <li>Variables:
+    <ul>
+      <li>Pre-named</li>
+    </ul>
+  </li>
+  <li>Expressions</li>
+  <li>Operators:
+    <ul>
+      <li>Arithmetic</li>
+      <li>Assignment</li>
+      <li>Bitwise</li>
+      <li>Comparison</li>
+      <li>Incrementing/Decrementing</li>
+      <li>Logical</li>
+      <li>String</li>
+      <li>Array</li>
+    </ul>
+  </li>
+  <li>Control Structures</li>
+  <li>Functions:
+    <ul>
+      <li>Internal (built-in):
+        <ul>
+          <li>Mathematical</li>
+          <li>Variable-handling</li>
+          <li>Strings</li>
+          <li>Array</li>
+        </ul>
+     </li>
+    </ul>
+  </li>
+  <li>References</li>
+</ul>
+
+<h4>Disallowed</h4>
+<ul>
+  <li>Basic syntax:
+    <ul>
+      <li>Comments</li>
+      <li>HTML</li>
+    </ul>
+  </li>
+  <li>Types:</li>
+    <ul>
+      <li>Objects</li>
+      <li>Resource</li>
+    </ul>
+  <li>Variables:
+    <ul>
+      <li>Predefined variables</li>
+      <li>Variable variables</li>
+      <li>Variables from outside PHP</li>
+    </ul>
+  </li>
+  <li>Constants</li>
+  <li>Operators:
+    <ul>
+      <li>Execution</li>
+      <li>Type</li>
+    </ul>
+  </li>
+  <li>Control structures:
+    <ul>
+      <li>Require</li>
+      <li>Include</li>
+    </ul>
+  </li>
+  <li>Functions:
+    <ul>
+      <li>User-defined functions</li>
+      <li>Variable-functions</li>
+    </ul>
+  </li>
+  <li>Classes and Objects</li>
+  <li>Namespaces</li>
+  <li>Exceptions</li>
+  <li>(everything else)</li>
+</ul>
+
+<h3>Credits</h3>
+<ul>
+  <li>Original script: Udo Schroeter</li>
+  <li>Syntax checking script: Nicolas Grekas</li>
+  <li>Security testing:
+    <ul>
+      <li>##php</li>
+      <li>Mordred</li>
+    </ul>
+  </li>
+  <li>Putting it all together: Hory</li>
+</ul>
