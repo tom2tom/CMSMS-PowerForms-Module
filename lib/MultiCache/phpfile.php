@@ -130,23 +130,23 @@ class Cache_phpfile extends CacheBase implements CacheInterface
 	/*
 	$keyword may include a namespace, which can look like a filepath
 	*/
-	private public function filename($keyword)
+	private function filename($keyword)
 	{
 		return str_replace('\\','|%|',$keyword);
 	}
 
-	private public function keyword($filepath)
+	private function keyword($filepath)
 	{
 		return str_replace('|%|','\\',basename($filepath));
 	}
 
-	private public function readfile($keyword)
+	private function readfile($keyword)
 	{
 		@include $this->basepath.$this->filename($keyword);
 		return (isset($val)) ? $val : FALSE;
 	}
 
-	private public function writefile($keyword,$value)
+	private function writefile($keyword,$value)
 	{
 		return @file_put_contents($this->basepath.$this->filename($keyword),
 			'<?php $val = '.$value.';');

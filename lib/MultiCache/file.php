@@ -126,17 +126,17 @@ class Cache_file extends CacheBase implements CacheInterface
 	/*
 	$keyword may include a namespace, which can look like a filepath
 	*/
-	private public function filename($keyword)
+	private function filename($keyword)
 	{
 		return str_replace('\\','|%|',$keyword);
 	}
 
-	private public function keyword($filepath)
+	private function keyword($filepath)
 	{
 		return str_replace('|%|','\\',basename($filepath));
 	}
 
-	private public function readfile($filepath)
+	private function readfile($filepath)
 	{
 		$h = @fopen($filepath,'rb');
 		if ($h) {
@@ -147,7 +147,7 @@ class Cache_file extends CacheBase implements CacheInterface
 		return FALSE;
 	}
 
-	private public function writefile($filepath, $content)
+	private function writefile($filepath, $content)
 	{
 		$h = @fopen($filepath,'wb');
 		if ($h) {
