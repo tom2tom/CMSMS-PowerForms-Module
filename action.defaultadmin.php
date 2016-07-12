@@ -1,7 +1,7 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 $padm = $this->CheckPermission('ModifyPFSettings');
@@ -36,7 +36,7 @@ if ($padm) {
 
 		$old = $this->GetPreference('masterpass');
 		if ($old)
-			$old = PowerForms\Utils::Unfusc($oldpw);
+			$old = PWForms\Utils::Unfusc($oldpw);
 		$t = trim($params['masterpass']);
 		if ($old != $t) {
 			//re-encrypt all stored records
@@ -45,9 +45,9 @@ if ($padm) {
 			if ($rst) {
 				$sql = 'UPDATE '.$pre.'module_pwf_record SET content=? WHERE record_id=?';
 				while (!$rst->EOF) {
-					$val = PowerForms\Utils::Decrypt($this,$rst->fields[1],$old);
-					$val = PowerForms\Utils::Encrypt($this,$val,$t);
-					if (!PowerForms\Utils::SafeExec($sql,array($val,$rst->fields[0]))) {
+					$val = PWForms\Utils::Decrypt($this,$rst->fields[1],$old);
+					$val = PWForms\Utils::Encrypt($this,$val,$t);
+					if (!PWForms\Utils::SafeExec($sql,array($val,$rst->fields[0]))) {
 						//TODO handle error
 					}
 					if (!$rst->MoveNext())
@@ -56,7 +56,7 @@ if ($padm) {
 				$rst->Close();
 			}
 			if ($t)
-				$t = PowerForms\Utils::Fusc($t);
+				$t = PWForms\Utils::Fusc($t);
 			$this->SetPreference('masterpass',$t);
 		}
 
@@ -71,5 +71,5 @@ $tplvars = array();
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 
-echo PowerForms\Utils::ProcessTemplate($this,'adminpanel.tpl',$tplvars);
+echo PWForms\Utils::ProcessTemplate($this,'adminpanel.tpl',$tplvars);
 

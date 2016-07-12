@@ -1,7 +1,7 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 if (!empty($message))
@@ -56,14 +56,14 @@ $tplvars = $tplvars + array(
 
 	'title_form_css_class' => $this->Lang('title_form_css_class'),
 	'input_form_css_class' => $this->CreateInputText($id,'opt_css_class',
-		PowerForms\Utils::GetFormOption($formdata,'css_class','powerform'),50,50),
+		PWForms\Utils::GetFormOption($formdata,'css_class','powerform'),50,50),
 
 	'title_form_fields' => $this->Lang('title_form_fields'),
 	'title_form_main' => $this->Lang('title_form_main'),
 
 	'title_form_unspecified' => $this->Lang('title_form_unspecified'),
 	'input_form_unspecified' =>	$this->CreateInputText($id,'opt_unspecified',
-		PowerForms\Utils::GetFormOption($formdata,'unspecified',$this->Lang('unspecified')),30),
+		PWForms\Utils::GetFormOption($formdata,'unspecified',$this->Lang('unspecified')),30),
 
 	'title_information' => $this->Lang('information'),
 //	'title_order' => $this->Lang('order'),
@@ -252,7 +252,7 @@ EOS;
 //CmsLayoutTemplate::get_designs() TODO
 //CmsLayoutTemplate::set_designs()
 
-PowerForms\Utils::Collect_Fields($this);
+PWForms\Utils::Collect_Fields($this);
 
 $displays = array($this->Lang('select_type')=>''); //non-disposition fields
 $dispositions = $displays; //non-disposition field
@@ -318,30 +318,30 @@ $tplvars['title_inline_form'] = $this->Lang('title_inline_form');
 $tplvars['input_inline_form'] =
 	$this->CreateInputHidden($id,'opt_inline',0).
 	$this->CreateInputCheckbox($id,'opt_inline',1,
-		PowerForms\Utils::GetFormOption($formdata,'inline',0)).'<br />'.
+		PWForms\Utils::GetFormOption($formdata,'inline',0)).'<br />'.
 	$this->Lang('help_inline_form');
 
 $tplvars['title_form_submit_button'] = $this->Lang('title_form_submit_button');
 $tplvars['input_form_submit_button'] =
 	$this->CreateInputText($id,'opt_submit_button_text',
-		PowerForms\Utils::GetFormOption($formdata,'submit_button_text',$this->Lang('button_submit')),35,35);
+		PWForms\Utils::GetFormOption($formdata,'submit_button_text',$this->Lang('button_submit')),35,35);
 
 $tplvars['title_submit_button_safety'] = $this->Lang('title_submit_button_safety');
 $tplvars['input_submit_button_safety'] =
 	$this->CreateInputHidden($id,'opt_input_button_safety',0).
 	$this->CreateInputCheckbox($id,'opt_input_button_safety',1,
-		PowerForms\Utils::GetFormOption($formdata,'input_button_safety',0)).'<br />'.
+		PWForms\Utils::GetFormOption($formdata,'input_button_safety',0)).'<br />'.
 	$this->Lang('help_submit_safety');
 
 $tplvars['title_form_prev_button'] = $this->Lang('title_form_prev_button');
 $tplvars['input_form_prev_button'] =
 	$this->CreateInputText($id,'opt_prev_button_text',
-		PowerForms\Utils::GetFormOption($formdata,'prev_button_text',$this->Lang('button_previous')),35,35);
+		PWForms\Utils::GetFormOption($formdata,'prev_button_text',$this->Lang('button_previous')),35,35);
 
 $tplvars['title_form_next_button'] = $this->Lang('title_form_next_button');
 $tplvars['input_form_next_button'] =
 	$this->CreateInputText($id,'opt_next_button_text',
-		PowerForms\Utils::GetFormOption($formdata,'next_button_text',$this->Lang('button_continue')),35,35);
+		PWForms\Utils::GetFormOption($formdata,'next_button_text',$this->Lang('button_continue')),35,35);
 
 $usertagops = cmsms()->GetUserTagOperations();
 $usertags = $usertagops->ListUserTags();
@@ -353,31 +353,31 @@ foreach ($usertags as $key => $value)
 $tplvars['title_form_predisplay_udt'] = $this->Lang('title_form_predisplay_udt');
 $tplvars['input_form_predisplay_udt'] =
 	$this->CreateInputDropdown($id,'opt_predisplay_udt',$usertaglist,-1,
-		PowerForms\Utils::GetFormOption($formdata,'predisplay_udt'));
+		PWForms\Utils::GetFormOption($formdata,'predisplay_udt'));
 
 $tplvars['title_form_predisplay_each_udt'] = $this->Lang('title_form_predisplay_each_udt');
 $tplvars['input_form_predisplay_each_udt'] =
 	$this->CreateInputDropdown($id,'opt_predisplay_each_udt',$usertaglist,-1,
-		PowerForms\Utils::GetFormOption($formdata,'predisplay_each_udt'));
+		PWForms\Utils::GetFormOption($formdata,'predisplay_each_udt'));
 
 $tplvars['title_form_validate_udt'] = $this->Lang('title_form_validate_udt');
 $tplvars['input_form_validate_udt'] =
 	$this->CreateInputDropdown($id,'opt_validate_udt',$usertaglist,-1,
-		PowerForms\Utils::GetFormOption($formdata,'validate_udt'));
+		PWForms\Utils::GetFormOption($formdata,'validate_udt'));
 
 $tplvars['title_form_required_symbol'] = $this->Lang('title_form_required_symbol');
 $tplvars['input_form_required_symbol'] =
 	 $this->CreateInputText($id,'opt_required_field_symbol',
-		PowerForms\Utils::GetFormOption($formdata,'required_field_symbol','*'),5);
+		PWForms\Utils::GetFormOption($formdata,'required_field_symbol','*'),5);
 
 $tplvars['title_list_delimiter'] = $this->Lang('title_list_delimiter');
 $tplvars['input_list_delimiter'] =
 	$this->CreateInputText($id,'opt_list_delimiter',
-		PowerForms\Utils::GetFormOption($formdata,'list_delimiter',','),5);
+		PWForms\Utils::GetFormOption($formdata,'list_delimiter',','),5);
 
 $tplvars['title_submit_javascript'] = $this->Lang('title_submit_javascript');
 $tplvars['input_submit_javascript'] =
-	$this->CreateTextArea(FALSE,$id,PowerForms\Utils::GetFormOption($formdata,'submit_javascript',''),
+	$this->CreateTextArea(FALSE,$id,PWForms\Utils::GetFormOption($formdata,'submit_javascript',''),
 		'opt_submit_javascript','pwf_shortarea','submit_javascript',
 		'','',50,8).
 		'<br />'.$this->Lang('help_submit_javascript');
@@ -385,14 +385,14 @@ $tplvars['input_submit_javascript'] =
 $tplvars['title_submit_limit'] = $this->Lang('title_submit_limit');
 $tplvars['input_submit_limit'] =
 	$this->CreateInputText($id,'opt_submit_limit',
-		PowerForms\Utils::GetFormOption($formdata,'submit_limit',$this->GetPreference('submit_limit')),3,5);
+		PWForms\Utils::GetFormOption($formdata,'submit_limit',$this->GetPreference('submit_limit')),3,5);
 
 $templateList = array(''=>'',
 	$this->Lang('default_template')=>'defaultform.tpl',
 	$this->Lang('table_left_template')=>'tableform_lefttitles.tpl',
 	$this->Lang('table_top_template')=>'tableform_toptitles.tpl');
 
-$allForms = PowerForms\Utils::GetForms();
+$allForms = PWForms\Utils::GetForms();
 foreach ($allForms as $one) {
 	if ($one['form_id'] != $form_id)
 		$templateList[$this->Lang('form_template_name',$one['name'])] = $one['form_id'];
@@ -419,12 +419,12 @@ $postsubmits = array($this->Lang('redirect_to_page')=>'redir',$this->Lang('displ
 $tplvars['title_submit_action'] = $this->Lang('title_submit_action');
 $tplvars['input_submit_action'] =
 	$this->CreateInputRadioGroup($id,'opt_submit_action',$postsubmits,
-		PowerForms\Utils::GetFormOption($formdata,'submit_action','text'),'','&nbsp;&nbsp;');
+		PWForms\Utils::GetFormOption($formdata,'submit_action','text'),'','&nbsp;&nbsp;');
 
 $tplvars['title_redirect_page'] = $this->Lang('title_redirect_page');
 $tplvars['input_redirect_page'] =
-	PowerForms\Utils::CreateHierarchyPulldown($this,$id,'opt_redirect_page',
-		PowerForms\Utils::GetFormOption($formdata,'redirect_page',0));
+	PWForms\Utils::CreateHierarchyPulldown($this,$id,'opt_redirect_page',
+		PWForms\Utils::GetFormOption($formdata,'redirect_page',0));
 
 if ($this->before20)
 	$tpl = $this->GetTemplate('pwf::sub_'.$form_id);
@@ -433,7 +433,7 @@ else {
 	$tpl = $ob->get_content();
 }
 if (!$tpl)
-	$tpl = PowerForms\Utils::CreateDefaultTemplate($formdata,TRUE,FALSE); //? generate default for CmsLayoutTemplateType
+	$tpl = PWForms\Utils::CreateDefaultTemplate($formdata,TRUE,FALSE); //? generate default for CmsLayoutTemplateType
 $tplvars['title_submit_template'] = $this->Lang('title_submit_response');
 //note WYSIWYG is no good, the MCE editor stuffs around with the template contents
 $tplvars['input_submit_template'] =
@@ -442,7 +442,7 @@ $tplvars['input_submit_template'] =
 //setup to revert to 'sample' submission-template
 $ctlData = array();
 $ctlData['opt_submission_template']['general_button'] = TRUE;
-list($buttons,$funcs) = PowerForms\Utils::TemplateActions($formdata,$id,$ctlData);
+list($buttons,$funcs) = PWForms\Utils::TemplateActions($formdata,$id,$ctlData);
 $jsfuncs[] = $funcs[0];
 $tplvars = $tplvars + array(
 	'sample_submit_template' => $buttons[0],
@@ -535,7 +535,7 @@ if ($formdata->Fields) {
 }
 
 //help for submission-template
-PowerForms\Utils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
+PWForms\Utils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
 
 $jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/include/jquery.tablednd.min.js"></script>

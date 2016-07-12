@@ -1,6 +1,6 @@
 <?php
 #------------------------------------------------------------------------
-# This is CMS Made Simple module: PowerForms
+# This is CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <@>
 # Derived in part from FormBuilder module, copyright (C) 2005-2012, Samuel Goldstein <sjg@cmsmodules.com>
 # This project's forge-page is: http://dev.cmsmadesimple.org/projects/powerforms
@@ -17,7 +17,7 @@
 # Read the License online: http://www.gnu.org/licenses/licenses.html#AGPL
 #-----------------------------------------------------------------------
 
-class PowerForms extends CMSModule
+class PWForms extends CMSModule
 {
 	public $before20;
 	public $havemcrypt;
@@ -36,6 +36,10 @@ class PowerForms extends CMSModule
 
 	public function __construct()
 	{
+		if (!function_exists('cmsms_spacedload')) {
+			spl_autoload_register(array($this,'cmsms_spacedload'));
+		}
+
 		parent::__construct();
 		global $CMS_VERSION;
 		$this->before20 = (version_compare($CMS_VERSION,'2.0') < 0);
@@ -48,8 +52,27 @@ class PowerForms extends CMSModule
 		$sep = strpos($url,'&amp;');
 		$this->Qurl = substr($url,0,$sep);
 */
-		require_once cms_join_path(__DIR__,'lib','class.Data.php');
+		require_once cms_join_path(__DIR__,'lib','FormData.php');
 		$this->RegisterModulePlugin(TRUE);
+	}
+
+	/* autoloader */
+	private function cmsms_spacedload ($class)
+	{
+		$prefix = get_class().'\\'; //specific namespace prefix
+		// ignore if the class doesn't use the prefix
+		if (!(strpos($class,$prefix) === 0 || ($class[0] == '\\' && strpos($class,$prefix,1) == 1)))
+			return;
+		// get the relative class name
+		$len = strlen($prefix);
+		if ($class[0] == '\\') {
+			$len++;
+		}
+		// base directory for the namespace prefix
+		$base_dir = __DIR__.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR;
+		$fp = $base_dir.str_replace('\\',DIRECTORY_SEPARATOR,$relative_class).'.php';
+		if (file_exists($fp))
+			include $fp;
 	}
 
 /*	public function __destruct()
@@ -81,7 +104,7 @@ class PowerForms extends CMSModule
 
 	public function GetName()
 	{
-		return 'PowerForms';
+		return 'PWForms';
 	}
 
 	public function GetFriendlyName()
@@ -132,7 +155,7 @@ class PowerForms extends CMSModule
 
 	public function get_tasks()
 	{
-		return new PowerForms\ClearTablesTask();
+		return new PWForms\ClearTablesTask();
 	}
 
 	public function MinimumCMSVersion()
@@ -307,7 +330,7 @@ class PowerForms extends CMSModule
 
 	public function &GetFormData(&$params=NULL)
 	{
-		$fd = new PowerForms\Data();
+		$fd = new PWForms\FormData();
 
 		$fd->formsmodule =& $this;
 		list($fd->current_prefix,$fd->prior_prefix) = $this->GetTokens();
@@ -357,7 +380,7 @@ class PowerForms extends CMSModule
 		$fp = cms_join_path($this->GetModulePath(),'lib',$basename);
 		copy($classfilepath,$fp);
 		
-		$classname = PowerForms\Utils::FileClassName($basename);
+		$classname = PWForms\Utils::FileClassName($basename);
 		//cache field data to be ready for restarts
 		$imports = $this->GetPreference('imported_fields');
 		if ($imports) {
@@ -368,13 +391,13 @@ class PowerForms extends CMSModule
 		}
 		$this->SetPreference('imported_fields',serialize($imports));
 		if ($this->field_types)
-			PowerForms\Utils::Show_Field($this,$classname);
+			PWForms\Utils::Show_Field($this,$classname);
 	}
 	
 	public function DeregisterField($classfilepath)
 	{
 		$basename = basename($classfilepath);
-		$classname = PowerForms\Utils::FileClassName($basename);
+		$classname = PWForms\Utils::FileClassName($basename);
 		$fp = cms_join_path($this->GetModulePath(),'lib',$basename);
 		if (is_file($fp))
 			unlink($fp);

@@ -1,8 +1,8 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 if (!$this->CheckAccess('ModifyPFForms')) exit;
@@ -14,7 +14,7 @@ if (isset($params['cancel']))
 		'formedit'=>1,
 		'active_tab'=>'fieldstab'));
 try {
-	$cache = PowerForms\Utils::GetCache($this);
+	$cache = PWForms\Utils::GetCache($this);
 } catch (Exception $e) {
 	echo $this->Lang('error_system');
 	exit;
@@ -37,7 +37,7 @@ $this->Crash();
 		$obfield = $formdata->Fields[$params['field_id']];
 	elseif (isset($params['field_type']) //we know what display-field type to add
 	    || isset($params['disposition_type'])) //we know what disposition-field type to add
-		$obfield = PowerForms\FieldOperations::NewField($formdata,$id,$params);
+		$obfield = PWForms\FieldOperations::NewField($formdata,$id,$params);
 	else //add field, whose type is to be selected
 		$obfield = FALSE;
 	$refresh = FALSE;
@@ -92,7 +92,7 @@ if (isset($params['submit'])) {
 	} else {
 		//start again //TODO if imported field with no tabled data
 		if ($newfield)
-			$obfield = PowerForms\FieldOperations::NewField($formdata,$id,$params);
+			$obfield = PWForms\FieldOperations::NewField($formdata,$id,$params);
 		else
 			$obfield->Load($id,$params); //TODO check for failure
 		$message = $this->PrettyMessage($message,FALSE,FALSE,FALSE);
@@ -131,4 +131,4 @@ require __DIR__.DIRECTORY_SEPARATOR.'populate.update_field.php';
 unset($formdata->formsmodule); //no need to cache this
 $cache->set($params['formdata'],$formdata);
 
-echo PowerForms\Utils::ProcessTemplate($this,'editfield.tpl',$tplvars);
+echo PWForms\Utils::ProcessTemplate($this,'editfield.tpl',$tplvars);

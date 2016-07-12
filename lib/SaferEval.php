@@ -7,7 +7,7 @@
 * License: GPL
 *
 */
-namespace PowerForms;;
+namespace PWForms;;
 
 include "config.SaferEval.php";
 

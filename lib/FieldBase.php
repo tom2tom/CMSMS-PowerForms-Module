@@ -1,15 +1,15 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-namespace PowerForms;
+namespace PWForms;
 
 class FieldBase
 {
-	var $formdata; //reference to shared Data data-object
+	var $formdata; //reference to shared FormData data-object
 	//field status
 	var $loaded = FALSE;
 	var $validated = TRUE;
@@ -695,7 +695,7 @@ class FieldBase
 
 	/**
 	AdminPopulateCommon:
-	@id: id given to the PowerForms module on execution
+	@id: id given to the PWForms module on execution
 	@visible: whether to include some options irrelevant to non-displayed disposition-fields, default=TRUE
 
 	Generates 'base'/common content for editing a field.
@@ -778,7 +778,7 @@ class FieldBase
 
 	/**
 	AdminPopulate:
-	@id: id given to the PowerForms module on execution  
+	@id: id given to the PWForms module on execution  
 
 	Construct content for field edit. Subclass this.
 	Array keys presently recognised are: 'main','adv','table','extra','funcs'.
@@ -825,7 +825,7 @@ class FieldBase
 	* an array of stdClass objects, each with properties:
 	->name, ->title and ->input (and for a couple of field-types, also ->op)
 	Object-names must begin with $this->formdata->current_prefix, so as to not be
-	dropped as 'unknown' frontend parameters (see PowerForms::InitializeFrontend())
+	dropped as 'unknown' frontend parameters (see PWForms::InitializeFrontend())
 	and not be excluded as time-expired
 	*/
 	public function Populate($id,&$params)

@@ -1,8 +1,8 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 if (!function_exists('EarlyExit')) {
@@ -18,7 +18,7 @@ if (!function_exists('EarlyExit')) {
 		break;
 	}
 	$tplvars['title'] = $mod->Lang('title_aborted');
-	echo PowerForms\Utils::ProcessTemplate($mod,'message.tpl',$tplvars);
+	echo PWForms\Utils::ProcessTemplate($mod,'message.tpl',$tplvars);
  }
 
  function BlockSource()
@@ -35,13 +35,13 @@ if (!function_exists('EarlyExit')) {
 'module_pwf_ip_log (src,howmany,basetime) SELECT ?,255,? FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
 		$pre.'module_pwf_ip_log T WHERE T.src=?)';
 		$args[] = array($src,$t2,$src);
-		PowerForms\Utils::SafeExec($query,$args);
+		PWForms\Utils::SafeExec($query,$args);
 	}
  }
 }
 
 if (!isset($params['form_id']) && isset($params['form'])) // got the form by alias
-	$params['form_id'] = PowerForms\Utils::GetFormIDFromAlias($params['form']);
+	$params['form_id'] = PWForms\Utils::GetFormIDFromAlias($params['form']);
 if (empty($params['form_id'])) {
 	echo '<!-- no form -->'.PHP_EOL;
 	return;
@@ -73,14 +73,14 @@ if ($matched) {
 $form_id = (int)$params['form_id'];
 $validerr = 0; //default no validation error
 try {
-	$cache = PowerForms\Utils::GetCache($this);
+	$cache = PWForms\Utils::GetCache($this);
 } catch (Exception $e) {
 	echo $this->Lang('error_system').' NO CACHE MECHANISM';
 	return;
 }
 /*QUEUE
 try {
-	$mx = PowerForms\Utils::GetMutex($this);
+	$mx = PWForms\Utils::GetMutex($this);
 } catch (Exception $e) {
 	echo $this->Lang('error_system').' NO MUTEX MECHANISM';
 	return;
@@ -134,7 +134,7 @@ if (isset($params[$prefix.'formdata'])) {
 
 		if ($donekey) {
 /*			// rate-limit?
-			$num = PowerForms\Utils::GetFormOption($formdata,'submit_limit',0);
+			$num = PWForms\Utils::GetFormOption($formdata,'submit_limit',0);
 			if ($num > 0) {
 				if (!empty($_SERVER['REMOTE_ADDR'])) {
 					$src = $_SERVER['REMOTE_ADDR'];
@@ -151,10 +151,10 @@ if (isset($params[$prefix.'formdata'])) {
 'module_pwf_ip_log (src,howmany,basetime) SELECT ?,1,? FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
 					$pre.'module_pwf_ip_log T WHERE T.src=?)';
 					$args[] = array($src,$t,$src);
-					PowerForms\Utils::SafeExec($query,$args);
+					PWForms\Utils::SafeExec($query,$args);
 
 					$sql = 'SELECT COUNT(src_ip) AS sent FROM '.$pre.'module_pwf_ip_log WHERE src_ip=?';
-					$sent = PowerForms\Utils::SafeGet($sql,array($src),'one');
+					$sent = PWForms\Utils::SafeGet($sql,array($src),'one');
 					if ($sent > $num) {
 						EarlyExit($this,2);
 						return;
@@ -201,7 +201,7 @@ if (isset($params[$prefix.'formdata'])) {
 						return;
 					}
 					//rate-limit?
-					$limit = PowerForms\Utils::GetFormOption($formdata,'submit_limit',0);
+					$limit = PWForms\Utils::GetFormOption($formdata,'submit_limit',0);
 					if ($limit) {
 						if ($num <= $limit) {
 							$query = array('UPDATE '.$pre.'module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?');
@@ -210,7 +210,7 @@ if (isset($params[$prefix.'formdata'])) {
 'module_pwf_ip_log (src,howmany,basetime) SELECT ?,1,? FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
 							$pre.'module_pwf_ip_log T WHERE T.src=?)';
 							$args[] = array($src,$t,$src);
-							PowerForms\Utils::SafeExec($query,$args);
+							PWForms\Utils::SafeExec($query,$args);
 						} else {
 							ExitAdvise($this,2);
 							return;
@@ -255,10 +255,10 @@ $this->Crash2();
 			}
 
 			if ($allvalid) {
-				$udt = PowerForms\Utils::GetFormOption($formdata,'validate_udt');
+				$udt = PWForms\Utils::GetFormOption($formdata,'validate_udt');
 				if (!empty($udt)) {
 					$usertagops = cmsms()->GetUserTagOperations(); //TODO ok here ?
-					$unspec = PowerForms\Utils::GetFormOption($formdata,'unspecified',$this->Lang('unspecified'));
+					$unspec = PWForms\Utils::GetFormOption($formdata,'unspecified',$this->Lang('unspecified'));
 
 					$parms = $params;
 					foreach ($formdata->FieldOrders as $one) {
@@ -373,21 +373,21 @@ $this->Crash2();
 
 				$parms = array();
 				$parms['form_id'] = $form_id;
-				$parms['form_name'] = PowerForms\Utils::GetFormNameFromID($form_id);
+				$parms['form_name'] = PWForms\Utils::GetFormNameFromID($form_id);
 
 				$tplvars['form_done'] = 1;
 				if ($alldisposed) {
 					$cache->delete($cache_key);
-					$act = PowerForms\Utils::GetFormOption($formdata,'submit_action','text');
+					$act = PWForms\Utils::GetFormOption($formdata,'submit_action','text');
 					switch ($act) {
 					 case 'text':
 						$this->SendEvent('OnFormSubmit',$parms);
-						PowerForms\Utils::setFinishedFormSmarty($formdata,TRUE);
-						PowerForms\Utils::ProcessTemplateFromDatabase($this,'pwf::sub_'.$form_id,$tplvars,TRUE);
+						PWForms\Utils::setFinishedFormSmarty($formdata,TRUE);
+						PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf::sub_'.$form_id,$tplvars,TRUE);
 						return;
 					 case 'redir':
 						$this->SendEvent('OnFormSubmit',$parms);
-						$ret = PowerForms\Utils::GetFormOption($formdata,'redirect_page',0);
+						$ret = PWForms\Utils::GetFormOption($formdata,'redirect_page',0);
 						if ($ret > 0)
 							$this->RedirectContent($ret);
 						else {
@@ -396,7 +396,7 @@ $this->Crash2();
 								'message' => $this->Lang('cannot_show_TODO'),
 								'error' => 1
 							);
-							echo PowerForms\Utils::ProcessTemplate($this,'message.tpl',$tplvars);
+							echo PWForms\Utils::ProcessTemplate($this,'message.tpl',$tplvars);
 							return;
 						}
 					 case 'confirm':
@@ -406,7 +406,7 @@ $this->Crash2();
 							'title' => $this->Lang('title_confirm'),
 							'message' => $this->Lang('help_confirm')
 						);
-						echo PowerForms\Utils::ProcessTemplate($this,'message.tpl',$tplvars);
+						echo PWForms\Utils::ProcessTemplate($this,'message.tpl',$tplvars);
 						return;
 					 default:
 						exit;
@@ -429,7 +429,7 @@ $this->Crash2();
 		}
 	}
 } else { //first time
-	$funcs = new PowerForms\FormOperations();
+	$funcs = new PWForms\FormOperations();
 	$formdata = $funcs->Load($this,$id,$params,$form_id);
 	unset($funcs);
 	if (!$formdata) {
@@ -456,15 +456,15 @@ $this->Crash2();
 	}
 	unset($one);
 	$formdata->FieldOrders = $orders;
-	$funcs = new PowerForms\FormOperations();
+	$funcs = new PWForms\FormOperations();
 	$funcs->Arrange($formdata->Fields,$formdata->FieldOrders);
 }
 
 $tplvars['form_has_validation_errors'] = $validerr;
 $tplvars['show_submission_errors'] = 0;
 
-$udtonce = $firsttime && PowerForms\Utils::GetFormOption($formdata,'predisplay_udt');
-$udtevery = PowerForms\Utils::GetFormOption($formdata,'predisplay_each_udt');
+$udtonce = $firsttime && PWForms\Utils::GetFormOption($formdata,'predisplay_udt');
+$udtevery = PWForms\Utils::GetFormOption($formdata,'predisplay_each_udt');
 if ($udtonce || $udtevery) {
 	$parms = $params;
 	$parms['FORM'] =& $formdata;
@@ -479,7 +479,7 @@ if ($udtonce || $udtevery) {
 
 $parms = array();
 $parms['form_id'] = $form_id;
-$parms['form_name'] = PowerForms\Utils::GetFormNameFromID($form_id);
+$parms['form_name'] = PWForms\Utils::GetFormNameFromID($form_id);
 $this->SendEvent('OnFormDisplay',$parms);
 unset($parms);
 
@@ -492,7 +492,7 @@ $cache->set($cache_key,$formdata);
 
 //we've got a form-template to display, don't bother with another 'parent'
 echo $form_start.$hidden;
-PowerForms\Utils::ProcessTemplateFromDatabase($this,'pwf::'.$form_id,$tplvars,TRUE);
+PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf::'.$form_id,$tplvars,TRUE);
 echo $form_end;
 //inject constructed js near end of page (pity we can't get to </body> or </html>)
 if ($jsincs) {

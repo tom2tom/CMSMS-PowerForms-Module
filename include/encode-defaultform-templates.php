@@ -1,7 +1,7 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 /*
 Temporarily include this somewhere, to generate encoded templates for default forms
@@ -72,11 +72,11 @@ EOS;
 
 $templates['Sample_submission'] =<<<EOS
 <h1>Thanks!</h1>
-<p>Your feedback helps make the PowerForms module better.</p>
+<p>Your feedback helps make the PWForms module better.</p>
 EOS;
 
 $templates['Sample_email'] =<<<EOS
-<h1>Someone's Testing a PowerForms Submission!</h1>
+<h1>Someone's Testing a PWForms Submission!</h1>
 <strong>Date submitted</strong>: {\$sub_date}<br />
 <strong>IP address from which form was submitted</strong>: {\$sub_source}<br />
 <strong>Form server</strong>: {\$form_host}<br />
@@ -179,13 +179,13 @@ $templates['Contact_submission'] =<<<EOS
 EOS;
 
 $templates['Contact_email'] =<<<EOS
-PowerForms Submission
+PWForms Submission
 Date submitted: {\$sub_date}
 IP address from which the form was submitted: {\$sub_source}
 Form server: {\$form_host}
 URL of page containing form: {\$form_url}
 Form name: {\$form_name}
-PowerForms version: {\$version}
+PWForms version: {\$version}
 ----------------------------------------------
 Your name: {\$your_name}
 Your email address: {\$your_email_a}
@@ -284,13 +284,13 @@ $templates['Advanced_submission'] =<<<EOS
 EOS;
 
 $templates['Advanced_email'] =<<<EOS
-PowerForms Submission
+PWForms Submission
 Date submitted: {\$sub_date}
 IP address from which form was submitted: {\$sub_source}
 Form host: {\$form_host}
 URL of page containing form: {\$form_url}
 Form name: {\$form_name}
-PowerForms version: {\$version}
+PWForms version: {\$version}
 ----------------------------------------------
 Your name: {\$your_name}
 Your email address: {\$your_email}

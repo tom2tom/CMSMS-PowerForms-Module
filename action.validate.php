@@ -1,11 +1,11 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 try {
-	$cache = PowerForms\Utils::GetCache($this);
+	$cache = PWForms\Utils::GetCache($this);
 } catch (Exception $e) {
 	echo $this->Lang('error_system');
 	return;
@@ -33,8 +33,8 @@ if (!$row || $row['pubkey'] != $params[$key.'c']) {
 
 $db->Execute($sql,array($record_id));
 
-$pw = $row['pubkey'].PowerForms\Utils::Unfusc($this->GetPreference('masterpass'));
-$formdata = PowerForms\Utils::Decrypt($row['content'],$pw);
+$pw = $row['pubkey'].PWForms\Utils::Unfusc($this->GetPreference('masterpass'));
+$formdata = PWForms\Utils::Decrypt($row['content'],$pw);
 if ($formdata === FALSE) {
 	echo $this->Lang('validation_response_error');
 	return;

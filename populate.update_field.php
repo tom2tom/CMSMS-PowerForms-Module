@@ -1,7 +1,7 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright(C) 2012-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 if (!empty($message))
@@ -81,7 +81,7 @@ if ($obfield) { //field data are loaded
 		 case 'varshelpadv':
 			if ($hasadv) {
 				$tplvars['advvarhelp'] = 1;
-				PowerForms\Utils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
+				PWForms\Utils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
 			}
 			break;
 		 case 'varshelpboth':
@@ -89,7 +89,7 @@ if ($obfield) { //field data are loaded
 				$tplvars['mainvarhelp'] = 1;
 			if ($hasadv) {
 				$tplvars['advvarhelp'] = 1;
-				PowerForms\Utils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
+				PWForms\Utils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
 			}
 			break;
 		}
@@ -100,7 +100,7 @@ if ($obfield) { //field data are loaded
 	//setup to select a type, then come back to edit it
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_add_new_field');
-	PowerForms\Utils::Collect_Fields($this);
+	PWForms\Utils::Collect_Fields($this);
 	$oneset->input = $this->CreateInputDropdown($id,'field_type',
 		array_merge(array($this->Lang('select_type')=>''),$this->field_types),-1,'');
 //	$oneset->help = ;

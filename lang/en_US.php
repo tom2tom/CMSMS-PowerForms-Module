@@ -334,7 +334,7 @@ $lang['desc_help_icon'] = 'string to generate help/info icon displayed on the fo
 $lang['desc_helptext'] = 'the field\'s help text';
 $lang['desc_helptext_id'] = 'DOM id of the html div containing controls to show help for the field';
 $lang['desc_hide_name'] = 'true if the field name is hidden';
-$lang['desc_id'] = 'the internal/opaque id PowerForms uses for the field';
+$lang['desc_id'] = 'the internal/opaque id PWForms uses for the field';
 $lang['desc_in_browser'] = 'true if form is being viewed or edited from PowerBrowse';
 $lang['desc_input'] = 'the field\'s input control, or array of objects (see below)';
 $lang['desc_input_id'] = 'the DOM id of the field\'s input (e.g. for a label: for="foo")';
@@ -366,7 +366,7 @@ $lang['duplicate_identifier'] = 'Form name or alias is already in use';
 
 $lang['edit'] = 'Edit';
 $lang['email_address_does_not_match'] = 'Email address does not match value in "%s"';
-$lang['email_default_template'] = 'PowerForms Submission';
+$lang['email_default_template'] = 'PWForms Submission';
 $lang['email_from_addr_help'] = 'Do not put some random address here. Many ISPs will not deliver mail if you use a domain name other than your actual host name (i.e. use something like name@%s)';
 $lang['email_template_not_set'] = 'Email template not yet set!';
 $lang['email_to_help'] = 'Emails can be sent without a "To" field';
@@ -399,7 +399,7 @@ $lang['error_usertag'] = 'User defined tag returned an error';
 $lang['error_usertag_named'] = 'User defined tag %s returned an error.';
 
 $lang['event_help_OnFormDisplay'] = <<< EOS
-<p>Event triggered when a PowerForms form is displayed</p>
+<p>Event triggered when a PWForms form is displayed</p>
 <h4>Parameters</h4>
 <ul>
 <li><em>form_name</em> - The form name (string)</li>
@@ -407,7 +407,7 @@ $lang['event_help_OnFormDisplay'] = <<< EOS
 </ul>
 EOS;
 $lang['event_help_OnFormSubmitError'] = <<<EOS
-<p>Event triggered if there is an error when a PowerForms form is submitted</p>
+<p>Event triggered if there is an error when a PWForms form is submitted</p>
 <h4>Parameters</h4>
 <ul>
 <li><em>form_name</em> - The form name (string)</li>
@@ -416,7 +416,7 @@ $lang['event_help_OnFormSubmitError'] = <<<EOS
 </ul>
 EOS;
 $lang['event_help_OnFormSubmit'] = <<<EOS
-<p>Event triggered when a PowerForms form is submitted.</p>
+<p>Event triggered when a PWForms form is submitted.</p>
 <h4>Parameters</h4>
 <ul>
 <li><em>form_name</em> - The form name (string)</li>
@@ -424,9 +424,9 @@ $lang['event_help_OnFormSubmit'] = <<<EOS
 <li><em>value_&lt;name&gt;</em> - Supply a default value to a field with the specified name.</li>
 </ul>
 EOS;
-$lang['event_info_OnFormDisplay'] = 'Event triggered when a PowerForms form is displayed';
-$lang['event_info_OnFormSubmitError'] = 'Event triggered if there is an error when a PowerForms form is submitted';
-$lang['event_info_OnFormSubmit'] = 'Event triggered when a PowerForms form is submitted';
+$lang['event_info_OnFormDisplay'] = 'Event triggered when a PWForms form is displayed';
+$lang['event_info_OnFormSubmitError'] = 'Event triggered if there is an error when a PWForms form is submitted';
+$lang['event_info_OnFormSubmit'] = 'Event triggered when a PWForms form is submitted';
 $lang['export'] = 'Export';
 $lang['export_tip'] = 'export form as XML';
 $lang['false'] = 'false';
@@ -555,7 +555,7 @@ $lang['help_import_alias'] = 'Optional replacement alias for the imported form';
 $lang['help_import_name'] = 'Optional replacement name for the imported form';
 $lang['help_tag'] = <<<EOS
 A template associated with another module may be used to generate content for the form.
-Such template must include a <code>{\$FBid}</code> tag to tie it back to PowerForms.
+Such template must include a <code>{\$FBid}</code> tag to tie it back to PWForms.
 For example, to include form options based on the Products module, create the following template in Products:<br />
 <pre>
 {foreach from=\$items item=entry}
@@ -575,7 +575,7 @@ For example, to include form options based on the Products module, create the fo
 <br />
 and in the input above, put something like <strong>{Products category="cat" summarytemplate="Your_FB_template"}</strong>
 EOS;
-$lang['help_module_version'] = 'PowerForms module version';
+$lang['help_module_version'] = 'PWForms module version';
 $lang['help_name_regex'] = 'A regular expression to allow filtering cataloger items by name';
 //$lang['help_object_example'] = '<em>e.g.</em> you could use "{$fld_1_obj->name} = {$fld_1_obj->value}"';
 $lang['help_operators'] = <<<EOS
@@ -586,7 +586,7 @@ must be quoted (substitution occurs before evaluation), e.g. substr('\$fld_22',0
 EOS;
 $lang['help_other_fields'] = 'Other fields will be available as you add them to the form.';
 $lang['help_require_fieldnames'] = 'Each field must have a name, and it must be unique';
-$lang['help_rtf_file_template'] = 'Specify a file located in the PowerForms/templates/ folder. This field is ignored if you use TXT as your file type.';
+$lang['help_rtf_file_template'] = 'Specify a file located in the PWForms/templates/ folder. This field is ignored if you use TXT as your file type.';
 $lang['help_rtf_template_type'] = <<<EOS
 Basic: Use the textarea below to layout the field names/values in a single block.<br />
 Advanced: Specify smarty variables in the RTF template file as you would below,
@@ -634,7 +634,7 @@ $lang['help_field_siblings'] = 'Dropdown lists all siblings of this field and al
 $lang['help_hide_label'] = 'Don\'t show this field\'s name on the form';
 $lang['help_feu_property'] = 'Only certain property types can be used for matching (dropdowns, multiselect fields, etc).';
 $lang['help_help'] = 'more information';
-$lang['help_inline_form'] = 'If activated, any form followup will replace the page/template <code>{PowerForms}</code> tag, otherwise the <code>{content}</code> tag will be replaced.';
+$lang['help_inline_form'] = 'If activated, any form followup will replace the page/template <code>{PWForms}</code> tag, otherwise the <code>{content}</code> tag will be replaced.';
 $lang['help_install_crypto'] = 'Please install the OpenSSL module or mcrypt support if you would like to enable database encryption.';
 $lang['help_maximum_size'] = 'This limitation is in addition to any limits set by the php or web server configuration';
 $lang['help_newline_replacement'] = 'Leave blank to allow newlines and carriage returns in output';
@@ -750,8 +750,8 @@ $lang['param_passed_from_tag'] = 'Default value for the form field named \'pwfp_
 $lang['password_does_not_match'] = 'Password does not match %s';
 $lang['permitted_extensions'] = 'Extensions';
 $lang['permitted_filetypes'] = 'Allowed file types';
-$lang['perm_any'] = 'use the PowerForms module';
-$lang['perm_admin'] = 'Modify PowerForms module settings';
+$lang['perm_any'] = 'use the PWForms module';
+$lang['perm_admin'] = 'Modify PWForms module settings';
 $lang['perm_modify'] = 'Modify Power Forms';
 $lang['please_enter_an_email'] = 'Please enter a valid email address for "%s"';
 $lang['please_enter_an_integer'] = 'Please enter an integer value for "%s"';
@@ -784,7 +784,7 @@ $lang['settings'] = 'Settings';
 $lang['settings_updated'] = 'Settings updated.';
 $lang['sort_options'] = 'Sort options on output';
 $lang['submit'] = 'Submit';
-$lang['submit_error'] = 'PowerForms submit error: %s';
+$lang['submit_error'] = 'PWForms submit error: %s';
 $lang['suggest'] = 'Did you mean';
 $lang['suspected_spam_log'] = 'Suspected spam from IP %s stopped.';
 $lang['suspected_spam'] = 'Too many emails generated from your IP address. Anti-Spam code has prevented delivery.';
@@ -1134,7 +1134,7 @@ compatible, and some manual attention will be needed. Specifically:</p>
 </ul>
 <h4>Displaying a form</h4>
 <p>The tag used to display each form is shown in the module's admin page. Each tag is like
-<code>{PowerForms form='sample_form'}</code>. Placing the relevant tag into the content of
+<code>{PWForms form='sample_form'}</code>. Placing the relevant tag into the content of
 a website page or template will cause that form to be displayed.</p>
 <br />
 MORE<br />
@@ -1174,7 +1174,7 @@ The PowerBrowse module code provides an example of this process in use.<p>
 <h3>Permissions</h3>
 <ul>
 <li>Modify Power Forms - add/delete/modify any form</li>
-<li>Modify PowerForms module settings - modify any configuration setting</li>
+<li>Modify PWForms module settings - modify any configuration setting</li>
 </ul>
 <h3>Events</h3>
 <ul>

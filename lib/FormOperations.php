@@ -1,11 +1,11 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-namespace PowerForms;
+namespace PWForms;
 
 //for sorting field display-orders
 class SortOrdersClosure
@@ -108,7 +108,7 @@ EOS;
 
 	/**
 	Add:
-	@mod: reference to the current PowerForms module object
+	@mod: reference to the current PWForms module object
 	@params: reference to array of parameters,which must include
 		'form_name' and preferably also 'form_alias'
 	$params['form_name'] and $params['form_alias'] may be set/updated to unique values
@@ -142,7 +142,7 @@ EOS;
 
 	/**
 	Delete:
-	@mod: reference to the current PowerForms module object
+	@mod: reference to the current PWForms module object
 	@form_id: enumerator of form to be processed
 	Returns: boolean TRUE/FALSE whether deletion succeeded
 	*/
@@ -190,7 +190,7 @@ EOS;
 	/**
 	Copy:
 	Copy and store entire form
-	@mod: reference to the current PowerForms module object
+	@mod: reference to the current PWForms module object
 	@id: module id
 	@params: reference to array of parameters
 	@form_id: enumerator of form to be processed
@@ -279,7 +279,7 @@ EOS;
 	Store:
 	Updates data in tables: form, form_opt, field, field_opt
 	 and stores form template as such
-	@mod: reference to the current PowerForms module object
+	@mod: reference to the current PWForms module object
 	@formdata: reference to form data object
 	Returns: boolean T/F indicating success, with $params['message'] set upon failure
 	*/
@@ -364,11 +364,11 @@ EOS;
 	/**
 	Load:
 	Populates a data object from tables or from suitably-keyed members of @params
-	@mod: reference to the current PowerForms module object
+	@mod: reference to the current PWForms module object
 	@id: module id
 	@params: reference to array of parameters
 	@form_id: enumerator of form to be processed
-	Returns: reference to a Data object for the form, or FALSE
+	Returns: reference to a FormData object for the form, or FALSE
 	*/
 	public function &Load(&$mod,$id,&$params,$form_id)
 	{
@@ -431,7 +431,7 @@ EOS;
 
 	/**
 	CreateXML:
-	@mod: reference to PowerForms module
+	@mod: reference to PWForms module
 	@form_id: single form identifier,or array of them
 	@date: date string for inclusion in the content
 	@charset: optional,name of content encoding,default = FALSE
@@ -680,7 +680,7 @@ EOS;
 
 	/**
 	ImportXML:
-	@mod: reference to the current PowerForms module object
+	@mod: reference to the current PWForms module object
 	@xmlfile:
 	Returns boolean T/F
 	*/
@@ -830,7 +830,7 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 
 	/* *
 	HasDisposition:
-	@formdata: reference to Data form data object
+	@formdata: reference to FormData form data object
 	Returns: boolean, TRUE if a disposition field is found among the fields in @formdata
 	*/
 /*	public function HasDisposition(&$formdata)

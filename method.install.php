@@ -1,13 +1,13 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 /*QUEUE
 if (!function_exists('curl_init'))
-	return 'PowerForms needs the PHP cURL extension';
+	return 'PWForms needs the PHP cURL extension';
 TODO mutex check
 */
 //TODO cache check
@@ -143,7 +143,7 @@ $this->CreateEvent('OnFormSubmitError');
 $css = @file_get_contents(cms_join_path(__DIR__,'css','default.css'));
 $css_id = $db->GenID($pre.'css_seq');
 $db->Execute('INSERT INTO '.$pre.'css (css_id,css_name,css_text,media_type,create_date) VALUES (?,?,?,?,?)',
-	array($css_id,'PowerForms Default Style',$css,'screen',date('Y-m-d')));
+	array($css_id,'PWForms Default Style',$css,'screen',date('Y-m-d')));
 
 if (!$this->before20) {
 	$myname = $this->GetName();
@@ -157,7 +157,7 @@ if (!$this->before20) {
 	}
 }
 
-$funcs = new PowerForms\FormOperations();
+$funcs = new PWForms\FormOperations();
 $path = cms_join_path(__DIR__,'include');
 $dir = opendir($path);
 while ($filespec = readdir($dir)) {

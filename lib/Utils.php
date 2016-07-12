@@ -1,11 +1,11 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-namespace PowerForms;
+namespace PWForms;
 
 class Utils
 {
@@ -111,7 +111,7 @@ class Utils
 	
 	/* *
 	GetMutex:
-	@mod: reference to PowerForms module object
+	@mod: reference to PWForms module object
 	@storage: optional cache-type name, one (or more, ','-separated) of
 		auto,memcache,semaphore,file,database, default = 'auto'
 	Returns: mutex-object or NULL
@@ -292,7 +292,7 @@ class Utils
 	Populates and caches full and abbreviated arrays of available field-types,
 	from file 'Fields.manifest' plus any 'imported' field(s), for use in any
 	add-field pulldown. Does nothing if the arrays are already cached.
-	@mod: reference to PowerForms module object
+	@mod: reference to PWForms module object
 	*/
 	public static function Collect_Fields(&$mod)
 	{
@@ -351,7 +351,7 @@ class Utils
 	/**
 	Show_Field:
 	Include @classname in the array of available fields (to be used in any add-field pulldown)
-	@mod: reference to PowerForms module object
+	@mod: reference to PWForms module object
 	@classname: name of class for the field to be added
 	@sort: optional boolean, whether to sort ... , defalut TRUE
 	*/
@@ -476,7 +476,7 @@ class Utils
 	/**
 	GetFormOption:
 	Get the value of option @optname, in the Options array in @formdata
-	@formdata: reference to Data form data object
+	@formdata: reference to FormData form data object
 	@optname: name of option to find
 	@default: optional value to return if the requested option value doesn't exist, default ''
 	Returns: value of form option, or @default
@@ -491,7 +491,7 @@ class Utils
 
 	/**
 	CreateDefaultTemplate:
-	@formdata: reference to Data form data object
+	@formdata: reference to FormData form data object
 	@htmlish: whether the template is to include html tags like <h1>, default FALSE
 	@email:  whether the template is to begin with email-specific stuff, default TRUE
 	@oneline: whether the template is to NOT begin with a 'thanks' line, (irrelevant if @email = TRUE) default FALSE
@@ -567,7 +567,7 @@ class Utils
 	CreateTemplateAction:
 	Setup to insert a defined (probably default) template into a html-control.
 	For use when editing a form or field containing a template.
-	@mod: reference to PowerForms module object
+	@mod: reference to PWForms module object
 	@id: id given to the Powerforms module on execution
 	@ctlName: name of the control, by convention like 'opt_'.field-opt-name,
 		here, it may have appended suffix 'text'
@@ -598,7 +598,7 @@ EOS;
 
 	/**
 	TemplateActions:
-	@formdata: reference to Data formdata object
+	@formdata: reference to FormData formdata object
 	@id: The id given to the Powerforms module on execution
 	@ctlData: array of parameters in which key(s) are respective names of affected form-control(s),
 		values are arrays of parameters, their key(s) being any one or more of
@@ -679,7 +679,7 @@ EOS;
 	/**
 	AddTemplateVariable:
 	Adds a member to the $templateVariables array in @formdata (to be used for variables-help)
-	@formdata: reference to Data object for form
+	@formdata: reference to FormData object for form
 	@name: variable name (excluding '$')
 	@langkey: lang-array key for variable description
 	*/
@@ -692,7 +692,7 @@ EOS;
 	FormFieldsHelp:
 	Document contents of Fields array in @formdata, and append the contents of
 	array @extras
-	@formdata: reference to Data object for form
+	@formdata: reference to FormData object for form
 	@$extras: optional array of items to be appended to the output, each member
 		having key=id, value=name default = empty array
 	Returns: xhtml string which generates a tabular help description
@@ -732,7 +732,7 @@ EOS;
 	Setup variables-help for a form's submission-template. Essentially, it sets
 	smarty variable 'help_subtplvars' to the output from processing the template
 	varshelp.tpl
-	@formdata: reference to Data object for form
+	@formdata: reference to FormData object for form
 	@mod: reference to current PowerBrowse module object
 	@tplvars: reference to template-variables array
 	*/
@@ -856,7 +856,7 @@ EOS;
 
 	/**
 	ProcessTemplate:
-	@mod: reference to current PowerForms module object
+	@mod: reference to current PWForms module object
 	@tplname: template identifier
 	@tplvars: associative array of template variables
 	@cache: optional boolean, default TRUE
@@ -885,7 +885,7 @@ EOS;
 
 	/**
 	ProcessTemplateFromDatabase:
-	@mod: reference to current PowerForms module object
+	@mod: reference to current PWForms module object
 	@tplname: template identifier
 	@tplvars: associative array of template variables
 	@cache: optional boolean, default TRUE
@@ -915,7 +915,7 @@ EOS;
 
 	/**
 	ProcessTemplateFromData:
-	@mod: reference to current PowerForms module object
+	@mod: reference to current PWForms module object
 	@data: string
 	@tplvars: associative array of template variables
 	No cacheing.
@@ -955,7 +955,7 @@ EOS;
 
 	/**
 	Encrypt:
-	@mod: reference to PowerForms module object
+	@mod: reference to PWForms module object
 	@source: string to be encrypted
 	@pass_phrase: en/de-crypt key, if empty then the default will be used
 	This function derived from work by Josh Hartman and others.
@@ -982,7 +982,7 @@ EOS;
 
 	/**
 	Decrypt:
-	@mod: reference to PowerForms module object
+	@mod: reference to PWForms module object
 	@source: string to be encrypted
 	@pass_phrase: en/de-crypt key, if empty then the default will be used
 	This function derived from work by Josh Hartman and others.

@@ -1,7 +1,7 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 if (!$this->CheckAccess('ModifyPFForms')) exit;
@@ -90,7 +90,7 @@ EOS;
 	$fb_*					$*
 	fbr_*					pwf_*
 	fb_invalid				invalid_field
-	FormBuilder				PowerForms
+	FormBuilder				PWForms
 	$in_formbrowser			$in_browser
 	$fbr_id					$browser_id
 	$sub_form_name			$form_name
@@ -144,7 +144,7 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 		'class="submit"'
 	);
 	$repls = array(
-		'PowerForms',
+		'PWForms',
 		'0',
 		'0',
 		'0',
@@ -243,7 +243,7 @@ function Get_FieldOpts(&$db,$pre,$oldfid,$newfid,$oldf,$newf,&$fieldrow)
 	$data = $db->GetArray($sql,array($oldfid,$oldf));
 	if ($data) {
 		$extras = array();
-		$extras['alias'] = PowerForms\Utils::MakeAlias($fieldrow['name'],24); //length conform to FieldBase::GetVariableName()
+		$extras['alias'] = PWForms\Utils::MakeAlias($fieldrow['name'],24); //length conform to FieldBase::GetVariableName()
 		if ($fieldrow['hide_label']) $extras['hide_label'] = 1;
 		if ($fieldrow['required']) $extras['required'] = 1;
 		if ($fieldrow['validation_type']) $extras['validation_type'] = trim($fieldrow['validation_type']);
@@ -405,16 +405,16 @@ if (isset($params['import'])) {
 	$sql = 'SELECT * FROM '.$pre.'module_fb_form ORDER BY form_id';
 	$oldforms = $db->GetArray($sql);
 	if ($oldforms) {
-		$funcs = new PowerForms\FormOperations();
+		$funcs = new PWForms\FormOperations();
 		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
 		$renums = array();
 		foreach ($oldforms as $row) {
 			$fid = $db->GenID($pre.'module_pwf_form_seq');
 			$alias = $row['alias'];
 			if ($alias)
-				$alias = PowerForms\Utils::MakeAlias($alias,18); //maybe shorten
+				$alias = PWForms\Utils::MakeAlias($alias,18); //maybe shorten
 			else
-				$alias = PowerForms\Utils::MakeAlias($row['name'],18);
+				$alias = PWForms\Utils::MakeAlias($row['name'],18);
 			$ta = $alias;
 			$i = 1;
 			while (!$funcs->NewID(FALSE,$alias)) {

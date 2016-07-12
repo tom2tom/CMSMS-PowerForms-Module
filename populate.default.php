@@ -1,15 +1,15 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module files (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 $tplvars = $tplvars + array(
 	'total_pages' => $formdata->PagesCount,
 	'this_page' => $formdata->Page,
 	'title_page_x_of_y' => $this->Lang('title_page_x_of_y',array($formdata->Page,$formdata->PagesCount)),
-	'css_class' => PowerForms\Utils::GetFormOption($formdata,'css_class'),
+	'css_class' => PWForms\Utils::GetFormOption($formdata,'css_class'),
 	'form_name' => $formdata->Name,
 	'form_id' => $formdata->Id,
 	'actionid' => $id
@@ -28,7 +28,7 @@ if (!empty($params['in_browser'])) {
 $tplvars['in_browser'] = $in_browser;
 $tplvars['in_admin'] = $in_browser; //deprecated template var
 
-$inline = (!$in_browser && PowerForms\Utils::GetFormOption($formdata,'inline',0));
+$inline = (!$in_browser && PWForms\Utils::GetFormOption($formdata,'inline',0));
 $form_start = $this->CreateFormStart($id,'default',$returnid,
 	'POST','multipart/form-data',$inline,'',array(
 	'form_id'=>$form_id,
@@ -41,7 +41,7 @@ $form_end = $this->CreateFormEnd();
 //if ($formdata->Page < $formdata->PagesCount) //TODO c.f. $WalkPage in field-walker
 //	$hidden .= $this->CreateInputHidden($id,$formdata->current_prefix.'continue',($formdata->Page + 1));
 
-$reqSymbol = PowerForms\Utils::GetFormOption($formdata,'required_field_symbol','*');
+$reqSymbol = PWForms\Utils::GetFormOption($formdata,'required_field_symbol','*');
 // Start building fields
 $fields = array();
 //$prev = array(); //make other-page field-values available to templates
@@ -75,13 +75,13 @@ foreach ($formdata->FieldOrders as $one) {
 				foreach ($params[$valueindx] as $val) {
 					$hidden .= $this->CreateInputHidden($id,
 								$valueindx.'[]',
-								PowerForms\Utils::html_myentities_decode($val));
+								PWForms\Utils::html_myentities_decode($val));
 				}
 			} else {
 				//hide the value
 				$hidden .= $this->CreateInputHidden($id,
 						   $valueindx,
-						   PowerForms\Utils::html_myentities_decode($params[$valueindx]));
+						   PWForms\Utils::html_myentities_decode($params[$valueindx]));
 			}
 */
 			if ($one->DisplayInSubmission()) {
@@ -248,9 +248,9 @@ EOS;
 }
 unset($formdata->jscripts); //finished with this
 
-$buttonjs = PowerForms\Utils::GetFormOption($formdata,'submit_javascript');
+$buttonjs = PWForms\Utils::GetFormOption($formdata,'submit_javascript');
 
-if (PowerForms\Utils::GetFormOption($formdata,'input_button_safety')) {
+if (PWForms\Utils::GetFormOption($formdata,'input_button_safety')) {
 	$buttonjs .= ' onclick="return LockButton();"';
 	$jsfuncs[] = <<<EOS
 var submitted = false;
@@ -272,7 +272,7 @@ EOS;
 if ($formdata->Page > 1)
 	$tplvars['prev'] = '<input type="submit" id="'.$id.'prev" class="cms_submit submit_prev" name="'.
 	$id.$formdata->current_prefix.'prev" value="'.
-	PowerForms\Utils::GetFormOption($formdata,'prev_button_text',$this->Lang('previous')).'" '.
+	PWForms\Utils::GetFormOption($formdata,'prev_button_text',$this->Lang('previous')).'" '.
 	$buttonjs.' />';
 else
 	$tplvars['prev'] = NULL;
@@ -280,12 +280,12 @@ else
 if ($formdata->Page < $formdata->PagesCount) {
 	$tplvars['submit'] = '<input type="submit" id="'.$id.'submit" class="cms_submit submit_next" name="'.
 	$id.$formdata->current_prefix.'submit" value="'.
-	PowerForms\Utils::GetFormOption($formdata,'next_button_text',$this->Lang('next')).'" '.
+	PWForms\Utils::GetFormOption($formdata,'next_button_text',$this->Lang('next')).'" '.
 	$buttonjs.' />';
 } else {
 	$tplvars['submit'] = '<input type="submit" id="'.$id.'submit" class="cms_submit submit_current" name="'.
 	$id.$formdata->current_prefix.'done" value="'.
-	PowerForms\Utils::GetFormOption($formdata,'submit_button_text',$this->Lang('submit')).'" '.
+	PWForms\Utils::GetFormOption($formdata,'submit_button_text',$this->Lang('submit')).'" '.
 	$buttonjs.' />';
 }
 

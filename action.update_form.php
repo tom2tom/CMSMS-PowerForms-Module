@@ -1,13 +1,13 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 if (!$this->CheckAccess('ModifyPFForms')) exit;
 
 try {
-	$cache = PowerForms\Utils::GetCache($this);
+	$cache = PWForms\Utils::GetCache($this);
 } catch (Exception $e) {
 	echo $this->Lang('error_system');
 	exit;
@@ -18,7 +18,7 @@ if (isset($params['cancel'])) {
 }
 
 $form_id = (int)$params['form_id'];
-$funcs = new PowerForms\FormOperations();
+$funcs = new PWForms\FormOperations();
 
 if (isset($params['formdata'])) {
 	$formdata = $cache->get($params['formdata']);
@@ -58,10 +58,10 @@ if (isset($params['submit'])) {
 		$this->SetPreference('adder_fields',$params['set_field_level']);
 	$message = '';
 } elseif (isset($params['fielddelete'])) {
-	PowerForms\FieldOperations::DeleteField($formdata,$params['field_id']);
+	PWForms\FieldOperations::DeleteField($formdata,$params['field_id']);
 	$message = $this->PrettyMessage('field_deleted');
 } elseif (isset($params['fieldcopy'])) {
-	$obfield = PowerForms\FieldOperations::Replicate($formdata,$params['field_id']);
+	$obfield = PWForms\FieldOperations::Replicate($formdata,$params['field_id']);
 	if ($obfield) {
 		$obfield->Store(TRUE);
 		$formdata->Fields[$obfield->Id] = $obfield;
@@ -76,9 +76,9 @@ if (isset($params['submit'])) {
 		$message = $this->PrettyMessage('error_copy',FALSE);
 	}
 } elseif (isset($params['dir'])) {
-	$srcIndex = PowerForms\FieldOperations::GetFieldIndexFromId($formdata,$params['field_id']);
+	$srcIndex = PWForms\FieldOperations::GetFieldIndexFromId($formdata,$params['field_id']);
 	$destIndex = ($params['dir'] == 'up') ? $srcIndex - 1 : $srcIndex + 1;
-	PowerForms\FieldOperations::SwapFieldsByIndex($srcIndex,$destIndex);
+	PWForms\FieldOperations::SwapFieldsByIndex($srcIndex,$destIndex);
 	$message = $this->PrettyMessage('field_order_updated');
 } elseif (isset($params['active'])) {
 	$obfield = $formdata->Fields[$params['field_id']];
@@ -108,5 +108,5 @@ require __DIR__.DIRECTORY_SEPARATOR.'populate.update_form.php';
 unset($formdata->formsmodule); //no need to cache this
 $cache->set($params['formdata'],$formdata);
 
-echo PowerForms\Utils::ProcessTemplate($this,'editform.tpl',$tplvars);
+echo PWForms\Utils::ProcessTemplate($this,'editform.tpl',$tplvars);
 

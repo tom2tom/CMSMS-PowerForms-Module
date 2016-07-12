@@ -1,7 +1,7 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 $tab = $this->GetActiveTab($params);
@@ -37,7 +37,7 @@ $jsincs = array();
 $baseurl = $this->GetModuleURLPath();
 
 //list all the extant forms
-$allforms = PowerForms\Utils::GetForms();
+$allforms = PWForms\Utils::GetForms();
 if ($allforms) {
 	$tplvars['title_name'] = $this->Lang('title_form_name');
 	$tplvars['title_alias'] = ($pdev) ? $this->Lang('title_page_tag'):
@@ -205,7 +205,7 @@ if ($padm) {
 
 	$t = $this->GetPreference('masterpass');
 	if ($t)
-		$t = PowerForms\Utils::Unfusc($t);
+		$t = PWForms\Utils::Unfusc($t);
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_password');
 	$oneset->input = $this->CreateTextArea(false,$id,$t,'masterpass','cloaked',

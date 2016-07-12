@@ -1,7 +1,7 @@
 <?php
-# This file is part of CMS Made Simple module: PowerForms
+# This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PowerForms.module.php
+# Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 if (isset($params['cancel'])) {
@@ -11,7 +11,7 @@ if (isset($params['cancel'])) {
 	$alias = trim($params['form_alias']);
 	if (!$alias) {
 		if ($name)
-			$alias = PowerForms\Utils::MakeAlias($name);
+			$alias = PWForms\Utils::MakeAlias($name);
 		else
 			$name = '<'.$this->Lang('tab_form').'>'; //alias stays empty
 		$seetab = 'maintab';
@@ -23,7 +23,7 @@ if (isset($params['cancel'])) {
 	$params['form_name'] = $name;
 	$params['form_alias'] = $alias;
 
-	$funcs = new PowerForms\FormOperations();
+	$funcs = new PWForms\FormOperations();
 	if (isset($params['form_id'])) {
 		$newid = $funcs->Copy($this,$id,$params,$params['form_id']);
 		if (!$newid)
@@ -44,12 +44,12 @@ if (isset($params['cancel'])) {
 if (isset($params['form_id'])) {
 	$h = $this->CreateInputHidden($id,'form_id',$params['form_id']); //remember what to copy
 	$t = $this->Lang('copy');
-	$name = PowerForms\Utils::GetFormNameFromID($params['form_id']);
+	$name = PWForms\Utils::GetFormNameFromID($params['form_id']);
 	if ($name)
 		$name .= ' '.$t;
-	$alias = PowerForms\Utils::GetFormAliasFromID($params['form_id']);
+	$alias = PWForms\Utils::GetFormAliasFromID($params['form_id']);
 	if ($alias)
-		$alias .= '_'.PowerForms\Utils::MakeAlias($t);
+		$alias .= '_'.PWForms\Utils::MakeAlias($t);
 } else {
 	$h = '';
 	$name = '';
@@ -70,4 +70,4 @@ $tplvars = array(
 	'cancel' => $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'))
 );
 
-echo PowerForms\Utils::ProcessTemplate($this,'addform.tpl',$tplvars);
+echo PWForms\Utils::ProcessTemplate($this,'addform.tpl',$tplvars);
