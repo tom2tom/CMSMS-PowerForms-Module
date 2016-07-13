@@ -27,7 +27,7 @@ class Captcha extends FieldBase
 		return $this->ValidationMessage; //TODO useless
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$ret = '[Captcha]';
 		if ($as_string)

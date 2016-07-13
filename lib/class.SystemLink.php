@@ -20,7 +20,7 @@ class SystemLink extends FieldBase
 		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_none')=>'none');
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->GetOption('auto_link',0)) {
 			$pageinfo = cmsms()->variables['pageinfo'];

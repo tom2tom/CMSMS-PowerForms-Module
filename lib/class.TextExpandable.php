@@ -55,7 +55,7 @@ class TextExpandable extends FieldBase
 		return $ret;
 	}
 
-	public function GetHumanReadableValue($as_string = TRUE)
+	public function GetDisplayableValue($as_string = TRUE)
 	{
 		if (is_array($this->Value)) {
 			if ($as_string)

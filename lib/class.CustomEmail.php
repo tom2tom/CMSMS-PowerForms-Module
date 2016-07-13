@@ -134,16 +134,16 @@ class CustomEmail extends EmailBase
 
 			$senderfld = $this->GetOption('email_from_name'); //TODO confirm this is field_id?
 			$fld = $formdata->Fields[$senderfld];
-			$this->SetOption('email_from_name',$fld->GetHumanReadableValue());
+			$this->SetOption('email_from_name',$fld->GetDisplayableValue());
 
 			$fromfld = $this->GetOption('email_from_address');
 			$fld = $formdata->Fields[$fromfld];
-			$this->SetOption('email_from_address',$fld->GetHumanReadableValue());
+			$this->SetOption('email_from_address',$fld->GetDisplayableValue());
 
 			$addrs = array();
 			foreach ($dests as $field_id) {
 				$fld = $formdata->Fields[$field_id];
-				$value = $fld->GetHumanReadableValue();
+				$value = $fld->GetDisplayableValue();
 				if (strpos($value,',') !== FALSE)
 					$addrs = $addrs + explode(',',$value);
 				else
@@ -152,14 +152,14 @@ class CustomEmail extends EmailBase
 
 /*			$subjectfld = $this->GetOption('email_subject');
 			$fld = $formdata->Fields[$subjectfld];
-			$this->SetOption('email_subject',$fld->GetHumanReadableValue());
+			$this->SetOption('email_subject',$fld->GetDisplayableValue());
 
 			$ret = $this->SendForm($addrs,$this->GetOption('email_subject'));
 
 			$this->SetOption('email_subject',$subjectfld);
 */
 			$fld = $formdata->Fields[$this->GetOption('email_subject')];
-			$ret = $this->SendForm($addrs,$fld->GetHumanReadableValue()); //TODO check value(subject) is ok
+			$ret = $this->SendForm($addrs,$fld->GetDisplayableValue()); //TODO check value(subject) is ok
 
 			$this->SetOption('email_from_name',$senderfld);
 			$this->SetOption('email_from_address',$fromfld);

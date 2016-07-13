@@ -65,7 +65,7 @@ class EmailDirector extends EmailBase
 		return $ret;
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue())
 			$ret = $this->GetOptionElement('destination_subject',$this->Value);

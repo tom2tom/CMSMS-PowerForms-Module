@@ -63,7 +63,7 @@ class CheckboxGroup extends FieldBase
 		return $this->formdata->formsmodule->Lang('boxes',$boxCount);
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$names = $this->GetOptionRef('box_name');
 		if ($names) {

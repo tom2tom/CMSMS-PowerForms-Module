@@ -185,4 +185,3 @@ class SharedFile extends FieldBase
 	}
 
 }
-

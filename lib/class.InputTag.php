@@ -57,7 +57,7 @@ class InputTag extends FieldBase
 		foreach ($this->formdata->Fields as &$one) {
 			$val = '';
 			if ($one->DisplayInSubmission()) {
-				$val = $one->GetHumanReadableValue();
+				$val = $one->GetDisplayableValue();
 				if (!$val)
 					$val = $unspec;
 			}

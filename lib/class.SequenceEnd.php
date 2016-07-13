@@ -20,7 +20,7 @@ class SequenceEnd extends FieldBase
 		$this->Type = 'SequenceEnd';
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$ret = '[End FieldSequence: '.$this->GetOption('starter').']';
 		if ($as_string)

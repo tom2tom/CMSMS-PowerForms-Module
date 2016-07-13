@@ -57,7 +57,7 @@ class PageRedirector extends FieldBase
 		return $this->formdata->formsmodule->Lang('destination_count',$num);
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue())
 			$ret = $this->GetOptionElement('destination_page',$this->Value);

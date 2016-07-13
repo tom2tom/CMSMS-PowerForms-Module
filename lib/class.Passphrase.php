@@ -127,4 +127,3 @@ EOS;
 		return array($this->validated,$this->ValidationMessage);
 	}
 }
-

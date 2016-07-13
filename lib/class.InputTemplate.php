@@ -22,7 +22,7 @@ class InputTemplate extends FieldBase
 		$this->Type = 'InputTemplate';
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$formdata = $this->formdata;
 

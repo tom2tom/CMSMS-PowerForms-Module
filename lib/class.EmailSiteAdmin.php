@@ -41,7 +41,7 @@ class EmailSiteAdmin extends EmailBase
 		return $ret;
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$userops = cmsms()->GetUserOperations();
 		if ($this->GetOption('restrict_to_group',0))

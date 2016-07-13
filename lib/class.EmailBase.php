@@ -295,7 +295,7 @@ $mod->Crash;
 					return array(FALSE,$mod->Lang('error_uploads_dir'));
 				}
 
-				$thisAtt = $one->GetHumanReadableValue(FALSE);
+				$thisAtt = $one->GetDisplayableValue(FALSE);
 
 				if (is_array($thisAtt)) {
 					foreach ($thisAtt as $onefile) {

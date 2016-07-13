@@ -70,7 +70,7 @@ class MultiselectFileDirector extends FieldBase
 		return implode("\t",$fields);
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$ret = array();
 		if (is_array($this->Value)) {

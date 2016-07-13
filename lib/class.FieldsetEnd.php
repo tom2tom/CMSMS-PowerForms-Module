@@ -20,7 +20,7 @@ class FieldsetEnd extends FieldBase
 		$this->Type = 'FieldsetEnd';
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$ret = '[End Fieldset: '.$this->Value.']';
 		if ($as_string)

@@ -19,7 +19,7 @@ class Link extends FieldBase
 		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_none')=>'none');
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if (property_exists($this,'Value') && is_array($this->Value))
 			$ret = '<a href="'.$this->Value[0].'">'.$this->Value[1].'</a>';

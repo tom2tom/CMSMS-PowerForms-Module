@@ -57,7 +57,7 @@ class Pulldown extends FieldBase
 		return $this->formdata->formsmodule->Lang('options',$num);
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue())
 			$ret = $this->GetOptionElement('option_value',$this->Value);

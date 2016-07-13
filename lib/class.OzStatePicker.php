@@ -29,7 +29,7 @@ class OzStatePicker extends FieldBase
 //		ksort($this->states);
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$ret = array_search($this->Value,$this->states);
 		if ($as_string)

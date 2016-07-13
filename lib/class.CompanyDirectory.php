@@ -30,7 +30,7 @@ class CompanyDirectory extends FieldBase
 		return '';
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue()) {
 			if (is_array($this->Value)) {

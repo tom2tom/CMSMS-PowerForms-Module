@@ -22,7 +22,7 @@ class SequenceStart extends FieldBase
 		$this->Type = 'SequenceStart';
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$ret = '[Begin FieldSequence: '.$this->GetOption('privatename').']';
 		if ($as_string)

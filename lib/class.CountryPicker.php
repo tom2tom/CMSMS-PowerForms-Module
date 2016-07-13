@@ -104,7 +104,7 @@ class CountryPicker extends FieldBase
 			ksort($this->Countries);
 		}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$ret = array_search($this->Value,$this->Countries);
 		if ($as_string)

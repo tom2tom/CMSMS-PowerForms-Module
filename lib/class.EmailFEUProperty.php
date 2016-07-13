@@ -29,7 +29,7 @@ class EmailFEUProperty extends EmailBase
 		return $ret;
 	}
 
-	public function GetHumanReadableValue($as_string = TRUE)
+	public function GetDisplayableValue($as_string = TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
 		$prop = $this->GetOption('feu_property');

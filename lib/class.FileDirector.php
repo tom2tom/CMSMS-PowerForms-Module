@@ -69,7 +69,7 @@ class FileDirector extends FieldBase
 		return implode("\t",$fields);
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$ret = $this->GetOptionElement('destination_displayname',$this->Value); //TODO
 		if ($as_string)

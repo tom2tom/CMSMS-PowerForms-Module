@@ -60,7 +60,7 @@ class RadioGroup extends FieldBase
 		return $ret;
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue())
 		   $ret = $this->GetOptionElement('button_checked',($this->Value - 1)); //TODO index

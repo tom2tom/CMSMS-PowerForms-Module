@@ -18,7 +18,7 @@ class FileUpload extends FieldBase
 		$this->ValidationTypes = array($mod->Lang('validation_none')=>'none');
 	}
 
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->GetOption('suppress_filename',0))
 			return '';
@@ -163,7 +163,7 @@ class FileUpload extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if ($this->Value)
-			$ret = $this->GetHumanReadableValue().'<br />'; // Value line
+			$ret = $this->GetDisplayableValue().'<br />'; // Value line
 		else
 			$ret = '';
 		$tmp = $mod->CreateFileUploadInput(
@@ -192,11 +192,11 @@ class FileUpload extends FieldBase
 	// Ryan's ugly fix for Bug 4307
 	// We should figure out why this field wasn't populating its Smarty variable
 	if ($one->GetFieldType() == 'FileUpload') { //TODO
-		$tplvars['fld_'.$one->GetId()] = $one->GetHumanReadableValue();
+		$tplvars['fld_'.$one->GetId()] = $one->GetDisplayableValue();
 		$hidden .= $this->CreateInputHidden($id,
 			$testIndex,
-			Utils::html_myentities_decode($one->GetHumanReadableValue()));
-		$thisAtt = $one->GetHumanReadableValue(FALSE);
+			Utils::html_myentities_decode($one->GetDisplayableValue()));
+		$thisAtt = $one->GetDisplayableValue(FALSE);
 		$tplvars['test_'.$one->GetId()] = $thisAtt;
 		$tplvars['value_fld'.$one->GetId()] = $thisAtt[0];
 	}
@@ -270,7 +270,7 @@ class FileUpload extends FieldBase
 				foreach ($fids[1] as $field_id) {
 					if (array_key_exists($field_id,$this->formdata->Fields)) {
 						$destination_name = str_replace('$fld_'.$field_id,
-							 $this->formdata->Fields[$field_id]->GetHumanReadableValue(),$destination_name);
+							 $this->formdata->Fields[$field_id]->GetDisplayableValue(),$destination_name);
 					}
 				}
 				$destination_name = str_replace('$ext',$thisExt,$destination_name);

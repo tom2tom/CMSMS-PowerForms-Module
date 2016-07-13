@@ -827,7 +827,7 @@ EOS;
 			$replVal = $unspec;
 			$replVals = array();
 			if ($one->DisplayInSubmission()) {
-				$replVal = $one->GetHumanReadableValue();
+				$replVal = $one->GetDisplayableValue();
 				if ($htmlemail) {
 					// allow <BR> as delimiter or in content
 					$replVal = preg_replace(
