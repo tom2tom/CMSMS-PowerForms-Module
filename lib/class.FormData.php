@@ -58,9 +58,9 @@ class FormData implements \Serializable
 	public function __toString()
 	{
 		$mod = $this->formsmodule;
-		$this->formsmodule = NULL; //no need to log 'public' data
+		$this->formsmodule = $mod->GetName(); //no need to log all 'public' data
 		foreach ($this->Fields as &$one) {
-			$one->formdata = NULL; //no need to self-refer
+			$one->formdata = $this->Id; //no need to fully self-document
 		}
 		unset ($one);
 		$ret = json_encode(get_object_vars($this));
@@ -71,7 +71,9 @@ class FormData implements \Serializable
 		unset ($one);
 		return $ret;
 	}
-	
+
+	// Serializable interface methods
+
 	public function serialize()
 	{
 		return $this->__toString();
@@ -85,7 +87,10 @@ class FormData implements \Serializable
 				$arr = (array)$props;
 				foreach ($arr as $key=>$one) {
 					switch ($key) {
-					 case Fields:
+					 case 'formsmodule':
+						$this->$key =& ModuleOperations::get_instance()->get_module_intance($one);
+						break;
+					 case 'Fields':
  						$one = (array)$one;
 						$members = array();
 						foreach ($one as $subkey=>$mdata) {
@@ -94,13 +99,13 @@ class FormData implements \Serializable
 						}
 						$this->$key = $members;
 						break;
-					 case FieldOrders:
-					 case templateVariables:
-					 case jscripts:
+					 case 'FieldOrders':
+					 case 'templateVariables':
+					 case 'jscripts':
 						$this->$key = ($one) ? (array)$one : array();
 						break;
-					 case Options:
-					 case extradata:
+					 case 'Options':
+					 case 'extradata':
  						$one = (array)$one;
 						$members = array();
 						foreach ($one as $subkey=>$mdata) {
