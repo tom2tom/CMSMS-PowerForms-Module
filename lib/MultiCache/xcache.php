@@ -1,4 +1,5 @@
 <?php
+
 namespace MultiCache;
 
 class Cache_xcache extends CacheBase implements CacheInterface
@@ -27,7 +28,7 @@ class Cache_xcache extends CacheBase implements CacheInterface
 
 	public function connectServer()
 	{
-        $this->client = new \XCache();
+        $this->client = new \XCache(); //TODO CAN'T FIND THIS
 //     $adbg = xcache_info(XC_TYPE_VAR, int id);
 		return TRUE;  //TODO connect
 	}

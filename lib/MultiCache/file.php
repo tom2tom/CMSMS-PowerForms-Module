@@ -1,4 +1,5 @@
 <?php
+
 namespace MultiCache;
 
 class Cache_file extends CacheBase implements CacheInterface
@@ -7,8 +8,8 @@ class Cache_file extends CacheBase implements CacheInterface
 
 	public function __construct($config = array())
 	{
+		parent::__construct($config);
 		if ($this->use_driver()) {
-			parent::__construct($config);
 			if ($this->connectServer()) {
 				return;
 			}

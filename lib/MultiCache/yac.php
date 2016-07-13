@@ -115,5 +115,4 @@ class Cache_yac extends CacheBase implements CacheInterface
 		}
 		return TRUE;
 	}
-
 }
