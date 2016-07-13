@@ -264,7 +264,7 @@ $this->Crash2();
 					foreach ($formdata->FieldOrders as $one) {
 						$one = $formdata->Fields($one);
 						if ($one->DisplayInSubmission()) {
-							$val = $one->GetHumanReadableValue();
+							$val = $one->GetDisplayableValue();
 							if ($val == '')
 								$val = $unspec;
 						} else

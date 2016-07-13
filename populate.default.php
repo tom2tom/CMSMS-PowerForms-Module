@@ -87,7 +87,7 @@ foreach ($formdata->FieldOrders as $one) {
 			if ($one->DisplayInSubmission()) {
 /*TODO			if ($WalkPage < $formdata->Page) {
 					$oneset = new stdClass();
-					$oneset->value = $one->GetHumanReadableValue();
+					$oneset->value = $one->GetDisplayableValue();
 					$tplvars[$one->GetName()] = $oneset;
 					$tplvars[$one->ForceAlias()] = $oneset;
 					$prev[] = $oneset;
@@ -135,8 +135,8 @@ foreach ($formdata->FieldOrders as $one) {
 	$oneset->smarty_eval = $one->GetSmartyEval()?1:0;
 	$oneset->type = $one->GetDisplayType();
 //	$oneset->valid = $one->GetOption('is_valid',TRUE)?1:0;
-	$oneset->valid = $one->validated?1:0;
-	$oneset->values = $one->GetAllHumanReadableValues();
+	$oneset->valid = $one->validated?1:0; //TODO method needed
+	$oneset->values = $one->GetDisplayableOptionValues(); //TODO
 
 	$tplvars[$alias] = $oneset;
 	$fields[$oneset->input_id] = $oneset;
