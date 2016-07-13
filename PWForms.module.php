@@ -36,10 +36,6 @@ class PWForms extends CMSModule
 
 	public function __construct()
 	{
-		if (!function_exists('cmsms_spacedload')) {
-			spl_autoload_register(array($this,'cmsms_spacedload'));
-		}
-
 		parent::__construct();
 		global $CMS_VERSION;
 		$this->before20 = (version_compare($CMS_VERSION,'2.0') < 0);
@@ -52,15 +48,30 @@ class PWForms extends CMSModule
 		$sep = strpos($url,'&amp;');
 		$this->Qurl = substr($url,0,$sep);
 */
-		require_once cms_join_path(__DIR__,'lib','FormData.php');
+		spl_autoload_register(array($this,'cmsms_spacedload'));
+		require_once cms_join_path(__DIR__,'lib','class.FormData.php');
+
 		$this->RegisterModulePlugin(TRUE);
 	}
 
-	/* autoloader */
-	private function cmsms_spacedload ($class)
+	public function __destruct()
 	{
-		$prefix = get_class().'\\'; //specific namespace prefix
-		// ignore if the class doesn't use the prefix
+/*		if ($this->ch) {
+			curl_multi_remove_handle($this->mh,$this->ch);
+			curl_close($this->ch);
+		}
+		if ($this->mh)
+			curl_multi_close($this->mh);
+*/
+		spl_autoload_unregister(array($this,'cmsms_spacedload'));
+		parent::__destruct();
+	}
+
+	/* namespace autoloader - CMSMS default autoloader doesn't do spacing */
+	private function cmsms_spacedload($class)
+	{
+		$prefix = get_class().'\\'; //our namespace prefix
+		// ignore if $class doesn't have the prefix
 		if (($p = strpos($class,$prefix)) === FALSE)
 			return;
 		if (!($p === 0 || ($p === 1 && $class[0] == '\\')))
@@ -70,25 +81,22 @@ class PWForms extends CMSModule
 		if ($class[0] == '\\') {
 			$len++;
 		}
-		$relative_class = substr($class,$len);
+		$relative_class = trim(substr($class,$len),'\\');
+		if (($p = strrpos($relative_class,'\\',-1)) !== FALSE) {
+			$relative_dir = str_replace('\\',DIRECTORY_SEPARATOR,$relative_class);
+			$base = substr($relative_dir,$p+1);
+			$relative_dir = substr($relative_dir,0,$p).DIRECTORY_SEPARATOR;
+		} else {
+			$base = $relative_class;
+			$relative_dir = '';
+		}
 		// base directory for the namespace prefix
-		$base_dir = __DIR__.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR;
-		$fp = $base_dir.str_replace('\\',DIRECTORY_SEPARATOR,$relative_class).'.php';
+		$fp = __DIR__.DIRECTORY_SEPARATOR.'lib'
+		.DIRECTORY_SEPARATOR.$relative_dir.'class.'.$base.'.php';
 		if (file_exists($fp))
 			include $fp;
 	}
 
-/*	public function __destruct()
-	{
-		if ($this->ch) {
-			curl_multi_remove_handle($this->mh,$this->ch);
-			curl_close($this->ch);
-		}
-		if ($this->mh)
-			curl_multi_close($this->mh);
-//		parent::__destruct();
-	}
-*/
 	public function AllowAutoInstall()
 	{
 		return FALSE;
