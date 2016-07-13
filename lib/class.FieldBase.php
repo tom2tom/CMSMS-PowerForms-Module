@@ -7,43 +7,43 @@
 
 namespace PWForms;
 
-class FieldBase
+class FieldBase implements \Serializable
 {
-	var $formdata; //reference to shared FormData data-object
+	protected $formdata; //reference to FormData object for the form to which this field belongs
 	//field status
-	var $loaded = FALSE;
-	var $validated = TRUE;
+	protected $loaded = FALSE;
+	protected $validated = TRUE;
 	//field properties
-	var $ChangeRequirement = TRUE; //whether admin user may change $Required
-	var $DisplayInForm = TRUE;
-	var $DisplayInSubmission = TRUE; //whether field value is echoed in submission template (if used) (effectively ~ ::$IsInput)
-	var $DispositionPermitted = TRUE;
-	var $FormId = 0;
-	var $HasAddOp = FALSE;
-	var $HasDeleteOp = FALSE;
-	var $HasLabel = TRUE;
-	var $HasUserAddOp = FALSE;
-	var $HasUserDeleteOp = FALSE;
-	var $HideLabel = FALSE;
-	var $Id = 0;
-	var $IsComputedOnSubmission = FALSE;
-	var $IsDisposition = FALSE;
-	var $IsEmailDisposition = FALSE;
-	var $IsInput = FALSE;
-	var $IsSortable = TRUE;
-	var $LabelSubComponents = TRUE;
-	var $MultiPopulate = FALSE; //whether Populate() generates array of objects
-	var $Name = '';
-	var $NeedsDiv = TRUE;
-	var $Options = array();
-	var $OrderBy = 0; //form display-order
-	var $Required = FALSE;
-	var $SmartyEval = FALSE; //TRUE for textinput field whose value is to be processed via smarty
-	var $Type = '';
-	var $ValidationMessage = ''; //post-validation error message, or ''
-	var $ValidationType = 'none';
-	var $ValidationTypes; //if set, an array of choices suitable for populating pulldowns
-	var $Value; //when set, can be scalar or array, with all content processed by Utils::html_myentities_decode()
+	protected $ChangeRequirement = TRUE; //whether admin user may change $Required
+	protected $DisplayInForm = TRUE;
+	protected $DisplayInSubmission = TRUE; //whether field value is echoed in submission template (if used) (effectively ~ ::$IsInput)
+	protected $DispositionPermitted = TRUE;
+	protected $FormId = 0;
+	protected $HasAddOp = FALSE;
+	protected $HasDeleteOp = FALSE;
+	protected $HasLabel = TRUE;
+	protected $HasUserAddOp = FALSE;
+	protected $HasUserDeleteOp = FALSE;
+	protected $HideLabel = FALSE;
+	protected $Id = 0;
+	protected $IsComputedOnSubmission = FALSE;
+	protected $IsDisposition = FALSE;
+	protected $IsEmailDisposition = FALSE;
+	protected $IsInput = FALSE;
+	protected $IsSortable = TRUE;
+	protected $LabelSubComponents = TRUE;
+	protected $MultiPopulate = FALSE; //whether Populate() generates array of objects
+	protected $Name = '';
+	protected $NeedsDiv = TRUE;
+	protected $Options = array();
+	protected $OrderBy = 0; //form display-order
+	protected $Required = FALSE;
+	protected $SmartyEval = FALSE; //TRUE for textinput field whose value is to be processed via smarty
+	protected $Type = '';
+	protected $ValidationMessage = ''; //post-validation error message, or ''
+	protected $ValidationType = 'none';
+	protected $ValidationTypes; //if set, an array of choices suitable for populating pulldowns
+	protected $Value; //when set, can be scalar or array, with all content processed by Utils::html_myentities_decode()
 
 	public function __construct(&$formdata,&$params)
 	{
@@ -82,7 +82,7 @@ class FieldBase
 	}
 
 	// Returns a form-option value, or $default if the option doesn't exist
-	public function GetFormOption($optname,$default='')
+	public function GetFormOption($optname, $default='')
 	{
 		if (isset($this->formdata->Options[$optname]))
 			return $this->formdata->Options[$optname];
@@ -364,7 +364,7 @@ class FieldBase
 	}
 */
 	//apply frontend class(es) to string $html
-	public function SetClass($html,$extra='') 
+	public function SetClass($html,$extra='')
 	{
 		$html = preg_replace('/class *= *".*"/U','',$html);
 		$cls = $this->GetOption('css_class');
@@ -394,7 +394,7 @@ class FieldBase
 
 	// Subclass this
 	// Returns field value as a scalar or array (per $as_string), suitable for display in the form
-	public function GetHumanReadableValue($as_string=TRUE)
+	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if (property_exists($this,'Value')) {
 			$ret = $this->Value;
@@ -418,11 +418,12 @@ class FieldBase
 	// Subclass this
 	// Returns array of option values if the option is an array with member(s),
 	// or else FALSE
-	public function GetAllHumanReadableValues()
+	public function GetDisplayableOptionValues()
 	{
 		if (array_key_exists('option_value',$this->Options)) {
-			if ($this->GetOption('option_value')) //array with member(s)
-				return $this->GetOption('option_value');
+			$ret = $this->GetOption('option_value'); //array with member(s)
+			if ($ret)
+				return $ret;
 		}
 		return FALSE;
 	}
@@ -540,7 +541,7 @@ class FieldBase
 			}
 		}
 		unset($val);
-		
+
 		if ($matches) {
 			if (count($matches) > 1)
 				ksort($matches);
@@ -562,7 +563,7 @@ class FieldBase
 
 	public function GetOptionElement($optionName,$index,$default='')
 	{
-		$so = $optionName.$index; 
+		$so = $optionName.$index;
 		if (isset($this->Options[$so]))
 			return $this->Options[$so];
 		elseif ($index == 0) {
@@ -701,7 +702,7 @@ class FieldBase
 	Generates 'base'/common content for editing a field.
 	See also - comments below, for AdminPopulate()
 
-	Returns: array with keys 'main' and  (possibly empty) 'adv', for use 
+	Returns: array with keys 'main' and  (possibly empty) 'adv', for use
 		ultimately in method.update_field.php.
 	*/
 	public function AdminPopulateCommon($id,$visible=TRUE)
@@ -778,7 +779,7 @@ class FieldBase
 
 	/**
 	AdminPopulate:
-	@id: id given to the PWForms module on execution  
+	@id: id given to the PWForms module on execution
 
 	Construct content for field edit. Subclass this.
 	Array keys presently recognised are: 'main','adv','table','extra','funcs'.
@@ -867,4 +868,45 @@ class FieldBase
 	{
 	}
 
+	public function __toString()
+	{
+		//no need to fully-document our 'parent'
+ 		$ob = $this->formdata;
+		$this->formdata = $this->formdata->Id;
+		$ret = json_encode(get_object_vars($this));
+		$this->formdata = $ob;
+		return $ret;
+	}
+
+	// Serializable interface methods
+	public function serialize()
+	{
+		return $this->__toString();
+	}
+
+	public function unserialize($serialized)
+	{
+		if ($serialized) {
+			$props = json_decode($serialized);
+			if ($props !== NULL) {
+				$arr = (array)$props;
+				foreach ($arr as $key=>$one) {
+					switch ($key) {
+					 case 'formdata':
+						$this->$key = $one; //TODO get ref to actual FormData-object
+					 case 'Options':
+					 case 'ValidationTypes': //if set, an array of choices suitable for populating pulldowns
+						$this->$key = $one; //TODO handle arrays
+						break;
+					 case 'Value':
+						$this->$key = $one; //TODO handle possible array
+						break;
+					 default:
+						$this->$key = $one;
+						break;
+					}
+				}
+			}
+		}
+	}
 }
