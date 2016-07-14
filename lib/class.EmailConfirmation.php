@@ -121,8 +121,7 @@ class EmailConfirmation extends EmailBase
 		$pub = substr(md5(session_id().$t),0,12);
 		$pw = $pub.Utils::Unfusc($mod->GetPreference('masterpass'));
 		$when = $db->DbTimeStamp($t);
-		$this->formdata->formsmodule = NULL; //exclude module-data from the record
-		$cont = Utils::Encrypt($this->formdata,$pw);
+		$cont = Utils::Encrypt(serialize($this->formdata),$pw);
 		$db->Execute('INSERT INTO '.$pre.
 		'module_pwf_record (record_id,pubkey,submitted,contents) VALUES (?,?,?,?)',
 			array($record_id,$pub,$when,$cont));
