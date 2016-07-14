@@ -34,12 +34,11 @@ if (!$row || $row['pubkey'] != $params[$key.'c']) {
 $db->Execute($sql,array($record_id));
 
 $pw = $row['pubkey'].PWForms\Utils::Unfusc($this->GetPreference('masterpass'));
-$formdata = PWForms\Utils::Decrypt($row['content'],$pw);
+$formdata = unserialize(PWForms\Utils::Decrypt($row['content'],$pw));
 if ($formdata === FALSE) {
 	echo $this->Lang('validation_response_error');
 	return;
 }
-$formdata->formsmodule = &$this; //restore un-cached content
 
 $field_id = $params[$key.'d'];
 $obfield = $formdata->Fields[$field_id];
