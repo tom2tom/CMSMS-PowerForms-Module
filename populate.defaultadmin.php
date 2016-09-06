@@ -216,7 +216,7 @@ if ($padm) {
 	$jsloads[] =<<<EOS
  $('#{$id}passwd').inputCloak({
   type:'see4',
-  symbol:'\u2022'
+  symbol:'\u25CF'
  });
 
 EOS;
