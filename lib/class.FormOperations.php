@@ -493,7 +493,7 @@ EOS;
 
 		foreach ($form_id as $one) {
 			$formopts = $db->GetAssoc($sql,array($one));
-			$formfields = $db->GetAll($sql2,array($one));
+			$formfields = $db->GetArray($sql2,array($one));
 			$fieldkeys = ($formfields) ? array_keys($formfields[0]) : array();
 			$fieldopts = $db->GetArray($sql3,array($one));
 			$xml = array();
