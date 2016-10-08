@@ -246,7 +246,6 @@ $jsfuncs[] =<<<EOS
  this.location='{$link}&{$id}field_type='+type;
  return TRUE;
 }
-
 EOS;
 
 //CmsLayoutTemplate::get_designs() TODO
@@ -542,12 +541,5 @@ $jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/include/module.js"></script>
 EOS;
 
-if ($jsloads) {
-	$jsfuncs[] = '$(document).ready(function() {
-';
-	$jsfuncs = array_merge($jsfuncs,$jsloads);
-	$jsfuncs[] = '});
-';
-}
-$tplvars['jsfuncs'] = $jsfuncs;
-$tplvars['jsincs'] = $jsincs;
+$tplvars['jsall'] = NULL;
+PWForms\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$tplvars['jsall']);

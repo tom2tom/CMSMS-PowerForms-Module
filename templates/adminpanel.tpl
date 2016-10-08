@@ -38,13 +38,13 @@
 {/if}
 <br />
 <div class="pageinput">
-	{if $pmod}{$addlink}&nbsp;{$addform}{/if}
-	{if !empty($forms)}
-		<div style="margin:0 50% 0 2%;float:right;text-align:right">
-		{if $pmod}{$clonebtn} {$deletebtn} {/if}{$exportbtn}
-		</div>
-		<div class="clearb"></div>
-	{/if}
+{if $pmod}{$addlink}&nbsp;{$addform}{/if}
+{if !empty($forms)}
+ <div style="margin:0 50% 0 2%;float:right;text-align:right">
+{if $pmod}{$clonebtn} {$deletebtn} {/if}{$exportbtn}
+ </div>
+<div class="clearb"></div>
+{/if}
 </div>
 {$form_end}
 {$tab_end}
@@ -52,25 +52,25 @@
 {$importstab_start}
 <div class="pageinput pageoverflow">
 {if isset($submitfb)}
-	<fieldset>
-	<legend>{$legend_xmlimport}</legend>
+ <fieldset>
+ <legend>{$legend_xmlimport}</legend>
 {/if}
-		{$start_importxmlform}
-		{foreach from=$xmls item=entry}
-		{if isset($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
-		<div>{$entry->input}{if isset($entry->help)}<br />{$entry->help}{/if}</div>
-		{/foreach}
-		<br />
-		<div>{$submitxml}</div>
-		{$form_end}
+ {$start_importxmlform}
+ {foreach from=$xmls item=entry}
+ {if isset($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
+  <div>{$entry->input}{if isset($entry->help)}<br />{$entry->help}{/if}</div>
+ {/foreach}
+ <br />
+ <div>{$submitxml}</div>
+ {$form_end}
 {if isset($submitfb)}
-	</fieldset>
-	<fieldset>
-	<legend>{$legend_fbimport}</legend>
-		{$start_importfbform}
-		<div>{$submitfb}{if isset($submitdata)} {$submitdata}{/if}</div>
-		{$form_end}
-	</fieldset>
+ </fieldset>
+ <fieldset>
+ <legend>{$legend_fbimport}</legend>
+ {$start_importfbform}
+  <div>{$submitfb}{if isset($submitdata)} {$submitdata}{/if}</div>
+ {$form_end}
+ </fieldset>
 {/if}
 </div>
 {$tab_end}
@@ -90,13 +90,5 @@
 {$tab_end}
 {/if}
 {$tabs_end}
-
-{if !empty($jsincs)}{foreach from=$jsincs item=inc}{$inc}
-{/foreach}{/if}
-{if !empty($jsfuncs)}
-<script type="text/javascript">
-//<![CDATA[
-{foreach from=$jsfuncs item=func}{$func}{/foreach}
-//]]>
-</script>
+{if !empty($jsall)}{$jsall}
 {/if}

@@ -165,11 +165,11 @@
  {else}
  <p>{$nodispositions}</p>
  {/if}
-	 <div class="addfast">
-	  <p class="pagetext">{$title_fastadd2}</p>
-	  <div>{$input_fastadd2}<br />{$help_fastadd2}</div>
-	 </div>
-  	 <div class="addslow">{$add_disposition_link}</div>
+ <div class="addfast">
+  <p class="pagetext">{$title_fastadd2}</p>
+  <div>{$input_fastadd2}<br />{$help_fastadd2}</div>
+ </div>
+ <div class="addslow">{$add_disposition_link}</div>
   <br />
   <p class="pagetext">{$title_submit_action}:</p>
   <p>{$input_submit_action}</p>
@@ -194,13 +194,5 @@
   <p class="pageinput">{$save} {$cancel} {$apply}</p>
  </div>
 {$form_end}
-
-{if !empty($jsincs)}{foreach from=$jsincs item=inc}{$inc}
-{/foreach}{/if}
-{if !empty($jsfuncs)}
-<script type="text/javascript">
-//<![CDATA[
-{foreach from=$jsfuncs item=func}{$func}{/foreach}
-//]]>
-</script>
+{if !empty($jsall)}{$jsall}
 {/if}

@@ -494,19 +494,8 @@ $cache->set($cache_key,$formdata);
 echo $form_start.$hidden;
 PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf::'.$form_id,$tplvars,TRUE);
 echo $form_end;
-//inject constructed js near end of page (pity we can't get to </body> or </html>)
-if ($jsincs) {
-	echo implode(PHP_EOL,$jsincs);
-//	echo PHP_EOL;
-}
-if ($jsfuncs) {
-	echo <<<EOS
-<script type="text/javascript">
-//<![CDATA[
-EOS;
-	echo implode(PHP_EOL,$jsfuncs);
-	echo <<<EOS
-//]]>
-</script>
-EOS;
-}
+//inject constructed js after other content (pity we can't get to </body> or </html> from here)
+$js = NULL;
+PWForms\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$js);
+if ($js)
+	echo $js;

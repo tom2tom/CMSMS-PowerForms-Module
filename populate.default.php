@@ -240,7 +240,6 @@ EOS;
    }
   });
  });
-
 EOS;
 			break;
 		}
@@ -287,13 +286,5 @@ if ($formdata->Page < $formdata->PagesCount) {
 	$id.$formdata->current_prefix.'done" value="'.
 	PWForms\Utils::GetFormOption($formdata,'submit_button_text',$this->Lang('submit')).'" '.
 	$buttonjs.' />';
-}
-
-if ($jsloads) {
-	$jsfuncs[] = '$(document).ready(function() {
-';
-	$jsfuncs = array_merge($jsfuncs,$jsloads);
-	$jsfuncs[] = '});
-';
 }
 //don't bother pushing $js* to $tplvars - will echo directly

@@ -218,7 +218,6 @@ if ($padm) {
   type:'see4',
   symbol:'\u25CF'
  });
-
 EOS;
 
 	$tplvars = $tplvars + array(
@@ -249,15 +248,7 @@ function confirm_selected(msg) {
   return false;
  }
 }
-
 EOS;
 
-if ($jsloads) {
-	$jsfuncs[] = '$(document).ready(function() {
-';
-	$jsfuncs = array_merge($jsfuncs,$jsloads);
-	$jsfuncs[] = '});
-';
-}
-$tplvars['jsfuncs'] = $jsfuncs;
-$tplvars['jsincs'] = $jsincs;
+$tplvars['jsall'] = NULL;
+PWForms\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$tplvars['jsall']);
