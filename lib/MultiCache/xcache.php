@@ -4,8 +4,6 @@ namespace MultiCache;
 
 class Cache_xcache extends CacheBase implements CacheInterface
 {
-    protected $client;
-
 	public function __construct($config=array())
 	{
 		if ($this->use_driver()) {
@@ -17,19 +15,18 @@ class Cache_xcache extends CacheBase implements CacheInterface
 		throw new \Exception('no xcache storage');
 	}
 
-/*	public function __destruct()
-	{
-	}
-*/
 	public function use_driver()
 	{
-		return (extension_loaded('xcache') && function_exists('xcache_get'));
+		if (extension_loaded('xcache') && function_exists('xcache_get')) {
+			if (ini_get('xcache.var_size')) {
+				return TRUE;
+			}
+		}
+		return FALSE;
 	}
 
 	public function connectServer()
 	{
-        $this->client = new \XCache(); //TODO CAN'T FIND THIS
-//     $adbg = xcache_info(XC_TYPE_VAR, int id);
 		return TRUE;  //TODO connect
 	}
 
@@ -39,9 +36,9 @@ class Cache_xcache extends CacheBase implements CacheInterface
 			return FALSE;
 		}
 		if ($lifetime) {
-			$ret = xcache_set($keyword,$value,(int)$lifetime);
+			$ret = xcache_set($keyword,serialize($value),(int)$lifetime);
 		} else {
-			$ret = xcache_set($keyword,$value);
+			$ret = xcache_set($keyword,serialize($value));
 		}
 		return $ret;
 	}
@@ -49,18 +46,18 @@ class Cache_xcache extends CacheBase implements CacheInterface
 	public function _upsert($keyword, $value, $lifetime=FALSE)
 	{
 		if ($lifetime) {
-			$ret = xcache_set($keyword,$value,(int)$lifetime);
+			$ret = xcache_set($keyword,serialize($value),(int)$lifetime);
 		} else {
-			$ret = xcache_set($keyword,$value);
+			$ret = xcache_set($keyword,serialize($value));
 		}
 		return $ret;
 	}
 
 	public function _get($keyword)
 	{
-		$data = xcache_get($keyword);
-		if ($data !== FALSE) {
-			return $data;
+		$value = xcache_get($keyword);
+		if ($value !== FALSE) {
+			return unserialize($value);
 		}
 		return NULL;
 	}
@@ -73,7 +70,7 @@ class Cache_xcache extends CacheBase implements CacheInterface
 			$keyword = $TODO;
 			$value = $this->_get($keyword);
 			$again = is_object($value); //get it again, in case the filter played with it!
-			if ($this->filterKey($filter,$keyword,$value)) {
+			if ($this->filterItem($filter,$keyword,$value)) {
 				if ($again) {
 					$value = $this->_get($keyword);
 				}
@@ -102,11 +99,10 @@ class Cache_xcache extends CacheBase implements CacheInterface
 		for ($i=0; $i<$count; $i++) {
 			$keyword = $TODO;
 			$value = $this->_get($keyword);
-			if ($this->filterKey($filter,$keyword,$value)) {
+			if ($this->filterItem($filter,$keyword,$value)) {
 				$ret = $ret && xcache_unset($keyword);
 			}
 		}
 		return $ret;
 	}
-
 }
