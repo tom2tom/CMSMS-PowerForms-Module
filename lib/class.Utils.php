@@ -51,10 +51,10 @@ class Utils
 
 		$settings = array_merge(
 			array(
-/* 			'memcache' => array(
+ 			'memcache' => array(
 			  array('host'=>$url,'port'=>11211)
 			  ),
-			  'memcached' => array(
+/*			  'memcached' => array(
 			  array('host'=>$url,'port'=>11211,'persist'=>1)
 			  ),
 */
@@ -68,7 +68,7 @@ class Utils
 				'path' => $basedir
 			),
 			'database' => array(
-				'table' => cms_db_prefix() . 'module_bkr_cache'
+				'table' => cms_db_prefix() . 'module_pwf_cache'
 			)
 			), $settings);
 
@@ -77,7 +77,7 @@ class Utils
 		} else
 			$storage = 'auto';
 		if (strpos($storage, 'auto') !== FALSE)
-			$storage = 'yac,apc,apcu,wincache,xcache,redis,predis,file,database';
+			$storage = 'yac,apc,apcu,wincache,xcache,memcache,redis,predis,file,database';
 
 		$cache = NULL;
 		$types = explode(',', $storage);
@@ -108,7 +108,7 @@ class Utils
 		unset(self::$cache);
 		self::$cache = NULL;
 	}
-	
+
 	/* *
 	GetMutex:
 	@mod: reference to PWForms module object
@@ -931,6 +931,53 @@ EOS;
 			$tpl = $smarty->CreateTemplate('eval:'.$data,NULL,NULL,$smarty,$tplvars);
 			return $tpl->fetch();
 		}
+	}
+
+	/**
+	MergeJS:
+	@jsincs: string or array of js 'include' directives
+	@jsfuncs: string or array of js methods
+	@jsloads: string or array of js onload-methods
+	@$merged: reference to variable to be populated with the merged js string
+	*/
+	public static function MergeJS($jsincs, $jsfuncs, $jsloads, &$merged)
+	{
+		if (is_array($jsincs)) {
+			$all = $jsincs;
+		} elseif ($jsincs) {
+			$all = array($jsincs);
+		} else {
+			$all = array();
+		}
+		if ($jsfuncs || $jsloads) {
+			$all[] =<<<EOS
+<script type="text/javascript">
+//<![CDATA[
+EOS;
+			if (is_array($jsfuncs)) {
+				$all = array_merge($all,$jsfuncs);
+			} elseif ($jsfuncs) {
+				$all[] = $jsfuncs;
+			}
+			if ($jsloads) {
+				$all[] =<<<EOS
+$(document).ready(function() {
+EOS;
+				if (is_array($jsloads)) {
+					$all = array_merge($all,$jsloads);
+				} else {
+					$all[] = $jsloads;
+				}
+				$all[] =<<<EOS
+});
+EOS;
+			}
+			$all[] =<<<EOS
+//]]>
+</script>
+EOS;
+		}
+		$merged = implode(PHP_EOL,$all);
 	}
 
 	/**
