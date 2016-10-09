@@ -118,4 +118,3 @@ class Password extends FieldBase
 		return array($this->validated,$this->ValidationMessage);
 	}
 }
-

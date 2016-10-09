@@ -101,6 +101,4 @@ class Checkbox extends FieldBase
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}
-
 }
-

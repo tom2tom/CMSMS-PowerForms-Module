@@ -66,5 +66,4 @@ class OzStatePicker extends FieldBase
 			'id="'.$this->GetInputId().'"'.$this->GetScript());
 		return $this->SetClass($tmp);
 	}
-
 }

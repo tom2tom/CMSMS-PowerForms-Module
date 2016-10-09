@@ -116,7 +116,7 @@ class CatalogerItems extends FieldBase
 				$tplvars['fld_'.$one->GetId()] = $one->Value;
 			}
 			unset($one);
-			$gCms->variables['pwf_smarty_vars_set'] = 1; //TODO BAD MODULE BEHAVIOUR 
+			$gCms->variables['pwf_smarty_vars_set'] = 1; //TODO BAD MODULE BEHAVIOUR
 		}
 
 		// for each hierarchy item (from the root down)
@@ -216,5 +216,4 @@ class CatalogerItems extends FieldBase
 
 		return ''; // error
 	}
-
 }

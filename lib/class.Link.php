@@ -72,7 +72,7 @@ class Link extends FieldBase
 		$tmp = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
 		$oneset->input = $this->SetClass($tmp);
 		$ret[] = $oneset;
-		
+
 		$oneset = new \stdClass();
 		$tid = $this->GetInputId('_2');
 		$oneset->title = $mod->Lang('link_label');
@@ -88,5 +88,4 @@ class Link extends FieldBase
 		$ret[] = $oneset;
 		return $ret;
 	}
-
 }

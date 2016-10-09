@@ -76,7 +76,7 @@ class SubmitForm extends FieldBase
 		$send_payload = implode('&',$payload);
 
 		$msg = '';
-	
+
 		if ($this->GetOption('method','POST') == 'POST') {
 			$ch = curl_init($this->GetOption('url'));
 			curl_setopt($ch,CURLOPT_POST,1);
@@ -105,6 +105,4 @@ class SubmitForm extends FieldBase
 		}
 		return array($res,$msg);
 	}
-
 }
-

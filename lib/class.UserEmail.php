@@ -63,7 +63,7 @@ class UserEmail extends EmailBase
 		else
 			$ret = $this->GetFormOption('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
-		
+
 		if ($as_string)
 			return $ret;
 		else
@@ -172,6 +172,4 @@ class UserEmail extends EmailBase
 			return array(TRUE,'');
 		}
 	}
-
 }
-

@@ -52,5 +52,4 @@ class FieldsetStart extends FieldBase
 			$ret .= '<legend>'.$opt.'</legend>';
 		return $ret;
 	}
-
 }

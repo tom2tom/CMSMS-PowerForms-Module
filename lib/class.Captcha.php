@@ -71,7 +71,7 @@ class Captcha extends FieldBase
 						$mod->CreateTextArea(FALSE,$id,$this->GetOption('captcha_template',$this->defaulttemplate),
 							'opt_captcha_template','pwf_shortarea','','','',50,5),
 						$mod->Lang('help_captcha_template').'<br /><br />'.$button);
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>[$func]);
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>array($func));
 	}
 
 	public function AdminValidate($id)

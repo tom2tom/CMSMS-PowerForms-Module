@@ -160,6 +160,4 @@ class TimePicker extends FieldBase
 			return $ret;
 		}
 	}
-
 }
-

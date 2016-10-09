@@ -137,7 +137,7 @@ LEFT JOIN {$pre}module_compdir_categories AS cat ON cat.id=comcat.category_id
 LEFT JOIN {$pre}module_compdir_companies AS com ON com.id=comcat.company_id
 WHERE cat.name{$processPath} AND status='published'
 EOS;
-		$sql2 =
+		$sql2 = <<<EOS
 SELECT value FROM {$pre}module_compdir_fieldvals AS comfv
 LEFT JOIN {$pre}module_compdir_fielddefs AS fdd ON fdd.id=comfv.fielddef_id
 LEFT JOIN {$pre}module_compdir_companies AS com ON comfv.company_id=com.id

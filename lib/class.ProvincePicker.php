@@ -63,4 +63,3 @@ class ProvincePicker extends FieldBase
 		return $this->SetClass($tmp);
 	}
 }
-

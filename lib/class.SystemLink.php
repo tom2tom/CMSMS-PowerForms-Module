@@ -80,6 +80,4 @@ class SystemLink extends FieldBase
 		$this->MultiPopulate = FALSE;
 		return '';
 	}
-
 }
-

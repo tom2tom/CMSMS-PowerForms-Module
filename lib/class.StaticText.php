@@ -46,7 +46,7 @@ class StaticText extends FieldBase
 							$this->GetOption('smarty_eval',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
-	
+
 	public function Populate($id,&$params)
 	{
 		if ($this->GetOption('smarty_eval',0))
@@ -54,5 +54,4 @@ class StaticText extends FieldBase
 
 		return $this->GetOption('text');
 	}
-
 }

@@ -166,4 +166,3 @@ class Text extends FieldBase
 		return array($this->validated,$this->ValidationMessage);
 	}
 }
-

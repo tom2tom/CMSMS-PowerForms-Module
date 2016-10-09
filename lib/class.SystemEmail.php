@@ -224,6 +224,4 @@ class SystemEmail extends EmailBase
 		$dests = $this->GetOptionRef('destination_address');
 		return $this->SendForm($dests,$this->GetOption('email_subject'));
 	}
-
 }
-

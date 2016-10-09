@@ -46,5 +46,4 @@ class EmailSubject extends FieldBase
 		}
 		unset($one);
 	}
-
 }

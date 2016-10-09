@@ -70,4 +70,3 @@ class SequenceEnd extends FieldBase
 	}
 */
 }
-

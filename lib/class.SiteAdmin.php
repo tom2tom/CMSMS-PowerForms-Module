@@ -143,6 +143,4 @@ class SiteAdmin extends FieldBase
 		}
 		return array($this->validated,$this->ValidationMessage);
 	}
-
 }
-

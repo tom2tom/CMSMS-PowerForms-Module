@@ -862,6 +862,4 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 	{
 		return (isset($params['form_alias'])) ? trim($params['form_alias']) : '';
 	}
-
 }
-

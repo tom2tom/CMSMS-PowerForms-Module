@@ -276,6 +276,4 @@ class FieldOperations
 	{
 		return array_search($field_id,array_keys($formdata->Fields));
 	}
-
 }
-

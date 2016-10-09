@@ -72,6 +72,4 @@ class StatePicker extends FieldBase
 			'id="'.$this->GetInputId().'"'.$this->GetScript());
 		return $this->SetClass($tmp);
 	}
-
 }
-

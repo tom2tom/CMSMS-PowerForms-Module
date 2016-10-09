@@ -184,6 +184,4 @@ class UniqueFile extends FieldBase
 */
 		return array(TRUE,'');
 	}
-
 }
-

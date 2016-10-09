@@ -237,6 +237,4 @@ class TextExpandable extends FieldBase
 
 		return array($this->validated,$this->ValidationMessage);
 	}
-
 }
-

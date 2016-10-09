@@ -183,5 +183,4 @@ class SharedFile extends FieldBase
 */
 		return array(TRUE,'');
 	}
-
 }

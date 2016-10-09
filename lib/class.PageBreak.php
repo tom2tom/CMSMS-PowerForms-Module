@@ -24,5 +24,4 @@ class PageBreak extends FieldBase
 	{
 		return $this->AdminPopulateCommon($id,FALSE);
 	}
-
 }

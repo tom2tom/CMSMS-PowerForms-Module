@@ -1150,6 +1150,4 @@ EOS;
 		}
 		return FALSE;
 	}
-
 }
-

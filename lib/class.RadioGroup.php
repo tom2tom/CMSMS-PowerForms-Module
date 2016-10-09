@@ -176,4 +176,3 @@ class RadioGroup extends FieldBase
 		return '';
 	}
 }
-

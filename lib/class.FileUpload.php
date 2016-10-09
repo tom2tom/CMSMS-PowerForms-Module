@@ -313,7 +313,7 @@ class FileUpload extends FieldBase
 				$ud = Utils::GetUploadsPath();
 				if (!$ud)
 					return array(FALSE,'error_uploads_dir');
-				
+
 				$src = $thisFile['tmp_name'];
 				//$dest_path = $this->GetOption('file_destination',$config['uploads_path']);
 				// validated message before,now do it for the file itself
@@ -378,5 +378,4 @@ class FileUpload extends FieldBase
 			}
 		}
 	}
-
 }

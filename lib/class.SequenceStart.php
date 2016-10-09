@@ -110,4 +110,3 @@ class SequenceStart extends FieldBase
 		//TODO skip $formdata->Fields to relevant SequenceEnd
 	}
 }
-

@@ -67,5 +67,4 @@ class InputTemplate extends FieldBase
 		$val = $this->GetOption('value');
 		return Utils::ProcessTemplateFromData($this->formdata->formsmodule,$val,$tplvars);
 	}
-
 }

@@ -150,5 +150,4 @@ class Multiselect extends FieldBase
 		 }
 		 return '';
 	}
-
 }

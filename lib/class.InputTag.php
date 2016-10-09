@@ -76,5 +76,4 @@ class InputTag extends FieldBase
 			return $this->SetClass($tmp);
 		return $mod->Lang('error_usertag_named',$udt);
 	}
-
 }

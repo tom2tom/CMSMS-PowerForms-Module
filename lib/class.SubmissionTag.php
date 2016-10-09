@@ -27,7 +27,7 @@ class SubmissionTag extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		$usertags = $\cmsms()->GetUserTagOperations()->ListUserTags();
+		$usertags = \cmsms()->GetUserTagOperations()->ListUserTags();
 		$choices = array();
 		foreach ($usertags as $key => $value)
 			$choices[$value] = $key;
@@ -84,5 +84,3 @@ class SubmissionTag extends FieldBase
 		return array(TRUE,'');
 	}
 }
-
-

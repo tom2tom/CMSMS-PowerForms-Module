@@ -144,6 +144,4 @@ class Pulldown extends FieldBase
 		}
 		return '';
 	}
-
 }
-

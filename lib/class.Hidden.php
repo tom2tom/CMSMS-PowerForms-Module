@@ -61,5 +61,4 @@ class Hidden extends FieldBase
 			$id.$this->formdata->current_prefix.$this->Id.'" value="'.$val.'" />';
 		return $this->SetClass($tmp);
 	}
-
 }

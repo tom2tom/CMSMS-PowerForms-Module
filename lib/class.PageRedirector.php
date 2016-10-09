@@ -168,6 +168,4 @@ class PageRedirector extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		return array(FALSE,$mod->Lang('missing_type',$mod->Lang('page')));
 	}
-
 }
-

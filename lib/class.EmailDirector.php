@@ -146,7 +146,7 @@ class EmailDirector extends EmailBase
   		list($ret,$msg) = parent::AdminValidate($id);
 		if (!ret)
 			$messages[] = $msg;
-	
+
 		$mod = $this->formdata->formsmodule;
 		list($rv,$msg) = $this->validateEmailAddr($this->GetOption('email_from_address'));
 		if (!$rv) {
@@ -209,5 +209,4 @@ class EmailDirector extends EmailBase
 
 		return $this->SendForm($this->GetOptionElement('destination_address',$this->Value),$subject);
 	}
-
 }

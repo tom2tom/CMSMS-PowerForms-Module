@@ -72,6 +72,4 @@ class UniqueInteger extends FieldBase
 
 		return $ret;
 	}
-
 }
-
