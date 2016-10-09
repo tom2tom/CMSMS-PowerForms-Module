@@ -29,13 +29,13 @@ if (!function_exists('EarlyExit')) {
 		$src = $_SERVER['REMOTE_ADDR'];
 	 	global $db;
 		$pre = cms_db_prefix();
-		$query = array('UPDATE '.$pre.'module_pwf_ip_log SET howmany=255,basetime=? WHERE src=?');
+		$sql = array('UPDATE '.$pre.'module_pwf_ip_log SET howmany=255,basetime=? WHERE src=?');
 		$args = array(array($t2,$src));
-		$query[] = 'INSERT INTO '.$pre.
+		$sql[] = 'INSERT INTO '.$pre.
 'module_pwf_ip_log (src,howmany,basetime) SELECT ?,255,? FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
 		$pre.'module_pwf_ip_log T WHERE T.src=?)';
 		$args[] = array($src,$t2,$src);
-		PWForms\Utils::SafeExec($query,$args);
+		PWForms\Utils::SafeExec($sql,$args);
 	}
  }
 }
@@ -143,15 +143,15 @@ if (isset($params[$prefix.'formdata'])) {
 					$t = trim($db->DBTimeStamp($t),"'");
 
 					$pre = cms_db_prefix();
-					$query = array('DELETE FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<?');
+					$sql = array('DELETE FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<?');
 					$args = array(array($src,$t2));
-					$query[] = 'UPDATE '.$pre.'module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?';
+					$sql[] = 'UPDATE '.$pre.'module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?';
 					$args[] = array($src,$num+1);
-					$query[] = 'INSERT INTO '.$pre.
+					$sql[] = 'INSERT INTO '.$pre.
 'module_pwf_ip_log (src,howmany,basetime) SELECT ?,1,? FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
 					$pre.'module_pwf_ip_log T WHERE T.src=?)';
 					$args[] = array($src,$t,$src);
-					PWForms\Utils::SafeExec($query,$args);
+					PWForms\Utils::SafeExec($sql,$args);
 
 					$sql = 'SELECT COUNT(src_ip) AS sent FROM '.$pre.'module_pwf_ip_log WHERE src_ip=?';
 					$sent = PWForms\Utils::SafeGet($sql,array($src),'one');
@@ -171,17 +171,17 @@ if (isset($params[$prefix.'formdata'])) {
 				$t = trim($db->DBTimeStamp($t),"'");
 				$num = 0;
 				$pre = cms_db_prefix();
-				$query = 'DELETE FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<?';
+				$sql = 'DELETE FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<?';
 				$args = array($src,$t2);
-				$query2 = 'SELECT COUNT(*) AS num FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<=?';
+				$sql2 = 'SELECT COUNT(*) AS num FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<=?';
 				$args2 = array(array($src,$t));
 
 				$nt = 10;
 				while ($nt > 0) {
 					$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'); //this isn't perfect!
 					$db->StartTrans();
-					$db->Execute($query,$args);
-					$num = $db->GetOne($query2,$args2);
+					$db->Execute($sql,$args);
+					$num = $db->GetOne($sql2,$args2);
 					if ($db->CompleteTrans())
 						break;
 					else {
@@ -204,13 +204,13 @@ if (isset($params[$prefix.'formdata'])) {
 					$limit = PWForms\Utils::GetFormOption($formdata,'submit_limit',0);
 					if ($limit) {
 						if ($num <= $limit) {
-							$query = array('UPDATE '.$pre.'module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?');
+							$sql = array('UPDATE '.$pre.'module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?');
 							$args = array(array($src,$num+1));
-							$query[] = 'INSERT INTO '.$pre.
+							$sql[] = 'INSERT INTO '.$pre.
 'module_pwf_ip_log (src,howmany,basetime) SELECT ?,1,? FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
 							$pre.'module_pwf_ip_log T WHERE T.src=?)';
 							$args[] = array($src,$t,$src);
-							PWForms\Utils::SafeExec($query,$args);
+							PWForms\Utils::SafeExec($sql,$args);
 						} else {
 							ExitAdvise($this,2);
 							return;
