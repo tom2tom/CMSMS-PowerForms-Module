@@ -9,41 +9,41 @@ namespace PWForms;
 
 class FieldBase implements \Serializable
 {
-	protected $formdata; //reference to FormData object for the form to which this field belongs
+	public $formdata; //reference to FormData object for the form to which this field belongs
 	//field status
-	protected $loaded = FALSE;
-	protected $validated = TRUE;
+	public $loaded = FALSE;
+	public $validated = TRUE;
 	//field properties
-	protected $ChangeRequirement = TRUE; //whether admin user may change $Required
-	protected $DisplayInForm = TRUE;
-	protected $DisplayInSubmission = TRUE; //whether field value is echoed in submission template (if used) (effectively ~ ::$IsInput)
-	protected $DispositionPermitted = TRUE;
-	protected $FormId = 0;
-	protected $HasAddOp = FALSE;
-	protected $HasDeleteOp = FALSE;
-	protected $HasLabel = TRUE;
-	protected $HasUserAddOp = FALSE;
-	protected $HasUserDeleteOp = FALSE;
-	protected $HideLabel = FALSE;
-	protected $Id = 0;
-	protected $IsComputedOnSubmission = FALSE;
-	protected $IsDisposition = FALSE;
-	protected $IsEmailDisposition = FALSE;
-	protected $IsInput = FALSE;
-	protected $IsSortable = TRUE;
-	protected $LabelSubComponents = TRUE;
-	protected $MultiPopulate = FALSE; //whether Populate() generates array of objects
-	protected $Name = '';
-	protected $NeedsDiv = TRUE;
-	protected $Options = array();
-	protected $OrderBy = 0; //form display-order
-	protected $Required = FALSE;
-	protected $SmartyEval = FALSE; //TRUE for textinput field whose value is to be processed via smarty
-	protected $Type = '';
-	protected $ValidationMessage = ''; //post-validation error message, or ''
-	protected $ValidationType = 'none';
-	protected $ValidationTypes; //if set, an array of choices suitable for populating pulldowns
-	protected $Value; //when set, can be scalar or array, with all content processed by Utils::html_myentities_decode()
+	public $ChangeRequirement = TRUE; //whether admin user may change $Required
+	public $DisplayInForm = TRUE;
+	public $DisplayInSubmission = TRUE; //whether field value is echoed in submission template (if used) (effectively ~ ::$IsInput)
+	public $DispositionPermitted = TRUE;
+	public $FormId = 0;
+	public $HasAddOp = FALSE;
+	public $HasDeleteOp = FALSE;
+	public $HasLabel = TRUE;
+	public $HasUserAddOp = FALSE;
+	public $HasUserDeleteOp = FALSE;
+	public $HideLabel = FALSE;
+	public $Id = 0;
+	public $IsComputedOnSubmission = FALSE;
+	public $IsDisposition = FALSE;
+	public $IsEmailDisposition = FALSE;
+	public $IsInput = FALSE;
+	public $IsSortable = TRUE;
+	public $LabelSubComponents = TRUE;
+	public $MultiPopulate = FALSE; //whether Populate() generates array of objects
+	public $Name = '';
+	public $NeedsDiv = TRUE;
+	public $Options = array();
+	public $OrderBy = 0; //form display-order
+	public $Required = FALSE;
+	public $SmartyEval = FALSE; //TRUE for textinput field whose value is to be processed via smarty
+	public $Type = '';
+	public $ValidationMessage = ''; //post-validation error message, or ''
+	public $ValidationType = 'none';
+	public $ValidationTypes; //if set, an array of choices suitable for populating pulldowns
+	public $Value; //when set, can be scalar or array, with all content processed by Utils::html_myentities_decode()
 
 	public function __construct(&$formdata,&$params)
 	{
