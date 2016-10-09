@@ -41,19 +41,19 @@ if ($padm) {
 		if ($old != $t) {
 			//re-encrypt all stored records
 			$pre = cms_db_prefix();
-			$rst = $db->Execute('SELECT record_id,content FROM '.$pre.'module_pwf_record');
-			if ($rst) {
+			$rs = $db->Execute('SELECT record_id,content FROM '.$pre.'module_pwf_record');
+			if ($rs) {
 				$sql = 'UPDATE '.$pre.'module_pwf_record SET content=? WHERE record_id=?';
-				while (!$rst->EOF) {
-					$val = PWForms\Utils::Decrypt($this,$rst->fields[1],$old);
+				while (!$rs->EOF) {
+					$val = PWForms\Utils::Decrypt($this,$rs->fields[1],$old);
 					$val = PWForms\Utils::Encrypt($this,$val,$t);
-					if (!PWForms\Utils::SafeExec($sql,array($val,$rst->fields[0]))) {
+					if (!PWForms\Utils::SafeExec($sql,array($val,$rs->fields[0]))) {
 						//TODO handle error
 					}
-					if (!$rst->MoveNext())
+					if (!$rs->MoveNext())
 						break;
 				}
-				$rst->Close();
+				$rs->Close();
 			}
 			if ($t)
 				$t = PWForms\Utils::Fusc($t);
@@ -72,4 +72,3 @@ $tplvars = array();
 require __DIR__.DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 
 echo PWForms\Utils::ProcessTemplate($this,'adminpanel.tpl',$tplvars);
-

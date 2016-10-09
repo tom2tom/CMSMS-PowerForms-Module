@@ -25,13 +25,13 @@ class Mutex_database implements iMutex
 		if (!empty($config['table'])) {
 			$db = \cmsms()->GetDb();
 			$tbl = $config['table'];
-			$rst = $db->Execute('SELECT * FROM '.$tbl);
-			if (!$rst || $rst->FieldCount() < 2)
+			$rs = $db->Execute('SELECT * FROM '.$tbl);
+			if (!$rs || $rs->FieldCount() < 2)
 				throw new \Exception('no database mutex');
-			$rst->Close();
-			$rst = $db->GetCol('SELECT column_name FROM information_schema.columns WHERE table_name=\''.$tbl.'\'');
-			$this->field1 = $rst[0];
-			$this->field2 = $rst[1];
+			$rs->Close();
+			$all = $db->GetCol('SELECT column_name FROM information_schema.columns WHERE table_name=\''.$tbl.'\'');
+			$this->field1 = $all[0];
+			$this->field2 = $all[1];
 			$this->table = $tbl;
 		} else
 			throw new \Exception('no database mutex');
