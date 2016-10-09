@@ -170,7 +170,7 @@ class DatePicker extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$js = $this->GetScript();
 
-		$day = new stdClass();
+		$day = new \stdClass();
 		$day->title = $mod->Lang('day');
 		$tid = $this->GetInputId('_day');
 		$tmp = '<label for="'.$tid.'">'.$day->title.'</label>';
@@ -179,7 +179,7 @@ class DatePicker extends FieldBase
 			$today['mday'],'id="'.$tid.'"'.$js);
 		$day->input = $this->SetClass($tmp);
 
-		$mon = new stdClass();
+		$mon = new \stdClass();
 		$tid = $this->GetInputId('_month');
 		$mon->title = $mod->Lang('mon');
 		$tmp = '<label for="'.$tid.'">'.$mon->title.'</label>';
@@ -188,7 +188,7 @@ class DatePicker extends FieldBase
 			$today['mon'],'id="'.$tid.'"'.$js);
 		$mon->input = $this->SetClass($tmp);
 
-		$yr = new stdClass();
+		$yr = new \stdClass();
 		$tid = $this->GetInputId('_year');
 		$yr->title = $mod->Lang('year');
 		$tmp = '<label for="'.$tid.'">'.$yr->title.'</label>';

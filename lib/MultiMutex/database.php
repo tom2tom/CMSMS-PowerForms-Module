@@ -23,7 +23,7 @@ class Mutex_database implements iMutex
 	public function __construct($config)
 	{
 		if (!empty($config['table'])) {
-			$db = cmsms()->GetDb();
+			$db = \cmsms()->GetDb();
 			$tbl = $config['table'];
 			$rst = $db->Execute('SELECT * FROM '.$tbl);
 			if (!$rst || $rst->FieldCount() < 2)
@@ -41,7 +41,7 @@ class Mutex_database implements iMutex
 
 	public function lock($token)
 	{
-		$db = cmsms()->GetDb();
+		$db = \cmsms()->GetDb();
 		$flid = abs(crc32($token.'.mx.lock'));
 		$stamp = $db->sysTimeStamp;
 		$sql = 'INSERT INTO '.$this->table.' ('.$this->field1.','.$this->field2.') VALUES ('.$flid.','.$stamp.')';
@@ -63,7 +63,7 @@ class Mutex_database implements iMutex
 
 	public function unlock($token)
 	{
-		$db = cmsms()->GetDb();
+		$db = \cmsms()->GetDb();
 		$sql = 'DELETE FROM '.$this->table.' WHERE '.$this->field1.'='.abs(crc32($token.'.mx.lock'));
 		while (1) {
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
@@ -76,7 +76,7 @@ class Mutex_database implements iMutex
 
 	public function reset()
 	{
-		$db = cmsms()->GetDb();
+		$db = \cmsms()->GetDb();
 		$sql = 'DELETE FROM '.$this->table;
 		while (1) {
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');

@@ -194,7 +194,7 @@ EOS;
 			$js = $this->GetScript();
 			$ret = array();
 			foreach ($names as $i=>&$one) {
-				$oneset = new stdClass();
+				$oneset = new \stdClass();
 				$tid = $this->GetInputId('_'.$i);
 				if ($one) {
 					$oneset->title = $one;

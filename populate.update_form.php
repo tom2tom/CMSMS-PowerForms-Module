@@ -258,7 +258,8 @@ $dispositions = $displays; //non-disposition field
 
 if ($this->GetPreference('adder_fields','basic') == 'basic') {
 	foreach ($this->std_field_types as $l=>$t) {
-		$one = new $t($formdata,$params);
+		$classPath = 'PWForms\\'.$t;
+		$one = new $classPath($formdata,$params);
 		if ($one->IsDisposition()) {
 			if ($one->IsInput)
 				$displays[$l] = $t;
@@ -284,7 +285,8 @@ if ($this->GetPreference('adder_fields','basic') == 'basic') {
 		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'submittab','set_field_level'=>'advanced'));
 } else {
 	foreach ($this->field_types as $l=>$t) {
-		$one = new $t($formdata,$params);
+		$classPath = 'PWForms\\'.$t;
+		$one = new $classPath($formdata,$params);
 		if ($one->IsDisposition()) {
 			if ($one->IsInput)
 				$displays[$l] = $t;

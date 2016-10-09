@@ -28,7 +28,7 @@ class InputTag extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		$usertags = cmsms()->GetUserTagOperations()->ListUserTags();
+		$usertags = \cmsms()->GetUserTagOperations()->ListUserTags();
 		$choices = array();
 		foreach ($usertags as $key => $value)
 			$choices[$value] = $key;
@@ -69,7 +69,7 @@ class InputTag extends FieldBase
 		}
 		unset($one);
 
-		$usertagops = cmsms()->GetUserTagOperations();
+		$usertagops = \cmsms()->GetUserTagOperations();
 		$udt = $this->GetOption('udtname');
 		$ret = $usertagops->CallUserTag($udt,$params);
 		if ($ret !== FALSE)

@@ -18,7 +18,7 @@ class SiteAdmin extends FieldBase
 	public function buildList($select=FALSE)
 	{
 		$mod = $this->formdata->formsmodule;
-		$userops = cmsms()->GetUserOperations();
+		$userops = \cmsms()->GetUserOperations();
 		if ($this->GetOption('restrict_to_group',0))
 			$userlist = $userops->LoadUsersInGroup($this->GetOption('group'));
 		else
@@ -54,7 +54,7 @@ class SiteAdmin extends FieldBase
 	{
 		$ret = '';
 		if ($this->GetOption('restrict_to_group',0)) {
-			$groupops = cmsms()->GetGroupOperations();
+			$groupops = \cmsms()->GetGroupOperations();
 			$group = $groupops->LoadGroupByID($this->GetOption('group'));
 			if ($group && isset($group->name)) {
 				$mod = $this->formdata->formsmodule;
@@ -84,7 +84,7 @@ class SiteAdmin extends FieldBase
 	public function AdminPopulate($id)
 	{
 		$choices = array();
-		$groups = cmsms()->GetGroupOperations()->LoadGroups();
+		$groups = \cmsms()->GetGroupOperations()->LoadGroups();
 		foreach ($groups as $one)
 			$choices[$one->name] = $one->id;
 

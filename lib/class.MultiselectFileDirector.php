@@ -210,7 +210,7 @@ class MultiselectFileDirector extends FieldBase
 			$ret = array();
 
 			foreach ($names as $i=>&$one) {
-				$oneset = new stdClass();
+				$oneset = new \stdClass();
 				$oneset->title = $one;
 				$tmp = '<label for="'.$this->GetInputId('_'.$i).'">'.$one.'</label>';
 				$oneset->name = $this->SetClass($tmp);

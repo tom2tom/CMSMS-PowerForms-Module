@@ -88,7 +88,7 @@ class CheckboxExtended extends FieldBase
 		$js = $this->GetScript();
 		$ret = array();
 
-		$oneset = new stdClass();
+		$oneset = new \stdClass();
 		$oneset->title = '';
 		$label = $this->GetOption('box_label');
 		if ($label) {
@@ -125,7 +125,7 @@ class CheckboxExtended extends FieldBase
 			else
 				$hasvalue = FALSE;
 
-			$oneset = new stdClass();
+			$oneset = new \stdClass();
 			$oneset->title = '';
 			$oneset->name = $label;
 			$tmp = $mod->CreateInputText(

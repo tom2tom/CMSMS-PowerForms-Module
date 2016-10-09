@@ -64,8 +64,8 @@ class FormOperations
 		if (self::$editors === NULL) {
 			$editors = array();
 
-			$db = cmsms()->GetDb();
-			$pre = cms_db_prefix();
+			$db = \cmsms()->GetDb();
+			$pre = \cms_db_prefix();
 			$sql = <<<EOS
 SELECT G.group_id
 FROM {$pre}groups G
@@ -95,7 +95,7 @@ EOS;
 			}
 			self::$editors = $editors;
 		}
-		$tpl = new CmsLayoutTemplate();
+		$tpl = new \CmsLayoutTemplate();
 		$tpl->set_type($type);
 		$pref = ($type == 'form') ? 'pwf::':'pwf::sub_';
 		$tpl->set_name($pref.$id);
@@ -132,9 +132,9 @@ EOS;
 		}
 		$params['form_name'] = $name;
 		$params['form_alias'] = $alias;
-		$pre = cms_db_prefix();
-		$db = cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+		$db = \cmsms()->GetDb();
 		$newid = $db->GenID($pre.'module_pwf_form_seq');
 		$db->Execute($sql,array($newid,$name,$alias));
 		return $newid;
@@ -169,9 +169,9 @@ EOS;
 				$tpl->delete();
 			} catch (Exception $e) {}
 		}
-		$pre = cms_db_prefix();
-		$db = cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_trans WHERE new_id=? AND isform=1';
+		$db = \cmsms()->GetDb();
 		$db->Execute($sql,array($form_id));
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field_opt WHERE form_id=?';
 		$res = $db->Execute($sql,array($form_id));
@@ -230,10 +230,10 @@ EOS;
 		}
 		$params['form_name'] = $name;
 		$params['form_alias'] = $alias;
-		
-		$pre = cms_db_prefix();
-		$db = cmsms()->GetDb();
+
+		$pre = \cms_db_prefix();
 		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+		$db = \cmsms()->GetDb();
 		$newid = $db->GenID($pre.'module_pwf_form_seq');
 		$db->Execute($sql,array($newid,$name,$alias));
 
@@ -291,8 +291,8 @@ EOS;
 		if ($newform && !self::NewID($formdata->Name,$formdata->Alias))
 			return array(FALSE,$mod->Lang('duplicate_identifier'));
 
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		if ($newform) {
 			$form_id = $db->GenID($pre.'module_pwf_form_seq');
 			$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
@@ -372,15 +372,15 @@ EOS;
 	*/
 	public function &Load(&$mod,$id,&$params,$form_id)
 	{
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
+		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_form WHERE form_id=?';
+		$db = \cmsms()->GetDb();
 		$row = $db->GetRow($sql,array($form_id));
 		if (!$row) {
 			$ret = FALSE;
 			return $ret;
 		}
-		
+
 		$formdata = $mod->GetFormData($params);
 		$formdata->Id = $row['form_id'];
 		//some form properties (if absent from $params) default to stored values
@@ -412,7 +412,7 @@ EOS;
 				// create the field object
 				if (isset($params[$formdata->current_prefix.$fid]) ||
 					isset($params[$formdata->prior_prefix.$fid]) ||
-					isset($params['value_'.$row['name']]) || 
+					isset($params['value_'.$row['name']]) ||
 					isset($params['value_fld'.$fid]) ||
 					(isset($params['field_id']) && $params['field_id'] == $fid)
 				  )
@@ -438,13 +438,13 @@ EOS;
 	@dtd: optional boolean,whether to consruct DTD in file,default TRUE
 	Returns: XML string,or FALSE. Included value-data are not bound by
 		<![CDATA[...]]> cuz that mechanism is not nestable. This means that
-		values which include javascript may be unbrowsable in a XML-viewer.		
+		values which include javascript may be unbrowsable in a XML-viewer.
 	*/
 	public function CreateXML(&$mod,$form_id,$date,$charset=FALSE,$dtd=TRUE)
 	{
-		$pre = cms_db_prefix();
-		$db = cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_form WHERE form_id=?';
+		$db = \cmsms()->GetDb();
 		if (!is_array($form_id)) {
 			$properties = $db->GetRow($sql,array($form_id));
 			$form_id = array($form_id);
@@ -667,7 +667,7 @@ EOS;
 		}
 		//and lower-level tags
 		self::ClearTags($array);
-		$expected = array('properties','options','fields');	
+		$expected = array('properties','options','fields');
 		foreach ($array['form1'] as $indx=>&$check) {
 			if (!in_array($indx,$expected)) {
 				unset($check);
@@ -689,8 +689,8 @@ EOS;
 		$data = self::ParseXML($xmlfile);
 		if ($data == FALSE)
 			return FALSE;
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		for ($i=1; $i<=$data['count']; $i++)
 		{
 			$fdata = $data['form'.$i];
@@ -818,9 +818,10 @@ option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 			$vars[] = $alias;
 		}
 		if ($where) {
-			$db = cmsms()->GetDb();
-			$sql = 'SELECT form_id FROM '.cms_db_prefix().'module_pwf_form WHERE ';
+			$pre = \cms_db_prefix();
+			$sql = 'SELECT form_id FROM '.$pre.'module_pwf_form WHERE ';
 			$sql .= implode(' OR ',$where);
+			$db = \cmsms()->GetDb();
 			$exists = $db->GetOne($sql,$vars);
 			if ($exists)
 				return FALSE;

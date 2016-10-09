@@ -27,7 +27,7 @@ class SubmissionTag extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		$usertags = $cmsms()->GetUserTagOperations()->ListUserTags();
+		$usertags = $\cmsms()->GetUserTagOperations()->ListUserTags();
 		$choices = array();
 		foreach ($usertags as $key => $value)
 			$choices[$value] = $key;
@@ -73,10 +73,10 @@ class SubmissionTag extends FieldBase
 		$tplvars = array();
 		Utils::SetupFormVars($this->formdata,$tplvars);
 		if ($tplvars) {
-			$smarty = cmsms()->GetSmarty();
+			$smarty = \cmsms()->GetSmarty();
 			$smarty->assign($tplvars);
 		}
-		$usertagops = cmsms()->GetUserTagOperations();
+		$usertagops = \cmsms()->GetUserTagOperations();
 		$res = $usertagops->CallUserTag($this->GetOption('udtname'),$params);
 
 		if ($res === FALSE)

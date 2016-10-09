@@ -17,13 +17,13 @@ class ClearTablesTask implements CmsRegularTask
 
 	public function get_description()
 	{
-		$module = cms_utils::get_module(self::MODNAME);
+		$module = \cms_utils::get_module(self::MODNAME);
 		return $module->Lang('taskdescription_clearold');
 	}
 
 	public function test($time = '')
 	{
-		$module = cms_utils::get_module(self::MODNAME);
+		$module = \cms_utils::get_module(self::MODNAME);
 		if (!$time) $time = time();
 		$last_cleared = $module->GetPreference('lastcleared',0);
 		return ($time >= $last_cleared + 1800);
@@ -31,7 +31,7 @@ class ClearTablesTask implements CmsRegularTask
 
 	public function execute($time = '')
 	{
-		$module = cms_utils::get_module(self::MODNAME);
+		$module = \cms_utils::get_module(self::MODNAME);
 		if (!$time) $time = time();
 		Utils::CleanTables($module,$time);
 		return TRUE;
@@ -39,7 +39,7 @@ class ClearTablesTask implements CmsRegularTask
 
 	public function on_success($time = '')
 	{
-		$module = cms_utils::get_module(self::MODNAME);
+		$module = \cms_utils::get_module(self::MODNAME);
 		if (!$time) $time = time();
 		$module->SetPreference('lastcleared',$time);
 	}

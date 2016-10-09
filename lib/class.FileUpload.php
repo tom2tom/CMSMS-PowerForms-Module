@@ -101,7 +101,7 @@ class FileUpload extends FieldBase
 						$mod->CreateInputCheckbox($id,'opt_remove_file',1,
 							$this->GetOption('remove_file',0)),
 						$mod->Lang('help_ignored_if_upload'));
-/*		$config = cmsms()->GetConfig();
+/*		$config = \cmsms()->GetConfig();
 		$adv[] = array($mod->Lang('title_file_destination'),
 							$mod->CreateInputText($id,'opt_file_destination',
 							$this->GetOption('file_destination',$config['uploads_path']),60,255),
@@ -140,14 +140,15 @@ class FileUpload extends FieldBase
 		// we get here (hopefully) when the template is changed in the dropdown
 		$defaultid = '';
 		if ($markdefault) {
-			$contentops = cmsms()->GetContentOperations();
+			$contentops = \cmsms()->GetContentOperations();
 			$defaultid = $contentops->GetDefaultPageID();
 		}
 
 		// get a list of the pages used by this template
-		$db = cmsms()->GetDb();
-		$sql = 'SELECT content_name,content_id FROM '.cms_db_prefix().
+		$pre = \cms_db_prefix();
+		$sql = 'SELECT content_name,content_id FROM '.$pre.
 			'content WHERE type = \'content\' AND active = 1 ORDER BY content_name';
+		$db = \cmsms()->GetDb();
 		$allpages = $db->GetAssoc($sql);
 		if ($allpages && $defaultid) {
 			$key = array_search($defaultid,$allpages);
@@ -254,7 +255,7 @@ class FileUpload extends FieldBase
 		if (empty($_FILES[$_id]))
 			$_id = $id.$this->formdata->prior_prefix.$this->Id;
 		if (isset($_FILES[$_id]) && $_FILES[$_id]['size'] > 0) {
-			$config = cmsms()->GetConfig();
+			$config = \cmsms()->GetConfig();
 			$mod = $this->formdata->formsmodule;
 
 			$thisFile =& $_FILES[$_id];

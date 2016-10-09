@@ -62,8 +62,9 @@ class UniqueInteger extends FieldBase
 			if ($this->GetOption('show_to_user',0))
 				$ret .= $number;
 		} else {
-			$db = cmsms()->GetDb();
-			$seq = $db->GenID(cms_db_prefix().'module_pwf_uniquefield_seq');
+			$db = \cmsms()->GetDb();
+			$pre = \cms_db_prefix();
+			$seq = $db->GenID($pre.'module_pwf_uniquefield_seq');
 			$ret = $mod->CreateInputHidden($id,$this->formdata->current_prefix.$this->Id,$seq);
 			if ($this->GetOption('show_to_user',0))
 				$ret .= $seq;

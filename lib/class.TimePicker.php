@@ -87,7 +87,7 @@ class TimePicker extends FieldBase
 				$now['tm_hour'] = $this->GetArrayValue(0);
 				$now['tm_min'] = $this->GetArrayValue(1);
 			}
-			$oneset = new stdClass();
+			$oneset = new \stdClass();
 			$tid = $this->GetInputId('_hour');
 			$oneset->title = $mod->Lang('hour');
 			$tmp = '<label for="'.$tid.'">'.$oneset->title.'</label>';
@@ -97,7 +97,7 @@ class TimePicker extends FieldBase
 			$oneset->input = $this->SetClass($tmp);
 			$ret[] = $oneset;
 
-			$oneset = new stdClass();
+			$oneset = new \stdClass();
 			$tid = $this->GetInputId('_min');
 			$oneset->title = $mod->Lang('min');
 			$tmp = '<label for="'.$tid.'">'.$oneset->title.'</label>';
@@ -128,7 +128,7 @@ class TimePicker extends FieldBase
 				}
 			}
 
-			$oneset = new stdClass();
+			$oneset = new \stdClass();
 			$tid = $this->GetInputId('_hour');
 			$oneset->title = $mod->Lang('hour');
 			$tmp = '<label class= "" for="'.$tid.'">'.$oneset->title.'</label>';
@@ -138,7 +138,7 @@ class TimePicker extends FieldBase
 			$oneset->input = $this->SetClass($tmp);
 			$ret[] = $oneset;
 
-			$oneset = new stdClass();
+			$oneset = new \stdClass();
 			$tid = $this->GetInputId('_min');
 			$oneset->title = $mod->Lang('min');
 			$tmp = '<label class= "" for="'.$tid.'">'.$oneset->title.'</label>';
@@ -148,7 +148,7 @@ class TimePicker extends FieldBase
 			$oneset->input = $this->SetClass($tmp);
 			$ret[] = $oneset;
 
-			$oneset = new stdClass();
+			$oneset = new \stdClass();
 			$tid = $this->GetInputId('_meridian');
 			$oneset->title = $mod->Lang('merid');
 			$tmp = '<label class= "" for="'.$tid.'">'.$oneset->title.'</label>';

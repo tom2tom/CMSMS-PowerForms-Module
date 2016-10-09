@@ -15,12 +15,14 @@ class FieldOperations
 		$obfield = FALSE;//may need ref to this
 		if (!empty($params['field_id'])) {
 			// we're loading an extant field
-			$sql = 'SELECT type FROM '.cms_db_prefix().'module_pwf_field WHERE field_id=?';
-			$db = cmsms()->GetDb();
+			$pre = \cms_db_prefix();
+			$sql = 'SELECT type FROM '.$pre.'module_pwf_field WHERE field_id=?';
+			$db = \cmsms()->GetDb();
 			$type = $db->GetOne($sql,array($params['field_id']));
 			if ($type) {
 				$className = Utils::MakeClassName($type);
-				$obfield = new $className($formdata,$params);
+				$classPath = 'PWForms\\'.$className;
+				$obfield = new $classPath($formdata,$params);
 				$obfield->Load($id,$params); //TODO check for failure
 /*TODO rationalise this
 				if (!empty($params['value_'.$this->Name]))
@@ -35,7 +37,8 @@ class FieldOperations
 			if (!empty($params['field_type'])) {
 				// specified field type via params
 				$className = Utils::MakeClassName($params['field_type']);
-				$obfield = new $className($formdata,$params);
+				$classPath = 'PWForms\\'.$className;
+				$obfield = new $classPath($formdata,$params);
 			} else {
 				// unknown field type
 				$obfield = new FieldBase($formdata,$params);
@@ -47,9 +50,9 @@ class FieldOperations
 	// 'hard' copy an existing field returns TRUE/FALSE
 	public static function CopyField($field_id,$newform=FALSE,$neworder=FALSE)
 	{
-		$pre = cms_db_prefix();
-		$db = cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
+		$db = \cmsms()->GetDb();
 		$row = $db->GetRow($sql,array($field_id));
 		if (!$row)
 			return FALSE;
@@ -73,14 +76,14 @@ class FieldOperations
 		}
 		$row['order_by'] = $neworder;
 		$sql = 'INSERT INTO '.$pre.
-		 'module_pwf_field (field_id,form_id,name,type,validation_type,required,hide_label,order_by) VALUES (?,?,?,?,?,?,?,?)';
+'module_pwf_field (field_id,form_id,name,type,validation_type,required,hide_label,order_by) VALUES (?,?,?,?,?,?,?,?)';
 		$db->Execute($sql,$row);
 
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field_opt WHERE field_id=?';
 		$rs = $db->Execute($sql,array($field_id));
 		if ($rs) {
 			$sql = 'INSERT INTO '.$pre.
-			 'module_pwf_field_opt (option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
+'module_pwf_field_opt (option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 			while ($row = $rs->FetchRow()) {
 				$row['option_id'] = $db->GenID($pre.'module_pwf_field_opt_seq');
 				$row['field_id'] = $fid;
@@ -123,8 +126,8 @@ class FieldOperations
 	*/
 	public static function StoreField(&$obfield,$deep=FALSE)
 	{
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		if ($obfield->Id <= 0) {
 			$obfield->Id = $db->GenID($pre.'module_pwf_field_seq');
 			$sql = 'INSERT INTO '.$pre.
@@ -174,9 +177,9 @@ class FieldOperations
 	*/
 	public static function LoadField(&$obfield)
 	{
-		$pre = cms_db_prefix();
+		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
-		$db = cmsms()->GetDb();
+		$db = \cmsms()->GetDb();
 		if ($row = $db->GetRow($sql,array($obfield->Id))) {
 			$obfield->FormId = (int)$row['form_id'];
 			if (!$obfield->Name)
@@ -226,9 +229,9 @@ class FieldOperations
 
 	public static function RealDeleteField(&$obfield)
 	{
-		$pre = cms_db_prefix();
-		$db = cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field where field_id=?';
+		$db = \cmsms()->GetDb();
 		$res = $db->Execute($sql,array($obfield->Id));
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field_opt where field_id=?';
 		$res = $db->Execute($sql,array($obfield->Id)) && $res;

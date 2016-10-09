@@ -25,7 +25,7 @@ class EmailSiteAdmin extends EmailBase
 	{
 		$ret = '';
 		if ($this->GetOption('restrict_to_group',0)) {
-			$groupops = cmsms()->GetGroupOperations();
+			$groupops = \cmsms()->GetGroupOperations();
 			$group = $groupops->LoadGroupByID($this->GetOption('group'));
 			if ($group && isset($group->name)) {
 				$mod = $this->formdata->formsmodule;
@@ -43,7 +43,7 @@ class EmailSiteAdmin extends EmailBase
 
 	public function GetDisplayableValue($as_string=TRUE)
 	{
-		$userops = cmsms()->GetUserOperations();
+		$userops = \cmsms()->GetUserOperations();
 		if ($this->GetOption('restrict_to_group',0))
 			$userlist = $userops->LoadUsersInGroup($this->GetOption('group'));
 		else
@@ -64,7 +64,7 @@ class EmailSiteAdmin extends EmailBase
 	public function AdminPopulate($id)
 	{
 		$choices = array();
-		$groups = cmsms()->GetGroupOperations()->LoadGroups();
+		$groups = \cmsms()->GetGroupOperations()->LoadGroups();
 		foreach ($groups as $one)
 			$choices[$one->name] = $one->id;
 
@@ -122,7 +122,7 @@ class EmailSiteAdmin extends EmailBase
 	public function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$userops = cmsms()->GetUserOperations();
+		$userops = \cmsms()->GetUserOperations();
 		if ($this->GetOption('restrict_to_group',0))
 			$userlist = $userops->LoadUsersInGroup($this->GetOption('group'));
 		else
@@ -169,7 +169,7 @@ class EmailSiteAdmin extends EmailBase
 	public function Dispose($id,$returnid)
 	{
 		if ($this->HasValue()) {
-			$userops = cmsms()->GetUserOperations();
+			$userops = \cmsms()->GetUserOperations();
 
 			if ($this->GetOption('restrict_to_group',0))
 				$userlist = $userops->LoadUsersInGroup($this->GetOption('group'));

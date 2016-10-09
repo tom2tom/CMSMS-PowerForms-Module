@@ -23,10 +23,10 @@ class SystemLink extends FieldBase
 	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->GetOption('auto_link',0)) {
-			$pageinfo = cmsms()->variables['pageinfo'];
+			$pageinfo = \cmsms()->variables['pageinfo'];
 			$ret = $this->formdata->formsmodule->CreateContentLink($pageinfo->content_id,$pageinfo->content_title);
 		} else {
-			$contentops = cmsms()->GetContentOperations();
+			$contentops = \cmsms()->GetContentOperations();
 			$cobj = $contentops->LoadContentFromId($this->GetOption('target_page',0));
 			$ret = $this->formdata->formsmodule->CreateContentLink($cobj->Id(),$cobj->Name());
 		}
@@ -55,8 +55,8 @@ class SystemLink extends FieldBase
 	public function Populate($id,&$params)
 	{
 		if ($this->GetOption('auto_link',0)) {
-			$oneset = new stdClass();
-			$pageinfo = cmsms()->variables['pageinfo'];
+			$oneset = new \stdClass();
+			$pageinfo = \cmsms()->variables['pageinfo'];
 			$oneset->name = $pageinfo->content_title;
 			$oneset->title = $oneset->name;
 			$tmp = $this->formdata->formsmodule->CreateContentLink($pageinfo->content_id,$oneset->name);
@@ -66,8 +66,8 @@ class SystemLink extends FieldBase
 		} else {
 			$page = $this->GetOption('target_page',0);
 			if ($page > 0) {
-				$oneset = new stdClass();
-				$contentops = cmsms()->GetContentOperations();
+				$oneset = new \stdClass();
+				$contentops = \cmsms()->GetContentOperations();
 				$cobj = $contentops->LoadContentFromId($page);
 				$oneset->name = $cobj->Name();
 				$oneset->title = $oneset->name;

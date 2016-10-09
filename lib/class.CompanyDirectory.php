@@ -64,10 +64,10 @@ class CompanyDirectory extends FieldBase
 
 		$Categories = array();
 		$Categories['All'] = $mod->Lang('all');
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
-		$query = 'SELECT id,name FROM '.$pre.'module_compdir_categories';
-		$rs = $db->Execute($query);
+		$db = \cmsms()->GetDb();
+		$sql = 'SELECT id,name FROM '.$pre.'module_compdir_categories';
+		$pre = \cms_db_prefix();
+		$rs = $db->Execute($sql);
 		if ($rs) {
 			while ($row = $rs->FetchRow())
 				$Categories[$row['name']] = $row['name'];
@@ -80,8 +80,8 @@ class CompanyDirectory extends FieldBase
 
 		$FieldDefs = array();
 		$FieldDefs['none'] = $this->Lang('none2');
-		$query = 'SELECT * FROM '.$pre.'module_compdir_fielddefs ORDER BY item_order';
-		$rs = $db->Execute($query);
+		$sql = 'SELECT * FROM '.$pre.'module_compdir_fielddefs ORDER BY item_order';
+		$rs = $db->Execute($sql);
 		if ($rs) {
 			while ($row = $rs->FetchRow())
 				$FieldDefs[$row['name']] = $row['name'];
@@ -123,33 +123,36 @@ class CompanyDirectory extends FieldBase
 
 		$results = array();
 
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		$Like = $this->GetOption('Category','%');
 		if ($Like=='' || $Like=='%' || $Like=='All')
-			$processPath="LIKE '%'";
+			$processPath=" LIKE '%'";
 		else
-			$processPath="= ?";
+			$processPath='=?';
 
-		$query = 'SELECT com.id,com.company_name FROM '.$pre.'module_compdir_company_categories AS comcat '
-				.'LEFT JOIN '.$pre.'module_compdir_categories AS cat ON cat.id = comcat.category_id '
-				.'LEFT JOIN '.$pre.'module_compdir_companies AS com ON com.id = comcat.company_id '
-				.'WHERE cat.name '.$processPath.' AND status = \'published\'';
-
-		$query2 = 'SELECT value FROM '.$pre.'module_compdir_fieldvals AS comfv '
-				.'LEFT JOIN '.$pre.'module_compdir_fielddefs AS fdd ON fdd.id = comfv.fielddef_id '
-				.'LEFT JOIN '.$pre.'module_compdir_companies AS com ON comfv.company_id = com.id '
-				.'WHERE com.company_name = ? AND fdd.name = ?';
+		$sql = <<<EOS
+SELECT com.id,com.company_name FROM {$pre}module_compdir_company_categories AS comcat
+LEFT JOIN {$pre}module_compdir_categories AS cat ON cat.id=comcat.category_id
+LEFT JOIN {$pre}module_compdir_companies AS com ON com.id=comcat.company_id
+WHERE cat.name{$processPath} AND status='published'
+EOS;
+		$sql2 =
+SELECT value FROM {$pre}module_compdir_fieldvals AS comfv
+LEFT JOIN {$pre}module_compdir_fielddefs AS fdd ON fdd.id=comfv.fielddef_id
+LEFT JOIN {$pre}module_compdir_companies AS com ON comfv.company_id=com.id
+WHERE com.company_name=? AND fdd.name=?
+EOS;
 		$val = array();
 		$companies = array();
 		$field = $this->GetOption('FieldDefs');
 		if ($Like=='' || $Like=='%' || $Like=='All') {
-			$rs = $db->Execute($query,array());
+			$rs = $db->Execute($sql,array());
 			if ($rs) {
 				while ($row = $rs->FetchRow()) {
 					$company = $row['company_name'];
 					$FDval = '';
-					$rs2 = $db->Execute($query2,array($company,$field));
+					$rs2 = $db->Execute($sql2,array($company,$field));
 					if ($rs2) {
 						while ($row = $rs2->FetchRow())
 							$FDval = $row['value'];
@@ -163,12 +166,12 @@ class CompanyDirectory extends FieldBase
 		} else {
 			if (is_array($Like)) {
 				foreach ($Like as $key => $value) {
-					$rs = $db->Execute($query ,array($value));
+					$rs = $db->Execute($sql,array($value));
 					if ($rs) {
 						while ($row = $rs->FetchRow()) {
 							$company = $row['company_name'];
 							$FDval = '';
-							$rs2 = $db->Execute($query2,array($company,$field));
+							$rs2 = $db->Execute($sql2,array($company,$field));
 							if ($rs2) {
 								while ($row = $rs2->FetchRow())
 									$FDval = $row['value'];
@@ -180,12 +183,12 @@ class CompanyDirectory extends FieldBase
 					}
 				}
 			} else {
-				$rs = $db->Execute($query ,array($Like));
+				$rs = $db->Execute($sql ,array($Like));
 				if ($rs) {
 					while ($row = $rs->FetchRow()) {
 						$company=$row['company_name'];
 						$FDval='';
-						$rs2 = $db->Execute($query2 ,array($company,$field));
+						$rs2 = $db->Execute($sql2 ,array($company,$field));
 						if ($rs2) {
 							while ($row = $rs2->FetchRow())
 								$FDval = $row['value'];

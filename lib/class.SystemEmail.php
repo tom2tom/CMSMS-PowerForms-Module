@@ -86,7 +86,7 @@ class SystemEmail extends EmailBase
 
 	public function GetDests($id,$row,$sel)
 	{
-		$id = cms_htmlentities($id);
+		$id = \cms_htmlentities($id);
 		$name = $id.$this->formdata->current_prefix.'mailto_'.$row; //must be distinct for each address
 		$totypes = array ('to','cc','bc');
 		$btns = array();

@@ -20,7 +20,7 @@ class Mutex_file implements iMutex
 		if (!empty($config['updir']))
 			$ud = $config['updir'];
 		else {
-			$sysconfig = cmsms()->GetConfig();
+			$sysconfig = \cmsms()->GetConfig();
 			$ud = $sysconfig['uploads_path'];
 			if ($ud == FALSE)
 				throw new \Exception('Error getting file lock');

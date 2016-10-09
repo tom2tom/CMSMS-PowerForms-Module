@@ -14,8 +14,8 @@ class BrowserIface
 	//returns array in which key = form id, value = form name
 	public function GetBrowsableForms()
 	{
-		$db = cmsms()->GetDb();
-		$pre = cms_db_prefix();
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		return $db->GetAssoc(
 		'SELECT DISTINCT FM.form_id,FM.name FROM '.$pre.
 		'module_pwf_form FM JOIN '.$pre.
@@ -26,19 +26,19 @@ class BrowserIface
 	//returns array in which key = field id, value = field name
 	public function GetBrowsableFields($form_id)
 	{
-		$db = cmsms()->GetDb();
 		$result = array();
-		$pre = cms_db_prefix();
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		$all = $db->GetAssoc('SELECT field_id,name,type FROM '.$pre.
 		'module_pwf_field WHERE form_id=? AND type LIKE \'%Field%\' ORDER BY order_by',
 			array($form_id));
 		if ($all) {
-			$mod = cms_utils::get_module('PWForms');
+			$mod = \cms_utils::get_module('PWForms');
 			$dummy = $mod->GetFormData();
 			$params = array();
 			foreach ($all as $key=>&$row) {
-				$classname = 'pwf'.$row['type'];
-				$fld = new $classname($dummy,$params);
+				$classPath = 'PWForms\\'.$row['type'];
+				$fld = new $classPath($dummy,$params);
 				if ($fld->IsSortable || $fld->IsInput)
 					$result[$key] = $row['name'];
 				unset($fld);

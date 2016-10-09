@@ -114,8 +114,8 @@ class EmailConfirmation extends EmailBase
 	{
 		$mod = $this->formdata->formsmodule;
 		//cache form data, pending confirmation
-		$pre = cms_db_prefix();
-		$db = cmsms()->GetDb();
+		$pre = \cms_db_prefix();
+		$db = \cmsms()->GetDb();
 		$record_id = $db->GenID($pre.'module_pwf_record_seq');
 		$t = time();
 		$pub = substr(md5(session_id().$t),0,12);

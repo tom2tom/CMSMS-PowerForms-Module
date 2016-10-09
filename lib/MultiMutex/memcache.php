@@ -18,11 +18,11 @@ class Mutex_memcache implements iMutex
 			$this->instance = $config['instance'];
 		else {
 			if (class_exists('Memcache') && function_exists('memcache_connect'))
-				$this->instance = new Memcache;
+				$this->instance = new \Memcache;
 			else
 				throw new \Exception('no memcache storage');
 		}
-		$sysconfig = cmsms()->GetConfig();
+		$sysconfig = \cmsms()->GetConfig();
 		$rooturl = (empty($_SERVER['HTTPS'])) ? $sysconfig['root_url'] : $sysconfig['ssl_url'];
 		$this->instance->connect($rooturl,11211);
 		$this->pause = (!empty($config['timeout'])) ? $config['timeout'] : 50;

@@ -59,7 +59,7 @@ class Link extends FieldBase
 			$val = array($this->GetOption('default_link'),$this->GetOption('default_link_title'));
 
 		$ret = array();
-		$oneset = new stdClass();
+		$oneset = new \stdClass();
 		$tid = $this->GetInputId('_1');
 		$oneset->title = $mod->Lang('link_destination');
 		$tmp = '<label for="'.$tid.'">'.$oneset->title.'</label>';
@@ -73,7 +73,7 @@ class Link extends FieldBase
 		$oneset->input = $this->SetClass($tmp);
 		$ret[] = $oneset;
 		
-		$oneset = new stdClass();
+		$oneset = new \stdClass();
 		$tid = $this->GetInputId('_2');
 		$oneset->title = $mod->Lang('link_label');
 		$tmp = '<label for="'.$tid.'">'.$oneset->title.'</label>';

@@ -19,7 +19,7 @@ class Utils
 	  GetCache:
 	  @mod: reference to Booker-module object
 	  @storage: optional cache-type name, one (or more, ','-separated) of
-	  auto,yac,apc,apcu,wincache,xcache,redis,predis,file,database
+	  yac,apc,apcu,wincache,xcache,memcache,redis,predis,file,database
 	  default = 'auto' to try all of the above, in that order
 	  @settings: optional array of general and cache-type-specific parameters,
 	  (e.g. see default array in this func)
@@ -28,14 +28,14 @@ class Utils
 	 */
 	public static function GetCache(&$mod, $storage='auto', $settings=array())
 	{
-//		if (self::$cache == NULL && isset($_SESSION['bkrcache']))
-//			self::$cache = $_SESSION['bkrcache'];
+//		if (self::$cache == NULL && isset($_SESSION['pwfcache']))
+//			self::$cache = $_SESSION['pwfcache'];
 		if (self::$cache)
 			return self::$cache;
 
-		$path = __DIR__ . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR;
-		require($path . 'CacheInterface.php');
-		require($path . 'CacheBase.php');
+		$path = __DIR__ . DIRECTORY_SEPARATOR . 'MultiCache' . DIRECTORY_SEPARATOR;
+		require_once($path.'CacheInterface.php'); //prevent repeated creation crash
+		require_once($path.'CacheBase.php');
 
 		$config = cmsms()->GetConfig();
 		$url = (empty($_SERVER['HTTPS'])) ? $config['root_url'] : $config['ssl_url'];
@@ -43,17 +43,18 @@ class Utils
 		$basedir = $config['uploads_path'];
 		if (is_dir($basedir)) {
 			$rel = $mod->GetPreference('pref_uploadsdir');
-			if ($rel) 	{
+			if ($rel) {
 				$basedir .= DIRECTORY_SEPARATOR . $rel;
 			}
 		} else
 			$basedir = '';
+		$pre = \cms_db_prefix();
 
 		$settings = array_merge(
 			array(
  			'memcache' => array(
 			  array('host'=>$url,'port'=>11211)
-			  ),
+			),
 /*			  'memcached' => array(
 			  array('host'=>$url,'port'=>11211,'persist'=>1)
 			  ),
@@ -68,7 +69,7 @@ class Utils
 				'path' => $basedir
 			),
 			'database' => array(
-				'table' => cms_db_prefix() . 'module_pwf_cache'
+				'table' => $pre . 'module_pwf_cache'
 			)
 			), $settings);
 
@@ -79,7 +80,6 @@ class Utils
 		if (strpos($storage, 'auto') !== FALSE)
 			$storage = 'yac,apc,apcu,wincache,xcache,memcache,redis,predis,file,database';
 
-		$cache = NULL;
 		$types = explode(',', $storage);
 		foreach ($types as $one) {
 			$one = trim($one);
@@ -87,19 +87,18 @@ class Utils
 				$settings[$one] = array();
 			if (empty($settings[$one]['namespace']))
 				$settings[$one]['namespace'] = $mod->GetName();
-			$class = 'MultiCache\Cache_'.$one;
+			$class = 'MultiCache\Cache_' . $one;
 			try {
 				require($path.$one.'.php');
 				$cache = new $class($settings[$one]);
-				break;
 			} catch (\Exception $e) {
 				continue;
 			}
-//			$_SESSION['bkrcache'] = $cache;
+//			$_SESSION['pwfcache'] = $cache;
 			self::$cache = $cache;
 			return self::$cache;
 		}
-		throw new Exception('No cache-driver is available');
+		return NULL;
 	}
 
 	public static function ClearCache()
@@ -121,7 +120,7 @@ class Utils
 	{
 		$path = __DIR__.DIRECTORY_SEPARATOR.'mutex'.DIRECTORY_SEPARATOR;
 		require($path.'interface.Mutex.php');
-
+		$pre = \cms_db_prefix();
 		$settings = array(
 			'memcache'=>array(
 				'instance'=>((self::$mxtype=='memcache')?self::$instance:NULL)
@@ -135,7 +134,7 @@ class Utils
 				'updir'=>self::GetUploadsPath($mod)
 				),
 			'database'=>array(
-				'table'=>cms_db_prefix().'module_pwf_flock'
+				'table'=>$pre.'module_pwf_flock'
 				)
 		);
 
@@ -170,7 +169,7 @@ class Utils
 					self::$instance = NULL;
 				return $mutex;
 			}
-			throw new Exception('Mutex not working');
+			throw new \Exception('Mutex not working');
 		}
 	}
 */
@@ -184,7 +183,7 @@ class Utils
 	*/
 	public static function SafeGet($sql,$args,$mode='all')
 	{
-		$db = cmsms()->GetDb();
+		$db = \cmsms()->GetDb();
 		$nt = 10;
 		while ($nt > 0) {
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
@@ -225,7 +224,7 @@ class Utils
 	*/
 	public static function SafeExec($sql,$args)
 	{
-		$db = cmsms()->GetDb();
+		$db = \cmsms()->GetDb();
 		$nt = 10;
 		while ($nt > 0) {
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'); //this isn't perfect!
@@ -257,8 +256,9 @@ class Utils
 		// instead,rudimentary security checks
 		$orderby = preg_replace('/\s/','',$orderby);
 		$orderby = preg_replace('/[^\w\-.]/','_',$orderby);
-		$sql = 'SELECT * FROM '.cms_db_prefix().'module_pwf_form ORDER BY '.$orderby;
-		$db = cmsms()->GetDb();
+		$pre = \cms_db_prefix();
+		$sql = 'SELECT * FROM '.$pre.'module_pwf_form ORDER BY '.$orderby;
+		$db = \cmsms()->GetDb();
 		return $db->GetArray($sql);
 	}
 
@@ -327,14 +327,14 @@ class Utils
 			if ($feu == FALSE && strpos($classname,'FEU') !== FALSE)
 				continue;
 			//TODO pre-req checks e.g. 'SubmitForm' needs cURL extension
-			if ($imports && in_array($imports,$classname))
+			if ($imports && in_array($classname,$imports))
 				self::Show_Field($mod,$classname,FALSE);
 			else {
 				$menukey = 'field_type_'.substr($classname,3);
 				$mod->field_types[$mod->Lang($menukey)] = $classname;
 			}
 		}
-		uksort($mod->field_types,array('Utils','labelcmp'));
+		uksort($mod->field_types,array('self','labelcmp'));
 
 		$mod->std_field_types = array(
 			$mod->Lang('field_type_Checkbox')=>'Checkbox',
@@ -345,7 +345,7 @@ class Utils
 			$mod->Lang('field_type_Text')=>'Text',
 			$mod->Lang('field_type_SystemEmail')=>'SystemEmail',
 			$mod->Lang('field_type_SharedFile')=>'SharedFile');
-		uksort($mod->std_field_types,array('Utils','labelcmp'));
+		uksort($mod->std_field_types,array('self','labelcmp'));
 	}
 
 	/**
@@ -371,7 +371,7 @@ class Utils
 				$menulabel = $t.$obfld->mymodule->Lang($obfld->MenuKey);
 				$mod->field_types[$menulabel] = $classname;
 				if ($sort)
-					uksort($mod->field_types,array('Utils','labelcmp'));
+					uksort($mod->field_types,array('self','labelcmp'));
 			}
 		}
 	}
@@ -394,13 +394,10 @@ class Utils
 	*/
 	public static function MakeClassName($type)
 	{
-		// rudimentary security,cuz' $type could come from a form
+		// rudimentary security, cuz' $type could come from a form
 		$type = preg_replace('~[\W]|\.\.~','_',$type); //TODO
 		if ($type) {
-			if (strpos($type,'pwf') !== 0)
-				return $type;
-			else
-				return substr($type,3);
+			return $type;
 		}
 		return 'Field';
 	}
@@ -433,8 +430,9 @@ class Utils
 	*/
 	public static function GetFormNameFromID($form_id)
 	{
-		$db = cmsms()->GetDb();
-		$sql = 'SELECT name FROM '.cms_db_prefix().'module_pwf_form WHERE form_id=?';
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
+		$sql = 'SELECT name FROM '.$pre.'module_pwf_form WHERE form_id=?';
 		$name = $db->GetOne($sql,array($form_id));
 		if ($name)
 			return $name;
@@ -449,8 +447,9 @@ class Utils
 	*/
 	public static function GetFormAliasFromID($form_id)
 	{
-		$db = cmsms()->GetDb();
-		$sql = 'SELECT alias FROM '.cms_db_prefix().'module_pwf_form WHERE form_id=?';
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
+		$sql = 'SELECT alias FROM '.$pre.'module_pwf_form WHERE form_id=?';
 		$alias = $db->GetOne($sql,array($form_id));
 		if ($alias)
 			return $alias;
@@ -465,8 +464,9 @@ class Utils
 	*/
 	public static function GetFormIDFromAlias($form_alias)
 	{
-		$db = cmsms()->GetDb();
-		$sql = 'SELECT form_id FROM '.cms_db_prefix().'module_pwf_form WHERE alias = ?';
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
+		$sql = 'SELECT form_id FROM '.$pre.'module_pwf_form WHERE alias = ?';
 		$fid = $db->GetOne($sql,array($form_alias));
 		if ($fid)
 			return (int)$fid;
@@ -701,7 +701,7 @@ EOS;
 	{
 		$rows = array();
 		foreach ($formdata->Fields as &$one) {
-			$oneset = new StdClass();
+			$oneset = new \stdClass();
 			$oneset->id = $one->GetId();
 			$oneset->name = $one->GetName();
 			$rows[] = $oneset;
@@ -709,7 +709,7 @@ EOS;
 		unset($one);
 		if ($extras) {
 			foreach ($extras as $id=>$name) {
-				$oneset = new StdClass();
+				$oneset = new \stdClass();
 				$oneset->id = $id;
 				$oneset->name = $name;
 				$rows[] = $oneset;
@@ -753,13 +753,13 @@ EOS;
 		 'sub_source' => 'help_sub_source',
 		 'version' => 'help_module_version') as $name=>$langkey)
 		{
-			$oneset = new stdClass();
+			$oneset = new \stdClass();
 			$oneset->name = '{$'.$name.'}';
 			$oneset->title = $mod->Lang($langkey);
 			$globalvars[] = $oneset;
 		}
 		foreach ($formdata->templateVariables as $name=>$langkey) {
-			$oneset = new stdClass();
+			$oneset = new \stdClass();
 			$oneset->name = '{$'.$name.'}';
 			$oneset->title = $mod->Lang($langkey);
 			$globalvars[] = $oneset;
@@ -770,7 +770,7 @@ EOS;
 			$fieldvars = array();
 			foreach ($formdata->Fields as &$one) {
 				if ($one->DisplayInSubmission()) {
-					$oneset = new stdClass();
+					$oneset = new \stdClass();
 					$oneset->title = $one->GetName();
 					$oneset->alias = $one->ForceAlias();
 					$oneset->name = $one->GetVariableName();
@@ -785,7 +785,7 @@ EOS;
 
 /*		$obfields = array();
 		foreach (array ('name','type','id','value','valuearray') as $name) {
-			$oneset = new stdClass();
+			$oneset = new \stdClass();
 			$oneset->name = $name;
 			$oneset->title = $mod->Lang('title_field_'.$name);
 			$obfields[] = $oneset;
@@ -1099,7 +1099,7 @@ EOS;
 	*/
 	public static function CreateHierarchyPulldown(&$mod,$id,$name,$current)
 	{
-		$contentops = cmsms()->GetContentOperations();
+		$contentops = \cmsms()->GetContentOperations();
 		$name = $id.$name;
 		$sel = $contentops->CreateHierarchyDropdown('',$current,$name);
 		if ($sel) {
@@ -1121,8 +1121,8 @@ EOS;
 	public static function CleanTables($time=0)
 	{
 		if (!$time) $time = time();
-		$pre = cms_db_prefix();
-		$db = cmsms()->GetDb();
+		$pre = \cms_db_prefix();
+		$db = \cmsms()->GetDb();
 		$limit = $db->DbTimeStamp($time-1800);
 		$db->Execute('DELETE FROM '.$pre.'module_pwf_ip_log WHERE basetime<'.$limit);
 		$limit = $db->DbTimeStamp($time-86400);
@@ -1137,7 +1137,7 @@ EOS;
 	*/
 	public static function GetUploadsPath(&$mod)
 	{
-		$config = cmsms()->GetConfig();
+		$config = \cmsms()->GetConfig();
 		$fp = $config['uploads_path'];
 		if ($fp && is_dir($fp)) {
 			$ud = $mod->GetPreference('uploads_dir');

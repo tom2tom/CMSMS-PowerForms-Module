@@ -67,7 +67,7 @@ class CatalogerItems extends FieldBase
 							$mod->Lang('help_name_regex'));
 			$main[] = array('','',$mod->Lang('help_cataloger_attribute_fields'));
 
-			$attrs = cmsms()->variables['catalog_attrs']; //TODO bad module behaviour
+			$attrs = \cmsms()->variables['catalog_attrs']; //TODO bad module behaviour
 			foreach ($attrs as &$one) {
 				if (!$one->is_text) {
 					$safeattr = strtolower(preg_replace('/\W/','',$one->attr));
@@ -92,7 +92,7 @@ class CatalogerItems extends FieldBase
 			return $mod->Lang('error_module_cataloger');
 
 		$cataloger->getUserAttributes();
-		$gCms = cmsms();
+		$gCms = \cmsms();
 		$tmp_attrs = $gCms->variables['catalog_attrs']; //BAD MODULE BEHAVIOUR!!
 		$lines = (int)$this->GetOption('lines',5);
 		$nameregex = trim($this->GetOption('nameregex'));

@@ -141,7 +141,7 @@ class RadioGroup extends FieldBase
 			$cnt = count($names);
 			$b = 1;
 			foreach ($names as $i=>&$one) {
-				$oneset = new stdClass();
+				$oneset = new \stdClass();
 				if ($one) {
 					$oneset->title = $one;
 					if ($b == $cnt) //last button

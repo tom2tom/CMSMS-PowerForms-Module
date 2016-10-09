@@ -137,7 +137,7 @@ class TextExpandable extends FieldBase
 		$ret = array();
 		for ($i=0; $i<$vals; $i++)
 		{
-			$oneset = new stdClass();
+			$oneset = new \stdClass();
 
 			$oneset->name = '';
 			$oneset->title = '';
@@ -161,7 +161,7 @@ class TextExpandable extends FieldBase
 
 		if (!$hidebuttons) {
 			// Add button
-			$oneset = new stdClass();
+			$oneset = new \stdClass();
 			$oneset->name = '';
 			$oneset->title = '';
 			$oneset->input = '';
