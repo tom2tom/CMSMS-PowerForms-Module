@@ -31,9 +31,9 @@ if (!function_exists('EarlyExit')) {
 		$pre = cms_db_prefix();
 		$sql = array('UPDATE '.$pre.'module_pwf_ip_log SET howmany=255,basetime=? WHERE src=?');
 		$args = array(array($t2,$src));
-		$sql[] = 'INSERT INTO '.$pre.
-'module_pwf_ip_log (src,howmany,basetime) SELECT ?,255,? FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
-		$pre.'module_pwf_ip_log T WHERE T.src=?)';
+		$sql[] = 'INSERT INTO '.$pre.'module_pwf_ip_log
+(src,howmany,basetime) SELECT ?,255,? FROM (SELECT 1 AS dmy) Z
+WHERE NOT EXISTS (SELECT 1 FROM '.$pre.'module_pwf_ip_log T WHERE T.src=?)';
 		$args[] = array($src,$t2,$src);
 		PWForms\Utils::SafeExec($sql,$args);
 	}
@@ -143,13 +143,20 @@ if (isset($params[$prefix.'formdata'])) {
 					$t = trim($db->DBTimeStamp($t),"'");
 
 					$pre = cms_db_prefix();
-					$sql = array('DELETE FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<?');
+					$sql = array();
+					$sql[] = <<<EOS
+DELETE FROM {$pre}module_pwf_ip_log WHERE src=? AND basetime<?
+EOS;
 					$args = array(array($src,$t2));
-					$sql[] = 'UPDATE '.$pre.'module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?';
+					$sql[] = <<<EOS
+UPDATE {$pre}module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?
+EOS;
 					$args[] = array($src,$num+1);
-					$sql[] = 'INSERT INTO '.$pre.
-'module_pwf_ip_log (src,howmany,basetime) SELECT ?,1,? FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
-					$pre.'module_pwf_ip_log T WHERE T.src=?)';
+					$sql[] = <<<EOS
+INSERT INTO {$pre}module_pwf_ip_log (src,howmany,basetime)
+SELECT ?,1,? FROM (SELECT 1 AS dmy) Z
+WHERE NOT EXISTS (SELECT 1 FROM {$pre}module_pwf_ip_log T WHERE T.src=?)
+EOS;
 					$args[] = array($src,$t,$src);
 					PWForms\Utils::SafeExec($sql,$args);
 
@@ -204,11 +211,16 @@ if (isset($params[$prefix.'formdata'])) {
 					$limit = PWForms\Utils::GetFormOption($formdata,'submit_limit',0);
 					if ($limit) {
 						if ($num <= $limit) {
-							$sql = array('UPDATE '.$pre.'module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?');
+							$sql = array();
+							$sql[] = <<<EOS
+UPDATE {$pre}module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?
+EOS;
 							$args = array(array($src,$num+1));
-							$sql[] = 'INSERT INTO '.$pre.
-'module_pwf_ip_log (src,howmany,basetime) SELECT ?,1,? FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS (SELECT 1 FROM '.
-							$pre.'module_pwf_ip_log T WHERE T.src=?)';
+							$sql[] = <<<EOS
+INSERT INTO {$pre}module_pwf_ip_log (src,howmany,basetime)
+SELECT ?,1,? FROM (SELECT 1 AS dmy) Z
+WHERE NOT EXISTS (SELECT 1 FROM {$pre}module_pwf_ip_log T WHERE T.src=?)
+EOS;
 							$args[] = array($src,$t,$src);
 							PWForms\Utils::SafeExec($sql,$args);
 						} else {

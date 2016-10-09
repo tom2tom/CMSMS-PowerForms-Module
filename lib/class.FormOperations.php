@@ -133,7 +133,8 @@ EOS;
 		$params['form_name'] = $name;
 		$params['form_alias'] = $alias;
 		$pre = \cms_db_prefix();
-		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form
+(form_id,name,alias) VALUES (?,?,?)';
 		$db = \cmsms()->GetDb();
 		$newid = $db->GenID($pre.'module_pwf_form_seq');
 		$db->Execute($sql,array($newid,$name,$alias));
@@ -232,14 +233,15 @@ EOS;
 		$params['form_alias'] = $alias;
 
 		$pre = \cms_db_prefix();
-		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form
+(form_id,name,alias) VALUES (?,?,?)';
 		$db = \cmsms()->GetDb();
 		$newid = $db->GenID($pre.'module_pwf_form_seq');
 		$db->Execute($sql,array($newid,$name,$alias));
 
 		$res = TRUE;
-		$sql = 'INSERT INTO '.$pre.
-		'module_pwf_form_opt (option_id,form_id,name,value) VALUES (?,?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form_opt
+(option_id,form_id,name,value) VALUES (?,?,?,?)';
 		foreach ($formdata->Options as $key=>&$val) {
 			$AttrId = $db->GenID($pre.'module_pwf_form_opt_seq');
 			if ($key == 'form_template') {
@@ -295,7 +297,8 @@ EOS;
 		$pre = \cms_db_prefix();
 		if ($newform) {
 			$form_id = $db->GenID($pre.'module_pwf_form_seq');
-			$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+			$sql = 'INSERT INTO '.$pre.'module_pwf_form
+(form_id,name,alias) VALUES (?,?,?)';
 			$res = $db->Execute($sql,array($form_id,$formdata->Name,$formdata->Alias));
 		} else {
 			$sql = 'UPDATE '.$pre.'module_pwf_form SET name=?,alias=? WHERE form_id=?';
@@ -311,7 +314,8 @@ EOS;
 			if ($db->Execute($sql,array($form_id)) == FALSE)
 				return array(FALSE,$mod->Lang('database_error'));
 		}
-		$sql = 'INSERT INTO '.$pre.'module_pwf_form_opt (option_id,form_id,name,value) VALUES (?,?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form_opt
+(option_id,form_id,name,value) VALUES (?,?,?,?)';
 		foreach ($formdata->Options as $key=>$val) {
 			if ($key == 'form_template') {
 				if ($mod->before20)
@@ -694,12 +698,14 @@ EOS;
 		for ($i=1; $i<=$data['count']; $i++)
 		{
 			$fdata = $data['form'.$i];
-			$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+			$sql = 'INSERT INTO '.$pre.'module_pwf_form
+(form_id,name,alias) VALUES (?,?,?)';
 			$form_id = $db->GenID($pre.'module_pwf_form_seq');
 			$db->Execute($sql,array($form_id,
 				$fdata['properties']['name'],
 				$fdata['properties']['alias']));
-			$sql = 'INSERT INTO '.$pre.'module_pwf_form_opt (option_id,form_id,name,value) VALUES (?,?,?,?)';
+			$sql = 'INSERT INTO '.$pre.'module_pwf_form_opt
+(option_id,form_id,name,value) VALUES (?,?,?,?)';
 			foreach ($fdata['options'] as $name=>&$one) {
 				$option_id = $db->GenID($pre.'module_pwf_form_opt_seq');
 				if (strncmp($one,']][[',4) != 0)
@@ -723,16 +729,16 @@ EOS;
 				$db->Execute($sql,array($option_id,$form_id,$name,$val));
 			}
 			unset($one);
-			$sql = 'INSERT INTO '.$pre.'module_pwf_field (
-field_id,form_id,name,type,order_by) VALUES (?,?,?,?,?)';
+			$sql = 'INSERT INTO '.$pre.'module_pwf_field
+(field_id,form_id,name,type,order_by) VALUES (?,?,?,?,?)';
 			foreach ($fdata['fields'] as &$fld) {
 				$field_id = $db->GenID($pre.'module_pwf_field_seq');
 				$db->Execute($sql,array($field_id,$form_id,
 					$fld['properties']['name'],
 					$fld['properties']['type'],
 					$fld['properties']['order_by']));
-				$sql2 = 'INSERT INTO '.$pre.'module_pwf_field_opt (
-option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
+				$sql2 = 'INSERT INTO '.$pre.'module_pwf_field_opt
+(option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 				foreach ($fld['options'] as $name=>&$one) {
 					$option_id = $db->GenID($pre.'module_pwf_field_opt_seq');
 					if (strncmp($one,']][[',4) != 0)

@@ -75,15 +75,15 @@ class FieldOperations
 			$neworder++;
 		}
 		$row['order_by'] = $neworder;
-		$sql = 'INSERT INTO '.$pre.
-'module_pwf_field (field_id,form_id,name,type,validation_type,required,hide_label,order_by) VALUES (?,?,?,?,?,?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_field
+(field_id,form_id,name,type,validation_type,required,hide_label,order_by) VALUES (?,?,?,?,?,?,?,?)';
 		$db->Execute($sql,$row);
 
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field_opt WHERE field_id=?';
 		$rs = $db->Execute($sql,array($field_id));
 		if ($rs) {
-			$sql = 'INSERT INTO '.$pre.
-'module_pwf_field_opt (option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
+			$sql = 'INSERT INTO '.$pre.'module_pwf_field_opt
+(option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 			while ($row = $rs->FetchRow()) {
 				$row['option_id'] = $db->GenID($pre.'module_pwf_field_opt_seq');
 				$row['field_id'] = $fid;
@@ -130,8 +130,8 @@ class FieldOperations
 		$pre = \cms_db_prefix();
 		if ($obfield->Id <= 0) {
 			$obfield->Id = $db->GenID($pre.'module_pwf_field_seq');
-			$sql = 'INSERT INTO '.$pre.
-'module_pwf_field (field_id,form_id,name,type,order_by) VALUES (?,?,?,?,?)';
+			$sql = 'INSERT INTO '.$pre.'module_pwf_field
+(field_id,form_id,name,type,order_by) VALUES (?,?,?,?,?)';
 			$res = $db->Execute($sql,
 				array($obfield->Id,$obfield->FormId,$obfield->Name,$obfield->Type,$obfield->OrderBy));
 		} else {
@@ -144,8 +144,8 @@ class FieldOperations
 			$sql = 'DELETE FROM '.$pre.'module_pwf_field_opt where field_id=?';
 			$res = $db->Execute($sql,array($obfield->Id)) && $res;
 			// add back current ones
-			$sql = 'INSERT INTO '.$pre.
-'module_pwf_field_opt (option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
+			$sql = 'INSERT INTO '.$pre.'module_pwf_field_opt
+(option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 			foreach ($obfield->Options as $name=>$optvalue) {
 				if (!is_array($optvalue))
 					$optvalue = array($optvalue);

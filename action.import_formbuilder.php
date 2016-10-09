@@ -355,7 +355,8 @@ function Get_Fields(&$db,$pre,$oldfid,$newfid)
 		);
 		$sql = 'INSERT INTO '.$pre.'module_pwf_field
 (field_id,form_id,name,type,order_by) VALUES (?,?,?,?,?)';
-		$sql2 = 'INSERT INTO '.$pre.'module_pwf_trans (old_id,new_id,isform) VALUES (?,?,0)';
+		$sql2 = 'INSERT INTO '.$pre.'module_pwf_trans
+(old_id,new_id,isform) VALUES (?,?,0)';
 		foreach ($data as $row) {
 			$oldf = (int)$row['field_id'];
 			$newf = $db->GenID($pre.'module_pwf_field_seq');
@@ -406,7 +407,8 @@ if (isset($params['import'])) {
 	$oldforms = $db->GetArray($sql);
 	if ($oldforms) {
 		$funcs = new PWForms\FormOperations();
-		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form
+(form_id,name,alias) VALUES (?,?,?)';
 		$renums = array();
 		foreach ($oldforms as $row) {
 			$fid = $db->GenID($pre.'module_pwf_form_seq');
@@ -447,7 +449,8 @@ $this->Crash();
 			}
 		}
 
-		$sql = 'INSERT INTO '.$pre.'module_pwf_trans (old_id,new_id,isform) VALUES (?,?,1)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_trans
+(old_id,new_id,isform) VALUES (?,?,1)';
 		foreach ($renums as $old=>$new) {
 			$db->Execute($sql,array($old,$new));
 			Get_Opts($this,$db,$pre,$old,$new);
