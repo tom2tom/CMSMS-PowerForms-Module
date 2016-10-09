@@ -26,6 +26,10 @@ textarea.cloaked {
  height:2.4em;
 }
 
+div.pageinput .pagetext {
+ margin-left:0;
+}
+
 .leftwards { margin-left:0 !important }
 
 .pwf_link { text-decoration:underline; }
