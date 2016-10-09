@@ -62,30 +62,24 @@ class CompanyDirectory extends FieldBase
 			return array('main'=>array('<span style="color:red">'.$mod->Lang('error').'</span>',
 				'',$mod->Lang('error_module_CompanyDirectory')));
 
-		$Categories = array();
-		$Categories['All'] = $mod->Lang('all');
-		$db = \cmsms()->GetDb();
-		$sql = 'SELECT id,name FROM '.$pre.'module_compdir_categories';
+		$Categories = array('All'=>$mod->Lang('all'));
 		$pre = \cms_db_prefix();
-		$rs = $db->Execute($sql);
-		if ($rs) {
-			while ($row = $rs->FetchRow())
-				$Categories[$row['name']] = $row['name'];
-			$rs->Close();
+		$sql = 'SELECT name FROM '.$pre.'module_compdir_categories';
+		$db = \cmsms()->GetDb();
+		$all = $db->GetCol($sql);
+		if ($all) {
+			$Categories += array_combine($all,$all);
 		}
 		$CategorySelected = $this->GetOption('Category');
 		//check and force the right type
 		if (!is_array($CategorySelected))
 			$CategorySelected = explode(',',$CategorySelected);
 
-		$FieldDefs = array();
-		$FieldDefs['none'] = $this->Lang('none2');
-		$sql = 'SELECT * FROM '.$pre.'module_compdir_fielddefs ORDER BY item_order';
-		$rs = $db->Execute($sql);
-		if ($rs) {
-			while ($row = $rs->FetchRow())
-				$FieldDefs[$row['name']] = $row['name'];
-			$rs->Close();
+		$FieldDefs = array('none'=>$this->Lang('none2'));
+		$sql = 'SELECT name FROM '.$pre.'module_compdir_fielddefs ORDER BY item_order';
+		$all = $db->GetCol($sql);
+		if ($all) {
+			$FieldDefs += array_combine($all,$all);
 		}
 		$FieldDefsSelected = $this->GetOption('FieldDefs');
 		if (!is_array($FieldDefsSelected))
