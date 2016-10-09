@@ -45,7 +45,7 @@ class FieldBase implements \Serializable
 	public $ValidationTypes; //if set, an array of choices suitable for populating pulldowns
 	public $Value; //when set, can be scalar or array, with all content processed by Utils::html_myentities_decode()
 
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
 		$this->formdata = $formdata;
 		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_none')=>'none');
@@ -514,7 +514,7 @@ class FieldBase implements \Serializable
 		return FALSE;
 	}
 
-	public function SetOption($optionName,$optionValue)
+	public function SetOption($optionName, $optionValue)
 	{
 		$this->Options[$optionName] = $optionValue;
 	}
@@ -556,12 +556,12 @@ class FieldBase implements \Serializable
 		return FALSE;
 	  }
 
-	public function SetOptionElement($optionName,$index,$value)
+	public function SetOptionElement($optionName, $index, $value)
 	{
 		$this->Options[$optionName.$index] = $value;
 	}
 
-	public function GetOptionElement($optionName,$index,$default='')
+	public function GetOptionElement($optionName, $index, $default='')
 	{
 		$so = $optionName.$index;
 		if (isset($this->Options[$so]))
@@ -603,7 +603,7 @@ class FieldBase implements \Serializable
 	TODO OK? Field options are merged with any existing options
 	Returns: boolean T/F per successful operation
 	*/
-	public function Load($id,&$params)
+	public function Load($id, &$params)
 	{
 		return FieldOperations::LoadField($this);
 	}
@@ -639,7 +639,7 @@ class FieldBase implements \Serializable
 		return FALSE;
 	}
 
-/*	public function GetFieldInputId($id,&$params)
+/*	public function GetFieldInputId($id, &$params)
 	{
 		return $id.$this->formdata->current_prefix.$this->Id;
 	}
@@ -705,7 +705,7 @@ class FieldBase implements \Serializable
 	Returns: array with keys 'main' and  (possibly empty) 'adv', for use
 		ultimately in method.update_field.php.
 	*/
-	public function AdminPopulateCommon($id,$visible=TRUE)
+	public function AdminPopulateCommon($id, $visible=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
 		//init main tab content
@@ -767,7 +767,7 @@ class FieldBase implements \Serializable
 		return array($main,$adv);
 	}
 
-	public function RemoveAdminField(&$array,$fieldtitle)
+	public function RemoveAdminField(&$array, $fieldtitle)
 	{
 		foreach ($array as $i=>$data) {
 			if ($data[0] == $fieldtitle) {

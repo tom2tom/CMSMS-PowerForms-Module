@@ -181,7 +181,7 @@ class Utils
 	@mode: optional type of get - 'one','row','col','assoc' or 'all', default 'all'
 	Returns: boolean indicating successful completion
 	*/
-	public static function SafeGet($sql,$args,$mode='all')
+	public static function SafeGet($sql, $args, $mode='all')
 	{
 		$db = \cmsms()->GetDb();
 		$nt = 10;
@@ -222,7 +222,7 @@ class Utils
 	@args: array of arguments for @sql, or array of them
 	Returns: boolean indicating successful completion
 	*/
-	public static function SafeExec($sql,$args)
+	public static function SafeExec($sql, $args)
 	{
 		$db = \cmsms()->GetDb();
 		$nt = 10;
@@ -355,7 +355,7 @@ class Utils
 	@classname: name of class for the field to be added
 	@sort: optional boolean, whether to sort ... , defalut TRUE
 	*/
-	public static function Show_Field(&$mod,$classname,$sort=TRUE)
+	public static function Show_Field(&$mod, $classname, $sort=TRUE)
 	{
 		if ($mod->field_types) {
 			$params = array();
@@ -481,7 +481,7 @@ class Utils
 	@default: optional value to return if the requested option value doesn't exist, default ''
 	Returns: value of form option, or @default
 	*/
-	public static function GetFormOption(&$formdata,$optname,$default='')
+	public static function GetFormOption(&$formdata, $optname, $default='')
 	{
 		if (isset($formdata->Options[$optname]))
 			return $formdata->Options[$optname];
@@ -578,7 +578,7 @@ class Utils
 	@funcName: identifier for use when multiple buttons populate the same control, default ''
 	Returns: 2-member array, 1st is a button, 2nd is js onclick-func for the button
 	*/
-	public static function CreateTemplateAction(&$mod,$id,$ctlName,$button_label,$template,$funcName=FALSE)
+	public static function CreateTemplateAction(&$mod, $id, $ctlName, $button_label, $template, $funcName=FALSE)
 	{
 		if (!$funcName)
 			$funcName = $ctlName;
@@ -625,7 +625,7 @@ EOS;
 	 The scripts install a 'sample template' into the corresponding control.
 	 For some combinations of options, pairs of buttons & scripts are created.
 	*/
-	public static function TemplateActions(&$formdata,$id,$ctlData)
+	public static function TemplateActions(&$formdata, $id, $ctlData)
 	{
 		$mod = $formdata->formsmodule;
 		$buttons = array();
@@ -683,7 +683,7 @@ EOS;
 	@name: variable name (excluding '$')
 	@langkey: lang-array key for variable description
 	*/
-	public static function AddTemplateVariable(&$formdata,$name,$langkey)
+	public static function AddTemplateVariable(&$formdata, $name, $langkey)
 	{
 		$formdata->templateVariables[$name] = $langkey;
 	}
@@ -736,7 +736,7 @@ EOS;
 	@mod: reference to current PowerBrowse module object
 	@tplvars: reference to template-variables array
 	*/
-	public static function SetupSubTemplateVarsHelp(&$formdata,&$mod,&$tplvars)
+	public static function SetupSubTemplateVarsHelp(&$formdata, &$mod, &$tplvars)
 	{
 		$tplvars = $tplvars + array(
 		 'template_vars_title' => $mod->Lang('title_template_variables'),
@@ -808,7 +808,7 @@ EOS;
 	@tplvars: reference to template-variables array
 	@htmlemail: optional boolean, whether processing a form for html email, default FALSE
 	*/
-	public static function SetupFormVars(&$formdata,&$tplvars,$htmlemail=FALSE)
+	public static function SetupFormVars(&$formdata, &$tplvars, $htmlemail=FALSE)
 	{
 		$mod = $formdata->formsmodule;
 		// general variables
@@ -862,7 +862,7 @@ EOS;
 	@cache: optional boolean, default TRUE
 	Returns: string, processed template
 	*/
-	public static function ProcessTemplate(&$mod,$tplname,$tplvars,$cache=TRUE)
+	public static function ProcessTemplate(&$mod, $tplname, $tplvars, $cache=TRUE)
 	{
 		global $smarty;
 		if ($mod->before20) {
@@ -891,7 +891,7 @@ EOS;
 	@cache: optional boolean, default TRUE
 	Returns: nothing
 	*/
-	public static function ProcessTemplateFromDatabase(&$mod,$tplname,$tplvars,$cache=TRUE)
+	public static function ProcessTemplateFromDatabase(&$mod, $tplname, $tplvars, $cache=TRUE)
 	{
 		global $smarty;
 		if ($mod->before20) {
@@ -921,7 +921,7 @@ EOS;
 	No cacheing.
 	Returns: string, processed template
 	*/
-	public static function ProcessTemplateFromData(&$mod,$data,$tplvars)
+	public static function ProcessTemplateFromData(&$mod, $data, $tplvars)
 	{
 		global $smarty;
 		if ($mod->before20) {
@@ -1008,7 +1008,7 @@ EOS;
 	This function derived from work by Josh Hartman and others.
 	Reference: http://www.warpconduit.net/2013/04/14/highly-secure-data-encryption-decryption-made-easy-with-php-mcrypt-rijndael-256-and-cbc
 	*/
-	public static function Encrypt(&$mod,$source,$pass_phrase='')
+	public static function Encrypt(&$mod, $source, $pass_phrase='')
 	{
 		if (!$source)
 			return '';
@@ -1035,7 +1035,7 @@ EOS;
 	This function derived from work by Josh Hartman and others.
 	Reference: http://www.warpconduit.net/2013/04/14/highly-secure-data-encryption-decryption-made-easy-with-php-mcrypt-rijndael-256-and-cbc
 	*/
-	public static function Decrypt(&$mod,$source,$pass_phrase='')
+	public static function Decrypt(&$mod, $source, $pass_phrase='')
 	{
 		if (!$source)
 			return '';
@@ -1097,7 +1097,7 @@ EOS;
 	@current: id of currently selected content object
 	Returns: html string
 	*/
-	public static function CreateHierarchyPulldown(&$mod,$id,$name,$current)
+	public static function CreateHierarchyPulldown(&$mod, $id, $name, $current)
 	{
 		$contentops = \cmsms()->GetContentOperations();
 		$name = $id.$name;

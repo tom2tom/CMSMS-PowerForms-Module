@@ -9,7 +9,7 @@ namespace PWForms;
 
 class EmailBase extends FieldBase
 {
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->IsDisposition = TRUE;
@@ -23,7 +23,7 @@ class EmailBase extends FieldBase
 		return $this->formdata->formsmodule->Lang('email_template_not_set');
 	}
 
-	public function AdminPopulateCommonEmail($id,$totype=FALSE,$visible=TRUE)
+	public function AdminPopulateCommonEmail($id, $totype=FALSE, $visible=TRUE)
 	{
 		list($main,$adv) = $this->AdminPopulateCommon($id,$visible);
 
@@ -151,7 +151,7 @@ $mod->Crash;
 	$subject is processed via smarty
 	message body is generated from field-option 'email_template' (or a default template)
 	*/
-	public function SendForm($destination_array,$subject,$tplvars=array())
+	public function SendForm($destination_array, $subject, $tplvars=array())
 	{
 		$mod = $this->formdata->formsmodule;
 		if ($destination_array == FALSE || $subject == FALSE)

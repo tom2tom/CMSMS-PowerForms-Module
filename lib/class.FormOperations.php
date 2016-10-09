@@ -13,13 +13,13 @@ class SortOrdersClosure
     private $fields;
 	private $orders;
 
-	public function __construct(&$fields,&$orders)
+	public function __construct(&$fields, &$orders)
 	{
         $this->fields = $fields;
         $this->orders = $orders;
     }
 
-	public function compare($a,$b)
+	public function compare($a, $b)
 	{
 		$fa = $this->fields[$this->orders[$a]];
 		$fb = $this->fields[$this->orders[$b]];
@@ -59,7 +59,7 @@ class FormOperations
 {
 	//for CMSMS 2+
 	private static $editors = NULL;
-	private function SetTemplate($type,$id,$val)
+	private function SetTemplate($type, $id, $val)
 	{
 		if (self::$editors === NULL) {
 			$editors = array();
@@ -114,7 +114,7 @@ EOS;
 	$params['form_name'] and $params['form_alias'] may be set/updated to unique values
 	Returns: new form id or FALSE
 	*/
-	public function Add(&$mod,&$params)
+	public function Add(&$mod, &$params)
 	{
 		$name = self::GetName($params);
 		if (!$name)
@@ -147,7 +147,7 @@ EOS;
 	@form_id: enumerator of form to be processed
 	Returns: boolean TRUE/FALSE whether deletion succeeded
 	*/
-	public function Delete(&$mod,$form_id)
+	public function Delete(&$mod, $form_id)
 	{
 /*		$noparms = array();
 		$formdata = self::Load($mod,$id,$noparms,$form_id);
@@ -198,7 +198,7 @@ EOS;
 	Returns: new form id or FALSE
 	$params['form_name'] and $params['form_alias'] are set/updated
 	*/
-	public function Copy(&$mod,$id,&$params,$form_id)
+	public function Copy(&$mod, $id, &$params, $form_id)
 	{
 		$noparms = array();
 		$formdata = self::Load($mod,$id,$noparms,$form_id);
@@ -285,7 +285,7 @@ EOS;
 	@formdata: reference to form data object
 	Returns: boolean T/F indicating success, with $params['message'] set upon failure
 	*/
-	public function Store(&$mod,&$formdata)
+	public function Store(&$mod, &$formdata)
 	{
 		$form_id = $formdata->Id;
 		$newform = ($form_id <= 0);
@@ -374,7 +374,7 @@ EOS;
 	@form_id: enumerator of form to be processed
 	Returns: reference to a FormData object for the form, or FALSE
 	*/
-	public function &Load(&$mod,$id,&$params,$form_id)
+	public function &Load(&$mod, $id, &$params, $form_id)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_form WHERE form_id=?';
@@ -444,7 +444,7 @@ EOS;
 		<![CDATA[...]]> cuz that mechanism is not nestable. This means that
 		values which include javascript may be unbrowsable in a XML-viewer.
 	*/
-	public function CreateXML(&$mod,$form_id,$date,$charset=FALSE,$dtd=TRUE)
+	public function CreateXML(&$mod, $form_id, $date, $charset=FALSE, $dtd=TRUE)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_form WHERE form_id=?';
@@ -688,7 +688,7 @@ EOS;
 	@xmlfile:
 	Returns boolean T/F
 	*/
-	public function ImportXML(&$mod,$xmlfile)
+	public function ImportXML(&$mod, $xmlfile)
 	{
 		$data = self::ParseXML($xmlfile);
 		if ($data == FALSE)
@@ -762,7 +762,7 @@ EOS;
 	@orders: reference to array of id's for @fields, ordered by e.g.
 		current in-page position, or as-walked
 	*/
-	public function Arrange(&$fields,&$orders)
+	public function Arrange(&$fields, &$orders)
 	{
 		$keys = array_keys($orders);
 		//old-PHP usort-with-extras
@@ -770,7 +770,7 @@ EOS;
 		usort($keys,array($soc,"compare"));
 		unset($soc);
 /*		usort($keys,
-		public function($a,$b) use ($fields,$orders) //this syntax is for PHP 5.3+
+		public function($a, $b) use ($fields,$orders) //this syntax is for PHP 5.3+
 		{
 			$fa = $fields[$orders[$a]];
 			$fb = $fields[$orders[$b]];
@@ -810,7 +810,7 @@ EOS;
 	@alias: optional form-alias string, default = FALSE
 	Returns TRUE if there's no form with matching name OR alias
 	*/
-	public function NewID($name=FALSE,$alias=FALSE)
+	public function NewID($name=FALSE, $alias=FALSE)
 	{
 		$where = array();
 		$vars = array();

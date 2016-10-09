@@ -10,7 +10,7 @@ namespace PWForms;
 class FieldOperations
 {
 	// returns reference to new field-object corresponding to $params['field_id']
-	public static function &NewField(&$formdata,$id,&$params)
+	public static function &NewField(&$formdata, $id, &$params)
 	{
 		$obfield = FALSE;//may need ref to this
 		if (!empty($params['field_id'])) {
@@ -48,7 +48,7 @@ class FieldOperations
 	}
 
 	// 'hard' copy an existing field returns TRUE/FALSE
-	public static function CopyField($field_id,$newform=FALSE,$neworder=FALSE)
+	public static function CopyField($field_id, $newform=FALSE, $neworder=FALSE)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
@@ -96,7 +96,7 @@ class FieldOperations
 	}
 
 	// returns reference to a clone of existing field-object corresponding to $field_id
-	public static function &Replicate(&$formdata,$field_id)
+	public static function &Replicate(&$formdata, $field_id)
 	{
 		$obfield = FALSE;//may need ref to this
 		if ($field_id != 0) {
@@ -124,7 +124,7 @@ class FieldOperations
 	Sets @obfield->Id to real value if it was -1 i.e. a new field
 	Returns: boolean T/F per success of executed db commands
 	*/
-	public static function StoreField(&$obfield,$deep=FALSE)
+	public static function StoreField(&$obfield, $deep=FALSE)
 	{
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
@@ -238,7 +238,7 @@ class FieldOperations
 		return $res;
 	}
 
-	public static function DeleteField(&$formdata,$field_id)
+	public static function DeleteField(&$formdata, $field_id)
 	{
 		//clear table data
 		//unless subclassed, it just calls RealDeleteField()
@@ -257,7 +257,7 @@ class FieldOperations
 
 	// Swaps field display-orders
 	// This is intended for swapping adjacent fields but works more generally
-	public static function SwapFieldsByIndex($field_index1,$field_index2)
+	public static function SwapFieldsByIndex($field_index1, $field_index2)
 	{
 		$keys = array_keys($formdata->Fields);
 		if (isset($keys[$field_index1]) && isset($keys[$field_index2])) {
@@ -272,7 +272,7 @@ class FieldOperations
 
 	// Returns 0-based index of field in $formdata->Fields[] and with id matching $field_id
 	// Check returned value with !== FALSE
-	public static function GetFieldIndexFromId(&$formdata,$field_id)
+	public static function GetFieldIndexFromId(&$formdata, $field_id)
 	{
 		return array_search($field_id,array_keys($formdata->Fields));
 	}

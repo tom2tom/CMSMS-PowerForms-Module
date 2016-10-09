@@ -9,7 +9,7 @@ namespace PWForms;
 
 class UniqueInteger extends FieldBase
 {
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->ChangeRequirement = FALSE;
@@ -17,7 +17,7 @@ class UniqueInteger extends FieldBase
 		$this->Type = 'UniqueInteger';
 	}
 
-	private function generate_numbers($min,$max,$times)
+	private function generate_numbers($min, $max, $times)
 	{
 		$output = '';
 		$array = range($min,$max);
@@ -48,7 +48,7 @@ class UniqueInteger extends FieldBase
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-	public function Populate($id,&$params)
+	public function Populate($id, &$params)
 	{
 		$mod = $this->formdata->formsmodule;
 		if ($this->Value) {

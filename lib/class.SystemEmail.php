@@ -14,7 +14,7 @@ class SystemEmail extends EmailBase
 {
 	var $addressAdd = FALSE;
 
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->ChangeRequirement = FALSE;
@@ -84,7 +84,7 @@ class SystemEmail extends EmailBase
 		return $ret;
 	}
 
-	public function GetDests($id,$row,$sel)
+	public function GetDests($id, $row, $sel)
 	{
 		$id = \cms_htmlentities($id);
 		$name = $id.$this->formdata->current_prefix.'mailto_'.$row; //must be distinct for each address
@@ -219,7 +219,7 @@ class SystemEmail extends EmailBase
 		return FALSE;
 	}
 
-	public function Dispose($id,$returnid)
+	public function Dispose($id, $returnid)
 	{
 		$dests = $this->GetOptionRef('destination_address');
 		return $this->SendForm($dests,$this->GetOption('email_subject'));

@@ -6,7 +6,7 @@
 
 if (!$this->CheckAccess('ModifyPFForms')) exit;
 
-function Match_Browses(&$db,$pre)
+function Match_Browses(&$db, $pre)
 {
 	$sql = 'SELECT * FROM '.$pre.'module_pwf_trans ORDER BY isform,trans_id';
 	$data = $db->GetAssoc($sql);
@@ -30,7 +30,7 @@ function Match_Browses(&$db,$pre)
 }
 
 //for CMSMS 2+
-function MySetTemplate($type,$id,$val)
+function MySetTemplate($type, $id, $val)
 {
 	static $editors = NULL;
 	if ($editors === NULL) {
@@ -114,7 +114,7 @@ EOS;
 		<div class="captcha">{$graphic_captcha}{$title_captcha}<br />{$input_captcha}<br /></div>
 	{/if}
 */
-function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
+function Update_Templates(&$mod, &$db, $pre, $oldfid, $newfid)
 {
 	$finds = array(
 		'FormBuilder',
@@ -237,7 +237,7 @@ function Update_Templates(&$mod,&$db,$pre,$oldfid,$newfid)
 	}
 }
 
-function Get_FieldOpts(&$db,$pre,$oldfid,$newfid,$oldf,$newf,&$fieldrow)
+function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, &$fieldrow)
 {
 	$sql = 'SELECT * FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY option_id';
 	$data = $db->GetArray($sql,array($oldfid,$oldf));
@@ -291,7 +291,7 @@ function Get_FieldOpts(&$db,$pre,$oldfid,$newfid,$oldf,$newf,&$fieldrow)
 	}
 }
 
-function Get_Fields(&$db,$pre,$oldfid,$newfid)
+function Get_Fields(&$db, $pre, $oldfid, $newfid)
 {
 	$sql = 'SELECT * FROM '.$pre.'module_fb_field WHERE form_id=? ORDER BY order_by,field_id';
 	$data = $db->GetArray($sql,array($oldfid));
@@ -368,7 +368,7 @@ function Get_Fields(&$db,$pre,$oldfid,$newfid)
 	}
 }
 
-function Get_Opts(&$mod,&$db,$pre,$oldfid,$newfid)
+function Get_Opts(&$mod, &$db, $pre, $oldfid, $newfid)
 {
 	$sql = 'SELECT * FROM '.$pre.'module_fb_form_attr WHERE form_id=? ORDER BY form_attr_id';
 	$data = $db->GetArray($sql,array($oldfid));

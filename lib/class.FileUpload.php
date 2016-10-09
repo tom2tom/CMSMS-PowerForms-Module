@@ -9,7 +9,7 @@ namespace PWForms;
 
 class FileUpload extends FieldBase
 {
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->IsSortable = FALSE;
@@ -122,7 +122,7 @@ class FileUpload extends FieldBase
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-	public function Load($id,&$params)
+	public function Load($id, &$params)
 	{
 		$ret = parent::Load($id,$params);
 		if (isset($_FILES)) {
@@ -135,7 +135,7 @@ class FileUpload extends FieldBase
 		return $ret;
 	}
 
-	public function CreatePageDropdown($id,$name,$current='',$addtext='',$markdefault=TRUE)
+	public function CreatePageDropdown($id, $name, $current='', $addtext='', $markdefault=TRUE)
 	{
 		// we get here (hopefully) when the template is changed in the dropdown
 		$defaultid = '';
@@ -160,7 +160,7 @@ class FileUpload extends FieldBase
 		return $this->formdata->formsmodule->CreateInputDropdown($id,$name,$allpages,-1,$current,$addtext);
 	}
 
-	public function Populate($id,&$params)
+	public function Populate($id, &$params)
 	{
 		$mod = $this->formdata->formsmodule;
 		if ($this->Value)
@@ -249,7 +249,7 @@ class FileUpload extends FieldBase
 	then the file is added to the uploads module and a link is added to the results.
 	Otherwise, upload the file to the "uploads" directory.
 	*/
-	public function Dispose($id,$returnid)
+	public function Dispose($id, $returnid)
 	{
 		$_id = $id.$this->formdata->current_prefix.$this->Id;
 		if (empty($_FILES[$_id]))

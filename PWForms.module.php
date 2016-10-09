@@ -326,7 +326,7 @@ class PWForms extends CMSModule
 			return 'maintab';
 	}
 
-	public function PrettyMessage($text,$success=TRUE,$faillink=FALSE,$key=TRUE)
+	public function PrettyMessage($text, $success=TRUE, $faillink=FALSE, $key=TRUE)
 	{
 		$base = ($key) ? $this->Lang($text) : $text;
 		if ($success)
@@ -396,7 +396,7 @@ class PWForms extends CMSModule
 		$basename = basename($classfilepath);
 		$fp = cms_join_path($this->GetModulePath(),'lib',$basename);
 		copy($classfilepath,$fp);
-		
+
 		$classname = PWForms\Utils::FileClassName($basename);
 		//cache field data to be ready for restarts
 		$imports = $this->GetPreference('imported_fields');
@@ -410,7 +410,7 @@ class PWForms extends CMSModule
 		if ($this->field_types)
 			PWForms\Utils::Show_Field($this,$classname);
 	}
-	
+
 	public function DeregisterField($classfilepath)
 	{
 		$basename = basename($classfilepath);
