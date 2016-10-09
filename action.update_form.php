@@ -66,7 +66,6 @@ if (isset($params['submit'])) {
 		$obfield->Store(TRUE);
 		$formdata->Fields[$obfield->Id] = $obfield;
 		//update cache ready for next use
-		unset($formdata->formsmodule);
 		$cache->set($params['formdata'],$formdata);
 		$this->Redirect($id,'update_field',$returnid,
 			array('field_id'=>$params['field_id'],
@@ -105,7 +104,7 @@ $tplvars = array();
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.update_form.php';
 
-unset($formdata->formsmodule); //no need to cache this
+//unset($formdata->formsmodule); //no need to cache this
 $cache->set($params['formdata'],$formdata);
 
 echo PWForms\Utils::ProcessTemplate($this,'editform.tpl',$tplvars);

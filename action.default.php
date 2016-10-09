@@ -487,7 +487,6 @@ $tplvars['form_done'] = 0;
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.default.php';
 
-unset($formdata->formsmodule); //no need to cache this
 $cache->set($cache_key,$formdata);
 
 //we've got a form-template to display, don't bother with another 'parent'
