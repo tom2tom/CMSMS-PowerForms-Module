@@ -64,24 +64,26 @@ class Passphrase extends FieldBase
 
 	public function Populate($id,&$params)
 	{
-		$rows = $this->GetOption('rows',2) * 1.2;
-		$cols = $this->GetOption('columns',40);
-		$add = ' style="overflow:auto;height:'.$rows.'em;width:'.$cols.'em;"';
-		$htmlid = $id.$this->GetInputId(); //html may get id="$id.$htmlid", or maybe not ...
 		$mod = $this->formdata->formsmodule;
-
+		$baseurl = $mod->GetModuleURLPath();
+		$this->formdata->jsincs['cloak'] = <<<EOS
+<script type="text/javascript" src="{$baseurl}/include/jquery-inputCloak.min.js"></script>
+EOS;
+		$htmlid = $id.$this->GetInputId(); //html may get id="$id.$htmlid", or maybe not ...
 		$style = $this->GetOption('style','all');
 		$char = $this->GetOption('masker','*');
 		$ms = $this->GetOption('delay',0);
-		$this->formdata->jscripts['cloak'] = <<<EOS
-$(document).ready(function() {
+		$this->formdata->jsloads[] = <<<EOS
  $('#{$htmlid}').inputCloak({
   type: '{$style}',
   symbol: '{$char}',
   delay: $ms
  });
-});
 EOS;
+		$rows = $this->GetOption('rows',2) * 1.2;
+		$cols = $this->GetOption('columns',40);
+		$add = ' style="overflow:auto;height:'.$rows.'em;width:'.$cols.'em;"';
+
 		$tmp = $mod->CreateTextArea(FALSE,$id,
 			($this->Value?$this->Value:''),
 			$this->formdata->current_prefix.$this->Id,
