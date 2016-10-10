@@ -69,9 +69,10 @@ if ($obfield) { //field data are loaded
 
 	if (isset($allOpts['table']))
 		$tplvars['mainTable'] = $allOpts['table'];
-	if (isset($allOpts['funcs']))
-		$tplvars['jsfuncs'] = $allOpts['funcs'];
-
+	if (isset($allOpts['funcs'])) {
+		$tplvars['jsall'] = NULL;
+		PWForms\Utils::MergeJS(FALSE,$allOpts['funcs'],FALSE,$tplvars['jsall']);
+	}
 	if (isset($allOpts['extra'])) {
 		switch ($allOpts['extra']) {
 		 case 'varshelpmain':
