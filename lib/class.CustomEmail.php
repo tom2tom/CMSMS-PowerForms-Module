@@ -56,22 +56,22 @@ class CustomEmail extends EmailBase
 		$mod = $this->formdata->formsmodule;
 		$choices = array($mod->Lang('select_one') => '') + $displayfields;
 
-		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE,FALSE);
+		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE,FALSE);
 		$waslast = array_pop($main); //keep only the default to-type selector
 		$main[] = array($mod->Lang('title_subject_field'),
 						$mod->CreateInputDropdown($id,'opt_email_subject',$choices,-1,
-							$this->GetOption('email_subject')));
+						$this->GetOption('email_subject')));
 		$main[] = array($mod->Lang('title_from_field'),
 						$mod->CreateInputDropdown($id,'opt_email_from_name',$choices,-1,
-							$this->GetOption('email_from_name',$mod->Lang('friendly_name'))));
+						$this->GetOption('email_from_name',$mod->Lang('friendly_name'))));
 		$main[] = array($mod->Lang('title_from_address_field'),
 						$mod->CreateInputDropdown($id,'opt_email_from_address',$choices,-1,
-							$this->GetOption('email_from_address')));
+						$this->GetOption('email_from_address')));
 		$main[] = array($mod->Lang('title_destination_field'),
 						$mod->CreateInputSelectList($id,'opt_destination_address'.$i,$displayfields,
-							$destfields,5));
+						$destfields,5));
 		$main[] = $waslast;
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
 	}
 
 	public function PostAdminAction(&$params)
@@ -166,6 +166,6 @@ class CustomEmail extends EmailBase
 
 			return $ret;
 		}
-		return array(FALSE,'errTODO');
+		return array(FALSE,$this->formdata->formsmodule->Lang('error_address',''));
 	}
 }

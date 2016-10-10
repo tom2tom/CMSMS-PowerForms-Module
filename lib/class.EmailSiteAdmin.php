@@ -70,7 +70,7 @@ class EmailSiteAdmin extends EmailBase
 
 		$mod = $this->formdata->formsmodule;
 
-		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE);
+		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE);
 		$waslast = array_pop($main); //keep the email to-type selector for later
 		$main[] = array($mod->Lang('title_select_one_message'),
 				$mod->CreateInputText($id,'opt_select_one',
@@ -93,7 +93,7 @@ class EmailSiteAdmin extends EmailBase
 				$mod->CreateInputCheckbox($id,'opt_restrict_to_group',1,
 					$this->GetOption('restrict_to_group',0)).
 				$mod->CreateInputDropdown($id,'opt_group',$choices,-1,$this->GetOption('group')));
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
 	}
 
 	public function AdminValidate($id)

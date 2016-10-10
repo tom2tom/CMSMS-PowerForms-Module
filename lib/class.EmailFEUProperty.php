@@ -6,7 +6,7 @@
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 //This class sends a pre-defined message to a destination selected from addresses
-//recorded as a property of the FrontEndUsers module 
+//recorded as a property of the FrontEndUsers module
 
 namespace PWForms;
 
@@ -55,14 +55,10 @@ class EmailFEUProperty extends EmailBase
 		$mod = $this->formdata->formsmodule;
 		$feu = $mod->GetModuleInstance('FrontEndUsers');
 		if (!$feu)
-			return array('main'=>array('<span style="color:red">'.$mod->Lang('error').'</span>',
-			'',$mod->Lang('error_module_feu')));
-
+			return array('main'=>array($this->GetErrorMessage('error_module_feu')));
 		$defns = $feu->GetPropertyDefns();
 		if (!is_array($defns))
-			return array('main'=>array('<span style="color:red">'.$mod->Lang('error').'</span>',
-				'',$mod->Lang('error_feudefns')));
-
+			return array('main'=>array($this->GetErrorMessage('error_feudefns')));
 		// check for dropdown or multiselect fields
 		$opts = array();
 		foreach ($defns as $key => $data) {
@@ -78,10 +74,8 @@ class EmailFEUProperty extends EmailBase
 			}
 		}
 		if (!count($opts))
-			return array('main'=>array('<span style="color:red">'.$mod->Lang('error').'</span>',
-				'',$mod->Lang('error_feudefns')));
-
-		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE);
+			return array('main'=>array($this->GetErrorMessage('error_feudefns')));
+		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE);
 		$waslast = array_pop($ret['main']); //keep the email to-type selector for last
 		$keys = array_keys($opts);
 		$main[] = array($mod->Lang('title_feu_property'),
@@ -89,7 +83,7 @@ class EmailFEUProperty extends EmailBase
 					$this->GetOption('feu_property',$keys[0])),
 				$mod->Lang('help_feu_property'));
 		$main[] = $waslast;
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
 	}
 
 	public function Populate($id,&$params)
@@ -126,7 +120,7 @@ class EmailFEUProperty extends EmailBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$feu = $mod->GetModuleInstance('FrontEndUsers');
-		if (!$feu) return array(FALSE,'FrontEndUsers module not found'); //TODO translate
+		if (!$feu) return array(FALSE,$mod_Lang('error_module_feu'));
 
 		// get the property name
 		$prop = $this->GetOption('feu_property');

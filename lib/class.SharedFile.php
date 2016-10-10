@@ -56,8 +56,7 @@ class SharedFile extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if (!Utils::GetUploadsPath($mod))
-			return array('main'=>array('<span style="color:red">'.$mod->Lang('error').'</span>',
-				'',$mod->Lang('error_uploads_dir')));
+			return array('main'=>array($this->GetErrorMessage('error_uploads_dir')));
 
 		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE);
 
@@ -77,7 +76,7 @@ class SharedFile extends FieldBase
 		$ctldata['opt_file_header']['is_header'] = TRUE;
 		$ctldata['opt_file_footer']['is_oneline'] = TRUE;
 		$ctldata['opt_file_footer']['is_footer'] = TRUE;
-		list($buttons,$revertscripts) = Utils::TemplateActions($this->formdata,$id,$ctldata);
+		list($buttons,$jsfuncs) = Utils::TemplateActions($this->formdata,$id,$ctldata);
 
 		$adv[] = array($mod->Lang('title_file_template'),
 						$mod->CreateTextArea(FALSE,$id,
@@ -97,11 +96,8 @@ class SharedFile extends FieldBase
 							'opt_file_footer','pwf_shortarea','','','',50,8),
 						'<br /><br />'.$buttons[2]);
 
-		return array(
-			'main'=>$main,
-			'adv'=>$adv,
-			'funcs'=>$revertscripts,
-			'extra'=>'varshelpadv'); //show variables-help on advanced tab
+		//show variables-help on advanced tab
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>'varshelpadv');
 	}
 
 	public function Dispose($id,$returnid)

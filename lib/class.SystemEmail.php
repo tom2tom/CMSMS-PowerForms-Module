@@ -106,7 +106,7 @@ class SystemEmail extends EmailBase
 	public function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,FALSE);
+		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,FALSE);
 		if ($this->addressAdd) {
 			$this->AddOptionElement('destination_address','');
 			$this->addressAdd = FALSE;
@@ -144,10 +144,10 @@ class SystemEmail extends EmailBase
 			}
 			unset($one);
 //			$main[] = array($mod->Lang('title_destination_address'),$dests);
-			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'funcs'=>$funcs,'extra'=>$extra);
+			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'funcs'=>$jsfuncs,'extra'=>$extra);
 		} else {
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('destination')));
-			return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
+			return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
 		}
 	}
 

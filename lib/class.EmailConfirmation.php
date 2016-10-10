@@ -46,13 +46,13 @@ class EmailConfirmation extends EmailBase
 		//log extra tag for use in template-help
 		Utils::AddTemplateVariable($this->formdata,'confirm_url','title_confirmation_url');
 
-		list($main,$adv,$funcs,$extra) = $this->AdminPopulateCommonEmail($id);
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>$funcs,'extra'=>$extra);
+		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id);
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
 	}
 
 	public function Populate($id,&$params)
 	{
-		$this->formdata->jscripts['mailcheck'] = 'construct'; //flag to generate & include js for this type of field
+		$this->SetEmailJS();
 		$tmp = $this->formdata->formsmodule->CreateInputEmail(
 			$id,$this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($this->Value,ENT_QUOTES),25,128,
