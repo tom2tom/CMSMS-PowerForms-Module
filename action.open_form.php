@@ -67,7 +67,7 @@ if (isset($params['submit'])) {
 		$formdata->Fields[$obfield->Id] = $obfield;
 		//update cache ready for next use
 		$cache->set($params['formdata'],$formdata);
-		$this->Redirect($id,'update_field',$returnid,
+		$this->Redirect($id,'open_field',$returnid,
 			array('field_id'=>$params['field_id'],
 				'form_id'=>$fid,
 				'formdata'=>$params['formdata']));
@@ -102,7 +102,7 @@ $funcs->Arrange($formdata->Fields,$formdata->FieldOrders);
 
 $tplvars = array();
 
-require __DIR__.DIRECTORY_SEPARATOR.'populate.update_form.php';
+require __DIR__.DIRECTORY_SEPARATOR.'populate.open_form.php';
 
 //unset($formdata->formsmodule); //no need to cache this
 $cache->set($params['formdata'],$formdata);

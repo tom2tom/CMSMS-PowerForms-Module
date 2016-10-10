@@ -56,9 +56,9 @@ if ($allforms) {
 		$fid = (int)$one['form_id'];
 		$oneset = new stdClass();
 		if ($pmod) {
-			$oneset->name = $this->CreateLink($id,'update_form','',
+			$oneset->name = $this->CreateLink($id,'open_form','',
 				$one['name'],array('formedit'=>1,'form_id'=>$fid)); //no formdata
-			$oneset->editlink = $this->CreateLink($id,'update_form','',
+			$oneset->editlink = $this->CreateLink($id,'open_form','',
 				$iconedit,array('formedit'=>1,'form_id'=>$fid));
 			$oneset->copylink = $this->CreateLink($id,'add_form','',
 				$iconcopy,array('form_id'=>$fid));

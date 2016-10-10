@@ -710,7 +710,7 @@ class FieldBase implements \Serializable
 	See also - comments below, for AdminPopulate()
 
 	Returns: array with keys 'main' and  (possibly empty) 'adv', for use
-		ultimately in method.update_field.php.
+		ultimately in method.open_field.php.
 	*/
 	public function AdminPopulateCommon($id, $visible=TRUE)
 	{
@@ -795,7 +795,7 @@ class FieldBase implements \Serializable
 	title, (optional) input and (optional) help.
 	That input should of course be a form input suitable for that field attribute/option.
 	'funcs' if present refers to array of js functions to be applied (not inc's or load's)
-	Returns: associative array with 0 or more keys recognised in method.update_field.php.
+	Returns: associative array with 0 or more keys recognised in method.open_field.php.
 	*/
 	public function AdminPopulate($id)
 	{

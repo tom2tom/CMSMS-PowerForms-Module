@@ -9,7 +9,7 @@ if (!empty($message))
 
 $tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$this->Lang('back_top'));
 
-$tplvars['form_start'] = $this->CreateFormStart($id,'update_form',$returnid,
+$tplvars['form_start'] = $this->CreateFormStart($id,'open_form',$returnid,
 	'POST','',FALSE,'',array(
 	'form_id'=>$form_id,
 	'formdata'=>$params['formdata']));
@@ -119,18 +119,18 @@ foreach ($formdata->FieldOrders as $one) {
 	$oneset->id = $fid;
 	$oneset->order = '<input type="hidden" name="'.$id.'orders[]" value="'.$fid.'" />';
 	$this->CreateInputHidden($id,'orders[]',$fid);
-	$oneset->name = $this->CreateLink($id,'update_field','',$one->GetName(),
+	$oneset->name = $this->CreateLink($id,'open_field','',$one->GetName(),
 		array('field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']));
 	$oneset->alias = $one->ForceAlias();
 	$oneset->type = $one->GetDisplayType();
 	$oneset->field_status = $one->GetFieldStatus();
-	$oneset->editlink = $this->CreateLink($id,'update_field','',
+	$oneset->editlink = $this->CreateLink($id,'open_field','',
 		$iconedit,
 		array('field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']));
-	$oneset->copylink = $this->CreateLink($id,'update_form','',
+	$oneset->copylink = $this->CreateLink($id,'open_form','',
 		$iconcopy,
 		array('fieldcopy'=>1,'field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']));
-	$oneset->deletelink = $this->CreateLink($id,'update_form','',
+	$oneset->deletelink = $this->CreateLink($id,'open_form','',
 		$icondelete,
 		array('fielddelete'=>1,'field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']),
 		'','','',
@@ -138,13 +138,13 @@ foreach ($formdata->FieldOrders as $one) {
 
 	if ($one->IsDisposition()) {
 		if ($dcount > 1)
-			$oneset->up = $this->CreateLink($id,'update_form','',
+			$oneset->up = $this->CreateLink($id,'open_form','',
 			$iconup,
 			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'up'));
 		else
 			$oneset->up = '';
 		if ($dcount < $dtotal)
-			$oneset->down = $this->CreateLink($id,'update_form','',
+			$oneset->down = $this->CreateLink($id,'open_form','',
 			$icondown,
 			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'down'));
 		else
@@ -156,24 +156,24 @@ foreach ($formdata->FieldOrders as $one) {
 		if (!$one->DisplayInForm() || !$one->GetChangeRequirement())
 			$oneset->required = '';
 		elseif ($one->GetRequired())
-			$oneset->required = $this->CreateLink($id,'update_form','',
+			$oneset->required = $this->CreateLink($id,'open_form','',
 				$icontrue,
 				array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'active'=>'off'),
-				'','','','class="true" onclick="update_field_required();return false;"');
+				'','','','class="true" onclick="open_field_required();return false;"');
 		else
-			$oneset->required = $this->CreateLink($id,'update_form','',
+			$oneset->required = $this->CreateLink($id,'open_form','',
 				$iconfalse,
 				array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'active'=>'on'),
-				'','','','class="false" onclick="update_field_required();return false;"');
+				'','','','class="false" onclick="open_field_required();return false;"');
 
 		if ($count > 1)
-			$oneset->up = $this->CreateLink($id,'update_form','',
+			$oneset->up = $this->CreateLink($id,'open_form','',
 			$iconup,
 			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'up'));
 		else
 			$oneset->up = '';
 		if ($count < $total)
-			$oneset->down = $this->CreateLink($id,'update_form','',
+			$oneset->down = $this->CreateLink($id,'open_form','',
 			$icondown,
 			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'down'));
 		else
@@ -212,12 +212,12 @@ if ($dispositions) {
 $t = $this->Lang('title_add_new_field');
 $tplvars['title_fastadd'] = $t;
 $tplvars['add_field_link'] =
-	$this->CreateLink($id,'update_field',$returnid,
+	$this->CreateLink($id,'open_field',$returnid,
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
 		array('field_id'=>-1,
 		'form_id'=>$form_id,
 		'formdata'=>$params['formdata']),'',FALSE).' '.
-	$this->CreateLink($id,'update_field',$returnid,$t,
+	$this->CreateLink($id,'open_field',$returnid,$t,
 		array('field_id'=>-1,
 		'form_id'=>$form_id,
 		'formdata'=>$params['formdata']),'',FALSE);
@@ -225,17 +225,17 @@ $tplvars['add_field_link'] =
 $t = $this->Lang('title_add_new_disposition');
 $tplvars['title_fastadd2'] = $t;
 $tplvars['add_disposition_link'] =
-	$this->CreateLink($id,'update_field',$returnid,
+	$this->CreateLink($id,'open_field',$returnid,
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
 		array('field_id'=>-1,
 		'form_id'=>$form_id,
 		'formdata'=>$params['formdata']),'',FALSE).' '.
-	$this->CreateLink($id,'update_field',$returnid,$t,
+	$this->CreateLink($id,'open_field',$returnid,$t,
 		array('field_id'=>-1,
 		'form_id'=>$form_id,
 		'formdata'=>$params['formdata']),'',FALSE);
 
-$link = $this->CreateLink($id,'update_field',$returnid,'',
+$link = $this->CreateLink($id,'open_field',$returnid,'',
 	array('field_id'=>-1,
 	'form_id'=>$form_id,
 	'formdata'=>$params['formdata']),'',TRUE,TRUE);
@@ -274,14 +274,14 @@ if ($this->GetPreference('adder_fields','basic') == 'basic') {
 	$t = $this->Lang('title_switch_advanced');
 	$tplvars['help_fastadd'] =
 		$t.
-		$this->CreateLink($id,'update_form',$returnid,$this->Lang('title_switch_advanced_link'),
+		$this->CreateLink($id,'open_form',$returnid,$this->Lang('title_switch_advanced_link'),
 		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'fieldstab','set_field_level'=>'advanced'));
 	$tplvars['input_fastadd2'] = $this->CreateInputDropdown($id,'disposition_type',
 		$dispositions,-1,'','onchange="fast_add(this)"');
 	$t = $this->Lang('title_switch_advanced2');
 	$tplvars['help_fastadd2'] =
 		$t.
-		$this->CreateLink($id,'update_form',$returnid,$this->Lang('title_switch_advanced_link'),
+		$this->CreateLink($id,'open_form',$returnid,$this->Lang('title_switch_advanced_link'),
 		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'submittab','set_field_level'=>'advanced'));
 } else {
 	foreach ($this->field_types as $l=>$t) {
@@ -301,14 +301,14 @@ if ($this->GetPreference('adder_fields','basic') == 'basic') {
 	$t = $this->Lang('title_switch_basic');
 	$tplvars['help_fastadd'] =
 		$t.
-		$this->CreateLink($id,'update_form',$returnid,$this->Lang('title_switch_basic_link'),
+		$this->CreateLink($id,'open_form',$returnid,$this->Lang('title_switch_basic_link'),
 		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'fieldstab','set_field_level'=>'basic'));
 	$tplvars['input_fastadd2'] = $this->CreateInputDropdown($id,'disposition_type',
 		$dispositions,-1,'','onchange="fast_add(this)"');
 	$t = $this->Lang('title_switch_basic2');
 	$tplvars['help_fastadd2'] =
 		$t.
-		$this->CreateLink($id,'update_form',$returnid,$this->Lang('title_switch_basic_link'),
+		$this->CreateLink($id,'open_form',$returnid,$this->Lang('title_switch_basic_link'),
 		array('formedit'=>1,'form_id'=>$form_id,'formdata'=>$params['formdata'],'active_tab'=>'submittab','set_field_level'=>'basic'));
 }
 

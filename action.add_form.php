@@ -37,7 +37,7 @@ if (isset($params['cancel'])) {
 				'message'=>$this->PrettyMessage('error_name',FALSE)));
 	}
 	unset($funcs);
-	$this->Redirect($id,'update_form','',array(
+	$this->Redirect($id,'open_form','',array(
 		'formedit'=>1,'form_id'=>$newid,'active_tab'=>$seetab)); //no formdata parameter
 }
 

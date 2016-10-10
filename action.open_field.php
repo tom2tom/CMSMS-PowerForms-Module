@@ -8,7 +8,7 @@
 if (!$this->CheckAccess('ModifyPFForms')) exit;
 
 if (isset($params['cancel']))
-	$this->Redirect($id,'update_form',$returnid,array(
+	$this->Redirect($id,'open_form',$returnid,array(
 		'form_id'=>$params['form_id'],
 		'formdata'=>$params['formdata'],
 		'formedit'=>1,
@@ -82,7 +82,7 @@ if (isset($params['submit'])) {
 		$cache->set($params['formdata'],$formdata);
 		$t = ($newfield) ? 'added':'updated';
 		$message = $this->Lang('field_op',$this->Lang($t));
-		$this->Redirect($id,'update_form',$returnid,array(
+		$this->Redirect($id,'open_form',$returnid,array(
 			'form_id'=>$params['form_id'],
 			'formdata'=>$params['formdata'],
 			'formedit'=>1,
@@ -125,7 +125,7 @@ if ($refresh) {
 
 $tplvars = array();
 
-require __DIR__.DIRECTORY_SEPARATOR.'populate.update_field.php';
+require __DIR__.DIRECTORY_SEPARATOR.'populate.open_field.php';
 
 //unset($formdata->formsmodule); //no need to cache this
 $cache->set($params['formdata'],$formdata);

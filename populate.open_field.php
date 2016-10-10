@@ -8,7 +8,7 @@ if (!empty($message))
 	$tplvars['message'] = $message;
 
 $tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$this->Lang('back_top'));
-$tplvars['backtoform_nav'] = $this->CreateLink($id,'update_form',$returnid,'&#171; '.$this->Lang('back_form'),
+$tplvars['backtoform_nav'] = $this->CreateLink($id,'open_form',$returnid,'&#171; '.$this->Lang('back_form'),
 	array('formedit'=>1,'form_id'=>$params['form_id'],'formdata'=>$params['formdata']));
 
 if ($obfield) { //field data are loaded
@@ -108,7 +108,7 @@ if ($obfield) { //field data are loaded
 	$tplvars['mainitem'] = $oneset;
 }
 
-$tplvars['form_start'] = $this->CreateFormStart($id,'update_field',$returnid,
+$tplvars['form_start'] = $this->CreateFormStart($id,'open_field',$returnid,
 	'POST','',FALSE,'',array(
 	'form_id'=>$params['form_id'],
 	'formdata'=>$params['formdata'],
