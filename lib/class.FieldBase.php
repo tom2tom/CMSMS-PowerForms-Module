@@ -325,6 +325,13 @@ class FieldBase implements \Serializable
 		return $this->ValidationMessage;
 	}
 
+	protected function GetErrorMessage($key)
+	{
+		return '<span style="color:red">'.
+			$this->formdata->formsmodule->Lang('error').'</span> '.
+			$this->formdata->formsmodule->Lang($key);
+	}
+
 	// Subclass this with a displayable type
 	public function GetDisplayType()
 	{
@@ -764,7 +771,7 @@ class FieldBase implements \Serializable
 							'opt_field_logic','pwf_shortarea','','','',50,8),
 							$mod->Lang('help_field_resources'));
 		}
-		return array($main,$adv);
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	public function RemoveAdminField(&$array, $fieldtitle)
@@ -780,15 +787,14 @@ class FieldBase implements \Serializable
 	/**
 	AdminPopulate:
 	@id: id given to the PWForms module on execution
-
 	Construct content for field edit. Subclass this.
 	Array keys presently recognised are: 'main','adv','table','extra','funcs'.
-	'main' and 'adv', if they exist, refer to arrays of content for the main and
+	'main' and 'adv', if present, refer to arrays of content for the main and
 	advanced settings tabs shown when adding/editing the field. Each member of
 	those arrays is itself an array of 1 to 3 members, for respectively generating
 	title, (optional) input and (optional) help.
 	That input should of course be a form input suitable for that field attribute/option.
-
+	'funcs' if present refers to array of js functions to be applied (not inc's or load's)
 	Returns: associative array with 0 or more keys recognised in method.update_field.php.
 	*/
 	public function AdminPopulate($id)
@@ -801,9 +807,11 @@ class FieldBase implements \Serializable
 	{
 	}
 
-	// Subclass this if needed
-	// Returns: array, in which 1st member is boolean T/F (indicating whether or
-	// not everything is ok), 2nd member is '' or a message
+	/* Subclass this if needed
+	Returns: 2-member array:
+	 [0] = boolean T/F indicating whether or not everything is ok
+	 [1] = '' or a (possibly multi-line) message
+	*/
 	public function AdminValidate($id)
 	{
 		$messages = array();
@@ -834,10 +842,12 @@ class FieldBase implements \Serializable
 		return '';
 	}
 
-	// Subclass this for fields that need validation
-	// Sets 2 field properties
-	// Returns an array: 1st member is boolean T/F (indicating whether or not
-	// the value is valid), 2nd member is '' or error message
+	/* Subclass this for fields that need validation
+	Sets 2 field properties
+	Returns: 2-member array:
+	 [0] = boolean T/F indicating whether or not the value is valid
+	 [1] = '' or error message
+	*/
 	public function Validate($id)
 	{
 		$this->validated = TRUE;
@@ -854,9 +864,9 @@ class FieldBase implements \Serializable
 	/* Subclass this for a disposition field
 	This method can do just about anything you want it to, in order to handle
 	form contents.
-	Returns: array,in which the first member is a boolean TRUE or FALSE
-	(indicating whether or not the disposition succeeded), and the second member
-	is empty, or explanatory text about the failure
+	Returns: 2-member array:
+	 [0] = boolean T/F indicating whether or not the disposition succeeded
+	 [1] = '' or error message
 	*/
 	public function Dispose($id,$returnid)
 	{
