@@ -43,8 +43,7 @@ class Captcha extends FieldBase
 		if ($captcha) {
 			unset($captcha);
 		} else {
-			return array('<span style="color:red">'.$mod->Lang('error').'</span>',
-				'',$mod->Lang('captcha_not_installed'));
+			return array('main'=>array($this->GetErrorMessage('error_module_captcha')));
 		}
 
 		list($main,$adv) = $this->AdminPopulateCommon($id);
@@ -64,14 +63,14 @@ class Captcha extends FieldBase
 							$this->GetOption('aslabel',0)),
 						$mod->Lang('help_captcha_label'));
 		//setup to revert to default (a.k.a. 'sample') template
-		list($button,$func) = Utils::CreateTemplateAction($mod,$id,
+		list($button,$jsfunc) = Utils::CreateTemplateAction($mod,$id,
 			'opt_captcha_template',$mod->Lang('title_create_sample_template'),
 			$this->defaulttemplate);
 		$adv[] = array($mod->Lang('title_captcha_template'),
 						$mod->CreateTextArea(FALSE,$id,$this->GetOption('captcha_template',$this->defaulttemplate),
 							'opt_captcha_template','pwf_shortarea','','','',50,5),
 						$mod->Lang('help_captcha_template').'<br /><br />'.$button);
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>array($func));
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>array($jsfunc));
 	}
 
 	public function AdminValidate($id)

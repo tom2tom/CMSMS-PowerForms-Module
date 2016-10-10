@@ -78,8 +78,7 @@ class CatalogerItems extends FieldBase
 			}
 			unset($one);
 		} else
-			$main[] = array('<span style="color:red">'.$mod->Lang('warning').'</span>',
-				'',$mod->Lang('error_module_cataloger'));
+			$main[] = array($this->GetErrorMessage('error_module_cataloger'));
 
 		return array('main'=>$main,'adv'=>$adv);
 	}
