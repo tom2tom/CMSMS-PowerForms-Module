@@ -23,7 +23,9 @@ class FormData implements \Serializable
 	public $PagesCount = 0; //no. of pages in the form
 //	public $sampleTemplateCode = '';
 	public $templateVariables = array(); //extra 'global' items for template-help, each like 'var_name'=>'help_lang_key'
-	public $jscripts; //associative array of funcs and/or instructions
+	public $jsincs = array(); //'include' directives
+	public $jsfuncs = array(); //funcs and/or instructions
+	public $jsloads = array(); //document-ready funcs and/or instructions
 	//extra form-properties
 	private $extradata = array();
 
@@ -42,14 +44,14 @@ class FormData implements \Serializable
             ' in '.$trace[0]['file'] .
             ' on line '.$trace[0]['line'],
             E_USER_NOTICE);
-        return NULL;			
-	}	
+        return NULL;
+	}
 
 	public function __isset($name)
 	{
 		return isset($this->extradata[$name]);
 	}
-	
+
 	public function __unset($name)
 	{
 		unset($this->extradata[$name]);
@@ -101,7 +103,9 @@ class FormData implements \Serializable
 						break;
 					 case 'FieldOrders':
 					 case 'templateVariables':
-					 case 'jscripts':
+					 case 'jsincs':
+					 case 'jsfuncs':
+					 case 'jsloads':
 						$this->$key = ($one) ? (array)$one : array();
 						break;
 					 case 'Options':
