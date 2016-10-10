@@ -180,7 +180,8 @@ class CheckboxGroup extends FieldBase
 			$mod = $this->formdata->formsmodule;
 			$limit = $this->GetOption('single_check',0);
 			if ($limit) {
-				$this->formdata->jscripts['checkboxgroup'] = <<<EOS
+				if (!isset($this->formdata->jsfuncs['cbgroup'])) {
+					$this->formdata->jsfuncs['cbgroup'] = <<<EOS
 function select_only(cb) {
  if (cb.checked) {
   $('input:checkbox[name="'+cb.name+'"]').attr('checked',false);
@@ -188,6 +189,7 @@ function select_only(cb) {
  }
 }
 EOS;
+				}
 				$jsl = ' onchange="select_only(this);"';
 			} else
 				$jsl = '';
