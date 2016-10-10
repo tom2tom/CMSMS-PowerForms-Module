@@ -7,7 +7,7 @@
 
 namespace PWForms;
 
-class EmailSender extends FieldBase
+class EmailSender extends EmailBase
 {
 	public function __construct(&$formdata,&$params)
 	{
@@ -42,7 +42,7 @@ class EmailSender extends FieldBase
 
 	public function Populate($id,&$params)
 	{
-		$this->formdata->jscripts['mailcheck'] = 'construct'; //flag to generate & include js for this type of field
+		$this->SetEmailJS();
 		if ($this->GetOption('html5',0)) {
 			$addr = ($this->HasValue()) ? $this->Value : '';
 			$place = 'placeholder="'.$this->GetOption('default').'"';
