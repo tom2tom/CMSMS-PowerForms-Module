@@ -9,7 +9,7 @@
 
 namespace PWForms;
 
-class EmailCCAddress extends FieldBase
+class EmailCCAddress extends EmailBase
 {
 	public function __construct(&$formdata,&$params)
 	{
@@ -56,7 +56,7 @@ class EmailCCAddress extends FieldBase
 
 	public function Populate($id,&$params)
 	{
-		$this->formdata->jscripts['mailcheck'] = 'construct'; //flag to generate & include js for this type of field
+		$this->SetEmailJS();
 		$tmp = $this->formdata->formsmodule->CreateInputEmail(
 			$id,$this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($this->Value,ENT_QUOTES),25,128,
