@@ -94,23 +94,21 @@ class TextArea extends FieldBase
 		}
 
 		if ($this->GetOption('clear_default',0)) {
+			$xclass = 'formarea';
 			//arrange for all such fields to be cleared
-			$this->formdata->jscripts['cleararea'] =<<<EOS
-$(document).ready(function() {
- $('.formarea').each(function(index,element) {
-  $(element).focus(function() {
-   if (this.value == this.defaultValue) {
-    this.value = '';
-   }
-  }).blur(function() {
+			if (!isset($this->formdata->jsloads['cleararea'])) {
+				$this->formdata->jsloads['cleararea'] = <<<EOS
+ $('.formarea').focus(function() {
+  if (this.value == this.defaultValue) {
+   this.value = '';
+  }
+ }).blur(function() {
    if (this.value === '') {
     this.value = this.defaultValue;
    }
-  });
  });
-});
 EOS;
-			$xclass = 'formarea';
+			}
 		} else
 			$xclass = '';
 		return $this->SetClass($tmp,$xclass);
