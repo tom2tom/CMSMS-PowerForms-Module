@@ -427,7 +427,7 @@ if (isset($params['import'])) {
 			$renums[(int)$row['form_id']] = $fid;
 		}
 
-		if (!$mod->before20) {
+		if (!$this->before20) {
 			$types = CmsLayoutTemplateType::load_all_by_originator('FormBuilder');
 			if ($types) {
 				foreach ($types as $type) {
