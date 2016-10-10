@@ -507,6 +507,6 @@ PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf::'.$form_id,$tplvars,TRUE)
 echo $form_end;
 //inject constructed js after other content (pity we can't get to </body> or </html> from here)
 $js = NULL;
-PWForms\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$js);
+PWForms\Utils::MergeJS($formdata->jsincs,$formdata->jsfuncs,$formdata->jsloads,$js);
 if ($js)
 	echo $js;
