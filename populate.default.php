@@ -104,8 +104,6 @@ foreach ($formdata->FieldOrders as $one) {
 		continue; //only current-page fields get the full suite of data
 	}
 
-	$formdata->jscripts = array(); //for accumulating js, during Populate()
-
 	$oneset = new stdClass();
 	$oneset->alias = $alias;
 //	$oneset->css_class = $one->GetOption('css_class');
@@ -114,8 +112,22 @@ foreach ($formdata->FieldOrders as $one) {
 	$oneset->error = $one->validated?'':$one->ValidationMessage;
 	$oneset->has_label = $one->HasLabel();
 	$oneset->helptext = $one->GetOption('helptext');
-	if ($oneset->helptext)
-		$formdata->jscripts['helptoggle'] = 'construct';
+	if ($oneset->helptext) {
+		if (!isset($formdata->jsfuncs['helptoggle'])) {
+/*TODO func*/	$formdata->jsfuncs['helptoggle'] = <<<EOS
+function help_toggle(htid) {
+ var help_container=document.getElementById(htid);
+ if (help_container) {
+  if (help_container.style.display == 'none') {
+   help_container.style.display = 'inline';
+  } else {
+   help_container.style.display = 'none';
+  }
+ }
+}
+EOS;
+		}
+	}
 	$oneset->helptext_id = 'pwfp_ht_'.$one->GetID();
 	if ((!$one->HasLabel() || $one->GetHideLabel())
 /*	 && (!$one->GetOption('browser_edit',0) || empty($params['in_admin']))*/)
@@ -140,7 +152,7 @@ foreach ($formdata->FieldOrders as $one) {
 
 	$tplvars[$alias] = $oneset;
 	$fields[$oneset->input_id] = $oneset;
-}
+} //foreach
 
 $formdata->PagesCount = $WalkPage;
 
@@ -151,107 +163,11 @@ $baseurl = $this->GetModuleURLPath();
 $tplvars['help_icon'] = '<img src="'.$baseurl.'/images/info-small.gif" alt="'.
 	$this->Lang('help').'" title="'.$this->Lang('help_help').'" />';
 
-//script accumulators
-$jsincs = array();
-$jsfuncs = array();
-$jsloads = array();
-
-foreach ($formdata->jscripts as $key=>$val) {
-	if ($val != 'construct')
-		$jsfuncs[] = $val;
-	else {
-		switch ($key) {
-		 case 'helptoggle':
-			$jsfuncs[] =<<<EOS
-function help_toggle(htid) {
- var help_container=document.getElementById(htid);
- if (help_container) {
-  if (help_container.style.display == 'none') {
-   help_container.style.display = 'inline';
-  } else {
-   help_container.style.display = 'none';
-  }
- }
-}
-EOS;
-			break;
-		case 'cloak':
-			$jsincs[] =<<< EOS
-<script type="text/javascript" src="{$baseurl}/include/jquery-inputCloak.min.js"></script>
-EOS;
-			break;
-		case 'mailcheck':
-			$jsincs[] =<<< EOS
-<script type="text/javascript" src="{$baseurl}/include/mailcheck.min.js"></script>
-<script type="text/javascript" src="{$baseurl}/include/levenshtein.min.js"></script>
-EOS;
-			if (!function_exists('ConvertDomains')) {
-			 function ConvertDomains($pref)
-			 {
-				if (!$pref)
-					return '""';
-				$v3 = array();
-				$v2 = explode(',',$pref);
-				foreach ($v2 as $one) {
-					$v3[] = '\''.trim($one).'\'';
-				}
-				return implode(',',$v3);
-			 }
-			}
-			$pref = $this->GetPreference('email_topdomains');
-			$topdomains = ConvertDomains($pref);
-			if ($topdomains)
-				$topdomains = '  topLevelDomains: ['.$topdomains.'],'.PHP_EOL;
-			else
-				$topdomains = '';
-			$pref = $this->GetPreference('email_domains');
-			$domains = ConvertDomains($pref);
-			if ($domains)
-				$domains = '  domains: ['.$domains.'],'.PHP_EOL;
-			else
-				$domains = '';
-			$pref = $this->GetPreference('email_subdomains');
-			$l2domains = ConvertDomains($pref);
-			if ($l2domains)
-				$l2domains = '  secondLevelDomains: ['.$l2domains.'],'.PHP_EOL;
-			else
-				$l2domains = '';
-			$intro = $this->Lang('suggest');
-			$empty = $this->Lang('missing_type',$this->Lang('destination'));
-
-			$jsloads[] =<<<EOS
- $('.emailaddr').blur(function() {
-  $(this).mailcheck({
-{$domains}{$l2domains}{$topdomains}
-   distanceFunction: function(string1,string2) {
-    var lv = Levenshtein;
-    return lv.get(string1,string2);
-   },
-   suggested: function(element,suggestion) {
-    if (confirm('{$intro} <strong><em>' + suggestion.full + '</em></strong>?')) {
-     element.innerHTML = suggestion.full;
-    } else {
-     element.focus();
-    }
-   },
-   empty: function(element) {
-    alert('{$empty}');
-    element.focus();
-   }
-  });
- });
-EOS;
-			break;
-		}
-	}
-}
-unset($formdata->jscripts); //finished with this
-
 $buttonjs = PWForms\Utils::GetFormOption($formdata,'submit_javascript');
 
 if (PWForms\Utils::GetFormOption($formdata,'input_button_safety')) {
 	$buttonjs .= ' onclick="return LockButton();"';
-	$jsfuncs[] = <<<EOS
+	$formdata->jsfuncs[] = <<<EOS
 var submitted = false;
 function LockButton () {
  if (!submitted) {
