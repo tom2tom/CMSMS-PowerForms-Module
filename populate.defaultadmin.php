@@ -213,7 +213,7 @@ if ($padm) {
 	$cfgs[] = $oneset;
 
 	$jsincs[] = '<script type="text/javascript" src="'.$baseurl.'/include/jquery-inputCloak.min.js"></script>';
-	$jsloads[] =<<<EOS
+	$jsloads[] = <<<EOS
  $('#{$id}passwd').inputCloak({
   type:'see4',
   symbol:'\u25CF'
