@@ -240,7 +240,7 @@ $link = $this->CreateLink($id,'update_field',$returnid,'',
 	'form_id'=>$form_id,
 	'formdata'=>$params['formdata']),'',TRUE,TRUE);
 $link = str_replace('&amp;','&',$link);
-$jsfuncs[] =<<<EOS
+$jsfuncs[] = <<<EOS
  function fast_add(field_type) {
  var type=field_type.options[field_type.selectedIndex].value;
  this.location='{$link}&{$id}field_type='+type;
@@ -443,8 +443,8 @@ $tplvars['input_submit_template'] =
 //setup to revert to 'sample' submission-template
 $ctlData = array();
 $ctlData['opt_submission_template']['general_button'] = TRUE;
-list($buttons,$funcs) = PWForms\Utils::TemplateActions($formdata,$id,$ctlData);
-$jsfuncs[] = $funcs[0];
+list($buttons,$revertscripts) = PWForms\Utils::TemplateActions($formdata,$id,$ctlData);
+$jsfuncs[] = $revertscripts[0];
 $tplvars = $tplvars + array(
 	'sample_submit_template' => $buttons[0],
 	'help_submit_template' => $this->Lang('help_submit_template'),
