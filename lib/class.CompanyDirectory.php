@@ -59,8 +59,7 @@ class CompanyDirectory extends FieldBase
 		if ($CompanyDirectory)
 			unset($CompanyDirectory);
 		else
-			return array('main'=>array('<span style="color:red">'.$mod->Lang('error').'</span>',
-				'',$mod->Lang('error_module_CompanyDirectory')));
+			return array('main'=>array($this->GetErrorMessage('error_module_CompanyDirectory')));
 
 		$Categories = array('All'=>$mod->Lang('all'));
 		$pre = \cms_db_prefix();
