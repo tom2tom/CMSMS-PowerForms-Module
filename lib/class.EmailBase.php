@@ -64,14 +64,14 @@ class EmailBase extends FieldBase
 		$ctldata['opt_email_template']['html_button'] = TRUE;
 		$ctldata['opt_email_template']['text_button'] = TRUE;
 		$ctldata['opt_email_template']['is_email'] = TRUE;
-		list($buttons,$scripts) = Utils::TemplateActions($this->formdata,$id,$ctldata);
+		list($buttons,$jsfuncs) = Utils::TemplateActions($this->formdata,$id,$ctldata);
 		$adv[] = array($mod->Lang('title_email_template'),
 						$mod->CreateTextArea(FALSE,$id,
 						//($this->GetOption('html_email',0)?$message:htmlspecialchars($message))
 						$message,'opt_email_template','pwf_tallarea','','','',50,15,'','html'),
 						'<br /><br />'.$buttons[0].'&nbsp'.$buttons[1]);
 		//show variables-help on advanced tab
-		return array($main,$adv,$scripts,'varshelpadv');
+		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>'varshelpadv');
 	}
 
 	public function PostAdminActionEmail(&$params)
@@ -97,28 +97,96 @@ $mod->Crash;
 		}
 	}
 
-	// override as necessary, return TRUE to include sender-address header in email 
+	// override as necessary, return TRUE to include sender-address header in email
 	public function SetFromAddress()
 	{
 		return TRUE;
 	}
 
-	// override as necessary, return TRUE to include sender header in email 
+	// override as necessary, return TRUE to include sender header in email
 	public function SetFromName()
 	{
 		return TRUE;
 	}
 
-	// override as necessary, return TRUE to include reply-to header in email 
+	// override as necessary, return TRUE to include reply-to header in email
 	public function SetReplyToName()
 	{
 		return TRUE;
 	}
 
-	// override as necessary, return TRUE to include reply-to header in email 
+	// override as necessary, return TRUE to include reply-to header in email
 	public function SetReplyToAddress()
 	{
 		return TRUE;
+	}
+
+	private function ConvertDomains($pref)
+	{
+	   if (!$pref)
+		   return '""';
+	   $v3 = array();
+	   $v2 = explode(',',$pref);
+	   foreach ($v2 as $one) {
+		   $v3[] = '\''.trim($one).'\'';
+	   }
+	   return implode(',',$v3);
+	}
+
+	protected function SetEmailJS()
+	{
+		if (isset($this->formdata->jsincs['mailcheck'])) {
+			return;
+		}
+		$mod = $this->formdata->formsmodule;
+		$baseurl = $mod->GetModuleURLPath();
+		$this->formdata->jsincs['mailcheck'] = <<<EOS
+<script type="text/javascript" src="{$baseurl}/include/mailcheck.min.js"></script>
+<script type="text/javascript" src="{$baseurl}/include/levenshtein.min.js"></script>
+EOS;
+
+		$pref = $mod->GetPreference('email_topdomains');
+		$topdomains = $this->ConvertDomains($pref);
+		if ($topdomains)
+			$topdomains = '  topLevelDomains: ['.$topdomains.'],'.PHP_EOL;
+		else
+			$topdomains = '';
+		$pref = $mod->GetPreference('email_domains');
+		$domains = $this->ConvertDomains($pref);
+		if ($domains)
+			$domains = '  domains: ['.$domains.'],'.PHP_EOL;
+		else
+			$domains = '';
+		$pref = $mod->GetPreference('email_subdomains');
+		$l2domains = $this->ConvertDomains($pref);
+		if ($l2domains)
+			$l2domains = '  secondLevelDomains: ['.$l2domains.'],'.PHP_EOL;
+		else
+			$l2domains = '';
+		$intro = $mod->Lang('suggest');
+		$empty = $mod->Lang('missing_type',$mod->Lang('destination'));
+		$this->formdata->jsloads['mailcheck'] = <<<EOS
+ $('.emailaddr').blur(function() {
+  $(this).mailcheck({
+{$domains}{$l2domains}{$topdomains}
+   distanceFunction: function(string1,string2) {
+    var lv = Levenshtein;
+    return lv.get(string1,string2);
+   },
+   suggested: function(element,suggestion) {
+    if (confirm('{$intro} <strong><em>' + suggestion.full + '</em></strong>?')) {
+     element.innerHTML = suggestion.full;
+    } else {
+     element.focus();
+    }
+   },
+   empty: function(element) {
+    alert('{$empty}');
+    element.focus();
+   }
+  });
+ });
+EOS;
 	}
 
 	public function validateEmailAddr($email)
