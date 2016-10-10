@@ -576,7 +576,9 @@ class Utils
 		This becomes a single-quoted js string, so any embedded single-quote
 		must be escaped, and any js-unfriendly content must be resolved.
 	@funcName: identifier for use when multiple buttons populate the same control, default ''
-	Returns: 2-member array, 1st is a button, 2nd is js onclick-func for the button
+	Returns: 2-member array:
+	 [0] XHTML for a button
+	 [1] js onclick handler for the button, sets object value
 	*/
 	public static function CreateTemplateAction(&$mod, $id, $ctlName, $button_label, $template, $funcName=FALSE)
 	{
@@ -620,8 +622,9 @@ EOS;
 		  'opt_file_footer' => array
 			  'is_oneline' => true
 			  'is_footer' => true
-	Returns: array($buttons,$funcs), where $funcs = array of scripts to be
-	 activated by clicking the corresponding button in the $buttons array.
+	Returns: 2-member array
+	 [0] = array of XHTML button-strings
+	 [1] = corresponding array of onclick handler-funcs for buttons in [0]
 	 The scripts install a 'sample template' into the corresponding control.
 	 For some combinations of options, pairs of buttons & scripts are created.
 	*/
