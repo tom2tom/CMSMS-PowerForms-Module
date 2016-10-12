@@ -60,12 +60,13 @@ class FormData implements \Serializable
 	public function __toString()
 	{
 		$mod = $this->formsmodule;
-		$this->formsmodule = $mod->GetName(); //no need to log all 'public' data
+		$this->formsmodule = ($mod) ? $mod->GetName():'PWForms'; //no need to log all 'public' data
 		foreach ($this->Fields as &$one) {
 			$one->formdata = $this->Id; //no need to fully self-document
 		}
 		unset ($one);
 		$ret = json_encode(get_object_vars($this));
+		//reinstate
 		$this->formsmodule = $mod;
 		foreach ($this->Fields as &$one) {
 			$one->formdata = &$this;
@@ -90,7 +91,7 @@ class FormData implements \Serializable
 				foreach ($arr as $key=>$one) {
 					switch ($key) {
 					 case 'formsmodule':
-						$this->$key =& ModuleOperations::get_instance()->get_module_intance($one);
+						$this->$key =& \cms_utils::get_module($one);
 						break;
 					 case 'Fields':
  						$one = (array)$one;
