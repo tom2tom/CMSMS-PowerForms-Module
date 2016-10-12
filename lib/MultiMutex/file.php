@@ -27,7 +27,7 @@ class Mutex_file implements iMutex
 		}
 		$dir = $ud.DIRECTORY_SEPARATOR.'file_locks';
 		if (!is_dir($dir)) {
-			if (!@mkdir($dir) && !file_exists($dir))
+			if (!(@mkdir($dir,0755) && file_exists($dir)))
 				throw new \Exception('Error getting file lock');
 		}
 		$this->fp = $dir.DIRECTORY_SEPARATOR;
