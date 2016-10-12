@@ -10,34 +10,37 @@ namespace PWForms;
 //for sorting field display-orders
 class SortOrdersClosure
 {
-    private $fields;
+	private $fields;
 	private $orders;
 
 	public function __construct(&$fields, &$orders)
 	{
-        $this->fields = $fields;
-        $this->orders = $orders;
-    }
+		$this->fields = $fields;
+		$this->orders = $orders;
+	}
 
 	public function compare($a, $b)
 	{
 		$fa = $this->fields[$this->orders[$a]];
 		$fb = $this->fields[$this->orders[$b]];
-		if ($fa->IsDisposition) {
-			if ($fb->IsDisposition) {
-				if ($fb->DisplayInForm) //email confirmation first
+		if ($fa->DisplayInBrowser == $fb->DisplayInBrowser) {
+			if ($fa->IsDisposition) {
+				if ($fb->IsDisposition) {
+					if ($fb->DisplayInForm) //email confirmation first
+						return 1;
+					elseif ($fa->DisplayInForm)
+						return -1;
+				} elseif (!$fa->DisplayInForm)
 					return 1;
-				elseif ($fa->DisplayInForm)
-					return -1;
-			} elseif (!$fa->DisplayInForm)
-				return 1;
-		} elseif ($fb->IsDisposition) {
-			if (!$fb->DisplayInForm)
-				return 1;
+			} elseif ($fb->IsDisposition) {
+				if (!$fb->DisplayInForm)
+					return 1;
+			}
+			//TODO field type '...start' before corresponding type '...end'
+			return $a - $b; //stet current order
 		}
-		//TODO field type '...start' before corresponding type '...end'
-		return $a - $b; //stet current order
-    }
+		return ($fa->DisplayInBrowser - $fb->DisplayInBrowser);
+	}
 }
 
 //for filtering field options
