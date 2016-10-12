@@ -441,6 +441,7 @@ $lang['field_op'] = 'Field %s';
 
 $lang['field_type_field'] = 'Field Type Not Set';
 $lang['field_type_Button'] = 'Button';
+$lang['field_type_Callback'] = 'Custom content from runtime-callback';
 $lang['field_type_Captcha'] = '*Captcha protection for form';
 $lang['field_type_CatalogerItems'] = 'Select cataloger item(s)';
 $lang['field_type_Checkbox'] = 'Checkbox';
@@ -520,7 +521,7 @@ If checked, the Captcha image and prompt will substituted for the field label. O
 they will treated as part of the field input, together with the captcha-text input field.
 EOS;
 $lang['help_captcha_template'] = <<<EOS
-The content constructed from this template will be substituted for either the 
+The content constructed from this template will be substituted for either the
 field label or field input, in accordance with the 'replace label' setting above.
 Include in the template <code>{\$prompt}</code> and <code>{\$captcha}</code>,
 and if replacing the label, <code>{\$captcha_input}</code>, plus anything else
@@ -579,7 +580,7 @@ $lang['help_module_version'] = 'PWForms module version';
 $lang['help_name_regex'] = 'A regular expression to allow filtering cataloger items by name';
 //$lang['help_object_example'] = '<em>e.g.</em> you could use "{$fld_1_obj->name} = {$fld_1_obj->value}"';
 $lang['help_operators'] = <<<EOS
-For string evaluation, the only operation available is concatenation (+). 
+For string evaluation, the only operation available is concatenation (+).
 For number evaluation, some basic, very simple math (+ - * /) is possible.
 For computed/PHP evaluation, you can use any function you want, but things
 must be quoted (substitution occurs before evaluation), e.g. substr('\$fld_22',0,2).'\$fld_23'.

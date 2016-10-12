@@ -5,6 +5,7 @@
 #If so, lang[] entries for corresponding selector-menu items must be conformed
 
 Button
+Callback
 Captcha
 CatalogerItems
 Checkbox
