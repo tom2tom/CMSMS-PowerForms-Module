@@ -247,7 +247,7 @@ $Crash1;
 */
 				$deny_space_validation = !!$this->GetPreference('blank_invalid');
 				if (// $one->GetChangeRequirement() &&
-					$one->GetRequired() && !$one->HasValue($deny_space_validation)) {
+					$one->IsRequired() && !$one->HasValue($deny_space_validation)) {
 $this->Crash2();
 					$allvalid = FALSE;
 					$one->SetOption('is_valid',FALSE);
@@ -369,7 +369,7 @@ $this->Crash2();
 				// dispose TODO handle 'blocked' notices
 				foreach ($formdata->FieldOrders as $one) {
 					$one = $formdata->Fields($one);
-					if ($one->IsDisposition() && $one->DispositionIsPermitted()) {
+					if ($one->IsDisposition() && $one->IsDispositionPermitted()) {
 						$res = $one->Dispose($id,$returnid);
 						if (!$res[0]) {
 							$alldisposed = FALSE;
