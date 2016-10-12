@@ -155,7 +155,7 @@ foreach ($formdata->FieldOrders as $one) {
 	} else {
 		if (!$one->DisplayInForm() || !$one->GetChangeRequirement())
 			$oneset->required = '';
-		elseif ($one->GetRequired())
+		elseif ($one->IsRequired())
 			$oneset->required = $this->CreateLink($id,'open_form','',
 				$icontrue,
 				array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'active'=>'off'),
