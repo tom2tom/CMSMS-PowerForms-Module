@@ -15,6 +15,7 @@ class FieldBase implements \Serializable
 	public $validated = TRUE;
 	//field properties
 	public $ChangeRequirement = TRUE; //whether admin user may change $Required
+	public $DisplayExternal = FALSE;
 	public $DisplayInForm = TRUE;
 	public $DisplayInSubmission = TRUE; //whether field value is echoed in submission template (if used) (effectively ~ ::$IsInput)
 	public $DispositionPermitted = TRUE;
@@ -240,7 +241,7 @@ class FieldBase implements \Serializable
 	}
 
 	// Get flag determining whether this disposition field is to be disposed
-	public function DispositionIsPermitted()
+	public function IsDispositionPermitted()
 	{
 		return $this->DispositionPermitted;
 	}
@@ -265,6 +266,11 @@ class FieldBase implements \Serializable
 		return $this->HideLabel;
 	}
 
+	public function DisplayExternal()
+	{
+		return $this->DisplayExternal;
+	}
+
 	public function DisplayInForm()
 	{
 		return $this->DisplayInForm;
@@ -280,14 +286,14 @@ class FieldBase implements \Serializable
 		return $this->ChangeRequirement;
 	}
 
+	public function IsRequired()
+	{
+		return $this->Required;
+	}
+
 	public function SetRequired($required)
 	{
 		$this->Required = $required;
-	}
-
-	public function GetRequired()
-	{
-		return $this->Required;
 	}
 
 	public function ToggleRequired()
@@ -731,7 +737,7 @@ class FieldBase implements \Serializable
 			$main[] = array($mod->Lang('title_field_required'),
 							$mod->CreateInputHidden($id,'field_required',0).
 							$mod->CreateInputCheckbox($id,'field_required',1,
-								$this->GetRequired()),
+								$this->IsRequired()),
 							$mod->Lang('help_field_required'));
 		}
 		//choice of validation type ?
@@ -836,6 +842,7 @@ class FieldBase implements \Serializable
 	Object-names must begin with $this->formdata->current_prefix, so as to not be
 	dropped as 'unknown' frontend parameters (see PWForms::InitializeFrontend())
 	and not be excluded as time-expired
+	self::Value is applied to the field control(s)
 	*/
 	public function Populate($id,&$params)
 	{
