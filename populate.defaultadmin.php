@@ -208,7 +208,7 @@ if ($padm) {
 		$t = PWForms\Utils::Unfusc($t);
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_password');
-	$oneset->input = $this->CreateTextArea(false,$id,$t,'masterpass','cloaked',
+	$oneset->input = $this->CreateTextArea(FALSE,$id,$t,'masterpass','cloaked',
 		$id.'passwd','','',50,3);
 	$cfgs[] = $oneset;
 

@@ -147,7 +147,7 @@ $db->Execute('INSERT INTO '.$pre.'css (css_id,css_name,css_text,media_type,creat
 
 if (!$this->before20) {
 	$myname = $this->GetName();
-//	$me = get_userid(false);
+//	$me = get_userid(FALSE);
 	foreach (array('form','submission') as $name) {
 		$ttype = new CmsLayoutTemplateType();
 		$ttype->set_originator($myname);
