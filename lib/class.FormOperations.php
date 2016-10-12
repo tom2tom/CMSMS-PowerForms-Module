@@ -23,7 +23,7 @@ class SortOrdersClosure
 	{
 		$fa = $this->fields[$this->orders[$a]];
 		$fb = $this->fields[$this->orders[$b]];
-		if ($fa->DisplayInBrowser == $fb->DisplayInBrowser) {
+		if ($fa->DisplayExternal == $fb->DisplayExternal) {
 			if ($fa->IsDisposition) {
 				if ($fb->IsDisposition) {
 					if ($fb->DisplayInForm) //email confirmation first
@@ -39,7 +39,7 @@ class SortOrdersClosure
 			//TODO field type '...start' before corresponding type '...end'
 			return $a - $b; //stet current order
 		}
-		return ($fa->DisplayInBrowser - $fb->DisplayInBrowser);
+		return ($fa->DisplayExternal - $fb->DisplayExternal);
 	}
 }
 
