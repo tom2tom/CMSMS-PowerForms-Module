@@ -51,7 +51,7 @@ else
 	$token = mt_rand(0,999999).'.'.mt_rand(0,999999);
 $token .= 'SERVER_ADDR'.uniqid().mt_rand(1100,2099).reset($_SERVER).key($_SERVER).end($_SERVER).key($_SERVER);
 $cache_key = md5($token);
-$cache->set($cache_key,$formdata);
+$cache->set($cache_key,$formdata,84600); //expiry ?
 
 $prefix = $formdata->current_prefix;
 $this->Redirect($id,'default',$returnid,array(

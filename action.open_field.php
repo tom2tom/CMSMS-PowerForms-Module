@@ -79,7 +79,7 @@ if (isset($params['submit'])) {
 			$formdata->FieldOrders = FALSE; //trigger re-sort
 		}
 		//update cache ready for next use
-		$cache->set($params['formdata'],$formdata);
+		$cache->set($params['formdata'],$formdata,84600);
 		$t = ($newfield) ? 'added':'updated';
 		$message = $this->Lang('field_op',$this->Lang($t));
 		$this->Redirect($id,'open_form',$returnid,array(
@@ -127,7 +127,6 @@ $tplvars = array();
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.open_field.php';
 
-//unset($formdata->formsmodule); //no need to cache this
-$cache->set($params['formdata'],$formdata);
+$cache->set($params['formdata'],$formdata,84600);
 
 echo PWForms\Utils::ProcessTemplate($this,'editfield.tpl',$tplvars);
