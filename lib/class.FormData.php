@@ -61,17 +61,18 @@ class FormData implements \Serializable
 	{
 		$mod = $this->formsmodule;
 		$this->formsmodule = ($mod) ? $mod->GetName():'PWForms'; //no need to log all 'public' data
-		foreach ($this->Fields as &$one) {
-			$one->formdata = $this->Id; //no need to fully self-document
+		$saved = $this->Fields;
+		$afields = array();
+		foreach ($saved as $one) {
+			$afields[] = serialize($one);
 		}
-		unset ($one);
-		$ret = json_encode(get_object_vars($this));
+		$this->Fields = '||~||';
+		$ret = json_encode(get_object_vars($this)); //include private properties
+		$jf = json_encode($afields);
+		$ret = str_replace('"||~||"',$jf,$ret);
 		//reinstate
 		$this->formsmodule = $mod;
-		foreach ($this->Fields as &$one) {
-			$one->formdata = &$this;
-		}
-		unset ($one);
+		$this->Fields = $saved;
 		return $ret;
 	}
 
@@ -94,11 +95,11 @@ class FormData implements \Serializable
 						$this->$key =& \cms_utils::get_module($one);
 						break;
 					 case 'Fields':
- 						$one = (array)$one;
 						$members = array();
 						foreach ($one as $subkey=>$mdata) {
-							$mdata->formdata = &$this;
-							$members[$subkey] = $mdata; //TODO
+							$members[$subkey] = unserialize($mdata);
+							$members[$subkey]->formdata =& $this->formsmodule;
+						    $members[$subkey]->loaded = FALSE;
 						}
 						$this->$key = $members;
 						break;
