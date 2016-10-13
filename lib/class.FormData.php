@@ -63,8 +63,8 @@ class FormData implements \Serializable
 		$this->formsmodule = ($mod) ? $mod->GetName():'PWForms'; //no need to log all 'public' data
 		$saved = $this->Fields;
 		$afields = array();
-		foreach ($saved as $one) {
-			$afields[] = serialize($one);
+		foreach ($saved as $i=>$one) {
+			$afields[$i] = serialize($one);
 		}
 		$this->Fields = '||~||';
 		$ret = json_encode(get_object_vars($this)); //include private properties
@@ -96,10 +96,11 @@ class FormData implements \Serializable
 						break;
 					 case 'Fields':
 						$members = array();
-						foreach ($one as $subkey=>$mdata) {
-							$members[$subkey] = unserialize($mdata);
-							$members[$subkey]->formdata =& $this->formsmodule;
-						    $members[$subkey]->loaded = FALSE;
+						foreach ($one as $i=>$mdata) {
+							$i = (int)$i;
+							$members[$i] = unserialize($mdata);
+							$members[$i]->formdata =& $this->formsmodule;
+						    $members[$i]->loaded = FALSE;
 						}
 						$this->$key = $members;
 						break;
