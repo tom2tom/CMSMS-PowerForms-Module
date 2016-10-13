@@ -54,12 +54,12 @@
  {else}
  <p>{$nofields}</p>
  {/if}
-	 <div class="addfast">
-	  <p class="pagetext">{$title_fastadd}</p>
-	  <div>{$input_fastadd}<br />{$help_fastadd}</div>
-	 </div>
-  	 <div class="addslow">{$add_field_link}</div>
- </div>
+   <div class="addfast">
+    <p class="pagetext">{$title_fastadd}</p>
+    <div>{$input_fastadd}<br />{$help_fastadd}</div>
+   </div>
+   <div class="addslow">{$add_field_link}</div>
+  </div>
 {$tab_end}{$designtab_start}
  <div class="pageinput pageoverflow">
   <p class="pagetext">{$title_form_css_class}:</p>
