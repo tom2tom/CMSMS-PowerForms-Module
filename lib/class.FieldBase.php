@@ -396,7 +396,6 @@ class FieldBase implements \Serializable
 			'/<option/',
 			),
 			array(
-			$repl,
 			'<input type="($1)" class="'.$cls.'"',
 			'<label class="'.$cls.'"',
 			'<option class="'.$cls.'"',
@@ -910,13 +909,16 @@ class FieldBase implements \Serializable
 				foreach ($arr as $key=>$one) {
 					switch ($key) {
 					 case 'formdata':
-						$this->$key = $one; //TODO get ref to actual FormData-object
+						$this->$key = NULL; //upstream must set ref to relevant FormData-object
+						break;
 					 case 'Options':
 					 case 'ValidationTypes': //if set, an array of choices suitable for populating pulldowns
-						$this->$key = $one; //TODO handle arrays
-						break;
 					 case 'Value':
-						$this->$key = $one; //TODO handle possible array
+					 	if (is_object($one)) {
+							$this->$key = (array)$one;
+						} else {
+							$this->$key = $one;
+						}
 						break;
 					 default:
 						$this->$key = $one;
