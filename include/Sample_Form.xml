@@ -4,14 +4,13 @@
 <!ELEMENT version (#PCDATA)>
 <!ELEMENT date (#PCDATA)>
 <!ELEMENT count (#PCDATA)>
-<!ELEMENT form (properties,options?,fields?)>
+<!ELEMENT form (properties,fields?)>
 <!ELEMENT properties (#PCDATA)>
-<!ELEMENT options (#PCDATA)>
 <!ELEMENT fields (field)>
-<!ELEMENT field (properties,options?)>
+<!ELEMENT field (properties?)>
 ]>
 <powerforms>
-	<version>0.7</version>
+	<version>0.8</version>
 	<date></date>
 	<count>1</count>
 	<form>
@@ -19,8 +18,6 @@
 			<form_id>1</form_id>
 			<name>Sample Form</name>
 			<alias>sample_form</alias>
-		</properties>
-		<options>
 			<css_class>powerform</css_class>
 			<form_displaytype>tab</form_displaytype>
 			<form_template>]][[%7Bif+%24form_done%7D%0A%09%7B%2A+This+section+is+for+displaying+submission-errors+%2A%7D%0A%09%7Bif+%24submission_error%7D%0A%09%09%3Cdiv+class%3D%22error_message%22%3E%7B%24submission_error%7D%3C%2Fdiv%3E%0A%09%09%7Bif+%24show_submission_errors%7D%0A%09%09%09%3Cdiv+class%3D%22error_list%22%3E%0A%09%09%09%3Cul%3E%0A%09%09%09%7Bforeach+from%3D%24submission_error_list+item%3Done%7D%0A%09%09%09%09%3Cli%3E%7B%24one%7D%3C%2Fli%3E%0A%09%09%09%7B%2Fforeach%7D%0A%09%09%09%3C%2Ful%3E%0A%09%09%09%3C%2Fdiv%3E%0A%09%09%7B%2Fif%7D%0A%09%7B%2Fif%7D%0A%7Belse%7D%0A%09%7B%2A+This+section+is+for+displaying+the+form+%2A%7D%0A%09%7B%2A+we+start+with+validation+errors+%2A%7D%0A%09%7Bif+%24form_has_validation_errors%7D%0A%09%09%3Cdiv+class%3D%22error_message%22%3E%0A%09%09%3Cul%3E%0A%09%09%7Bforeach+from%3D%24form_validation_errors+item%3Done%7D%0A%09%09%09%3Cli%3E%7B%24one%7D%3C%2Fli%3E%0A%09%09%7B%2Fforeach%7D%0A%09%09%3C%2Ful%3E%0A%09%09%3C%2Fdiv%3E%0A%09%7B%2Fif%7D%0A%09%7B%2A+and+now+the+form+itself+%2A%7D%0A%09%3Cdiv%7Bif+%24css_class%7D+class%3D%22%7B%24css_class%7D%22%7B%2Fif%7D%3E%0A%09%7Bif+%24total_pages+gt+1%7D%3Cspan%3E%7B%24title_page_x_of_y%7D%3C%2Fspan%3E%7B%2Fif%7D%0A%09%7Bforeach+from%3D%24fields+item%3Done%7D%0A%09%09%7Bstrip%7D%0A%09%09%7Bif+%24one-%3Edisplay%7D%0A%09%09%09%7Bif+%24one-%3Eneeds_div%7D%3Cdiv%3E%7B%2Fif%7D%0A%09%09%09%7Bif+%21%24one-%3Ehide_name%7D%0A%09%09%09%09%3Clabel%7Bif+%21%24one-%3Emultiple_parts%7D+for%3D%22%7B%24one-%3Einput_id%7D%22%7B%2Fif%7D%3E%7B%24one-%3Ename%7D%0A%09%09%09%09%09%7Bif+%24one-%3Erequired_symbol%7D%7B%24one-%3Erequired_symbol%7D%7B%2Fif%7D%0A%09%09%09%09%3C%2Flabel%3E%0A%09%09%09%7B%2Fif%7D%0A%09%09%09%7Bif+%24one-%3Emultiple_parts%7D%0A%09%09%09%09%7Bsection+name%3Dnumloop+loop%3D%24one-%3Einput%7D%0A%09%09%09%09%7Bif+%24one-%3Elabel_parts%7D%0A%09%09%09%09%09%3Cdiv%3E%7B%24one-%3Einput%5Bnumloop%5D-%3Einput%7D%26nbsp%3B%7B%24one-%3Einput%5Bnumloop%5D-%3Ename%7D%3C%2Fdiv%3E%0A%09%09%09%09%7Belse%7D%0A%09%09%09%09%09%7B%24one-%3Einput%5Bnumloop%5D-%3Einput%7D%0A%09%09%09%09%7B%2Fif%7D%0A%09%09%09%09%7Bif+%21empty%28%24one-%3Einput%5Bnumloop%5D-%3Eop%29%7D%7B%24one-%3Einput%5Bnumloop%5D-%3Eop%7D%7B%2Fif%7D%0A%09%09%09%09%7B%2Fsection%7D%0A%09%09%09%7Belse%7D%0A%09%09%09%09%7Bif+%24one-%3Esmarty_eval%7D%7Beval+var%3D%24one-%3Einput%7D%7Belse%7D%7B%24one-%3Einput%7D%7B%2Fif%7D%0A%09%09%09%7B%2Fif%7D%0A%09%09%09%7Bif+%21%24one-%3Evalid%7D+%26lt%3B---+%7B%24one-%3Eerror%7D%7B%2Fif%7D%0A%09%09%09%7Bif+%24one-%3Eneeds_div%7D%3C%2Fdiv%3E%7B%2Fif%7D%0A%09%09%7B%2Fif%7D%0A%09%09%7B%2Fstrip%7D%0A%09%7B%2Fforeach%7D%0A%09%3Cdiv+class%3D%22submit_actions%22%3E%7B%24prev%7D+%7B%24submit%7D%3C%2Fdiv%3E%0A%09%3C%2Fdiv%3E%0A%7B%2Fif%7D</form_template>
@@ -35,28 +32,25 @@
 			<submit_button_text>Send Feedback</submit_button_text>
 			<title_position>left</title_position>
 			<unspecified>[unspecified]</unspecified>
-		</options>
+		</properties>
 		<fields>
 			<field>
 				<properties>
 					<field_id>1</field_id>
 					<name>Fieldset Start</name>
+					<alias>fieldset_sta</alias>
 					<type>FieldsetStart</type>
 					<order_by>1</order_by>
-				</properties>
-				<options>
 					<legend>Help Improve Power Forms</legend>
-					<alias>fieldset_sta</alias>
-				</options>
+				</properties>
 			</field>
 			<field>
 				<properties>
 					<field_id>2</field_id>
 					<name>Send It</name>
+					<alias>send_it</alias>
 					<type>SystemEmail</type>
 					<order_by>2</order_by>
-				</properties>
-				<options>
 					<email_subject>PowerForms Sample Form Submission</email_subject>
 					<email_from_name>Power Forms Installation</email_from_name>
 					<email_from_address>me@overhere.com</email_from_address>
@@ -64,30 +58,26 @@
 					<email_template>]][[%3Ch1%3ESomeone%27s+Testing+a+PowerForms+Submission%21%3C%2Fh1%3E%0A%3Cstrong%3EDate+submitted%3C%2Fstrong%3E%3A+%7B%24sub_date%7D%3Cbr+%2F%3E%0A%3Cstrong%3EIP+address+from+which+form+was+submitted%3C%2Fstrong%3E%3A+%7B%24sub_source%7D%3Cbr+%2F%3E%0A%3Cstrong%3EForm+server%3C%2Fstrong%3E%3A+%7B%24form_host%7D%3Cbr+%2F%3E%0A%3Cstrong%3EURL+of+page+containing+form%3C%2Fstrong%3E%3A+%7B%24form_url%7D%3Cbr+%2F%3E%0A%3Cstrong%3EForm+name%3C%2Fstrong%3E%3A+%7B%24form_name%7D%3Cbr+%2F%3E%0A%3Chr+%2F%3E%0A%3Cstrong%3EModules+you%27ll+be+using+together%3C%2Fstrong%3E%3A+%7B%24modules_you%7D%3Cbr+%2F%3E%0A%3Cstrong%3EWhat+will+you+personally+be+doing+on+your+CMS+MS+site%3F%3C%2Fstrong%3E%3A+%7B%24what_will_yo%7D%3Cbr+%2F%3E%0A%3Cstrong%3EWhere+are+you+from%3F%3C%2Fstrong%3E%3A+%7B%24where_are_yo%7D%3Cbr+%2F%3E%0A%3Cstrong%3EDo+you+have+any+comments+%2F+feedback+for+me%3F%3C%2Fstrong%3E%3A+%7B%24do_you_have%7D</email_template>
 					<email_encoding>utf-8</email_encoding>
 					<html_email>1</html_email>
-					<alias>send_it</alias>
-				</options>
+				</properties>
 			</field>
 			<field>
 				<properties>
 					<field_id>3</field_id>
 					<name>Welcome!</name>
+					<alias>welcome</alias>
 					<type>StaticText</type>
 					<order_by>3</order_by>
-				</properties>
-				<options>
 					<text>Thanks for trying out PowerForms. You can use this form to provide feedback about how you will be using this module.</text>
 					<css_class>message</css_class>
-					<alias>welcome</alias>
-				</options>
+				</properties>
 			</field>
 			<field>
 				<properties>
 					<field_id>4</field_id>
 					<name>Modules you'll be using together</name>
+					<alias>modules_you</alias>
 					<type>CheckboxGroup</type>
 					<order_by>4</order_by>
-				</properties>
-				<options>
 					<box_name1>PowerForms</box_name1>
 					<box_name2>PowerBrowse</box_name2>
 					<box_name3>Front End Users</box_name3>
@@ -112,17 +102,15 @@
 					<box_is_set4>n</box_is_set4>
 					<box_is_set5>n</box_is_set5>
 					<box_is_set6>n</box_is_set6>
-					<alias>modules_you</alias>
-				</options>
+				</properties>
 			</field>
 			<field>
 				<properties>
 					<field_id>5</field_id>
 					<name>What will you personally be doing on your CMS MS site?</name>
+					<alias>what_will_yo</alias>
 					<type>CheckboxGroup</type>
 					<order_by>5</order_by>
-				</properties>
-				<options>
 					<no_empty1>1</no_empty1>
 					<box_name1>Graphical Design</box_name1>
 					<box_name2>HTML and CSS</box_name2>
@@ -142,59 +130,50 @@
 					<box_is_set4>n</box_is_set4>
 					<box_is_set5>n</box_is_set5>
 					<box_is_set6>n</box_is_set6>
-					<alias>what_will_yo</alias>
-				</options>
+				</properties>
 			</field>
 			<field>
 				<properties>
 					<field_id>6</field_id>
 					<name>Where are you from?</name>
+					<alias>where_are_yo</alias>
 					<type>CountryPicker</type>
 					<order_by>6</order_by>
-				</properties>
-				<options>
 					<select_one>Select One</select_one>
-					<alias>where_are_yo</alias>
-				</options>
+				</properties>
 			</field>
 			<field>
 				<properties>
 					<field_id>7</field_id>
 					<name>Enter here any comments that might be helpful</name>
+					<alias>enter_here_a</alias>
 					<type>TextArea</type>
 					<order_by>7</order_by>
-				</properties>
-				<options>
 					<rows>10</rows>
 					<cols>60</cols>
-					<alias>enter_here_a</alias>
-				</options>
+				</properties>
 			</field>
 			<field>
 				<properties>
 					<field_id>8</field_id>
 					<name>Fieldset End</name>
+					<alias>fieldset_end</alias>
 					<type>FieldsetEnd</type>
 					<order_by>8</order_by>
 				</properties>
-				<options>
-					<alias>fieldset_end</alias>
-				</options>
 			</field>
 			<field>
 				<properties>
 					<field_id>9</field_id>
 					<name>Captcha</name>
+					<alias>captcha</alias>
 					<type>Captcha</type>
 					<order_by>9</order_by>
-				</properties>
-				<options>
-					<alias>captcha</alias>
 					<aslabel>1</aslabel>
 					<prompt>Please enter the text from the image</prompt>
 					<wrongtext>The entered text was not correct</wrongtext>
 					<captcha_template>]][[%7B%24prompt%7D%3Cbr+%2F%3E%7B%24captcha_input%7D%3Cbr+%2F%3E%7B%24captcha%7D</captcha_template>
-				</options>
+				</properties>
 			</field>
 		</fields>
 	</form>
