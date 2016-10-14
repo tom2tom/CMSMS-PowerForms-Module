@@ -113,7 +113,7 @@ if (isset($params['submit'])) {
 if ($refresh) {
 	foreach ($params as $key=>$val) {
 		if (strncmp($key,'opt_',4) == 0)
-			$obfield->Options[substr($key,4)] = $val;
+			$obfield->XtraProps[substr($key,4)] = $val;
 	}
 	$obfield->SetName($params['field_name']);
 	$obfield->SetAlias($params['opt_field_alias']);
