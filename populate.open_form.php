@@ -39,9 +39,9 @@ $tplvars = $tplvars + array(
 	'form_end' => $this->CreateFormEnd(),
 
 	'title_form_name' => $this->Lang('title_form_name'),
-	'input_form_name' => $this->CreateInputText($id,'form_name',$formdata->Name,50),
+	'input_form_name' => $this->CreateInputText($id,'form_Name',$formdata->Name,50), //NB object name = 'form_'.property-name
 	'title_form_alias' => $this->Lang('title_form_alias'),
-	'input_form_alias' => $this->CreateInputText($id,'form_alias',$formdata->Alias,50),
+	'input_form_alias' => $this->CreateInputText($id,'form_Alias',$formdata->Alias,50), //ditto
 	'help_form_alias' => $this->Lang('help_form_alias'),
 	'title_form_status' => $this->Lang('title_form_status'),
 
@@ -86,7 +86,7 @@ $tplvars['icon_info'] =
 
 $tplvars['hidden'] = $this->CreateInputHidden($id,'active_tab');
 $tplvars['save'] = $this->CreateInputSubmit($id,'submit',$this->Lang('save'));
-$tplvars['apply'] = $this->CreateInputSubmit($id,'submit',$this->Lang('apply'),
+$tplvars['apply'] = $this->CreateInputSubmit($id,'apply',$this->Lang('apply'),
 	'title = "'.$this->Lang('save_and_continue').'" onclick="set_tab()"');
 
 $icontrue = $theme->DisplayImage('icons/system/true.gif',$this->Lang('true'),'','','systemicon');
@@ -117,8 +117,8 @@ foreach ($formdata->FieldOrders as $one) {
 	$oneset = new stdClass();
 	$fid = (int)$one->GetId();
 	$oneset->id = $fid;
-	$oneset->order = '<input type="hidden" name="'.$id.'orders[]" value="'.$fid.'" />';
-	$this->CreateInputHidden($id,'orders[]',$fid);
+	$oneset->order = '<input type="hidden" name="'.$id.'form_FieldOrders[]" value="'.$fid.'" />';
+	$this->CreateInputHidden($id,'form_FieldOrders[]',$fid);
 	$oneset->name = $this->CreateLink($id,'open_field','',$one->GetName(),
 		array('field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']));
 	$oneset->alias = $one->ForceAlias();
@@ -405,16 +405,15 @@ $tplvars['input_load_template'] = $this->CreateInputDropdown($id,'template_load'
 	$templateList,-1,'','id="template_load" onchange="get_template(\''.$this->Lang('confirm_template').'\',\''.$thisLink.'\');"');
 
 if ($this->before20)
-	$tpl = $this->GetTemplate('pwf::'.$form_id);
+	$tpl = $this->GetTemplate('pwf_'.$form_id);
 else {
-	$ob = CmsLayoutTemplate::load('pwf::'.$form_id);
+	$ob = CmsLayoutTemplate::load('pwf_'.$form_id);
 	$tpl = $ob->get_content();
 }
 $tplvars['title_form_template'] = $this->Lang('title_form_template');
 //note WYSIWYG is no good, the MCE editor stuffs around with the template contents
-$tplvars['input_form_template'] =
-	$this->CreateSyntaxArea($id,$tpl,'opt_form_template',
-	'pwf_tallarea','form_template','','',50,24,'','','style="height:30em;"');
+$tplvars['input_form_template'] = $this->CreateSyntaxArea($id,$tpl,'opt_form_template',
+	'pwf_tallarea','','','',50,24,'','','style="height:30em;"'); //xtra-tall!
 
 $postsubmits = array($this->Lang('redirect_to_page')=>'redir',$this->Lang('display_text')=>'text');
 $tplvars['title_submit_action'] = $this->Lang('title_submit_action');
@@ -428,18 +427,17 @@ $tplvars['input_redirect_page'] =
 		PWForms\Utils::GetFormOption($formdata,'redirect_page',0));
 
 if ($this->before20)
-	$tpl = $this->GetTemplate('pwf::sub_'.$form_id);
+	$tpl = $this->GetTemplate('pwf_sub_'.$form_id);
 else {
-	$ob = CmsLayoutTemplate::load('pwf::sub_'.$form_id);
+	$ob = CmsLayoutTemplate::load('pwf_sub_'.$form_id);
 	$tpl = $ob->get_content();
 }
 if (!$tpl)
 	$tpl = PWForms\Utils::CreateDefaultTemplate($formdata,TRUE,FALSE); //? generate default for CmsLayoutTemplateType
 $tplvars['title_submit_template'] = $this->Lang('title_submit_response');
 //note WYSIWYG is no good, the MCE editor stuffs around with the template contents
-$tplvars['input_submit_template'] =
-	 $this->CreateSyntaxArea($id,$tpl,'opt_submission_template',
-	 'pwf_tallarea','','','',50,15);
+$tplvars['input_submit_template'] = $this->CreateSyntaxArea($id,$tpl,'opt_submission_template',
+	'pwf_tallarea','','','',50,15);
 //setup to revert to 'sample' submission-template
 $ctlData = array();
 $ctlData['opt_submission_template']['general_button'] = TRUE;
