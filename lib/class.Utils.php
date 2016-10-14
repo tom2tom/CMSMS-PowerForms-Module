@@ -309,9 +309,6 @@ class Utils
 				$mail = FALSE;
 		}
 */
-		$imports = $mod->GetPreference('imported_fields');
-		if ($imports)
-			$imports = unserialize($imports);
 
 		$mod->field_types = array();
 
@@ -327,13 +324,25 @@ class Utils
 			if ($feu == FALSE && strpos($classname,'FEU') !== FALSE)
 				continue;
 			//TODO pre-req checks e.g. 'SubmitForm' needs cURL extension
-			if ($imports && in_array($classname,$imports))
-				self::Show_Field($mod,$classname,FALSE);
-			else {
-				$menukey = 'field_type_'.substr($classname,3);
-				$mod->field_types[$mod->Lang($menukey)] = $classname;
+			$menukey = 'field_type_'.$classname;
+			$mod->field_types[$mod->Lang($menukey)] = $classname;
+		}
+
+		$imports = $mod->GetPreference('imported_fields');
+		if ($imports) {
+			$imports = unserialize($imports);
+			foreach ($imports as $classname) {
+				$classpath = 'PWForms\\'.$classname;
+				$params = array();
+				$formdata = $mod->GetFormData($params);
+				$obfld = new $classpath($formdata,$params);
+				if ($obfld) {
+					$t = $obfld->GetDisplayType();
+					$mod->field_types[$t] = $classname;
+				}
 			}
 		}
+
 		uksort($mod->field_types,array('self','labelcmp'));
 
 		$mod->std_field_types = array(
@@ -360,8 +369,9 @@ class Utils
 		if ($mod->field_types) {
 			$params = array();
 			$formdata = $mod->GetFormData($params);
-			$obfld = new $classname($formdata,$params);
-			if ($obfield) {
+			$classpath = 'PWForms\\'.$classname;
+			$obfld = new $classpath($formdata,$params);
+			if ($obfld) {
 				if (!($obfld->IsInput || $obfld->IsSortable)) //TODO check this
 					$t = '-';
 				elseif ($obfld->IsDisposition)
