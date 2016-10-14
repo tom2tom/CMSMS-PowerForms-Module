@@ -27,7 +27,7 @@ if ($padm) {
 			$fp = $config['uploads_path'];
 			if ($fp && is_dir($fp)) {
 				$fp = $fp.DIRECTORY_SEPARATOR.$t;
-				if (!(is_dir($fp) || mkdir($fp,0644)))
+				if (!(is_dir($fp) || mkdir($fp,0755)))
 					$t = '';
 			} else
 				$t = '';
