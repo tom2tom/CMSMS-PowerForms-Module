@@ -32,7 +32,7 @@ $flds = '
 prop_id I(8) KEY,
 form_id I(8),
 name C(64),
-value C(64),
+value C('.PWForms::LENSHORTVAL.'),
 longvalue B
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_formdata',$flds,$taboptarray);
@@ -60,7 +60,7 @@ prop_id I(8) KEY,
 field_id I(8),
 form_id I(8),
 name C(256),
-value C(64),
+value C('.PWForms::LENSHORTVAL.'),
 longvalue B
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_fielddata',$flds,$taboptarray);
