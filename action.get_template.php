@@ -10,9 +10,10 @@
 if (preg_match('/\.tpl$/',$params['tid']))
     $tplstr = ''.@file_get_contents(cms_join_path(__DIR__,'templates',$params['tid']));
 else {
-    $sql = 'SELECT value FROM '.cms_db_prefix().
-		'module_pwf_form_opt WHERE form_id=? AND name=\'form_template\'';
-	$tplstr = $db->GetOne($sql,array($params['tid']));
+	$sql = 'SELECT value,longvalue FROM '.cms_db_prefix().'module_pwf_formdata WHERE form_id=? AND name=\'form_template\'';
+	$data = $db->GetRow($sql,array($params['tid']));
+	$tplstr = $data['longvalue'];
+	if (!$tplstr) $tplstr = $data['value'];
 	if ($tplstr && strncmp($tplstr,'pwf_',4) == 0) {
 		$name = 'tpl::'.substr($tplstr,4);
 		if ($this->before20)
