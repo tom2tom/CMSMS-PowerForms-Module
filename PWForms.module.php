@@ -443,7 +443,7 @@ class PWForms extends CMSModule
 		$ids = $db->GetCol($sql,array($classname));
 		if ($ids) {
 			$join = implode(',',$ids);
-			$sql = 'DELETE FROM '.$pre.'module_pwf_field_opt WHERE field_id IN('.$join.')';
+			$sql = 'DELETE FROM '.$pre.'module_pwf_fielddata WHERE field_id IN('.$join.')';
 			$db->Execute($sql);
 			$sql = 'DELETE FROM '.$pre.'module_pwf_field WHERE field_id IN('.$join.')';
 			$db->Execute($sql);
