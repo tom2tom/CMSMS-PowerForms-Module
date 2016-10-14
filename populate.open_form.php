@@ -117,9 +117,11 @@ foreach ($formdata->FieldOrders as $one) {
 	$oneset = new stdClass();
 	$fid = (int)$one->GetId();
 	$oneset->id = $fid;
+	$t = $one->GetName();
+	if (!$t)
+		$t = $this->Lang('none');
 	$oneset->order = '<input type="hidden" name="'.$id.'form_FieldOrders[]" value="'.$fid.'" />';
-	$this->CreateInputHidden($id,'form_FieldOrders[]',$fid);
-	$oneset->name = $this->CreateLink($id,'open_field','',$one->GetName(),
+	$oneset->name = $this->CreateLink($id,'open_field','',$t,
 		array('field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']));
 	$oneset->alias = $one->ForceAlias();
 	$oneset->type = $one->GetDisplayType();
