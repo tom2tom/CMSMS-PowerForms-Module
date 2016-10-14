@@ -23,6 +23,18 @@ class EmailBase extends FieldBase
 		return $this->formdata->formsmodule->Lang('email_template_not_set');
 	}
 
+	/**
+	AdminPopulateCommonEmail:
+	@id: id given to the PWForms module on execution
+	@totype: optional bool, whether to include a to/cc/bcc selector dropdown, default=FALSE
+	@visible: optional bool, whether to include some options irrelevant to non-displayed
+	 disposition-fields, default=TRUE
+	Returns: 4-member array of stuff for use ultimately in method.open_field.php
+	 [0] = array of things for 'main' tab
+	 [1] = (possibly empty) array of things for 'adv' tab
+	 [2] = array of js related to the created stuff
+	 [3] = something? relevant to upstream 'extra' parameter
+	*/
 	public function AdminPopulateCommonEmail($id, $totype=FALSE, $visible=TRUE)
 	{
 		list($main,$adv) = $this->AdminPopulateCommon($id,$visible);
@@ -71,7 +83,7 @@ class EmailBase extends FieldBase
 						$message,'opt_email_template','pwf_tallarea','','','',50,15,'','html'),
 						'<br /><br />'.$buttons[0].'&nbsp'.$buttons[1]);
 		//show variables-help on advanced tab
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>'varshelpadv');
+		return array($main,$adv,$jsfuncs,'varshelpadv');
 	}
 
 	public function PostAdminActionEmail(&$params)
