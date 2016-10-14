@@ -25,7 +25,7 @@ class FieldBase implements \Serializable
 	public $HasLabel = TRUE;
 	public $HasUserAddOp = FALSE;
 	public $HasUserDeleteOp = FALSE;
-	public $HideLabel = FALSE;
+	public $HideLabel = FALSE; //to XtraProps[] ?
 	public $Id = 0;
 	public $IsComputedOnSubmission = FALSE;
 	public $IsDisposition = FALSE;
@@ -36,15 +36,15 @@ class FieldBase implements \Serializable
 	public $MultiPopulate = FALSE; //whether Populate() generates array of objects
 	public $Name = '';
 	public $NeedsDiv = TRUE;
-	public $Options = array();
 	public $OrderBy = 0; //form display-order
-	public $Required = FALSE;
+	public $Required = FALSE; //to XtraProps[] ?
 	public $SmartyEval = FALSE; //TRUE for textinput field whose value is to be processed via smarty
 	public $Type = '';
 	public $ValidationMessage = ''; //post-validation error message, or ''
 	public $ValidationType = 'none';
-	public $ValidationTypes; //if set, an array of choices suitable for populating pulldowns
+	public $ValidationTypes; //if set, an array of choices suitable for populating pulldowns to XtraProps[] ?
 	public $Value; //when set, can be scalar or array, with all content processed by Utils::html_myentities_decode()
+	public $XtraProps = array();
 
 	public function __construct(&$formdata, &$params)
 	{
@@ -74,7 +74,7 @@ class FieldBase implements \Serializable
 		//admin parameters present ?
 		foreach ($params as $key=>$val) {
 			if (strncmp($key,'opt_',4) == 0)
-				$this->Options[substr($key,4)] = $val;
+				$this->XtraProps[substr($key,4)] = $val;
 		}
 		//frontend parameter present ? TODO captcha-field value has different type of key
 		$key = $this->formdata->current_prefix.$this->Id;
@@ -82,11 +82,39 @@ class FieldBase implements \Serializable
 			$this->Value = $params[$key];
 	}
 
+	public function __set($name,$value)
+	{
+		$this->XtraProps[$name] = $value;
+	}
+
+	public function __get($name)
+	{
+		if (array_key_exists($name,$this->XtraProps))
+            return $this->XtraProps[$name];
+        $trace = debug_backtrace();
+        trigger_error(
+            'Undefined property via __get(): '.$name.
+            ' in '.$trace[0]['file'] .
+            ' on line '.$trace[0]['line'],
+            E_USER_NOTICE);
+        return NULL;
+	}
+
+	public function __isset($name)
+	{
+		return isset($this->XtraProps[$name]);
+	}
+
+	public function __unset($name)
+	{
+		unset($this->XtraProps[$name]);
+	}
+
 	// Returns a form-option value, or $default if the option doesn't exist
 	public function GetFormOption($optname, $default='')
 	{
-		if (isset($this->formdata->Options[$optname]))
-			return $this->formdata->Options[$optname];
+		if (isset($this->formdata->XtraProps[$optname]))
+			return $this->formdata->XtraProps[$optname];
 		else
 			return $default;
 	}
@@ -432,7 +460,7 @@ class FieldBase implements \Serializable
 	// or else FALSE
 	public function GetDisplayableOptionValues()
 	{
-		if (array_key_exists('option_value',$this->Options)) {
+		if (array_key_exists('option_value',$this->XtraProps)) {
 			$ret = $this->GetOption('option_value'); //array with member(s)
 			if ($ret)
 				return $ret;
@@ -488,8 +516,8 @@ class FieldBase implements \Serializable
 	public function HasValue($deny_blank_responses=FALSE)
 	{
 		if (property_exists($this,'Value')) {
-			if (isset($this->Options['default'])) { // fields with defaults
-				$def = $this->Options['default'];
+			if (isset($this->XtraProps['default'])) { // fields with defaults
+				$def = $this->XtraProps['default'];
 				if ($def && $this->Value == $def) //TODO if array
 					return FALSE;
 			}
@@ -528,14 +556,14 @@ class FieldBase implements \Serializable
 
 	public function SetOption($optionName, $optionValue)
 	{
-		$this->Options[$optionName] = $optionValue;
+		$this->XtraProps[$optionName] = $optionValue;
 	}
 
 	// Returns a field-option value, or $default if the option doesn't exist
 	public function GetOption($optionName,$default='')
 	{
-		if (isset($this->Options[$optionName]))
-			return $this->Options[$optionName];
+		if (isset($this->XtraProps[$optionName]))
+			return $this->XtraProps[$optionName];
 
 		return $default;
 	}
@@ -546,7 +574,7 @@ class FieldBase implements \Serializable
 	{
 		$len = strlen($optionName);
 		$matches = array();
-		foreach ($this->Options as $key => &$val) {
+		foreach ($this->XtraProps as $key => &$val) {
 			if (strncmp($key,$optionName,$len) == 0) {
 				$o = (int)substr($key,$len);
 				$matches[$o] = $val;
@@ -560,8 +588,8 @@ class FieldBase implements \Serializable
 			elseif (key($matches) == 0) {
 				$matches[1] = $matches[0];
 				unset($matches[0]);
-				$this->Options[$optionName.'1'] = $matches[1];
-				unset($this->Options[$optionName]);
+				$this->XtraProps[$optionName.'1'] = $matches[1];
+				unset($this->XtraProps[$optionName]);
 			}
 			return $matches;
 		}
@@ -570,17 +598,17 @@ class FieldBase implements \Serializable
 
 	public function SetOptionElement($optionName, $index, $value)
 	{
-		$this->Options[$optionName.$index] = $value;
+		$this->XtraProps[$optionName.$index] = $value;
 	}
 
 	public function GetOptionElement($optionName, $index, $default='')
 	{
 		$so = $optionName.$index;
-		if (isset($this->Options[$so]))
-			return $this->Options[$so];
+		if (isset($this->XtraProps[$so]))
+			return $this->XtraProps[$so];
 		elseif ($index == 0) {
-			if (isset($this->Options[$optionName]))
-				return $this->Options[$optionName];
+			if (isset($this->XtraProps[$optionName]))
+				return $this->XtraProps[$optionName];
 		}
 		return $default;
 	}
@@ -589,7 +617,7 @@ class FieldBase implements \Serializable
 	{
 		$len = strlen($optionName);
 		$max = -1;
-		foreach ($this->Options as $key => &$one) {
+		foreach ($this->XtraProps as $key => &$one) {
 			if (strpos($key,$optionName) === 0) {
 				$o = (int)substr($key,$len);
 				if ($o > $max)
@@ -598,12 +626,12 @@ class FieldBase implements \Serializable
 		}
 		unset($one);
 		$index = ($max > -1) ? $max + 1 : 1;
-		$this->Options[$optionName.$index] = $value;
+		$this->XtraProps[$optionName.$index] = $value;
 	}
 
 	public function RemoveOptionElement($optionName,$index)
 	{
-		unset($this->Options[$optionName.$index]);
+		unset($this->XtraProps[$optionName.$index]);
 	}
 
 	/**
@@ -714,8 +742,9 @@ class FieldBase implements \Serializable
 	Generates 'base'/common content for editing a field.
 	See also - comments below, for AdminPopulate()
 
-	Returns: array with keys 'main' and  (possibly empty) 'adv', for use
-		ultimately in method.open_field.php.
+	Returns: 2-member array of stuff for use ultimately in method.open_field.php
+	 [0] = array of things for 'main' tab
+	 [1] = (possibly empty) array of things for 'adv' tab
 	*/
 	public function AdminPopulateCommon($id, $visible=TRUE)
 	{
@@ -776,7 +805,7 @@ class FieldBase implements \Serializable
 							'opt_field_logic','pwf_shortarea','','','',50,8),
 							$mod->Lang('help_field_resources'));
 		}
-		return array('main'=>$main,'adv'=>$adv);
+		return array($main,$adv);
 	}
 
 	public function RemoveAdminField(&$array, $fieldtitle)
@@ -911,9 +940,9 @@ class FieldBase implements \Serializable
 					 case 'formdata':
 						$this->$key = NULL; //upstream must set ref to relevant FormData-object
 						break;
-					 case 'Options':
 					 case 'ValidationTypes': //if set, an array of choices suitable for populating pulldowns
 					 case 'Value':
+					 case 'XtraProps':
 					 	if (is_object($one)) {
 							$this->$key = (array)$one;
 						} else {
