@@ -18,26 +18,24 @@ class FormData implements \Serializable
 	public $FieldOrders = FALSE; //when needed, set to ordered array representing field->Orderby
 	public $Id = 0;
 	public $Name = '';
-	public $Options = array();
 	public $Page = 0; //current page in the form
 	public $PagesCount = 0; //no. of pages in the form
+	public $XtraProps = array(); //extra form-properties
 //	public $sampleTemplateCode = '';
 	public $templateVariables = array(); //extra 'global' items for template-help, each like 'var_name'=>'help_lang_key'
 	public $jsincs = array(); //'include' directives
 	public $jsfuncs = array(); //funcs and/or instructions
 	public $jsloads = array(); //document-ready funcs and/or instructions
-	//extra form-properties
-	private $extradata = array();
 
 	public function __set($name,$value)
 	{
-		$this->extradata[$name] = $value;
+		$this->XtraProps[$name] = $value;
 	}
 
 	public function __get($name)
 	{
-		if (array_key_exists($name,$this->extradata))
-            return $this->extradata[$name];
+		if (array_key_exists($name,$this->XtraProps))
+            return $this->XtraProps[$name];
         $trace = debug_backtrace();
         trigger_error(
             'Undefined property via __get(): '.$name.
@@ -49,12 +47,12 @@ class FormData implements \Serializable
 
 	public function __isset($name)
 	{
-		return isset($this->extradata[$name]);
+		return isset($this->XtraProps[$name]);
 	}
 
 	public function __unset($name)
 	{
-		unset($this->extradata[$name]);
+		unset($this->XtraProps[$name]);
 	}
 
 	public function __toString()
@@ -99,8 +97,7 @@ class FormData implements \Serializable
 						foreach ($one as $i=>$mdata) {
 							$i = (int)$i;
 							$members[$i] = unserialize($mdata);
-							$members[$i]->formdata =& $this->formsmodule;
-						    $members[$i]->loaded = FALSE;
+							$members[$i]->formdata =& $this;
 						}
 						$this->$key = $members;
 						break;
@@ -111,8 +108,7 @@ class FormData implements \Serializable
 					 case 'jsloads':
 						$this->$key = ($one) ? (array)$one : array();
 						break;
-					 case 'Options':
-					 case 'extradata':
+					 case 'XtraProps':
  						$one = (array)$one;
 						$members = array();
 						foreach ($one as $subkey=>$mdata) {
