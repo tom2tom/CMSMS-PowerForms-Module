@@ -36,15 +36,9 @@
 {else}{*no $forms*}
 <p class="pageinput">{$noforms}</p>
 {/if}
-<br />
-<div class="pageinput">
-{if $pmod}{$addlink}&nbsp;{$addform}{/if}
-{if !empty($forms)}
- <div style="margin:0 50% 0 2%;float:right;text-align:right">
-{if $pmod}{$clonebtn} {$deletebtn} {/if}{$exportbtn}
- </div>
-<div class="clearb"></div>
-{/if}
+<div class="pageinput" style="margin-top:1em;">
+{if $pmod}<span style="margin-right:5em;">{$addlink}&nbsp;{$addform}</span>{/if}
+{if !empty($forms)}{if $pmod}{$clonebtn} {$deletebtn} {/if}{$exportbtn}{/if}
 </div>
 {$form_end}
 {$tab_end}
