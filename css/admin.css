@@ -1,3 +1,16 @@
+.pageoverflow {
+ overflow:auto;
+}
+
+.lolines textarea {
+ height:4em;
+}
+.midlines textarea {
+ height:7em;
+}
+.hilines textarea {
+ height:15em;
+}
 textarea.pwf_tallarea {
  font-family:auto;
  font-family:inherit;
@@ -30,8 +43,6 @@ div.pageinput .pagetext {
  margin-left:0;
 }
 
-.leftwards { margin-left:0 !important }
-
 .pwf_link { text-decoration:underline; }
 .pwf_fieldset { margin-bottom:2em; }
 .help_display { display:none; }
@@ -58,7 +69,9 @@ table.varshelp
 }
 table.varshelp th {background-color:#AAA;}
 
-table.leftside {
+.leftwards { margin-left:0 !important }
+
+table.leftwards {
  margin-left:0;
  padding:3px;
  border-spacing:0;
@@ -66,7 +79,7 @@ table.leftside {
  width:auto;
  table-layout:auto;
 }
-table.rightside {
+table.rightwards {
  margin-right:0;
  padding:3px;
  border-spacing:0;
@@ -74,6 +87,13 @@ table.rightside {
  width:auto;
  table-layout:auto;
 }
+
+/* radio buttons */
+label.radiolabel {
+ margin:0 0.5em;
+ vertical-align:0.2em;
+}
+
 /*multi-page submit buttons */
 .submit_current {}
 .submit_next {}
