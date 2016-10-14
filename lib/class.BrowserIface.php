@@ -18,7 +18,7 @@ class BrowserIface
 		$sql = <<<EOS
 SELECT DISTINCT FM.form_id,FM.name FROM {$pre}module_pwf_form FM
 JOIN {$pre}module_pwf_field FD ON FM.form_id=FD.form_id
-WHERE FD.type='DispositionFormBrowser'
+WHERE FD.type='FormBrowser'
 EOS;
 		$db = \cmsms()->GetDb();
 		return $db->GetAssoc($sql);
@@ -31,7 +31,7 @@ EOS;
 		$pre = \cms_db_prefix();
 		$sql = <<<EOS
 SELECT field_id,name,type FROM {$pre}module_pwf_field
-WHERE form_id=? AND type LIKE '%Field%' ORDER BY order_by
+WHERE form_id=? ORDER BY order_by
 EOS;
 		$db = \cmsms()->GetDb();
 		$all = $db->GetAssoc($sql,array($form_id));
