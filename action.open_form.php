@@ -32,27 +32,19 @@ if (isset($params['formdata'])) {
 	$params['formdata'] = base64_encode($formdata->Id.session_id());
 }
 
-if (isset($params['submit'])) {
-	$funcs->Arrange($formdata->Fields,$params['orders'],TRUE);
-	list($res,$message) = $funcs->Store($this,$formdata); //may alter $formdata (field-order)
+if (isset($params['submit']) || isset($params['apply'])) {
+	list($res,$message) = $funcs->Store($this,$formdata,$params);
 	if ($res) {
 		$message = $this->Lang('form_op',$this->Lang('updated'));
 		$message = $this->PrettyMessage($message,TRUE,FALSE,FALSE);
+		if (isset($params['submit'])) {
+			$cache->delete($params['formdata']);
+			$this->Redirect($id,'defaultadmin','',array('message'=> $message));
+		}
 	} else {
 		$message = $this->PrettyMessage($message,FALSE,FALSE,FALSE);
 	}
 	$cache->delete($params['formdata']);
-	$this->Redirect($id,'defaultadmin','',array('message'=> $message));
-} elseif (isset($params['apply'])) {
-	$funcs->Arrange($formdata->Fields,$params['orders'],TRUE);
-	list($res,$message) = $funcs->Store($this,$params['orders'],$formdata); //may alter $formdata (field-order)
-	if ($res) {
-		$message = $this->Lang('form_op',$this->Lang('updated'));
-		$message = $this->PrettyMessage($message,TRUE,FALSE,FALSE);
-	} else {
-		$this->Redirect($id,'defaultadmin','',array(
-		'message' => $this->PrettyMessage($message,FALSE,FALSE,FALSE)));
-	}
 } elseif (isset($params['formedit'])) {
 	if (isset($params['set_field_level']))
 		$this->SetPreference('adder_fields',$params['set_field_level']);
