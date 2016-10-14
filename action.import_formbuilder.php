@@ -67,7 +67,7 @@ EOS;
 	}
 	$tpl = new CmsLayoutTemplate();
 	$tpl->set_type($type);
-	$pref = ($type == 'form') ? 'pwf::':'pwf::sub_';
+	$pref = ($type == 'form') ? 'pwf_':'pwf_sub_';
 	$tpl->set_name($pref.$id);
 	$tpl->set_owner(1); //original admin user
 	$tpl->set_additional_editors($editors); // !too bad if permissions change? or handle that event ?
@@ -182,55 +182,74 @@ function Update_Templates(&$mod, &$db, $pre, $oldfid, $newfid)
 	}
 
 	if ($mod->before20)
-		$tpl = $mod->GetTemplate('pwf::'.$newfid);
+		$tpl = $mod->GetTemplate('pwf_'.$newfid);
 	else {
 		//CHECKME try/catch?
-		$ob = CmsLayoutTemplate::load('pwf::'.$newfid);
+		$ob = CmsLayoutTemplate::load('pwf_'.$newfid);
 		$tpl = $ob->get_content();
 	}
 	if ($tpl) {
 		$tpl = str_replace($finds,$repls,$tpl);
 		if ($mod->before20)
-			$mod->SetTemplate('pwf::'.$newfid,$tpl);
+			$mod->SetTemplate('pwf_'.$newfid,$tpl);
 		else {
 			$ob->set_content($tpl);
 			$ob->save();
 		}
 	}
 	if ($mod->before20)
-		$tpl = $mod->GetTemplate('pwf::sub_'.$newfid);
+		$tpl = $mod->GetTemplate('pwf_sub_'.$newfid);
 	else {
-		$ob = CmsLayoutTemplate::load('pwf::sub_'.$newfid);
+		$ob = CmsLayoutTemplate::load('pwf_sub_'.$newfid);
 		$tpl = $ob->get_content();
 	}
 	if ($tpl) {
 		$tpl = str_replace($finds,$repls,$tpl);
 		if ($mod->before20)
-			$mod->SetTemplate('pwf::sub_'.$newfid,$tpl);
+			$mod->SetTemplate('pwf_sub_'.$newfid,$tpl);
 		else {
 			$ob->set_content($tpl);
 			$ob->save();
 		}
 	}
 
-	$sql = 'SELECT option_id,value FROM '.$pre.'module_pwf_form_opt WHERE form_id=? AND name = \'submission_template\'';
-	$row = $db->GetOne($sql,array($newfid));
+	$sql = 'SELECT prop_id,value,longvalue FROM '.$pre.'module_pwf_formdata WHERE form_id=? AND name=\'submission_template\'';
+	$row = $db->GetRow($sql,array($newfid));
 	if ($row) {
-		$sql = 'UPDATE '.$pre.'module_pwf_form_opt SET value=? WHERE option_id=?';
-		if ($row['value']) {
-			$tpl = str_replace($finds,$repls,$row['value']);
-			$db->Execute($sql,array($tpl,$row['option_id']));
+		$sval = $row['value'];
+		$lval = $row['longvalue'];
+		if ($sval) {
+			$tpl = str_replace($finds,$repls,$sval);
+		} elseif ($lval) {
+			$tpl = str_replace($finds,$repls,$lval);
+		}
+		if ($sval || $lval) {
+			$sql = 'UPDATE '.$pre.'module_pwf_formdata SET value=?,longvalue=? WHERE prop_id=?';
+			$args = (strlen($tpl) <= PWForms::LENSHORTVAL) ?
+				array($tpl,NULL,$row['prop_id']):
+				array(NULL,$tpl,$row['prop_id']);
+			$db->Execute($sql,$args);
 		}
 	}
 
-	$sql = 'SELECT option_id,value FROM '.$pre.'module_pwf_field_opt WHERE form_id=? AND name LIKE \'%template%\'';
+	$sql = 'SELECT prop_id,value,longvalue FROM '.$pre.'module_pwf_fielddata WHERE form_id=? AND name LIKE\'%template%\'';
 	$rows = $db->GetArray($sql,array($newfid));
 	if ($rows) {
-		$sql = 'UPDATE '.$pre.'module_pwf_field_opt SET value=? WHERE option_id=?';
+		$sql = 'UPDATE '.$pre.'module_pwf_fielddata SET value=?,longvalue=? WHERE prop_id=?';
 		foreach ($rows as &$row) {
-			if ($row['value']) {
-				$tpl = str_replace($finds,$repls,$row['value']);
-				$db->Execute($sql,array($tpl,$row['option_id']));
+			$sval = $row['value'];
+			$lval = $row['longvalue'];
+			if ($sval) {
+				$tpl = str_replace($finds,$repls,$sval);
+			} elseif ($lval) {
+				$tpl = str_replace($finds,$repls,$lval);
+			}
+			if ($sval || $lval) {
+				$len = strlen($tpl);
+				$args = ($len <= PWForms::LENSHORTVAL) ?
+					array($tpl,NULL,$row['prop_id']):
+					array(NULL,$tpl,$row['prop_id']);
+				$db->Execute($sql,$args);
 			}
 		}
 		unset($row);
@@ -239,7 +258,7 @@ function Update_Templates(&$mod, &$db, $pre, $oldfid, $newfid)
 
 function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, &$fieldrow)
 {
-	$sql = 'SELECT * FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY option_id';
+	$sql = 'SELECT * FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY prop_id';
 	$data = $db->GetArray($sql,array($oldfid,$oldf));
 	if ($data) {
 		$extras = array();
@@ -264,10 +283,10 @@ function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, &$fieldrow)
 		if ($sequence)
 			$desc = '';
 
-		$sql = 'INSERT INTO '.$pre.'module_pwf_field_opt
-(option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_fielddata
+(prop_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
 		foreach ($data as $row) {
-			$oid = $db->GenID($pre.'module_pwf_field_opt_seq');
+			$oid = $db->GenID($pre.'module_pwf_fielddata_seq');
 			$nm = $row['name'];
 			if ($sequence) {
 				if ($nm != $desc) {
@@ -284,7 +303,7 @@ function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, &$fieldrow)
 		}
 		foreach ($extras as $name=>$value) {
 			if ($value) {
-				$oid = $db->GenID($pre.'module_pwf_field_opt_seq');
+				$oid = $db->GenID($pre.'module_pwf_fielddata_seq');
 				$db->Execute($sql,array($oid,$newf,$newfid,$name,$value));
 			}
 		}
@@ -373,29 +392,43 @@ function Get_Opts(&$mod, &$db, $pre, $oldfid, $newfid)
 	$sql = 'SELECT * FROM '.$pre.'module_fb_form_attr WHERE form_id=? ORDER BY form_attr_id';
 	$data = $db->GetArray($sql,array($oldfid));
 	if ($data) {
-		$sql = 'INSERT INTO '.$pre.'module_pwf_form_opt
-(option_id,form_id,name,value) VALUES (?,?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_formdata
+(prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
 		foreach ($data as $row) {
 			if (strpos($row['name'],'captcha') !== FALSE) //ignore redundant options
 				continue;
 			if (strpos($row['name'],'udt') !== FALSE && ($row['value'] == FALSE || $row['value'] == -1))
 				continue;
+			$val = $row['value'];
+			$longval = NULL;
 			//CHECKME template arrangements used by newer FormBuilder
-			if ($row['name'] == 'form_template') {
+			switch ($row['name']) {
+			 case 'form_template':
 				if ($mod->before20)
-					$mod->SetTemplate('pwf::'.$newfid,$row['value']);
+					$mod->SetTemplate('pwf_'.$newfid,$val);
 				else
-					MySetTemplate('form',$newfid,$row['value']);
-				$row['value'] = 'pwf_'.$newfid;
-			} elseif ($row['name'] == 'submission_template') {
+					MySetTemplate('form',$newfid,$val);
+				$name = $row['name'];
+				$val = 'pwf_'.$newfid;
+				break;
+			 case 'submission_template':
 				if ($mod->before20)
-					$mod->SetTemplate('pwf::sub_'.$newfid,$row['value']);
+					$mod->SetTemplate('pwf_sub_'.$newfid,$val);
 				else
-					MySetTemplate('submission',$newfid,$row['value']);
-				$row['value'] = 'pwf_sub_'.$newfid;
+					MySetTemplate('submission',$newfid,$val);
+				$name = $row['name'];
+				$val = 'pwf_sub_'.$newfid;
+				break;
+			 default:
+				$name = $row['name'];
+				if (strlen($val) > PWForms::LENSHORTVAL) {
+					$longval = $val;
+					$val = NULL;
+				}
+				break;
 			}
-			$newopt = $db->GenID($pre.'module_pwf_form_opt_seq');
-			$db->Execute($sql,array($newopt,$newfid,$row['name'],$row['value']));
+			$newid = $db->GenID($pre.'module_pwf_formdata_seq');
+			$db->Execute($sql,array($newid,$newfid,$name,$val,$longval));
 		}
 	}
 }
