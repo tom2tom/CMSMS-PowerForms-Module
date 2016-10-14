@@ -5,22 +5,7 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if (!function_exists('EarlyExit')) {
- function ExitAdvise(&$mod,$mode=0)
- {
-	$tplvars = array();
- 	switch ($mode) {
-	 case 1:
-		$tplvars['message'] = $mod->Lang('comeback_expired');
-		break;
-	 case 2:
-		$tplvars['message'] = $mod->Lang('comeback_toomany');
-		break;
-	}
-	$tplvars['title'] = $mod->Lang('title_aborted');
-	echo PWForms\Utils::ProcessTemplate($mod,'message.tpl',$tplvars);
- }
-
+if (!function_exists('BlockSource')) {
  function BlockSource()
  {
 	if (!empty($_SERVER['REMOTE_ADDR'])) {
@@ -43,7 +28,10 @@ WHERE NOT EXISTS (SELECT 1 FROM '.$pre.'module_pwf_ip_log T WHERE T.src=?)';
 if (!isset($params['form_id']) && isset($params['form'])) // got the form by alias
 	$params['form_id'] = PWForms\Utils::GetFormIDFromAlias($params['form']);
 if (empty($params['form_id'])) {
-	echo '<!-- no form -->'.PHP_EOL;
+	echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+		'title'=>$this->Lang('title_aborted'),
+		'message'=>$this->Lang('error_data'),
+		'error'=>1));
 	return;
 }
 list($current,$prior) = $this->GetTokens(); //fresh pair of fieldname-prefixes
@@ -57,13 +45,17 @@ if ($matched) {
 		$prefix = $prior;
 	else {
 		BlockSource();
-		ExitAdvise($this,1);
+		echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+			'title'=>$this->Lang('title_aborted'),
+			'message'=>$this->Lang('comeback_expired')));
 		return;
 	}
 	while ($key = next($matched)) {
 		if (strpos($key,$prefix) !== 0) {
 			BlockSource();
-			ExitAdvise($this,1);
+			echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+				'title'=>$this->Lang('title_aborted'),
+				'message'=>$this->Lang('comeback_expired')));
 			return;
 		}
 	}
@@ -75,14 +67,20 @@ $validerr = 0; //default no validation error
 try {
 	$cache = PWForms\Utils::GetCache($this);
 } catch (Exception $e) {
-	echo $this->Lang('error_system').' NO CACHE MECHANISM';
+	echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+		'title'=>$this->Lang('title_aborted'),
+		'message'=>$this->Lang('error_system').' NO CACHE MECHANISM',
+		'error'=>1));
 	return;
 }
 /*QUEUE
 try {
 	$mx = PWForms\Utils::GetMutex($this);
 } catch (Exception $e) {
-	echo $this->Lang('error_system').' NO MUTEX MECHANISM';
+	echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+		'title'=>$this->Lang('title_aborted'),
+		'message'=>$this->Lang('error_system').' NO MUTEX MECHANISM',
+		'error'=>1));
 	return;
 }
 */
@@ -94,7 +92,10 @@ if (isset($params[$prefix.'formdata'])) {
 	$cache_key = $params[$prefix.'formdata'];
 	$formdata = $cache->get($cache_key);
 	if (is_null($formdata)) {
-		echo $this->Lang('error_data');
+		echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+			'title'=>$this->Lang('title_aborted'),
+			'message'=>$this->Lang('error_data'),
+			'error'=>1));
 		return;
 	}
 	$formdata->formsmodule = &$this;
@@ -197,14 +198,18 @@ EOS;
 					}
 				}
 				if ($nt == 0) {
-	$this->Crash();
-					echo $this->Lang('system_data');
+					echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+						'title'=>$this->Lang('title_aborted'),
+						'message'=>$this->Lang('system_data'),
+						'error'=>1));
 					return;
 				}
 				if ($num) {
 					if ($num == 255) { //blocked due to expiry
 						BlockSource(); //again!
-						ExitAdvise($this,1);
+						echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+							'title'=>$this->Lang('title_aborted'),
+							'message'=>$this->Lang('comeback_expired')));
 						return;
 					}
 					//rate-limit?
@@ -224,7 +229,9 @@ EOS;
 							$args[] = array($src,$t,$src);
 							PWForms\Utils::SafeExec($sql,$args);
 						} else {
-							ExitAdvise($this,2);
+							echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+								'title'=>$this->Lang('title_aborted'),
+								'message'=>$this->Lang('comeback_toomany')));
 							return;
 						}
 					}
@@ -395,7 +402,7 @@ $this->Crash2();
 					 case 'text':
 						$this->SendEvent('OnFormSubmit',$parms);
 						PWForms\Utils::setFinishedFormSmarty($formdata,TRUE);
-						PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf::sub_'.$form_id,$tplvars,TRUE);
+						PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf_sub_'.$form_id,$tplvars,TRUE);
 						return;
 					 case 'redir':
 						$this->SendEvent('OnFormSubmit',$parms);
@@ -403,22 +410,18 @@ $this->Crash2();
 						if ($ret > 0)
 							$this->RedirectContent($ret);
 						else {
-							$tplvars = $tplvars + array(
-								'title' => $this->Lang('missing_type',$this->Lang('page')),
-								'message' => $this->Lang('cannot_show_TODO'),
-								'error' => 1
-							);
-							echo PWForms\Utils::ProcessTemplate($this,'message.tpl',$tplvars);
+							echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+								'title'=>$this->Lang('missing_type',$this->Lang('page')),
+								'message'=>$this->Lang('cannot_show_TODO'),
+								'error'=>1));
 							return;
 						}
 					 case 'confirm':
 					 	//confirmation needed before submission
 						//after confirmation, formdata will be different
-						$tplvars = $tplvars + array(
-							'title' => $this->Lang('title_confirm'),
-							'message' => $this->Lang('help_confirm')
-						);
-						echo PWForms\Utils::ProcessTemplate($this,'message.tpl',$tplvars);
+						echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+							'title'=>$this->Lang('title_confirm'),
+							'message'=>$this->Lang('help_confirm')));
 						return;
 					 default:
 						exit;
@@ -443,16 +446,24 @@ $this->Crash2();
 } else { //first time
 	$funcs = new PWForms\FormOperations();
 	$formdata = $funcs->Load($this,$id,$params,$form_id);
-	unset($funcs);
 	if (!$formdata) {
-		echo '<!-- no form -->'.PHP_EOL;
+		unset($funcs);
+		echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+			'title'=>$this->Lang('title_aborted'),
+			'message'=>$this->Lang('error_data'),
+			'error'=>1));
 		return;
 	}
 	$firsttime = TRUE;
 	$formdata->Page = 1;
 	$formdata->PagesCount = 1; //we will count
 
-	//TODO if $in_browser && $form_edit, import & store field data
+/*	if ($params['action'] == 'show_form') {
+		import & store field data
+	}
+*/
+	$formdata->FieldOrders = array_keys($formdata->Fields);
+	$funcs->Arrange($formdata->Fields,$formdata->FieldOrders);
 
 	//construct sufficiently-unique cache key
 	if (!empty($_SERVER['SERVER_ADDR']))
@@ -461,15 +472,6 @@ $this->Crash2();
 		$token = mt_rand(0,999999).'.'.mt_rand(0,999999);
 	$token .= 'SERVER_ADDR'.uniqid().mt_rand(1100,2099).reset($_SERVER).key($_SERVER).end($_SERVER).key($_SERVER);
 	$cache_key = md5($token);
-
-	$orders = array();
-	foreach ($formdata->Fields as $fid=>&$one) {
-		$orders[] = $fid;
-	}
-	unset($one);
-	$formdata->FieldOrders = $orders;
-	$funcs = new PWForms\FormOperations();
-	$funcs->Arrange($formdata->Fields,$formdata->FieldOrders);
 }
 
 $tplvars['form_has_validation_errors'] = $validerr;
@@ -489,21 +491,18 @@ if ($udtonce || $udtevery) {
 	unset($usertagops);
 }
 
-$parms = array();
-$parms['form_id'] = $form_id;
-$parms['form_name'] = PWForms\Utils::GetFormNameFromID($form_id);
-$this->SendEvent('OnFormDisplay',$parms);
-unset($parms);
+$this->SendEvent('OnFormDisplay',array(
+ 'form_id'=>$form_id,
+ 'form_name'=>PWForms\Utils::GetFormNameFromID($form_id)));
 
 $tplvars['form_done'] = 0;
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.default.php';
 
-$cache->set($cache_key,$formdata);
+$cache->set($cache_key,$formdata,84600);
 
-//we've got a form-template to display, don't bother with another 'parent'
 echo $form_start.$hidden;
-PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf::'.$form_id,$tplvars,TRUE);
+PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf_'.$form_id,$tplvars,TRUE);
 echo $form_end;
 //inject constructed js after other content (pity we can't get to </body> or </html> from here)
 $js = NULL;
