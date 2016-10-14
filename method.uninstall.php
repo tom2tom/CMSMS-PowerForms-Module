@@ -26,17 +26,25 @@ function delTree($dir)
 $pre = cms_db_prefix();
 $dict = NewDataDictionary($db);
 
+$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_field_idx',$pre.'module_pwf_field');
+$dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_field');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropTableSQL($pre.'module_pwf_field_opt');
+$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_fielddata_idx',$pre.'module_pwf_fielddata');
+$dict->ExecuteSQLArray($sqlarray);
+$sqlarray = $dict->DropTableSQL($pre.'module_pwf_fielddata');
 $dict->ExecuteSQLArray($sqlarray);
 /*MUTEX
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_flock');
 $dict->ExecuteSQLArray($sqlarray);
 */
+$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_form_idx',$pre.'module_pwf_form');
+$dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_form');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropTableSQL($pre.'module_pwf_form_opt');
+$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_formdata_idx',$pre.'module_pwf_formdata');
+$dict->ExecuteSQLArray($sqlarray);
+$sqlarray = $dict->DropTableSQL($pre.'module_pwf_formdata');
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_cache');
 $dict->ExecuteSQLArray($sqlarray);
@@ -48,9 +56,9 @@ $sqlarray = $dict->DropTableSQL($pre.'module_pwf_trans');
 $dict->ExecuteSQLArray($sqlarray);
 
 $db->DropSequence($pre.'module_pwf_field_seq');
-$db->DropSequence($pre.'module_pwf_field_opt_seq');
+$db->DropSequence($pre.'module_pwf_fielddata_seq');
 $db->DropSequence($pre.'module_pwf_form_seq');
-$db->DropSequence($pre.'module_pwf_form_opt_seq');
+$db->DropSequence($pre.'module_pwf_formdata_seq');
 $db->DropSequence($pre.'module_pwf_record_seq');
 $db->DropSequence($pre.'module_pwf_uniquefield_seq');
 
