@@ -19,6 +19,8 @@
 
 class PWForms extends CMSModule
 {
+	const LENSHORTVAL = 64;
+
 	public $before20;
 	public $havemcrypt;
 /*QUEUE
@@ -395,7 +397,7 @@ class PWForms extends CMSModule
 	{
 		$basename = basename($classfilepath);
 		$fp = cms_join_path($this->GetModulePath(),'lib',$basename);
-		copy($classfilepath,$fp);
+		@copy($classfilepath,$fp);
 
 		$classname = PWForms\Utils::FileClassName($basename);
 		//cache field data to be ready for restarts
