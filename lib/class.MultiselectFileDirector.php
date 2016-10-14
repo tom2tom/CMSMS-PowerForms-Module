@@ -234,7 +234,7 @@ class MultiselectFileDirector extends FieldBase
 			return array(FALSE,$this->Lang('error_system'));
 		}
 */
-		$fn = reset($this->Options['destination_filename']);
+		$fn = reset($this->XtraProps['destination_filename']);
 /*MUTEX
 		$token = abs(crc32($fn.'mutex'));
 		if (!$mx->lock($token))

@@ -161,8 +161,8 @@ class PageRedirector extends FieldBase
 //		$this->formdata->formsmodule->RedirectContent($this->GetOptionElement('destination_page',$this->Value));
 		$page = $this->GetOptionElement('destination_page',$this->Value);
 		if ($page >= 0) {
-			$this->formdata->Options['redirect_page'] = $page;
-			$this->formdata->Options['submit_action'] = 'redir';
+			$this->formdata->XtraProps['redirect_page'] = $page;
+			$this->formdata->XtraProps['submit_action'] = 'redir';
 			return array(TRUE,'');
 		}
 		$mod = $this->formdata->formsmodule;

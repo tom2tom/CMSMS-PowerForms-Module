@@ -53,7 +53,7 @@ class SequenceEnd extends FieldBase
 
 /*	public function PostAdminAction(&$params)
 	{
-		'starter' option = that_field ->Options['name'], not ->Name
+		'starter' option = that_field ->XtraProps['name'], not ->Name
 		conform any starterfield::opt_ender
 	}
 
