@@ -917,7 +917,7 @@ class FieldBase implements \Serializable
 	{
 		//no need to fully-document our 'parent'
  		$ob = $this->formdata;
-		$this->formdata = $this->formdata->Id;
+		$this->formdata = NULL; //upstream must reinstate ref to relevant FormData-object when unserializing
 		$ret = json_encode(get_object_vars($this));
 		$this->formdata = $ob;
 		return $ret;
@@ -937,9 +937,6 @@ class FieldBase implements \Serializable
 				$arr = (array)$props;
 				foreach ($arr as $key=>$one) {
 					switch ($key) {
-					 case 'formdata':
-						$this->$key = NULL; //upstream must set ref to relevant FormData-object
-						break;
 					 case 'ValidationTypes': //if set, an array of choices suitable for populating pulldowns
 					 case 'Value':
 					 case 'XtraProps':
