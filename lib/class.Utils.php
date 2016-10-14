@@ -37,12 +37,12 @@ class Utils
 		require_once($path.'CacheInterface.php'); //prevent repeated creation crash
 		require_once($path.'CacheBase.php');
 
-		$config = cmsms()->GetConfig();
+		$config = \cmsms()->GetConfig();
 		$url = (empty($_SERVER['HTTPS'])) ? $config['root_url'] : $config['ssl_url'];
 
 		$basedir = $config['uploads_path'];
 		if (is_dir($basedir)) {
-			$rel = $mod->GetPreference('pref_uploadsdir');
+			$rel = $mod->GetPreference('uploads_dir');
 			if ($rel) {
 				$basedir .= DIRECTORY_SEPARATOR . $rel;
 			}
@@ -475,7 +475,7 @@ class Utils
 
 	/**
 	GetFormOption:
-	Get the value of option @optname, in the Options array in @formdata
+	Get the value of option @optname, in the XtraProps array in @formdata
 	@formdata: reference to FormData form data object
 	@optname: name of option to find
 	@default: optional value to return if the requested option value doesn't exist, default ''
@@ -483,8 +483,8 @@ class Utils
 	*/
 	public static function GetFormOption(&$formdata, $optname, $default='')
 	{
-		if (isset($formdata->Options[$optname]))
-			return $formdata->Options[$optname];
+		if (isset($formdata->XtraProps[$optname]))
+			return $formdata->XtraProps[$optname];
 		else
 			return $default;
 	}
@@ -869,6 +869,7 @@ EOS;
 	{
 		global $smarty;
 		if ($mod->before20) {
+//			$smarty->clearAllAssign();
 			$smarty->assign($tplvars);
 			return $mod->ProcessTemplate($tplname);
 		} else {
