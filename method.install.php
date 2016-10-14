@@ -26,24 +26,26 @@ $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_form',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
 $db->CreateSequence($pre.'module_pwf_form_seq');
-$db->Execute('create index '.$pre.'module_pwf_form_idx on '.$pre.'module_pwf_form (alias)');
+$db->Execute('CREATE INDEX '.$pre.'module_pwf_form_idx ON '.$pre.'module_pwf_form (alias)');
 
 $flds = '
-option_id I(8) KEY,
+prop_id I(8) KEY,
 form_id I(8),
 name C(64),
-value X
+value C(64),
+longvalue B
 ';
-$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_form_opt',$flds,$taboptarray);
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_formdata',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pre.'module_pwf_form_opt_seq');
-$db->Execute('create index '.$pre.'module_pwf_form_opt_idx on '.$pre.'module_pwf_form_opt (form_id)');
+$db->CreateSequence($pre.'module_pwf_formdata_seq');
+$db->Execute('CREATE INDEX '.$pre.'module_pwf_formdata_idx ON '.$pre.'module_pwf_formdata (form_id)');
 
 $flds = '
 field_id I(8) KEY,
 form_id I(8),
 name C(96),
+alias C(32),
 type C(48),
 order_by I(2)
 ';
@@ -54,17 +56,18 @@ $db->CreateSequence($pre.'module_pwf_field_seq');
 $db->Execute('CREATE INDEX '.$pre.'module_pwf_field_idx ON '.$pre.'module_pwf_field (form_id)');
 
 $flds = '
-option_id I(8) KEY,
+prop_id I(8) KEY,
 field_id I(8),
 form_id I(8),
 name C(256),
-value X
+value C(64),
+longvalue B
 ';
-$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_field_opt',$flds,$taboptarray);
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_fielddata',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pre.'module_pwf_field_opt_seq');
-$db->Execute('CREATE INDEX '.$pre.'module_pwf_field_opt_idx ON '.$pre.'module_pwf_field_opt (field_id,form_id)');
+$db->CreateSequence($pre.'module_pwf_fielddata_seq');
+$db->Execute('CREATE INDEX '.$pre.'module_pwf_fielddata_idx ON '.$pre.'module_pwf_fielddata (field_id,form_id)');
 
 $flds = '
 record_id I(4) KEY,
