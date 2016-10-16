@@ -109,7 +109,7 @@ foreach ($formdata->FieldOrders as $one) {
 //	$oneset->css_class = $one->GetOption('css_class');
 	$oneset->display = $one->DisplayInForm()?1:0;
 //	$oneset->error = $one->GetOption('is_valid',TRUE)?'':$one->ValidationMessage;
-	$oneset->error = $one->validated?'':$one->ValidationMessage;
+	$oneset->error = $one->valid?'':$one->ValidationMessage;
 	$oneset->has_label = $one->HasLabel();
 	$oneset->helptext = $one->GetOption('helptext');
 	if ($oneset->helptext) {
@@ -147,7 +147,7 @@ EOS;
 	$oneset->smarty_eval = $one->GetSmartyEval()?1:0;
 	$oneset->type = $one->GetDisplayType();
 //	$oneset->valid = $one->GetOption('is_valid',TRUE)?1:0;
-	$oneset->valid = $one->validated?1:0; //TODO method needed
+	$oneset->valid = $one->valid?1:0; //TODO method needed
 	$oneset->values = $one->GetDisplayableOptionValues(); //TODO
 
 	$tplvars[$alias] = $oneset;
@@ -163,44 +163,52 @@ $baseurl = $this->GetModuleURLPath();
 $tplvars['help_icon'] = '<img src="'.$baseurl.'/images/info-small.gif" alt="'.
 	$this->Lang('help').'" title="'.$this->Lang('help_help').'" />';
 
-$buttonjs = PWForms\Utils::GetFormOption($formdata,'submit_javascript');
-
-if (PWForms\Utils::GetFormOption($formdata,'input_button_safety')) {
-	$buttonjs .= ' onclick="return LockButton();"';
-	$formdata->jsfuncs[] = <<<EOS
-var submitted = false;
-function LockButton () {
- if (!submitted) {
-  submitted = true;
-  var item = document.getElementById("{$id}submit");
-  if (item != NULL) {
-   setTimeout(function() {item.disabled = true},0);
-  }
-  return true;
- }
- return false;
-}
-EOS;
-}
-
 //TODO id="*pwfp_prev" NOW id="*prev"
 if ($formdata->Page > 1)
 	$tplvars['prev'] = '<input type="submit" id="'.$id.'prev" class="cms_submit submit_prev" name="'.
 	$id.$formdata->current_prefix.'prev" value="'.
-	PWForms\Utils::GetFormOption($formdata,'prev_button_text',$this->Lang('previous')).'" '.
-	$buttonjs.' />';
+	PWForms\Utils::GetFormOption($formdata,'prev_button_text',$this->Lang('previous')).'"/>';
 else
 	$tplvars['prev'] = NULL;
 
 if ($formdata->Page < $formdata->PagesCount) {
 	$tplvars['submit'] = '<input type="submit" id="'.$id.'submit" class="cms_submit submit_next" name="'.
 	$id.$formdata->current_prefix.'submit" value="'.
-	PWForms\Utils::GetFormOption($formdata,'next_button_text',$this->Lang('next')).'" '.
-	$buttonjs.' />';
+	PWForms\Utils::GetFormOption($formdata,'next_button_text',$this->Lang('next')).'"/>';
 } else {
 	$tplvars['submit'] = '<input type="submit" id="'.$id.'submit" class="cms_submit submit_current" name="'.
 	$id.$formdata->current_prefix.'done" value="'.
-	PWForms\Utils::GetFormOption($formdata,'submit_button_text',$this->Lang('submit')).'" '.
-	$buttonjs.' />';
+	PWForms\Utils::GetFormOption($formdata,'submit_button_text',$this->Lang('submit')).'"/>';
+}
+
+$usersafejs = PWForms\Utils::GetFormOption($formdata,'submit_javascript');
+if ($usersafejs)
+	$usersafejs = PHP_EOL.'   '.$usersafejs;
+if (PWForms\Utils::GetFormOption($formdata,'input_button_safety')) {
+	$safejs = <<<EOS
+
+   setTimeout(function() {
+    $('input[class*=" submit_"]').each(function() {
+     this.disabled = true;
+    });
+   },0);
+EOS;
+} else {
+	$safejs = '';
+} 
+
+if ($usersafejs || $safejs) {
+	$formdata->jsfuncs[] =<<<EOS
+var submitted = false;
+EOS;
+	$formdata->jsloads[] =<<<EOS
+ $('input[class*=" submit_"]').click(function() {
+  if (!submitted) {{$usersafejs}
+   submitted = true;{$safejs}
+   return true;
+  }
+  return false;
+ });
+EOS;
 }
 //don't bother pushing $js* to $tplvars - will echo directly
