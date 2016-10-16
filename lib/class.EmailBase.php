@@ -81,7 +81,7 @@ class EmailBase extends FieldBase
 						$mod->CreateTextArea(FALSE,$id,
 						//($this->GetOption('html_email',0)?$message:htmlspecialchars($message))
 						$message,'opt_email_template','pwf_tallarea','','','',50,15,'','html'),
-						'<br /><br />'.$buttons[0].'&nbsp'.$buttons[1]);
+						'<br /><br />'.$buttons[0].'&nbsp;'.$buttons[1]);
 		//show variables-help on advanced tab
 		return array($main,$adv,$jsfuncs,'varshelpadv');
 	}

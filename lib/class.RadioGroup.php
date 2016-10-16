@@ -80,7 +80,7 @@ class RadioGroup extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_radio_separator'),
 						$mod->CreateInputText($id,'opt_radio_separator',
-							$this->GetOption('radio_separator','&nbsp;&nbsp'),15,25),
+							$this->GetOption('radio_separator','&nbsp;&nbsp;'),15,25),
 						$mod->Lang('help_radio_separator'));
 		if ($this->optionAdd) {
 			$this->AddOptionElement('button_name','');
@@ -137,7 +137,7 @@ class RadioGroup extends FieldBase
 		if ($names) {
 			$ret = array();
 			$mod = $this->formdata->formsmodule;
-			$sep = $this->GetOption('radio_separator','&nbsp;&nbsp');
+			$sep = $this->GetOption('radio_separator','&nbsp;&nbsp;');
 			$cnt = count($names);
 			$b = 1;
 			foreach ($names as $i=>&$one) {
