@@ -12,12 +12,12 @@ class FieldBase implements \Serializable
 	public $formdata; //reference to FormData object for the form to which this field belongs
 	//field status
 	public $loaded = FALSE;
-	public $validated = TRUE;
+	public $valid = TRUE; //TRUE unless validation has failed
 	//field properties
-	public $ChangeRequirement = TRUE; //whether admin user may change $Required
+	public $ChangeRequirement = TRUE; //whether admin user may change self::Required
 	public $DisplayExternal = FALSE;
 	public $DisplayInForm = TRUE;
-	public $DisplayInSubmission = TRUE; //whether field value is echoed in submission template (if used) (effectively ~ ::$IsInput)
+	public $DisplayInSubmission = TRUE; //whether field value is echoed in submission template (if used) (effectively ~ self::IsInput)
 	public $DispositionPermitted = TRUE;
 	public $FormId = 0;
 	public $HasAddOp = FALSE;
@@ -38,13 +38,13 @@ class FieldBase implements \Serializable
 	public $NeedsDiv = TRUE;
 	public $OrderBy = 0; //form display-order
 	public $Required = FALSE; //to XtraProps[] ?
-	public $SmartyEval = FALSE; //TRUE for textinput field whose value is to be processed via smarty
+	public $SmartyEval = FALSE; //TRUE for textinput field whose value is to be processed via smarty before display
 	public $Type = '';
 	public $ValidationMessage = ''; //post-validation error message, or ''
 	public $ValidationType = 'none';
 	public $ValidationTypes; //if set, an array of choices suitable for populating pulldowns to XtraProps[] ?
 	public $Value; //when set, can be scalar or array, with all content processed by Utils::html_myentities_decode()
-	public $XtraProps = array();
+	public $XtraProps = array(); //container for other properties
 
 	public function __construct(&$formdata, &$params)
 	{
@@ -351,7 +351,7 @@ class FieldBase implements \Serializable
 
 	public function IsValid()
 	{
-		return $this->validated;
+		return $this->valid;
 	}
 
 	public function GetValidationMessage()
@@ -411,7 +411,7 @@ class FieldBase implements \Serializable
 		$cls = $this->GetOption('css_class');
 		if ($this->Required)
 			$cls .= ' required';
-		if (!$this->validated)
+		if (!$this->valid)
 			$cls .= ' invalid_field';
 		if ($extra)
 			$cls .= ' '.$extra;
@@ -885,9 +885,9 @@ class FieldBase implements \Serializable
 	*/
 	public function Validate($id)
 	{
-		$this->validated = TRUE;
+		$this->valid = TRUE;
 		$this->ValidationMessage = '';
-		return array($this->validated,$this->ValidationMessage);
+		return array($this->valid,$this->ValidationMessage);
 	}
 
 	// Subclass this to do stuff (e.g. modify other fields) after validation
