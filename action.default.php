@@ -27,7 +27,7 @@ WHERE NOT EXISTS (SELECT 1 FROM '.$pre.'module_pwf_ip_log T WHERE T.src=?)';
 
 if (!isset($params['form_id']) && isset($params['form'])) // got the form by alias
 	$params['form_id'] = PWForms\Utils::GetFormIDFromAlias($params['form']);
-if (empty($params['form_id'])) {
+if (empty($params['form_id']) || $params['form_id'] == -1) {
 	echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
 		'title'=>$this->Lang('title_aborted'),
 		'message'=>$this->Lang('error_data'),
@@ -258,7 +258,7 @@ $Crash1;
 $this->Crash2();
 					$allvalid = FALSE;
 					$one->SetOption('is_valid',FALSE);
-					$one->validated = FALSE;
+					$one->valid = FALSE;
 					$one->ValidationMessage = $this->Lang('please_enter_a_value',$one->GetName());
 					$message[] = $one->ValidationMessage;
 				} elseif ($one->GetValue()) {
@@ -445,7 +445,7 @@ $this->Crash2();
 	}
 } else { //first time
 	$funcs = new PWForms\FormOperations();
-	$formdata = $funcs->Load($this,$id,$params,$form_id);
+	$formdata = $funcs->Load($this,$form_id,$id,$params);
 	if (!$formdata) {
 		unset($funcs);
 		echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
