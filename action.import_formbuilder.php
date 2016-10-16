@@ -6,8 +6,9 @@
 
 if (!$this->CheckAccess('ModifyPFForms')) exit;
 
-function Match_Browses(&$db, $pre)
-{
+if (!function_exists('Match_Browses')) {
+ function Match_Browses(&$db, $pre)
+ {
 	$sql = 'SELECT * FROM '.$pre.'module_pwf_trans ORDER BY isform,trans_id';
 	$data = $db->GetAssoc($sql);
 	if ($data) {
@@ -27,11 +28,11 @@ function Match_Browses(&$db, $pre)
 		}
 		unset($row);
 	}
-}
+ }
 
 //for CMSMS 2+
-function MySetTemplate($type, $id, $val)
-{
+ function MySetTemplate($type, $id, $val)
+ {
 	static $editors = NULL;
 	if ($editors === NULL) {
 		$editors = array();
@@ -73,7 +74,7 @@ EOS;
 	$tpl->set_additional_editors($editors); // !too bad if permissions change? or handle that event ?
 	$tpl->set_content($val);
 	$tpl->save();
-}
+ }
 
 /* REPLACEMENTS ...
 	$fld_X					$fld_Y
@@ -90,6 +91,7 @@ EOS;
 	$fb_*					$*
 	fbr_*					pwf_*
 	fb_invalid				invalid_field
+	field_helptext			helptext
 	FormBuilder				PWForms
 	$in_formbrowser			$in_browser
 	$fbr_id					$browser_id
@@ -114,8 +116,8 @@ EOS;
 		<div class="captcha">{$graphic_captcha}{$title_captcha}<br />{$input_captcha}<br /></div>
 	{/if}
 */
-function Update_Templates(&$mod, &$db, $pre, $oldfid, $newfid)
-{
+ function Update_Templates(&$mod, &$db, $pre, $oldfid, $newfid)
+ {
 	$finds = array(
 		'FormBuilder',
 		'$one->css_class',
@@ -134,6 +136,7 @@ function Update_Templates(&$mod, &$db, $pre, $oldfid, $newfid)
 		'$fb_',
 		'$fbr_id',
 		'fbr_',
+		'field_helptext',
 		'$in_formbrowser',
 		'$sub_form_name',
 		'$sub_url',
@@ -161,6 +164,7 @@ function Update_Templates(&$mod, &$db, $pre, $oldfid, $newfid)
 		'$',
 		'$browser_id',
 		'pwf_',
+		'helptext',
 		'$in_browser',
 		'$form_name',
 		'$form_url',
@@ -245,8 +249,7 @@ function Update_Templates(&$mod, &$db, $pre, $oldfid, $newfid)
 				$tpl = str_replace($finds,$repls,$lval);
 			}
 			if ($sval || $lval) {
-				$len = strlen($tpl);
-				$args = ($len <= PWForms::LENSHORTVAL) ?
+				$args = (strlen($tpl) <= PWForms::LENSHORTVAL) ?
 					array($tpl,NULL,$row['prop_id']):
 					array(NULL,$tpl,$row['prop_id']);
 				$db->Execute($sql,$args);
@@ -254,21 +257,31 @@ function Update_Templates(&$mod, &$db, $pre, $oldfid, $newfid)
 		}
 		unset($row);
 	}
-}
+ }
 
-function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, &$fieldrow)
-{
-	$sql = 'SELECT * FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY prop_id';
+ function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, $oldtype, &$xtraopts)
+ {
+	$sql = 'SELECT * FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY option_id';
 	$data = $db->GetArray($sql,array($oldfid,$oldf));
 	if ($data) {
-		$extras = array();
-		$extras['alias'] = PWForms\Utils::MakeAlias($fieldrow['name'],24); //length conform to FieldBase::GetVariableName()
-		if ($fieldrow['hide_label']) $extras['hide_label'] = 1;
-		if ($fieldrow['required']) $extras['required'] = 1;
-		if ($fieldrow['validation_type']) $extras['validation_type'] = trim($fieldrow['validation_type']);
+		$fbfields = array_keys($data[0]);
+		$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_fielddata');
+		if (!$pfrow) {
+			$db->Execute('INSERT INTO '.$pre.'module_pwf_fielddata (prop_id) VALUES (-1)');
+			$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_fielddata');
+			$db->Execute('DELETE FROM '.$pre.'module_pwf_fielddata WHERE prop_id=-1');
+		}
+		$pwfields = array_keys($pfrow);
+		$pfrow = array_fill_keys($pwfields,NULL); //default values
+
+		$namers = implode(',',$pwfields);
+		$fillers = str_repeat('?,',count($pwfields)-1);
+		$sql = 'INSERT INTO '.$pre.'module_pwf_fielddata ('.$namers.') VALUES ('.$fillers.'?)';
+		//TODO support insert into $pre.'module_pwf_field' if relevant
+
 		//some field-types simply repeat the same option-name (relying on save-order for any reconciliation!)
 		//we are more careful!
-		$sequence = in_array($fieldrow['type'],array(
+		$sequence = in_array($oldtype,array(
 		 'CheckboxGroupField',
 		 'DispositionDirector',
 		 'DispositionEmail',
@@ -283,115 +296,150 @@ function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, &$fieldrow)
 		if ($sequence)
 			$desc = '';
 
-		$sql = 'INSERT INTO '.$pre.'module_pwf_fielddata
-(prop_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
-		foreach ($data as $row) {
-			$oid = $db->GenID($pre.'module_pwf_fielddata_seq');
-			$nm = $row['name'];
+		foreach ($data as $fbrow) {
+			extract($pfrow); //NULL default values
+			extract($fbrow);
+			if (!$name)
+				$name = $this->Lang('none');
+			//existing option-value prevails
+			if (isset($xtraopts[$name]))
+				unset($xtraopts[$name]);
 			if ($sequence) {
-				if ($nm != $desc) {
-					$desc = $nm;
+				if ($name != $desc) {
+					$desc = $name;
 					$indx = 1;
-				} else
+				} else {
 					$indx++;
-				$nm .= $indx;
+				}
+				$name .= $indx;
 			}
-			$db->Execute($sql,array($oid,$newf,$newfid,$nm,$row['value']));
-			//existing option-value prevails over actions-table 'transfer'
-			if (isset($extras[$row['name']]))
-				$extras[$row['name']] = FALSE;
+			$value = $value;
+			$longvalue = $longvalue;
+			if (strlen($value) > PWForms::LENSHORTVAL) {
+				$longvalue = $value;
+				$value = NULL;
+			}
+			$field_id = $newf;
+			$form_id = $newfid;
+
+			$pid = $db->GenID($pre.'module_pwf_fielddata_seq');
+			$args = array($pid);
+			foreach ($pwfields as $one) {
+				if ($one != 'prop_id') {
+					$args[] = $$one;
+				}
+			}
+			$db->Execute($sql,$args);
 		}
-		foreach ($extras as $name=>$value) {
-			if ($value) {
-				$oid = $db->GenID($pre.'module_pwf_fielddata_seq');
-				$db->Execute($sql,array($oid,$newf,$newfid,$name,$value));
+
+		foreach ($xtraopts as $nm=>$val) {
+//			if ($val) {
+			extract($pfrow); //NULL default values
+			$name = ($nm) ? $nm:$this->Lang('none');
+			if ($name == 'alias') {
+				$val = PWForms\Utils::MakeAlias($val,24); //length conform to FieldBase::GetVariableName()
 			}
+			if (strlen($val) > PWForms::LENSHORTVAL) {
+				$longvalue = $val;
+			} else {
+				$value = $val;
+			}
+			$field_id = $newf;
+			$form_id = $newfid;
+			$pid = $db->GenID($pre.'module_pwf_fielddata_seq');
+			$args = array($pid);
+			foreach ($pwfields as $one) {
+				if ($one != 'prop_id') {
+					$args[] = $$one;
+				}
+			}
+			$db->Execute($sql,$args);
+//			}
 		}
 	}
-}
+ }
 
-function Get_Fields(&$db, $pre, $oldfid, $newfid)
-{
+ function Get_Fields(&$db, $pre, $oldfid, $newfid)
+ {
 	$sql = 'SELECT * FROM '.$pre.'module_fb_field WHERE form_id=? ORDER BY order_by,field_id';
 	$data = $db->GetArray($sql,array($oldfid));
 	if ($data) {
+		$fbfields = array_keys($data[0]);
+		$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_field');
+		if (!$pfrow) {
+			$db->Execute('INSERT INTO '.$pre.'module_pwf_field (field_id) VALUES (-1)');
+			$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_field');
+			$db->Execute('DELETE FROM '.$pre.'module_pwf_field WHERE field_id=-1');
+		}
+		$pwfields = array_keys($pfrow);
+		$pfrow = array_fill_keys($pwfields,NULL); //default values
+
+		$namers = implode(',',$pwfields);
+		$fillers = str_repeat('?,',count($pwfields)-1);
+		$sql = 'INSERT INTO '.$pre.'module_pwf_field ('.$namers.') VALUES ('.$fillers.'?)';
+		$sql2 = 'INSERT INTO '.$pre.'module_pwf_trans (old_id,new_id,isform) VALUES (?,?,0)';
+		//these are used after type has been cleaned up and some duplicates done
 		$renames = array(
-		 'ButtonField'=>'Button',
-		 'CatalogerItemsField'=>'CatalogerItems',
-		 'CCEmailAddressField'=>'EmailCCAddress',
-		 'CheckboxExtendedField'=>'CheckboxExtended',
-		 'CheckboxField'=>'Checkbox',
-		 'CheckboxGroupField'=>'CheckboxGroup',
-		 'CompanyDirectoryField'=>'CompanyDirectory',
-		 'ComputedField'=>'Computed',
-		 'CountryPickerField'=>'CountryPicker',
-		 'DatePickerField'=>'DatePicker',
-		 'DispositionDeliverToEmailAddressField'=>'EmailOne',
-		 'DispositionDirector'=>'EmailDirector',
-		 'DispositionEmail'=>'SystemEmail',
-		 'DispositionEmailBasedFrontendFields'=>'CustomEmail',
-		 'DispositionEmailConfirmation'=>'EmailConfirmation',
-		 'DispositionEmailFromFEUProperty'=>'EmailFEUProperty',
-		 'DispositionEmailSiteAdmin'=>'EmailSiteAdmin',
-		 'DispositionFile'=>'SharedFile',
-		 'DispositionFileDirector'=>'FileDirector',
-		 'DispositionForm'=>'SubmitForm',
-		 'DispositionFormBrowser'=>'FormBrowser',
-		 'DispositionFromEmailAddressField'=>'UserEmail',
-		 'DispositionMultiselectFileDirector'=>'MultiselectFileDirector',
-		 'DispositionPageRedirector'=>'PageRedirector',
-		 'DispositionUniqueFile'=>'UniqueFile',
-		 'DispositionUserTag'=>'SubmissionTag',
-		 'FieldsetEnd'=>'FieldsetEnd',
-		 'FieldsetStart'=>'FieldsetStart',
-		 'FileUploadField'=>'FileUpload',
-		 'FromEmailAddressAgainField'=>'EmailAddressAgain',
-		 'FromEmailAddressField'=>'EmailAddress',
-		 'FromEmailNameField'=>'EmailSender',
-		 'FromEmailSubjectField'=>'EmailSubject',
-		 'HiddenField'=>'Hidden',
-		 'LinkField'=>'Link',
-		 'ModuleInterfaceField'=>'InputTemplate',
-		 'MultiselectField'=>'Multiselect',
-		 'OzStatePickerField'=>'OzStatePicker',
-		 'PageBreakField'=>'PageBreak',
-		 'PasswordAgainField'=>'PasswordAgain',
-		 'PasswordField'=>'Password',
-		 'ProvincePickerField'=>'ProvincePicker',
-		 'PulldownField'=>'Pulldown',
-		 'RadioGroupField'=>'RadioGroup',
-		 'SiteAdminField'=>'EmailSiteAdmin',
-		 'StatePickerField'=>'StatePicker',
-		 'StaticTextField'=>'StaticText',
-		 'SystemLinkField'=>'SystemLink',
-		 'TextAreaField'=>'TextArea',
-		 'TextField'=>'Text',
-		 'TextFieldExpandable'=>'TextExpandable',
-		 'TimePickerField'=>'TimePicker',
-		 'UniqueIntegerField'=>'UniqueInteger',
-		 'UserTagField'=>'InputTag',
-		 'YearPullDownField'=>'YearPulldown'
+		 'DeliverToEmailAddress'=>'EmailOne',
+		 'Director'=>'EmailDirector',
+		 'Email'=>'SystemEmail',
+		 'EmailBasedFrontends'=>'CustomEmail',
+		 'EmailFromFEUProperty'=>'EmailFEUProperty',
+		 'File'=>'SharedFile',
+		 'Form'=>'SubmitForm',
+		 'FromEmailAddress'=>'EmailAddress',
+		 'FromEmailAddressAgain'=>'EmailAddressAgain',
+		 'FromEmailName'=>'EmailSender',
+		 'FromEmailSubject'=>'EmailSubject',
+		 'ModuleInterface'=>'InputTemplate',
+		 'setEnd'=>'FieldsetEnd',
+		 'setStart'=>'FieldsetStart',
+		 'SiteAdmin'=>'EmailSiteAdmin',
+		 'UserTag'=>'InputTag',
 		);
-		$sql = 'INSERT INTO '.$pre.'module_pwf_field
-(field_id,form_id,name,type,order_by) VALUES (?,?,?,?,?)';
-		$sql2 = 'INSERT INTO '.$pre.'module_pwf_trans
-(old_id,new_id,isform) VALUES (?,?,0)';
-		foreach ($data as $row) {
-			$oldf = (int)$row['field_id'];
+
+		foreach ($data as $fbrow) {
+			extract($pfrow); //default values
+			extract($fbrow);
+			$form_id = $newfid;
+			$oldf = (int)$field_id;
+			$oldtype = $type;
+			$type = str_replace(
+				array('Field','DispositionFromEmailAddress',DispositionUserTag,'Disposition'),
+				array('','UserEmail','SubmissionTag',''),$type);
+			if (array_key_exists($type,$renames)) {
+				$type = $renames[$type];
+			}
+			$done = array();
 			$newf = $db->GenID($pre.'module_pwf_field_seq');
-			$newt = (array_key_exists($row['type'],$renames)) ? $renames[$row['type']] : $row['type'];
-			$db->Execute($sql,array($newf,$newfid,$row['name'],$newt,$row['order_by']));
+			$args = array($newf);
+			foreach ($pwfields as $one) {
+				$done[] = $one;
+				if ($one != 'field_id') {
+					$args[] = $$one;
+				}
+			}
+			$ares = $db->Execute($sql,$args);
 			$db->Execute($sql2,array($oldf,$newf));
-			Get_FieldOpts($db,$pre,$oldfid,$newfid,$oldf,$newf,$row);
+
+			$more = array();
+			$xopts = array_diff($fbfields,$done);
+			if ($xopts) {
+				foreach ($xopts as $one) {
+					$more[$one] = $$one;
+				}
+			}
+			Get_FieldOpts($db,$pre,$oldfid,$newfid,$oldf,$newf,$oldtype,$more);
 		}
 	}
-}
+ }
 
-function Get_Opts(&$mod, &$db, $pre, $oldfid, $newfid)
-{
+ function Get_FormOpts(&$mod, &$db, $pre, $oldfid, $newfid, &$xtraopts)
+ {
 	$sql = 'SELECT * FROM '.$pre.'module_fb_form_attr WHERE form_id=? ORDER BY form_attr_id';
 	$data = $db->GetArray($sql,array($oldfid));
 	if ($data) {
+		//TODO support insert into $pre.'module_pwf_form' if relevant
 		$sql = 'INSERT INTO '.$pre.'module_pwf_formdata
 (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
 		foreach ($data as $row) {
@@ -428,10 +476,14 @@ function Get_Opts(&$mod, &$db, $pre, $oldfid, $newfid)
 				break;
 			}
 			$newid = $db->GenID($pre.'module_pwf_formdata_seq');
-			$db->Execute($sql,array($newid,$newfid,$name,$val,$longval));
+			$ares = $db->Execute($sql,array($newid,$newfid,$name,$val,$longval));
 		}
 	}
-}
+	if ($xtraopts) {
+$this->Crash(); //TODO
+	}
+ }
+} // !function_exists
 
 if (isset($params['import'])) {
 	$pre = cms_db_prefix();
@@ -439,26 +491,6 @@ if (isset($params['import'])) {
 	$sql = 'SELECT * FROM '.$pre.'module_fb_form ORDER BY form_id';
 	$oldforms = $db->GetArray($sql);
 	if ($oldforms) {
-		$funcs = new PWForms\FormOperations();
-		$sql = 'INSERT INTO '.$pre.'module_pwf_form
-(form_id,name,alias) VALUES (?,?,?)';
-		$renums = array();
-		foreach ($oldforms as $row) {
-			$fid = $db->GenID($pre.'module_pwf_form_seq');
-			$alias = $row['alias'];
-			if ($alias)
-				$alias = PWForms\Utils::MakeAlias($alias,18); //maybe shorten
-			else
-				$alias = PWForms\Utils::MakeAlias($row['name'],18);
-			$ta = $alias;
-			$i = 1;
-			while (!$funcs->NewID(FALSE,$alias)) {
-				$alias = $ta."[$i]";
-				$i++;
-			}
-			$db->Execute($sql,array($fid,$row['name'],$alias));
-			$renums[(int)$row['form_id']] = $fid;
-		}
 
 		if (!$this->before20) {
 			$types = CmsLayoutTemplateType::load_all_by_originator('FormBuilder');
@@ -482,13 +514,65 @@ $this->Crash();
 			}
 		}
 
-		$sql = 'INSERT INTO '.$pre.'module_pwf_trans
-(old_id,new_id,isform) VALUES (?,?,1)';
-		foreach ($renums as $old=>$new) {
-			$db->Execute($sql,array($old,$new));
-			Get_Opts($this,$db,$pre,$old,$new);
-			Get_Fields($db,$pre,$old,$new);
-			Update_Templates($this,$db,$pre,$old,$new);
+		$fbfields = array_keys($oldforms[0]);
+		$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_form');
+		if (!$pfrow) {
+			$db->Execute('INSERT INTO '.$pre.'module_pwf_form (form_id) VALUES (-1)');
+			$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_form');
+			$db->Execute('DELETE FROM '.$pre.'module_pwf_form WHERE form_id=-1');
+		}
+		$pwfields = array_keys($pfrow);
+		$pfrow = array_fill_keys($pwfields,NULL); //default values
+
+		$namers = implode(',',$pwfields);
+		$fillers = str_repeat('?,',count($pwfields)-1);
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form ('.$namers.') VALUES ('.$fillers.'?)';
+		$sql2 = 'INSERT INTO '.$pre.'module_pwf_trans (old_id,new_id,isform) VALUES (?,?,1)';
+
+		$funcs = new PWForms\FormOperations();
+//		$renums = array(); //keys = FormBuilder id, values = PowerForms id
+		foreach ($oldforms as $fbrow) {
+			extract($pfrow); //default values
+			extract($fbrow);
+			if (!$name) {
+				$name = $this->Lang('none');
+			}
+			if (!$alias) {
+				$alias = $name;
+			}
+			$alias = PWForms\Utils::MakeAlias($alias,18); //maybe shorten
+			$ta = $alias;
+			$i = 1;
+			while (!$funcs->NewID(FALSE,$ta)) {
+				$ta = $alias."[$i]";
+				$i++;
+			}
+			$alias = $ta;
+
+			$done = array();
+			$fid = $db->GenID($pre.'module_pwf_form_seq');
+			$args = array($fid);
+			foreach ($pwfields as $one) {
+				$done[] = $one;
+				if ($one != 'form_id') {
+					$args[] = $$one;
+				}
+			}
+			$db->Execute($sql,$args);
+//			$renums[$form_id] = $fid;
+			$db->Execute($sql2,array($form_id,$fid));
+
+			$more = array();
+			$xopts = array_diff($fbfields,$done);
+			if ($xopts) {
+				foreach ($xopts as $one) {
+					$more[$one] = $$one;
+				}
+			}
+
+			Get_FormOpts($this,$db,$pre,$form_id,$fid,$more);
+			Get_Fields($db,$pre,$form_id,$fid);
+			Update_Templates($this,$db,$pre,$form_id,$fid);
 			//data may've already been imported by the browser module
 			$rs = $db->SelectLimit('SELECT * FROM '.$pre.'module_pwbr_browser',1);
 			if ($rs) {
