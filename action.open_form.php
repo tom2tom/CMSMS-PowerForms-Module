@@ -23,12 +23,12 @@ $funcs = new PWForms\FormOperations();
 if (isset($params['formdata'])) {
 	$formdata = $cache->get($params['formdata']);
 	if (is_null($formdata) || !$formdata->Fields) {
-		$formdata = $funcs->Load($this,$id,$params,$form_id);
+		$formdata = $funcs->Load($this,$form_id,$id,$params,TRUE);
 		$params['formdata'] = base64_encode($formdata->Id.session_id()); //must persist across requests
 	} else
 		$formdata->formsmodule = &$this;
 } else { //first time
-	$formdata = $funcs->Load($this,$id,$params,$form_id);
+	$formdata = $funcs->Load($this,$form_id,$id,$params,TRUE);
 	$params['formdata'] = base64_encode($formdata->Id.session_id());
 }
 

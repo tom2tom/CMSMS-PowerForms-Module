@@ -27,7 +27,7 @@ if (isset($params['formdata'])) {
 	if (is_null($formdata) || !$formdata->Fields) {
 		//probably the system has been shut down
 $this->Crash();
-//		$formdata = $funcs->Load($this,$id,$params,$params['form_id']);
+//		$formdata = $funcs->Load($this,$params['form_id'],$id,$params);
 //		$params['formdata'] = base64_encode($formdata->Id.session_id()); //must persist across requests
 		$this->Redirect($id,'defaultadmin','',array('message'=>$this->PrettyMessage('error_data',FALSE)));
 	}
