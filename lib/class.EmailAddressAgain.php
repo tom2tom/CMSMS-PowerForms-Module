@@ -74,7 +74,7 @@ class EmailAddressAgain extends EmailBase
 
 	public function Validate($id)
 	{
-		$this->validated = TRUE;
+		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 
 		$field_to_validate = $this->GetOption('field_to_validate');
@@ -83,7 +83,7 @@ class EmailAddressAgain extends EmailBase
 			foreach ($this->formdata->Fields as &$one) {
 				if ($one->Name == $field_to_validate) {
 					if ($one->GetValue() != $this->Value) {
-						$this->validated = FALSE;
+						$this->valid = FALSE;
 						$this->ValidationMessage = $this->formdata->formsmodule->Lang('email_address_does_not_match',$field_to_validate);
 					}
 					break;
@@ -91,6 +91,6 @@ class EmailAddressAgain extends EmailBase
 			}
 			unset($one);
 		}
-		return array($this->validated,$this->ValidationMessage);
+		return array($this->valid,$this->ValidationMessage);
 	}
 }

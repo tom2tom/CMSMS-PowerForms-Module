@@ -134,13 +134,13 @@ class SiteAdmin extends FieldBase
 	public function Validate($id)
 	{
 		if (property_exists($this,'Value') && $this->Value) {
-			$this->validated = TRUE;
+			$this->valid = TRUE;
 			$this->ValidationMessage = '';
 		} else {
-			$this->validated = FALSE;
+			$this->valid = FALSE;
 			$mod = $this->formdata->formsmodule;
 			$this->ValidationMessage = $mod->Lang('missing_type',$mod->Lang('admin'));
 		}
-		return array($this->validated,$this->ValidationMessage);
+		return array($this->valid,$this->ValidationMessage);
 	}
 }

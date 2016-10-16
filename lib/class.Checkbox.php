@@ -84,13 +84,13 @@ class Checkbox extends FieldBase
 
 	public function Validate($id)
 	{
-		$this->validated = TRUE;
+		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 
 		switch ($this->ValidationType) {
 		 case 'checked':
 			if (!property_exists($this,'Value') || !$this->Value) {
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$mod = $this->formdata->formsmodule;
 				$label = $this->GetOption('label',$mod->Lang('thebox'));
 				$this->ValidationMessage = $mod->Lang('you_must_check',$label);
@@ -99,6 +99,6 @@ class Checkbox extends FieldBase
 		 default:
 			break;
 		}
-		return array($this->validated,$this->ValidationMessage);
+		return array($this->valid,$this->ValidationMessage);
 	}
 }

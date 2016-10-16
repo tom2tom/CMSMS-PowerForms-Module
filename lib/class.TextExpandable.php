@@ -228,13 +228,13 @@ class TextExpandable extends FieldBase
 			}
 		}
 		if ($res) {
-			$this->validated = TRUE;
+			$this->valid = TRUE;
 			$this->ValidationMessage = '';
 		} else {
-			$this->validated = FALSE;
+			$this->valid = FALSE;
 			$this->ValidationMessage = implode('<br />',$messages);
 		}
 
-		return array($this->validated,$this->ValidationMessage);
+		return array($this->valid,$this->ValidationMessage);
 	}
 }

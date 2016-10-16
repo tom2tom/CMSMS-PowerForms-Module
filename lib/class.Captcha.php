@@ -140,18 +140,18 @@ class Captcha extends FieldBase
 			$this->Name = $this->RealName;
 			$this->RealName = FALSE;
 		}
-		$this->validated = TRUE;
+		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 		$mod = $this->formdata->formsmodule;
 		$captcha = $mod->getModuleInstance('Captcha');
 		if (!$captcha) { //should never happen
-			$this->validated = FALSE;
+			$this->valid = FALSE;
 			$this->ValidationMessage = $mod->Lang('error_module_captcha');
 		} elseif (!$captcha->CheckCaptcha($this->Value)) { //upstream migrated any $params['captcha_input] to this
-			$this->validated = FALSE;
+			$this->valid = FALSE;
 			$this->ValidationMessage = $this->GetOption('wrongtext',
 				$mod->Lang('captcha_wrong'));
 		}
-		return array($this->validated,$this->ValidationMessage);
+		return array($this->valid,$this->ValidationMessage);
 	}
 }

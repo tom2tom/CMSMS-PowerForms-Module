@@ -144,7 +144,7 @@ class CheckboxExtended extends FieldBase
 	public function Validate($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		$this->validated = TRUE;
+		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 
 		switch ($this->ValidationType) {
@@ -152,17 +152,17 @@ class CheckboxExtended extends FieldBase
 			break;
 		 case 'checked':
 			if ($this->Value['box'] == FALSE) {
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('you_must_check',$this->GetOption('box_label'));
 			}
 			break;
 			case 'empty':
 			if (empty($this->Value['text'])) {
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_a_value',$this->GetOption('text_label'));
 			}
 			break;
 		}
-		return array($this->validated,$this->ValidationMessage);
+		return array($this->valid,$this->ValidationMessage);
 	}
 }

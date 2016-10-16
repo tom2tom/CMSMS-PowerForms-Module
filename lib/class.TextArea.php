@@ -116,17 +116,17 @@ EOS;
 
 	public function Validate($id)
 	{
-		$this->validated = TRUE;
+		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 		$length = $this->GetOption('length');
 		if (is_numeric($length) && $length > 0) {
 			if ((strlen($this->Value)-1) > $length) {
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$mod = $this->formdata->formsmodule;
 				$this->ValidationMessage = $mod->Lang('please_enter_no_longer',$length);
 			}
 			$this->Value = substr($this->Value,0,$length+1);
 		}
-		return array($this->validated,$this->ValidationMessage);
+		return array($this->valid,$this->ValidationMessage);
 	}
 }

@@ -94,7 +94,7 @@ EOS;
 
 	public function Validate($id)
 	{
-		$this->validated = TRUE;
+		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 		$mod = $this->formdata->formsmodule;
 		switch ($this->ValidationType) {
@@ -104,7 +104,7 @@ EOS;
 			$length = $this->GetOption('length');
 			if (is_numeric($length) && $length > 0) {
 				if (strlen($this->Value) < $length) {
-					$this->validated = FALSE;
+					$this->valid = FALSE;
 					$this->ValidationMessage = $mod->Lang('please_enter_no_shorter',$length);
 				}
 			}
@@ -113,7 +113,7 @@ EOS;
 			if (property_exists($this,'Value') &&
 				!preg_match($this->GetOption('regex','/.*/'),$this->Value))
 			{
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
 			}
 			break;
@@ -121,11 +121,11 @@ EOS;
 			if (property_exists($this,'Value') &&
 				preg_match($this->GetOption('regex','/.*/'),$this->Value))
 			{
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
 			}
 			break;
 		}
-		return array($this->validated,$this->ValidationMessage);
+		return array($this->valid,$this->ValidationMessage);
 	}
 }

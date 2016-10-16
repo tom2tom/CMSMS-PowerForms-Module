@@ -29,13 +29,13 @@ class EmailSubject extends FieldBase
 	public function Validate($id)
 	{
 		if ($this->Value) {
-			$this->validated = TRUE;
+			$this->valid = TRUE;
 			$this->ValidationMessage = '';
 		} else {
-			$this->validated = FALSE;
+			$this->valid = FALSE;
 			$this->ValidationMessage = $mod->Lang('missing_type',$mod->Lang('subject'));
 		}
-		return array($this->validated,$this->ValidationMessage);
+		return array($this->valid,$this->ValidationMessage);
 	}
 
 	public function PreDisposeAction()

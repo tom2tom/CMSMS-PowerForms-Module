@@ -85,7 +85,7 @@ class Password extends FieldBase
 
 	public function Validate($id)
 	{
-		$this->validated = TRUE;
+		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 		$mod = $this->formdata->formsmodule;
 		switch ($this->ValidationType) {
@@ -94,7 +94,7 @@ class Password extends FieldBase
 		 case 'length':
 		 	$ln = $this->GetOption('min_length',0);
 			if ($ln > 0 && strlen($this->Value) < $ln) {
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_at_least',$ln);
 			}
 			break;
@@ -102,7 +102,7 @@ class Password extends FieldBase
 			if (property_exists($this,'Value') &&
 				!preg_match($this->GetOption('regex','/.*/'),$this->Value))
 			{
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
 			}
 			break;
@@ -110,11 +110,11 @@ class Password extends FieldBase
 			if (property_exists($this,'Value') &&
 				preg_match($this->GetOption('regex','/.*/'),$this->Value))
 			{
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
 			}
 			break;
 		}
-		return array($this->validated,$this->ValidationMessage);
+		return array($this->valid,$this->ValidationMessage);
 	}
 }

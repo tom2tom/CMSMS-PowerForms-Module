@@ -100,7 +100,7 @@ class Text extends FieldBase
 
 	public function Validate($id)
 	{
-		$this->validated = TRUE;
+		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 		$mod = $this->formdata->formsmodule;
 		switch ($this->ValidationType) {
@@ -109,7 +109,7 @@ class Text extends FieldBase
 		 case 'numeric':
 			if ($this->Value) $this->Value = trim($this->Value);
 			if ($this->Value && !preg_match('/^[\d\.\,]+$',$this->Value)) {
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_a_number',$this->Name);
 			}
 			break;
@@ -118,14 +118,14 @@ class Text extends FieldBase
 			if ($this->Value && !preg_match('/^\d+$/',$this->Value) ||
 				(int)$this->Value != $this->Value)
 			{
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_an_integer',$this->Name);
 			}
 			break;
 		 case 'email':
 			if ($this->Value) $this->Value = trim($this->Value);
 			if ($this->Value && !preg_match($mod->email_regex,$this->Value)) {
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_an_email',$this->Name);
 			}
 			break;
@@ -135,7 +135,7 @@ class Text extends FieldBase
 				!preg_match('/^([0-9][\s\.-]?)?(\(?[0-9]{3}\)?|[0-9]{3})[\s\.-]?([0-9]{3}[\s\.-]?[0-9]{4}|[a-zA-Z0-9]{7})(\s?(x|ext|ext.)\s?[a-zA-Z0-9]+)?$/',
 			$this->Value))
 			{
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_a_phone',$this->Name);
 			}
 			break;
@@ -143,7 +143,7 @@ class Text extends FieldBase
 			if ($this->Value &&
 				!preg_match($this->GetOption('regex','/.*/'),$this->Value))
 			{
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
 			}
 			break;
@@ -151,7 +151,7 @@ class Text extends FieldBase
 			if ($this->Value &&
 				preg_match($this->GetOption('regex','/.*/'),$this->Value))
 			{
-				$this->validated = FALSE;
+				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
 			}
 			break;
@@ -159,10 +159,10 @@ class Text extends FieldBase
 
 		$lm = $this->GetOption('length',0);
 		if ($lm && strlen($this->Value) > $lm) {
-			$this->validated = FALSE;
+			$this->valid = FALSE;
 			$this->ValidationMessage = $mod->Lang('please_enter_no_longer',$lm);
 		}
 
-		return array($this->validated,$this->ValidationMessage);
+		return array($this->valid,$this->ValidationMessage);
 	}
 }
