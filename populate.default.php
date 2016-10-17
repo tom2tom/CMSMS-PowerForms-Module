@@ -108,8 +108,8 @@ foreach ($formdata->FieldOrders as $one) {
 	$oneset->alias = $alias;
 //	$oneset->css_class = $one->GetOption('css_class');
 	$oneset->display = $one->DisplayInForm()?1:0;
-//	$oneset->error = $one->GetOption('is_valid',TRUE)?'':$one->ValidationMessage;
-	$oneset->error = $one->valid?'':$one->ValidationMessage;
+	$oneset->valid = $one->IsValid()?1:0;
+	$oneset->error = $oneset->valid?'':$one->ValidationMessage;
 	$oneset->has_label = $one->HasLabel();
 	$oneset->helptext = $one->GetOption('helptext');
 	if ($oneset->helptext) {
@@ -143,11 +143,9 @@ EOS;
 	$oneset->name = $one->GetName();
 	$oneset->needs_div = $one->NeedsDiv();
 	$oneset->required = $one->IsRequired()?1:0;
-	$oneset->required_symbol = $one->IsRequired()?$reqSymbol:'';
+	$oneset->required_symbol = $oneset->required?$reqSymbol:'';
 	$oneset->smarty_eval = $one->GetSmartyEval()?1:0;
 	$oneset->type = $one->GetDisplayType();
-//	$oneset->valid = $one->GetOption('is_valid',TRUE)?1:0;
-	$oneset->valid = $one->valid?1:0; //TODO method needed
 	$oneset->values = $one->GetDisplayableOptionValues(); //TODO
 
 	$tplvars[$alias] = $oneset;
@@ -195,7 +193,7 @@ if (PWForms\Utils::GetFormOption($formdata,'input_button_safety')) {
 EOS;
 } else {
 	$safejs = '';
-} 
+}
 
 if ($usersafejs || $safejs) {
 	$formdata->jsfuncs[] =<<<EOS
