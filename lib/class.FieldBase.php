@@ -14,42 +14,46 @@ class FieldBase implements \Serializable
 	public $loaded = FALSE;
 	public $valid = TRUE; //TRUE unless validation has failed
 	//field properties
-	public $ChangeRequirement = TRUE; //whether admin user may change self::Required
-	public $DisplayExternal = FALSE;
-	public $DisplayInForm = TRUE;
-	public $DisplayInSubmission = TRUE; //whether field value is echoed in submission template (if used) (effectively ~ self::IsInput)
-	public $DispositionPermitted = TRUE;
+	public $Alias = '';
 	public $FormId = 0;
-	public $HasAddOp = FALSE;
-	public $HasDeleteOp = FALSE;
-	public $HasLabel = TRUE;
-	public $HasUserAddOp = FALSE;
-	public $HasUserDeleteOp = FALSE;
-	public $HideLabel = FALSE; //to XtraProps[] ?
 	public $Id = 0;
-	public $IsComputedOnSubmission = FALSE;
-	public $IsDisposition = FALSE;
-	public $IsEmailDisposition = FALSE;
-	public $IsInput = FALSE;
-	public $IsSortable = TRUE;
-	public $LabelSubComponents = TRUE;
-	public $MultiPopulate = FALSE; //whether Populate() generates array of objects
 	public $Name = '';
-	public $NeedsDiv = TRUE;
 	public $OrderBy = 0; //form display-order
-	public $Required = FALSE; //to XtraProps[] ?
-	public $SmartyEval = FALSE; //TRUE for textinput field whose value is to be processed via smarty before display
 	public $Type = '';
-	public $ValidationMessage = ''; //post-validation error message, or ''
-	public $ValidationType = 'none';
-	public $ValidationTypes; //if set, an array of choices suitable for populating pulldowns to XtraProps[] ?
 	public $Value; //when set, can be scalar or array, with all content processed by Utils::html_myentities_decode()
-	public $XtraProps = array(); //container for other properties
+	public $XtraProps; //container for other properties
 
 	public function __construct(&$formdata, &$params)
 	{
 		$this->formdata = $formdata;
-		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_none')=>'none');
+		$this->XtraProps = array(
+		'ChangeRequirement' => TRUE, //whether admin user may change 'Required'
+		'DisplayExternal' => FALSE, //whether field is for use in another module e.g. browser
+		'DisplayInForm' => TRUE,
+		'DisplayInSubmission' => TRUE, //whether field value is echoed in submission template (if used) (effectively ~ self::IsInput)
+		'DispositionPermitted' => TRUE,
+		'HasAddOp' => FALSE,
+		'HasDeleteOp' => FALSE,
+		'HasLabel' => TRUE,
+		'HasUserAddOp' => FALSE,
+		'HasUserDeleteOp' => FALSE,
+		'HideLabel' => FALSE,
+		'IsComputedOnSubmission' => FALSE,
+		'IsDisposition' => FALSE,
+		'IsEmailDisposition' => FALSE,
+		'IsInput' => FALSE,
+		'IsSortable' => TRUE,
+		'LabelSubComponents' => TRUE,
+		'MultiPopulate' => FALSE, //whether Populate() generates array of objects
+		'NeedsDiv' => TRUE,
+		'Required' => FALSE,
+		'SmartyEval' => FALSE, //TRUE for textinput field whose value is to be processed via smarty before display
+		'ValidationMessage' => '', //post-validation error message, or ''
+		'ValidationType' => 'none',
+		'ValidationTypes' => NULL //array of choices suitable for populating pulldowns to XtraProps[] ?
+		);
+		$this->XtraProps['ValidationTypes'] = array(
+			$formdata->formsmodule->Lang('validation_none')=>'none');
 
 		if (isset($params['form_id']))
 			$this->FormId = $params['form_id'];
@@ -64,22 +68,28 @@ class FieldBase implements \Serializable
 			$this->Type = $params['field_type'];
 
 		if (isset($params['hide_label']))
-			$this->HideLabel = $params['hide_label'];
+			$this->XtraProps['HideLabel'] = $params['hide_label'];
 
 		if (isset($params['field_required']))
-			$this->Required = $params['field_required'];
+			$this->XtraProps['Required'] = $params['field_required'];
 
 		if (isset($params['validation_type']))
-			$this->ValidationType = $params['validation_type'];
+			$this->XtraProps['ValidationType'] = $params['validation_type'];
 		//admin parameters present ?
 		foreach ($params as $key=>$val) {
-			if (strncmp($key,'opt_',4) == 0)
-				$this->XtraProps[substr($key,4)] = $val;
+			if (strncmp($key,'opt_',4) == 0) {
+				$key = substr($key,4);
+				if (property_exists($this,$key)) {
+					$this->$key = $val;
+				} else {
+					$this->XtraProps[$key] = $val;
+				}
+			}
 		}
 		//frontend parameter present ? TODO captcha-field value has different type of key
 		$key = $this->formdata->current_prefix.$this->Id;
 		if (isset($params[$key]))
-			$this->Value = $params[$key];
+			$this->SetValue($params[$key]);
 	}
 
 	public function __set($name,$value)
@@ -90,14 +100,8 @@ class FieldBase implements \Serializable
 	public function __get($name)
 	{
 		if (array_key_exists($name,$this->XtraProps))
-            return $this->XtraProps[$name];
-        $trace = debug_backtrace();
-        trigger_error(
-            'Undefined property via __get(): '.$name.
-            ' in '.$trace[0]['file'] .
-            ' on line '.$trace[0]['line'],
-            E_USER_NOTICE);
-        return NULL;
+			return $this->XtraProps[$name];
+		return NULL;
 	}
 
 	public function __isset($name)
@@ -110,450 +114,6 @@ class FieldBase implements \Serializable
 		unset($this->XtraProps[$name]);
 	}
 
-	// Returns a form-option value, or $default if the option doesn't exist
-	public function GetFormOption($optname, $default='')
-	{
-		if (isset($this->formdata->XtraProps[$optname]))
-			return $this->formdata->XtraProps[$optname];
-		else
-			return $default;
-	}
-
-	public function SetId($fid)
-	{
-		$this->Id = (int)$fid;
-	}
-
-	// Gets the cached field-id
-	public function GetId()
-	{
-		return $this->Id;
-	}
-
-	public function SetName($name)
-	{
-		$this->Name = $name;
-	}
-
-	// Gets the cached field-name
-	public function GetName()
-	{
-		return $this->Name;
-	}
-
-	// Check whether this field has a name or doesn't need one
-	// Returns array, 1st member is T/F, 2nd is '' or message
-	public function FieldIsNamed()
-	{
-		$mod = $this->formdata->formsmodule;
-		if ($this->Name || !$mod->GetPreference('require_fieldnames'))
-			return array(TRUE,'');
-		return array(FALSE,$mod->Lang('field_no_name'));
-	 }
-
-	// Confirm this field's name is the not same as another field's name
-	// Returns array, 1st member is T/F, 2nd is '' or message
-	public function FieldNameUnique()
-	{
-		foreach ($this->formdata->Fields as &$one) {
-			if ($one->Name == $this->Name && $one->Id != $this->Id) {
-				unset($one);
-				return array(FALSE,$this->formdata->formsmodule->Lang('field_name_in_use',$this->Name));
-			}
-		}
-		unset($one);
-		return array(TRUE,'');
-	}
-
-	// Caches a new field-alias
-	public function SetAlias($alias)
-	{
-		$this->SetOption('alias',$alias);
-	}
-
-	// Gets the cached field-alias
-/*	public function GetAlias()
-	{
-		return $this->GetOption('alias');
-	}
-*/
-	// Gets the field alias, after creating it if not already recorded
-	public function ForceAlias()
-	{
-		$alias = $this->GetOption('alias');
-		if (!$alias) {
-			$alias = $this->GetVariableName();
-			if ($alias)
-				$this->SetOption('alias',$alias);
-			else
-				$alias = 'fld_'.$this->Id;
-		}
-		return $alias;
-	}
-
-	// Gets an alias-like string derived from field name, for use as a smarty var
-	public function GetVariableName()
-	{
-		$alias = strtolower(trim($this->Name,"\t\n\r\0 _"));
-		if (!$alias)
-			return '';
-		$alias = preg_replace('/[^\w]+/','_',$alias);
-		$parts = array_slice(explode('_',$alias),0,5);
-		$alias = substr(implode('_',$parts),0,12);
-		return trim($alias,'_');
-	}
-
-/*	public function GetIdTag($suffix='')
-	{
-		return ' id="'.$this->ForceAlias().$suffix.'"';
-	}
-*/
-	public function GetInputId($suffix='')
-	{
-		return $this->ForceAlias().$suffix;
-	}
-
-	public function GetScript($prefix=' ')
-	{
-		$js = $this->GetOption('javascript');
-		if ($js)
-			return $prefix.$js;
-		return '';
-
-	}
-
-	public function SetSmartyEval($bool)
-	{
-		$this->SmartyEval = $bool;
-	}
-
-	public function GetSmartyEval()
-	{
-		return $this->SmartyEval;
-	}
-
-	public function SetOrder($order)
-	{
-		$this->OrderBy = $order;
-	}
-
-	public function GetOrder()
-	{
-		return $this->OrderBy;
-	}
-
-	public function SetFieldType($type)
-	{
-		$this->Type = $type;
-	}
-
-	public function GetFieldType()
-	{
-		return $this->Type;
-	}
-
-	public function IsDisposition()
-	{
-		return $this->IsDisposition;
-	}
-
-	public function IsEmailDisposition()
-	{
-		return $this->IsEmailDisposition;
-	}
-
-	// Set flag determining whether this disposition field is to be disposed (i.e. not inhibited)
-	public function SetDispositionPermission($permitted=TRUE)
-	{
-		$this->DispositionPermitted = $permitted;
-	}
-
-	// Get flag determining whether this disposition field is to be disposed
-	public function IsDispositionPermitted()
-	{
-		return $this->DispositionPermitted;
-	}
-
-	public function IsInputField()
-	{
-		return $this->IsInput;
-	}
-
-	public function HasLabel()
-	{
-		return $this->HasLabel;
-	}
-
-	public function SetHideLabel($hide)
-	{
-		$this->HideLabel = $hide;
-	}
-
-	public function GetHideLabel()
-	{
-		return $this->HideLabel;
-	}
-
-	public function DisplayExternal()
-	{
-		return $this->DisplayExternal;
-	}
-
-	public function DisplayInForm()
-	{
-		return $this->DisplayInForm;
-	}
-
-	public function DisplayInSubmission()
-	{
-		return $this->DisplayInSubmission; //&& $this->DisplayInForm
-	}
-
-	public function GetChangeRequirement()
-	{
-		return $this->ChangeRequirement;
-	}
-
-	public function IsRequired()
-	{
-		return $this->Required;
-	}
-
-	public function SetRequired($required)
-	{
-		$this->Required = $required;
-	}
-
-	public function ToggleRequired()
-	{
-		$this->Required = !$this->Required;
-	}
-
-	public function SetValidationType($type)
-	{
-		$this->ValidationType = $type;
-	}
-
-	public function GetValidationType()
-	{
-		return $this->ValidationType;
-	}
-
-	public function RequiresValidation()
-	{
-		return ($this->ValidationType != 'none');
-	}
-
-	public function GetValidationTypes()
-	{
-		return $this->ValidationTypes;
-	}
-
-	public function IsValid()
-	{
-		return $this->valid;
-	}
-
-	public function GetValidationMessage()
-	{
-		return $this->ValidationMessage;
-	}
-
-	protected function GetErrorMessage($key)
-	{
-		return '<span style="color:red">'.
-			$this->formdata->formsmodule->Lang('error').'</span> '.
-			$this->formdata->formsmodule->Lang($key);
-	}
-
-	// Subclass this with a displayable type
-	public function GetDisplayType()
-	{
-		return $this->formdata->formsmodule->Lang('field_type_'.$this->Type);
-	}
-
-	public function GetMultiPopulate()
-	{
-		return $this->MultiPopulate;
-	}
-
-	// Subclass this if appropriate
-	public function LabelSubComponents()
-	{
-		return $this->LabelSubComponents;
-	}
-
-	public function ComputeOnSubmission()
-	{
-		return $this->IsComputedOnSubmission;
-	}
-
-	// Subclass this if appropriate
-	public function ComputeOrder()
-	{
-		return 0;
-	}
-
-	public function NeedsDiv()
-	{
-		return $this->NeedsDiv;
-	}
-
-/*	public function HasMultipleValues()
-	{
-		return ($this->MultiPopulate || $this->HasUserAddOp); //TODO multipopulate not relevant
-	}
-*/
-	//apply frontend class(es) to string $html
-	public function SetClass($html,$extra='')
-	{
-		$html = preg_replace('/class *= *".*"/U','',$html);
-		$cls = $this->GetOption('css_class');
-		if ($this->Required)
-			$cls .= ' required';
-		if (!$this->valid)
-			$cls .= ' invalid_field';
-		if ($extra)
-			$cls .= ' '.$extra;
-		$cls = trim($cls);
-		if ($cls) {
-			$html = preg_replace(
-			array(
-			'/<input +type *= *"(\w+)"/U',
-			'/<label/',
-			'/<option/',
-			),
-			array(
-			'<input type="($1)" class="'.$cls.'"',
-			'<label class="'.$cls.'"',
-			'<option class="'.$cls.'"',
-			),$html);
-		}
-		return $html;
-	}
-
-	// Subclass this
-	// Returns field value as a scalar or array (per $as_string), suitable for display in the form
-	public function GetDisplayableValue($as_string=TRUE)
-	{
-		if (property_exists($this,'Value')) {
-			$ret = $this->Value;
-			if (is_array($ret)) {
-				if ($as_string)
-					return implode($this->GetFormOption('list_delimiter',','),$ret);
-				else
-					return $ret; //assume array members are all displayable
-			} else
-				$ret = (string)$ret;
-		} else {
-			$ret = $this->GetFormOption('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
-		}
-		if ($as_string)
-			return $ret;
-		else
-			return array($ret);
-	}
-
-	// Subclass this
-	// Returns array of option values if the option is an array with member(s),
-	// or else FALSE
-	public function GetDisplayableOptionValues()
-	{
-		if (array_key_exists('option_value',$this->XtraProps)) {
-			$ret = $this->GetOption('option_value'); //array with member(s)
-			if ($ret)
-				return $ret;
-		}
-		return FALSE;
-	}
-
-	// Subclass this if necessary to convert type or something
-	public function SetValue($newvalue)
-	{
-		if (is_array($newvalue)) {
-			$this->Value = array();
-			foreach ($newvalue as &$one)
-				$this->Value[] = Utils::html_myentities_decode($one);
-			unset($one);
-		} else
-			 $this->Value = Utils::html_myentities_decode($newvalue);
-	}
-
-/*	public function LoadValue($newvalue)
-	{
-		if (property_exists($this,'Value')) {
-			if (!is_array($this->Value))
-				$this->Value = array($this->Value);
-			if (is_array($newvalue)) {
-				foreach ($newvalue as &$one)
-					$this->Value[] = Utils::html_myentities_decode($one);
-				unset($one);
-			} else
-				$this->Value[] = Utils::html_myentities_decode($newvalue);
-		} elseif (is_array($newvalue)) {
-			$this->Value = array();
-			foreach ($newvalue as &$one)
-				$this->Value[] = Utils::html_myentities_decode($one);
-			unset($one);
-		} else
-			 $this->Value = Utils::html_myentities_decode($newvalue);
-	}
-*/
-	// Probably don't need to subclass this
-	public function GetValue()
-	{
-		return $this->Value;
-	}
-
-	public function ResetValue()
-	{
-		unset($this->Value);
-	}
-
-	// Subclass this if needed to support some unusual format for the value
-	// Returns boolean T/F indication whether the field value is present and non-default
-	public function HasValue($deny_blank_responses=FALSE)
-	{
-		if (property_exists($this,'Value')) {
-			if (isset($this->XtraProps['default'])) { // fields with defaults
-				$def = $this->XtraProps['default'];
-				if ($def && $this->Value == $def) //TODO if array
-					return FALSE;
-			}
-			return (!$deny_blank_responses ||
-					is_array($this->Value) ||
-					trim($this->Value));
-		}
-		return FALSE;
-	}
-
-	// Returns a member of the field-value-array, or if $index == 0, the entire value, or FALSE
-	public function GetArrayValue($index)
-	{
-		if (property_exists($this,'Value')) {
-			if (is_array($this->Value)) {
-				if (isset($this->Value[$index]))
-					return $this->Value[$index];
-			} elseif ($index == 0)
-				return $this->Value;
-		}
-		return FALSE;
-	}
-
-	// Subclass this?
-	// Returns TRUE if $value is contained in array $Value or matches scalar $Value
-	public function FindArrayValue($value)
-	{
-		if (property_exists($this,'Value')) {
-			if (is_array($this->Value))
-				return array_search($value,$this->Value) !== FALSE;
-			elseif ($this->Value == $value)
-				return TRUE;
-		}
-		return FALSE;
-	}
-
 	public function SetOption($optionName, $optionValue)
 	{
 		$this->XtraProps[$optionName] = $optionValue;
@@ -564,7 +124,6 @@ class FieldBase implements \Serializable
 	{
 		if (isset($this->XtraProps[$optionName]))
 			return $this->XtraProps[$optionName];
-
 		return $default;
 	}
 
@@ -634,6 +193,510 @@ class FieldBase implements \Serializable
 		unset($this->XtraProps[$optionName.$index]);
 	}
 
+	// Returns a form-option value, or $default if the option doesn't exist
+	public function GetFormOption($optname, $default='')
+	{
+		if (isset($this->formdata->XtraProps[$optname]))
+			return $this->formdata->XtraProps[$optname];
+		else
+			return $default;
+	}
+
+	public function SetId($fid)
+	{
+		$this->Id = (int)$fid;
+	}
+
+	// Gets the cached field-id
+	public function GetId()
+	{
+		return $this->Id;
+	}
+
+	public function SetName($name)
+	{
+		$this->Name = $name;
+	}
+
+	// Gets the cached field-name
+	public function GetName()
+	{
+		return $this->Name;
+	}
+
+	// Check whether this field has a name or doesn't need one
+	// Returns array, 1st member is T/F, 2nd is '' or message
+	public function FieldIsNamed()
+	{
+		$mod = $this->formdata->formsmodule;
+		if ($this->Name || !$mod->GetPreference('require_fieldnames'))
+			return array(TRUE,'');
+		return array(FALSE,$mod->Lang('field_no_name'));
+	 }
+
+	// Confirm this field's name is the not same as another field's name
+	// Returns array, 1st member is T/F, 2nd is '' or message
+	public function FieldNameUnique()
+	{
+		foreach ($this->formdata->Fields as &$one) {
+			if ($one->Name == $this->Name && $one->Id != $this->Id) {
+				unset($one);
+				return array(FALSE,$this->formdata->formsmodule->Lang('field_name_in_use',$this->Name));
+			}
+		}
+		unset($one);
+		return array(TRUE,'');
+	}
+
+	// Caches a new field-alias
+	public function SetAlias($alias)
+	{
+		$this->Alias = $alias;
+	}
+
+	// Gets the cached field-alias
+	public function GetAlias()
+	{
+		return $this->Alias;
+	}
+
+	// Gets the field alias, after creating it if not already recorded
+	public function ForceAlias()
+	{
+		$alias = $this->Alias;
+		if (!$alias) {
+			$alias = $this->GetVariableName();
+			if ($alias)
+				$this->Alias = $alias;
+			else
+				$alias = 'fld_'.$this->Id;
+		}
+		return $alias;
+	}
+
+	// Gets an alias-like string derived from field name, for use as a smarty var
+	public function GetVariableName()
+	{
+		$alias = strtolower(trim($this->Name,"\t\n\r\0 _"));
+		if (!$alias)
+			return '';
+		$alias = preg_replace('/[^\w]+/','_',$alias);
+		$parts = array_slice(explode('_',$alias),0,5);
+		$alias = substr(implode('_',$parts),0,12);
+		return trim($alias,'_');
+	}
+
+/*	public function GetIdTag($suffix='')
+	{
+		return ' id="'.$this->ForceAlias().$suffix.'"';
+	}
+*/
+	public function GetInputId($suffix='')
+	{
+		return $this->ForceAlias().$suffix;
+	}
+	
+	public function SetOrder($order)
+	{
+		$this->OrderBy = $order;
+	}
+
+	public function GetOrder()
+	{
+		return $this->OrderBy;
+	}
+
+	public function SetFieldType($type)
+	{
+		$this->Type = $type;
+	}
+
+	public function GetFieldType()
+	{
+		return $this->Type;
+	}
+
+	public function IsValid()
+	{
+		return $this->valid;
+	}
+
+	public function GetScript($prefix=' ')
+	{
+		if (!empty($this->XtraProps['javascript'])) {
+			return $prefix.$this->XtraProps['javascript'];
+		}
+		return '';
+	}
+
+	public function SetSmartyEval($state)
+	{
+		$this->XtraProps['SmartyEval'] = $state;
+	}
+
+	public function GetSmartyEval()
+	{
+		return !empty($this->XtraProps['SmartyEval']);
+	}
+
+	public function IsDisposition()
+	{
+		return !empty($this->XtraProps['IsDisposition']);
+	}
+
+	public function IsEmailDisposition()
+	{
+		return !empty($this->XtraProps['IsEmailDisposition']);
+	}
+
+	// Set flag determining whether this disposition field is to be disposed (i.e. not inhibited)
+	public function SetDispositionPermission($state=TRUE)
+	{
+		$this->XtraProps['DispositionPermitted'] = $state;
+	}
+
+	// Get flag determining whether this disposition field is to be disposed
+	public function IsDispositionPermitted()
+	{
+		return !empty($this->XtraProps['DispositionPermitted']);
+	}
+
+	public function IsInputField()
+	{
+		return !empty($this->XtraProps['IsInput']);
+	}
+
+	public function HasLabel()
+	{
+		return !empty($this->XtraProps['HasLabel']);
+	}
+
+	public function SetHideLabel($state)
+	{
+		$this->XtraProps['HideLabel'] = $state;
+	}
+
+	public function GetHideLabel()
+	{
+		return !empty($this->XtraProps['HideLabel']);
+	}
+
+	public function DisplayExternal()
+	{
+		return !empty($this->XtraProps['DisplayExternal']);
+	}
+
+	public function DisplayInForm()
+	{
+		return !empty($this->XtraProps['DisplayInForm']);
+	}
+
+	public function DisplayInSubmission()
+	{
+		return !empty($this->XtraProps['DisplayInSubmission']); //&& $this->XtraProps['DisplayInForm']
+	}
+
+	public function GetChangeRequirement()
+	{
+		return !empty($this->XtraProps['ChangeRequirement']);
+	}
+
+	public function IsRequired()
+	{
+		return !empty($this->XtraProps['Required']);
+	}
+
+	public function SetRequired($state)
+	{
+		$this->XtraProps['Required'] = $state;
+	}
+
+	public function ToggleRequired()
+	{
+		$this->XtraProps['Required'] = empty($this->XtraProps['Required']);
+	}
+
+	public function SetValidationType($type)
+	{
+		$this->XtraProps['ValidationType'] = $type;
+	}
+
+	public function GetValidationType()
+	{
+		if (empty($this->XtraProps['ValidationType']))
+			$this->XtraProps['ValidationType'] = 'none';
+		return $this->XtraProps['ValidationType'];
+	}
+
+	public function RequiresValidation()
+	{
+		return (!empty($this->XtraProps['ValidationType']) &&
+			$this->XtraProps['ValidationType'] != 'none');
+	}
+
+	public function GetValidationTypes()
+	{
+		if (empty($this->XtraProps['ValidationTypes']))
+			$this->XtraProps['ValidationTypes'] = array(
+				$formdata->formsmodule->Lang('validation_none')=>'none');
+		return $this->XtraProps['ValidationTypes'];
+	}
+
+	public function GetValidationMessage()
+	{
+		return (isset($this->XtraProps['ValidationMessage'])) ?
+			$this->XtraProps['ValidationMessage'] : '';
+	}
+
+	protected function GetErrorMessage($key)
+	{
+		return '<span style="color:red">'.
+			$this->formdata->formsmodule->Lang('error').'</span> '.
+			$this->formdata->formsmodule->Lang($key);
+	}
+
+	// Subclass this with a displayable type
+	public function GetDisplayType()
+	{
+		return $this->formdata->formsmodule->Lang('field_type_'.$this->Type);
+	}
+
+	public function GetMultiPopulate()
+	{
+		return !empty($this->XtraProps['MultiPopulate']);
+	}
+
+	// Subclass this if appropriate
+	public function LabelSubComponents()
+	{
+		return (isset($this->XtraProps['LabelSubComponents'])) ?
+			$this->XtraProps['LabelSubComponents'] : '';
+	}
+
+	public function ComputeOnSubmission()
+	{
+		return !empty($this->XtraProps['IsComputedOnSubmission']);
+	}
+
+	// Subclass this if appropriate
+	public function ComputeOrder()
+	{
+		return 0;
+	}
+
+	public function NeedsDiv()
+	{
+		return !empty($this->XtraProps['NeedsDiv']);
+	}
+
+/*	public function HasMultipleValues()
+	{
+		return (!empty($this->XtraProps['MultiPopulate']) || 1empty($this->XtraProps['HasUserAddOp'])); //TODO multipopulate not relevant
+	}
+*/
+	//apply frontend class(es) to string $html
+	public function SetClass($html,$extra='')
+	{
+		$html = preg_replace('/class *= *".*"/U','',$html);
+		$cls = (!empty($this->XtraProps['css_class'])) ? $this->XtraProps['css_class']:'';
+		if ($this->Required)
+			$cls .= ' required';
+		if (!$this->valid)
+			$cls .= ' invalid_field';
+		if ($extra)
+			$cls .= ' '.$extra;
+		$cls = trim($cls);
+		if ($cls) {
+			$html = preg_replace(
+			array(
+			'/<input +type *= *"(\w+)"/U',
+			'/<label/',
+			'/<option/',
+			),
+			array(
+			'<input type="($1)" class="'.$cls.'"',
+			'<label class="'.$cls.'"',
+			'<option class="'.$cls.'"',
+			),$html);
+		}
+		return $html;
+	}
+
+	// Subclass this
+	// Returns field value as a scalar or array (per $as_string), suitable for display in the form
+	public function GetDisplayableValue($as_string=TRUE)
+	{
+		if (property_exists($this,'Value')) {
+			$ret = $this->Value;
+			if (is_array($ret)) {
+				if ($as_string)
+					return implode($this->GetFormOption('list_delimiter',','),$ret);
+				else
+					return $ret; //assume array members are all displayable
+			} else
+				$ret = (string)$ret;
+		} else {
+			$ret = $this->GetFormOption('unspecified',
+				$this->formdata->formsmodule->Lang('unspecified'));
+		}
+		if ($as_string)
+			return $ret;
+		else
+			return array($ret);
+	}
+
+	// Subclass this
+	// Returns array of option values if the option is an array with member(s),
+	// or else FALSE
+	public function GetDisplayableOptionValues()
+	{
+		if (array_key_exists('option_value',$this->XtraProps)) {
+			return $this->XtraProps['option_value']; //array with member(s)
+		}
+		return FALSE;
+	}
+
+	// Subclass this if necessary to convert type or something
+	public function SetValue($newvalue)
+	{
+		if (is_array($newvalue)) {
+			$this->Value = array();
+			foreach ($newvalue as &$one)
+				$this->Value[] = Utils::html_myentities_decode($one);
+			unset($one);
+		} else
+			 $this->Value = Utils::html_myentities_decode($newvalue);
+	}
+
+/*	public function LoadValue($newvalue)
+	{
+		if (property_exists($this,'Value')) {
+			if (!is_array($this->Value))
+				$this->Value = array($this->Value);
+			if (is_array($newvalue)) {
+				foreach ($newvalue as &$one)
+					$this->Value[] = Utils::html_myentities_decode($one);
+				unset($one);
+			} else
+				$this->Value[] = Utils::html_myentities_decode($newvalue);
+		} elseif (is_array($newvalue)) {
+			$this->Value = array();
+			foreach ($newvalue as &$one)
+				$this->Value[] = Utils::html_myentities_decode($one);
+			unset($one);
+		} else
+			 $this->Value = Utils::html_myentities_decode($newvalue);
+	}
+*/
+	// Probably don't need to subclass this
+	public function GetValue()
+	{
+		return $this->Value;
+	}
+
+	public function ResetValue()
+	{
+		unset($this->Value);
+	}
+
+	// Subclass this if needed to support some unusual format for the value
+	// Returns boolean T/F indication whether the field value is present and non-default
+	public function HasValue($deny_blank_responses=FALSE)
+	{
+		if (property_exists($this,'Value')) {
+			if (!empty($this->XtraProps['default'])) { // fields with defaults
+				$def = $this->XtraProps['default'];
+				if ($this->Value == $def) //TODO if array
+					return FALSE;
+			}
+			return (!$deny_blank_responses ||
+					is_array($this->Value) ||
+					trim($this->Value));
+		}
+		return FALSE;
+	}
+
+	// Returns a member of the field-value-array, or if $index == 0, the entire value, or FALSE
+	public function GetArrayValue($index)
+	{
+		if (property_exists($this,'Value')) {
+			if (is_array($this->Value)) {
+				if (isset($this->Value[$index]))
+					return $this->Value[$index];
+			} elseif ($index == 0)
+				return $this->Value;
+		}
+		return FALSE;
+	}
+
+	// Subclass this?
+	// Returns TRUE if $value is contained in array $Value or matches scalar $Value
+	public function FindArrayValue($value)
+	{
+		if (property_exists($this,'Value')) {
+			if (is_array($this->Value))
+				return array_search($value,$this->Value) !== FALSE;
+			elseif ($this->Value == $value)
+				return TRUE;
+		}
+		return FALSE;
+	}
+
+/*	public function GetFieldInputId($id, &$params)
+	{
+		return $id.$this->formdata->current_prefix.$this->Id;
+	}
+*/
+	// Sends logic along with field, also allows smarty logic
+	// Doesn't need subclass in most cases
+	public function GetFieldLogic()
+	{
+		if (!empty($this->XtraProps['field_logic'])) {
+			$code = $this->XtraProps['field_logic'];
+			return Utils::ProcessTemplateFromData($this->formdata->formsmodule,$code,array());
+		}
+		return '';
+	}
+
+	// Subclass this with something to show users
+	public function GetFieldStatus()
+	{
+		return '';
+	}
+
+	//Whether to generate a submit-button labelled 'add',along with the field
+	public function HasAddOp()
+	{
+		return !empty($this->XtraProps['HasAddOp']);
+	}
+
+	// Subclass this to generate appropriate add-button label
+	public function GetOptionAddButton()
+	{
+		return $this->formdata->formsmodule->Lang('add_options');
+	}
+
+	// Subclass this when necessary or useful (often, just set a flag)
+	public function DoOptionAdd(&$params)
+	{
+	}
+	//Whether to generate a submit-button labelled 'delete',along with the field
+	public function HasDeleteOp()
+	{
+		return !empty($this->XtraProps['HasDeleteOp']);
+	}
+
+	// Subclass this to generate appropriate delete-button label
+	public function GetOptionDeleteButton()
+	{
+		return $this->formdata->formsmodule->Lang('delete_options');
+	}
+
+	// Subclass this when necessary or useful to delete option-data
+	public function DoOptionDelete(&$params)
+	{
+	}
+
 	/**
 	Load:
 	@id: module id, unused here but is needed in subclass
@@ -658,7 +721,6 @@ class FieldBase implements \Serializable
 	*/
 	public function Store($deep=FALSE)
 	{
-//	$this->Crash();
 		return FieldOperations::StoreField($this,$deep);
 	}
 
@@ -677,61 +739,6 @@ class FieldBase implements \Serializable
 		if ($this->Id)
 			return FieldOperations::RealDeleteField($this);
 		return FALSE;
-	}
-
-/*	public function GetFieldInputId($id, &$params)
-	{
-		return $id.$this->formdata->current_prefix.$this->Id;
-	}
-*/
-	// Sends logic along with field, also allows smarty logic
-	// Doesn't need subclass in most cases
-	public function GetFieldLogic()
-	{
-		$code = $this->GetOption('field_logic');
-		if (!empty($code)) {
-			$tplvars = array();
-			return Utils::ProcessTemplateFromData($this->formdata->formsmodule,$code,$tplvars);
-		}
-		return '';
-	}
-
-	// Subclass this with something to show users
-	public function GetFieldStatus()
-	{
-		return '';
-	}
-
-	//Whether to generate a submit-button labelled 'add',along with the field
-	public function HasAddOp()
-	{
-		return $this->HasAddOp;
-	}
-
-	// Subclass this to generate appropriate add-button label
-	public function GetOptionAddButton()
-	{
-		return $this->formdata->formsmodule->Lang('add_options');
-	}
-
-	// Subclass this when necessary or useful (often, just set a flag)
-	public function DoOptionAdd(&$params)
-	{
-	}
-	//Whether to generate a submit-button labelled 'delete',along with the field
-	public function HasDeleteOp()
-	{
-		return $this->HasDeleteOp;
-	}
-	// Subclass this to generate appropriate delete-button label
-	public function GetOptionDeleteButton()
-	{
-		return $this->formdata->formsmodule->Lang('delete_options');
-	}
-
-	// Subclass this when necessary or useful to delete option-data
-	public function DoOptionDelete(&$params)
-	{
 	}
 
 	/**
@@ -761,7 +768,7 @@ class FieldBase implements \Serializable
 						$mod->CreateInputHidden($id,'field_type',$this->Type).
 						$this->GetDisplayType());
 
-		if ($this->ChangeRequirement && $visible) {
+		if ($visible && $this->XtraProps['ChangeRequirement']) {
 			$main[] = array($mod->Lang('title_field_required'),
 							$mod->CreateInputHidden($id,'field_required',0).
 							$mod->CreateInputCheckbox($id,'field_required',1,
@@ -777,15 +784,15 @@ class FieldBase implements \Serializable
 		$main[] = array($mod->Lang('title_field_validation'),
 						$validInput);
 
-		if ($this->DisplayInForm && $visible) {
+		if ($visible && $this->XtraProps['DisplayInForm']) {
 			$main[] = array($mod->Lang('title_field_helptext'),
-							$mod->CreateTextArea(FALSE,$id,$this->GetOption('helptext'),
+							$mod->CreateTextArea(FALSE,$id,$this->XtraProps['helptext'],
 							'opt_helptext','pwf_shortarea','','','',50,8));
 		}
 
 		//init advanced tab content
 		$adv = array();
-		if ($this->HasLabel && $visible) {
+		if ($visible && $this->XtraProps['HasLabel']) {
 			$adv[] = array($mod->Lang('title_hide_label'),
 							$mod->CreateInputHidden($id,'hide_label',0).
 							$mod->CreateInputCheckbox($id,'hide_label',1,$this->HideLabel),
@@ -794,14 +801,14 @@ class FieldBase implements \Serializable
 		if ($this->DisplayInForm()) {
 			if ($visible) {
 				$adv[] = array($mod->Lang('title_field_css_class'),
-								$mod->CreateInputText($id,'opt_css_class',$this->GetOption('css_class'),30));
+								$mod->CreateInputText($id,'opt_css_class',$this->XtraProps['css_class'],30));
 				$adv[] = array($mod->Lang('title_field_javascript'),
-								$mod->CreateTextArea(FALSE,$id,$this->GetOption('javascript'),
+								$mod->CreateTextArea(FALSE,$id,$this->XtraProps['javascript'],
 								'opt_javascript','pwf_shortarea','','','',50,8,'','js'),
 								$mod->Lang('help_field_javascript'));
 			}
 			$adv[] = array($mod->Lang('title_field_resources'),
-							$mod->CreateTextArea(FALSE,$id,$this->GetOption('field_logic'),
+							$mod->CreateTextArea(FALSE,$id,$this->XtraProps['field_logic'],
 							'opt_field_logic','pwf_shortarea','','','',50,8),
 							$mod->Lang('help_field_resources'));
 		}
@@ -886,8 +893,8 @@ class FieldBase implements \Serializable
 	public function Validate($id)
 	{
 		$this->valid = TRUE;
-		$this->ValidationMessage = '';
-		return array($this->valid,$this->ValidationMessage);
+		$this->XtraProps['ValidationMessage'] = '';
+		return array($this->valid,$this->XtraProps['ValidationMessage']);
 	}
 
 	// Subclass this to do stuff (e.g. modify other fields) after validation
@@ -937,7 +944,6 @@ class FieldBase implements \Serializable
 				$arr = (array)$props;
 				foreach ($arr as $key=>$one) {
 					switch ($key) {
-					 case 'ValidationTypes': //if set, an array of choices suitable for populating pulldowns
 					 case 'Value':
 					 case 'XtraProps':
 					 	if (is_object($one)) {
