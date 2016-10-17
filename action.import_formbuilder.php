@@ -581,7 +581,7 @@ $this->Crash();
 				$rs->Close();
 			}
 		}
-		$this->Redirect($id,'defaultadmin');
+		$message = $this->PrettyMessage('adjust_templates');
 	} else
 		$message = $this->PrettyMessage('no_forms',FALSE);
 } elseif (isset($params['conform'])) {
