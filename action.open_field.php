@@ -37,7 +37,7 @@ $this->Crash();
 		$obfield = $formdata->Fields[$params['field_id']];
 	elseif (isset($params['field_type']) //we know what display-field type to add
 	    || isset($params['disposition_type'])) //we know what disposition-field type to add
-		$obfield = PWForms\FieldOperations::NewField($formdata,$id,$params);
+		$obfield = PWForms\FieldOperations::NewField($formdata,$params);
 	else //add field, whose type is to be selected
 		$obfield = FALSE;
 	$refresh = FALSE;
@@ -91,7 +91,7 @@ if (isset($params['submit'])) {
 	} else {
 		//start again //TODO if imported field with no tabled data
 		if ($newfield)
-			$obfield = PWForms\FieldOperations::NewField($formdata,$id,$params);
+			$obfield = PWForms\FieldOperations::NewField($formdata,$params);
 		else
 			$obfield->Load($id,$params); //TODO check for failure
 		$message = $this->PrettyMessage($message,FALSE,FALSE,FALSE);
