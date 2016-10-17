@@ -9,46 +9,64 @@ namespace PWForms;
 
 class FieldOperations
 {
-	// returns reference to new field-object corresponding to $params['field_id']
-	public static function &NewField(&$formdata, $id, &$params)
+	/**
+	NewField:
+	@formdata: reference to FormData-class object to be set in the field
+	@params: reference to array of request parameters or table-row fields
+	Constructs new field-object per $params['field_id'] or $params['field_type']
+	Returns: the object, or FALSE
+	*/
+	public static function NewField(&$formdata, &$params)
 	{
 		$obfield = FALSE;//may need ref to this
 		if (!empty($params['field_id'])) {
 			// we're loading an extant field
-			$pre = \cms_db_prefix();
-			$sql = 'SELECT type FROM '.$pre.'module_pwf_field WHERE field_id=?';
-			$db = \cmsms()->GetDb();
-			$type = $db->GetOne($sql,array($params['field_id']));
+			if (empty($params['type'])) {
+				$pre = \cms_db_prefix();
+				$sql = 'SELECT type FROM '.$pre.'module_pwf_field WHERE field_id=?';
+				$db = \cmsms()->GetDb();
+				$type = $db->GetOne($sql,array($params['field_id']));
+			} else {
+				$type = $params['type'];
+			}
 			if ($type) {
 				$className = Utils::MakeClassName($type);
-				$classPath = 'PWForms\\'.$className;
-				$obfield = new $classPath($formdata,$params);
-				$obfield->Load($id,$params); //TODO check for failure
-/*TODO rationalise this
-				if (!empty($params['value_'.$this->Name]))
-					$obfield->SetValue($params['value_'.$this->Name]);
-				if (!empty($params['value_fld'.$this->Id]))
-					$obfield->SetValue($params['value_fld'.$this->Id]);
-*/
+				//check file to prevent fatal autoloader error if class N/A
+				$classPath = __DIR__.DIRECTORY_SEPARATOR.'class.'.$className.'.php';
+				if (is_file($classPath)) {
+					$classPath = 'PWForms\\'.$className;
+					$obfield = new $classPath($formdata,$params);
+					if (self::LoadField($obfield)) {
+//TODO rationalise current-property setting
+						if (!empty($params['value_'.$obfield->Name])) {
+							$obfield->SetValue($params['value_'.$obfield->Name]);
+						} elseif (!empty($params['value_fld'.$obfield->Id])) {
+							$obfield->SetValue($params['value_fld'.$obfield->Id]);
+						}
+					}
+				}
 			}
-		}
-		if ($obfield === FALSE) {
-			// new field
-			if (!empty($params['field_type'])) {
-				// specified field type via params
-				$className = Utils::MakeClassName($params['field_type']);
+		} elseif (!empty($params['field_type'])) {
+			// specified field type via params
+			$className = Utils::MakeClassName($params['field_type']);
+			$classPath = __DIR__.DIRECTORY_SEPARATOR.'class.'.$className.'.php';
+			if (is_file($classPath)) {
 				$classPath = 'PWForms\\'.$className;
 				$obfield = new $classPath($formdata,$params);
-			} else {
-				// unknown field type
-				$obfield = new FieldBase($formdata,$params);
 			}
 		}
 		return $obfield;
 	}
 
-	// 'hard' copy an existing field returns TRUE/FALSE
-	public static function CopyField($field_id, $newform=FALSE, $neworder=FALSE)
+	/**
+	CopyField:
+	@field_id: field enumerator
+	@form_id: optional form enumerator, default FALSE to use the form for @field_id
+	@neworder: optional display-order for the field, default FALSE to place it last
+	'hard' copy an existing field i.e. from and to the database
+	Returns: boolean T/F indicating success
+	*/
+	public static function CopyField($field_id, $form_id=FALSE, $neworder=FALSE)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
@@ -58,36 +76,34 @@ class FieldOperations
 			return FALSE;
 
 		$fid = $db->GenID($pre.'module_pwf_field_seq');
-		if ($newform == FALSE)
-			$newform = (int)$row['form_id'];
-
 		$row['field_id'] = $fid;
-		$row['form_id'] = $newform;
+		if ($form_id === FALSE)
+			$form_id = $row['form_id'];
+		else
+			$row['form_id'] = $form_id;
 //		$row['name'] .= ' '.$mod->Lang('copy');
-		if ($row['validation_type'] == '')
-			$row['validation_type'] = NULL;
 
 		if ($neworder === FALSE) {
 			$sql = 'SELECT MAX(order_by) AS last FROM '.$pre.'module_pwf_field WHERE form_id=?';
-			$neworder = $db->GetOne($sql,array($newform));
+			$neworder = $db->GetOne($sql,array($form_id));
 			if ($neworder == FALSE)
 				$neworder = 0;
 			$neworder++;
 		}
 		$row['order_by'] = $neworder;
 		$sql = 'INSERT INTO '.$pre.'module_pwf_field
-(field_id,form_id,name,type,validation_type,required,hide_label,order_by) VALUES (?,?,?,?,?,?,?,?)';
+(field_id,form_id,name,alias,type,order_by) VALUES (?,?,?,?,?,?)';
 		$db->Execute($sql,$row);
 
-		$sql = 'SELECT * FROM '.$pre.'module_pwf_field_opt WHERE field_id=?';
+		$sql = 'SELECT * FROM '.$pre.'module_pwf_fielddata WHERE field_id=?';
 		$rs = $db->Execute($sql,array($field_id));
 		if ($rs) {
-			$sql = 'INSERT INTO '.$pre.'module_pwf_field_opt
-(option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
+			$sql = 'INSERT INTO '.$pre.'module_pwf_fielddata
+(prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
 			while ($row = $rs->FetchRow()) {
-				$row['option_id'] = $db->GenID($pre.'module_pwf_field_opt_seq');
+				$row['prop_id'] = $db->GenID($pre.'module_pwf_fielddata_seq');
 				$row['field_id'] = $fid;
-				$row['form_id'] = $newform;
+				$row['form_id'] = $form_id;
 				$db->Execute($sql,$row);
 			}
 			$rs->Close();
@@ -95,22 +111,21 @@ class FieldOperations
 		return TRUE;
 	}
 
-	// returns reference to a clone of existing field-object corresponding to $field_id
-	public static function &Replicate(&$formdata, $field_id)
+	/**
+	Replicate:
+	@formdata: reference to FormData-class object including the field to be cloned
+	@field_id: field enumerator, key in @formdata->Fields[]
+	Returns: a tailored clone of existing field-object identified by @field_id, or FALSE
+	*/
+	public static function Replicate(&$formdata, $field_id)
 	{
 		$obfield = FALSE;//may need ref to this
-		if ($field_id != 0) {
-			foreach ($formdata->Fields as &$one) {
-				if ($one->GetId() == $field_id) {
-					$name = $one->GetName();
-					$obfield = clone($one);
-					$obfield->Id = 0;
-					$obfield->SetName($name.' '.$formdata->formsmodule->Lang('copy'));
-					$obfield->SetOrder(count($formdata->Fields)+1); //bit racy!
-					break;
-				}
-			}
-			unset($one);
+		if (isset($formdata->Fields[$field_id])) {
+			$field = $formdata->Fields[$field_id];
+			$obfield = clone($field);
+			$obfield->Id = 0;
+			$obfield->SetName($field->GetName().' '.$formdata->formsmodule->Lang('copy'));
+			$obfield->SetOrder(count($formdata->Fields)+1); //bit racy!
 		}
 		return $obfield;
 	}
@@ -131,37 +146,45 @@ class FieldOperations
 		if ($obfield->Id <= 0) {
 			$obfield->Id = $db->GenID($pre.'module_pwf_field_seq');
 			$sql = 'INSERT INTO '.$pre.'module_pwf_field
-(field_id,form_id,name,type,order_by) VALUES (?,?,?,?,?)';
-			$res = $db->Execute($sql,
-				array($obfield->Id,$obfield->FormId,$obfield->Name,$obfield->Type,$obfield->OrderBy));
+(field_id,form_id,name,alias,type,order_by) VALUES (?,?,?,?,?,?)';
+			$res = $db->Execute($sql,array(
+				$obfield->Id,
+				$obfield->FormId,
+				$obfield->Name,
+				$obfield->Alias,
+				$obfield->Type,
+				$obfield->OrderBy));
 		} else {
-			$sql = 'UPDATE '.$pre.'module_pwf_field SET name=?,order_by=? WHERE field_id=?';
-			$res = $db->Execute($sql,array($obfield->Name,$obfield->OrderBy,$obfield->Id));
+			$sql = 'UPDATE '.$pre.'module_pwf_field SET name=?,alias=?,order_by=? WHERE field_id=?';
+			$res = $db->Execute($sql,array(
+				$obfield->Name,
+				$obfield->Alias,
+				$obfield->OrderBy,
+				$obfield->Id));
 		}
 
 		if ($deep) {
-			// drop all current options
-			$sql = 'DELETE FROM '.$pre.'module_pwf_field_opt where field_id=?';
+			// drop all current properties
+			$sql = 'DELETE FROM '.$pre.'module_pwf_fielddata where field_id=?';
 			$res = $db->Execute($sql,array($obfield->Id)) && $res;
 			// add back current ones
-			$sql = 'INSERT INTO '.$pre.'module_pwf_field_opt
-(option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
-			foreach ($obfield->Options as $name=>$optvalue) {
-				if (!is_array($optvalue))
-					$optvalue = array($optvalue);
-				foreach ($optvalue as &$one) {
-					$newid = $db->GenID($pre.'module_pwf_field_opt_seq');
+			$sql = 'INSERT INTO '.$pre.'module_pwf_fielddata
+(prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
+			foreach ($obfield->XtraProps as $name=>$value) {
+				if (!is_array($value))
+					$value = array($value);
+				foreach ($value as $sval) {
+					$newid = $db->GenID($pre.'module_pwf_fielddata_seq');
+					if (strlen($sval) <= \PWForms::LENSHORTVAL) {
+						$lval = NULL;
+					} else {
+						$lval = $sval;
+						$sval = NULL;
+					}
 					$res = $db->Execute($sql,
-						array($newid,$obfield->Id,$obfield->FormId,$name,$one)) && $res;
+						array($newid,$obfield->Id,$obfield->FormId,$name,$sval,$lval)) && $res;
 				}
 				unset($one);
-			}
-			//some former properties, now migrated to options
-			foreach (array('hide_label','required','validation_type') as $name) {
-				$newid = $db->GenID($pre.'module_pwf_field_opt_seq');
-				$optvalue = $obfield->$name;
-				$res = $db->Execute($sql,
-					array($newid,$obfield->Id,$obfield->FormId,$name,$optvalue)) && $res;
 			}
 		}
 		return $res;
@@ -170,10 +193,9 @@ class FieldOperations
 	/**
 	LoadField:
 	@obfield: reference to field data object, including (at least) the appropriate Id
-
 	Populates @obfield data from database tables.
-	Field data are merged with any existing data TODO OK?
-	Returns: boolean T/F per successful operation
+	Table data replace existing data TODO OK?
+	Returns: boolean T/F indicating successful operation
 	*/
 	public static function LoadField(&$obfield)
 	{
@@ -184,6 +206,8 @@ class FieldOperations
 			$obfield->FormId = (int)$row['form_id'];
 			if (!$obfield->Name)
 				$obfield->Name = $row['name'];
+			if (!$obfield->Alias)
+				$obfield->Alias = $row['alias'];
 			$obfield->Type = $row['type'];
 			$obfield->OrderBy = (int)$row['order_by'];
 		} else
@@ -191,57 +215,62 @@ class FieldOperations
 
 		$obfield->loaded = TRUE;
 
-		$sql = 'SELECT name,value FROM '.$pre.
-		  'module_pwf_field_opt WHERE field_id=? ORDER BY option_id';
-		$rs = $db->Execute($sql,array($obfield->Id));
-		if ($rs) {
-			$newopts = array();
-			while ($row = $rs->FetchRow()) {
+		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_fielddata WHERE field_id=? ORDER BY prop_id';
+		$defaults = $db->GetArray($sql,array($obfield->Id));
+		if ($defaults) {
+			$merged = array();
+			$rc = count($defaults);
+			for ($r=0; $r<$rc; $r++) {
+				$row = $defaults[$r];
 				$nm = $row['name'];
+				$val = $row['value'];
+				if ($val === NULL)
+					$val = $row['longvalue']; //maybe still FALSE
 				//accumulate options with the same name into array
-				if (isset($newopts[$nm])) {
-					if (!is_array($newopts[$nm]))
-						$newopts[$nm] = array($newopts[$nm]);
-					$newopts[$nm][] = $row['value'];
+				if (isset($merged[$nm])) {
+					if (!is_array($merged[$nm]))
+						$merged[$nm] = array($merged[$nm]);
+					$merged[$nm][] = $val;
 				} else {
-					//some former properties, now migrated to options
-					switch ($nm) {
-					 case 'hide_label':
-						$obfield->HideLabel = (int)$row['value'];
-						break;
-					 case 'required':
-						$obfield->Required = (int)$row['value'];
-						break;
-					 case 'validation_type':
-						$obfield->ValidationType = $row['value'];
-						break;
-					 default:
-						$newopts[$nm] = $row['value'];
-						break;
-					}
+					$merged[$nm] = $val;
 				}
 			}
-			$rs->Close();
-			$obfield->Options = array_merge($newopts,$obfield->Options);
+			foreach ($merged as $nm=>$val) {
+				if (property_exists($obfield,$nm)) {
+					$obfield->$nm = $val;
+				} else {
+					$obfield->XtraProps[$nm] = $val;
+				}
+			}
 		}
 		return TRUE;
 	}
 
+	/**
+	RealDeleteField:
+	@obfield: reference to field data object, including (at least) the appropriate Id
+	Returns: boolean T/F indicating success
+	*/
 	public static function RealDeleteField(&$obfield)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field where field_id=?';
 		$db = \cmsms()->GetDb();
 		$res = $db->Execute($sql,array($obfield->Id));
-		$sql = 'DELETE FROM '.$pre.'module_pwf_field_opt where field_id=?';
+		$sql = 'DELETE FROM '.$pre.'module_pwf_fielddata where field_id=?';
 		$res = $db->Execute($sql,array($obfield->Id)) && $res;
 		return $res;
 	}
 
+	/**
+	DeleteField:
+	@formdata: reference to FormData-class object
+	@field_id: field enumerator, key in @formdata->Fields[]
+	Clear table data
+	Unless the-field->Delete() is subclassed, it just calls self::RealDeleteField()
+	*/
 	public static function DeleteField(&$formdata, $field_id)
 	{
-		//clear table data
-		//unless subclassed, it just calls RealDeleteField()
 		$formdata->Fields[$field_id]->Delete();
 		unset($formdata->Fields[$field_id]);
 	}
@@ -255,8 +284,13 @@ class FieldOperations
 	}
 */
 
-	// Swaps field display-orders
-	// This is intended for swapping adjacent fields but works more generally
+	/**
+	SwapFieldsByIndex:
+	@field_index1:
+	@field_index2:
+	Swaps field display-orders
+	This is intended for swapping adjacent fields but works more generally
+	*/
 	public static function SwapFieldsByIndex($field_index1, $field_index2)
 	{
 		$keys = array_keys($formdata->Fields);
@@ -270,8 +304,13 @@ class FieldOperations
 		}
 	}
 
-	// Returns 0-based index of field in $formdata->Fields[] and with id matching $field_id
-	// Check returned value with !== FALSE
+	/**
+	GetFieldIndexFromId:
+	@formdata: reference to FormData-class object
+	@field_id: field enumerator, key in @formdata->Fields[]
+	Returns: 0-based index of a field in @formdata->Fields[] and with id matching @field_id
+	Check returned value with !== FALSE
+	*/
 	public static function GetFieldIndexFromId(&$formdata, $field_id)
 	{
 		return array_search($field_id,array_keys($formdata->Fields));
