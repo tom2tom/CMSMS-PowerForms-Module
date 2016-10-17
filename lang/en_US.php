@@ -258,6 +258,7 @@ $lang['add_destination'] = 'Add Another Destination';
 $lang['added'] = 'added';
 $lang['add_file'] = 'Add Another File';
 $lang['add_options'] = 'Add Another Option';
+$lang['adjust_templates'] = 'NOTE: imported templates may need further adjustment';
 $lang['admin_desc'] = 'Add, edit and manage interactive forms';
 $lang['advanced'] = 'Advanced';
 $lang['all'] = 'All';
