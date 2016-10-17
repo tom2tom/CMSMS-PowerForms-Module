@@ -8,7 +8,7 @@
 namespace PWForms;
 
 //for sorting field display-orders
-class SortOrdersClosure
+/*class SortOrdersClosure
 {
 	private $fields;
 	private $orders;
@@ -57,11 +57,12 @@ class IsFieldOption
 		return $fieldopt['field_id'] == $this->id;
 	}
 }
-
+*/
 class FormOperations
 {
 	//for CMSMS 2+
 	private static $editors = NULL;
+
 	private function SetTemplate($type, $id, $val)
 	{
 		if (self::$editors === NULL) {
@@ -70,8 +71,7 @@ class FormOperations
 			$db = \cmsms()->GetDb();
 			$pre = \cms_db_prefix();
 			$sql = <<<EOS
-SELECT G.group_id
-FROM {$pre}groups G
+SELECT G.group_id FROM {$pre}groups G
 JOIN {$pre}group_perms GP ON G.group_id = GP.group_id
 JOIN {$pre}permissions P on GP.permission_id = P.permission_id
 WHERE G.active=1 AND P.permission_name='ModifyPFSettings'
@@ -82,8 +82,7 @@ EOS;
 					$editors[] = -$id;
 			}
 			$sql = <<<EOS
-SELECT DISTINCT U.user_id
-FROM {$pre}users U
+SELECT DISTINCT U.user_id FROM {$pre}users U
 JOIN {$pre}user_groups UG ON U.user_id = UG.user_id
 JOIN {$pre}group_perms GP ON GP.group_id = UG.group_id
 JOIN {$pre}permissions P ON P.permission_id = GP.permission_id
@@ -100,7 +99,7 @@ EOS;
 		}
 		$tpl = new \CmsLayoutTemplate();
 		$tpl->set_type($type);
-		$pref = ($type == 'form') ? 'pwf::':'pwf::sub_';
+		$pref = ($type == 'form') ? 'pwf_':'pwf_sub_';
 		$tpl->set_name($pref.$id);
 		$tpl->set_owner(1); //original admin user
 		if ($this->editors)
@@ -153,7 +152,7 @@ EOS;
 	public function Delete(&$mod, $form_id)
 	{
 /*		$noparms = array();
-		$formdata = self::Load($mod,$id,$noparms,$form_id);
+		$formdata = self::Load($mod,$form_id,$id,$noparms);
 		if (!$formdata)
 			return FALSE;
 		foreach ($formdata->Fields as &$one)
@@ -161,15 +160,15 @@ EOS;
 		unset($one);
 */
 		if ($mod->before20) {
-			$mod->DeleteTemplate('pwf::'.$form_id);
-			$mod->DeleteTemplate('pwf::sub_'.$form_id);
+			$mod->DeleteTemplate('pwf_'.$form_id);
+			$mod->DeleteTemplate('pwf_sub_'.$form_id);
 		} else {
 			try {
-				$tpl = CmsLayoutTemplateType::load('pwf::'.$form_id);
+				$tpl = CmsLayoutTemplateType::load('pwf_'.$form_id);
 				$tpl->delete();
 			} catch (Exception $e) {}
 			try {
-				$tpl = CmsLayoutTemplateType::load('pwf::sub_'.$form_id);
+				$tpl = CmsLayoutTemplateType::load('pwf_sub_'.$form_id);
 				$tpl->delete();
 			} catch (Exception $e) {}
 		}
@@ -177,12 +176,12 @@ EOS;
 		$sql = 'DELETE FROM '.$pre.'module_pwf_trans WHERE new_id=? AND isform=1';
 		$db = \cmsms()->GetDb();
 		$db->Execute($sql,array($form_id));
-		$sql = 'DELETE FROM '.$pre.'module_pwf_field_opt WHERE form_id=?';
+		$sql = 'DELETE FROM '.$pre.'module_pwf_fielddata WHERE form_id=?';
 		$res = $db->Execute($sql,array($form_id));
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field WHERE form_id=?';
 		if (!$db->Execute($sql,array($form_id)))
 			$res = FALSE;
-		$sql = 'DELETE FROM '.$pre.'module_pwf_form_opt WHERE form_id=?';
+		$sql = 'DELETE FROM '.$pre.'module_pwf_formdata WHERE form_id=?';
 		if (!$db->Execute($sql,array($form_id)))
 			$res = FALSE;
 		$sql = 'DELETE FROM '.$pre.'module_pwf_form WHERE form_id=?';
@@ -204,7 +203,7 @@ EOS;
 	public function Copy(&$mod, $id, &$params, $form_id)
 	{
 		$noparms = array();
-		$formdata = self::Load($mod,$id,$noparms,$form_id);
+		$formdata = self::Load($mod,$form_id,$id,$noparms);
 		if (!$formdata)
 			return FALSE;
 		$tn = $mod->Lang('copy');
@@ -243,24 +242,30 @@ EOS;
 		$db->Execute($sql,array($newid,$name,$alias));
 
 		$res = TRUE;
-		$sql = 'INSERT INTO '.$pre.'module_pwf_form_opt
-(option_id,form_id,name,value) VALUES (?,?,?,?)';
-		foreach ($formdata->Options as $key=>&$val) {
-			$AttrId = $db->GenID($pre.'module_pwf_form_opt_seq');
+		$sql = 'INSERT INTO '.$pre.'module_pwf_formdata
+(prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
+		foreach ($formdata->XtraProps as $key=>&$val) {
+			$newid = $db->GenID($pre.'module_pwf_formdata_seq');
+			$longval = NULL;
 			if ($key == 'form_template') {
 				if ($mod->before20)
-					$mod->SetTemplate('pwf::'.$form_id,$val);
+					$mod->SetTemplate('pwf_'.$form_id,$val);
 				else
 					self::SetTemplate('form',$form_id,$val);
 				$val = 'pwf_'.$form_id;
 			} elseif ($key == 'submission_template') {
 				if ($mod->before20)
-					$mod->SetTemplate('pwf::sub_'.$form_id,$val);
+					$mod->SetTemplate('pwf_sub_'.$form_id,$val);
 				else
 					self::SetTemplate('submission',$form_id,$val);
 				$val = 'pwf_sub_'.$form_id;
+			} else {
+				if (strlen($val) > \PWForms::LENSHORTVAL) {
+					$longval = $val;
+					$val = NULL;
+				}
 			}
-			if (!$db->Execute($sql,array($AttrId,$form_id,$key,$val))) {
+			if (!$db->Execute($sql,array($newid,$form_id,$key,$val,$longval))) {
 				$params['message'] = $mod->Lang('database_error');
 				$res = FALSE;
 			}
@@ -286,9 +291,10 @@ EOS;
 	 and stores form template as such
 	@mod: reference to the current PWForms module object
 	@formdata: reference to form data object
+	@params: reference to array of request-parameters including form/field property-values
 	Returns: boolean T/F indicating success, with $params['message'] set upon failure
 	*/
-	public function Store(&$mod, &$formdata)
+	public function Store(&$mod, &$formdata, &$params)
 	{
 		$form_id = $formdata->Id;
 		$newform = ($form_id <= 0);
@@ -302,64 +308,84 @@ EOS;
 			$form_id = $db->GenID($pre.'module_pwf_form_seq');
 			$sql = 'INSERT INTO '.$pre.'module_pwf_form
 (form_id,name,alias) VALUES (?,?,?)';
-			$res = $db->Execute($sql,array($form_id,$formdata->Name,$formdata->Alias));
+			$res = $db->Execute($sql,array($form_id,$params['form_Name'],$params['form_Alias']));
 		} else {
 			$sql = 'UPDATE '.$pre.'module_pwf_form SET name=?,alias=? WHERE form_id=?';
-			$res = $db->Execute($sql,array($formdata->Name,$formdata->Alias,$form_id));
+			$res = $db->Execute($sql,array($params['form_Name'],$params['form_Alias'],$form_id));
+			$done = array();
 		}
 		if ($res == FALSE)
 			return array(FALSE,$mod->Lang('database_error'));
 
+		$sql = 'INSERT INTO '.$pre.'module_pwf_formdata (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
+		$sql2 = 'UPDATE '.$pre.'module_pwf_formdata SET value=?,longvalue=? WHERE form_id=? AND name=?';
+
 		//store form options
-		//TODO incremental instead of junk current then re-store
-		if (!$newform) {
-			$sql = 'DELETE FROM '.$pre.'module_pwf_form_opt WHERE form_id=?';
-			if ($db->Execute($sql,array($form_id)) == FALSE)
-				return array(FALSE,$mod->Lang('database_error'));
-		}
-		$sql = 'INSERT INTO '.$pre.'module_pwf_form_opt
-(option_id,form_id,name,value) VALUES (?,?,?,?)';
-		foreach ($formdata->Options as $key=>$val) {
-			if ($key == 'form_template') {
-				if ($mod->before20)
-					$mod->SetTemplate('pwf::'.$form_id,$val);
-				else {
-					if ($newform)
-						self::SetTemplate('form',$form_id,$val);
-					else {
-						$ob = CmsLayoutTemplate::load('pwf::'.$form_id);
-						$ob->set_content($val);
-						$ob->save();
+		foreach ($params as $key=>$val) {
+			if (strncmp($key,'opt_',4) == 0) {
+				$key = substr($key,4);
+				$longval = NULL;
+				if (($p = strpos($key,'_template')) !== FALSE) {
+					$type = substr($key,0,$p);
+					switch ($type) {
+						case 'form':
+							$name = 'pwf_'.$form_id;
+							break;
+						case 'submission':
+							$name = 'pwf_sub_'.$form_id;
+							break;
+						default:
+							break 2;
 					}
-				}
-				$val = 'pwf_'.$form_id;
-			} elseif ($key == 'submission_template') {
-				if ($mod->before20)
-					$mod->SetTemplate('pwf::sub_'.$form_id,$val);
-				else {
-					if ($newform)
-						self::SetTemplate('submission',$form_id,$val);
+					if ($mod->before20)
+						$mod->SetTemplate($name,$val);
 					else {
-						$ob = CmsLayoutTemplate::load('pwf::sub_'.$form_id);
-						$ob->set_content($val);
-						$ob->save();
+						if ($newform)
+							self::SetTemplate($type,$form_id,$val);
+						else {
+							$ob = CmsLayoutTemplate::load($name);
+							$ob->set_content($val);
+							$ob->save();
+						}
 					}
+					$val = $name; //record a pointer
+				} elseif (strlen($val > \PWForms::LENSHORTVAL)) {
+					$longval = $val;
+					$val = NULL;
 				}
-				$val = 'pwf_sub_'.$form_id;
+				if ($newform) {
+					$newid = $db->GenID($pre.'module_pwf_formdata_seq');
+					if (!$db->Execute($sql,array($newid,$form_id,$key,$val,$longval)))
+						return array(FALSE,$mod->Lang('database_error'));
+				} else {
+					if (!$db->Execute($sql2,array($val,$longval,$form_id,$key)))
+						return array(FALSE,$mod->Lang('database_error'));
+					$done[] = $key;
+				}
 			}
-			$newid = $db->GenID($pre.'module_pwf_form_opt_seq');
-			if (!$db->Execute($sql,array($newid,$form_id,$key,$val)))
-				return array(FALSE,$mod->Lang('database_error'));
 		}
+
+		if (!$newform) {
+			$sql = 'DELETE FROM '.$pre.'module_pwf_formdata WHERE form_id=?';
+			$args = array(-1=>$form_id);
+			if ($done) {
+				$fillers = str_repeat('?,',count($done)-1);
+				$sql .= ' AND name NOT IN ('.$fillers.'?)';
+				$args += $done;
+			}
+			$db->Execute($sql,$args);
+		}
+
+		self::Arrange($formdata->Fields,$params['form_FieldOrders']);
 
 		// store fields
 		$newfields = array();
-		foreach ($formdata->Fields as $key=>&$fld) {
-			$fld->Store(TRUE);
+		foreach ($formdata->Fields as $key=>&$obfield) {
+			$obfield->Store(TRUE);
 			if ($key <= 0) //new field, after save it will include an actual id
-				$newfields[$key] = $fld->GetId();
+				$newfields[$key] = $obfield->GetId();
 		}
-		unset($fld);
+		unset($obfield);
 		// conform array-keys of new fields
 		foreach ($newfields as $key=>$newkey) {
 			$formdata->Fields[$newkey] = $formdata->Fields[$key];
@@ -370,17 +396,19 @@ EOS;
 
 	/**
 	Load:
-	Populates a data object from tables or from suitably-keyed members of @params
-	@mod: reference to the current PWForms module object
-	@id: module id
-	@params: reference to array of parameters
+	Create and populate a FormData object from database tables and/or from
+		suitably-keyed members of @params
+	@mod: reference to PWForms module object
 	@form_id: enumerator of form to be processed
-	Returns: reference to a FormData object for the form, or FALSE
+	@id: module id
+	@params: reference to array of request-parameters
+	@withtemplates: optional boolean whether to also load templates, default FALSE
+	Returns: reference to a FormData object, or FALSE
 	*/
-	public function &Load(&$mod, $id, &$params, $form_id)
+	public function &Load(&$mod, $form_id, $id, &$params, $withtemplates=FALSE)
 	{
 		$pre = \cms_db_prefix();
-		$sql = 'SELECT * FROM '.$pre.'module_pwf_form WHERE form_id=?';
+		$sql = 'SELECT name,alias FROM '.$pre.'module_pwf_form WHERE form_id=?';
 		$db = \cmsms()->GetDb();
 		$row = $db->GetRow($sql,array($form_id));
 		if (!$row) {
@@ -389,47 +417,80 @@ EOS;
 		}
 
 		$formdata = $mod->GetFormData($params);
-		$formdata->Id = $row['form_id'];
 		//some form properties (if absent from $params) default to stored values
 		if (empty($params['form_name']))
 			$formdata->Name = $row['name'];
 		if (empty($params['form_alias']))
 			$formdata->Alias = $row['alias'];
 
-		//no form opt value is an array, so no records with same name
-		$sql = 'SELECT name,value FROM '.$pre.'module_pwf_form_opt WHERE form_id=?';
-		$formdata->Options = $db->GetAssoc($sql,array($form_id));
-
-		$val = $formdata->Options['form_template'];
-		if ($mod->before20)
-			$tpl = $mod->GetTemplate($val);
-		else {
-			$ob = CmsLayoutTemplate::load($val);
-			$tpl = $ob->get_content();
+		//no form data value is an array, so no records with same name
+		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_formdata WHERE form_id=?';
+		$data = $db->GetArray($sql,array($form_id));
+		foreach ($data as $one) {
+			$nm = $one['name'];
+/*			TODO support arrays when 'name' field like A[B...
+			if (strpos($nm,'[') !== FALSE) {
+				$parts = explode('[',$nm);
+				foreach ($parts as $a) {
+					if (!is_array(<pathto>$a)) {
+						create it in <pathto>
+					}
+					process rest of parts as members
+				}
+			}
+*/
+			$val = $one['value'];
+			if ($val === NULL)
+				$val = $one['longvalue']; //maybe still FALSE
+			if (property_exists($formdata,$nm))
+				$formdata->$nm = $val;
+			else
+				$formdata->XtraProps[$nm] = $val;
 		}
-		$formdata->Options['form_template'] = $tpl;
-//		$val = $formdata->Options['submission_template'];
-//		$formdata->Options['submission_template'] = $mod->GetTemplate($val);
+
+		if ($withtemplates) {
+			$val = $formdata->XtraProps['form_template'];
+			if ($mod->before20)
+				$tpl = $mod->GetTemplate($val);
+			else {
+				$ob = CmsLayoutTemplate::load($val);
+				$tpl = $ob->get_content();
+			}
+			$formdata->XtraProps['form_template'] = $tpl;
+			$val = $formdata->XtraProps['submission_template'];
+			if ($val) {
+				if ($mod->before20)
+					$tpl = $mod->GetTemplate($val);
+				else {
+					$ob = CmsLayoutTemplate::load($val);
+					$tpl = $ob->get_content();
+				}
+				$formdata->XtraProps['submission_template'] = $tpl;
+			}
+		}
 
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
 		$fields = $db->GetArray($sql,array($form_id));
 		if ($fields) {
 			foreach ($fields as &$row) {
 				$fid = $row['field_id'];
-				// create the field object
-				if (isset($params[$formdata->current_prefix.$fid]) ||
+				//TODO ensure data are present for field setup: value etc
+ 				if (isset($params[$formdata->current_prefix.$fid]) ||
 					isset($params[$formdata->prior_prefix.$fid]) ||
 					isset($params['value_'.$row['name']]) ||
 					isset($params['value_fld'.$fid]) ||
 					(isset($params['field_id']) && $params['field_id'] == $fid)
 				  )
 				{
-					$row = array_merge($row,$params); //TODO
+					$row = array_merge($row,$params);
 				}
-				$obfield = FieldOperations::NewField($formdata,$id,$row);
-				$formdata->Fields[$obfield->Id] = $obfield;
-				if ($obfield->Type == 'PageBreakField')
-					$formdata->PagesCount++;
+				// create the field object
+				$obfield = FieldOperations::NewField($formdata,$row);
+				if ($obfield) {
+					$formdata->Fields[$obfield->Id] = $obfield;
+					if ($obfield->Type == 'PageBreak')
+						$formdata->PagesCount++;
+				}
 			}
 			unset($row);
 		}
@@ -478,11 +539,10 @@ EOS;
 <!ELEMENT version (#PCDATA)>
 <!ELEMENT date (#PCDATA)>
 <!ELEMENT count (#PCDATA)>
-<!ELEMENT form (properties,options?,fields?)>
+<!ELEMENT form (properties,fields?)>
 <!ELEMENT properties (#PCDATA)>
-<!ELEMENT options (#PCDATA)>
 <!ELEMENT fields (field)>
-<!ELEMENT field (properties,options?)>
+<!ELEMENT field (properties?)>
 ]>
 EOS;
 		}
@@ -493,9 +553,9 @@ EOS;
 \t<date>{$date}</date>
 \t<count>{$count}</count>
 EOS;
-		$sql = 'SELECT name,value FROM '.$pre.'module_pwf_form_opt WHERE form_id=? ORDER BY name';
+		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_formdata WHERE form_id=? ORDER BY name';
 		$sql2 = 'SELECT field_id,name,type,order_by FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
-		$sql3 = 'SELECT option_id,field_id,name,value FROM '.$pre.'module_pwf_field_opt WHERE form_id=? ORDER BY option_id,name';
+		$sql3 = 'SELECT prop_id,field_id,name,value,longvalue FROM '.$pre.'module_pwf_fielddata WHERE form_id=? ORDER BY prop_id,name';
 		$formpropkeys = array_keys($properties);
 
 		foreach ($form_id as $one) {
@@ -508,13 +568,12 @@ EOS;
 \t<form>
 \t\t<properties>
 EOS;
+//TODO <alias> <template>
 			foreach ($formpropkeys as $onekey)
 				$xml[] = "\t\t\t<$onekey>".$properties[$onekey]."</$onekey>";
-			$xml[] =<<<EOS
-\t\t</properties>
-\t\t<options>
-EOS;
-			foreach ($formopts as $name=>$value) {
+			foreach ($formopts as $name=>$row) {
+				$value = $row['value'];
+				if ($value === '') $value = $row['longvalue'];
 				if ($value === '') continue;
 				if (strpos($name,'template') === FALSE)
 					$xml[] = "\t\t\t<$name>".trim($value)."</$name>";
@@ -540,7 +599,7 @@ EOS;
 				}
 			}
 			$xml[] =<<<EOS
-\t\t</options>
+\t\t</properties>
 \t\t<fields>
 EOS;
 			foreach ($formfields as $thisfield) {
@@ -550,12 +609,13 @@ EOS;
 EOS;
 				foreach ($fieldkeys as $onekey)
 					$xml[] = "\t\t\t\t\t<$onekey>".$thisfield[$onekey]."</$onekey>";
-				$xml[] =<<<EOS
-\t\t\t\t</properties>
-\t\t\t\t<options>
-EOS;
 				//get $fieldopts[] for this field
-				$myopts = array_filter($fieldopts,array(new IsFieldOption($thisfield['field_id']),'isMine'));
+//				$myopts = array_filter($fieldopts,array(new IsFieldOption($thisfield['field_id']),'isMine'));
+				$fid = $thisfield['field_id'];
+				$myopts = array_filter($fieldopts,function($fieldopt) use ($fid)
+				{
+					return $fieldopt['field_id'] == $fid;
+				});
 				if ($myopts) {
 					foreach ($myopts as &$oneopt) {
 						if ($oneopt['value'] === '') continue;
@@ -567,8 +627,8 @@ EOS;
 					}
 					unset($oneopt);
 				}
-			$xml[] =<<<EOS
-\t\t\t\t</options>
+				$xml[] =<<<EOS
+\t\t\t\t</properties>
 \t\t\t</field>
 EOS;
 			}
@@ -674,7 +734,7 @@ EOS;
 		}
 		//and lower-level tags
 		self::ClearTags($array);
-		$expected = array('properties','options','fields');
+		$expected = array('properties','fields');
 		foreach ($array['form1'] as $indx=>&$check) {
 			if (!in_array($indx,$expected)) {
 				unset($check);
@@ -707,48 +767,64 @@ EOS;
 			$db->Execute($sql,array($form_id,
 				$fdata['properties']['name'],
 				$fdata['properties']['alias']));
-			$sql = 'INSERT INTO '.$pre.'module_pwf_form_opt
-(option_id,form_id,name,value) VALUES (?,?,?,?)';
-			foreach ($fdata['options'] as $name=>&$one) {
-				$option_id = $db->GenID($pre.'module_pwf_form_opt_seq');
+			unset($fdata['properties']['name']);
+			unset($fdata['properties']['alias']);
+
+			$sql = 'INSERT INTO '.$pre.'module_pwf_formdata
+(prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
+			foreach ($fdata['properties'] as $name=>&$one) {
+				$prop_id = $db->GenID($pre.'module_pwf_formdata_seq');
 				if (strncmp($one,']][[',4) != 0)
 					$val = $one;
 				else { //encoded value
 					$val = urldecode(substr($one,4)); //TODO translate numbered fields in templates
 					if ($name == 'form_template') {
 						if ($mod->before20)
-							$mod->SetTemplate('pwf::'.$form_id,$val);
+							$mod->SetTemplate('pwf_'.$form_id,$val);
 						else
 							self::SetTemplate('form',$form_id,$val);
 						$val = 'pwf_'.$form_id;
 					} elseif ($name == 'submission_template') {
 						if ($mod->before20)
-							$mod->SetTemplate('pwf::sub_'.$form_id,$val);
+							$mod->SetTemplate('pwf_sub_'.$form_id,$val);
 						else
 							self::SetTemplate('submission',$form_id,$val);
 						$val = 'pwf_sub_'.$form_id;
 					}
 				}
-				$db->Execute($sql,array($option_id,$form_id,$name,$val));
+				$args = (strlen($val) <= \PWForms::LENSHORTVAL) ?
+					array($prop_id,$form_id,$name,$val,NULL):
+					array($prop_id,$form_id,$name,NULL,$val);
+				$db->Execute($sql,$args);
 			}
 			unset($one);
 			$sql = 'INSERT INTO '.$pre.'module_pwf_field
-(field_id,form_id,name,type,order_by) VALUES (?,?,?,?,?)';
+(field_id,form_id,name,alias,type,order_by) VALUES (?,?,?,?,?,?)';
+			$sql2 = 'INSERT INTO '.$pre.'module_pwf_fielddata
+(prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
 			foreach ($fdata['fields'] as &$fld) {
 				$field_id = $db->GenID($pre.'module_pwf_field_seq');
-				$db->Execute($sql,array($field_id,$form_id,
-					$fld['properties']['name'],
-					$fld['properties']['type'],
-					$fld['properties']['order_by']));
-				$sql2 = 'INSERT INTO '.$pre.'module_pwf_field_opt
-(option_id,field_id,form_id,name,value) VALUES (?,?,?,?,?)';
-				foreach ($fld['options'] as $name=>&$one) {
-					$option_id = $db->GenID($pre.'module_pwf_field_opt_seq');
-					if (strncmp($one,']][[',4) != 0)
+				unset($fld['properties']['field_id']);
+				foreach (array('name','alias','type','order_by') as $key) {
+					if (isset($fld['properties'][$key])) {
+						$$key = $fld['properties'][$key];
+						unset($fld['properties'][$key]);
+					} else {
+						$$key = '';
+					}
+				}
+				$db->Execute($sql,array($field_id,$form_id,$name,$alias,$type,$order_by));
+
+				foreach ($fld['properties'] as $name=>&$one) {
+					$prop_id = $db->GenID($pre.'module_pwf_fielddata_seq');
+					if (strncmp($one,']][[',4) !== 0)
 						$val = $one;
 					else //encoded
 						$val = urldecode(substr($one,4)); //TODO translate numbered fields in templates
-					$db->Execute($sql2,array($option_id,$field_id,$form_id,$name,$val));
+					$args = (strlen($val) <= \PWForms::LENSHORTVAL) ?
+						array($prop_id,$field_id,$form_id,$name,$val,NULL):
+						array($prop_id,$field_id,$form_id,$name,NULL,$val);
+					$db->Execute($sql2,$args);
 				}
 				unset($one);
 			}
@@ -768,39 +844,41 @@ EOS;
 	public function Arrange(&$fields, &$orders)
 	{
 		$keys = array_keys($orders);
-		//old-PHP usort-with-extras
+/*		//old-PHP usort-with-extras
 		$soc = new SortOrdersClosure($fields,$orders);
-		usort($keys,array($soc,"compare"));
+		usort($keys,array($soc,'compare'));
 		unset($soc);
-/*		usort($keys,
-		public function($a, $b) use ($fields,$orders) //this syntax is for PHP 5.3+
+*/
+		usort($keys,function($a, $b) use ($fields,$orders)
 		{
 			$fa = $fields[$orders[$a]];
 			$fb = $fields[$orders[$b]];
-			if ($fa->IsDisposition) {
-				if ($fb->IsDisposition) {
-					if ($fb->Type == 'PageRedirector') //page redirect last
-						return -1;
-					elseif ($fb->DisplayInForm) //email confirmation first
+			if ($fa->DisplayExternal == $fb->DisplayExternal) {
+				if ($fa->IsDisposition) {
+					if ($fb->IsDisposition) {
+						if ($fb->Type == 'PageRedirector') //page redirect last
+							return -1;
+						elseif ($fb->DisplayInForm) //email confirmation first
+							return 1;
+						elseif ($fa->Type == 'PageRedirector')
+							return 1;
+						elseif ($fa->DisplayInForm)
+							return -1;
+					} elseif (!$fa->DisplayInForm)//includes $fa->Type == 'PageRedirector'
 						return 1;
-					elseif ($fa->Type == 'PageRedirector')
+				} elseif ($fb->IsDisposition) {
+					if (!$fb->DisplayInForm)
 						return 1;
-					elseif ($fa->DisplayInForm)
-						return -1;
-				} elseif (!$fa->DisplayInForm)//includes $fa->Type == 'PageRedirector'
-					return 1;
-			} elseif ($fb->IsDisposition) {
-				if (!$fb->DisplayInForm)
-					return 1;
+				}
+				//TODO field type '...start' before corresponding type '...end'
+				return $a - $b; //stet current order
 			}
-			//TODO field type '...start' before corresponding type '...end'
-			return $a - $b; //stet current order
+			return ($fa->DisplayExternal - $fb->DisplayExternal);
 		});
-*/
 		// update source-arrays accordingly
 		$neworder = array();
 		foreach ($keys as $val)
-			$neworder[] = $orders[$val];
+			$neworder[] = (int)$orders[$val];
 		foreach ($neworder as $i=>$val) {
 			$fields[$val]->SetOrder($i+1);
 			$orders[$i] = $val;
