@@ -416,7 +416,7 @@ EOS;
 			return $ret;
 		}
 
-		$formdata = $mod->GetFormData($params);
+		$formdata = $mod->_GetFormData($params);
 		//some form properties (if absent from $params) default to stored values
 		if (empty($params['form_name']))
 			$formdata->Name = $row['name'];

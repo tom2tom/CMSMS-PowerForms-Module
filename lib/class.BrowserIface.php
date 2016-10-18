@@ -38,7 +38,7 @@ EOS;
 		$result = array();
 		if ($all) {
 			$mod = \cms_utils::get_module('PWForms');
-			$dummy = $mod->GetFormData();
+			$dummy = $mod->_GetFormData();
 			$params = array();
 			foreach ($all as $key=>&$row) {
 				$classPath = 'PWForms\\'.$row['type'];
