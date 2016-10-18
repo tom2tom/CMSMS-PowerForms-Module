@@ -9,7 +9,7 @@ namespace PWForms;
 
 class Multiselect extends FieldBase
 {
-	var $optionAdd = FALSE;
+	private $optionAdd = FALSE;
 
 	public function __construct(&$formdata,&$params)
 	{

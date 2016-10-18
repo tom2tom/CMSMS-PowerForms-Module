@@ -9,7 +9,7 @@ namespace PWForms;
 
 class CountryPicker extends FieldBase
 {
-	var $Countries;
+	private $Countries;
 
 	public function __construct(&$formdata,&$params)
 	{

@@ -9,7 +9,7 @@ namespace PWForms;
 
 class MultiselectFileDirector extends FieldBase
 {
-	var $fileAdd = FALSE;
+	private $fileAdd = FALSE;
 
 	public function __construct(&$formdata,&$params)
 	{

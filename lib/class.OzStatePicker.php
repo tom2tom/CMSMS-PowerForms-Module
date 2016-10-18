@@ -9,14 +9,14 @@ namespace PWForms;
 
 class OzStatePicker extends FieldBase
 {
-	var $states;
+	private $States;
 
 	public function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
 		$this->Type = 'OzStatePicker';
-		$this->states = array(
+		$this->States = array(
 		'Australian Capital Territory'=>'ACT',
 		'New South Wales'=>'NSW',
 		'Northern Territory'=>'NT',
@@ -26,12 +26,12 @@ class OzStatePicker extends FieldBase
 		'Victoria'=>'Vic',
 		'Western Australia'=>'WA'
 		);
-//		ksort($this->states);
+//		ksort($this->States);
 	}
 
 	public function GetDisplayableValue($as_string=TRUE)
 	{
-		$ret = array_search($this->Value,$this->states);
+		$ret = array_search($this->Value,$this->States);
 		if ($as_string)
 			return $ret;
 		else
@@ -40,7 +40,7 @@ class OzStatePicker extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		$choices = array_merge(array('No Default'=>''),$this->states);
+		$choices = array_merge(array('No Default'=>''),$this->States);
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_select_default_state'),
@@ -56,7 +56,7 @@ class OzStatePicker extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 
-		$choices = array_merge(array($this->GetOption('select_one',$mod->Lang('select_one'))=>-1),$this->states);
+		$choices = array_merge(array($this->GetOption('select_one',$mod->Lang('select_one'))=>-1),$this->States);
 
 		if (!$this->HasValue() && $this->GetOption('default_state'))
 			$this->SetValue($this->GetOption('default_state'));

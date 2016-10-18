@@ -9,7 +9,7 @@ namespace PWForms;
 
 class DatePicker extends FieldBase
 {
-	var $Months;
+	private $Months;
 
 	public function __construct(&$formdata,&$params)
 	{

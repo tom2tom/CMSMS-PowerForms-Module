@@ -12,7 +12,7 @@ namespace PWForms;
 
 class SystemEmail extends EmailBase
 {
-	var $addressAdd = FALSE;
+	private $addressAdd = FALSE;
 
 	public function __construct(&$formdata, &$params)
 	{

@@ -9,7 +9,7 @@ namespace PWForms;
 
 class RadioGroup extends FieldBase
 {
-	var $optionAdd = FALSE;
+	private $optionAdd = FALSE;
 
 	public function __construct(&$formdata,&$params)
 	{

@@ -8,8 +8,8 @@ namespace PWForms;
 
 class Captcha extends FieldBase
 {
-	var $defaulttemplate = '{$prompt}<br />{$captcha}';
-	var $RealName = FALSE;
+	private $defaulttemplate = '{$prompt}<br />{$captcha}';
+	private $RealName = FALSE;
 
 	public function __construct(&$formdata,&$params)
 	{

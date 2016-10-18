@@ -9,7 +9,7 @@ namespace PWForms;
 
 class CheckboxGroup extends FieldBase
 {
-	var $boxAdd = FALSE;
+	private $boxAdd = FALSE;
 
 	public function __construct(&$formdata,&$params)
 	{

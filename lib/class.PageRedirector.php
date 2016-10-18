@@ -9,7 +9,7 @@ namespace PWForms;
 
 class PageRedirector extends FieldBase
 {
-	var $addressAdd = FALSE;
+	private $addressAdd = FALSE;
 
 	public function __construct(&$formdata,&$params)
 	{
