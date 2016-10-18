@@ -228,7 +228,7 @@ class PWForms extends CMSModule
 
 	public function VisibleToAdminUser()
 	{
-		return self::CheckAccess();
+		return self::_CheckAccess();
 	}
 
 	public function GetHeaderHTML()
@@ -297,7 +297,7 @@ class PWForms extends CMSModule
 
 // ~~~~~~~~~~~~~~~~~~~~~ NON-CMSModule METHODS ~~~~~~~~~~~~~~~~~~~~~
 
-	public function CheckAccess($permission='')
+	public function _CheckAccess($permission='')
 	{
 		switch ($permission) {
 		 case 'ModifyPFForms':
@@ -320,7 +320,7 @@ class PWForms extends CMSModule
 		return FALSE;
 	}
 
-	public function GetActiveTab(&$params)
+	public function _GetActiveTab(&$params)
 	{
 		if (!empty($params['active_tab']))
 		    return $params['active_tab'];
@@ -328,31 +328,12 @@ class PWForms extends CMSModule
 			return 'maintab';
 	}
 
-	public function PrettyMessage($text, $success=TRUE, $faillink=FALSE, $key=TRUE)
-	{
-		$base = ($key) ? $this->Lang($text) : $text;
-		if ($success)
-			return $this->ShowMessage($base);
-		else {
-			$msg = $this->ShowErrors($base);
-			if ($faillink == FALSE) {
-				//strip the link
-				$pos = strpos($msg,'<a href=');
-				$part1 = ($pos !== FALSE) ? substr($msg,0,$pos) : '';
-				$pos = strpos($msg,'</a>',$pos);
-				$part2 = ($pos !== FALSE) ? substr($msg,$pos+4) : $msg;
-				$msg = $part1.$part2;
-			}
-			return $msg;
-		}
-	}
-
-	public function &GetFormData(&$params=NULL)
+	public function _GetFormData(&$params=NULL)
 	{
 		$fd = new PWForms\FormData();
 
 		$fd->formsmodule =& $this;
-		list($fd->current_prefix,$fd->prior_prefix) = $this->GetTokens();
+		list($fd->current_prefix,$fd->prior_prefix) = $this->_GetTokens();
 
 		if ($params == NULL)
 			return $fd;
@@ -371,18 +352,18 @@ class PWForms extends CMSModule
 	Submitted data will be accepted if the parameter-keys of that data include
 	either the 'current-period' prefix or the 'previous-period' one
 	*/
-	public function GetTokens()
+	public function _GetTokens()
 	{
 		$now = time();
 		$base = floor($now / (84600 * 1800)) * 1800; //start of current 30-mins
 		$day = date('j',$now);
 		return array(
-			'pwfp_'.$this->Hash($base+$day).'_',
-			'pwfp_'.$this->Hash($base-1800+$day-1).'_'
+			'pwfp_'.$this->_Hash($base+$day).'_',
+			'pwfp_'.$this->_Hash($base-1800+$day-1).'_'
 		);
 	}
 
-	private function Hash($num)
+	private function _Hash($num)
 	{
 		//djb2 hash : see http://www.cse.yorku.ca/~oz/hash.html
 		$n = ''.$num;
@@ -391,6 +372,26 @@ class PWForms extends CMSModule
 		for ($i = 0; $i < $l; $i++)
 			$hash = $hash * 33 + $n[$i];
 		return substr($hash,-3);
+	}
+
+	//$success may be boolean or 'warn'
+	public function _PrettyMessage($text, $success=TRUE, $key=TRUE)
+	{
+		$msg = ($key) ? $this->Lang($text) : $text;
+		if ($success === 'warn') {
+			return "<div class=\"pagewarning\"><p class=\"pagemessage\">$msg</p></div>";
+		} elseif ($success) {
+			return $this->ShowMessage($msg);
+		} else {
+			$msg = $this->ShowErrors($msg);
+			//strip the link
+			$pos = strpos($msg,'<a href=');
+			$part1 = ($pos !== FALSE) ? substr($msg,0,$pos) : '';
+			$pos = strpos($msg,'</a>',$pos);
+			$part2 = ($pos !== FALSE) ? substr($msg,$pos+4) : $msg;
+			$msg = $part1.$part2;
+			return $msg;
+		}
 	}
 
 	public function RegisterField($classfilepath)
