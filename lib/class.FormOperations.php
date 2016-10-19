@@ -322,7 +322,7 @@ EOS;
 
 		//store form options
 		foreach ($params as $key=>$val) {
-			if (strncmp($key,'opt_',4) == 0) {
+			if (strncmp($key,'pdt_',4) == 0) {
 				$key = substr($key,4);
 				$longval = NULL;
 				if (($p = strpos($key,'_template')) !== FALSE) {
