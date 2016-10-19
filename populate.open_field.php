@@ -11,6 +11,8 @@ $tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$t
 $tplvars['backtoform_nav'] = $this->CreateLink($id,'open_form',$returnid,'&#171; '.$this->Lang('back_form'),
 	array('formedit'=>1,'form_id'=>$params['form_id'],'formdata'=>$params['formdata']));
 
+$jsall = NULL;
+
 if ($obfield) { //field data are loaded
 	$fid = $obfield->GetId(); //maybe <= 0, if adding
 	$nm = 'submit'; //submit-control name
@@ -19,7 +21,7 @@ if ($obfield) { //field data are loaded
 	$hasmain = (isset($allOpts['main']) && count($allOpts['main']) > 0);
 	$hasadv = (isset($allOpts['adv']) && count($allOpts['adv']) > 0);
 
-	$tab = $this->GetActiveTab($params);
+	$tab = $this->_GetActiveTab($params);
 	$t = $this->StartTabHeaders();
 	if ($hasmain)
 		$t .= $this->SetTabHeader('maintab',$this->Lang('tab_field'),($tab == 'maintab'));
@@ -70,8 +72,7 @@ if ($obfield) { //field data are loaded
 	if (isset($allOpts['table']))
 		$tplvars['mainTable'] = $allOpts['table'];
 	if (isset($allOpts['funcs'])) {
-		$tplvars['jsall'] = NULL;
-		PWForms\Utils::MergeJS(FALSE,$allOpts['funcs'],FALSE,$tplvars['jsall']);
+		PWForms\Utils::MergeJS(FALSE,$allOpts['funcs'],FALSE,$jsall);
 	}
 	if (isset($allOpts['extra'])) {
 		switch ($allOpts['extra']) {
