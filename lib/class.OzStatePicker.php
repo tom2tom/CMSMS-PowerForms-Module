@@ -31,7 +31,6 @@ class OzStatePicker extends FieldBase
 
 	public function GetDisplayableValue($as_string=TRUE)
 	{
-		$this->EnsureArray($this->States);
 		$ret = array_search($this->Value,$this->States);
 		if ($as_string)
 			return $ret;
@@ -43,7 +42,7 @@ class OzStatePicker extends FieldBase
 	{
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
-		
+
 		$choices = array_merge(array('No Default'=>''),$this->States);
 		$main[] = array($mod->Lang('title_select_default_state'),
 						$mod->CreateInputDropdown($id,'pdt_default_state',$choices,-1,

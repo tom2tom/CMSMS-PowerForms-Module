@@ -27,7 +27,6 @@ class ProvincePicker extends FieldBase
 
 	public function GetDisplayableValue($as_string=TRUE)
 	{
-		$this->EnsureArray($this->Provinces);
 		$ret = array_search($this->Value,$this->Provinces);
 		if ($as_string)
 			return $ret;
