@@ -27,11 +27,11 @@ class FieldBase implements \Serializable
 	{
 		$this->formdata = $formdata;
 		$this->XtraProps = array(
-		'ChangeRequirement' => TRUE, //whether admin user may change 'Required'
+		'ChangeRequirement' => TRUE, //whether admin user may change 'Required' state
 		'DisplayExternal' => FALSE, //whether field is for use in another module e.g. browser
 		'DisplayInForm' => TRUE,
-		'DisplayInSubmission' => TRUE, //whether field value is echoed in submission template (if used) (effectively ~ self::IsInput)
-		'DispositionPermitted' => TRUE,
+		'DisplayInSubmission' => TRUE, //whether field value is shown in submission template (if used) (effectively ~ self::IsInput)
+		'Disposable' => TRUE,
 		'HasAddOp' => FALSE,
 		'HasDeleteOp' => FALSE,
 		'HasLabel' => TRUE,
@@ -77,7 +77,7 @@ class FieldBase implements \Serializable
 			$this->XtraProps['ValidationType'] = $params['validation_type'];
 		//admin parameters present ?
 		foreach ($params as $key=>$val) {
-			if (strncmp($key,'opt_',4) == 0) {
+			if (strncmp($key,'pdt_',4) == 0) {
 				$key = substr($key,4);
 				if (property_exists($this,$key)) {
 					$this->$key = $val;
@@ -114,22 +114,22 @@ class FieldBase implements \Serializable
 		unset($this->XtraProps[$name]);
 	}
 
-	public function SetOption($optionName, $optionValue)
+	public function SetProperty($optionName, $optionValue)
 	{
 		$this->XtraProps[$optionName] = $optionValue;
 	}
 
-	// Returns a field-option value, or $default if the option doesn't exist
-	public function GetOption($optionName,$default='')
+	// Returns a field-property value, or $default if the property doesn't exist
+	public function GetProperty($optionName,$default='')
 	{
 		if (isset($this->XtraProps[$optionName]))
 			return $this->XtraProps[$optionName];
 		return $default;
 	}
 
-	// Returns array of option-values (possibly just 0=>NULL), or FALSE
+	// Returns array of property-values (possibly just 0=>NULL), or FALSE
 	// Each array-key is the numeric-suffix to $optionName, & array-value is the stored value
-	public function GetOptionRef($optionName)
+	public function GetPropArray($optionName)
 	{
 		$len = strlen($optionName);
 		$matches = array();
@@ -155,12 +155,12 @@ class FieldBase implements \Serializable
 		return FALSE;
 	  }
 
-	public function SetOptionElement($optionName, $index, $value)
+	public function SetPropIndexed($optionName, $index, $value)
 	{
 		$this->XtraProps[$optionName.$index] = $value;
 	}
 
-	public function GetOptionElement($optionName, $index, $default='')
+	public function GetPropIndexed($optionName, $index, $default='')
 	{
 		$so = $optionName.$index;
 		if (isset($this->XtraProps[$so]))
@@ -172,7 +172,7 @@ class FieldBase implements \Serializable
 		return $default;
 	}
 
-	public function AddOptionElement($optionName,$value)
+	public function AddPropIndexed($optionName,$value)
 	{
 		$len = strlen($optionName);
 		$max = -1;
@@ -188,7 +188,7 @@ class FieldBase implements \Serializable
 		$this->XtraProps[$optionName.$index] = $value;
 	}
 
-	public function RemoveOptionElement($optionName,$index)
+	public function RemovePropIndexed($optionName,$index)
 	{
 		unset($this->XtraProps[$optionName.$index]);
 	}
@@ -295,7 +295,7 @@ class FieldBase implements \Serializable
 	{
 		return $this->ForceAlias().$suffix;
 	}
-	
+
 	public function SetOrder($order)
 	{
 		$this->OrderBy = $order;
@@ -349,16 +349,16 @@ class FieldBase implements \Serializable
 		return !empty($this->XtraProps['IsEmailDisposition']);
 	}
 
-	// Set flag determining whether this disposition field is to be disposed (i.e. not inhibited)
-	public function SetDispositionPermission($state=TRUE)
+	// Set flag determining whether this disposition field is permitted to be disposed (i.e. not inhibited)
+	public function SetDisposable($state=TRUE)
 	{
-		$this->XtraProps['DispositionPermitted'] = $state;
+		$this->XtraProps['Disposable'] = $state;
 	}
 
-	// Get flag determining whether this disposition field is to be disposed
-	public function IsDispositionPermitted()
+	// Get flag determining whether this disposition field is permitted to be disposed
+	public function IsDisposable()
 	{
-		return !empty($this->XtraProps['DispositionPermitted']);
+		return !empty($this->XtraProps['Disposable']);
 	}
 
 	public function IsInputField()
@@ -393,7 +393,7 @@ class FieldBase implements \Serializable
 
 	public function DisplayInSubmission()
 	{
-		return !empty($this->XtraProps['DisplayInSubmission']); //&& $this->XtraProps['DisplayInForm']
+		return !empty($this->XtraProps['DisplayInSubmission']); //&& !empty($this->XtraProps['DisplayInForm'])
 	}
 
 	public function GetChangeRequirement()
@@ -744,6 +744,7 @@ class FieldBase implements \Serializable
 	/**
 	AdminPopulateCommon:
 	@id: id given to the PWForms module on execution
+	@boolean: whether to exclude some options irrelevant to boolean-fields, default=FALSE
 	@visible: whether to include some options irrelevant to non-displayed disposition-fields, default=TRUE
 
 	Generates 'base'/common content for editing a field.
@@ -753,63 +754,77 @@ class FieldBase implements \Serializable
 	 [0] = array of things for 'main' tab
 	 [1] = (possibly empty) array of things for 'adv' tab
 	*/
-	public function AdminPopulateCommon($id, $visible=TRUE)
+	public function AdminPopulateCommon($id, $boolean=FALSE, $visible=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
+		$displayable = !empty($this->XtraProps['DisplayInForm']) || !empty($this->XtraProps['DisplayExternal']);
 		//init main tab content
 		$main = array();
 		$main[] = array($mod->Lang('title_field_name'),
-						$mod->CreateInputText($id,'field_name',$this->GetName(),50));
+						$mod->CreateInputText($id,'field_Name',$this->GetName(),50));
 		$alias = $this->ForceAlias();
 		$main[] = array($mod->Lang('title_field_alias'),
-						$mod->CreateInputText($id,'opt_field_alias',$alias,30));
-
+						$mod->CreateInputText($id,'field_Alias',$alias,30)); //was 'pdt_...
 		$main[] = array($mod->Lang('title_field_type'),
-						$mod->CreateInputHidden($id,'field_type',$this->Type).
+						$mod->CreateInputHidden($id,'field_Type',$this->Type).
 						$this->GetDisplayType());
 
-		if ($visible && $this->XtraProps['ChangeRequirement']) {
+		if (!$boolean && $visible && !empty($this->XtraProps['ChangeRequirement'])) {
 			$main[] = array($mod->Lang('title_field_required'),
-							$mod->CreateInputHidden($id,'field_required',0).
-							$mod->CreateInputCheckbox($id,'field_required',1,
+							$mod->CreateInputHidden($id,'pdt_Required',0). //was field_required
+							$mod->CreateInputCheckbox($id,'pdt_Required',1,
 								$this->IsRequired()),
 							$mod->Lang('help_field_required'));
 		}
-		//choice of validation type ?
-		if (count($this->GetValidationTypes()) > 1)
-			$validInput = $mod->CreateInputDropdown($id,'validation_type',
-				$this->GetValidationTypes(),-1,$this->GetValidationType());
-		else
-			$validInput = $mod->Lang('automatic'); //or 'none' ?
-		$main[] = array($mod->Lang('title_field_validation'),
-						$validInput);
 
-		if ($visible && $this->XtraProps['DisplayInForm']) {
+		if (!$boolean) {
+			//choice of validation type ?
+			if (count($this->GetValidationTypes()) > 1)
+				$validInput = $mod->CreateInputDropdown($id,'pdt_ValidationType', //was validation_type
+					$this->GetValidationTypes(),-1,$this->GetValidationType());
+			else
+				$validInput = $mod->Lang('automatic'); //or 'none' ?
+			$main[] = array($mod->Lang('title_field_validation'),
+							$validInput);
+		}
+
+		if ($visible && $displayable) {
 			$main[] = array($mod->Lang('title_field_helptext'),
-							$mod->CreateTextArea(FALSE,$id,$this->XtraProps['helptext'],
-							'opt_helptext','pwf_shortarea','','','',50,8));
+							$mod->CreateTextArea(FALSE,$id,$this->helptext,
+							'pdt_helptext','pwf_shortarea','','','',50,8));
+			$helper = TRUE;
+		} else {
+			$helper = FALSE;
 		}
 
 		//init advanced tab content
 		$adv = array();
-		if ($visible && $this->XtraProps['HasLabel']) {
+		if ($visible && !empty($this->XtraProps['HasLabel'])) {
 			$adv[] = array($mod->Lang('title_hide_label'),
-							$mod->CreateInputHidden($id,'hide_label',0).
-							$mod->CreateInputCheckbox($id,'hide_label',1,$this->HideLabel),
+							$mod->CreateInputHidden($id,'pdt_HideLabel',0).
+							$mod->CreateInputCheckbox($id,'pdt_HideLabel',1,$this->HideLabel),
 							$mod->Lang('help_hide_label'));
 		}
-		if ($this->DisplayInForm()) {
+		if ($helper) {
+			$adv[] = array($mod->Lang('title_field_helptoggle'),
+							$mod->CreateInputHidden($id,'pdt_helptoggle',0).
+							$mod->CreateInputCheckbox($id,'pdt_helptoggle',1,
+								$this->helptoggle),
+							$mod->Lang('help_field_helptoggle'));
+		}
+
+		if ($displayable) {
 			if ($visible) {
 				$adv[] = array($mod->Lang('title_field_css_class'),
-								$mod->CreateInputText($id,'opt_css_class',$this->XtraProps['css_class'],30));
+								$mod->CreateInputText($id,'pdt_css_class',$this->css_class,30));
 				$adv[] = array($mod->Lang('title_field_javascript'),
-								$mod->CreateTextArea(FALSE,$id,$this->XtraProps['javascript'],
-								'opt_javascript','pwf_shortarea','','','',50,8,'','js'),
+								$mod->CreateTextArea(FALSE,$id,$this->javascript,
+								'pdt_javascript','pwf_shortarea','','','',50,8,'','js'),
 								$mod->Lang('help_field_javascript'));
 			}
 			$adv[] = array($mod->Lang('title_field_resources'),
-							$mod->CreateTextArea(FALSE,$id,$this->XtraProps['field_logic'],
-							'opt_field_logic','pwf_shortarea','','','',50,8),
+							$mod->CreateTextArea(FALSE,$id,$this->resources, //was field_logic
+							'pdt_resources','pwf_shortarea','','','',50,8),
 							$mod->Lang('help_field_resources'));
 		}
 		return array($main,$adv);
@@ -918,6 +933,17 @@ class FieldBase implements \Serializable
 	// Subclass this to do stuff after the form has been disposed
 	public function PostDisposeAction()
 	{
+	}
+
+	//for cleanup after serialize()
+	protected function EnsureArray(&$val)
+	{
+		if (is_string($val)) {
+			$val = json_decode($val);
+		}
+		if (!is_array($val)) {
+			$val = array($val);
+		}
 	}
 
 	public function __toString()
