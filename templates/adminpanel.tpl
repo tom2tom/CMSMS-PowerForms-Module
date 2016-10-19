@@ -84,5 +84,3 @@
 {$tab_end}
 {/if}
 {$tabs_end}
-{if !empty($jsall)}{$jsall}
-{/if}

@@ -1,5 +1,4 @@
 {if isset($message)}{$message}{/if}
-
 {$backtomod_nav}&nbsp;{$backtoform_nav}<br />
 {$form_start}
 {if isset($tabs_start)}
@@ -59,5 +58,3 @@
  <br />
  <p class="pageinput">{if isset($submit)}{$submit}&nbsp;{/if}{$cancel}</p>
 {$form_end}
-{if !empty($jsall)}{$jsall}
-{/if}
