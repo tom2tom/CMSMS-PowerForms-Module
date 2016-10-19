@@ -20,6 +20,10 @@ class CheckboxGroup extends FieldBase
 		$this->IsSortable = FALSE;
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'CheckboxGroup';
+		$mod = $formdata->formsmodule;
+		$this->ValidationTypes = array(
+			$mod->Lang('validation_none')=>'none',
+			$mod->Lang('validation_empty')=>'empty');
 	}
 
 	// Get add-button label
@@ -45,19 +49,19 @@ class CheckboxGroup extends FieldBase
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {
-				$this->RemoveOptionElement('box_name',$indx);
-				$this->RemoveOptionElement('box_checked',$indx);
-				$this->RemoveOptionElement('box_unchecked',$indx);
-				$this->RemoveOptionElement('box_is_set',$indx);
+				$this->RemovePropIndexed('box_name',$indx);
+				$this->RemovePropIndexed('box_checked',$indx);
+				$this->RemovePropIndexed('box_unchecked',$indx);
+				$this->RemovePropIndexed('box_is_set',$indx);
 			}
 		}
 	}
 
 	public function GetFieldStatus()
 	{
-		$opt = $this->GetOptionRef('box_name');
-		if ($opt)
-			$boxCount = count($opt);
+		$pt = $this->GetPropArray('box_name');
+		if ($pt)
+			$boxCount = count($pt);
 		else
 			$boxCount = 0;
 		return $this->formdata->formsmodule->Lang('boxes',$boxCount);
@@ -65,18 +69,18 @@ class CheckboxGroup extends FieldBase
 
 	public function GetDisplayableValue($as_string=TRUE)
 	{
-		$names = $this->GetOptionRef('box_name');
+		$names = $this->GetPropArray('box_name');
 		if ($names) {
 			$ret = array();
 			foreach ($names as $i=>&$one) {
 				if ($this->FindArrayValue($i) === FALSE) { //TODO sequence
-					if (!$this->GetOption('no_empty',0)) {
-						$unchecked = trim($this->GetOptionElement('box_unchecked',$i));
+					if (!$this->GetProperty('no_empty',0)) {
+						$unchecked = trim($this->GetPropIndexed('box_unchecked',$i));
 						if ($unchecked)
 							$ret[$one] = $unchecked;
 					}
 				} else {
-					$checked = trim($this->GetOptionElement('box_checked',$i));
+					$checked = trim($this->GetPropIndexed('box_checked',$i));
 					if ($checked)
 						$ret[$one] = $checked;
 				}
@@ -85,7 +89,7 @@ class CheckboxGroup extends FieldBase
 
 			if ($as_string) {
 				// Check if we should include labels
-				if ($this->GetOption('include_labels',0)) {
+				if ($this->GetProperty('include_labels',0)) {
 					$output = '';
 					foreach ($ret as $key=>$value)
 						$output .= $key.': '.$value.$this->GetFormOption('list_delimiter',',');
@@ -103,31 +107,31 @@ class CheckboxGroup extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_no_empty'),
-						$mod->CreateInputHidden($id,'opt_no_empty',0).
-						$mod->CreateInputCheckbox($id,'opt_no_empty',1,
-							$this->GetOption('no_empty',0)),
+						$mod->CreateInputHidden($id,'pdt_no_empty',0).
+						$mod->CreateInputCheckbox($id,'pdt_no_empty',1,
+							$this->GetProperty('no_empty',0)),
 						$mod->Lang('help_no_empty'));
 		$adv[] = array($mod->Lang('title_single_check'),
-						$mod->CreateInputHidden($id,'opt_single_check',0).
-						$mod->CreateInputCheckbox($id,'opt_single_check',1,
-							$this->GetOption('single_check',0)),
+						$mod->CreateInputHidden($id,'pdt_single_check',0).
+						$mod->CreateInputCheckbox($id,'pdt_single_check',1,
+							$this->GetProperty('single_check',0)),
 						$mod->Lang('help_single_check'));
 		$adv[] = array($mod->Lang('title_field_includelabels'),
-						$mod->CreateInputHidden($id,'opt_include_labels',0).
-						$mod->CreateInputCheckbox($id,'opt_include_labels',1,
-							$this->GetOption('include_labels',0)),
+						$mod->CreateInputHidden($id,'pdt_include_labels',0).
+						$mod->CreateInputCheckbox($id,'pdt_include_labels',1,
+							$this->GetProperty('include_labels',0)),
 						$mod->Lang('help_field_includelabels'));
 
 		if ($this->boxAdd) {
-			$this->AddOptionElement('box_name','');
-			$this->AddOptionElement('box_checked','');
-			$this->AddOptionElement('box_is_set','y');
+			$this->AddPropIndexed('box_name','');
+			$this->AddPropIndexed('box_checked','');
+			$this->AddPropIndexed('box_is_set','y');
 			$this->boxAdd = FALSE;
 		}
-		$names = $this->GetOptionRef('box_name');
+		$names = $this->GetPropArray('box_name');
 		if ($names) {
 			$boxes = array();
 			$boxes[] = array(
@@ -140,10 +144,10 @@ class CheckboxGroup extends FieldBase
 			$yesNo = array($mod->Lang('no')=>'n',$mod->Lang('yes')=>'y');
 			foreach ($names as $i=>&$one) {
 				$boxes[] = array(
-					$mod->CreateInputText($id,'opt_box_name'.$i,$one,30,128),
-					$mod->CreateInputText($id,'opt_box_checked'.$i,$this->GetOptionElement('box_checked',$i),20,128),
-					$mod->CreateInputText($id,'opt_box_unchecked'.$i,$this->GetOptionElement('box_unchecked',$i),20,128),
-					$mod->CreateInputDropdown($id,'opt_box_is_set'.$i,$yesNo,-1,$this->GetOptionElement('box_is_set',$i)),
+					$mod->CreateInputText($id,'pdt_box_name'.$i,$one,30,128),
+					$mod->CreateInputText($id,'pdt_box_checked'.$i,$this->GetPropIndexed('box_checked',$i),20,128),
+					$mod->CreateInputText($id,'pdt_box_unchecked'.$i,$this->GetPropIndexed('box_unchecked',$i),20,128),
+					$mod->CreateInputDropdown($id,'pdt_box_is_set'.$i,$yesNo,-1,$this->GetPropIndexed('box_is_set',$i)),
 					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
@@ -159,14 +163,14 @@ class CheckboxGroup extends FieldBase
 	public function PostAdminAction(&$params)
 	{
 		//cleanup empties
-		$names = $this->GetOptionRef('box_name');
+		$names = $this->GetPropArray('box_name');
 		if ($names) {
 			foreach ($names as $i=>&$one) {
-				if (!($one || $this->GetOptionElement('box_checked',$i))) {
-					$this->RemoveOptionElement('box_name',$i); //should be ok in loop
-					$this->RemoveOptionElement('box_checked',$i);
-					$this->RemoveOptionElement('box_unchecked',$i);
-					$this->RemoveOptionElement('box_is_set',$i);
+				if (!($one || $this->GetPropIndexed('box_checked',$i))) {
+					$this->RemovePropIndexed('box_name',$i); //should be ok in loop
+					$this->RemovePropIndexed('box_checked',$i);
+					$this->RemovePropIndexed('box_unchecked',$i);
+					$this->RemovePropIndexed('box_is_set',$i);
 				}
 			}
 			unset($one);
@@ -175,10 +179,10 @@ class CheckboxGroup extends FieldBase
 
 	public function Populate($id,&$params)
 	{
-		$names = $this->GetOptionRef('box_name');
+		$names = $this->GetPropArray('box_name');
 		if ($names) {
 			$mod = $this->formdata->formsmodule;
-			$limit = $this->GetOption('single_check',0);
+			$limit = $this->GetProperty('single_check',0);
 			if ($limit) {
 				if (!isset($this->formdata->jsfuncs['cbgroup'])) {
 					$this->formdata->jsfuncs['cbgroup'] = <<<EOS
@@ -209,7 +213,7 @@ EOS;
 
 				if (property_exists($this,'Value'))
 					$checked = $this->FindArrayValue($i) ? $i:-1; //TODO
-				elseif ($this->GetOptionElement('box_is_set',$i) == 'y')
+				elseif ($this->GetPropIndexed('box_is_set',$i) == 'y')
 					$checked = $i;
 				else
 					$checked = -1;
@@ -225,5 +229,24 @@ EOS;
 		}
 		$this->MultiPopulate = FALSE;
 		return '';
+	}
+
+	public function Validate($id)
+	{
+		$mod = $this->formdata->formsmodule;
+		$this->valid = TRUE;
+		$this->ValidationMessage = '';
+
+		switch ($this->ValidationType) {
+		 case 'none':
+			break;
+			case 'empty':
+			if (0) { //TODO
+				$this->valid = FALSE;
+				$this->ValidationMessage = $mod->Lang('please_TODO',$this->GetProperty('text_label'));
+			}
+			break;
+		}
+		return array($this->valid,$this->ValidationMessage);
 	}
 }
