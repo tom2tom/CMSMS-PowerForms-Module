@@ -7,11 +7,11 @@
 if (!empty($params['selected'])) {
 	$funcs = new PWForms\FormOperations();
 	if (isset($params['clone'])) {
-		if (!$this->CheckAccess('ModifyPFForms')) exit;
+		if (!$this->_CheckAccess('ModifyPFForms')) exit;
 		foreach ($params['selected'] as $fid)
 			$funcs->Copy($this,$id,$params,$fid);
 	} elseif (isset($params['delete'])) {
-		if (!$this->CheckAccess('ModifyPFForms')) exit;
+		if (!$this->_CheckAccess('ModifyPFForms')) exit;
 		foreach ($params['selected'] as $fid)
 			$funcs->Delete($this,$fid);
 	} elseif (isset($params['export'])) {

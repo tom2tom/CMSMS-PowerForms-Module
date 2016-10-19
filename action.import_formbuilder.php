@@ -4,7 +4,7 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if (!$this->CheckAccess('ModifyPFForms')) exit;
+if (!$this->_CheckAccess('ModifyPFForms')) exit;
 
 if (!function_exists('Match_Browses')) {
  function Match_Browses(&$db, $pre)
@@ -581,16 +581,16 @@ $this->Crash();
 				$rs->Close();
 			}
 		}
-		$message = $this->PrettyMessage('adjust_templates');
+		$message = $this->_PrettyMessage('adjust_templates','warn');
 	} else
-		$message = $this->PrettyMessage('no_forms',FALSE);
+		$message = $this->_PrettyMessage('no_forms',FALSE);
 } elseif (isset($params['conform'])) {
 	//relevant checks are done upstream (method.defaultadmin.php)
 	$pre = cms_db_prefix();
 	Match_Browses($db,$pre);
-	$message = $this->PrettyMessage('browsers_updated');
+	$message = $this->_PrettyMessage('browsers_updated');
 } else
-	$message = $this->PrettyMessage('error',FALSE);
+	$message = $this->_PrettyMessage('error',FALSE);
 
 $this->Redirect($id,'defaultadmin','',array(
 	'message'=>$message,'active_tab'=>'import'));

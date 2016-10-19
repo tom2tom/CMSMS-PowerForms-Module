@@ -34,7 +34,7 @@ if (empty($params['form_id']) || $params['form_id'] == -1) {
 		'error'=>1));
 	return;
 }
-list($current,$prior) = $this->GetTokens(); //fresh pair of fieldname-prefixes
+list($current,$prior) = $this->_GetTokens(); //fresh pair of fieldname-prefixes
 //check that we're current
 $matched = preg_grep('/^pwfp_\d{3}_/',array_keys($params));
 if ($matched) {
@@ -257,17 +257,17 @@ $Crash1;
 					$one->IsRequired() && !$one->HasValue($deny_space_validation)) {
 $this->Crash2();
 					$allvalid = FALSE;
-					$one->SetOption('is_valid',FALSE);
+					$one->SetProperty('is_valid',FALSE);
 					$one->valid = FALSE;
 					$one->ValidationMessage = $this->Lang('please_enter_a_value',$one->GetName());
 					$message[] = $one->ValidationMessage;
 				} elseif ($one->GetValue()) {
 					$res = $one->Validate($id);
 					if ($res[0])
-						$one->SetOption('is_valid',TRUE);
+						$one->SetProperty('is_valid',TRUE);
 					else {
 						$allvalid = FALSE;
-						$one->SetOption('is_valid',FALSE);
+						$one->SetProperty('is_valid',FALSE);
 						$message[] = $res[1];
 					}
 				}
@@ -376,7 +376,7 @@ $this->Crash2();
 				// dispose TODO handle 'blocked' notices
 				foreach ($formdata->FieldOrders as $one) {
 					$one = $formdata->Fields($one);
-					if ($one->IsDisposition() && $one->IsDispositionPermitted()) {
+					if ($one->IsDisposition() && $one->IsDisposable()) {
 						$res = $one->Dispose($id,$returnid);
 						if (!$res[0]) {
 							$alldisposed = FALSE;
@@ -505,7 +505,7 @@ echo $form_start.$hidden;
 PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf_'.$form_id,$tplvars,TRUE);
 echo $form_end;
 //inject constructed js after other content (pity we can't get to </body> or </html> from here)
-$js = NULL;
-PWForms\Utils::MergeJS($formdata->jsincs,$formdata->jsfuncs,$formdata->jsloads,$js);
-if ($js)
-	echo $js;
+$jsall = NULL;
+PWForms\Utils::MergeJS($formdata->jsincs,$formdata->jsfuncs,$formdata->jsloads,$jsall);
+if ($jsall)
+	echo $jsall;

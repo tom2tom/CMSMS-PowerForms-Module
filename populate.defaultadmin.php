@@ -4,7 +4,7 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-$tab = $this->GetActiveTab($params);
+$tab = $this->_GetActiveTab($params);
 
 $starts = $this->StartTabHeaders().
 	$this->SetTabHeader('maintab',$this->Lang('forms'),($tab == 'maintab'));
@@ -31,9 +31,9 @@ $tplvars['message'] = (isset($params['message']))?$params['message']:'';
 $theme = ($this->before20) ? cmsms()->variables['admintheme']:
 	cms_utils::get_theme_object();
 //script accumulators
+$jsincs = array();
 $jsfuncs = array();
 $jsloads = array();
-$jsincs = array();
 $baseurl = $this->GetModuleURLPath();
 
 //list all the extant forms
@@ -249,6 +249,3 @@ function confirm_selected(msg) {
  }
 }
 EOS;
-
-$tplvars['jsall'] = NULL;
-PWForms\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$tplvars['jsall']);

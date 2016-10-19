@@ -106,12 +106,12 @@ foreach ($formdata->FieldOrders as $one) {
 
 	$oneset = new stdClass();
 	$oneset->alias = $alias;
-//	$oneset->css_class = $one->GetOption('css_class');
+//	$oneset->css_class = $one->GetProperty('css_class');
 	$oneset->display = $one->DisplayInForm()?1:0;
 	$oneset->valid = $one->IsValid()?1:0;
 	$oneset->error = $oneset->valid?'':$one->ValidationMessage;
 	$oneset->has_label = $one->HasLabel();
-	$oneset->helptext = $one->GetOption('helptext');
+	$oneset->helptext = $one->GetProperty('helptext');
 	if ($oneset->helptext) {
 		if (!isset($formdata->jsfuncs['helptoggle'])) {
 /*TODO func*/	$formdata->jsfuncs['helptoggle'] = <<<EOS
@@ -130,7 +130,7 @@ EOS;
 	}
 	$oneset->helptext_id = 'pwfp_ht_'.$one->GetID();
 	if ((!$one->HasLabel() || $one->GetHideLabel())
-/*	 && (!$one->GetOption('browser_edit',0) || empty($params['in_admin']))*/)
+/*	 && (!$one->GetProperty('browser_edit',0) || empty($params['in_admin']))*/)
 		$oneset->hide_name = 1;
 	else
 		$oneset->hide_name = 0;

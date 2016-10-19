@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if (!$this->CheckAccess('ModifyPFForms')) exit;
+if (!$this->_CheckAccess('ModifyPFForms')) exit;
 
 $funcs = new PWForms\FormOperations();
 if ($funcs->NewID($params['import_formname'],$params['import_formalias'])) {
@@ -18,4 +18,4 @@ if ($funcs->NewID($params['import_formname'],$params['import_formalias'])) {
 }
 
 $this->Redirect($id,'defaultadmin','',array(
-	'message' => $this->PrettyMessage($key,$state)));
+	'message' => $this->_PrettyMessage($key,$state)));

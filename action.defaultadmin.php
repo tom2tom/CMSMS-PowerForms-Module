@@ -60,7 +60,7 @@ if ($padm) {
 			$this->SetPreference('masterpass',$t);
 		}
 
-		$params['message'] = $this->PrettyMessage('settings_updated');
+		$params['message'] = $this->_PrettyMessage('settings_updated');
 		$params['active_tab'] = 'settings';
 	} elseif (isset($params['cancel'])) {
 		$params['active_tab'] = 'settings';
@@ -71,4 +71,12 @@ $tplvars = array();
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 
+$jsall = NULL;
+PWForms\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
+unset($jsincs);
+unset($jsfuncs);
+unset($jsloads);
+
 echo PWForms\Utils::ProcessTemplate($this,'adminpanel.tpl',$tplvars);
+if ($jsall)
+	echo $jsall;

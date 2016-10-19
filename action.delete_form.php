@@ -4,10 +4,10 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if (!$this->CheckAccess('ModifyPFForms')) exit;
+if (!$this->_CheckAccess('ModifyPFForms')) exit;
 
 $funcs = new PWForms\FormOperations();
 $funcs->Delete($this,$params['form_id']);
 
 $this->Redirect($id,'defaultadmin',$returnid,array(
-	'message' => $this->PrettyMessage('form_deleted')));
+	'message' => $this->_PrettyMessage('form_deleted')));

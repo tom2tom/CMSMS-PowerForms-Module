@@ -28,13 +28,13 @@ if (isset($params['cancel'])) {
 		$newid = $funcs->Copy($this,$id,$params,$params['form_id']);
 		if (!$newid)
 			$this->Redirect($id,'defaultadmin','',array(
-				'message'=>$this->PrettyMessage('error_copy2',FALSE)));
+				'message'=>$this->_PrettyMessage('error_copy2',FALSE)));
 		$seetab = 'maintab'; //name/alias will be different
 	} else {
 		$newid = $funcs->Add($this,$params);
 		if (!$newid)
 			$this->Redirect($id,'defaultadmin','',array(
-				'message'=>$this->PrettyMessage('error_name',FALSE)));
+				'message'=>$this->_PrettyMessage('error_name',FALSE)));
 	}
 	unset($funcs);
 	$this->Redirect($id,'open_form','',array(
