@@ -55,15 +55,15 @@ class CatalogerItems extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$cataloger = $mod->GetModuleInstance('Cataloger');
 		if ($cataloger) {
 			$main[] = array($mod->Lang('title_field_height'),
-							$mod->CreateInputText($id,'opt_lines',$this->GetOption('lines','5'),3,3),
+							$mod->CreateInputText($id,'pdt_lines',$this->GetProperty('lines','5'),3,3),
 							$mod->Lang('help_field_height'));
 			$main[] = array($mod->Lang('title_name_regex'),
-							$mod->CreateInputText($id,'opt_nameregex',$this->GetOption('nameregex'),25,25),
+							$mod->CreateInputText($id,'pdt_nameregex',$this->GetProperty('nameregex'),25,25),
 							$mod->Lang('help_name_regex'));
 			$main[] = array('','',$mod->Lang('help_cataloger_attribute_fields'));
 
@@ -72,8 +72,8 @@ class CatalogerItems extends FieldBase
 				if (!$one->is_text) {
 					$safeattr = strtolower(preg_replace('/\W/','',$one->attr));
 					$main[] = array($one->attr,
-									$mod->CreateInputText($id,'opt_attr_'.$safeattr,
-									$this->GetOption('attr_'.$safeattr),30,80));
+									$mod->CreateInputText($id,'pdt_attr_'.$safeattr,
+									$this->GetProperty('attr_'.$safeattr),30,80));
 				}
 			}
 			unset($one);
@@ -93,13 +93,13 @@ class CatalogerItems extends FieldBase
 		$cataloger->getUserAttributes();
 		$gCms = \cmsms();
 		$tmp_attrs = $gCms->variables['catalog_attrs']; //BAD MODULE BEHAVIOUR!!
-		$lines = (int)$this->GetOption('lines',5);
-		$nameregex = trim($this->GetOption('nameregex'));
+		$lines = (int)$this->GetProperty('lines',5);
+		$nameregex = trim($this->GetProperty('nameregex'));
 
 		$attrs = array();
 		foreach ($tmp_attrs as $one) {
 			$safeattr = strtolower(preg_replace('/\W/','',$one->attr));
-			$val = trim($this->GetOption('attr_'.$safeattr));
+			$val = trim($this->GetProperty('attr_'.$safeattr));
 			if ($val) {
 				$one->input = $val;
 				$attrs[] = $one;

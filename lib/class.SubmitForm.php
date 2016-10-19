@@ -22,38 +22,39 @@ class SubmitForm extends FieldBase
 	public function GetFieldStatus()
 	{
 		if (function_exists('curl_init'))
-			return $this->GetOption('method').' '.$this->GetOption('url');
+			return $this->GetProperty('method').' '.$this->GetProperty('url');
 		return $this->Lang('missing_type','PHP cURL extension');
 	}
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
 		$mod = $formdata->formsmodule;
+		
 		if (function_exists('curl_init')) {
 			$formdata = $this->formdata;
 			$methods = array('POST'=>'POST','GET'=>'GET');
 			$main[] = array($mod->Lang('title_method'),
-				$mod->CreateInputDropdown($id,'opt_method',$methods,-1,
-					$this->GetOption('method')));
+				$mod->CreateInputDropdown($id,'pdt_method',$methods,-1,
+					$this->GetProperty('method')));
 			$main[] = array($mod->Lang('title_url'),
-				$mod->CreateInputText($id,'opt_url',$this->GetOption('url'),40,255),
+				$mod->CreateInputText($id,'pdt_url',$this->GetProperty('url'),40,255),
 				$mod->Lang('help_url'));
 			foreach ($formdata->Fields as &$one) {
 				$alias = $one->ForceAlias();
 				$fid = $one->GetId();
 				$adv[] = array($mod->Lang('title_maps_to',$one->GetName()),
-					$mod->CreateInputText($id,'opt_fld_'.$fid,
-						 $this->GetOption('fld_'.$fid,$alias),40,255).
-					$mod->CreateInputHidden($id,'opt_sub_'.$fid,0).
-					$mod->CreateInputCheckbox($id,'opt_sub_'.$fid,1,
-						$this->GetOption('sub_'.$fid,($one->DisplayInSubmission()?1:0))),
+					$mod->CreateInputText($id,'pdt_fld_'.$fid,
+						 $this->GetProperty('fld_'.$fid,$alias),40,255).
+					$mod->CreateInputHidden($id,'pdt_sub_'.$fid,0).
+					$mod->CreateInputCheckbox($id,'pdt_sub_'.$fid,1,
+						$this->GetProperty('sub_'.$fid,($one->DisplayInSubmission()?1:0))),
 					$mod->Lang('title_include_in_submission'));
 			}
 			unset($one);
 			$adv[] = array($mod->Lang('title_additional'),
-				$mod->CreateInputText($id,'opt_additional',
-					$this->GetOption('additional'),40,255),
+				$mod->CreateInputText($id,'pdt_additional',
+					$this->GetProperty('additional'),40,255),
 				$mod->Lang('help_additional_payload'));
 		} else {
 			$main[] = array('','',$mod->Lang('title_install_curl'));
@@ -65,20 +66,20 @@ class SubmitForm extends FieldBase
 	{
 		$payload = array();
 		foreach ($this->formdata->Fields as &$one) {
-			if ($this->GetOption('sub_'.$one->GetId(),0)) {
-				$payload[] = urlencode($this->GetOption('fld_'.$one->GetId())).'='.
+			if ($this->GetProperty('sub_'.$one->GetId(),0)) {
+				$payload[] = urlencode($this->GetProperty('fld_'.$one->GetId())).'='.
 				urlencode($one->GetDisplayableValue());
 			}
 		}
 		unset($one);
-		if ($this->GetOption('additional'))
-			$payload[] = $this->GetOption('additional');
+		if ($this->GetProperty('additional'))
+			$payload[] = $this->GetProperty('additional');
 		$send_payload = implode('&',$payload);
 
 		$msg = '';
 
-		if ($this->GetOption('method','POST') == 'POST') {
-			$ch = curl_init($this->GetOption('url'));
+		if ($this->GetProperty('method','POST') == 'POST') {
+			$ch = curl_init($this->GetProperty('url'));
 			curl_setopt($ch,CURLOPT_POST,1);
 			curl_setopt($ch,CURLOPT_POSTFIELDS,$send_payload);
 			curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
@@ -89,7 +90,7 @@ class SubmitForm extends FieldBase
 			}
 			curl_close($ch);
 		} else {
-			$url = $this->GetOption('url');
+			$url = $this->GetProperty('url');
 			if (strpos($url,'?'))
 				$url .= '&'.$send_payload;
 			else

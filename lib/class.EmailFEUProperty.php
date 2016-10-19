@@ -22,7 +22,7 @@ class EmailFEUProperty extends EmailBase
 	public function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		$ret = $mod->Lang('title_feu_property').': '.$this->GetOption('feu_property');
+		$ret = $mod->Lang('title_feu_property').': '.$this->GetProperty('feu_property');
 		$status = $this->TemplateStatus();
 		if ($status)
 			$ret .= '<br />'.$status;
@@ -32,7 +32,7 @@ class EmailFEUProperty extends EmailBase
 	public function GetDisplayableValue($as_string = TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
-		$prop = $this->GetOption('feu_property');
+		$prop = $this->GetProperty('feu_property');
 		$ret = FALSE;
 		if ($prop) {
 			$feu = $mod->GetModuleInstance('FrontEndUsers');
@@ -40,9 +40,9 @@ class EmailFEUProperty extends EmailBase
 			if (array_key_exists($this->Value,$opts)) //TODO check logic
 				$ret = $opts[$this->Value]; //TODO if FALSE
 			else
-				$ret = $this->GetOption('unspecified',$mod->Lang('unspecified'));
+				$ret = $this->GetProperty('unspecified',$mod->Lang('unspecified'));
 		} else
-			$ret = $this->GetOption('unspecified',$mod->Lang('unspecified'));
+			$ret = $this->GetProperty('unspecified',$mod->Lang('unspecified'));
 
 		if ($as_string)
 			return $ret;
@@ -79,8 +79,8 @@ class EmailFEUProperty extends EmailBase
 		$waslast = array_pop($ret['main']); //keep the email to-type selector for last
 		$keys = array_keys($opts);
 		$main[] = array($mod->Lang('title_feu_property'),
-				$mod->CreateInputDropdown($id,'opt_feu_property',array_flip($opts),-1,
-					$this->GetOption('feu_property',$keys[0])),
+				$mod->CreateInputDropdown($id,'pdt_feu_property',array_flip($opts),-1,
+					$this->GetProperty('feu_property',$keys[0])),
 				$mod->Lang('help_feu_property'));
 		$main[] = $waslast;
 		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
@@ -93,7 +93,7 @@ class EmailFEUProperty extends EmailBase
 		if (!$feu) return '';
 
 		// get the property name and data
-		$prop = $this->GetOption('feu_property');
+		$prop = $this->GetProperty('feu_property');
 		if (!$prop) return '';
 		$defn = $feu->GetPropertyDefn($prop);
 		if (!$defn) return '';
@@ -123,7 +123,7 @@ class EmailFEUProperty extends EmailBase
 		if (!$feu) return array(FALSE,$mod_Lang('error_module_feu'));
 
 		// get the property name
-		$prop = $this->GetOption('feu_property');
+		$prop = $this->GetProperty('feu_property');
 
 		// get the list of emails that match this value.
 		$users = $feu->GetUsersInGroup(-1,'','','',$prop,$this->Value);
@@ -155,6 +155,6 @@ class EmailFEUProperty extends EmailBase
 			}
 		}
 		// send email(s)
-		return $this->SendForm($destinations,$this->GetOption('email_subject'),$tplvars);
+		return $this->SendForm($destinations,$this->GetProperty('email_subject'),$tplvars);
 	}
 }

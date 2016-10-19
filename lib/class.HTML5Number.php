@@ -19,17 +19,17 @@ class HTML5Number extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_min_number'),
-						$mod->CreateInputText($id,'opt_min_number',
-							$this->GetOption('min_number',0)));
+						$mod->CreateInputText($id,'pdt_min_number',
+							$this->GetProperty('min_number',0)));
 		$main[] = array($mod->Lang('title_max_number'),
-						$mod->CreateInputText($id,'opt_max_number',
-							$this->GetOption('max_number',500)));
+						$mod->CreateInputText($id,'pdt_max_number',
+							$this->GetProperty('max_number',500)));
 		$main[] = array($mod->Lang('title_step_number'),
-						$mod->CreateInputText($id,'opt_step_number',
-							$this->GetOption('step_number',50)));
+						$mod->CreateInputText($id,'pdt_step_number',
+							$this->GetProperty('step_number',50)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -41,17 +41,17 @@ class HTML5Number extends FieldBase
 			$messages[] = $msg;
 
 		$mod = $this->formdata->formsmodule;
-		$min = $this->GetOption('min_number');
+		$min = $this->GetProperty('min_number');
 		if (!$min || !is_numeric($min)) {
 			$ret = FALSE;
 			$messages[] = $mod->Lang('error_typed',$mod->Lang('minumum'));
 		}
-		$max = $this->GetOption('max_number');
+		$max = $this->GetProperty('max_number');
 		if (!$max || !is_numeric($max) || $max <= $min) {
 			$ret = FALSE;
 			$messages[] = $mod->Lang('error_typed',$mod->Lang('maximum'));
 		}
-		$step = $this->GetOption('step_number');
+		$step = $this->GetProperty('step_number');
 		if (!$step || !is_numeric($step) || $step >= $max) {
 			$ret = FALSE;
 			$messages[] = $mod->Lang('error_typed',$mod->Lang('increment'));
@@ -62,9 +62,9 @@ class HTML5Number extends FieldBase
 
 	public function Populate($id,&$params)
 	{
-		$min = $this->GetOption('min_number',0);
-		$max = $this->GetOption('max_number',500);
-		$step = $this->GetOption('step_number',50);
+		$min = $this->GetProperty('min_number',0);
+		$max = $this->GetProperty('max_number',500);
+		$step = $this->GetProperty('step_number',50);
 
 		$tmp = '<input type="number" id="'.$this->GetInputId().'" name="'.
 			$id.$this->formdata->current_prefix.$this->Id.

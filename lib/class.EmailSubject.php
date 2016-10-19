@@ -42,7 +42,7 @@ class EmailSubject extends FieldBase
 	{
 		foreach ($this->formdata->Fields as &$one) {
 			if ($one->IsDisposition() && is_subclass_of($one,'EmailBase'))
-				$one->SetOption('email_subject',$this->Value);
+				$one->SetProperty('email_subject',$this->Value);
 		}
 		unset($one);
 	}

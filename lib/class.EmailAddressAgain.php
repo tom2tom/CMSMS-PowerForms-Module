@@ -20,7 +20,7 @@ class EmailAddressAgain extends EmailBase
 	public function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		return $mod->Lang('title_field_id') . ': ' . $this->GetOption('field_to_validate');
+		return $mod->Lang('title_field_id') . ': ' . $this->GetProperty('field_to_validate');
 	}
 
 	public function AdminPopulate($id)
@@ -37,31 +37,31 @@ class EmailAddressAgain extends EmailBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_field_to_validate'),
-						$mod->CreateInputDropdown($id,'opt_field_to_validate',$choices,-1,
-							$this->GetOption('field_to_validate')));
+						$mod->CreateInputDropdown($id,'pdt_field_to_validate',$choices,-1,
+							$this->GetProperty('field_to_validate')));
 		$adv[] = array($mod->Lang('title_field_default_value'),
-						$mod->CreateInputText($id,'opt_default',
-					  		$this->GetOption('default'),25,1024));
+						$mod->CreateInputText($id,'pdt_default',
+					  		$this->GetProperty('default'),25,1024));
 		$adv[] = array($mod->Lang('title_clear_default'),
-						$mod->CreateInputHidden($id,'opt_clear_default',0).
-						$mod->CreateInputCheckbox($id,'opt_clear_default',1,
-							$this->GetOption('clear_default',0)),
+						$mod->CreateInputHidden($id,'pdt_clear_default',0).
+						$mod->CreateInputCheckbox($id,'pdt_clear_default',1,
+							$this->GetProperty('clear_default',0)),
 						$mod->Lang('help_clear_default'));
 		$adv[] = array($mod->Lang('title_html5'),
-						$mod->CreateInputHidden($id,'opt_html5',0).
-						$mod->CreateInputCheckbox($id,'opt_html5',1,
-							$this->GetOption('html5',0)));
+						$mod->CreateInputHidden($id,'pdt_html5',0).
+						$mod->CreateInputCheckbox($id,'pdt_html5',1,
+							$this->GetProperty('html5',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	public function Populate($id,&$params)
 	{
 		$this->SetEmailJS();
-		if ($this->GetOption('html5',0)) {
+		if ($this->GetProperty('html5',0)) {
 			$addr = ($this->HasValue()) ? $this->Value : '';
-			$place = 'placeholder="'.$this->GetOption('default').'"';
+			$place = 'placeholder="'.$this->GetProperty('default').'"';
 		} else {
-			$addr = ($this->HasValue()) ? $this->Value : $this->GetOption('default');
+			$addr = ($this->HasValue()) ? $this->Value : $this->GetProperty('default');
 			$place = '';
 		}
 		$tmp = $this->formdata->formsmodule->CreateInputEmail(
@@ -77,7 +77,7 @@ class EmailAddressAgain extends EmailBase
 		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 
-		$field_to_validate = $this->GetOption('field_to_validate');
+		$field_to_validate = $this->GetProperty('field_to_validate');
 
 		if ($field_to_validate) {
 			foreach ($this->formdata->Fields as &$one) {

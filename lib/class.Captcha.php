@@ -49,26 +49,27 @@ class Captcha extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$this->RemoveAdminField($main,$mod->Lang('title_field_helptext'));
 		$main[] = array($mod->Lang('title_captcha_prompt'),
-						$mod->CreateInputText($id,'opt_prompt',
-							$this->GetOption('prompt',$mod->Lang('captcha_prompt')),60,120));
+						$mod->CreateInputText($id,'pdt_prompt',
+							$this->GetProperty('prompt',$mod->Lang('captcha_prompt')),60,120));
 		$main[] = array($mod->Lang('title_captcha_wrong'),
-						$mod->CreateInputText($id,'opt_wrongtext',
-							$this->GetOption('wrongtext',$mod->Lang('captcha_wrong')),60,120));
+						$mod->CreateInputText($id,'pdt_wrongtext',
+							$this->GetProperty('wrongtext',$mod->Lang('captcha_wrong')),60,120));
 		$this->RemoveAdminField($adv,$mod->Lang('title_hide_label'));
+		$this->RemoveAdminField($adv,$mod->Lang('title_field_helptoggle'));
 		$this->RemoveAdminField($adv,$mod->Lang('title_field_javascript'));
 		$this->RemoveAdminField($adv,$mod->Lang('title_field_resources'));
 		$adv[] = array($mod->Lang('title_captcha_label'),
-						$mod->CreateInputHidden($id,'opt_aslabel',0).
-						$mod->CreateInputCheckbox($id,'opt_aslabel',1,
-							$this->GetOption('aslabel',0)),
+						$mod->CreateInputHidden($id,'pdt_aslabel',0).
+						$mod->CreateInputCheckbox($id,'pdt_aslabel',1,
+							$this->GetProperty('aslabel',0)),
 						$mod->Lang('help_captcha_label'));
 		//setup to revert to default (a.k.a. 'sample') template
 		list($button,$jsfunc) = Utils::CreateTemplateAction($mod,$id,
-			'opt_captcha_template',$mod->Lang('title_create_sample_template'),
+			'pdt_captcha_template',$mod->Lang('title_create_sample_template'),
 			$this->defaulttemplate);
 		$adv[] = array($mod->Lang('title_captcha_template'),
-						$mod->CreateTextArea(FALSE,$id,$this->GetOption('captcha_template',$this->defaulttemplate),
-							'opt_captcha_template','pwf_shortarea','','','',50,5),
+						$mod->CreateTextArea(FALSE,$id,$this->GetProperty('captcha_template',$this->defaulttemplate),
+							'pdt_captcha_template','pwf_shortarea','','','',50,5),
 						$mod->Lang('help_captcha_template').'<br /><br />'.$button);
 		return array('main'=>$main,'adv'=>$adv,'funcs'=>array($jsfunc));
 	}
@@ -80,22 +81,22 @@ class Captcha extends FieldBase
   		list($ret,$msg) = parent::AdminValidate($id);
 		if (!ret)
 			$messages[] = $msg;
-		$opt = $this->GetOption('captcha_template');
-		if (!$opt) {
+		$pt = $this->GetProperty('captcha_template');
+		if (!$pt) {
 			$ret = FALSE;
 			$messages[] = $mod->Lang('missing_type',$mod->Lang('captchatemplateTODO'));
 		}
-		$opt = $this->GetOption('prompt');
-		if (!$opt) {
+		$pt = $this->GetProperty('prompt');
+		if (!$pt) {
 			$ret = FALSE;
 			$messages[] = $mod->Lang('missing_type',$mod->Lang('captchapromptTODO'));
 		}
-		$opt = $this->GetOption('wrongtext');
-		if (!$opt) {
+		$pt = $this->GetProperty('wrongtext');
+		if (!$pt) {
 			$ret = FALSE;
 			$messages[] = $mod->Lang('missing_type',$mod->Lang('captchamsgTODO'));
 		}
-		$msg = ($ret)? '' : implode('<br />',$messages);
+		$msg = ($ret) ? '' : implode('<br />',$messages);
 		return array($ret,$msg);
 	}
 
@@ -105,21 +106,20 @@ class Captcha extends FieldBase
 		$captcha = $mod->getModuleInstance('Captcha');
 		$tplvars = array(
 			'captcha' => $captcha->getCaptcha(),
-			'prompt' => $this->GetOption('prompt',$mod->Lang('captcha_prompt')).
+			'prompt' => $this->GetProperty('prompt',$mod->Lang('captcha_prompt')).
 				$this->GetFormOption('required_field_symbol','*')
 		);
 		$test = method_exists($captcha,'NeedsInputField') ? $captcha->NeedsInputField() : TRUE;
 		if ($test) {
 			//for captcha validation, input-object name must be as shown, not e.g. $this->formdata->current_prefix.$this->Id
 //			$tmp = $mod->CreateInputText($id,'captcha_input','',10,10);
-			$tmp = $mod->CreateInputText(
-				$id,$this->formdata->current_prefix.$this->Id,'',10,10);
+			$tmp = $mod->CreateInputText($id,$this->formdata->current_prefix.$this->Id,'',10,10);
 			$tplvars['captcha_input'] = preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
 		} else {
 			$tplvars['captcha_input'] = $mod->CreateInputHidden($id,$this->formdata->current_prefix.$this->Id,1); //include field in post-submit walk
 		}
-		$tpl = $this->GetOption('captcha_template',$this->defaulttemplate);
-		if ($this->GetOption('aslabel',0)) {
+		$tpl = $this->GetProperty('captcha_template',$this->defaulttemplate);
+		if ($this->GetProperty('aslabel',0)) {
 			$this->HideLabel = FALSE;
 			$this->RealName = $this->Name;
 			$tmp = Utils::ProcessTemplateFromData($mod,$tpl,$tplvars);
@@ -149,7 +149,7 @@ class Captcha extends FieldBase
 			$this->ValidationMessage = $mod->Lang('error_module_captcha');
 		} elseif (!$captcha->CheckCaptcha($this->Value)) { //upstream migrated any $params['captcha_input] to this
 			$this->valid = FALSE;
-			$this->ValidationMessage = $this->GetOption('wrongtext',
+			$this->ValidationMessage = $this->GetProperty('wrongtext',
 				$mod->Lang('captcha_wrong'));
 		}
 		return array($this->valid,$this->ValidationMessage);

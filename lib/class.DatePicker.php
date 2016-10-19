@@ -40,9 +40,9 @@ class DatePicker extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$today = getdate();
-		return $mod->Lang('date_range',array($this->GetOption('start_year',($today['year']-10)) ,
-		 $this->GetOption('end_year',($today['year']+10)))).
-		 ($this->GetOption('default_year','-1')!=='-1'?' ('.$this->GetOption('default_year','-1').')':'');
+		return $mod->Lang('date_range',array($this->GetProperty('start_year',($today['year']-10)) ,
+		 $this->GetProperty('end_year',($today['year']+10)))).
+		 ($this->GetProperty('default_year','-1')!=='-1'?' ('.$this->GetProperty('default_year','-1').')':'');
 	}
 
 	public function HasValue($deny_blank_responses=FALSE)
@@ -68,13 +68,13 @@ class DatePicker extends FieldBase
 			//$theDate = mktime (1,1,1,$this->GetArrayValue(1), $this->GetArrayValue(0),$this->GetArrayValue(2));
 			// Month,Day,Year
 			//$theDate = mktime (1,1,1,$this->GetArrayValue(0), $this->GetArrayValue(1),$this->GetArrayValue(2));
-			$user_order = $this->GetOption('date_order','d-m-y');
+			$user_order = $this->GetProperty('date_order','d-m-y');
 			$arrUserOrder = explode("-",$user_order);
 			$theDate = mktime (1,1,1,
 				$this->GetArrayValue(array_search('m',$arrUserOrder)),
 				$this->GetArrayValue(array_search('d',$arrUserOrder)),
 				$this->GetArrayValue(array_search('y',$arrUserOrder)));
-			$ret = date($this->GetOption('date_format','j F Y'),$theDate);
+			$ret = date($this->GetProperty('date_format','j F Y'),$theDate);
 
 			$ret = str_replace(array('January','February','March','April','May','June','July','August','September','October','November','December'),
 				array(
@@ -106,30 +106,30 @@ class DatePicker extends FieldBase
 	{
 		$today = getdate();
 
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_default_blank'),
-						$mod->CreateInputHidden($id,'opt_default_blank',0).
-						$mod->CreateInputCheckbox($id,'opt_default_blank',1,
-							$this->GetOption('default_blank',0)),
+						$mod->CreateInputHidden($id,'pdt_default_blank',0).
+						$mod->CreateInputCheckbox($id,'pdt_default_blank',1,
+							$this->GetProperty('default_blank',0)),
 						$mod->Lang('help_default_today'));
 		$main[] = array($mod->Lang('title_start_year'),
-						$mod->CreateInputText($id,'opt_start_year',
-							$this->GetOption('start_year',($today['year']-10)),10,10));
+						$mod->CreateInputText($id,'pdt_start_year',
+							$this->GetProperty('start_year',($today['year']-10)),10,10));
 		$main[] = array($mod->Lang('title_end_year'),
-						$mod->CreateInputText($id,'opt_end_year',
-							$this->GetOption('end_year',($today['year']+10)),10,10));
+						$mod->CreateInputText($id,'pdt_end_year',
+							$this->GetProperty('end_year',($today['year']+10)),10,10));
 		$main[] = array($mod->Lang('title_default_year'),
-						$mod->CreateInputText($id,'opt_default_year',
-							$this->GetOption('default_year','-1'),10,10),
+						$mod->CreateInputText($id,'pdt_default_year',
+							$this->GetProperty('default_year','-1'),10,10),
 						$mod->Lang('help_default_year'));
 		$adv[] = array($mod->Lang('title_date_format'),
-						$mod->CreateInputText($id,'opt_date_format',
-							$this->GetOption('date_format','j F Y'),25,25),
+						$mod->CreateInputText($id,'pdt_date_format',
+							$this->GetProperty('date_format','j F Y'),25,25),
 						$mod->Lang('help_date_format'));
 		$adv[] = array($mod->Lang('title_date_order'),
-						$mod->CreateInputText($id,'opt_date_order',
-							$this->GetOption('date_order','d-m-y'),5,5),
+						$mod->CreateInputText($id,'pdt_date_order',
+							$this->GetProperty('date_order','d-m-y'),5,5),
 						$mod->Lang('help_date_order'));
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -143,26 +143,26 @@ class DatePicker extends FieldBase
 			$Days[$i] = $i;
 
 		$Years = array(''=>'');
-		$sty = $this->GetOption('start_year',($today['year']-10));
+		$sty = $this->GetProperty('start_year',($today['year']-10));
 		if ($sty <= 0)
 			$sty = $today['year'];
-		$ndy = $this->GetOption('end_year',($today['year']+10)) + 1;
+		$ndy = $this->GetProperty('end_year',($today['year']+10)) + 1;
 		for ($i=$sty; $i<$ndy; $i++)
 			$Years[$i] = $i;
 
 		if ($this->HasValue()) {
-			$user_order = $this->GetOption('date_order','d-m-y');
+			$user_order = $this->GetProperty('date_order','d-m-y');
 			$arrUserOrder = explode("-",$user_order);
 
 			$today['mday'] = $this->GetArrayValue(array_search('d',$arrUserOrder));
 			$today['mon'] = $this->GetArrayValue(array_search('m',$arrUserOrder));
 			$today['year'] = $this->GetArrayValue(array_search('y',$arrUserOrder));
-		} else if ($this->GetOption('default_blank',0)) {
+		} else if ($this->GetProperty('default_blank',0)) {
 			$today['mday']='';
 			$today['mon']='';
 			$today['year']='';
 		} else {
-			$i = $this->GetOption('default_year',0);
+			$i = $this->GetProperty('default_year',0);
 			if ($i)
 				$today['year'] = $i;
 		}
@@ -198,7 +198,7 @@ class DatePicker extends FieldBase
 		$yr->input = $this->SetClass($tmp);
 
 		$order = array('d' => $day,'m' => $mon,'y' => $yr);
-		$user_order = $this->GetOption('date_order','d-m-y');
+		$user_order = $this->GetProperty('date_order','d-m-y');
 		$arrUserOrder = explode("-",$user_order);
 
 		$ret = array();

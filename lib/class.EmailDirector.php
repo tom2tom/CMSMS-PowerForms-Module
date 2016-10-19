@@ -41,15 +41,15 @@ class EmailDirector extends EmailBase
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {
-				$this->RemoveOptionElement('destination_address',$indx);
-				$this->RemoveOptionElement('destination_subject',$indx);
+				$this->RemovePropIndexed('destination_address',$indx);
+				$this->RemovePropIndexed('destination_subject',$indx);
 			}
 		}
 	}
 
 	public function GetFieldStatus()
 	{
-		$opt = $this->GetOption('destination_address');
+		$opt = $this->GetProperty('destination_address');
 		if (is_array($opt))
 			$num = count($opt);
 		elseif ($opt)
@@ -68,7 +68,7 @@ class EmailDirector extends EmailBase
 	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue())
-			$ret = $this->GetOptionElement('destination_subject',$this->Value);
+			$ret = $this->GetPropIndexed('destination_subject',$this->Value);
 		else
 			$ret = $this->GetFormOption('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
@@ -88,19 +88,19 @@ class EmailDirector extends EmailBase
 		$this->RemoveAdminField($main,
 			$mod->Lang('title_email_subject'));
 		$main[] = array($mod->Lang('title_select_one_message'),
-			$mod->CreateInputText($id,'opt_select_one',
-			$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
+			$mod->CreateInputText($id,'pdt_select_one',
+			$this->GetProperty('select_one',$mod->Lang('select_one')),25,128));
 		$main[] = array($mod->Lang('title_allow_subject_override'),
-			$mod->CreateInputHidden($id,'opt_subject_override',0).
-			$mod->CreateInputCheckbox($id,'opt_subject_override',1,
-				$this->GetOption('subject_override',0)),
+			$mod->CreateInputHidden($id,'pdt_subject_override',0).
+			$mod->CreateInputCheckbox($id,'pdt_subject_override',1,
+				$this->GetProperty('subject_override',0)),
 			$mod->Lang('help_allow_subject_override'));
 		if ($this->addressAdd) {
-			$this->AddOptionElement('destination_subject','');
-			$this->AddOptionElement('destination_address','');
+			$this->AddPropIndexed('destination_subject','');
+			$this->AddPropIndexed('destination_address','');
 			$this->addressAdd = FALSE;
 		}
-		$opt = $this->GetOptionRef('destination_address');
+		$opt = $this->GetPropArray('destination_address');
 		if ($opt) {
 			$dests = array();
 			$dests[] = array(
@@ -110,9 +110,9 @@ class EmailDirector extends EmailBase
 				);
 			foreach ($opt as $i=>&$one) {
 				$dests[] = array(
-				$mod->CreateInputText($id,'opt_destination_subject'.$i,
-					$this->GetOptionElement('destination_subject',$i),40,128),
-				$mod->CreateInputText($id,'opt_destination_address'.$i,$one,50,128),
+				$mod->CreateInputText($id,'pdt_destination_subject'.$i,
+					$this->GetPropIndexed('destination_subject',$i),40,128),
+				$mod->CreateInputText($id,'pdt_destination_address'.$i,$one,50,128),
 				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
@@ -128,12 +128,12 @@ class EmailDirector extends EmailBase
 	public function PostAdminAction(&$params)
 	{
 		//cleanup empties
-		$addrs = $this->GetOptionRef('destination_address');
+		$addrs = $this->GetPropArray('destination_address');
 		if ($addrs) {
 			foreach ($addrs as $i=>&$one) {
-				if (!$one || !$this->GetOptionElement('destination_subject',$i)) {
-					$this->RemoveOptionElement('destination_address',$i);
-					$this->RemoveOptionElement('destination_subject',$i);
+				if (!$one || !$this->GetPropIndexed('destination_subject',$i)) {
+					$this->RemovePropIndexed('destination_address',$i);
+					$this->RemovePropIndexed('destination_subject',$i);
 				}
 			}
 			unset($one);
@@ -149,12 +149,12 @@ class EmailDirector extends EmailBase
 			$messages[] = $msg;
 
 		$mod = $this->formdata->formsmodule;
-		list($rv,$msg) = $this->validateEmailAddr($this->GetOption('email_from_address'));
+		list($rv,$msg) = $this->validateEmailAddr($this->GetProperty('email_from_address'));
 		if (!$rv) {
 			$ret = FALSE;
 			$messages[] = $msg;
 		}
-		$dests = $this->GetOption('destination_address');
+		$dests = $this->GetProperty('destination_address');
 		$c = count($dests);
 		if ($c) {
 			for ($i=0; $i<$c; $i++)
@@ -175,10 +175,10 @@ class EmailDirector extends EmailBase
 
 	public function Populate($id,&$params)
 	{
-		$subjects = $this->GetOptionRef('destination_subject');
+		$subjects = $this->GetPropArray('destination_subject');
 		if ($subjects) {
 			$mod = $this->formdata->formsmodule;
-			$choices = array(' '.$this->GetOption('select_one',$mod->Lang('select_one'))=>-1)
+			$choices = array(' '.$this->GetProperty('select_one',$mod->Lang('select_one'))=>-1)
 				+ array_flip($subjects);
 			$tmp = $mod->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
@@ -203,11 +203,11 @@ class EmailDirector extends EmailBase
 
 	public function Dispose($id,$returnid)
 	{
-		if ($this->GetOption('subject_override',0) && $this->GetOption('email_subject'))
-			$subject = $this->GetOption('email_subject');
+		if ($this->GetProperty('subject_override',0) && $this->GetProperty('email_subject'))
+			$subject = $this->GetProperty('email_subject');
 		else
-			$subject = $this->GetOptionElement('destination_subject',$this->Value);
+			$subject = $this->GetPropIndexed('destination_subject',$this->Value);
 
-		return $this->SendForm($this->GetOptionElement('destination_address',$this->Value),$subject);
+		return $this->SendForm($this->GetPropIndexed('destination_address',$this->Value),$subject);
 	}
 }

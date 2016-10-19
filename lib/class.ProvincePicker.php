@@ -27,6 +27,7 @@ class ProvincePicker extends FieldBase
 
 	public function GetDisplayableValue($as_string=TRUE)
 	{
+		$this->EnsureArray($this->Provinces);
 		$ret = array_search($this->Value,$this->Provinces);
 		if ($as_string)
 			return $ret;
@@ -36,15 +37,16 @@ class ProvincePicker extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		$choices = array_merge(array('No Default'=>''),$this->Provinces);
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
+
+		$choices = array_merge(array('No Default'=>''),$this->Provinces);
 		$main[] = array($mod->Lang('title_select_default_province'),
-						$mod->CreateInputDropdown($id,'opt_default_province',$choices,-1,
-							$this->GetOption('default_province')));
+						$mod->CreateInputDropdown($id,'pdt_default_province',$choices,-1,
+							$this->GetProperty('default_province')));
 		$main[] = array($mod->Lang('title_select_one_message'),
-						$mod->CreateInputText($id,'opt_select_one',
-							$this->GetOption('select_one',$mod->Lang('select_one'))));
+						$mod->CreateInputText($id,'pdt_select_one',
+							$this->GetProperty('select_one',$mod->Lang('select_one'))));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -52,10 +54,10 @@ class ProvincePicker extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 
-		$choices = array_merge(array($this->GetOption('select_one',$mod->Lang('select_one'))=>-1),$this->Provinces);
+		$choices = array_merge(array($this->GetProperty('select_one',$mod->Lang('select_one'))=>-1),$this->Provinces);
 
-		if (!$this->HasValue() && $this->GetOption('default_province'))
-			$this->SetValue($this->GetOption('default_province'));
+		if (!$this->HasValue() && $this->GetProperty('default_province'))
+			$this->SetValue($this->GetProperty('default_province'));
 
 		$tmp = $mod->CreateInputDropdown(
 			$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,

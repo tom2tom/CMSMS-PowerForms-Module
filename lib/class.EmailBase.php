@@ -18,7 +18,7 @@ class EmailBase extends FieldBase
 
 	public function TemplateStatus()
 	{
-		if ($this->GetOption('email_template'))
+		if ($this->GetProperty('email_template'))
 			return '';
 		return $this->formdata->formsmodule->Lang('email_template_not_set');
 	}
@@ -33,54 +33,54 @@ class EmailBase extends FieldBase
 	 [0] = array of things for 'main' tab
 	 [1] = (possibly empty) array of things for 'adv' tab
 	 [2] = array of js related to the created stuff
-	 [3] = something? relevant to upstream 'extra' parameter
+	 [3] = something?? for upstream 'extra' parameter
 	*/
 	public function AdminPopulateCommonEmail($id, $totype=FALSE, $visible=TRUE)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,$visible);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,$visible);
 
 		$mod = $this->formdata->formsmodule;
-		$message = $this->GetOption('email_template');
+		$message = $this->GetProperty('email_template');
 
 		//additional main-tab items
 		$main[] = array($mod->Lang('title_email_subject'),
-						$mod->CreateInputText($id,'opt_email_subject',
-							$this->GetOption('email_subject'),50),$mod->Lang('canuse_smarty'));
+						$mod->CreateInputText($id,'pdt_email_subject',
+							$this->GetProperty('email_subject'),50),$mod->Lang('canuse_smarty'));
 		$main[] = array($mod->Lang('title_email_from_name'),
-						$mod->CreateInputText($id,'opt_email_from_name',
-							$this->GetOption('email_from_name',$mod->Lang('friendly_name')),40,128));
+						$mod->CreateInputText($id,'pdt_email_from_name',
+							$this->GetProperty('email_from_name',$mod->Lang('friendly_name')),40,128));
 		$main[] = array($mod->Lang('title_email_from_address'),
-						$mod->CreateInputText($id,'opt_email_from_address',
-							$this->GetOption('email_from_address'),50,128),
+						$mod->CreateInputText($id,'pdt_email_from_address',
+							$this->GetProperty('email_from_address'),50,128),
 						$mod->Lang('email_from_addr_help',$_SERVER['SERVER_NAME']));
-		//abandoned here: 'opt_email_cc_address','opt_use_bcc'
+		//abandoned here: 'pdt_email_cc_address','pdt_use_bcc'
 		//code elsewhere assumes this is last in $main[]
 		if ($totype)
 			$main[] = array(
 				$mod->Lang('title_send_using'),
-				$mod->CreateInputRadioGroup($id,'opt_send_using',
+				$mod->CreateInputRadioGroup($id,'pdt_send_using',
 					array($mod->Lang('to')=>'to',$mod->Lang('cc')=>'cc',$mod->Lang('bcc')=>'bc'),
-					$this->getOption('send_using','to'),'','&nbsp;&nbsp;'),
+					$this->GetProperty('send_using','to'),'','&nbsp;&nbsp;'),
 					$mod->Lang('email_to_help'));
 
 		//additional advanced-tab items
 		$adv[] = array($mod->Lang('title_html_email'),
-					$mod->CreateInputHidden($id,'opt_html_email',0).
-					$mod->CreateInputCheckbox($id,'opt_html_email',1,
-						$this->GetOption('html_email',0)));
+					$mod->CreateInputHidden($id,'pdt_html_email',0).
+					$mod->CreateInputCheckbox($id,'pdt_html_email',1,
+						$this->GetProperty('html_email',0)));
 		$adv[] = array($mod->Lang('title_email_encoding'),
-					$mod->CreateInputText($id,'opt_email_encoding',
-						$this->GetOption('email_encoding','utf-8'),15,128));
+					$mod->CreateInputText($id,'pdt_email_encoding',
+						$this->GetProperty('email_encoding','utf-8'),15,128));
 		//setup sample-template buttons and scripts
 		$ctldata = array();
-		$ctldata['opt_email_template']['html_button'] = TRUE;
-		$ctldata['opt_email_template']['text_button'] = TRUE;
-		$ctldata['opt_email_template']['is_email'] = TRUE;
+		$ctldata['pdt_email_template']['html_button'] = TRUE;
+		$ctldata['pdt_email_template']['text_button'] = TRUE;
+		$ctldata['pdt_email_template']['is_email'] = TRUE;
 		list($buttons,$jsfuncs) = Utils::TemplateActions($this->formdata,$id,$ctldata);
 		$adv[] = array($mod->Lang('title_email_template'),
 						$mod->CreateTextArea(FALSE,$id,
-						//($this->GetOption('html_email',0)?$message:htmlspecialchars($message))
-						$message,'opt_email_template','pwf_tallarea','','','',50,15,'','html'),
+						//($this->GetProperty('html_email',0)?$message:htmlspecialchars($message))
+						$message,'pdt_email_template','pwf_tallarea','','','',50,15,'','html'),
 						'<br /><br />'.$buttons[0].'&nbsp;'.$buttons[1]);
 		//show variables-help on advanced tab
 		return array($main,$adv,$jsfuncs,'varshelpadv');
@@ -88,22 +88,22 @@ class EmailBase extends FieldBase
 
 	public function PostAdminActionEmail(&$params)
 	{
-		if (!is_array($params['opt_destination_address']))
-			$params['opt_destination_address'] = array($params['opt_destination_address']);
+		if (!is_array($params['pdt_destination_address']))
+			$params['pdt_destination_address'] = array($params['pdt_destination_address']);
 
-		foreach ($params['opt_destination_address'] as $i => $to) {
+		foreach ($params['pdt_destination_address'] as $i => $to) {
 $mod->Crash;
 			if (isset($params['mailto_'.$i])) {
 				$totype = $params['mailto_'.$i];
 				switch ($totype) {
 				 case 'cc';
-					$params['opt_destination_address'][$i] = '|cc|'.$to;
+					$params['pdt_destination_address'][$i] = '|cc|'.$to;
 					break;
 				 case 'bc':
-					$params['opt_destination_address'][$i] = '|bc|'.$to;
+					$params['pdt_destination_address'][$i] = '|bc|'.$to;
 					break;
 				}
-//TODO ?? somewhere $this->SetOptionElement('destination_address',[$i or other index],[adjusted]parameter) ??
+//TODO ?? somewhere $this->SetPropIndexed('destination_address',[$i or other index],[adjusted]parameter) ??
 				unset($params[$totype]);
 			}
 		}
@@ -243,7 +243,7 @@ EOS;
 
 		$mail->reset();
 
-		$defto = $this->GetOption('send_using','to');
+		$defto = $this->GetProperty('send_using','to');
 		if (!is_array($destination_array))
 			$destination_array = array($destination_array);
 		foreach ($destination_array as $thisDest) {
@@ -319,32 +319,32 @@ EOS;
 		}
 
 		if ($this->SetFromName())
-			$mail->SetFromName($this->GetOption('email_from_name'));
+			$mail->SetFromName($this->GetProperty('email_from_name'));
 
 		if ($this->SetFromAddress())
-			$mail->SetFrom($this->GetOption('email_from_address'));
+			$mail->SetFrom($this->GetProperty('email_from_address'));
 
-		$rt = $this->GetOption('email_reply_to_address');
+		$rt = $this->GetProperty('email_reply_to_address');
 		if ($rt && $this->SetReplyToAddress()) {
 			if ($this->SetFromName()) {
-				$rn = $this->GetOption('email_reply_to_name');
+				$rn = $this->GetProperty('email_reply_to_name');
 				if (!$rn)
-					$rn = $this->GetOption('email_from_name');
+					$rn = $this->GetProperty('email_from_name');
 			} else
 				$rn = '';
 			$mail->AddReplyTo($rt,$rn);
 		}
 
-		$mail->SetCharSet($this->GetOption('email_encoding','utf-8'));
+		$mail->SetCharSet($this->GetProperty('email_encoding','utf-8'));
 
-		$htmlemail = $this->GetOption('html_email',0);
+		$htmlemail = $this->GetProperty('html_email',0);
 
 		Utils::SetupFormVars($this->formdata,$htmlemail,$tplvars);
 
 		$subject = Utils::ProcessTemplateFromData($mod,$subject,$tplvars);
 		$mail->SetSubject($subject);
 
-		$message = $this->GetOption('email_template');
+		$message = $this->GetProperty('email_template');
 		if ($message) {
 			if ($htmlemail)
 				$message2 = $message;
@@ -366,7 +366,7 @@ EOS;
 
 		foreach ($this->formdata->Fields as &$one) {
 	 		if ($one->Type == 'FileUpload' &&
- 			  !$one->GetOption('suppress_attachment') && !$one->GetOption('sendto_uploads'))
+ 			  !$one->GetProperty('suppress_attachment') && !$one->GetProperty('sendto_uploads'))
 			{
 				// file(s) to be attached to email
 				$ud = Utils::GetUploadsPath();

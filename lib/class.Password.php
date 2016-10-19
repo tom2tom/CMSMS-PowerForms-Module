@@ -27,10 +27,12 @@ class Password extends FieldBase
 	public function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		$ret = $mod->Lang('abbreviation_length',$this->GetOption('length','80'));
-		if ($this->ValidationType)
+		$ret = $mod->Lang('abbreviation_length',$this->GetProperty('length','80'));
+		if ($this->ValidationType) {
+			$this->EnsureArray($this->ValidationTypes);
 			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
-		if ($this->GetOption('readonly',0))
+		}
+		if ($this->GetProperty('readonly',0))
 			$ret .= ','.$mod->Lang('title_read_only');
 		return $ret;
 	}
@@ -40,23 +42,23 @@ class Password extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_display_length'),
-						$mod->CreateInputText($id,'opt_length',
-							$this->GetOption('length',12),3,3));
+						$mod->CreateInputText($id,'pdt_length',
+							$this->GetProperty('length',12),3,3));
 		$main[] = array($mod->Lang('title_minimum_length'),
-						$mod->CreateInputText($id,'opt_min_length',
-							$this->GetOption('min_length',8),3,3));
+						$mod->CreateInputText($id,'pdt_min_length',
+							$this->GetProperty('min_length',8),3,3));
 		$main[] = array($mod->Lang('title_hide'),
-						$mod->CreateInputHidden($id,'opt_hide',0).
-						$mod->CreateInputCheckbox($id,'opt_hide',1,
-							$this->GetOption('hide',1)),
+						$mod->CreateInputHidden($id,'pdt_hide',0).
+						$mod->CreateInputCheckbox($id,'pdt_hide',1,
+							$this->GetProperty('hide',1)),
 					  $mod->Lang('title_hide_help'));
 		$main[] = array($mod->Lang('title_read_only'),
-						$mod->CreateInputHidden($id,'opt_readonly',0).
-						$mod->CreateInputCheckbox($id,'opt_readonly',1,
-							$this->GetOption('readonly',0)));
+						$mod->CreateInputHidden($id,'pdt_readonly',0).
+						$mod->CreateInputCheckbox($id,'pdt_readonly',1,
+							$this->GetProperty('readonly',0)));
 		$adv[] = array($mod->Lang('title_field_regex'),
-						$mod->CreateInputText($id,'opt_regex',
-							$this->GetOption('regex'),25,1024),
+						$mod->CreateInputText($id,'pdt_regex',
+							$this->GetProperty('regex'),25,1024),
 						$mod->Lang('help_regex_use'));
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -64,13 +66,13 @@ class Password extends FieldBase
 	public function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		if ($this->GetOption('readonly',0))
+		if ($this->GetProperty('readonly',0))
 			$ro = ' readonly="readonly"';
 		else
 			$ro = '';
 
-		$ln = $this->GetOption('length',16);
-		if ($this->GetOption('hide',1)) {
+		$ln = $this->GetProperty('length',16);
+		if ($this->GetProperty('hide',1)) {
 			$tmp = $mod->CreateInputPassword($id,$this->formdata->current_prefix.$this->Id,
 					($this->Value?$this->Value:''),$ln,$ln,
 					$ro.$this->GetScript());
@@ -92,7 +94,7 @@ class Password extends FieldBase
 		 case 'none':
 			break;
 		 case 'length':
-		 	$ln = $this->GetOption('min_length',0);
+		 	$ln = $this->GetProperty('min_length',0);
 			if ($ln > 0 && strlen($this->Value) < $ln) {
 				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_at_least',$ln);
@@ -100,7 +102,7 @@ class Password extends FieldBase
 			break;
 		 case 'regex_match':
 			if (property_exists($this,'Value') &&
-				!preg_match($this->GetOption('regex','/.*/'),$this->Value))
+				!preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
@@ -108,7 +110,7 @@ class Password extends FieldBase
 			break;
 		 case 'regex_nomatch':
 			if (property_exists($this,'Value') &&
-				preg_match($this->GetOption('regex','/.*/'),$this->Value))
+				preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);

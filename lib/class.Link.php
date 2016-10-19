@@ -16,7 +16,7 @@ class Link extends FieldBase
 		$this->MultiPopulate = TRUE;
 		$this->Required = FALSE;
 		$this->Type = 'Link';
-		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_none')=>'none');
+		$this->ValidationTypes = array();
 	}
 
 	public function GetDisplayableValue($as_string=TRUE)
@@ -34,17 +34,15 @@ class Link extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
-		// remove the "required" field TODO
-		$this->RemoveAdminField($main,$mod->Lang('title_field_required'));
 
 		$main[] = array($mod->Lang('title_default_link'),
-						$mod->CreateInputText($id,'opt_default_link',
-							$this->GetOption('default_link'),25,128));
+						$mod->CreateInputText($id,'pdt_default_link',
+							$this->GetProperty('default_link'),25,128));
 		$main[] = array($mod->Lang('title_default_link_title'),
-						$mod->CreateInputText($id,'opt_default_link_title',
-							$this->GetOption('default_link_title'),25,128));
+						$mod->CreateInputText($id,'pdt_default_link_title',
+							$this->GetProperty('default_link_title'),25,128));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -56,7 +54,7 @@ class Link extends FieldBase
 		if (property_exists($this,'Value') && is_array($this->Value))
 			$val = $this->Value;
 		else
-			$val = array($this->GetOption('default_link'),$this->GetOption('default_link_title'));
+			$val = array($this->GetProperty('default_link'),$this->GetProperty('default_link_title'));
 
 		$ret = array();
 		$oneset = new \stdClass();

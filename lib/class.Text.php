@@ -29,12 +29,14 @@ class Text extends FieldBase
 	public function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		$ret = $mod->Lang('abbreviation_length',$this->GetOption('length',80));
+		$ret = $mod->Lang('abbreviation_length',$this->GetProperty('length',80));
 
-		if ($this->ValidationType)
+		if ($this->ValidationType) {
+			$this->EnsureArray($this->ValidationTypes);
 		  	$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
+		}
 
-		if ($this->GetOption('readonly',0))
+		if ($this->GetProperty('readonly',0))
 			$ret .= ','.$mod->Lang('title_read_only');
 
 		return $ret;
@@ -45,27 +47,27 @@ class Text extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_maximum_length'),
-						$mod->CreateInputText($id,'opt_length',
-							$this->GetOption('length',80),3,3));
+						$mod->CreateInputText($id,'pdt_length',
+							$this->GetProperty('length',80),3,3));
 		$main[] = array($mod->Lang('title_read_only'),
-						$mod->CreateInputHidden($id,'opt_readonly',0).
-						$mod->CreateInputCheckbox($id,'opt_readonly',1,
-							$this->GetOption('readonly',0)));
+						$mod->CreateInputHidden($id,'pdt_readonly',0).
+						$mod->CreateInputCheckbox($id,'pdt_readonly',1,
+							$this->GetProperty('readonly',0)));
 		$adv[] = array($mod->Lang('title_field_regex'),
-						$mod->CreateInputText($id,'opt_regex',
-							$this->GetOption('regex'),25,1024),
+						$mod->CreateInputText($id,'pdt_regex',
+							$this->GetProperty('regex'),25,1024),
 						$mod->Lang('help_regex_use'));
 		$adv[] = array($mod->Lang('title_field_default_value'),
-						$mod->CreateInputText($id,'opt_default',
-							$this->GetOption('default'),25,1024));
+						$mod->CreateInputText($id,'pdt_default',
+							$this->GetProperty('default'),25,1024));
 		$adv[] = array($mod->Lang('title_html5'),
-						$mod->CreateInputHidden($id,'opt_html5',0).
-						$mod->CreateInputCheckbox($id,'opt_html5',1,
-							$this->GetOption('html5',0)));
+						$mod->CreateInputHidden($id,'pdt_html5',0).
+						$mod->CreateInputCheckbox($id,'pdt_html5',1,
+							$this->GetProperty('html5',0)));
 		$adv[] = array($mod->Lang('title_clear_default'),
-						$mod->CreateInputHidden($id,'opt_clear_default',0).
-						$mod->CreateInputCheckbox($id,'opt_clear_default',1,
-							$this->GetOption('clear_default',0)),
+						$mod->CreateInputHidden($id,'pdt_clear_default',0).
+						$mod->CreateInputCheckbox($id,'pdt_clear_default',1,
+							$this->GetProperty('clear_default',0)),
 						$mod->Lang('help_clear_default'));
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -74,24 +76,24 @@ class Text extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 
-		if ($this->GetOption('readonly',0))
+		if ($this->GetProperty('readonly',0))
 			$ro = ' readonly="readonly"';
 		else
 			$ro = '';
 
-		if ($this->GetOption('html5',0)) {
+		if ($this->GetProperty('html5',0)) {
 			$tmp = $mod->CreateInputText(
 				$id,$this->formdata->current_prefix.$this->Id,$this->Value,
-				$this->GetOption('length')<25?$this->GetOption('length'):25,$this->GetOption('length'),
-				' placeholder="'.$this->GetOption('default').'"'.$ro.$this->GetScript());
+				$this->GetProperty('length')<25?$this->GetProperty('length'):25,$this->GetProperty('length'),
+				' placeholder="'.$this->GetProperty('default').'"'.$ro.$this->GetScript());
 		} else {
 			$js = $this->GetScript();
-			if ($this->GetOption('clear_default',0))
+			if ($this->GetProperty('clear_default',0))
 				$js = ' onfocus="if (this.value==this.defaultValue) this.value=\'\';" onblur="if (this.value==\'\') this.value=this.defaultValue;"'.$js;
 			$tmp = $mod->CreateInputText(
 				$id,$this->formdata->current_prefix.$this->Id,
-				($this->HasValue()?$this->Value:$this->GetOption('default')),
-				$this->GetOption('length')<25?$this->GetOption('length'):25,$this->GetOption('length'),
+				($this->HasValue()?$this->Value:$this->GetProperty('default')),
+				$this->GetProperty('length')<25?$this->GetProperty('length'):25,$this->GetProperty('length'),
 				$ro.$js);
 		}
 		$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
@@ -141,7 +143,7 @@ class Text extends FieldBase
 			break;
 		 case 'regex_match':
 			if ($this->Value &&
-				!preg_match($this->GetOption('regex','/.*/'),$this->Value))
+				!preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
@@ -149,7 +151,7 @@ class Text extends FieldBase
 			break;
 		 case 'regex_nomatch':
 			if ($this->Value &&
-				preg_match($this->GetOption('regex','/.*/'),$this->Value))
+				preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
@@ -157,7 +159,7 @@ class Text extends FieldBase
 			break;
 		}
 
-		$lm = $this->GetOption('length',0);
+		$lm = $this->GetProperty('length',0);
 		if ($lm && strlen($this->Value) > $lm) {
 			$this->valid = FALSE;
 			$this->ValidationMessage = $mod->Lang('please_enter_no_longer',$lm);

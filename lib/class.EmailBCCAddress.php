@@ -23,7 +23,7 @@ class EmailBCCAddress extends EmailBase
 	public function GetFieldStatus()
 	{
 //TODO advice about email addr
-		$target = $this->GetOption('field_to_modify');
+		$target = $this->GetProperty('field_to_modify');
 		foreach ($this->formdata->Fields as &$one) {
 			if ($one->GetId() == $target) {
 				$ret = $this->formdata->formsmodule->Lang('title_modifies',$one->GetName());
@@ -50,8 +50,8 @@ class EmailBCCAddress extends EmailBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_field_to_modify2'),
-						$mod->CreateInputDropdown($id,'opt_field_to_modify',$choices,-1,
-							$this->GetOption('field_to_modify')));
+						$mod->CreateInputDropdown($id,'pdt_field_to_modify',$choices,-1,
+							$this->GetProperty('field_to_modify')));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -89,13 +89,13 @@ class EmailBCCAddress extends EmailBase
 			foreach ($this->formdata->Fields as &$one) {
 				if ($one->IsDisposition()
 				 && is_subclass_of($one,'pwfEmailBase')
-				 && $one->GetId() == $this->GetOption('field_to_modify'))
+				 && $one->GetId() == $this->GetProperty('field_to_modify'))
 				{
-					$bc = $one->GetOption('email_bcc_address');
+					$bc = $one->GetProperty('email_bcc_address');
 					if ($bc)
 						$bc .= ',';
 					$bc .= $this->Value;
-					$one->SetOption('email_bcc_address',$bc);
+					$one->SetProperty('email_bcc_address',$bc);
 				}
 			}
 			unset($one);

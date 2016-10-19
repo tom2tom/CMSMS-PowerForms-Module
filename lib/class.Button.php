@@ -20,11 +20,11 @@ class Button extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_button_text'),
-						$mod->CreateInputText($id,'opt_text',
-							$this->GetOption('text'),40));
+						$mod->CreateInputText($id,'pdt_text',
+							$this->GetProperty('text'),40));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -32,7 +32,7 @@ class Button extends FieldBase
 	{
 		$tmp = '<input type="button" id="'.$this->GetInputId().'" name="'.
 			$id.$this->formdata->current_prefix.$this->Id.
-			'" value="'.$this->GetOption('text').'"'.$this->GetScript().' />';
+			'" value="'.$this->GetProperty('text').'"'.$this->GetScript().' />';
 		return $this->SetClass($tmp);
 	}
 }

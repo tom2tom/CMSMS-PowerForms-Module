@@ -28,31 +28,31 @@ class EmailAddress extends EmailBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_headers_to_modify'),
-						$mod->CreateInputDropdown($id,'opt_headers_to_modify',$choices,-1,
-							$this->GetOption('headers_to_modify','f')));
+						$mod->CreateInputDropdown($id,'pdt_headers_to_modify',$choices,-1,
+							$this->GetProperty('headers_to_modify','f')));
 		$adv[] = array($mod->Lang('title_field_default_value'),
-						$mod->CreateInputText($id,'opt_default',
-							$this->GetOption('default'),25,1024));
+						$mod->CreateInputText($id,'pdt_default',
+							$this->GetProperty('default'),25,1024));
 		$adv[] = array($mod->Lang('title_clear_default'),
-						$mod->CreateInputHidden($id,'opt_clear_default',0).
-						$mod->CreateInputCheckbox($id,'opt_clear_default',1,
-							$this->GetOption('clear_default',0)),
+						$mod->CreateInputHidden($id,'pdt_clear_default',0).
+						$mod->CreateInputCheckbox($id,'pdt_clear_default',1,
+							$this->GetProperty('clear_default',0)),
 						$mod->Lang('help_clear_default'));
 		$adv[] = array($mod->Lang('title_html5'),
-						$mod->CreateInputHidden($id,'opt_html5',0).
-						$mod->CreateInputCheckbox($id,'opt_html5',1,
-							$this->GetOption('html5',0)));
+						$mod->CreateInputHidden($id,'pdt_html5',0).
+						$mod->CreateInputCheckbox($id,'pdt_html5',1,
+							$this->GetProperty('html5',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	public function Populate($id,&$params)
 	{
 		$this->SetEmailJS();
-		if ($this->GetOption('html5',0)) {
+		if ($this->GetProperty('html5',0)) {
 			$addr = ($this->HasValue()) ? $this->Value : '';
-			$place = 'placeholder="'.$this->GetOption('default').'"';
+			$place = 'placeholder="'.$this->GetProperty('default').'"';
 		} else {
-			$addr = ($this->HasValue()) ? $this->Value : $this->GetOption('default');
+			$addr = ($this->HasValue()) ? $this->Value : $this->GetProperty('default');
 			$place = '';
 		}
 		$tmp = $this->formdata->formsmodule->CreateInputEmail(
@@ -83,13 +83,13 @@ class EmailAddress extends EmailBase
 	public function PreDisposeAction()
 	{
 		if (property_exists($this,'Value')) {
-			$htm = $this->GetOption('headers_to_modify','f');
+			$htm = $this->GetProperty('headers_to_modify','f');
 			foreach ($this->formdata->Fields as &$one) {
 				if ($one->IsDisposition() && is_subclass_of($one,'EmailBase')) {
 					if ($htm == 'f' || $htm == 'b')
-						$one->SetOption('email_from_address',$this->Value);
+						$one->SetProperty('email_from_address',$this->Value);
 					if ($htm == 'r' || $htm == 'b')
-						$one->SetOption('email_reply_to_address',$this->Value);
+						$one->SetProperty('email_reply_to_address',$this->Value);
 				}
 			}
 			unset($one);

@@ -81,25 +81,25 @@ class UserEmail extends EmailBase
 			$mod->Lang('option_user_choice')=>'c',
 			$mod->Lang('option_always')=>'a');
 		$main[] = array($mod->Lang('title_send_user_copy'),
-						$mod->CreateInputDropdown($id,'opt_send_user_copy',$choices,-1,
-						$this->GetOption('send_user_copy','n')));
+						$mod->CreateInputDropdown($id,'pdt_send_user_copy',$choices,-1,
+						$this->GetProperty('send_user_copy','n')));
 		$main[] = array($mod->Lang('title_send_user_label'),
-						$mod->CreateInputText($id,'opt_send_user_label',
-						$this->GetOption('send_user_label',$mod->Lang('title_send_me_a_copy')),25,125));
+						$mod->CreateInputText($id,'pdt_send_user_label',
+						$this->GetProperty('send_user_label',$mod->Lang('title_send_me_a_copy')),25,125));
 		$choices = array(
 			$mod->Lang('option_from')=>'f',
 			$mod->Lang('option_reply')=>'r',
 			$mod->Lang('option_both')=>'b');
 		$main[] = array($mod->Lang('title_headers_to_modify'),
-						$mod->CreateInputDropdown($id,'opt_headers_to_modify',$choices,-1,
-						$this->GetOption('headers_to_modify','f')));
+						$mod->CreateInputDropdown($id,'pdt_headers_to_modify',$choices,-1,
+						$this->GetProperty('headers_to_modify','f')));
 	 	return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
 	}
 
 	public function Populate($id,&$params)
 	{
 		$this->SetEmailJS();
-		$toself = ($this->GetOption('send_user_copy','n') == 'c');
+		$toself = ($this->GetProperty('send_user_copy','n') == 'c');
 //		$multi = ($toself) ? '[]':'';
 //TODO check this logic
 		$sf = ($toself) ? '_1':'';
@@ -119,7 +119,7 @@ class UserEmail extends EmailBase
 				$id,$this->formdata->current_prefix.$this->Id.'[]',1,0,'id="'.$tid.'"');
 			$ret .= '<br />'.$this->SetClass($tmp);
 			$tmp = '<label class ="" for="'.$tid.'">'.
-				$this->GetOption('send_user_label',$mod->Lang('title_send_me_a_copy')).'</label>';
+				$this->GetProperty('send_user_label',$mod->Lang('title_send_me_a_copy')).'</label>';
 			$ret .= '&nbsp;'.$this->SetClass($tmp);
 		}
 		return $ret;
@@ -147,13 +147,13 @@ class UserEmail extends EmailBase
 	public function PreDisposeAction()
 	{
 		if (property_exists($this,'Value')) {
-			$htm = $this->GetOption('headers_to_modify','f');
+			$htm = $this->GetProperty('headers_to_modify','f');
 			foreach ($this->formdata->Fields as &$one) {
 				if ($one->IsDisposition() && is_subclass_of($one,'EmailBase')) {
 					if ($htm == 'f' || $htm == 'b')
-						$one->SetOption('email_from_address',$this->Value[0]);
+						$one->SetProperty('email_from_address',$this->Value[0]);
 					if ($htm == 'r' || $htm == 'b')
-						$one->SetOption('email_reply_to_address',$this->Value[0]);
+						$one->SetProperty('email_reply_to_address',$this->Value[0]);
 				}
 			}
 			unset($one);
@@ -163,11 +163,11 @@ class UserEmail extends EmailBase
 	public function Dispose($id,$returnid)
 	{
 		if ($this->HasValue() &&
-		($this->GetOption('send_user_copy','n') == 'a' ||
-		($this->GetOption('send_user_copy','n') == 'c' && isset($this->Value[1]) && $this->Value[1] == 1))
+		($this->GetProperty('send_user_copy','n') == 'a' ||
+		($this->GetProperty('send_user_copy','n') == 'c' && isset($this->Value[1]) && $this->Value[1] == 1))
 		)
 		{
-			return $this->SendForm($this->Value[0],$this->GetOption('email_subject'));
+			return $this->SendForm($this->Value[0],$this->GetProperty('email_subject'));
 		} else {
 			return array(TRUE,'');
 		}

@@ -48,9 +48,11 @@ class TextExpandable extends FieldBase
 	public function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		$ret = $mod->Lang('abbreviation_length',$this->GetOption('length',80));
-		if (strlen($this->ValidationType)>0)
-			$ret .= ",".array_search($this->ValidationType,$this->ValidationTypes);
+		$ret = $mod->Lang('abbreviation_length',$this->GetProperty('length',80));
+		if ($this->ValidationType) {
+			$this->EnsureArray($this->ValidationTypes);
+			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
+		}
 
 		return $ret;
 	}
@@ -81,21 +83,21 @@ class TextExpandable extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_maximum_length'),
-						$mod->CreateInputText($id,'opt_length',$this->GetOption('length',80),3,3));
+						$mod->CreateInputText($id,'pdt_length',$this->GetProperty('length',80),3,3));
 		$main[] = array($mod->Lang('title_add_button_text'),
-						$mod->CreateInputText($id,'opt_add_button',$this->GetOption('add_button','+'),15,25));
+						$mod->CreateInputText($id,'pdt_add_button',$this->GetProperty('add_button','+'),15,25));
 		$main[] = array($mod->Lang('title_del_button_text'),
-						$mod->CreateInputText($id,'opt_del_button',$this->GetOption('del_button','X'),15,25));
+						$mod->CreateInputText($id,'pdt_del_button',$this->GetProperty('del_button','X'),15,25));
 		$adv[] = array($mod->Lang('title_field_regex'),
-						$mod->CreateInputText($id,'opt_regex',$this->GetOption('regex'),25,255),
+						$mod->CreateInputText($id,'pdt_regex',$this->GetProperty('regex'),25,255),
 						$mod->Lang('help_regex_use'));
 		$adv[] = array($mod->Lang('title_field_siblings'),
-						$mod->CreateInputDropdown($id,'opt_siblings',$this->GetFieldSiblings(),-1,
-							$this->GetOption('siblings')),
+						$mod->CreateInputDropdown($id,'pdt_siblings',$this->GetFieldSiblings(),-1,
+							$this->GetProperty('siblings')),
 						$mod->Lang('help_field_siblings'));
 		$adv[] = array($mod->Lang('title_field_hidebuttons'),
-						$mod->CreateInputHidden($id,'opt_hidebuttons',0).
-						$mod->CreateInputCheckbox($id,'opt_hidebuttons',1,$this->GetOption('hidebuttons',0)),
+						$mod->CreateInputHidden($id,'pdt_hidebuttons',0).
+						$mod->CreateInputCheckbox($id,'pdt_hidebuttons',1,$this->GetProperty('hidebuttons',0)),
 						$mod->Lang('help_field_hidebuttons'));
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -108,8 +110,8 @@ class TextExpandable extends FieldBase
 	public function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$sibling_id = $this->GetOption('siblings');
-		$hidebuttons = $this->GetOption('hidebuttons');
+		$sibling_id = $this->GetProperty('siblings');
+		$hidebuttons = $this->GetProperty('hidebuttons');
 
 		if (!is_array($this->Value))
 			$vals = 1;
@@ -143,15 +145,15 @@ class TextExpandable extends FieldBase
 			$oneset->title = '';
 			$tmp = $mod->CreateInputText(
 				$id,$this->formdata->current_prefix.$this->Id.'[]',
-				$this->Value[$i],$this->GetOption('length')<25?$this->GetOption('length'):25,
-				$this->GetOption('length'),
+				$this->Value[$i],$this->GetProperty('length')<25?$this->GetProperty('length'):25,
+				$this->GetProperty('length'),
 				$this->GetScript());
 			$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_'.$i).'"',$tmp);
 			$oneset->input = $this->SetClass($tmp);
 			if (!$hidebuttons) {
 				$tmp = $mod->CreateInputSubmit($id,
 					$this->formdata->current_prefix.'FeD_'.$this->Id.'_'.$i,
-					$this->GetOption('del_button','X'),($vals==1?' disabled="disabled"':''));
+					$this->GetProperty('del_button','X'),($vals==1?' disabled="disabled"':''));
 				$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_del_'.$i).'"',$tmp);
 				$oneset->op = $this->SetClass($tmp);
 			}
@@ -167,7 +169,7 @@ class TextExpandable extends FieldBase
 			$oneset->input = '';
 			$tmp = $mod->CreateInputSubmit($id,
 				$this->formdata->current_prefix.'FeX_'.$this->Id.'_'.$i,
-				$this->GetOption('add_button','+'));
+				$this->GetProperty('add_button','+'));
 			$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId('_add_'.$i).'"',$tmp);
 			$oneset->op = $this->SetClass($tmp);
 
@@ -182,7 +184,7 @@ class TextExpandable extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$res = TRUE;
 		$messages = array();
-		$l = $this->GetOption('length',0);
+		$l = $this->GetProperty('length',0);
 
 		if (!is_array($this->Value))
 			$this->Value = array($this->Value);
@@ -209,13 +211,13 @@ class TextExpandable extends FieldBase
 				}
 				break;
 			 case 'regex_match':
-				if ($one && !preg_match($this->GetOption('regex','/.*/'),$one)) {
+				if ($one && !preg_match($this->GetProperty('regex','/.*/'),$one)) {
 					$res = FALSE;
 					$messages[] = $mod->Lang('please_enter_valid',$this->Name);
 				}
 				break;
 			 case 'regex_nomatch':
-				if ($one && preg_match($this->GetOption('regex','/.*/'),$one)) {
+				if ($one && preg_match($this->GetProperty('regex','/.*/'),$one)) {
 					$res = FALSE;
 					$messages[] = $mod->Lang('please_enter_valid',$this->Name);
 				}

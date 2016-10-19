@@ -48,10 +48,10 @@ class InputTemplate extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_tag'),
-						$mod->CreateInputText($id,'opt_value',$this->GetOption('value'),100,1024),
+						$mod->CreateInputText($id,'pdt_value',$this->GetProperty('value'),100,1024),
 						$mod->Lang('help_tag'));
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -64,7 +64,7 @@ class InputTemplate extends FieldBase
 		// for things like checked="checked" on the back page
 		$tplvars['FBvalue'] = $this->Value;
 
-		$val = $this->GetOption('value');
+		$val = $this->GetProperty('value');
 		return Utils::ProcessTemplateFromData($this->formdata->formsmodule,$val,$tplvars);
 	}
 }

@@ -20,7 +20,7 @@ class FileUpload extends FieldBase
 
 	public function GetDisplayableValue($as_string=TRUE)
 	{
-		if ($this->GetOption('suppress_filename',0))
+		if ($this->GetProperty('suppress_filename',0))
 			return '';
 		if ($as_string && is_array($this->Value) && isset($this->Value[1]))
 			return $this->Value[1];
@@ -34,17 +34,17 @@ class FileUpload extends FieldBase
 		if (!Utils::GetUploadsPath())
 			return $mod->Lang('error_uploads_dir');
 
-		$ms = $this->GetOption('max_size');
-		$exts = $this->GetOption('permitted_extensions');
+		$ms = $this->GetProperty('max_size');
+		$exts = $this->GetProperty('permitted_extensions');
 		$ret = '';
 		if ($ms)
 			$ret .= $mod->Lang('maximum_size').': '.$ms.'kb,';
 		if ($exts)
 			$ret .= $mod->Lang('permitted_extensions') . ': '.$exts.',';
-//		if ($this->GetOption('file_destination'))
-//			$ret .= $this->GetOption('file_destination');
+//		if ($this->GetProperty('file_destination'))
+//			$ret .= $this->GetProperty('file_destination');
 		$ret .= $ud;
-		if ($this->GetOption('allow_overwrite',0))
+		if ($this->GetProperty('allow_overwrite',0))
 			$ret .= ' '.$mod->Lang('overwrite');
 		else
 			$ret .= ' '.$mod->Lang('nooverwrite');
@@ -53,29 +53,29 @@ class FileUpload extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		$ms = $this->GetOption('max_size');
-		$exts = $this->GetOption('permitted_extensions');
-		$show = $this->GetOption('show_details',0);
-		$sendto_uploads = $this->GetOption('sendto_uploads',0);
-		$uploads_category = $this->GetOption('uploads_category');
-		$uploads_destpage = $this->GetOption('uploads_destpage');
+		$ms = $this->GetProperty('max_size');
+		$exts = $this->GetProperty('permitted_extensions');
+		$show = $this->GetProperty('show_details',0);
+		$sendto_uploads = $this->GetProperty('sendto_uploads',0);
+		$uploads_category = $this->GetProperty('uploads_category');
+		$uploads_destpage = $this->GetProperty('uploads_destpage');
 
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_maximum_size'),
-				$mod->CreateInputText($id,'opt_max_size',$ms,5,5),
+				$mod->CreateInputText($id,'pdt_max_size',$ms,5,5),
 				$mod->Lang('help_maximum_size'));
 		$main[] = array($mod->Lang('title_permitted_extensions'),
-				$mod->CreateInputText($id,'opt_permitted_extensions',$exts,25,80),
+				$mod->CreateInputText($id,'pdt_permitted_extensions',$exts,25,80),
 				$mod->Lang('help_permitted_extensions'));
 		$main[] = array($mod->Lang('title_show_limitations'),
-				$mod->CreateInputHidden($id,'opt_show_details',0).
-				$mod->CreateInputCheckbox($id,'opt_show_details',1,$show),
+				$mod->CreateInputHidden($id,'pdt_show_details',0).
+				$mod->CreateInputCheckbox($id,'pdt_show_details',1,$show),
 				$mod->Lang('help_show_limitations'));
 		$main[] = array($mod->Lang('title_allow_overwrite'),
-				$mod->CreateInputHidden($id,'opt_allow_overwrite',0).
-				$mod->CreateInputCheckbox($id,'opt_allow_overwrite',1,
-					$this->GetOption('allow_overwrite',0)),
+				$mod->CreateInputHidden($id,'pdt_allow_overwrite',0).
+				$mod->CreateInputCheckbox($id,'pdt_allow_overwrite',1,
+					$this->GetProperty('allow_overwrite',0)),
 				$mod->Lang('help_allow_overwrite'));
 
 		$uploads = $mod->GetModuleInstance('Uploads');
@@ -85,38 +85,38 @@ class FileUpload extends FieldBase
 		Utils::FormFieldsHelp($this->formdata,array('$ext'=>$mod->Lang('original_file_extension')));
 
 		$adv[] = array($mod->Lang('title_file_rename'),
-						$mod->CreateInputText($id,'opt_file_rename',
-						$this->GetOption('file_rename'),60,255),
+						$mod->CreateInputText($id,'pdt_file_rename',
+						$this->GetProperty('file_rename'),60,255),
 						$help_file_rename);
 		$adv[] = array($mod->Lang('title_suppress_filename'),
-						$mod->CreateInputHidden($id,'opt_suppress_filename',0).
-						$mod->CreateInputCheckbox($id,'opt_suppress_filename',1,
-							$this->GetOption('suppress_filename',0)));
+						$mod->CreateInputHidden($id,'pdt_suppress_filename',0).
+						$mod->CreateInputCheckbox($id,'pdt_suppress_filename',1,
+							$this->GetProperty('suppress_filename',0)));
 		$adv[] = array($mod->Lang('title_suppress_attachment'),
-						$mod->CreateInputHidden($id,'opt_suppress_attachment',0).
-						$mod->CreateInputCheckbox($id,'opt_suppress_attachment',1,
-							$this->GetOption('suppress_attachment',1)));
+						$mod->CreateInputHidden($id,'pdt_suppress_attachment',0).
+						$mod->CreateInputCheckbox($id,'pdt_suppress_attachment',1,
+							$this->GetProperty('suppress_attachment',1)));
 		$adv[] = array($mod->Lang('title_remove_file_from_server'),
-						$mod->CreateInputHidden($id,'opt_remove_file',0).
-						$mod->CreateInputCheckbox($id,'opt_remove_file',1,
-							$this->GetOption('remove_file',0)),
+						$mod->CreateInputHidden($id,'pdt_remove_file',0).
+						$mod->CreateInputCheckbox($id,'pdt_remove_file',1,
+							$this->GetProperty('remove_file',0)),
 						$mod->Lang('help_ignored_if_upload'));
 /*		$config = \cmsms()->GetConfig();
 		$adv[] = array($mod->Lang('title_file_destination'),
-							$mod->CreateInputText($id,'opt_file_destination',
-							$this->GetOption('file_destination',$config['uploads_path']),60,255),
+							$mod->CreateInputText($id,'pdt_file_destination',
+							$this->GetProperty('file_destination',$config['uploads_path']),60,255),
 							$mod->Lang('help_ignored_if_upload'));
 */
 		if ($uploads) {
 			$categorylist = $uploads->getCategoryList();
 			$adv[] = array($mod->Lang('title_sendto_uploads'),
-				 			$mod->CreateInputDropdown($id,'opt_sendto_uploads',$sendto_uploads_list,
+				 			$mod->CreateInputDropdown($id,'pdt_sendto_uploads',$sendto_uploads_list,
 							$sendto_uploads));
 			$adv[] = array($mod->Lang('title_uploads_category'),
-							$mod->CreateInputDropdown($id,'opt_uploads_category',$categorylist,'',
+							$mod->CreateInputDropdown($id,'pdt_uploads_category',$categorylist,'',
 							$uploads_category));
 			$adv[] = array($mod->Lang('title_uploads_destpage'),
-							self::CreatePageDropdown($id,'opt_uploads_destpage',$uploads_destpage));
+							self::CreatePageDropdown($id,'pdt_uploads_destpage',$uploads_destpage));
 		}
 
 		return array('main'=>$main,'adv'=>$adv);
@@ -178,11 +178,11 @@ class FileUpload extends FieldBase
 		}
 
 		// Extras
-		if ($this->GetOption('show_details',0)) {
-			$opt = $this->GetOption('max_size');
+		if ($this->GetProperty('show_details',0)) {
+			$opt = $this->GetProperty('max_size');
 			if ($opt)
 				$ret .= ' '.$mod->Lang('maximum_size').': '.$opt.'kB';
-			$opt = $this->GetOption('permitted_extensions');
+			$opt = $this->GetProperty('permitted_extensions');
 			if ($opt)
 				$ret .= ' '.$mod->Lang('permitted_extensions').': '.$opt;
 		}
@@ -219,8 +219,8 @@ class FileUpload extends FieldBase
 		if ($_FILES[$_id]['size'] < 1 && ! $this->Required)
 			return array(TRUE,'');
 
-		$ms = $this->GetOption('max_size');
-		$exts = $this->GetOption('permitted_extensions');
+		$ms = $this->GetProperty('max_size');
+		$exts = $this->GetProperty('permitted_extensions');
 		if ($_FILES[$_id]['size'] < 1 && $this->Required) {
 			$this->valid = FALSE;
 			$this->ValidationMessage = $mod->Lang('required_field_missing');
@@ -261,11 +261,11 @@ class FileUpload extends FieldBase
 			$thisFile =& $_FILES[$_id];
 			$thisExt = substr($thisFile['name'],strrpos($thisFile['name'],'.'));
 
-			if ($this->GetOption('file_rename') == '')
+			if ($this->GetProperty('file_rename') == '')
 				$destination_name = $thisFile['name'];
 			else {
 				$fids = array();
-				$destination_name = $this->GetOption('file_rename');
+				$destination_name = $this->GetProperty('file_rename');
 				//TODO if fields not named like '$fld_N' in the string ?
 				preg_match_all('/\$fld_(\d+)/',$destination_name,$fids);
 				foreach ($fids[1] as $field_id) {
@@ -277,7 +277,7 @@ class FileUpload extends FieldBase
 				$destination_name = str_replace('$ext',$thisExt,$destination_name);
 			}
 
-			if ($this->GetOption('sendto_uploads')) {
+			if ($this->GetProperty('sendto_uploads')) {
 				// we have a file we can send to the uploads
 				$uploads = $mod->GetModuleInstance('Uploads');
 				if (!$uploads) {
@@ -288,10 +288,10 @@ class FileUpload extends FieldBase
 				$parms = array();
 				$parms['input_author'] = $mod->Lang('anonymous');
 				$parms['input_summary'] = $mod->Lang('title_uploadmodule_summary');
-				$parms['category_id'] = $this->GetOption('uploads_category');
+				$parms['category_id'] = $this->GetProperty('uploads_category');
 				$parms['field_name'] = $_id;
 				$parms['input_destname'] = $destination_name;
-				if ($this->GetOption('allow_overwrite',0)) {
+				if ($this->GetProperty('allow_overwrite',0)) {
 					$parms['input_replace'] = 1;
 				}
 				$res = $uploads->AttemptUpload(-1,$parms,-1);
@@ -301,7 +301,7 @@ class FileUpload extends FieldBase
 					return array(FALSE,$mod->Lang('uploads_error',$res[1]));
 				}
 
-				$uploads_destpage = $this->GetOption('uploads_destpage');
+				$uploads_destpage = $this->GetProperty('uploads_destpage');
 				$url = $uploads->CreateLink($parms['category_id'],'getfile',$uploads_destpage,'',
 					array ('upload_id' => $res[1]),'',TRUE);
 
@@ -315,11 +315,11 @@ class FileUpload extends FieldBase
 					return array(FALSE,'error_uploads_dir');
 
 				$src = $thisFile['tmp_name'];
-				//$dest_path = $this->GetOption('file_destination',$config['uploads_path']);
+				//$dest_path = $this->GetProperty('file_destination',$config['uploads_path']);
 				// validated message before,now do it for the file itself
 				$valid = TRUE;
-				$ms = $this->GetOption('max_size');
-				$exts = $this->GetOption('permitted_extensions');
+				$ms = $this->GetProperty('max_size');
+				$exts = $this->GetProperty('permitted_extensions');
 				if ($ms && $thisFile['size'] > ($ms * 1024)) {
 					$valid = FALSE;
 				} elseif ($exts) {
@@ -343,7 +343,7 @@ class FileUpload extends FieldBase
 				}
 
 				$dest = $ud.DIRECTORY_SEPARATOR.$destination_name;
-				if (file_exists($dest) && !$this->GetOption('allow_overwrite',0)) {
+				if (file_exists($dest) && !$this->GetProperty('allow_overwrite',0)) {
 					unlink($src);
 					return array(FALSE,$mod->Lang('error_file_exists',array($destination_name)));
 				}
@@ -370,7 +370,7 @@ class FileUpload extends FieldBase
 
 	public function PostDisposeAction()
 	{
-		if ($this->GetOption('remove_file',0)) {
+		if ($this->GetProperty('remove_file',0)) {
 			if (is_array($this->Value)) {
 				$dest = $this->Value[0];
 				if (is_file($dest))

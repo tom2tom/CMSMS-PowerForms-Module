@@ -69,7 +69,7 @@ class CompanyDirectory extends FieldBase
 		if ($all) {
 			$Categories += array_combine($all,$all);
 		}
-		$CategorySelected = $this->GetOption('Category');
+		$CategorySelected = $this->GetProperty('Category');
 		//check and force the right type
 		if (!is_array($CategorySelected))
 			$CategorySelected = explode(',',$CategorySelected);
@@ -80,7 +80,7 @@ class CompanyDirectory extends FieldBase
 		if ($all) {
 			$FieldDefs += array_combine($all,$all);
 		}
-		$FieldDefsSelected = $this->GetOption('FieldDefs');
+		$FieldDefsSelected = $this->GetProperty('FieldDefs');
 		if (!is_array($FieldDefsSelected))
 			$FieldDefsSelected = explode(',',$FieldDefsSelected);
 
@@ -91,17 +91,17 @@ class CompanyDirectory extends FieldBase
 			$mod->Lang('option_radiogroup')=>'Radio Group'
 		);
 
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$main[] = array('','',$mod->Lang('help_company_field'));
 		$main[] = array($mod->Lang('title_pick_categories'),
-						$mod->CreateInputSelectList($id,'opt_Category',$Categories,$CategorySelected,
+						$mod->CreateInputSelectList($id,'pdt_Category',$Categories,$CategorySelected,
 						5,'',TRUE));
 		$main[] = array($mod->Lang('title_pick_fielddef'),
-						$mod->CreateInputSelectList($id,'opt_FieldDefs',$FieldDefs,$FieldDefsSelected,
+						$mod->CreateInputSelectList($id,'pdt_FieldDefs',$FieldDefs,$FieldDefsSelected,
 						5,'',FALSE));
 		$adv[] = array($mod->Lang('title_choose_user_input'),
-						$mod->CreateInputDropdown($id,'opt_UserInput',$choices,'-1',
-							$this->GetOption('UserInput')));
+						$mod->CreateInputDropdown($id,'pdt_UserInput',$choices,'-1',
+							$this->GetProperty('UserInput')));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -118,7 +118,7 @@ class CompanyDirectory extends FieldBase
 
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
-		$Like = $this->GetOption('Category','%');
+		$Like = $this->GetProperty('Category','%');
 		if ($Like=='' || $Like=='%' || $Like=='All')
 			$processPath=" LIKE '%'";
 		else
@@ -138,7 +138,7 @@ WHERE com.company_name=? AND fdd.name=?
 EOS;
 		$val = array();
 		$companies = array();
-		$field = $this->GetOption('FieldDefs');
+		$field = $this->GetProperty('FieldDefs');
 		if ($Like=='' || $Like=='%' || $Like=='All') {
 			$rs = $db->Execute($sql,array());
 			if ($rs) {
@@ -209,7 +209,7 @@ EOS;
 					$val = array($this->Value);
 			}
 
-			switch ($this->GetOption('UserInput','Dropdown')) {
+			switch ($this->GetProperty('UserInput','Dropdown')) {
 			 case 'Dropdown':
 				$tmp = $mod->CreateInputDropdown(
 					$id,$this->formdata->current_prefix.$this->Id,

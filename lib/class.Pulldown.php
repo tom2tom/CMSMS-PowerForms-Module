@@ -39,15 +39,15 @@ class Pulldown extends FieldBase
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {
-				$this->RemoveOptionElement('option_name',$indx);
-				$this->RemoveOptionElement('option_value',$indx);
+				$this->RemovePropIndexed('option_name',$indx);
+				$this->RemovePropIndexed('option_value',$indx);
 			}
 		}
 	}
 
 	public function GetFieldStatus()
 	{
-		$opt = $this->GetOption('option_name');
+		$opt = $this->GetProperty('option_name');
 		if (is_array($opt))
 			$num = count($opt);
 		elseif ($opt)
@@ -60,7 +60,7 @@ class Pulldown extends FieldBase
 	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue())
-			$ret = $this->GetOptionElement('option_value',$this->Value);
+			$ret = $this->GetPropIndexed('option_value',$this->Value);
 		else
 			$ret = $this->GetFormOption('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
@@ -73,22 +73,22 @@ class Pulldown extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_select_one_message'),
-			$mod->CreateInputText($id,'opt_select_one',
-			  $this->GetOption('select_one',$mod->Lang('select_one')),25,128));
+			$mod->CreateInputText($id,'pdt_select_one',
+			  $this->GetProperty('select_one',$mod->Lang('select_one')),25,128));
 		$main[] = array($mod->Lang('sort_options'),
-			$mod->CreateInputDropdown($id,'opt_sort',
+			$mod->CreateInputDropdown($id,'pdt_sort',
 			  array($mod->Lang('yes')=>1,$mod->Lang('no')=>0),-1,
-			  $this->GetOption('sort',0)));
+			  $this->GetProperty('sort',0)));
 		if ($this->optionAdd) {
-			$this->AddOptionElement('option_name','');
-			$this->AddOptionElement('option_value','');
+			$this->AddPropIndexed('option_name','');
+			$this->AddPropIndexed('option_value','');
 			$this->optionAdd = FALSE;
 		}
-		$opt = $this->GetOptionRef('option_name');
+		$opt = $this->GetPropArray('option_name');
 		if ($opt) {
 			$dests = array();
 			$dests[] = array(
@@ -98,8 +98,8 @@ class Pulldown extends FieldBase
 				);
 			foreach ($opt as $i=>&$one) {
 				$dests[] = array(
-				$mod->CreateInputText($id,'opt_option_name'.$i,$one,30,128),
-				$mod->CreateInputText($id,'opt_option_value'.$i,$this->GetOptionElement('option_value',$i),30,128),
+				$mod->CreateInputText($id,'pdt_option_name'.$i,$one,30,128),
+				$mod->CreateInputText($id,'pdt_option_value'.$i,$this->GetPropIndexed('option_value',$i),30,128),
 				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
@@ -115,12 +115,12 @@ class Pulldown extends FieldBase
 	public function PostAdminAction(&$params)
 	{
 		//cleanup empties
-		$names = $this->GetOptionRef('option_name');
+		$names = $this->GetPropArray('option_name');
 		if ($names) {
 			foreach ($names as $i=>&$one) {
-				if (!$one || !$this->GetOptionElement('option_value',$i)) {
-					$this->RemoveOptionElement('option_name',$i);
-					$this->RemoveOptionElement('option_value',$i);
+				if (!$one || !$this->GetPropIndexed('option_value',$i)) {
+					$this->RemovePropIndexed('option_name',$i);
+					$this->RemovePropIndexed('option_value',$i);
 				}
 			}
 			unset($one);
@@ -129,13 +129,13 @@ class Pulldown extends FieldBase
 
 	public function Populate($id,&$params)
 	{
-		$subjects = $this->GetOptionRef('option_name');
+		$subjects = $this->GetPropArray('option_name');
 		if ($subjects) {
 			$choices = array_flip($subjects);
-			if (count($choices) > 1 && $this->GetOption('sort'))
+			if (count($choices) > 1 && $this->GetProperty('sort'))
 				ksort($choices);
 			$mod = $this->formdata->formsmodule;
-			$choices = array(' '.$this->GetOption('select_one',$mod->Lang('select_one'))=>-1) + $choices;
+			$choices = array(' '.$this->GetProperty('select_one',$mod->Lang('select_one'))=>-1) + $choices;
 
 			$tmp = $mod->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,

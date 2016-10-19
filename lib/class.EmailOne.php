@@ -61,7 +61,7 @@ class EmailOne extends EmailBase
 	public function Dispose($id,$returnid)
 	{
 		if ($this->HasValue())
-			return $this->SendForm($this->Value,$this->GetOption('email_subject'));
+			return $this->SendForm($this->Value,$this->GetProperty('email_subject'));
 		else
 			return array(TRUE,'');
 	}

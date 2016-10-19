@@ -49,7 +49,7 @@ class UniqueFile extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		if (!Utils::GetUploadsPath($mod))
 			return $mod->Lang('error_uploads_dir');
-		return $this->GetOption('filespec',$mod->Lang('unspecified'));
+		return $this->GetProperty('filespec',$mod->Lang('unspecified'));
 	}
 
 	public function AdminPopulate($id)
@@ -58,43 +58,43 @@ class UniqueFile extends FieldBase
 		if (!Utils::GetUploadsPath($mod))
 			return array('main'=>array($this->GetErrorMessage('error_uploads_dir')));
 
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
 
 		$main[] = array($mod->Lang('title_file_name'),
-			$mod->CreateInputText($id,'opt_filespec',
-				$this->GetOption('filespec',
+			$mod->CreateInputText($id,'pdt_filespec',
+				$this->GetProperty('filespec',
 				'form_submission_'.date('Y-m-d_His').'.txt'),50,128));
 
 /*		$main[] = array($mod->Lang('title_newline_replacement'),
-			$mod->CreateInputText($id,'opt_newlinechar',
-				$this->GetOption('newlinechar'),5,15),
+			$mod->CreateInputText($id,'pdt_newlinechar',
+				$this->GetProperty('newlinechar'),5,15),
 			$mod->Lang('help_newline_replacement'));
 */
 		//setup sample-template buttons and scripts
 		$ctldata = array();
-		$ctldata['opt_file_template']['is_oneline'] = TRUE;
-		$ctldata['opt_file_header']['is_oneline'] = TRUE;
-		$ctldata['opt_file_header']['is_header'] = TRUE;
-		$ctldata['opt_file_footer']['is_oneline'] = TRUE;
-		$ctldata['opt_file_footer']['is_footer'] = TRUE;
+		$ctldata['pdt_file_template']['is_oneline'] = TRUE;
+		$ctldata['pdt_file_header']['is_oneline'] = TRUE;
+		$ctldata['pdt_file_header']['is_header'] = TRUE;
+		$ctldata['pdt_file_footer']['is_oneline'] = TRUE;
+		$ctldata['pdt_file_footer']['is_footer'] = TRUE;
 		list($buttons,$jsfuncs) = Utils::TemplateActions($this->formdata,$id,$ctldata);
 
 		$adv[] = array( $mod->Lang('title_unique_file_template'),
 						$mod->CreateTextArea(FALSE,$id,
-							htmlspecialchars($this->GetOption('file_template')),
-							'opt_file_template','pwf_tallarea','','','',50,15),
+							htmlspecialchars($this->GetProperty('file_template')),
+							'pdt_file_template','pwf_tallarea','','','',50,15),
 						$mod->Lang('help_unique_file_template').'<br /><br />'.$buttons[0]);
 
 		$adv[] = array( $mod->Lang('title_file_header'),
 						$mod->CreateTextArea(FALSE,$id,
-							htmlspecialchars($this->GetOption('file_header')),
-							'opt_file_header','pwf_shortarea','','','',50,8),
+							htmlspecialchars($this->GetProperty('file_header')),
+							'pdt_file_header','pwf_shortarea','','','',50,8),
 						$mod->Lang('help_file_header_template').'<br /><br />'.$buttons[1]);
 
 		$adv[] = array( $mod->Lang('title_file_footer'),
 						$mod->CreateTextArea(FALSE,$id,
-							htmlspecialchars($this->GetOption('file_footer')),
-							'opt_file_footer','pwf_shortarea','','','',50,8),
+							htmlspecialchars($this->GetProperty('file_footer')),
+							'pdt_file_footer','pwf_shortarea','','','',50,8),
 						$mod->Lang('help_file_footer_template').'<br /><br />'.$buttons[2]);
 
 		//show variables-help on advanced tab
@@ -117,7 +117,7 @@ class UniqueFile extends FieldBase
 		$tplvars = array();
 		Utils::SetupFormVars($this->formdata,$tplvars);
 
-		$filespec = $this->GetOption('filespec');
+		$filespec = $this->GetProperty('filespec');
 		if ($filespec)
 			$fn = preg_replace('/[^\w\d\.]|\.\./','_',Utils::ProcessTemplateFromData($mod,$filespec,$tplvars));
 		else
@@ -129,16 +129,16 @@ class UniqueFile extends FieldBase
 */
 		$fp = $ud.DIRECTORY_SEPARATOR.$fn;
 
-		$footer = $this->GetOption('file_footer');
+		$footer = $this->GetProperty('file_footer');
 		if ($footer)
 			$footer = Utils::ProcessTemplateFromData($mod,$footer,$tplvars);
 
-		$template = $this->GetOption('file_template');
+		$template = $this->GetProperty('file_template');
 		if (!$template)
 			$template = $this->CreateDefaultTemplate();
 
 		$newline = Utils::ProcessTemplateFromData($mod,$template,$tplvars);
-/*		$replchar = $this->GetOption('newlinechar');
+/*		$replchar = $this->GetProperty('newlinechar');
 		if ($replchar) {
 			$newline = rtrim($newline,"\r\n");
 			$newline = preg_replace('/[\n\r]+/',$replchar,$newline);
@@ -151,7 +151,7 @@ class UniqueFile extends FieldBase
 		$first = !file_exists($fp);
 		$fh = fopen($fp,'w');
 		if ($first) {
-			$header = $this->GetOption('file_header');
+			$header = $this->GetProperty('file_header');
 			if (!$header)
 				$header = $this->CreateSampleHeader();
 			$header = Utils::ProcessTemplateFromData($mod,$header,$tplvars);

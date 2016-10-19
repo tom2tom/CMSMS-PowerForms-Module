@@ -24,17 +24,17 @@ class Computed extends FieldBase
 
 	public function ComputeOrder()
 	{
-		return $this->GetOption('order',1); //user-supplied number
+		return $this->GetProperty('order',1); //user-supplied number
 	}
 
 	public function Compute()
 	{
 		$fids = array();
-		$procstr = $this->GetOption('value');
+		$procstr = $this->GetProperty('value');
 		//TODO if fields not named like '$fld_N' in the string ?
 		preg_match_all('/\$fld_(\d+)/',$procstr,$fids);
 
-		$etype = $this->GetOption('string_or_number_eval','numeric');
+		$etype = $this->GetProperty('string_or_number_eval','numeric');
 		switch ($etype) {
 		 case 'numeric':
 			foreach ($fids[1] as $field_id) {
@@ -96,15 +96,15 @@ class Computed extends FieldBase
 			$mod->Lang('title_string_unspaced')=>'unstring',
 			$mod->Lang('title_compute')=>'compute');
 
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$main[] = array($mod->Lang('title_compute_value'),
-						$mod->CreateInputText($id,'opt_value',$this->GetOption('value'),35,1024),
+						$mod->CreateInputText($id,'pdt_value',$this->GetProperty('value'),35,1024),
 						$help);
 		$main[] = array($mod->Lang('title_string_or_number_eval'),
-						$mod->CreateInputRadioGroup($id,'opt_string_or_number_eval',$choices,
-						$this->GetOption('string_or_number_eval','numeric'),'&nbsp;&nbsp;'));
+						$mod->CreateInputRadioGroup($id,'pdt_string_or_number_eval',$choices,
+						$this->GetProperty('string_or_number_eval','numeric'),'&nbsp;&nbsp;'));
 		$main[] = array($mod->Lang('title_compute_order'),
-						$mod->CreateInputText($id,'opt_order',$this->GetOption('order',1),3),
+						$mod->CreateInputText($id,'pdt_order',$this->GetProperty('order',1),3),
 						$mod->Lang('help_compute_order'));
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -115,7 +115,7 @@ class Computed extends FieldBase
   		list($ret,$msg) = parent::AdminValidate($id);
 		if (!ret)
 			$messages[] = $msg;
-		$val = $this->GetOption('value');
+		$val = $this->GetProperty('value');
 		if ($val) {
 			//PROCESSING ARBITRARY INPUT WITH EVAL() IS NOT SAFE!!!
 			// but throw in a few checks for $val sanity
@@ -134,7 +134,7 @@ class Computed extends FieldBase
 			$ret = FALSE;
 			$messages[] = $mod->Lang('missing_type',$mod->Lang('TODO_eval'));
 		}
-		$val = $this->GetOption('compute_order');
+		$val = $this->GetProperty('compute_order');
 		if (!is_numeric($val) || $val < 1) {
 			$ret = FALSE;
 			$messages[] = $mod->Lang('error_typed',$mod->Lang('TODO_order'));

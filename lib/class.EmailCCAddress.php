@@ -24,7 +24,7 @@ class EmailCCAddress extends EmailBase
 	{
 //TODO advice about email addr
 		foreach ($this->formdata->Fields as &$one) {
-			if ($one->GetId() == $this->GetOption('field_to_modify')) {
+			if ($one->GetId() == $this->GetProperty('field_to_modify')) {
 				$ret = $this->formdata->formsmodule->Lang('title_modifies',$one->GetName());
 				unset($one);
 				return $ret;
@@ -49,8 +49,8 @@ class EmailCCAddress extends EmailBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_field_to_modify'),
-						$mod->CreateInputDropdown($id,'opt_field_to_modify',$choices,-1,
-							$this->GetOption('field_to_modify')));
+						$mod->CreateInputDropdown($id,'pdt_field_to_modify',$choices,-1,
+							$this->GetProperty('field_to_modify')));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -88,13 +88,13 @@ class EmailCCAddress extends EmailBase
 			foreach ($this->formdata->Fields as &$one) {
 				if ($one->IsDisposition()
 				 && is_subclass_of($one,'pwfEmailBase')
-				 && $one->GetId() == $this->GetOption('field_to_modify'))
+				 && $one->GetId() == $this->GetProperty('field_to_modify'))
 				{
-					$cc = $one->GetOption('email_cc_address');
+					$cc = $one->GetProperty('email_cc_address');
 					if ($cc)
 						$cc .= ',';
 					$cc .= $this->Value;
-					$one->SetOption('email_cc_address',$cc);
+					$one->SetProperty('email_cc_address',$cc);
 				}
 			}
 			unset($one);

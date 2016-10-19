@@ -22,12 +22,12 @@ class SystemLink extends FieldBase
 
 	public function GetDisplayableValue($as_string=TRUE)
 	{
-		if ($this->GetOption('auto_link',0)) {
+		if ($this->GetProperty('auto_link',0)) {
 			$pageinfo = \cmsms()->variables['pageinfo'];
 			$ret = $this->formdata->formsmodule->CreateContentLink($pageinfo->content_id,$pageinfo->content_title);
 		} else {
 			$contentops = \cmsms()->GetContentOperations();
-			$cobj = $contentops->LoadContentFromId($this->GetOption('target_page',0));
+			$cobj = $contentops->LoadContentFromId($this->GetProperty('target_page',0));
 			$ret = $this->formdata->formsmodule->CreateContentLink($cobj->Id(),$cobj->Name());
 		}
 
@@ -42,19 +42,19 @@ class SystemLink extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_auto_link'),
-						$mod->CreateInputHidden($id,'opt_auto_link',0).
-						$mod->CreateInputCheckbox($id,'opt_auto_link',1,
-							$this->GetOption('auto_link',0)),
+						$mod->CreateInputHidden($id,'pdt_auto_link',0).
+						$mod->CreateInputCheckbox($id,'pdt_auto_link',1,
+							$this->GetProperty('auto_link',0)),
 						$mod->Lang('help_auto_link'));
 		$main[] = array($mod->Lang('title_target_page'),
-						Utils::CreateHierarchyPulldown($mod,$id,'opt_target_page',
-							$this->GetOption('target_page',0)));
+						Utils::CreateHierarchyPulldown($mod,$id,'pdt_target_page',
+							$this->GetProperty('target_page',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	public function Populate($id,&$params)
 	{
-		if ($this->GetOption('auto_link',0)) {
+		if ($this->GetProperty('auto_link',0)) {
 			$oneset = new \stdClass();
 			$pageinfo = \cmsms()->variables['pageinfo'];
 			$oneset->name = $pageinfo->content_title;
@@ -64,7 +64,7 @@ class SystemLink extends FieldBase
 			$this->MultiPopulate = TRUE;
 			return array($oneset);
 		} else {
-			$page = $this->GetOption('target_page',0);
+			$page = $this->GetProperty('target_page',0);
 			if ($page > 0) {
 				$oneset = new \stdClass();
 				$contentops = \cmsms()->GetContentOperations();

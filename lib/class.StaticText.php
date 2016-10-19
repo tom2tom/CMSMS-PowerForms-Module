@@ -20,7 +20,7 @@ class StaticText extends FieldBase
 
 	public function GetFieldStatus()
 	{
-		return $this->formdata->formsmodule->Lang('text_length',strlen($this->GetOption('text')));
+		return $this->formdata->formsmodule->Lang('text_length',strlen($this->GetProperty('text')));
 	}
 
 	public function GetDisplayableValue($as_string=TRUE)
@@ -34,24 +34,24 @@ class StaticText extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE);
-
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
 		$mod = $this->formdata->formsmodule;
+		
 		$main[] = array($mod->Lang('title_text'),
 						$mod->CreateTextArea((get_preference(get_userid(),'use_wysiwyg')),$id,
-							$this->GetOption('text'),'opt_text','pageheadtags'));
+							$this->GetProperty('text'),'pdt_text','pageheadtags'));
 		$adv[] = array($mod->Lang('title_smarty_eval'),
-						$mod->CreateInputHidden($id,'opt_smarty_eval',0).
-						$mod->CreateInputCheckbox($id,'opt_smarty_eval',1,
-							$this->GetOption('smarty_eval',0)));
+						$mod->CreateInputHidden($id,'pdt_smarty_eval',0).
+						$mod->CreateInputCheckbox($id,'pdt_smarty_eval',1,
+							$this->GetProperty('smarty_eval',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	public function Populate($id,&$params)
 	{
-		if ($this->GetOption('smarty_eval',0))
+		if ($this->GetProperty('smarty_eval',0))
 			$this->SetSmartyEval(TRUE);
 
-		return $this->GetOption('text');
+		return $this->GetProperty('text');
 	}
 }

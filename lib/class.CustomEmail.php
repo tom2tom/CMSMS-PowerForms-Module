@@ -26,7 +26,7 @@ class CustomEmail extends EmailBase
 	public function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		$opt = $this->GetOptionRef('destination_address');
+		$opt = $this->GetPropArray('destination_address');
 		if ($opt)
 			$ret = $mod->Lang('to').': '.count($opt).' '.$mod->Lang('fields');
 		else
@@ -46,7 +46,7 @@ class CustomEmail extends EmailBase
 		}
 		unset($one);
 		$destfields = array();
-		$opt = $this->GetOptionRef('destination_address');
+		$opt = $this->GetPropArray('destination_address');
 		if ($opt) {
 			foreach ($displayfields as $k=>$v) {
 				if (in_array($v,$opt))
@@ -59,16 +59,16 @@ class CustomEmail extends EmailBase
 		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE,FALSE);
 		$waslast = array_pop($main); //keep only the default to-type selector
 		$main[] = array($mod->Lang('title_subject_field'),
-						$mod->CreateInputDropdown($id,'opt_email_subject',$choices,-1,
-						$this->GetOption('email_subject')));
+						$mod->CreateInputDropdown($id,'pdt_email_subject',$choices,-1,
+						$this->GetProperty('email_subject')));
 		$main[] = array($mod->Lang('title_from_field'),
-						$mod->CreateInputDropdown($id,'opt_email_from_name',$choices,-1,
-						$this->GetOption('email_from_name',$mod->Lang('friendly_name'))));
+						$mod->CreateInputDropdown($id,'pdt_email_from_name',$choices,-1,
+						$this->GetProperty('email_from_name',$mod->Lang('friendly_name'))));
 		$main[] = array($mod->Lang('title_from_address_field'),
-						$mod->CreateInputDropdown($id,'opt_email_from_address',$choices,-1,
-						$this->GetOption('email_from_address')));
+						$mod->CreateInputDropdown($id,'pdt_email_from_address',$choices,-1,
+						$this->GetProperty('email_from_address')));
 		$main[] = array($mod->Lang('title_destination_field'),
-						$mod->CreateInputSelectList($id,'opt_destination_address'.$i,$displayfields,
+						$mod->CreateInputSelectList($id,'pdt_destination_address'.$i,$displayfields,
 						$destfields,5));
 		$main[] = $waslast;
 		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
@@ -87,15 +87,15 @@ class CustomEmail extends EmailBase
 			$messages[] = $msg;
 
 		$mod = $this->formdata->formsmodule;
-		if (!$this->GetOption('email_subject')) {
+		if (!$this->GetProperty('email_subject')) {
 			$ret = FALSE;
 			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_email_subject'));
 		}
-		if (!$this->GetOption('email_from_name')) {
+		if (!$this->GetProperty('email_from_name')) {
 			$ret = FALSE;
 			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_email_from_name'));
 		}
-		$opt = $this->GetOption('email_from_address');
+		$opt = $this->GetProperty('email_from_address');
 		if ($opt) {
 			list($rv,$msg) = $this->validateEmailAddr($opt);
 			if (!$rv) {
@@ -106,7 +106,7 @@ class CustomEmail extends EmailBase
 			$ret = FALSE;
 			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_email_from_address'));
 		}
-		$opt = $this->GetOptionRef('destination_address');
+		$opt = $this->GetPropArray('destination_address');
 		if ($opt) {
 			list($rv,$msg) = $this->validateEmailAddr($opt);
 			if (!$rv) {
@@ -128,17 +128,17 @@ class CustomEmail extends EmailBase
 
 	public function Dispose($id,$returnid)
 	{
-		$dests = $this->GetOptionRef('destination_address'); //TODO in this case, field id's ?
+		$dests = $this->GetPropArray('destination_address'); //TODO in this case, field id's ?
 		if ($dests) {
 			$formdata = $this->formdata;
 
-			$senderfld = $this->GetOption('email_from_name'); //TODO confirm this is field_id?
+			$senderfld = $this->GetProperty('email_from_name'); //TODO confirm this is field_id?
 			$fld = $formdata->Fields[$senderfld];
-			$this->SetOption('email_from_name',$fld->GetDisplayableValue());
+			$this->SetProperty('email_from_name',$fld->GetDisplayableValue());
 
-			$fromfld = $this->GetOption('email_from_address');
+			$fromfld = $this->GetProperty('email_from_address');
 			$fld = $formdata->Fields[$fromfld];
-			$this->SetOption('email_from_address',$fld->GetDisplayableValue());
+			$this->SetProperty('email_from_address',$fld->GetDisplayableValue());
 
 			$addrs = array();
 			foreach ($dests as $field_id) {
@@ -150,19 +150,19 @@ class CustomEmail extends EmailBase
 					$addrs[] = $value;
 			}
 
-/*			$subjectfld = $this->GetOption('email_subject');
+/*			$subjectfld = $this->GetProperty('email_subject');
 			$fld = $formdata->Fields[$subjectfld];
-			$this->SetOption('email_subject',$fld->GetDisplayableValue());
+			$this->SetProperty('email_subject',$fld->GetDisplayableValue());
 
-			$ret = $this->SendForm($addrs,$this->GetOption('email_subject'));
+			$ret = $this->SendForm($addrs,$this->GetProperty('email_subject'));
 
-			$this->SetOption('email_subject',$subjectfld);
+			$this->SetProperty('email_subject',$subjectfld);
 */
-			$fld = $formdata->Fields[$this->GetOption('email_subject')];
+			$fld = $formdata->Fields[$this->GetProperty('email_subject')];
 			$ret = $this->SendForm($addrs,$fld->GetDisplayableValue()); //TODO check value(subject) is ok
 
-			$this->SetOption('email_from_name',$senderfld);
-			$this->SetOption('email_from_address',$fromfld);
+			$this->SetProperty('email_from_name',$senderfld);
+			$this->SetProperty('email_from_address',$fromfld);
 
 			return $ret;
 		}

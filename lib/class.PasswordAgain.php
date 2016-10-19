@@ -20,7 +20,7 @@ class PasswordAgain extends FieldBase
 	public function GetFieldStatus()
 	{
 		return $this->formdata->formsmodule->Lang('title_field_id').
-			': '.$this->GetOption('field_to_validate');
+			': '.$this->GetProperty('field_to_validate');
 	}
 
 	public function AdminPopulate($id)
@@ -37,18 +37,18 @@ class PasswordAgain extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$main[] = array(
 					$mod->Lang('title_field_to_validate'),
-					$mod->CreateInputDropdown($id,'opt_field_to_validate',$choices,-1,
-						$this->GetOption('field_to_validate')));
+					$mod->CreateInputDropdown($id,'pdt_field_to_validate',$choices,-1,
+						$this->GetProperty('field_to_validate')));
 		$main[] = array($mod->Lang('title_display_length'),
-					$mod->CreateInputText($id,'opt_length',
-						$this->GetOption('length','12'),3,3));
+					$mod->CreateInputText($id,'pdt_length',
+						$this->GetProperty('length','12'),3,3));
 		$main[] = array($mod->Lang('title_minimum_length'),
-					$mod->CreateInputText($id,'opt_min_length',
-						$this->GetOption('min_length','8'),3,3));
+					$mod->CreateInputText($id,'pdt_min_length',
+						$this->GetProperty('min_length','8'),3,3));
 		$main[] = array($mod->Lang('title_hide'),
-					$mod->CreateInputHidden($id,'opt_hide',0).
-					$mod->CreateInputCheckbox($id,'opt_hide',1,
-						$this->GetOption('hide',1)),
+					$mod->CreateInputHidden($id,'pdt_hide',0).
+					$mod->CreateInputCheckbox($id,'pdt_hide',1,
+						$this->GetProperty('hide',1)),
 					$mod->Lang('title_hide_help'));
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -56,8 +56,8 @@ class PasswordAgain extends FieldBase
 	public function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$ln = $this->GetOption('length',16);
-		if ($this->GetOption('hide',1)) {
+		$ln = $this->GetProperty('length',16);
+		if ($this->GetProperty('hide',1)) {
 			$tmp = $mod->CreateInputPassword($id,$this->formdata->current_prefix.$this->Id,
 				($this->Value?$this->Value:''),$ln,$ln,
 				$this->GetScript());
@@ -75,7 +75,7 @@ class PasswordAgain extends FieldBase
 		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 
-		$field_to_validate = $this->GetOption('field_to_validate');
+		$field_to_validate = $this->GetProperty('field_to_validate');
 		if ($field_to_validate) {
 			foreach ($this->formdata->Fields as &$one) {
 				if ($one->Name == $field_to_validate) {

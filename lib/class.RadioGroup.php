@@ -40,30 +40,32 @@ class RadioGroup extends FieldBase
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {
-				$this->RemoveOptionElement('button_name',$indx);
-				$this->RemoveOptionElement('button_checked',$indx);
-				$this->RemoveOptionElement('button_is_set',$indx);
+				$this->RemovePropIndexed('button_name',$indx);
+				$this->RemovePropIndexed('button_checked',$indx);
+				$this->RemovePropIndexed('button_is_set',$indx);
 			}
 		}
 	}
 
 	public function GetFieldStatus()
 	{
-		$opt = $this->GetOptionRef('button_name');
+		$opt = $this->GetPropArray('button_name');
 		if ($opt)
 			$optionCount = count($opt);
 		else
 			$optionCount = 0;
 		$ret = $this->formdata->formsmodule->Lang('options',$optionCount);
-		if ($this->ValidationType)
+		if ($this->ValidationType) {
+			$this->EnsureArray($this->ValidationTypes);
 			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
+		}
 		return $ret;
 	}
 
 	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue())
-		   $ret = $this->GetOptionElement('button_checked',($this->Value - 1)); //TODO index
+		   $ret = $this->GetPropIndexed('button_checked',($this->Value - 1)); //TODO index
 		else
 			$ret = $this->GetFormOption('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
@@ -76,19 +78,20 @@ class RadioGroup extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
+		
 		$main[] = array($mod->Lang('title_radio_separator'),
-						$mod->CreateInputText($id,'opt_radio_separator',
-							$this->GetOption('radio_separator','&nbsp;&nbsp;'),15,25),
+						$mod->CreateInputText($id,'pdt_radio_separator',
+							$this->GetProperty('radio_separator','&nbsp;&nbsp;'),15,25),
 						$mod->Lang('help_radio_separator'));
 		if ($this->optionAdd) {
-			$this->AddOptionElement('button_name','');
-			$this->AddOptionElement('button_checked','');
-			$this->AddOptionElement('button_is_set','y');
+			$this->AddPropIndexed('button_name','');
+			$this->AddPropIndexed('button_checked','');
+			$this->AddPropIndexed('button_is_set','y');
 			$this->optionAdd = FALSE;
 		}
-		$names = $this->GetOptionRef('button_name');
+		$names = $this->GetPropArray('button_name');
 		if ($names) {
 			$boxes = array();
 			$boxes[] = array(
@@ -100,9 +103,9 @@ class RadioGroup extends FieldBase
 			$yesNo = array($mod->Lang('no')=>'n',$mod->Lang('yes')=>'y');
 			foreach ($names as $i=>&$one) {
 				$boxes[] = array(
-					$mod->CreateInputText($id,'opt_button_name'.$i,$one,25,128),
-					$mod->CreateInputText($id,'opt_button_checked'.$i,$this->GetOptionElement('button_checked',$i),25,128),
-					$mod->CreateInputDropdown($id,'opt_button_is_set'.$i,$yesNo,-1,$this->GetOptionElement('button_is_set',$i)),
+					$mod->CreateInputText($id,'pdt_button_name'.$i,$one,25,128),
+					$mod->CreateInputText($id,'pdt_button_checked'.$i,$this->GetPropIndexed('button_checked',$i),25,128),
+					$mod->CreateInputDropdown($id,'pdt_button_is_set'.$i,$yesNo,-1,$this->GetPropIndexed('button_is_set',$i)),
 					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				 );
 			}
@@ -118,13 +121,13 @@ class RadioGroup extends FieldBase
 	public function PostAdminAction(&$params)
 	{
 		//cleanup empties
-		$names = $this->GetOptionRef('button_name');
+		$names = $this->GetPropArray('button_name');
 		if ($names) {
 			foreach ($names as $i=>&$one) {
-				if (!($one || $this->GetOptionElement('button_checked',$i))) {
-					$this->RemoveOptionElement('button_name',$i); //should be ok in loop
-					$this->RemoveOptionElement('button_checked',$i);
-					$this->RemoveOptionElement('button_is_set',$i);
+				if (!($one || $this->GetPropIndexed('button_checked',$i))) {
+					$this->RemovePropIndexed('button_name',$i); //should be ok in loop
+					$this->RemovePropIndexed('button_checked',$i);
+					$this->RemovePropIndexed('button_is_set',$i);
 				}
 			}
 			unset($one);
@@ -133,11 +136,11 @@ class RadioGroup extends FieldBase
 
 	public function Populate($id,&$params)
 	{
-		$names = $this->GetOptionRef('button_name');
+		$names = $this->GetPropArray('button_name');
 		if ($names) {
 			$ret = array();
 			$mod = $this->formdata->formsmodule;
-			$sep = $this->GetOption('radio_separator','&nbsp;&nbsp;');
+			$sep = $this->GetProperty('radio_separator','&nbsp;&nbsp;');
 			$cnt = count($names);
 			$b = 1;
 			foreach ($names as $i=>&$one) {
@@ -157,7 +160,7 @@ class RadioGroup extends FieldBase
 					$id.$this->formdata->current_prefix.$this->Id.'[]" value="'.$i.'"';
 				if (property_exists($this,'Value'))
 					$checked = $this->FindArrayValue($i); //TODO
-				elseif ($this->GetOptionElement('button_is_set',$i) == 'y')
+				elseif ($this->GetPropIndexed('button_is_set',$i) == 'y')
 					$checked = TRUE;
 				else
 					$checked = FALSE;

@@ -31,11 +31,11 @@ class FieldsetStart extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_legend'),
-						$mod->CreateInputText($id,'opt_legend',
-							$this->GetOption('legend'),50));
+						$mod->CreateInputText($id,'pdt_legend',
+							$this->GetProperty('legend'),50));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -47,7 +47,7 @@ class FieldsetStart extends FieldBase
 		if ($opt)
 			$ret .= ' '.$opt;
 		$ret .= '>';
-		$opt = $this->GetOption('legend');
+		$opt = $this->GetProperty('legend');
 		if ($opt)
 			$ret .= '<legend>'.$opt.'</legend>';
 		return $ret;

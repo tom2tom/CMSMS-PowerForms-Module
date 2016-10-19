@@ -32,19 +32,19 @@ class UniqueInteger extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_show_to_user'),
-						$mod->CreateInputHidden($id,'opt_show_to_user',0).
-						$mod->CreateInputCheckbox($id,'opt_show_to_user',1,
-							$this->GetOption('show_to_user',0)));
+						$mod->CreateInputHidden($id,'pdt_show_to_user',0).
+						$mod->CreateInputCheckbox($id,'pdt_show_to_user',1,
+							$this->GetProperty('show_to_user',0)));
 		$adv[] = array($mod->Lang('title_use_random_generator'),
-						$mod->CreateInputHidden($id,'opt_use_random_generator',0).
-						$mod->CreateInputCheckbox($id,'opt_use_random_generator',1,
-							$this->GetOption('use_random_generator',0)));
+						$mod->CreateInputHidden($id,'pdt_use_random_generator',0).
+						$mod->CreateInputCheckbox($id,'pdt_use_random_generator',1,
+							$this->GetProperty('use_random_generator',0)));
 		$adv[] = array($mod->Lang('title_numbers_to_generate'),
-						$mod->CreateInputText($id,'opt_numbers_to_generate',
-							$this->GetOption('numbers_to_generate',5),25,25));
+						$mod->CreateInputText($id,'pdt_numbers_to_generate',
+							$this->GetProperty('numbers_to_generate',5),25,25));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -53,20 +53,20 @@ class UniqueInteger extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		if ($this->Value) {
 			$ret = $mod->CreateInputHidden($id,$this->formdata->current_prefix.$this->Id,$this->Value);
-			if ($this->GetOption('show_to_user',0))
+			if ($this->GetProperty('show_to_user',0))
 				$ret .= $this->Value;
-		} else if ($this->GetOption('use_random_generator',0)) {
-			$times = $this->GetOption('numbers_to_generate',5);
+		} else if ($this->GetProperty('use_random_generator',0)) {
+			$times = $this->GetProperty('numbers_to_generate',5);
 			$number = $this->generate_numbers(0,9,$times);
 			$ret = $mod->CreateInputHidden($id,$this->formdata->current_prefix.$this->Id,$number);
-			if ($this->GetOption('show_to_user',0))
+			if ($this->GetProperty('show_to_user',0))
 				$ret .= $number;
 		} else {
 			$db = \cmsms()->GetDb();
 			$pre = \cms_db_prefix();
 			$seq = $db->GenID($pre.'module_pwf_uniquefield_seq');
 			$ret = $mod->CreateInputHidden($id,$this->formdata->current_prefix.$this->Id,$seq);
-			if ($this->GetOption('show_to_user',0))
+			if ($this->GetProperty('show_to_user',0))
 				$ret .= $seq;
 		}
 

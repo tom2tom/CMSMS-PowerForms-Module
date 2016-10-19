@@ -39,15 +39,15 @@ class Multiselect extends FieldBase
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {
-				$this->RemoveOptionElement('option_name',$indx);
-				$this->RemoveOptionElement('option_value',$indx);
+				$this->RemovePropIndexed('option_name',$indx);
+				$this->RemovePropIndexed('option_value',$indx);
 			}
 		}
 	}
 
 	public function GetFieldStatus()
 	{
-		$opt = $this->GetOption('option_name');
+		$opt = $this->GetProperty('option_name');
 		if (is_array($opt))
 			$optionCount = count($opt);
 		else
@@ -60,7 +60,7 @@ class Multiselect extends FieldBase
 		if ($this->HasValue()) {
 			if (is_array($this->Value)) {
 				$ret = array();
-				$vals = $this->GetOptionRef('option_value');
+				$vals = $this->GetPropArray('option_value');
 				foreach ($this->Value as $one)
 					$ret[] = $vals[$one];
 				if ($as_string)
@@ -81,18 +81,18 @@ class Multiselect extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_lines_to_show'),
-						$mod->CreateInputText($id,'opt_lines',
-							$this->GetOption('lines','3'),10,10));
+						$mod->CreateInputText($id,'pdt_lines',
+							$this->GetProperty('lines','3'),10,10));
 		if ($this->optionAdd) {
-			$this->AddOptionElement('option_name','');
-			$this->AddOptionElement('option_value','');
+			$this->AddPropIndexed('option_name','');
+			$this->AddPropIndexed('option_value','');
 			$this->optionAdd = FALSE;
 		}
-		$names = $this->GetOptionRef('option_name');
+		$names = $this->GetPropArray('option_name');
 		if ($names) {
 			$dests = array();
 			$dests[] = array(
@@ -102,8 +102,8 @@ class Multiselect extends FieldBase
 				);
 			foreach ($names as $i=>&$one) {
 				$dests[] = array(
-				$mod->CreateInputText($id,'opt_option_name'.$i,$one,30,128),
-				$mod->CreateInputText($id,'opt_option_value'.$i,$this->GetOptionElement('option_value',$i),30,128),
+				$mod->CreateInputText($id,'pdt_option_name'.$i,$one,30,128),
+				$mod->CreateInputText($id,'pdt_option_value'.$i,$this->GetPropIndexed('option_value',$i),30,128),
 				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
@@ -119,12 +119,12 @@ class Multiselect extends FieldBase
 	public function PostAdminAction(&$params)
 	{
 		//cleanup empties
-		$names = $this->GetOptionRef('option_name');
+		$names = $this->GetPropArray('option_name');
 		if ($names) {
 			foreach ($names as $i=>&$one) {
-				if (!$one || !$this->GetOptionElement('option_value',$i)) {
-					$this->RemoveOptionElement('option_name',$i);
-					$this->RemoveOptionElement('option_value',$i);
+				if (!$one || !$this->GetPropIndexed('option_value',$i)) {
+					$this->RemovePropIndexed('option_name',$i);
+					$this->RemovePropIndexed('option_value',$i);
 				}
 			}
 			unset($one);
@@ -133,7 +133,7 @@ class Multiselect extends FieldBase
 
 	public function Populate($id,&$params)
 	{
-		$choices = $this->GetOptionRef('option_name');
+		$choices = $this->GetPropArray('option_name');
 		if ($choices) {
 			$choices = array_flip($choices);
 			if (!property_exists($this,'Value'))
@@ -144,7 +144,7 @@ class Multiselect extends FieldBase
 				$val = $this->Value;
 
 			$tmp = $this->formdata->formsmodule->CreateInputSelectList(
-				$id,$this->formdata->current_prefix.$this->Id.'[]',$choices,$val,$this->GetOption('lines',3),
+				$id,$this->formdata->current_prefix.$this->Id.'[]',$choices,$val,$this->GetProperty('lines',3),
 			 	'id="'.$this->GetInputId().'"'.$this->GetScript());
 			return $this->SetClass($tmp);
 		 }

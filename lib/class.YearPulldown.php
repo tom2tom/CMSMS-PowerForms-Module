@@ -32,25 +32,26 @@ class YearPulldown extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
+		
 		$main[] = array($mod->Lang('title_select_one_message'),
-						$mod->CreateInputText($id,'opt_select_one',
-						  $this->GetOption('select_one',$mod->Lang('select_one')),25,128));
+						$mod->CreateInputText($id,'pdt_select_one',
+						  $this->GetProperty('select_one',$mod->Lang('select_one')),25,128));
 		$main[] = array($mod->Lang('title_year_end_message'),
-						$mod->CreateInputText($id,'opt_year_start',
-						  $this->GetOption('year_start',1900),25,128));
+						$mod->CreateInputText($id,'pdt_year_start',
+						  $this->GetProperty('year_start',1900),25,128));
 		$main[] = array($mod->Lang('sort_options'),
-						$mod->CreateInputDropdown($id,'opt_sort',
+						$mod->CreateInputDropdown($id,'pdt_sort',
 						  array($mod->Lang('yes')=>1,$mod->Lang('no')=>0),-1,
-						  $this->GetOption('sort',0)));
+						  $this->GetProperty('sort',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	public function Populate($id,&$params)
 	{
-		if($this->GetOption('year_start'))
-			$count_from = $this->GetOption('year_start');
+		if($this->GetProperty('year_start'))
+			$count_from = $this->GetProperty('year_start');
 		else
 			$count_from = 1900;
 
@@ -58,11 +59,11 @@ class YearPulldown extends FieldBase
 		for($i=date('Y'); $i>=$count_from; $i--)
 			$choices[$i] = $i;
 
-		if($this->GetOption('sort'))
+		if($this->GetProperty('sort'))
 			ksort($choices);
 
 		$mod = $this->formdata->formsmodule;
-		$choices = array($this->GetOption('select_one',$mod->Lang('select_one'))=>-1) + $choices;
+		$choices = array($this->GetProperty('select_one',$mod->Lang('select_one'))=>-1) + $choices;
 		$tmp = $mod->CreateInputDropdown(
 			$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
 			'id="'.$this->GetInputId().'"'.$this->GetScript());

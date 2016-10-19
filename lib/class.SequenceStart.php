@@ -24,7 +24,7 @@ class SequenceStart extends FieldBase
 
 	public function GetDisplayableValue($as_string=TRUE)
 	{
-		$ret = '[Begin FieldSequence: '.$this->GetOption('privatename').']';
+		$ret = '[Begin FieldSequence: '.$this->GetProperty('privatename').']';
 		if ($as_string)
 			return $ret;
 		else
@@ -33,29 +33,28 @@ class SequenceStart extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE); // !$visible?
 		$mod = $this->formdata->formsmodule;
-		$this->RemoveAdminField($main,$mod->Lang('title_field_validation'));
 		$this->RemoveAdminField($main,$mod->Lang('title_field_helptext'));
 
 		$main[] = array($mod->Lang('title_privatename'),
-						$mod->CreateInputText($id,'opt_privatename',
-							$this->GetOption('privatename',htmlentities($this->Name)),20,50));
+						$mod->CreateInputText($id,'pdt_privatename',
+							$this->GetProperty('privatename',htmlentities($this->Name)),20,50));
 		//paired end
 /*		$choices = array of current ender fields + notyet
 		$main[] = array($mod->Lang(''),
-						$mod->CreateInputDropdown($id,'opt_starter',$choices,
-							-1,$this->GetOption('starter')));
+						$mod->CreateInputDropdown($id,'pdt_starter',$choices,
+							-1,$this->GetProperty('starter')));
 */
 		$main[] = array($mod->Lang('title_endername'),
-						$mod->CreateInputText($id,'opt_ender',
-							$this->GetOption('ender'),20,50));
+						$mod->CreateInputText($id,'pdt_ender',
+							$this->GetProperty('ender'),20,50));
 		$main[] = array($mod->Lang('title_initial_count'),
-						$mod->CreateInputText($id,'opt_repeatcount',
-							$this->GetOption('repeatcount',1),2,2));
+						$mod->CreateInputText($id,'pdt_repeatcount',
+							$this->GetProperty('repeatcount',1),2,2));
 		$main[] = array($mod->Lang('title_max_count'),
-						$mod->CreateInputText($id,'opt_maxcount',
-							$this->GetOption('maxcount',0),2,2));
+						$mod->CreateInputText($id,'pdt_maxcount',
+							$this->GetProperty('maxcount',0),2,2));
 
 		$this->RemoveAdminField($adv,$mod->Lang('title_field_javascript'));
 		$this->RemoveAdminField($adv,$mod->Lang('title_field_resources'));
@@ -93,8 +92,8 @@ class SequenceStart extends FieldBase
 		if only 1 sequence
 			$(BTNREM).css('display','none');
 		*/
-		$name = $this->GetOption('privatename'); //htmlentities?
-		$repeats = $this->GetOption('repeatcount');
+		$name = $this->GetProperty('privatename'); //htmlentities?
+		$repeats = $this->GetProperty('repeatcount');
 		$ret = '';
 		for ($i=0; $i<$repeats; $i++) //OR support looping in form constructor
 		{

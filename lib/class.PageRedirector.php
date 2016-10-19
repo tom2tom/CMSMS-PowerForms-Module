@@ -39,15 +39,15 @@ class PageRedirector extends FieldBase
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {
-				$this->RemoveOptionElement('destination_page',$indx);
-				$this->RemoveOptionElement('destination_subject',$indx);
+				$this->RemovePropIndexed('destination_page',$indx);
+				$this->RemovePropIndexed('destination_subject',$indx);
 			}
 		}
 	}
 
 	public function GetFieldStatus()
 	{
-		$opt = $this->GetOption('destination_page');
+		$opt = $this->GetProperty('destination_page');
 		if (is_array($opt))
 			$num = count($opt);
 		elseif ($opt)
@@ -60,7 +60,7 @@ class PageRedirector extends FieldBase
 	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue())
-			$ret = $this->GetOptionElement('destination_page',$this->Value);
+			$ret = $this->GetPropIndexed('destination_page',$this->Value);
 		else
 			$ret = $this->GetFormOption('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
@@ -73,18 +73,18 @@ class PageRedirector extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_select_one_message'),
-						$mod->CreateInputText($id,'opt_select_one',
-							$this->GetOption('select_one',$mod->Lang('select_one')),30,128));
+						$mod->CreateInputText($id,'pdt_select_one',
+							$this->GetProperty('select_one',$mod->Lang('select_one')),30,128));
 		if ($this->addressAdd) {
-			$this->AddOptionElement('destination_page','');
-			$this->AddOptionElement('destination_subject','');
+			$this->AddPropIndexed('destination_page','');
+			$this->AddPropIndexed('destination_subject','');
 			$this->addressAdd = FALSE;
 		}
-		$opt = $this->GetOptionRef('destination_page');
+		$opt = $this->GetPropArray('destination_page');
 		if ($opt) {
 			$dests = array();
 			$dests[] = array(
@@ -94,9 +94,9 @@ class PageRedirector extends FieldBase
 				);
 			foreach ($opt as $i=>&$one) {
 				$dests[] = array(
-					$mod->CreateInputText($id,'opt_destination_subject'.$i,
-						$this->GetOptionElement('destination_subject',$i),30,128),
-					Utils::CreateHierarchyPulldown($mod,$id,'opt_destination_page'.$i,$one),
+					$mod->CreateInputText($id,'pdt_destination_subject'.$i,
+						$this->GetPropIndexed('destination_subject',$i),30,128),
+					Utils::CreateHierarchyPulldown($mod,$id,'pdt_destination_page'.$i,$one),
 					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
@@ -112,12 +112,12 @@ class PageRedirector extends FieldBase
 	public function PostAdminAction(&$params)
 	{
 		//cleanup empties
-		$pages = $this->GetOptionRef('destination_page');
+		$pages = $this->GetPropArray('destination_page');
 		if ($pages) {
 			foreach ($pages as $i=>&$one) {
-				if (!$one || !$this->GetOptionElement('destination_subject',$i)) {
-					$this->RemoveOptionElement('destination_page',$i);
-					$this->RemoveOptionElement('destination_subject',$i);
+				if (!$one || !$this->GetPropIndexed('destination_subject',$i)) {
+					$this->RemovePropIndexed('destination_page',$i);
+					$this->RemovePropIndexed('destination_subject',$i);
 				}
 			}
 			unset($one);
@@ -131,7 +131,7 @@ class PageRedirector extends FieldBase
 		if (!ret)
 			$messages[] = $msg;
 
-		if (!$this->GetOption('destination_page')) {
+		if (!$this->GetProperty('destination_page')) {
 			$ret = FALSE;
 			$mod = $this->formdata->formsmodule;
 			$messages[] = $mod->Lang('missing_type',$mod->Lang('page'));
@@ -142,10 +142,10 @@ class PageRedirector extends FieldBase
 
 	public function Populate($id,&$params)
 	{
-		$pages = $this->GetOptionRef('destination_subject');
+		$pages = $this->GetPropArray('destination_subject');
 		if ($pages) {
 			$mod = $this->formdata->formsmodule;
-			$choices = array(' '.$this->GetOption('select_one',$mod->Lang('select_one')) => -1)
+			$choices = array(' '.$this->GetProperty('select_one',$mod->Lang('select_one')) => -1)
 				+ array_flip($pages);
 			$tmp = $mod->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
@@ -158,8 +158,8 @@ class PageRedirector extends FieldBase
 	public function Dispose($id,$returnid)
 	{
 		//TODO ensure all other dispositions are run before this
-//		$this->formdata->formsmodule->RedirectContent($this->GetOptionElement('destination_page',$this->Value));
-		$page = $this->GetOptionElement('destination_page',$this->Value);
+//		$this->formdata->formsmodule->RedirectContent($this->GetPropIndexed('destination_page',$this->Value));
+		$page = $this->GetPropIndexed('destination_page',$this->Value);
 		if ($page >= 0) {
 			$this->formdata->XtraProps['redirect_page'] = $page;
 			$this->formdata->XtraProps['submit_action'] = 'redir';

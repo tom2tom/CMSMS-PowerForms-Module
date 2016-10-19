@@ -22,7 +22,7 @@ class SequenceEnd extends FieldBase
 
 	public function GetDisplayableValue($as_string=TRUE)
 	{
-		$ret = '[End FieldSequence: '.$this->GetOption('starter').']';
+		$ret = '[End FieldSequence: '.$this->GetProperty('starter').']';
 		if ($as_string)
 			return $ret;
 		else
@@ -31,23 +31,22 @@ class SequenceEnd extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE); // !$visible?
 		$mod = $this->formdata->formsmodule;
-		$this->RemoveAdminField($main,$mod->Lang('title_field_alias'));
-		$this->RemoveAdminField($main,$mod->Lang('title_field_validation'));
+//		$this->RemoveAdminField($main,$mod->Lang('title_field_alias'));
 		$this->RemoveAdminField($main,$mod->Lang('title_field_helptext'));
 /*		$choices = array of current starter fields + notyet
 		$main[] = array($mod->Lang(''),
-						$mod->CreateInputDropdown($id,'opt_starter',$choices,
-							-1,$this->GetOption('starter')));
+						$mod->CreateInputDropdown($id,'pdt_starter',$choices,
+							-1,$this->GetProperty('starter')));
 */
 		$main[] = array($mod->Lang('title_privatename'),
-						$mod->CreateInputText($id,'opt_privatename',
-							$this->GetOption('privatename',htmlentities($this->Name)),20,50));
+						$mod->CreateInputText($id,'pdt_privatename',
+							$this->GetProperty('privatename',htmlentities($this->Name)),20,50));
 
 		$main[] = array($mod->Lang('title_startername'),
-						$mod->CreateInputText($id,'opt_starter',
-							$this->GetOption('starter'),20,50));
+						$mod->CreateInputText($id,'pdt_starter',
+							$this->GetProperty('starter'),20,50));
 		return array('main'=>$main,'adv'=>array());
 	}
 
@@ -66,7 +65,7 @@ class SequenceEnd extends FieldBase
 */
 /*	public function Populate($id,&$params)
 	{
-		return '</div><!-- end sequence '.$this->GetOption('starter').' -->';
+		return '</div><!-- end sequence '.$this->GetProperty('starter').' -->';
 	}
 */
 }

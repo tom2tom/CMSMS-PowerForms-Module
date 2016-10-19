@@ -19,7 +19,7 @@ class TimePicker extends FieldBase
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'TimePicker';
 		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = array($mod->Lang('validation_none')=>'none');
+		$this->ValidationTypes = array();
 		$this->flag12hour = array(
 			$mod->Lang('title_before_noon')=>$mod->Lang('title_before_noon'),
 			$mod->Lang('title_after_noon')=>$mod->Lang('title_after_noon'));
@@ -28,13 +28,13 @@ class TimePicker extends FieldBase
 	public function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		return ($this->GetOption('24_hour',0)?$mod->Lang('24_hour'):$mod->Lang('12_hour'));
+		return ($this->GetProperty('24_hour',0)?$mod->Lang('24_hour'):$mod->Lang('12_hour'));
 	}
 
 	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue()) {
-			if ($this->GetOption('24_hour',0))
+			if ($this->GetProperty('24_hour',0))
 				$ret = $this->GetArrayValue(0).':'.
 					$this->GetArrayValue(1);
 			else
@@ -53,12 +53,12 @@ class TimePicker extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_24_hour'),
-						$mod->CreateInputHidden($id,'opt_24_hour',0).
-						$mod->CreateInputCheckbox($id,'opt_24_hour',1,
-							$this->GetOption('24_hour',0)));
+						$mod->CreateInputHidden($id,'pdt_24_hour',0).
+						$mod->CreateInputCheckbox($id,'pdt_24_hour',1,
+							$this->GetProperty('24_hour',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -76,7 +76,7 @@ class TimePicker extends FieldBase
 			$mo = sprintf("%02d",$i);
 			$Mins[$mo] = $mo;
 		}
-		if ($this->GetOption('24_hour',0)) {
+		if ($this->GetProperty('24_hour',0)) {
 			for ($i=0; $i<24; $i++)
 			{
 				$mo = sprintf("%02d",$i);

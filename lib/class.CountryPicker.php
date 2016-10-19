@@ -115,26 +115,27 @@ class CountryPicker extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		$choices = array_merge(array($mod->Lang('no_default')=>''),$this->Countries);
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
+
+		$choices = array_merge(array($mod->Lang('no_default')=>''),$this->Countries);
 		$main[] = array($mod->Lang('title_select_default_country'),
-						$mod->CreateInputDropdown($id,'opt_default_country',$choices,-1,
-							$this->GetOption('default_country')));
+						$mod->CreateInputDropdown($id,'pdt_default_country',$choices,-1,
+							$this->GetProperty('default_country')));
 		$main[] = array($mod->Lang('title_select_one_message'),
-						$mod->CreateInputText($id,'opt_select_one',
-							$this->GetOption('select_one',$mod->Lang('select_one'))));
+						$mod->CreateInputText($id,'pdt_select_one',
+							$this->GetProperty('select_one',$mod->Lang('select_one'))));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	public function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$choices = array_merge(array($this->GetOption('select_one',$mod->Lang('select_one'))=>-1),
+		$choices = array_merge(array($this->GetProperty('select_one',$mod->Lang('select_one'))=>-1),
 			$this->Countries);
 
-		if (!$this->HasValue() && $this->GetOption('default_country'))
-			$this->SetValue($this->GetOption('default_country'));
+		if (!$this->HasValue() && $this->GetProperty('default_country'))
+			$this->SetValue($this->GetProperty('default_country'));
 		$tmp = $mod->CreateInputDropdown(
 			$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
 			'id="'.$this->GetInputId().'"'.$this->GetScript());

@@ -42,8 +42,8 @@ class MultiselectFileDirector extends FieldBase
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {
-				$this->RemoveOptionElement('destination_filename',$indx);
-				$this->RemoveOptionElement('destination_displayname',$indx);
+				$this->RemovePropIndexed('destination_filename',$indx);
+				$this->RemovePropIndexed('destination_displayname',$indx);
 			}
 		}
 	}
@@ -91,7 +91,7 @@ class MultiselectFileDirector extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		if (!Utils::GetUploadsPath($mod))
 			return $mod->Lang('error_uploads_dir');
-		$opt = $this->GetOptionRef('destination_filename');
+		$opt = $this->GetPropArray('destination_filename');
 		if ($opt)
 			$fileCount = count($opt);
 		else
@@ -105,23 +105,23 @@ class MultiselectFileDirector extends FieldBase
 		if (!Utils::GetUploadsPath($mod))
 			return array('main'=>array($this->GetErrorMessage('error_uploads_dir')));
 
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$main[] = array($mod->Lang('title_select_one_message'),
 			$mod->CreateInputText($id,
-			'opt_select_one',
-			$this->GetOption('select_one',$mod->Lang('select_one')),25,128));
+			'pdt_select_one',
+			$this->GetProperty('select_one',$mod->Lang('select_one')),25,128));
 /*		$main[] = array($mod->Lang('title_newline_replacement'),
-			$mod->CreateInputText($id,'opt_newlinechar',
-				$this->GetOption('newlinechar'),5,15),
+			$mod->CreateInputText($id,'pdt_newlinechar',
+				$this->GetProperty('newlinechar'),5,15),
 			$mod->Lang('help_newline_replacement'));
 */
 		if ($this->fileAdd) {
-			$this->AddOptionElement('destination_displayname','');
-			$this->AddOptionElement('destination_value','');
-			$this->AddOptionElement('destination_filename','');
+			$this->AddPropIndexed('destination_displayname','');
+			$this->AddPropIndexed('destination_value','');
+			$this->AddPropIndexed('destination_filename','');
 			$this->fileAdd = FALSE;
 		}
-		$names = $this->GetOptionRef('destination_filename');
+		$names = $this->GetPropArray('destination_filename');
 		if ($names) {
 			$dests = array();
 			$dests[] = array(
@@ -132,9 +132,9 @@ class MultiselectFileDirector extends FieldBase
 				);
 			foreach ($names as $i=>&$one) {
 				$dests[] = array(
-				$mod->CreateInputText($id,'opt_destination_displayname'.$i,$this->GetOptionElement('destination_displayname',$i),30,128),
-				$mod->CreateInputText($id,'opt_destination_value'.$i,$this->GetOptionElement('destination_value',$i),30,128),
-				$mod->CreateInputText($id,'opt_destination_filename'.$i,$one,30,128),
+				$mod->CreateInputText($id,'pdt_destination_displayname'.$i,$this->GetPropIndexed('destination_displayname',$i),30,128),
+				$mod->CreateInputText($id,'pdt_destination_value'.$i,$this->GetPropIndexed('destination_value',$i),30,128),
+				$mod->CreateInputText($id,'pdt_destination_filename'.$i,$one,30,128),
 				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
@@ -147,27 +147,27 @@ class MultiselectFileDirector extends FieldBase
 
 		//setup sample-template buttons and scripts
 		$ctldata = array();
-		$ctldata['opt_file_template']['is_oneline']=TRUE;
-		$ctldata['opt_file_header']['is_oneline']=TRUE;
-		$ctldata['opt_file_header']['is_header']=TRUE;
-		$ctldata['opt_file_footer']['is_oneline']=TRUE;
-		$ctldata['opt_file_footer']['is_footer']=TRUE;
+		$ctldata['pdt_file_template']['is_oneline']=TRUE;
+		$ctldata['pdt_file_header']['is_oneline']=TRUE;
+		$ctldata['pdt_file_header']['is_header']=TRUE;
+		$ctldata['pdt_file_footer']['is_oneline']=TRUE;
+		$ctldata['pdt_file_footer']['is_footer']=TRUE;
 		list($buttons,$jsfuncs) = Utils::TemplateActions($this->formdata,$id,$ctldata);
 
 		$adv[] = array($mod->Lang('title_file_template'),
 			$mod->CreateTextArea(FALSE,$id,
-			htmlspecialchars($this->GetOption('file_template')),
-			'opt_file_template','pwf_tallarea','','','',50,15).
+			htmlspecialchars($this->GetProperty('file_template')),
+			'pdt_file_template','pwf_tallarea','','','',50,15).
 			'<br /><br />'.$buttons[0]);
 		$adv[] = array($mod->Lang('title_file_header'),
 			$mod->CreateTextArea(FALSE,$id,
-			htmlspecialchars($this->GetOption('file_header')),
-			'opt_file_header','pwf_shortarea','','','',50,8).
+			htmlspecialchars($this->GetProperty('file_header')),
+			'pdt_file_header','pwf_shortarea','','','',50,8).
 			'<br /><br />'.$buttons[1]);
 		$adv[] = array($mod->Lang('title_file_footer'),
 			$mod->CreateTextArea(FALSE,$id,
-			htmlspecialchars($this->GetOption('file_footer')),
-			'opt_file_footer','pwf_shortarea','','','',50,8).
+			htmlspecialchars($this->GetProperty('file_footer')),
+			'pdt_file_footer','pwf_shortarea','','','',50,8).
 			'<br /><br />'.$buttons[2]);
 
 		if ($dests)
@@ -180,12 +180,12 @@ class MultiselectFileDirector extends FieldBase
 	public function PostAdminAction(&$params)
 	{
 		//cleanup empties
-		$names = $this->GetOptionRef('destination_filename');
+		$names = $this->GetPropArray('destination_filename');
 		if ($names) {
 			foreach ($names as $i=>&$one) {
-				if (!$one || !$this->GetOptionElement('destination_displayname',$i)) {
-					$this->RemoveOptionElement('destination_filename',$i);
-					$this->RemoveOptionElement('destination_displayname',$i);
+				if (!$one || !$this->GetPropIndexed('destination_displayname',$i)) {
+					$this->RemovePropIndexed('destination_filename',$i);
+					$this->RemovePropIndexed('destination_displayname',$i);
 				}
 			}
 			unset($one);
@@ -194,7 +194,7 @@ class MultiselectFileDirector extends FieldBase
 
 	public function Populate($id,&$params)
 	{
-		$names = $this->GetOptionRef('destination_displayname');
+		$names = $this->GetPropArray('destination_displayname');
 		if ($names) {
 			$mod = $this->formdata->formsmodule;
 			$js = $this->GetScript();
@@ -205,7 +205,7 @@ class MultiselectFileDirector extends FieldBase
 				$oneset->title = $one;
 				$tmp = '<label for="'.$this->GetInputId('_'.$i).'">'.$one.'</label>';
 				$oneset->name = $this->SetClass($tmp);
-				$value = $this->GetOptionElement('destination_value',$i);
+				$value = $this->GetPropIndexed('destination_value',$i);
 				$tmp = $mod->CreateInputCheckbox(
 					$id,$this->formdata->current_prefix.$this->Id.'[]',$value,
 					(is_array($this->Value) && in_array($value,$this->Value))?$value:-1,
@@ -243,16 +243,16 @@ class MultiselectFileDirector extends FieldBase
 		$tplvars = array();
 		Utils::SetupFormVars($this->formdata,$tplvars);
 
-		$header = $this->GetOption('file_header');
+		$header = $this->GetProperty('file_header');
 		if (!$header)
 			$header = $this->CreateSampleHeader();
 		$header = Utils::ProcessTemplateFromData($mod,$header,$tplvars);
 
-		$template = $this->GetOption('file_template');
+		$template = $this->GetProperty('file_template');
 		if (!$template)
 			$template = $this->CreateDefaultTemplate();
 		$newline = Utils::ProcessTemplateFromData($mod,$template,$tplvars);
-/*		$replchar = $this->GetOption('newlinechar');
+/*		$replchar = $this->GetProperty('newlinechar');
 		if ($replchar) {
 			$newline = rtrim($newline,"\r\n");
 			$newline = preg_replace('/[\n\r]+/',$replchar,$newline);
@@ -262,17 +262,17 @@ class MultiselectFileDirector extends FieldBase
 		if (substr($newline,-$l) != PHP_EOL)
 			$newline .= PHP_EOL;
 
-		$footer = $this->GetOption('file_footer');
+		$footer = $this->GetProperty('file_footer');
 		if ($footer)
 			$footer = Utils::ProcessTemplateFromData($mod,$footer,$tplvars);
 
 		// output to files
 		if (is_array($this->Value)) {
-			$values = $this->GetOptionRef('destination_value');
+			$values = $this->GetPropArray('destination_value');
 
 			foreach ($this->Value as $indx) {
 				$fn = preg_replace('/[^\w\d\.]|\.\./','_',
-					$this->GetOptionElement('destination_filename',$indx));
+					$this->GetPropIndexed('destination_filename',$indx));
 				if (!$fn)
 					continue;
 				$fp = $ud.DIRECTORY_SEPARATOR.$fn;

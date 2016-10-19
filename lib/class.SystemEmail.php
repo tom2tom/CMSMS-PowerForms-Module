@@ -45,7 +45,7 @@ class SystemEmail extends EmailBase
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {
-				$this->RemoveOptionElement('destination_address',$indx);
+				$this->RemovePropIndexed('destination_address',$indx);
 			}
 		}
 	}
@@ -54,7 +54,7 @@ class SystemEmail extends EmailBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$ret = $mod->Lang('to').': ';
-		$dests = $this->GetOption('destination_address');
+		$dests = $this->GetProperty('destination_address');
 		if (is_array($dests)) {
 			if (count($dests) > 1) {
 				$ret.= count($dests).' '.$mod->Lang('recipients');
@@ -108,10 +108,10 @@ class SystemEmail extends EmailBase
 		$mod = $this->formdata->formsmodule;
 		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,FALSE);
 		if ($this->addressAdd) {
-			$this->AddOptionElement('destination_address','');
+			$this->AddPropIndexed('destination_address','');
 			$this->addressAdd = FALSE;
 		}
-		$opt = $this->GetOptionRef('destination_address');
+		$opt = $this->GetPropArray('destination_address');
 		if ($opt) {
 			$dests = array();
 			$dests[] = array(
@@ -135,7 +135,7 @@ class SystemEmail extends EmailBase
 				$btns = self::GetDests($id,$i,$totype);
 
 				$dests[] = array(
-					$mod->CreateInputText($id,'opt_destination_address'.$i,$addr,50,128),
+					$mod->CreateInputText($id,'pdt_destination_address'.$i,$addr,50,128),
 					array_shift($btns),
 					array_shift($btns),
 					array_shift($btns),
@@ -154,11 +154,11 @@ class SystemEmail extends EmailBase
 	public function PostAdminAction(&$params)
 	{
 		//cleanup empties
-		$addrs = $this->GetOptionRef('destination_address');
+		$addrs = $this->GetPropArray('destination_address');
 		if ($addrs) {
 			foreach ($addrs as $i=>&$one) {
 				if (!$one)
-					$this->RemoveOptionElement('destination_address',$i);
+					$this->RemovePropIndexed('destination_address',$i);
 			}
 			unset($one);
 		}
@@ -173,7 +173,7 @@ class SystemEmail extends EmailBase
 			$messages[] = $msg;
 
 		$mod = $this->formdata->formsmodule;
-		$opt = $this->GetOption('email_from_address');
+		$opt = $this->GetProperty('email_from_address');
 		if ($opt) {
 			list($rv,$msg) = $this->validateEmailAddr($opt);
 			if (!$rv) {
@@ -185,7 +185,7 @@ class SystemEmail extends EmailBase
 			$messages[] = $mod->Lang('missing_type',$mod->Lang('source'));
 		}
 
-		$dests = $this->GetOptionRef('destination_address');
+		$dests = $this->GetPropArray('destination_address');
 		if ($dests) {
 			foreach ($dests as &$one) {
 				list($rv,$msg) = $this->validateEmailAddr($one);
@@ -221,7 +221,7 @@ class SystemEmail extends EmailBase
 
 	public function Dispose($id, $returnid)
 	{
-		$dests = $this->GetOptionRef('destination_address');
-		return $this->SendForm($dests,$this->GetOption('email_subject'));
+		$dests = $this->GetPropArray('destination_address');
+		return $this->SendForm($dests,$this->GetProperty('email_subject'));
 	}
 }

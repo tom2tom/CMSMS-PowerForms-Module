@@ -27,11 +27,13 @@ class Passphrase extends FieldBase
 	public function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		$ret = $mod->Lang('abbreviation_length',$this->GetOption('min_length','8'));
-		if ($this->ValidationType)
+		$ret = $mod->Lang('abbreviation_length',$this->GetProperty('min_length','8'));
+		if ($this->ValidationType) {
+			$this->EnsureArray($this->ValidationTypes);
 			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
-		$ret .= ','.$mod->Lang('rows',$this->GetOption('rows',2)).
-		','.$mod->Lang('columns',$this->GetOption('columns',40));
+		}
+		$ret .= ','.$mod->Lang('rows',$this->GetProperty('rows',2)).
+		','.$mod->Lang('columns',$this->GetProperty('columns',40));
 		return $ret;
 	}
 
@@ -40,11 +42,11 @@ class Passphrase extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_minimum_length'),
-						$mod->CreateInputText($id,'opt_min_length',$this->GetOption('min_length',8),3,3));
+						$mod->CreateInputText($id,'pdt_min_length',$this->GetProperty('min_length',8),3,3));
 		$main[] = array($mod->Lang('title_textarea_rows'),
-						$mod->CreateInputText($id,'opt_rows',$this->GetOption('rows',2),2,2));
+						$mod->CreateInputText($id,'pdt_rows',$this->GetProperty('rows',2),2,2));
 		$main[] = array($mod->Lang('title_textarea_cols'),
-						$mod->CreateInputText($id,'opt_columns',$this->GetOption('columns',40),3,3));
+						$mod->CreateInputText($id,'pdt_columns',$this->GetProperty('columns',40),3,3));
 		$choices = array(
 		'*****'=>'all',
 		'*1234'=>'credit',
@@ -53,11 +55,11 @@ class Passphrase extends FieldBase
 		'*******4'=>'see1'
 		);
 		$main[] = array($mod->Lang('title_cloak_type'),
-						$mod->CreateInputDropdown($id,'opt_style',$choices,-1,$this->GetOption('style','all')));
+						$mod->CreateInputDropdown($id,'pdt_style',$choices,-1,$this->GetProperty('style','all')));
 
 		$adv[] = array($mod->Lang('title_field_regex'),
-						$mod->CreateInputText($id,'opt_regex',
-							$this->GetOption('regex'),25,1024),
+						$mod->CreateInputText($id,'pdt_regex',
+							$this->GetProperty('regex'),25,1024),
 						$mod->Lang('help_regex_use'));
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -70,9 +72,9 @@ class Passphrase extends FieldBase
 <script type="text/javascript" src="{$baseurl}/include/jquery-inputCloak.min.js"></script>
 EOS;
 		$htmlid = $id.$this->GetInputId(); //html may get id="$id.$htmlid", or maybe not ...
-		$style = $this->GetOption('style','all');
-		$char = $this->GetOption('masker','*');
-		$ms = $this->GetOption('delay',0);
+		$style = $this->GetProperty('style','all');
+		$char = $this->GetProperty('masker','*');
+		$ms = $this->GetProperty('delay',0);
 		$this->formdata->jsloads[] = <<<EOS
  $('#{$htmlid}').inputCloak({
   type: '{$style}',
@@ -80,8 +82,8 @@ EOS;
   delay: $ms
  });
 EOS;
-		$rows = $this->GetOption('rows',2) * 1.2;
-		$cols = $this->GetOption('columns',40);
+		$rows = $this->GetProperty('rows',2) * 1.2;
+		$cols = $this->GetProperty('columns',40);
 		$add = ' style="overflow:auto;height:'.$rows.'em;width:'.$cols.'em;"';
 
 		$tmp = $mod->CreateTextArea(FALSE,$id,
@@ -101,7 +103,7 @@ EOS;
 		 case 'none':
 			break;
 		 case 'length':
-			$length = $this->GetOption('length');
+			$length = $this->GetProperty('length');
 			if (is_numeric($length) && $length > 0) {
 				if (strlen($this->Value) < $length) {
 					$this->valid = FALSE;
@@ -111,7 +113,7 @@ EOS;
 			break;
 		 case 'regex_match':
 			if (property_exists($this,'Value') &&
-				!preg_match($this->GetOption('regex','/.*/'),$this->Value))
+				!preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
@@ -119,7 +121,7 @@ EOS;
 			break;
 		 case 'regex_nomatch':
 			if (property_exists($this,'Value') &&
-				preg_match($this->GetOption('regex','/.*/'),$this->Value))
+				preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);

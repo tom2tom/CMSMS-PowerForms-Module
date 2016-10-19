@@ -93,20 +93,20 @@ class EmailConfirmation extends EmailBase
 			//unblock dispositions
 			foreach ($this->blocked as $fid) {
 				$one = $this->formdata->Fields[$fid];
-				$one->DispositionPermitted = TRUE;
+				$one->SetDisposable(TRUE);
 			}
 		} else {
 			//block relevant dispositions (some may already be blocked for other reasons)
 			$this->blocked = array();
 			foreach ($this->formdata->Fields as &$one) {
-				if ($one->IsDisposition && $one->DispositionPermitted) {
+				if ($one->IsDisposition() && $one->IsDisposable()) {
 					$this->blocked[] = $one->Id;
-					$one->DispositionPermitted = FALSE;
+					$one->SetDisposable(FALSE);
 				}
 			}
 			unset($one);
 		}
-		$this->DispositionPermitted = !$val; //re-enable/inhibit this disposition
+		$this->SetDisposable(!$val); //re-enable/inhibit this disposition
 	}
 
 	//only called when $this->approvedToGo is FALSE
@@ -136,6 +136,6 @@ class EmailConfirmation extends EmailBase
 //				$pref.'f'=>$this->formdata->Id,
 				$pref.'r'=>$record_id),
 			'',TRUE,FALSE,'',TRUE);
-		return $this->SendForm($this->GetValue(),$this->GetOption('email_subject'),$tplvars);
+		return $this->SendForm($this->GetValue(),$this->GetProperty('email_subject'),$tplvars);
 	}
 }

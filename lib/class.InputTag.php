@@ -23,7 +23,7 @@ class InputTag extends FieldBase
 
 	public function GetFieldStatus()
 	{
-		return $this->GetOption('udtname',$this->formdata->formsmodule->Lang('unspecified'));
+		return $this->GetProperty('udtname',$this->formdata->formsmodule->Lang('unspecified'));
 	}
 
 	public function AdminPopulate($id)
@@ -33,15 +33,15 @@ class InputTag extends FieldBase
 		foreach ($usertags as $key => $value)
 			$choices[$value] = $key;
 
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_udt_name'),
-						$mod->CreateInputDropdown($id,'opt_udtname',$choices,-1,
-							$this->GetOption('udtname')));
+						$mod->CreateInputDropdown($id,'pdt_udtname',$choices,-1,
+							$this->GetProperty('udtname')));
 		$adv[] = array($mod->Lang('title_export_form_to_udt'),
-						$mod->CreateInputHidden($id,'opt_export_form',0).
-						$mod->CreateInputCheckbox($id,'opt_export_form',1,
-							$this->GetOption('export_form',0)));
+						$mod->CreateInputHidden($id,'pdt_export_form',0).
+						$mod->CreateInputCheckbox($id,'pdt_export_form',1,
+							$this->GetProperty('export_form',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -49,7 +49,7 @@ class InputTag extends FieldBase
 	{
 		//setup variables for use in template
 		$params = array();
-		if ($this->GetOption('export_form',0))
+		if ($this->GetProperty('export_form',0))
 			$params['FORM'] = $this->formdata;
 
 		$mod = $this->formdata->formsmodule;
@@ -70,7 +70,7 @@ class InputTag extends FieldBase
 		unset($one);
 
 		$usertagops = \cmsms()->GetUserTagOperations();
-		$udt = $this->GetOption('udtname');
+		$udt = $this->GetProperty('udtname');
 		$ret = $usertagops->CallUserTag($udt,$params);
 		if ($ret !== FALSE)
 			return $this->SetClass($tmp);
