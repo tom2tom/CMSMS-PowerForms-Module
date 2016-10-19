@@ -137,7 +137,7 @@ class CheckboxExtended extends FieldBase
 				$js);
 			$tmp = preg_replace('/id="\S+"/','id="'.$tid.'"',$tmp);
 			$oneset->input = $this->SetClass($tmp);
-			
+
 			$ret[] = $oneset;
 		}
 
