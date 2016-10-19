@@ -22,6 +22,8 @@ class PageBreak extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		return $this->AdminPopulateCommon($id,FALSE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
+		//TODO remove irrelevant objects
+		return array('main'=>$main,'adv'=>$adv);
 	}
 }
