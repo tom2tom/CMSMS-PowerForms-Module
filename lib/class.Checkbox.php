@@ -14,17 +14,13 @@ class Checkbox extends FieldBase
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
 		$this->Type = 'Checkbox';
+		$this->ValidationTypes = array();
 	}
 
 	public function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
 		$ret = ($this->GetProperty('is_checked',0)?$mod->Lang('checked_by_default'):$mod->Lang('unchecked_by_default'));
-		if ($this->ValidationType) {
-			$this->EnsureArray($this->ValidationTypes);
-			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
-		}
-
 		return $ret;
 	}
 
