@@ -969,18 +969,10 @@ class FieldBase implements \Serializable
 			if ($props !== NULL) {
 				$arr = (array)$props;
 				foreach ($arr as $key=>$one) {
-					switch ($key) {
-					 case 'Value':
-					 case 'XtraProps':
-					 	if (is_object($one)) {
-							$this->$key = (array)$one;
-						} else {
-							$this->$key = $one;
-						}
-						break;
-					 default:
+					if (is_object($one)) {
+						$this->$key = (array)$one; //no objects in field properties
+					} else {
 						$this->$key = $one;
-						break;
 					}
 				}
 			}
