@@ -4,7 +4,7 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if (!$this->CheckAccess('ModifyPFForms')) exit;
+if (!$this->_CheckAccess('ModifyPFForms')) exit;
 
 try {
 	$cache = PWForms\Utils::GetCache($this);
@@ -24,7 +24,7 @@ if (isset($params['formdata'])) {
 	$formdata = $cache->get($params['formdata']);
 	if (is_null($formdata) || !$formdata->Fields) {
 		$formdata = $funcs->Load($this,$form_id,$id,$params,TRUE);
-		$params['formdata'] = base64_encode($formdata->Id.session_id()); //must persist across requests
+		$params['formdata'] = base64_encode($form_id.session_id());
 	} else
 		$formdata->formsmodule = &$this;
 } else { //first time
@@ -36,22 +36,18 @@ if (isset($params['submit']) || isset($params['apply'])) {
 	list($res,$message) = $funcs->Store($this,$formdata,$params);
 	if ($res) {
 		$message = $this->Lang('form_op',$this->Lang('updated'));
-		$message = $this->PrettyMessage($message,TRUE,FALSE,FALSE);
+		$message = $this->_PrettyMessage($message,TRUE,FALSE);
 		if (isset($params['submit'])) {
 			$cache->delete($params['formdata']);
 			$this->Redirect($id,'defaultadmin','',array('message'=> $message));
 		}
 	} else {
-		$message = $this->PrettyMessage($message,FALSE,FALSE,FALSE);
+		$message = $this->_PrettyMessage($message,FALSE,FALSE);
 	}
 	$cache->delete($params['formdata']);
-} elseif (isset($params['formedit'])) {
-	if (isset($params['set_field_level']))
-		$this->SetPreference('adder_fields',$params['set_field_level']);
-	$message = '';
 } elseif (isset($params['fielddelete'])) {
 	PWForms\FieldOperations::DeleteField($formdata,$params['field_id']);
-	$message = $this->PrettyMessage('field_deleted');
+	$message = $this->_PrettyMessage('field_deleted');
 } elseif (isset($params['fieldcopy'])) {
 	$obfield = PWForms\FieldOperations::Replicate($formdata,$params['field_id']);
 	if ($obfield) {
@@ -64,25 +60,24 @@ if (isset($params['submit']) || isset($params['apply'])) {
 				'form_id'=>$fid,
 				'formdata'=>$params['formdata']));
 	} else {
-		$message = $this->PrettyMessage('error_copy',FALSE);
+		$message = $this->_PrettyMessage('error_copy',FALSE);
 	}
 } elseif (isset($params['dir'])) {
 	$srcIndex = PWForms\FieldOperations::GetFieldIndexFromId($formdata,$params['field_id']);
 	$destIndex = ($params['dir'] == 'up') ? $srcIndex - 1 : $srcIndex + 1;
 	PWForms\FieldOperations::SwapFieldsByIndex($srcIndex,$destIndex);
-	$message = $this->PrettyMessage('field_order_updated');
+	$message = $this->_PrettyMessage('field_order_updated');
 } elseif (isset($params['active'])) {
 	$obfield = $formdata->Fields[$params['field_id']];
 	if ($obfield !== FALSE) {
 //		$obfield->SetRequired(($params['active']=='on'));
 		$obfield->ToggleRequired();
 		$obfield->Store();
-		$message = $this->PrettyMessage('field_requirement_updated');
+		$message = $this->_PrettyMessage('field_requirement_updated');
 	} else {
-		$message = $this->PrettyMessage('TODO',FALSE);
+		$message = $this->_PrettyMessage('error_data',FALSE);
 	}
-} else
-	exit;
+}
 
 $orders = array();
 foreach ($formdata->Fields as $fid=>&$one) {
@@ -98,5 +93,12 @@ require __DIR__.DIRECTORY_SEPARATOR.'populate.open_form.php';
 
 $cache->set($params['formdata'],$formdata,84600);
 
-echo PWForms\Utils::ProcessTemplate($this,'editform.tpl',$tplvars);
+$jsall = NULL;
+PWForms\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
+unset($jsincs);
+unset($jsfuncs);
+unset($jsloads);
 
+echo PWForms\Utils::ProcessTemplate($this,'editform.tpl',$tplvars);
+if ($jsall)
+	echo $jsall;
