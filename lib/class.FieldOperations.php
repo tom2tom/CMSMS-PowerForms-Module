@@ -46,13 +46,36 @@ class FieldOperations
 					}
 				}
 			}
-		} elseif (!empty($params['field_type'])) {
+		} elseif (!empty($params['field_pick'])) { //addition triggered by open_form field-picker change/choice
 			// specified field type via params
 			$className = Utils::MakeClassName($params['field_type']);
 			$classPath = __DIR__.DIRECTORY_SEPARATOR.'class.'.$className.'.php';
 			if (is_file($classPath)) {
 				$classPath = 'PWForms\\'.$className;
 				$obfield = new $classPath($formdata,$params);
+				if (isset($params['in'])) {
+					switch ($params['in']) {
+						case 'disposition':
+							if (!$obfield->GetProperty('IsDisposition')) {
+								$obfield = FALSE;
+							}
+							break;
+						case 'external':
+							if ($obfield->GetProperty('IsDisposition')) {
+								$obfield = FALSE;
+							} else {
+								$obfield->SetProperty('DisplayExternal',TRUE);
+							}
+							break;
+						case 'form':
+							if ($obfield->GetProperty('IsDisposition')) {
+								$obfield = FALSE;
+							} else {
+								$obfield->SetProperty('DisplayInForm',TRUE);
+							}
+							break;
+					}
+				}
 			}
 		}
 		return $obfield;
@@ -171,20 +194,19 @@ class FieldOperations
 			$sql = 'INSERT INTO '.$pre.'module_pwf_fielddata
 (prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
 			foreach ($obfield->XtraProps as $name=>$value) {
-				if (!is_array($value))
-					$value = array($value);
-				foreach ($value as $sval) {
-					$newid = $db->GenID($pre.'module_pwf_fielddata_seq');
-					if (strlen($sval) <= \PWForms::LENSHORTVAL) {
-						$lval = NULL;
-					} else {
-						$lval = $sval;
-						$sval = NULL;
-					}
-					$res = $db->Execute($sql,
-						array($newid,$obfield->Id,$obfield->FormId,$name,$sval,$lval)) && $res;
+				if (!is_scalar($value)) {
+					$value = json_encode($value);
 				}
-				unset($one);
+				$newid = $db->GenID($pre.'module_pwf_fielddata_seq');
+				if (strlen($value) <= \PWForms::LENSHORTVAL) {
+					$sval = $value;
+					$lval = NULL;
+				} else {
+					$sval = NULL;
+					$lval = $value;
+				}
+				$res = $db->Execute($sql,
+					array($newid,$obfield->Id,$obfield->FormId,$name,$sval,$lval)) && $res;
 			}
 		}
 		return $res;
@@ -226,7 +248,7 @@ class FieldOperations
 				$val = $row['value'];
 				if ($val === NULL)
 					$val = $row['longvalue']; //maybe still FALSE
-				//accumulate options with the same name into array
+				//accumulate properties with the same name into array
 				if (isset($merged[$nm])) {
 					if (!is_array($merged[$nm]))
 						$merged[$nm] = array($merged[$nm]);
@@ -236,6 +258,12 @@ class FieldOperations
 				}
 			}
 			foreach ($merged as $nm=>$val) {
+				if ($val && is_string($val) && ($val[0] == '[' || $val[0] == '{')) {
+					$ar = json_decode($val);
+					if (json_last_error() == JSON_ERROR_NONE) {
+						$val = is_array($ar) ? $ar : (array)$ar;
+					}
+				}
 				if (property_exists($obfield,$nm)) {
 					$obfield->$nm = $val;
 				} else {
