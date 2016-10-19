@@ -14,11 +14,13 @@
 {$tab_end}{$fieldstab_start}
  <div class="pageinput pageoverflow">
  {if !empty($fields)}
-  <div class="reordermsg pagemessage" style="display:none">
+  {if count($fields)>1}
+  <div class="reordermsg pagemessage">
   <p>{$help_can_drag}</p>
-  <div id="saveordermsg" style="display:none"><p>{$help_save_order}</p></div>
+  <div class="saveordermsg"><p>{$help_save_order}</p></div>
   </div>
-  <table id="fields" class="pagetable tabledrag">
+  {/if}
+  <table id="fields" class="pagetable{if count($fields)>1} tabledrag{/if}">
    <thead><tr>
   {if isset($title_field_id)}<th>{$title_field_id}</th>{/if}
     <th style="max-width:15em;">{$title_field_name}</th>
@@ -55,8 +57,8 @@
  <p>{$nofields}</p>
  {/if}
    <div class="addfast">
-    <p class="pagetext">{$title_fastadd}</p>
-    <div>{$input_fastadd}<br />{$help_fastadd}</div>
+    <p class="pagetext">{$title_fieldpick}</p>
+    <div>{$input_fieldpick}<br />{$help_fieldpick}</div>
    </div>
    <div class="addslow">{$add_field_link}</div>
   </div>
@@ -131,11 +133,13 @@
   <p>{$input_submit_javascript}</p>
  {if !empty($dispositions)}
   <p class="pagetext">{$title_form_dispositions}</p>
-  <div class="reordermsg pagemessage" style="display:none">
+  {if count($dispositions)>1}
+  <div class="reordermsg pagemessage">
   <p>{$help_can_drag}</p>
-  <div id="saveordermsg" style="display:none"><p>{$help_save_order}</p></div>
+  <div class="saveordermsg"><p>{$help_save_order}</p></div>
   </div>
-  <table id="dispositions" class="leftwards tabledrag">
+  {/if}
+  <table id="dispositions" class="leftwards{if count($dispositions)>1} tabledrag{/if}">
    <thead><tr>
     <th style="max-width:15em;">{$title_field_name}</th>
     <th style="max-width:20em;">{$title_field_type}</th>
@@ -166,8 +170,8 @@
  <p>{$nodispositions}</p>
  {/if}
  <div class="addfast">
-  <p class="pagetext">{$title_fastadd2}</p>
-  <div>{$input_fastadd2}<br />{$help_fastadd2}</div>
+  <p class="pagetext">{$title_fieldpick2}</p>
+  <div>{$input_fieldpick2}<br />{$help_fieldpick2}</div>
  </div>
  <div class="addslow">{$add_disposition_link}</div>
   <br />
@@ -187,6 +191,52 @@
   <p class="pagetext">{$title_inline_form}:</p>
   <p>{$input_inline_form}</p>
  </div>
+{$tab_end}{$externtab_start}
+ <div class="pageinput">
+ {if !empty($externals)}
+  <p class="pagetext">{$title_form_externals}</p>
+ {if count($externals)>1}
+  <div class="reordermsg pagemessage">
+  <p>{$help_can_drag}</p>
+  <div class="saveordermsg"><p>{$help_save_order}</p></div>
+  </div>
+  {/if}
+  <table id="externalfield" class="leftwards{if count($externals)>1} tabledrag{/if}">
+   <thead><tr>
+    <th style="max-width:15em;">{$title_field_name}</th>
+    <th style="max-width:20em;">{$title_field_type}</th>
+    <th style="max-width:25em;">{$title_information}</th>
+    <th class="updown" style="width:20px;">&nbsp;</th>
+    <th class="updown" style="width:20px;">&nbsp;</th>
+    <th class="pageicon"></th>
+    <th class="pageicon"></th>
+    <th class="pageicon"></th>
+   </tr></thead>
+   <tbody>
+  {foreach from=$externals item=entry}
+   {cycle name=fields values='row1,row2' assign=rowclass}
+  	 <tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
+     <td>{$entry->order}{$entry->name}</td>
+     <td>{$entry->type}</td>
+     <td>{$entry->field_status}</td>
+     <td class="updown">{$entry->up}</td>
+     <td class="updown">{$entry->down}</td>
+     <td>{$entry->editlink}</td>
+     <td>{$entry->copylink}</td>
+     <td>{$entry->deletelink}</td>
+     </tr>
+  {/foreach}
+   </tbody>
+  </table>
+ {else}
+ <p>{$noexternals}</p>
+ {/if}
+ <div class="addfast">
+  <p class="pagetext">{$title_fieldpick}</p>
+  <div>{$input_fieldpick3}<br />{$help_fieldpick3}</div>
+ </div>
+ <div class="addslow">{$add_external_link}</div>
+ </div>
 {$tab_end}
 {$tabs_end}
  <div class="pageoverflow">
@@ -194,5 +244,3 @@
   <p class="pageinput">{$save} {$cancel} {$apply}</p>
  </div>
 {$form_end}
-{if !empty($jsall)}{$jsall}
-{/if}
