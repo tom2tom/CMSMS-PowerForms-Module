@@ -94,6 +94,15 @@ label.radiolabel {
  vertical-align:0.2em;
 }
 
+div.reordermsg {
+ display:none;
+}
+
+div.saveordermsg {
+ display:none;
+ font-weight:bold;
+}
+
 /*multi-page submit buttons */
 .submit_current {}
 .submit_next {}
