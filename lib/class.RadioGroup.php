@@ -19,6 +19,7 @@ class RadioGroup extends FieldBase
 		$this->IsInput = TRUE;
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'RadioGroup';
+		$this->ValidationTypes = array();
 	}
 
 	public function GetOptionAddButton()
@@ -55,10 +56,6 @@ class RadioGroup extends FieldBase
 		else
 			$optionCount = 0;
 		$ret = $this->formdata->formsmodule->Lang('options',$optionCount);
-		if ($this->ValidationType) {
-			$this->EnsureArray($this->ValidationTypes);
-			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
-		}
 		return $ret;
 	}
 
@@ -80,7 +77,7 @@ class RadioGroup extends FieldBase
 	{
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
-		
+
 		$main[] = array($mod->Lang('title_radio_separator'),
 						$mod->CreateInputText($id,'pdt_radio_separator',
 							$this->GetProperty('radio_separator','&nbsp;&nbsp;'),15,25),
