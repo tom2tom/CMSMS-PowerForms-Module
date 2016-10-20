@@ -15,7 +15,7 @@ class FileUpload extends FieldBase
 		$this->IsSortable = FALSE;
 		$this->Type = 'FileUpload';
 		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = array($mod->Lang('validation_none')=>'none');
+		$this->ValidationTypes = array(); //$mod->Lang('validation_none')=>'none');
 	}
 
 	public function GetDisplayableValue($as_string=TRUE)

@@ -19,7 +19,7 @@ class DatePicker extends FieldBase
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'DatePicker';
 		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = array($mod->Lang('validation_none')=>'none');
+		$this->ValidationTypes = array(); //$mod->Lang('validation_none')=>'none');
 		$this->Months = array(
 			''=>'',
 			$mod->Lang('date_january')=>1,
