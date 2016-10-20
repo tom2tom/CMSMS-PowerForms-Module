@@ -107,7 +107,7 @@ class Pulldown extends FieldBase
 //			$main[] = array($mod->Lang('title_pulldown_details'),$dests);
 			return array('main'=>$main,'adv'=>$adv,'table'=>$dests);
 		} else {
-			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('item')));
+			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('member')));
 			return array('main'=>$main,'adv'=>$adv);
 		}
 	}
