@@ -334,7 +334,7 @@ class Utils
 			foreach ($imports as $classname) {
 				$classpath = 'PWForms\\'.$classname;
 				$params = array();
-				$formdata = $mod->GetFormData($params);
+				$formdata = $mod->_GetFormData($params);
 				$obfld = new $classpath($formdata,$params);
 				if ($obfld) {
 					$t = $obfld->GetDisplayType();
@@ -368,7 +368,7 @@ class Utils
 	{
 		if ($mod->field_types) {
 			$params = array();
-			$formdata = $mod->GetFormData($params);
+			$formdata = $mod->_GetFormData($params);
 			$classpath = 'PWForms\\'.$classname;
 			$obfld = new $classpath($formdata,$params);
 			if ($obfld) {
@@ -579,7 +579,7 @@ class Utils
 	For use when editing a form or field containing a template.
 	@mod: reference to PWForms module object
 	@id: id given to the Powerforms module on execution
-	@ctlName: name of the control, by convention like 'opt_'.field-opt-name,
+	@ctlName: name of the control, by convention like 'pdt_'.field-prop-name,
 		here, it may have appended suffix 'text'
 	@$button_label: text for button label
 	@template: template to be inserted into the control, upon button-click.
@@ -624,12 +624,12 @@ EOS;
 		and their respective values being boolean
 		e.g. for 3 controls:
 		array
-		  'opt_file_template' => array
+		  'pdt_file_template' => array
 			  'is_oneline' => true
-		  'opt_file_header' => array
+		  'pdt_file_header' => array
 			  'is_oneline' => true
 			  'is_header' => true
-		  'opt_file_footer' => array
+		  'pdt_file_footer' => array
 			  'is_oneline' => true
 			  'is_footer' => true
 	Returns: 2-member array
