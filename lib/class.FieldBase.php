@@ -31,7 +31,7 @@ class FieldBase implements \Serializable
 		'DisplayExternal' => FALSE, //whether field is for use in another module e.g. browser
 		'DisplayInForm' => TRUE,
 		'DisplayInSubmission' => TRUE, //whether field value is shown in submission template (if used) (effectively ~ self::IsInput)
-		'Disposable' => TRUE,
+		'Disposable' => TRUE, //a field-status, not so much a continuing property
 		'HasAddOp' => FALSE,
 		'HasDeleteOp' => FALSE,
 		'HasLabel' => TRUE,
@@ -713,15 +713,15 @@ class FieldBase implements \Serializable
 
 	/**
 	Store:
-	@deep: optional boolean, whether to also save all options for the field, default=FALSE
+	@allprops: optional boolean, whether to also save all field properties, default=FALSE
 	Stores (by insert or update) data for this field in database tables.
 	Multi-valued (array) options are saved merely as multiple records with same name
 	Sets field->Id to real value if it was -1 i.e. a new field
 	Returns: boolean T/F per success of executed db commands
 	*/
-	public function Store($deep=FALSE)
+	public function Store($allprops=FALSE)
 	{
-		return FieldOperations::StoreField($this,$deep);
+		return FieldOperations::StoreField($this,$allprops);
 	}
 
 	// Subclass this if needed to do stuff after the field is stored
@@ -935,17 +935,17 @@ class FieldBase implements \Serializable
 	{
 	}
 
-	//for cleanup after serialize()
+/*	// Cleanup after serialize()
 	protected function EnsureArray(&$val)
 	{
 		if (is_string($val)) {
 			$val = json_decode($val);
 		}
-		if (!is_array($val)) {
-			$val = array($val);
+		if (is_object($val)) {
+			$val = (array)$val;
 		}
 	}
-
+*/
 	public function __toString()
 	{
 		//no need to fully-document our 'parent'
