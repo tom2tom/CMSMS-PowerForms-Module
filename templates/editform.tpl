@@ -62,22 +62,13 @@
    </div>
    <div class="addslow">{$add_field_link}</div>
   </div>
-{$tab_end}{$designtab_start}
+{$tab_end}{$displaytab_start}
  <div class="pageinput pageoverflow">
-  <p class="pagetext">{$title_form_css_class}:</p>
-  <p>{$input_form_css_class}</p>
-  <p class="pagetext">{$title_form_required_symbol}:</p>
-  <p>{$input_form_required_symbol}</p>
-  <p class="pagetext">{$title_list_delimiter}:</p>
-  <p>{$input_list_delimiter}</p>
-  <p class="pagetext">{$title_form_unspecified}:</p>
-  <p>{$input_form_unspecified}</p>
-  <p class="pagetext">{$title_form_submit_button}:</p>
-  <p>{$input_form_submit_button}</p>
-  <p class="pagetext">{$title_form_next_button}:</p>
-  <p>{$input_form_next_button}</p>
-  <p class="pagetext">{$title_form_prev_button}:</p>
-  <p>{$input_form_prev_button}</p>
+ {foreach from=$displays item=entry}
+  <p class="pagetext">{$entry->title}:</p>
+  <div>{$entry->input}</div>
+  {if !empty($entry->help)}<p>{$entry->help}</p>{/if}
+ {/foreach}
  </div>
 {$tab_end}{$templatetab_start}
  <div class="pageinput">
@@ -115,22 +106,22 @@
  </div>
 {$tab_end}{$udttab_start}
  <div class="pageinput pageoverflow">
-{*<p class="pagetext">{$help_see_udt}</p>*}
   <p class="pagetext">{$title_form_predisplay_udt}:</p>
   <p>{$input_form_predisplay_udt}</p>
   <p class="pagetext">{$title_form_predisplay_each_udt}:</p>
   <p>{$input_form_predisplay_each_udt}</p>
   <p class="pagetext">{$title_form_validate_udt}:</p>
   <p>{$input_form_validate_udt}</p>
+  <br />
+  <p>{$help_udt}</p>
  </div>
 {$tab_end}{$submittab_start}
  <div class="pageinput pageoverflow">
-  <p class="pagetext">{$title_submit_limit}:</p>
-  <p>{$input_submit_limit}</p>
-  <p class="pagetext">{$title_submit_button_safety}:</p>
-  <p>{$input_submit_button_safety}</p>
-  <p class="pagetext">{$title_submit_javascript}:</p>
-  <p>{$input_submit_javascript}</p>
+ {foreach from=$presubmits item=entry}
+  <p class="pagetext">{$entry->title}:</p>
+  <div>{$entry->input}</div>
+  {if !empty($entry->help)}<p>{$entry->help}</p>{/if}
+ {/foreach}
  {if !empty($dispositions)}
   <p class="pagetext">{$title_form_dispositions}</p>
   {if count($dispositions)>1}
@@ -184,12 +175,14 @@
   <div id="tplobjects">
   <p class="pagetext">{$title_submit_template}:{$icon_info}</p>
   <div class="pageoverflow">{$input_submit_template}</div>
-  <p>{$help_submit_template}<br /><br />
-  {$sample_submit_template}</p>
+  <p>{$help_submit_template}<br /><br />{$sample_submit_template}</p>
   <div class="showhelp"><br />{$help_subtplvars}</div>
   </div>
-  <p class="pagetext">{$title_inline_form}:</p>
-  <p>{$input_inline_form}</p>
+ {foreach from=$postsubmits item=entry}
+  <p class="pagetext">{$entry->title}:</p>
+  <div>{$entry->input}</div>
+  {if !empty($entry->help)}<p>{$entry->help}</p>{/if}
+ {/foreach}
  </div>
 {$tab_end}{$externtab_start}
  <div class="pageinput">
@@ -239,8 +232,5 @@
  </div>
 {$tab_end}
 {$tabs_end}
- <div class="pageoverflow">
-  <br />
-  <p class="pageinput">{$save} {$cancel} {$apply}</p>
- </div>
+<div class="pageinput" style="margin-top:1em;">{$save} {$cancel} {$apply}</div>
 {$form_end}
