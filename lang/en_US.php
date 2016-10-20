@@ -698,7 +698,6 @@ $lang['link_label'] = 'Link Label';
 
 $lang['maximum'] = 'maximum';
 $lang['maximum_size'] = 'Max. Size';
-$lang['members'] = 'Members';
 $lang['mcrypt'] = 'PHP mcrypt Library';
 $lang['merid'] = 'Meridian';
 $lang['min'] = 'Minute';
@@ -713,6 +712,7 @@ $lang['admin'] = 'admininstrator';
 $lang['destination'] = 'destination address';
 $lang['file'] = 'file';
 $lang['item'] = 'item';
+$lang['member'] = 'member';
 $lang['page'] = 'website page';
 $lang['source'] = 'source address';
 $lang['subject'] = 'email subject';
