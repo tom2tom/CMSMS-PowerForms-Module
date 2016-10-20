@@ -30,9 +30,9 @@ $sqlarray = $dict->DropIndexSQL($pre.'module_pwf_field_idx',$pre.'module_pwf_fie
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_field');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_fielddata_idx',$pre.'module_pwf_fielddata');
+$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_fieldprops_idx',$pre.'module_pwf_fieldprops');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropTableSQL($pre.'module_pwf_fielddata');
+$sqlarray = $dict->DropTableSQL($pre.'module_pwf_fieldprops');
 $dict->ExecuteSQLArray($sqlarray);
 /*MUTEX
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_flock');
@@ -42,9 +42,9 @@ $sqlarray = $dict->DropIndexSQL($pre.'module_pwf_form_idx',$pre.'module_pwf_form
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_form');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_formdata_idx',$pre.'module_pwf_formdata');
+$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_formprops_idx',$pre.'module_pwf_formprops');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropTableSQL($pre.'module_pwf_formdata');
+$sqlarray = $dict->DropTableSQL($pre.'module_pwf_formprops');
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_cache');
 $dict->ExecuteSQLArray($sqlarray);
@@ -56,9 +56,9 @@ $sqlarray = $dict->DropTableSQL($pre.'module_pwf_trans');
 $dict->ExecuteSQLArray($sqlarray);
 
 $db->DropSequence($pre.'module_pwf_field_seq');
-$db->DropSequence($pre.'module_pwf_fielddata_seq');
+$db->DropSequence($pre.'module_pwf_fieldprops_seq');
 $db->DropSequence($pre.'module_pwf_form_seq');
-$db->DropSequence($pre.'module_pwf_formdata_seq');
+$db->DropSequence($pre.'module_pwf_formprops_seq');
 $db->DropSequence($pre.'module_pwf_record_seq');
 $db->DropSequence($pre.'module_pwf_uniquefield_seq');
 

@@ -217,7 +217,7 @@ EOS;
 		}
 	}
 
-	$sql = 'SELECT prop_id,value,longvalue FROM '.$pre.'module_pwf_formdata WHERE form_id=? AND name=\'submission_template\'';
+	$sql = 'SELECT prop_id,value,longvalue FROM '.$pre.'module_pwf_formprops WHERE form_id=? AND name=\'submission_template\'';
 	$row = $db->GetRow($sql,array($newfid));
 	if ($row) {
 		$sval = $row['value'];
@@ -228,7 +228,7 @@ EOS;
 			$tpl = str_replace($finds,$repls,$lval);
 		}
 		if ($sval || $lval) {
-			$sql = 'UPDATE '.$pre.'module_pwf_formdata SET value=?,longvalue=? WHERE prop_id=?';
+			$sql = 'UPDATE '.$pre.'module_pwf_formprops SET value=?,longvalue=? WHERE prop_id=?';
 			$args = (strlen($tpl) <= PWForms::LENSHORTVAL) ?
 				array($tpl,NULL,$row['prop_id']):
 				array(NULL,$tpl,$row['prop_id']);
@@ -236,10 +236,10 @@ EOS;
 		}
 	}
 
-	$sql = 'SELECT prop_id,value,longvalue FROM '.$pre.'module_pwf_fielddata WHERE form_id=? AND name LIKE\'%template%\'';
+	$sql = 'SELECT prop_id,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE form_id=? AND name LIKE\'%template%\'';
 	$rows = $db->GetArray($sql,array($newfid));
 	if ($rows) {
-		$sql = 'UPDATE '.$pre.'module_pwf_fielddata SET value=?,longvalue=? WHERE prop_id=?';
+		$sql = 'UPDATE '.$pre.'module_pwf_fieldprops SET value=?,longvalue=? WHERE prop_id=?';
 		foreach ($rows as &$row) {
 			$sval = $row['value'];
 			$lval = $row['longvalue'];
@@ -265,18 +265,18 @@ EOS;
 	$data = $db->GetArray($sql,array($oldfid,$oldf));
 	if ($data) {
 		$fbfields = array_keys($data[0]);
-		$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_fielddata');
+		$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_fieldprops');
 		if (!$pfrow) {
-			$db->Execute('INSERT INTO '.$pre.'module_pwf_fielddata (prop_id) VALUES (-1)');
-			$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_fielddata');
-			$db->Execute('DELETE FROM '.$pre.'module_pwf_fielddata WHERE prop_id=-1');
+			$db->Execute('INSERT INTO '.$pre.'module_pwf_fieldprops (prop_id) VALUES (-1)');
+			$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_fieldprops');
+			$db->Execute('DELETE FROM '.$pre.'module_pwf_fieldprops WHERE prop_id=-1');
 		}
 		$pwfields = array_keys($pfrow);
 		$pfrow = array_fill_keys($pwfields,NULL); //default values
 
 		$namers = implode(',',$pwfields);
 		$fillers = str_repeat('?,',count($pwfields)-1);
-		$sql = 'INSERT INTO '.$pre.'module_pwf_fielddata ('.$namers.') VALUES ('.$fillers.'?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_fieldprops ('.$namers.') VALUES ('.$fillers.'?)';
 		//TODO support insert into $pre.'module_pwf_field' if relevant
 
 		//some field-types simply repeat the same option-name (relying on save-order for any reconciliation!)
@@ -322,7 +322,7 @@ EOS;
 			$field_id = $newf;
 			$form_id = $newfid;
 
-			$pid = $db->GenID($pre.'module_pwf_fielddata_seq');
+			$pid = $db->GenID($pre.'module_pwf_fieldprops_seq');
 			$args = array($pid);
 			foreach ($pwfields as $one) {
 				if ($one != 'prop_id') {
@@ -346,7 +346,7 @@ EOS;
 			}
 			$field_id = $newf;
 			$form_id = $newfid;
-			$pid = $db->GenID($pre.'module_pwf_fielddata_seq');
+			$pid = $db->GenID($pre.'module_pwf_fieldprops_seq');
 			$args = array($pid);
 			foreach ($pwfields as $one) {
 				if ($one != 'prop_id') {
@@ -440,7 +440,7 @@ EOS;
 	$data = $db->GetArray($sql,array($oldfid));
 	if ($data) {
 		//TODO support insert into $pre.'module_pwf_form' if relevant
-		$sql = 'INSERT INTO '.$pre.'module_pwf_formdata
+		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops
 (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
 		foreach ($data as $row) {
 			if (strpos($row['name'],'captcha') !== FALSE) //ignore redundant options
@@ -475,7 +475,7 @@ EOS;
 				}
 				break;
 			}
-			$newid = $db->GenID($pre.'module_pwf_formdata_seq');
+			$newid = $db->GenID($pre.'module_pwf_formprops_seq');
 			$ares = $db->Execute($sql,array($newid,$newfid,$name,$val,$longval));
 		}
 	}

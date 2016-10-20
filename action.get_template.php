@@ -10,7 +10,7 @@
 if (preg_match('/\.tpl$/',$params['tid']))
     $tplstr = ''.@file_get_contents(cms_join_path(__DIR__,'templates',$params['tid']));
 else {
-	$sql = 'SELECT value,longvalue FROM '.cms_db_prefix().'module_pwf_formdata WHERE form_id=? AND name=\'form_template\'';
+	$sql = 'SELECT value,longvalue FROM '.cms_db_prefix().'module_pwf_formprops WHERE form_id=? AND name=\'form_template\'';
 	$data = $db->GetRow($sql,array($params['tid']));
 	$tplstr = $data['longvalue'];
 	if (!$tplstr) $tplstr = $data['value'];
