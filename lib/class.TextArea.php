@@ -24,7 +24,9 @@ class TextArea extends FieldBase
 	public function GetFieldStatus()
 	{
 		if ($this->ValidationType) {
-			$this->EnsureArray($this->ValidationTypes);
+//			$this->EnsureArray($this->ValidationTypes);
+			if (is_object($this->ValidationTypes))
+				$this->ValidationTypes = (array)$this->ValidationTypes;
 			$ret = array_search($this->ValidationType,$this->ValidationTypes);
 		} else
 			$ret = '';

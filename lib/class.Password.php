@@ -29,7 +29,9 @@ class Password extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$ret = $mod->Lang('abbreviation_length',$this->GetProperty('length','80'));
 		if ($this->ValidationType) {
-			$this->EnsureArray($this->ValidationTypes);
+//			$this->EnsureArray($this->ValidationTypes);
+			if (is_object($this->ValidationTypes))
+				$this->ValidationTypes = (array)$this->ValidationTypes;
 			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
 		}
 		if ($this->GetProperty('readonly',0))

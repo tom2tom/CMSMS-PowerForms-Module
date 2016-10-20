@@ -29,7 +29,9 @@ class Passphrase extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$ret = $mod->Lang('abbreviation_length',$this->GetProperty('min_length','8'));
 		if ($this->ValidationType) {
-			$this->EnsureArray($this->ValidationTypes);
+//			$this->EnsureArray($this->ValidationTypes);
+			if (is_object($this->ValidationTypes))
+				$this->ValidationTypes = (array)$this->ValidationTypes;
 			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
 		}
 		$ret .= ','.$mod->Lang('rows',$this->GetProperty('rows',2)).
