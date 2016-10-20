@@ -48,7 +48,7 @@ class FieldOperations
 			}
 		} elseif (!empty($params['field_pick'])) { //addition triggered by open_form field-picker change/choice
 			// specified field type via params
-			$className = Utils::MakeClassName($params['field_type']);
+			$className = Utils::MakeClassName($params['field_pick']);
 			$classPath = __DIR__.DIRECTORY_SEPARATOR.'class.'.$className.'.php';
 			if (is_file($classPath)) {
 				$classPath = 'PWForms\\'.$className;
@@ -86,7 +86,7 @@ class FieldOperations
 	@field_id: field enumerator
 	@form_id: optional form enumerator, default FALSE to use the form for @field_id
 	@neworder: optional display-order for the field, default FALSE to place it last
-	'hard' copy an existing field i.e. from and to the database
+	Copy an existing field from and to the database
 	Returns: boolean T/F indicating success
 	*/
 	public static function CopyField($field_id, $form_id=FALSE, $neworder=FALSE)
@@ -118,13 +118,13 @@ class FieldOperations
 (field_id,form_id,name,alias,type,order_by) VALUES (?,?,?,?,?,?)';
 		$db->Execute($sql,$row);
 
-		$sql = 'SELECT * FROM '.$pre.'module_pwf_fielddata WHERE field_id=?';
+		$sql = 'SELECT * FROM '.$pre.'module_pwf_fieldprops WHERE field_id=?';
 		$rs = $db->Execute($sql,array($field_id));
 		if ($rs) {
-			$sql = 'INSERT INTO '.$pre.'module_pwf_fielddata
+			$sql = 'INSERT INTO '.$pre.'module_pwf_fieldprops
 (prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
 			while ($row = $rs->FetchRow()) {
-				$row['prop_id'] = $db->GenID($pre.'module_pwf_fielddata_seq');
+				$row['prop_id'] = $db->GenID($pre.'module_pwf_fieldprops_seq');
 				$row['field_id'] = $fid;
 				$row['form_id'] = $form_id;
 				$db->Execute($sql,$row);
@@ -156,13 +156,13 @@ class FieldOperations
 	/**
 	StoreField:
 	@obfield: reference to field data object
-	@deep: optional boolean, whether to also save all options for the field, default=FALSE
+	@allprops: optional boolean, whether to also save all field properties, default=FALSE
 	Stores (by insert or update) data for @obfield in database tables.
 	Multi-valued (array) options are saved merely as multiple records with same name
 	Sets @obfield->Id to real value if it was -1 i.e. a new field
 	Returns: boolean T/F per success of executed db commands
 	*/
-	public static function StoreField(&$obfield, $deep=FALSE)
+	public static function StoreField(&$obfield, $allprops=FALSE)
 	{
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
@@ -186,18 +186,18 @@ class FieldOperations
 				$obfield->Id));
 		}
 
-		if ($deep) {
+		if ($allprops) {
 			// drop all current properties
-			$sql = 'DELETE FROM '.$pre.'module_pwf_fielddata where field_id=?';
+			$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops where field_id=?';
 			$res = $db->Execute($sql,array($obfield->Id)) && $res;
 			// add back current ones
-			$sql = 'INSERT INTO '.$pre.'module_pwf_fielddata
+			$sql = 'INSERT INTO '.$pre.'module_pwf_fieldprops
 (prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
 			foreach ($obfield->XtraProps as $name=>$value) {
 				if (!is_scalar($value)) {
 					$value = json_encode($value);
 				}
-				$newid = $db->GenID($pre.'module_pwf_fielddata_seq');
+				$newid = $db->GenID($pre.'module_pwf_fieldprops_seq');
 				if (strlen($value) <= \PWForms::LENSHORTVAL) {
 					$sval = $value;
 					$lval = NULL;
@@ -237,7 +237,7 @@ class FieldOperations
 
 		$obfield->loaded = TRUE;
 
-		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_fielddata WHERE field_id=? ORDER BY prop_id';
+		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE field_id=? ORDER BY prop_id';
 		$defaults = $db->GetArray($sql,array($obfield->Id));
 		if ($defaults) {
 			$merged = array();
@@ -285,7 +285,7 @@ class FieldOperations
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field where field_id=?';
 		$db = \cmsms()->GetDb();
 		$res = $db->Execute($sql,array($obfield->Id));
-		$sql = 'DELETE FROM '.$pre.'module_pwf_fielddata where field_id=?';
+		$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops where field_id=?';
 		$res = $db->Execute($sql,array($obfield->Id)) && $res;
 		return $res;
 	}

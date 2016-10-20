@@ -7,57 +7,6 @@
 
 namespace PWForms;
 
-//for sorting field display-orders
-/*class SortOrdersClosure
-{
-	private $fields;
-	private $orders;
-
-	public function __construct(&$fields, &$orders)
-	{
-		$this->fields = $fields;
-		$this->orders = $orders;
-	}
-
-	public function compare($a, $b)
-	{
-		$fa = $this->fields[$this->orders[$a]];
-		$fb = $this->fields[$this->orders[$b]];
-		if ($fa->DisplayExternal == $fb->DisplayExternal) {
-			if ($fa->IsDisposition) {
-				if ($fb->IsDisposition) {
-					if ($fb->DisplayInForm) //email confirmation first
-						return 1;
-					elseif ($fa->DisplayInForm)
-						return -1;
-				} elseif (!$fa->DisplayInForm)
-					return 1;
-			} elseif ($fb->IsDisposition) {
-				if (!$fb->DisplayInForm)
-					return 1;
-			}
-			//TODO field type '...start' before corresponding type '...end'
-			return $a - $b; //stet current order
-		}
-		return ($fa->DisplayExternal - $fb->DisplayExternal);
-	}
-}
-
-//for filtering field options
-class IsFieldOption
-{
-	private $id;
-	public function __construct($id)
-	{
-		$this->id = $id;
-	}
-
-	public function isMine($fieldopt)
-	{
-		return $fieldopt['field_id'] == $this->id;
-	}
-}
-*/
 class FormOperations
 {
 	//for CMSMS 2+
@@ -147,7 +96,7 @@ EOS;
 	Delete:
 	@mod: reference to the current PWForms module object
 	@form_id: enumerator of form to be processed
-	Returns: boolean TRUE/FALSE whether deletion succeeded
+	Returns: boolean T/F indicating whether deletion succeeded
 	*/
 	public function Delete(&$mod, $form_id)
 	{
@@ -176,12 +125,12 @@ EOS;
 		$sql = 'DELETE FROM '.$pre.'module_pwf_trans WHERE new_id=? AND isform=1';
 		$db = \cmsms()->GetDb();
 		$db->Execute($sql,array($form_id));
-		$sql = 'DELETE FROM '.$pre.'module_pwf_fielddata WHERE form_id=?';
+		$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops WHERE form_id=?';
 		$res = $db->Execute($sql,array($form_id));
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field WHERE form_id=?';
 		if (!$db->Execute($sql,array($form_id)))
 			$res = FALSE;
-		$sql = 'DELETE FROM '.$pre.'module_pwf_formdata WHERE form_id=?';
+		$sql = 'DELETE FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
 		if (!$db->Execute($sql,array($form_id)))
 			$res = FALSE;
 		$sql = 'DELETE FROM '.$pre.'module_pwf_form WHERE form_id=?';
@@ -242,10 +191,10 @@ EOS;
 		$db->Execute($sql,array($newid,$name,$alias));
 
 		$res = TRUE;
-		$sql = 'INSERT INTO '.$pre.'module_pwf_formdata
+		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops
 (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
 		foreach ($formdata->XtraProps as $key=>&$val) {
-			$newid = $db->GenID($pre.'module_pwf_formdata_seq');
+			$newid = $db->GenID($pre.'module_pwf_formprops_seq');
 			$longval = NULL;
 			if ($key == 'form_template') {
 				if ($mod->before20)
@@ -317,8 +266,8 @@ EOS;
 		if ($res == FALSE)
 			return array(FALSE,$mod->Lang('database_error'));
 
-		$sql = 'INSERT INTO '.$pre.'module_pwf_formdata (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
-		$sql2 = 'UPDATE '.$pre.'module_pwf_formdata SET value=?,longvalue=? WHERE form_id=? AND name=?';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
+		$sql2 = 'UPDATE '.$pre.'module_pwf_formprops SET value=?,longvalue=? WHERE form_id=? AND name=?';
 
 		//store form options
 		foreach ($params as $key=>$val) {
@@ -354,7 +303,7 @@ EOS;
 					$val = NULL;
 				}
 				if ($newform) {
-					$newid = $db->GenID($pre.'module_pwf_formdata_seq');
+					$newid = $db->GenID($pre.'module_pwf_formprops_seq');
 					if (!$db->Execute($sql,array($newid,$form_id,$key,$val,$longval)))
 						return array(FALSE,$mod->Lang('database_error'));
 				} else {
@@ -366,7 +315,7 @@ EOS;
 		}
 
 		if (!$newform) {
-			$sql = 'DELETE FROM '.$pre.'module_pwf_formdata WHERE form_id=?';
+			$sql = 'DELETE FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
 			$args = array(-1=>$form_id);
 			if ($done) {
 				$fillers = str_repeat('?,',count($done)-1);
@@ -424,7 +373,7 @@ EOS;
 			$formdata->Alias = $row['alias'];
 
 		//no form data value is an array, so no records with same name
-		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_formdata WHERE form_id=?';
+		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
 		$data = $db->GetArray($sql,array($form_id));
 		foreach ($data as $one) {
 			$nm = $one['name'];
@@ -553,9 +502,9 @@ EOS;
 \t<date>{$date}</date>
 \t<count>{$count}</count>
 EOS;
-		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_formdata WHERE form_id=? ORDER BY name';
+		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_formprops WHERE form_id=? ORDER BY name';
 		$sql2 = 'SELECT field_id,name,type,order_by FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
-		$sql3 = 'SELECT prop_id,field_id,name,value,longvalue FROM '.$pre.'module_pwf_fielddata WHERE form_id=? ORDER BY prop_id,name';
+		$sql3 = 'SELECT prop_id,field_id,name,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE form_id=? ORDER BY prop_id,name';
 		$formpropkeys = array_keys($properties);
 
 		foreach ($form_id as $one) {
@@ -770,10 +719,10 @@ EOS;
 			unset($fdata['properties']['name']);
 			unset($fdata['properties']['alias']);
 
-			$sql = 'INSERT INTO '.$pre.'module_pwf_formdata
+			$sql = 'INSERT INTO '.$pre.'module_pwf_formprops
 (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
 			foreach ($fdata['properties'] as $name=>&$one) {
-				$prop_id = $db->GenID($pre.'module_pwf_formdata_seq');
+				$prop_id = $db->GenID($pre.'module_pwf_formprops_seq');
 				if (strncmp($one,']][[',4) != 0)
 					$val = $one;
 				else { //encoded value
@@ -800,7 +749,7 @@ EOS;
 			unset($one);
 			$sql = 'INSERT INTO '.$pre.'module_pwf_field
 (field_id,form_id,name,alias,type,order_by) VALUES (?,?,?,?,?,?)';
-			$sql2 = 'INSERT INTO '.$pre.'module_pwf_fielddata
+			$sql2 = 'INSERT INTO '.$pre.'module_pwf_fieldprops
 (prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
 			foreach ($fdata['fields'] as &$fld) {
 				$field_id = $db->GenID($pre.'module_pwf_field_seq');
@@ -816,7 +765,7 @@ EOS;
 				$db->Execute($sql,array($field_id,$form_id,$name,$alias,$type,$order_by));
 
 				foreach ($fld['properties'] as $name=>&$one) {
-					$prop_id = $db->GenID($pre.'module_pwf_fielddata_seq');
+					$prop_id = $db->GenID($pre.'module_pwf_fieldprops_seq');
 					if (strncmp($one,']][[',4) !== 0)
 						$val = $one;
 					else //encoded
