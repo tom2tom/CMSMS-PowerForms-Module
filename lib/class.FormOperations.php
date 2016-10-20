@@ -345,16 +345,21 @@ EOS;
 
 	/**
 	Load:
-	Create and populate a FormData object from database tables and/or from
-		suitably-keyed members of @params
+	Create a FormData object (including all fields) with values populated
+	 from database tables and/or from suitably-keyed members of @params.
+	 For the latter, @params keys may be
+	 $formdata->current_prefix.<FID> or $formdata->prior_prefix.<FID> or
+	 'value_'.<FIELDNAME> or 'value_fld'.<FID>
+	 where <FID> is the relevant field_id enumerator, <FIELDNAME> is recorded fieldname
+	 If present, @params['field_id'] = <FID> generates a field per that id
 	@mod: reference to PWForms module object
 	@form_id: enumerator of form to be processed
 	@id: module id
 	@params: reference to array of request-parameters
 	@withtemplates: optional boolean whether to also load templates, default FALSE
-	Returns: reference to a FormData object, or FALSE
+	Returns: a FormData object, or FALSE
 	*/
-	public function &Load(&$mod, $form_id, $id, &$params, $withtemplates=FALSE)
+	public function Load(&$mod, $form_id, $id, &$params, $withtemplates=FALSE)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT name,alias FROM '.$pre.'module_pwf_form WHERE form_id=?';
@@ -431,7 +436,7 @@ EOS;
 					(isset($params['field_id']) && $params['field_id'] == $fid)
 				  )
 				{
-					$row = array_merge($row,$params);
+					$row = array_merge($row,$params); //make field id/values available
 				}
 				// create the field object
 				$obfield = FieldOperations::NewField($formdata,$row);
@@ -698,7 +703,7 @@ EOS;
 	ImportXML:
 	@mod: reference to the current PWForms module object
 	@xmlfile:
-	Returns boolean T/F
+	Returns boolean T/F indicating success
 	*/
 	public function ImportXML(&$mod, $xmlfile)
 	{

@@ -12,13 +12,18 @@ class FieldOperations
 	/**
 	NewField:
 	@formdata: reference to FormData-class object to be set in the field
-	@params: reference to array of request parameters or table-row fields
-	Constructs new field-object per $params['field_id'] or $params['field_type']
+	@params: reference to array of table-row fields and/or request parameters,
+	 should include 'field_id' (in which case, maybe 'type' too) or 'field_pick'
+	 @params representing wanted values may be present, with keys:
+	 $formdata->current_prefix.<FID> or $formdata->prior_prefix.<FID> or
+	 'value_'.<FIELDNAME> or 'value_fld'.<FID>
+	 where <FID> is the relevant field enumerator, <FIELDNAME> is recorded fieldname
+	Constructs new field-object per $params['field_id'] or $params['field_pick']
 	Returns: the object, or FALSE
 	*/
 	public static function NewField(&$formdata, &$params)
 	{
-		$obfield = FALSE;//may need ref to this
+		$obfield = FALSE;
 		if (!empty($params['field_id'])) {
 			// we're loading an extant field
 			if (empty($params['type'])) {
@@ -37,8 +42,12 @@ class FieldOperations
 					$classPath = 'PWForms\\'.$className;
 					$obfield = new $classPath($formdata,$params);
 					if (self::LoadField($obfield)) {
-//TODO rationalise current-property setting
-						if (!empty($params['value_'.$obfield->Name])) {
+//TODO rationalise value setting
+						if (!empty($params[$formdata->current_prefix.$obfield->Id])) {
+							$obfield->SetValue($params[$formdata->current_prefix.$obfield->Id]);
+						} elseif (!empty($params[$formdata->prior_prefix.$obfield->Id])) {
+							$obfield->SetValue($params[$formdata->prior_prefix.$obfield->Id]);
+						} elseif (!empty($params['value_'.$obfield->Name])) {
 							$obfield->SetValue($params['value_'.$obfield->Name]);
 						} elseif (!empty($params['value_fld'.$obfield->Id])) {
 							$obfield->SetValue($params['value_fld'.$obfield->Id]);
@@ -46,7 +55,7 @@ class FieldOperations
 					}
 				}
 			}
-		} elseif (!empty($params['field_pick'])) { //addition triggered by open_form field-picker change/choice
+		} elseif (!empty($params['field_pick'])) { //new field triggered by open_form field-picker change/choice
 			// specified field type via params
 			$className = Utils::MakeClassName($params['field_pick']);
 			$classPath = __DIR__.DIRECTORY_SEPARATOR.'class.'.$className.'.php';
