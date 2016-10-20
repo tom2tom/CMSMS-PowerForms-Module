@@ -20,7 +20,7 @@ $t = $this->StartTabHeaders().
 if ($form_id > 0)
 	$t .= $this->SetTabHeader('fieldstab',$this->Lang('tab_fields'),($tab == 'fieldstab'));
 $t .=
-	$this->SetTabHeader('designtab',$this->Lang('tab_design'),($tab == 'designtab')).
+	$this->SetTabHeader('displaytab',$this->Lang('tab_display'),($tab == 'displaytab')).
 	$this->SetTabHeader('templatetab',$this->Lang('tab_templatelayout'),($tab == 'templatetab')).
 	$this->SetTabHeader('udttab',$this->Lang('tab_udt'),($tab == 'udttab')).
 	$this->SetTabHeader('submittab',$this->Lang('tab_submit'),($tab == 'submittab')).
@@ -32,7 +32,7 @@ if ($form_id > 0)
 $tplvars = $tplvars + array(
 	'tabs_end' => $this->EndTabContent(),
 	'maintab_start' => $this->StartTab('maintab'),
-	'designtab_start' => $this->StartTab('designtab'),
+	'displaytab_start' => $this->StartTab('displaytab'),
 	'templatetab_start' => $this->StartTab('templatetab'),
 	'udttab_start' => $this->StartTab('udttab'),
 	'submittab_start' => $this->StartTab('submittab'),
@@ -56,16 +56,8 @@ $tplvars = $tplvars + array(
 	'title_field_required_abbrev' => $this->Lang('title_field_required_abbrev'),
 	'title_field_type' => $this->Lang('title_field_type'),
 
-	'title_form_css_class' => $this->Lang('title_form_css_class'),
-	'input_form_css_class' => $this->CreateInputText($id,'pdt_css_class',
-		PWForms\Utils::GetFormOption($formdata,'css_class','powerform'),50,50),
-
 	'title_form_fields' => $this->Lang('title_form_fields'),
 	'title_form_main' => $this->Lang('title_form_main'),
-
-	'title_form_unspecified' => $this->Lang('title_form_unspecified'),
-	'input_form_unspecified' =>	$this->CreateInputText($id,'pdt_unspecified',
-		PWForms\Utils::GetFormOption($formdata,'unspecified',$this->Lang('unspecified')),30),
 
 	'title_information' => $this->Lang('information'),
 //	'title_order' => $this->Lang('order'),
@@ -338,7 +330,7 @@ if ($selfield == 'basic') {
 		array('active_tab'=>'fieldstab','selectfields'=>'basic') + $linkargs);
 }
 
-//dispositions 
+//dispositions
 $t = $this->Lang('title_add_new_disposition');
 $tplvars['title_fieldpick2'] = $t;
 $tplvars['add_disposition_link'] =
@@ -413,80 +405,53 @@ function add_field(selector,scope) {
 }
 EOS;
 
-//no scope for !empty() checks for boolean attrs, so we add hidden 0 for checkboxes
-$tplvars['title_inline_form'] = $this->Lang('title_inline_form');
-$tplvars['input_inline_form'] =
-	$this->CreateInputHidden($id,'pdt_inline',0).
-	$this->CreateInputCheckbox($id,'pdt_inline',1,
-		PWForms\Utils::GetFormOption($formdata,'inline',0)).'<br />'.
-	$this->Lang('help_inline_form');
+//====== DISPLAY TAB
+$displays = array();
 
-$tplvars['title_form_submit_button'] = $this->Lang('title_form_submit_button');
-$tplvars['input_form_submit_button'] =
-	$this->CreateInputText($id,'pdt_submit_button_text',
-		PWForms\Utils::GetFormOption($formdata,'submit_button_text',$this->Lang('button_submit')),35,35);
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_form_required_symbol');
+$oneset->input = $this->CreateInputText($id,'pdt_required_field_symbol',
+	PWForms\Utils::GetFormOption($formdata,'required_field_symbol','*'),3);
+$displays[] = $oneset;
 
-$tplvars['title_submit_button_safety'] = $this->Lang('title_submit_button_safety');
-$tplvars['input_submit_button_safety'] =
-	$this->CreateInputHidden($id,'pdt_input_button_safety',0).
-	$this->CreateInputCheckbox($id,'pdt_input_button_safety',1,
-		PWForms\Utils::GetFormOption($formdata,'input_button_safety',0)).'<br />'.
-	$this->Lang('help_submit_safety');
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_form_submit_button');
+$oneset->input = $this->CreateInputText($id,'pdt_submit_button_text',
+	PWForms\Utils::GetFormOption($formdata,'submit_button_text',$this->Lang('button_submit')),30);
+$displays[] = $oneset;
 
-$tplvars['title_form_prev_button'] = $this->Lang('title_form_prev_button');
-$tplvars['input_form_prev_button'] =
-	$this->CreateInputText($id,'pdt_prev_button_text',
-		PWForms\Utils::GetFormOption($formdata,'prev_button_text',$this->Lang('button_previous')),35,35);
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_form_next_button');
+$oneset->input = $this->CreateInputText($id,'pdt_next_button_text',
+	PWForms\Utils::GetFormOption($formdata,'next_button_text',$this->Lang('button_continue')),30);
+$displays[] = $oneset;
 
-$tplvars['title_form_next_button'] = $this->Lang('title_form_next_button');
-$tplvars['input_form_next_button'] =
-	$this->CreateInputText($id,'pdt_next_button_text',
-		PWForms\Utils::GetFormOption($formdata,'next_button_text',$this->Lang('button_continue')),35,35);
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_form_prev_button');
+$oneset->input = $this->CreateInputText($id,'pdt_prev_button_text',
+	PWForms\Utils::GetFormOption($formdata,'prev_button_text',$this->Lang('button_previous')),30);
+$displays[] = $oneset;
 
-$usertagops = cmsms()->GetUserTagOperations();
-$usertags = $usertagops->ListUserTags();
-$usertaglist = array();
-$usertaglist[$this->Lang('none')] = '';
-foreach ($usertags as $key => $value)
-	$usertaglist[$value] = $key;
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_form_css_class');
+$oneset->input = $this->CreateInputText($id,'pdt_css_class',
+	PWForms\Utils::GetFormOption($formdata,'css_class','powerform'),30);
+$displays[] = $oneset;
 
-$tplvars['title_form_predisplay_udt'] = $this->Lang('title_form_predisplay_udt');
-$tplvars['input_form_predisplay_udt'] =
-	$this->CreateInputDropdown($id,'pdt_predisplay_udt',$usertaglist,-1,
-		PWForms\Utils::GetFormOption($formdata,'predisplay_udt'));
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_form_css_file');
+$oneset->input = $this->CreateInputText($id,'pdt_css_file',
+	PWForms\Utils::GetFormOption($formdata,'css_file',''),40);
+$oneset->help = $this->Lang('help_form_css_file');
+$displays[] = $oneset;
 
-$tplvars['title_form_predisplay_each_udt'] = $this->Lang('title_form_predisplay_each_udt');
-$tplvars['input_form_predisplay_each_udt'] =
-	$this->CreateInputDropdown($id,'pdt_predisplay_each_udt',$usertaglist,-1,
-		PWForms\Utils::GetFormOption($formdata,'predisplay_each_udt'));
+$tplvars['displays'] = $displays;
 
-$tplvars['title_form_validate_udt'] = $this->Lang('title_form_validate_udt');
-$tplvars['input_form_validate_udt'] =
-	$this->CreateInputDropdown($id,'pdt_validate_udt',$usertaglist,-1,
-		PWForms\Utils::GetFormOption($formdata,'validate_udt'));
+//TODO file-upload controls
 
-$tplvars['title_form_required_symbol'] = $this->Lang('title_form_required_symbol');
-$tplvars['input_form_required_symbol'] =
-	 $this->CreateInputText($id,'pdt_required_field_symbol',
-		PWForms\Utils::GetFormOption($formdata,'required_field_symbol','*'),5);
+//====== TEMPLATE TAB
 
-$tplvars['title_list_delimiter'] = $this->Lang('title_list_delimiter');
-$tplvars['input_list_delimiter'] =
-	$this->CreateInputText($id,'pdt_list_delimiter',
-		PWForms\Utils::GetFormOption($formdata,'list_delimiter',','),5);
-
-$tplvars['title_submit_javascript'] = $this->Lang('title_submit_javascript');
-$tplvars['input_submit_javascript'] =
-	$this->CreateTextArea(FALSE,$id,PWForms\Utils::GetFormOption($formdata,'submit_javascript',''),
-		'pdt_submit_javascript','pwf_shortarea','submit_javascript',
-		'','',50,8).
-		'<br />'.$this->Lang('help_submit_javascript');
-
-$tplvars['title_submit_limit'] = $this->Lang('title_submit_limit');
-$tplvars['input_submit_limit'] =
-	$this->CreateInputText($id,'pdt_submit_limit',
-		PWForms\Utils::GetFormOption($formdata,'submit_limit',$this->GetPreference('submit_limit')),3,5);
-
+$thisLink = $this->CreateLink($id,'get_template',$returnid,'',array(),'',TRUE);
 $templateList = array(''=>'',
 	$this->Lang('default_template')=>'defaultform.tpl',
 	$this->Lang('table_left_template')=>'tableform_lefttitles.tpl',
@@ -498,13 +463,10 @@ foreach ($allForms as $one) {
 		$templateList[$this->Lang('form_template_name',$one['name'])] = $one['form_id'];
 }
 
-//CmsLayoutTemplate::get_designs() TODO
-//CmsLayoutTemplate::set_designs()
-
-$thisLink = $this->CreateLink($id,'get_template',$returnid,'',array(),'',TRUE);
 $tplvars['title_load_template'] = $this->Lang('title_load_template');
 $tplvars['input_load_template'] = $this->CreateInputDropdown($id,'template_load',
-	$templateList,-1,'','id="template_load" onchange="get_template(\''.$this->Lang('confirm_template').'\',\''.$thisLink.'\');"');
+	$templateList,-1,'',
+	'id="template_load" onchange="get_template(\''.$this->Lang('confirm_template').'\',\''.$thisLink.'\');"');
 
 $jsloads[] = <<<EOS
 function get_template (message,url) {
@@ -528,6 +490,8 @@ EOS;
 if ($this->before20)
 	$tpl = $this->GetTemplate('pwf_'.$form_id);
 else {
+//	CmsLayoutTemplate::get_designs() TODO
+//	CmsLayoutTemplate::set_designs()
 	$ob = CmsLayoutTemplate::load('pwf_'.$form_id);
 	$tpl = $ob->get_content();
 }
@@ -536,37 +500,7 @@ $tplvars['title_form_template'] = $this->Lang('title_form_template');
 $tplvars['input_form_template'] = $this->CreateSyntaxArea($id,$tpl,'pdt_form_template',
 	'pwf_tallarea','','','',50,24,'','','style="height:30em;"'); //xtra-tall!
 
-$postsubmits = array($this->Lang('redirect_to_page')=>'redir',$this->Lang('display_text')=>'text');
-$tplvars['title_submit_action'] = $this->Lang('title_submit_action');
-$tplvars['input_submit_action'] =
-	$this->CreateInputRadioGroup($id,'pdt_submit_action',$postsubmits,
-		PWForms\Utils::GetFormOption($formdata,'submit_action','text'),'','&nbsp;&nbsp;');
-
-$tplvars['title_redirect_page'] = $this->Lang('title_redirect_page');
-$tplvars['input_redirect_page'] =
-	PWForms\Utils::CreateHierarchyPulldown($this,$id,'pdt_redirect_page',
-		PWForms\Utils::GetFormOption($formdata,'redirect_page',0));
-
-if ($this->before20)
-	$tpl = $this->GetTemplate('pwf_sub_'.$form_id);
-else {
-	$ob = CmsLayoutTemplate::load('pwf_sub_'.$form_id);
-	$tpl = $ob->get_content();
-}
-if (!$tpl)
-	$tpl = PWForms\Utils::CreateDefaultTemplate($formdata,TRUE,FALSE); //? generate default for CmsLayoutTemplateType
-$tplvars['title_submit_template'] = $this->Lang('title_submit_response');
-//note WYSIWYG is no good, the MCE editor stuffs around with the template contents
-$tplvars['input_submit_template'] = $this->CreateSyntaxArea($id,$tpl,'pdt_submission_template',
-	'pwf_tallarea','','','',50,15);
-//setup to revert to 'sample' submission-template
-$ctlData = array();
-$ctlData['pdt_submission_template']['general_button'] = TRUE;
-list($buttons,$revertscripts) = PWForms\Utils::TemplateActions($formdata,$id,$ctlData);
-$jsfuncs[] = $revertscripts[0];
 $tplvars = $tplvars + array(
-	'sample_submit_template' => $buttons[0],
-	'help_submit_template' => $this->Lang('help_submit_template'),
 	'title_variable' => $this->Lang('variable'),
 	'title_property' => $this->Lang('property'),
 	'title_description' => $this->Lang('description'),
@@ -603,6 +537,7 @@ foreach (array(
 	$oneset->description = $this->Lang('desc_'.$name);
 	$formvars[] = $oneset;
 }
+
 if ($formdata->Fields) {
 	foreach ($formdata->Fields as &$one) {
 		if ($one->DisplayInSubmission()) {
@@ -613,10 +548,7 @@ if ($formdata->Fields) {
 		}
 	}
 	unset($one);
-}
-$tplvars['formvars'] = $formvars;
 
-if ($formdata->Fields) {
 	$fieldprops = array();
 	foreach (array(
 		'alias',
@@ -653,6 +585,119 @@ if ($formdata->Fields) {
 	}
 	$tplvars['fieldprops'] = $fieldprops;
 }
+$tplvars['formvars'] = $formvars;
+
+//====== UDT TAB
+
+$usertagops = cmsms()->GetUserTagOperations();
+$usertags = $usertagops->ListUserTags();
+$usertaglist = array();
+$usertaglist[$this->Lang('none')] = '';
+foreach ($usertags as $key => $value)
+	$usertaglist[$value] = $key;
+
+$tplvars['title_form_predisplay_udt'] = $this->Lang('title_form_predisplay_udt');
+$tplvars['input_form_predisplay_udt'] =
+	$this->CreateInputDropdown($id,'pdt_predisplay_udt',$usertaglist,-1,
+		PWForms\Utils::GetFormOption($formdata,'predisplay_udt'));
+
+$tplvars['title_form_predisplay_each_udt'] = $this->Lang('title_form_predisplay_each_udt');
+$tplvars['input_form_predisplay_each_udt'] =
+	$this->CreateInputDropdown($id,'pdt_predisplay_each_udt',$usertaglist,-1,
+		PWForms\Utils::GetFormOption($formdata,'predisplay_each_udt'));
+
+$tplvars['title_form_validate_udt'] = $this->Lang('title_form_validate_udt');
+$tplvars['input_form_validate_udt'] =
+	$this->CreateInputDropdown($id,'pdt_validate_udt',$usertaglist,-1,
+		PWForms\Utils::GetFormOption($formdata,'validate_udt'));
+
+$tplvars['help_udt'] = $this->Lang('help_udt');
+
+//====== PROCESSING TAB
+
+$submits = array();
+
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_list_delimiter');
+$oneset->input = $this->CreateInputText($id,'pdt_list_delimiter',
+	PWForms\Utils::GetFormOption($formdata,'list_delimiter',','),3);
+$submits[] = $oneset;
+
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_form_unspecified');
+$oneset->input = $this->CreateInputText($id,'pdt_unspecified',
+	PWForms\Utils::GetFormOption($formdata,'unspecified',$this->Lang('unspecified')),30);
+$submits[] = $oneset;
+
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_submit_limit');
+$oneset->input = $this->CreateInputText($id,'pdt_submit_limit',
+	PWForms\Utils::GetFormOption($formdata,'submit_limit',$this->GetPreference('submit_limit')),3,5);
+$submits[] = $oneset;
+
+//no scope for !empty() checks for boolean attrs, so we add hidden 0 for checkboxes
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_submit_button_safety');
+$oneset->input = $this->CreateInputHidden($id,'pdt_input_button_safety',0).
+	$this->CreateInputCheckbox($id,'pdt_input_button_safety',1,
+	PWForms\Utils::GetFormOption($formdata,'input_button_safety',0));
+$oneset->help = $this->Lang('help_submit_safety');
+$submits[] = $oneset;
+
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_submit_javascript');
+$oneset->input = $this->CreateTextArea(FALSE,$id,
+	PWForms\Utils::GetFormOption($formdata,'submit_javascript',''),
+	'pdt_submit_javascript','pwf_shortarea','submit_javascript','','',50,8);
+$oneset->help = $this->Lang('help_submit_javascript');
+$submits[] = $oneset;
+
+$tplvars['presubmits'] = $submits;
+
+$submits = array();
+
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_inline_form');
+$oneset->input = $this->CreateInputHidden($id,'pdt_inline',0).
+	$this->CreateInputCheckbox($id,'pdt_inline',1,
+	PWForms\Utils::GetFormOption($formdata,'inline',0));
+$oneset->help = $this->Lang('help_inline_form');
+$submits[] = $oneset;
+
+$tplvars['postsubmits'] = $submits;
+
+$choices = array($this->Lang('redirect_to_page')=>'redir',$this->Lang('display_text')=>'text');
+$tplvars['title_submit_action'] = $this->Lang('title_submit_action');
+$tplvars['input_submit_action'] =
+	$this->CreateInputRadioGroup($id,'pdt_submit_action',$choices,
+		PWForms\Utils::GetFormOption($formdata,'submit_action','text'),'','&nbsp;&nbsp;');
+
+$tplvars['title_redirect_page'] = $this->Lang('title_redirect_page');
+$tplvars['input_redirect_page'] =
+	PWForms\Utils::CreateHierarchyPulldown($this,$id,'pdt_redirect_page',
+		PWForms\Utils::GetFormOption($formdata,'redirect_page',0));
+
+if ($this->before20)
+	$tpl = $this->GetTemplate('pwf_sub_'.$form_id);
+else {
+	$ob = CmsLayoutTemplate::load('pwf_sub_'.$form_id);
+	$tpl = $ob->get_content();
+}
+if (!$tpl)
+	$tpl = PWForms\Utils::CreateDefaultTemplate($formdata,TRUE,FALSE); //? generate default for CmsLayoutTemplateType
+$tplvars['title_submit_template'] = $this->Lang('title_submit_response');
+//note WYSIWYG is no good, the MCE editor stuffs around with the template contents
+$tplvars['input_submit_template'] = $this->CreateSyntaxArea($id,$tpl,'pdt_submission_template',
+	'pwf_tallarea','','','',50,15);
+//setup to revert to 'sample' submission-template
+$ctlData = array();
+$ctlData['pdt_submission_template']['general_button'] = TRUE;
+list($buttons,$revertscripts) = PWForms\Utils::TemplateActions($formdata,$id,$ctlData);
+$jsfuncs[] = $revertscripts[0];
+$tplvars = $tplvars + array(
+	'sample_submit_template' => $buttons[0],
+	'help_submit_template' => $this->Lang('help_submit_template'),
+);
 
 $tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
 $tplvars['save'] = $this->CreateInputSubmit($id,'submit',$this->Lang('save'));
@@ -686,6 +731,20 @@ $jsloads[] = <<<EOS
  $('img.tipper').css({'display':'inline','padding-left':'10px'})
  .click(function() {
    $(this).parent().parent().find('.showhelp').slideToggle();
+ });
+ if($('input[name="{$id}pdt_submit_action"]:checked').val() == 'redir') {
+  $('#tplobjects').hide();
+ } else {
+  $('#pageobjects').hide();
+ }
+ $('input[name="{$id}pdt_submit_action"]').change(function() {
+  if($(this).val() == 'redir') {
+   $('#tplobjects').hide();
+   $('#pageobjects').show();
+  } else {
+   $('#pageobjects').hide();
+   $('#tplobjects').show();
+  }
  });
  $('.tabledrag').tableDnD({
   dragClass: 'row1hover',
