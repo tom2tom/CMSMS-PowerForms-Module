@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if (!$this->CheckAccess('ModifyPFForms')) exit;
+if (!$this->_CheckAccess('ModifyPFForms')) exit;
 
 if (isset($params['cancel']))
 	$this->Redirect($id,'open_form',$returnid,array(
@@ -29,17 +29,18 @@ if (isset($params['formdata'])) {
 $this->Crash();
 //		$formdata = $funcs->Load($this,$params['form_id'],$id,$params);
 //		$params['formdata'] = base64_encode($formdata->Id.session_id()); //must persist across requests
-		$this->Redirect($id,'defaultadmin','',array('message'=>$this->PrettyMessage('error_data',FALSE)));
+		$this->Redirect($id,'defaultadmin','',array('message'=>$this->_PrettyMessage('error_data',FALSE)));
 	}
 	$formdata->formsmodule = &$this;
 
-	if (!$newfield)
+	if (!$newfield) {
 		$obfield = $formdata->Fields[$params['field_id']];
-	elseif (isset($params['field_type']) //we know what display-field type to add
-	    || isset($params['disposition_type'])) //we know what disposition-field type to add
+	} elseif (isset($params['field_pick'])) { //we know what type of field to add
+		unset($params['field_id']); //-1 no use
 		$obfield = PWForms\FieldOperations::NewField($formdata,$params);
-	else //add field, whose type is to be selected
+	} else { //add field, whose type is to be selected
 		$obfield = FALSE;
+	}
 	$refresh = FALSE;
 } else {
 	//should never happen
@@ -50,22 +51,18 @@ $message = '';
 if (isset($params['submit'])) {
 	//migrate $params to field data
 	foreach (array(
-		'field_name'=>'SetName',
-		'field_required'=>'SetRequired',
-		'hide_label'=>'SetHideLabel',
-		'opt_field_alias'=>'SetAlias',
+		'field_Name'=>'SetName',
+		'field_Alias'=>'SetAlias',
 	) as $key=>$val)
 	{
 		if (array_key_exists($key,$params)) {
-			$t = $params[$key];
-			if (is_numeric($t))
-				$t = (int)$t;
-			$obfield->$val($t);
+			$obfield->$val($params[$key]);
 		}
 	}
 	foreach ($params as $key=>$val) {
-		if (strncmp($key,'opt_',4) == 0)
-			$obfield->SetOption(substr($key,4),$val); //TODO check for OptionRef
+		if (strncmp($key,'pdt_',4) == 0)
+			//TODO check for prop. array or indexed
+			$obfield->SetProperty(substr($key,4),$val);
 	}
 	$obfield->PostAdminAction($params);
 	list($res,$message) = $obfield->AdminValidate($id);
@@ -87,14 +84,14 @@ if (isset($params['submit'])) {
 			'formdata'=>$params['formdata'],
 			'formedit'=>1,
 			'active_tab'=>'fieldstab',
-			'message'=>$this->PrettyMessage($message,TRUE,FALSE,FALSE)));
+			'message'=>$this->_PrettyMessage($message,TRUE,FALSE)));
 	} else {
 		//start again //TODO if imported field with no tabled data
 		if ($newfield)
 			$obfield = PWForms\FieldOperations::NewField($formdata,$params);
 		else
 			$obfield->Load($id,$params); //TODO check for failure
-		$message = $this->PrettyMessage($message,FALSE,FALSE,FALSE);
+		$message = $this->_PrettyMessage($message,FALSE,FALSE);
 	}
 } elseif (isset($params['optionadd'])) {
 	// call the field's option-add method, with all available parameters
@@ -112,11 +109,11 @@ if (isset($params['submit'])) {
 
 if ($refresh) {
 	foreach ($params as $key=>$val) {
-		if (strncmp($key,'opt_',4) == 0)
+		if (strncmp($key,'pdt_',4) == 0)
 			$obfield->XtraProps[substr($key,4)] = $val;
 	}
 	$obfield->SetName($params['field_name']);
-	$obfield->SetAlias($params['opt_field_alias']);
+	$obfield->SetAlias($params['pdt_field_alias']);
 	if (isset($params['hide_label']))
 		$obfield->SetHideLabel((int)$params['hide_label']);
 	if (isset($params['field_required']))
@@ -130,3 +127,5 @@ require __DIR__.DIRECTORY_SEPARATOR.'populate.open_field.php';
 $cache->set($params['formdata'],$formdata,84600);
 
 echo PWForms\Utils::ProcessTemplate($this,'editfield.tpl',$tplvars);
+if ($jsall)
+	echo $jsall;
