@@ -7,9 +7,9 @@
 {$maintab_start}
  <div class="pageinput pageoverflow">
 {foreach from=$mainList item=entry}
-{if isset($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
+{if !empty($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
 {if isset($entry->input)}<div>{$entry->input}</div>{/if}
-{if isset($entry->help)}<p>{$entry->help}</p>{/if}
+{if !empty($entry->help)}<p>{$entry->help}</p>{/if}
 {/foreach}
 {if !empty($mainvarhelp)}<br /><div>{$help_subtplvars}</div>{/if}
 {if isset($mainTable)}
@@ -41,9 +41,9 @@
 {$advancedtab_start}
  <div class="pageinput pageoverflow">
 {foreach from=$advList item=entry}
-{if isset($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
+{if !empty($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
 {if isset($entry->input)}<div>{$entry->input}</div>{/if}
-{if isset($entry->help)}<p>{$entry->help}</p>{/if}
+{if !empty($entry->help)}<p>{$entry->help}</p>{/if}
 {/foreach}
 {if !empty($advvarhelp)}<br /><div>{$help_subtplvars}</div>{/if}
  </div>
@@ -51,9 +51,9 @@
 {/if}{*isset($advancedtab_start)*}
 {$tabs_end}
 {else}{*!isset($tabs_start)*}
-{if isset($mainitem->title)}<p class="pagetext">{$mainitem->title}:</p>{/if}
+{if !empty($mainitem->title)}<p class="pagetext">{$mainitem->title}:</p>{/if}
 {if isset($mainitem->input)}<div class="pageinput">{$mainitem->input}</div>{/if}
-{if isset($mainitem->help)}<p class="pageinput">{$mainitem->help}</p>{/if}
+{if !empty($mainitem->help)}<p class="pageinput">{$mainitem->help}</p>{/if}
 {/if}
  <br />
  <p class="pageinput">{if isset($submit)}{$submit}&nbsp;{/if}{$cancel}</p>

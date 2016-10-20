@@ -51,8 +51,8 @@
 {/if}
  {$start_importxmlform}
  {foreach from=$xmls item=entry}
- {if isset($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
-  <div>{$entry->input}{if isset($entry->help)}<br />{$entry->help}{/if}</div>
+ {if !empty($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
+  <div>{$entry->input}{if !empty($entry->help)}<br />{$entry->help}{/if}</div>
  {/foreach}
  <br />
  <div>{$submitxml}</div>
@@ -74,7 +74,7 @@
 {$start_configform}
 <div class="pageinput pageoverflow">
 {foreach from=$configs item=entry}
-{if isset($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
+{if !empty($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
 <div>{$entry->input}{if isset($entry->help)}<br />{$entry->help}{/if}</div>
 {/foreach}
 <br />
