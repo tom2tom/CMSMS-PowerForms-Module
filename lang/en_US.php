@@ -698,6 +698,7 @@ $lang['link_label'] = 'Link Label';
 
 $lang['maximum'] = 'maximum';
 $lang['maximum_size'] = 'Max. Size';
+$lang['members'] = 'Members';
 $lang['mcrypt'] = 'PHP mcrypt Library';
 $lang['merid'] = 'Meridian';
 $lang['min'] = 'Minute';
