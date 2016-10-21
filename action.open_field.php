@@ -94,12 +94,10 @@ if (isset($params['submit'])) {
 		$message = $this->_PrettyMessage($message,FALSE,FALSE);
 	}
 } elseif (isset($params['optionadd'])) {
-	// call the field's option-add method, with all available parameters
-	$obfield->DoOptionAdd($params);
+	$obfield->OptionAdd($params);
 	$refresh = TRUE;
 } elseif (isset($params['optiondel'])) {
-	// call the field's option-delete method, with all available parameters
-	$obfield->DoOptionDelete($params);
+	$obfield->OptionDelete($params);
 	$refresh = TRUE;
 }
 /*else {

@@ -37,11 +37,11 @@ if ($obfield) { //field data are loaded
 		$tplvars['advancedtab_start'] = $this->StartTab('advancedtab');
 	$tplvars['tab_end'] = $this->EndTab();
 
-	$tplvars['add'] = ($obfield->HasAddOp())?
-		$this->CreateInputSubmit($id,'optionadd',$obfield->GetOptionAddButton()):'';
+	$tplvars['add'] = ($obfield->HasOptionAdd())?
+		$this->CreateInputSubmit($id,'optionadd',$obfield->GetOptionAddLabel()):'';
 
-	$tplvars['del'] = ($obfield->HasDeleteOp())?
-		$this->CreateInputSubmit($id,'optiondel',$obfield->GetOptionDeleteButton()):'';
+	$tplvars['del'] = ($obfield->HasOptionDelete())?
+		$this->CreateInputSubmit($id,'optiondel',$obfield->GetOptionDeleteLabel()):'';
 
 	$tplvars['requirable'] = (/*!$obfield->IsDisposition() && */!$obfield->GetChangeRequirement())?1:0;
 

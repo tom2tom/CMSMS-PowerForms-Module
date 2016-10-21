@@ -9,7 +9,7 @@ $tplvars = $tplvars + array(
 	'total_pages' => $formdata->PagesCount,
 	'this_page' => $formdata->Page,
 	'title_page_x_of_y' => $this->Lang('title_page_x_of_y',array($formdata->Page,$formdata->PagesCount)),
-	'css_class' => PWForms\Utils::GetFormOption($formdata,'css_class'),
+	'css_class' => PWForms\Utils::GetFormProperty($formdata,'css_class'),
 	'form_name' => $formdata->Name,
 	'form_id' => $formdata->Id,
 	'actionid' => $id
@@ -28,7 +28,7 @@ if (!empty($params['in_browser'])) {
 $tplvars['in_browser'] = $in_browser;
 $tplvars['in_admin'] = $in_browser; //deprecated template var
 
-$inline = (!$in_browser && PWForms\Utils::GetFormOption($formdata,'inline',0));
+$inline = (!$in_browser && PWForms\Utils::GetFormProperty($formdata,'inline',0));
 $form_start = $this->CreateFormStart($id,'default',$returnid,
 	'POST','multipart/form-data',$inline,'',array(
 	'form_id'=>$form_id,
@@ -41,7 +41,7 @@ $form_end = $this->CreateFormEnd();
 //if ($formdata->Page < $formdata->PagesCount) //TODO c.f. $WalkPage in field-walker
 //	$hidden .= $this->CreateInputHidden($id,$formdata->current_prefix.'continue',($formdata->Page + 1));
 
-$reqSymbol = PWForms\Utils::GetFormOption($formdata,'required_field_symbol','*');
+$reqSymbol = PWForms\Utils::GetFormProperty($formdata,'required_field_symbol','*');
 // Start building fields
 $fields = array();
 //$prev = array(); //make other-page field-values available to templates
@@ -146,7 +146,7 @@ EOS;
 	$oneset->required_symbol = $oneset->required?$reqSymbol:'';
 	$oneset->smarty_eval = $one->GetSmartyEval()?1:0;
 	$oneset->type = $one->GetDisplayType();
-	$oneset->values = $one->GetDisplayableOptionValues(); //TODO
+	$oneset->values = $one->GetIndexedValues(); //TODO multi-element field, not really values?
 
 	$tplvars[$alias] = $oneset;
 	$fields[$oneset->input_id] = $oneset;
@@ -165,24 +165,24 @@ $tplvars['help_icon'] = '<img src="'.$baseurl.'/images/info-small.gif" alt="'.
 if ($formdata->Page > 1)
 	$tplvars['prev'] = '<input type="submit" id="'.$id.'prev" class="cms_submit submit_prev" name="'.
 	$id.$formdata->current_prefix.'prev" value="'.
-	PWForms\Utils::GetFormOption($formdata,'prev_button_text',$this->Lang('previous')).'"/>';
+	PWForms\Utils::GetFormProperty($formdata,'prev_button_text',$this->Lang('previous')).'"/>';
 else
 	$tplvars['prev'] = NULL;
 
 if ($formdata->Page < $formdata->PagesCount) {
 	$tplvars['submit'] = '<input type="submit" id="'.$id.'submit" class="cms_submit submit_next" name="'.
 	$id.$formdata->current_prefix.'submit" value="'.
-	PWForms\Utils::GetFormOption($formdata,'next_button_text',$this->Lang('next')).'"/>';
+	PWForms\Utils::GetFormProperty($formdata,'next_button_text',$this->Lang('next')).'"/>';
 } else {
 	$tplvars['submit'] = '<input type="submit" id="'.$id.'submit" class="cms_submit submit_current" name="'.
 	$id.$formdata->current_prefix.'done" value="'.
-	PWForms\Utils::GetFormOption($formdata,'submit_button_text',$this->Lang('submit')).'"/>';
+	PWForms\Utils::GetFormProperty($formdata,'submit_button_text',$this->Lang('submit')).'"/>';
 }
 
-$usersafejs = PWForms\Utils::GetFormOption($formdata,'submit_javascript');
+$usersafejs = PWForms\Utils::GetFormProperty($formdata,'submit_javascript');
 if ($usersafejs)
 	$usersafejs = PHP_EOL.'   '.$usersafejs;
-if (PWForms\Utils::GetFormOption($formdata,'input_button_safety')) {
+if (PWForms\Utils::GetFormProperty($formdata,'input_button_safety')) {
 	$safejs = <<<EOS
 
    setTimeout(function() {
