@@ -16,7 +16,7 @@ if (isset($params['cancel']))
 try {
 	$cache = PWForms\Utils::GetCache($this);
 } catch (Exception $e) {
-	echo $this->Lang('error_system');
+	echo $this->Lang('err_system');
 	exit;
 }
 
@@ -29,7 +29,7 @@ if (isset($params['formdata'])) {
 $this->Crash();
 //		$formdata = $funcs->Load($this,$params['form_id'],$id,$params);
 //		$params['formdata'] = base64_encode($formdata->Id.session_id()); //must persist across requests
-		$this->Redirect($id,'defaultadmin','',array('message'=>$this->_PrettyMessage('error_data',FALSE)));
+		$this->Redirect($id,'defaultadmin','',array('message'=>$this->_PrettyMessage('err_data',FALSE)));
 	}
 	$formdata->formsmodule = &$this;
 

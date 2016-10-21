@@ -7,7 +7,7 @@
 try {
 	$cache = PWForms\Utils::GetCache($this);
 } catch (Exception $e) {
-	echo $this->Lang('error_system');
+	echo $this->Lang('err_system');
 	return;
 }
 $paramkeys = array_keys($params);

@@ -30,7 +30,7 @@ if (!isset($params['form_id']) && isset($params['form'])) // got the form by ali
 if (empty($params['form_id']) || $params['form_id'] == -1) {
 	echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
 		'title'=>$this->Lang('title_aborted'),
-		'message'=>$this->Lang('error_data'),
+		'message'=>$this->Lang('err_data'),
 		'error'=>1));
 	return;
 }
@@ -69,7 +69,7 @@ try {
 } catch (Exception $e) {
 	echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
 		'title'=>$this->Lang('title_aborted'),
-		'message'=>$this->Lang('error_system').' NO CACHE MECHANISM',
+		'message'=>$this->Lang('err_system').' NO CACHE MECHANISM',
 		'error'=>1));
 	return;
 }
@@ -79,7 +79,7 @@ try {
 } catch (Exception $e) {
 	echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
 		'title'=>$this->Lang('title_aborted'),
-		'message'=>$this->Lang('error_system').' NO MUTEX MECHANISM',
+		'message'=>$this->Lang('err_system').' NO MUTEX MECHANISM',
 		'error'=>1));
 	return;
 }
@@ -94,7 +94,7 @@ if (isset($params[$prefix.'formdata'])) {
 	if (is_null($formdata)) {
 		echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
 			'title'=>$this->Lang('title_aborted'),
-			'message'=>$this->Lang('error_data'),
+			'message'=>$this->Lang('err_data'),
 			'error'=>1));
 		return;
 	}
@@ -308,7 +308,7 @@ $this->Crash2();
 /*QUEUE (php with async post-callback is bogus !?
 				$token = abs(crc32($this->GetName().'Qmutex')); //same token as in action.run_queue.php
 				if (!$mx->lock($token)) {
-					echo $this->Lang('error_lock');
+					echo $this->Lang('err_lock');
 					exit;
 				}
 				$queue = $cache->get('pwfQarray');
@@ -429,7 +429,7 @@ $this->Crash2();
 				} else {
 					$this->SendEvent('OnFormSubmitError',$parms);
 					$tplvars = $tplvars + array(
-						'submission_error' => $this->Lang('error_submission'),
+						'submission_error' => $this->Lang('err_submission'),
 						'submission_error_list' => $message,
 						'show_submission_errors' => !$this->GetPreference('hide_errors')
 					);
@@ -450,7 +450,7 @@ $this->Crash2();
 		unset($funcs);
 		echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
 			'title'=>$this->Lang('title_aborted'),
-			'message'=>$this->Lang('error_data'),
+			'message'=>$this->Lang('err_data'),
 			'error'=>1));
 		return;
 	}

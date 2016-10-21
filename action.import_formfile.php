@@ -11,7 +11,7 @@ $funcs = new PWForms\FormOperations();
 if ($funcs->NewID($params['import_formname'],$params['import_formalias'])) {
 	$fp = $_FILES[$id.'xmlfile']['tmp_name'];
 	$state = $funcs->ImportXML($this,$fp);
-	$key = ($state)?'form_imported':'error_form_import';
+	$key = ($state)?'form_imported':'err_form_import';
 } else {
 	$state = FALSE;
 	$key = 'duplicate_identifier';
