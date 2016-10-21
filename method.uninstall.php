@@ -79,13 +79,14 @@ if (!$this->before20) {
 
 $fp = $config['uploads_path'];
 if ($fp && is_dir($fp)) {
-	$upd = $this->GetPreference('uploads_dir');
-	if ($upd) {
-		$fp = cms_join_path($fp,$upd);
-		if ($fp && is_dir($fp))
-			delTree($fp);
+	$ud = $this->GetPreference('uploads_dir');
+	if ($ud) {
+		$ud = $fp.DIRECTORY_SEPARATOR.$ud;
+		if (is_dir($ud))
+			delTree($ud);
 	}
 }
+
 $this->RemovePreference();
 
 $this->RemovePermission('ModifyPFForms');
