@@ -128,8 +128,7 @@ foreach ($formdata->FieldOrders as $one) {
 	$oneset->deletelink = $this->CreateLink($id,'open_form','',
 		$icondelete,
 		array('fielddelete'=>1,'field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']),
-		'','','',
-		'onclick="delete_field(\''.$this->Lang('confirm_delete_field',htmlspecialchars($one->GetName())).'\');return false;"');
+		'','','','onclick="delete_field(\''.htmlspecialchars($one->GetName()).'\');return false;"');
 
 	if ($one->IsDisposition()) {
 		if ($dcount > 1)
@@ -154,12 +153,12 @@ foreach ($formdata->FieldOrders as $one) {
 			$oneset->required = $this->CreateLink($id,'open_form','',
 				$icontrue,
 				array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'active'=>'off'),
-				'','','','class="true" onclick="open_field_required();return false;"');
+				'','','','class="true" onclick="require_field(false);return false;"');
 		else
 			$oneset->required = $this->CreateLink($id,'open_form','',
 				$iconfalse,
 				array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'active'=>'on'),
-				'','','','class="false" onclick="open_field_required();return false;"');
+				'','','','class="false" onclick="require_field(true);return false;"');
 
 		if ($count > 1)
 			$oneset->up = $this->CreateLink($id,'open_form','',
@@ -182,11 +181,15 @@ foreach ($formdata->FieldOrders as $one) {
 if ($fields) {
 	$tplvars['fields'] = $fields;
 
+	$prompt = $this->Lang('confirm_delete_field','%s');
+	$msg = $this->Lang('err_server');
 	$jsfuncs[] = <<<EOS
-function delete_field (message) {
+function delete_field (name) {
+ var message = '{$prompt}'.replace('%s',name);
  if (confirm(message)) {
   var url = $(this).attr('href');
   var parent = $(this).closest('tr');
+  var errmsg = '{$msg}';
   $.ajax({
    type: 'GET',
    url: url,
@@ -214,8 +217,12 @@ function delete_field (message) {
   });
  }
 }
+function require_field(state) {
+ var url = $(this).attr('href');
+//TODO
+}
 EOS;
-} else {
+} else { //no field
 	$tplvars = $tplvars + array(
 		'nofields' => $this->Lang('no_fields'),
 		'text_ready' => '',
@@ -399,10 +406,10 @@ $link = $this->CreateLink($id,'open_field',$returnid,'',
 	'formdata'=>$params['formdata']),'',TRUE,TRUE);
 $link = str_replace('&amp;','&',$link);
 $jsfuncs[] = <<<EOS
-function add_field(selector,scope) {
- var type=selector.options[selector.selectedIndex].value;
+function add_field(sel,scope) {
+ var type=sel.options[sel.selectedIndex].value;
  this.location='{$link}&{$id}field_pick='+type+'&{$id}in='+scope;
- return TRUE;
+ return true;
 }
 EOS;
 
@@ -458,7 +465,7 @@ $displays[] = $oneset;
 
 $tplvars['displays'] = $displays;
 
-$jsloads[] = <<<EOS
+$jsfuncs[] = <<<EOS
 function file_selected() {
 //TODO
 }
@@ -482,7 +489,7 @@ $tplvars['input_load_template'] = $this->CreateInputDropdown($id,'template_load'
 	$templateList,-1,'','id="template_load" onchange="get_template(this);"'); //overwrites downstream-generated id
 
 $prompt = $this->Lang('confirm_template');
-$errmsg = $this->Lang('err_system');
+$msg = $this->Lang('err_server');
 $u = $this->create_url($id,'get_template','',array('tid'=>''));
 $offs = strpos($u,'?mact=');
 $u = str_replace('&amp;','&',substr($u,$offs+1)); //template identifier will be appended at runtime
@@ -492,7 +499,7 @@ function get_template (sel) {
  if (confirm('{$prompt}')) {
   var value = $(sel).val();
   if (value) {
-   var msg = '{$errmsg}';
+   var msg = '{$msg}';
    $.ajax({
     type: 'POST',
     url: 'moduleinterface.php',
