@@ -9,8 +9,9 @@ if (!empty($message))
 
 $tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$this->Lang('back_top'));
 
+//multipart form needed for file uploads
 $tplvars['form_start'] = $this->CreateFormStart($id,'open_form',$returnid,
-	'POST','',FALSE,'',array(
+	'POST','multipart/form-data',FALSE,'',array(
 	'form_id'=>$form_id,
 	'formdata'=>$params['formdata']));
 
@@ -424,12 +425,14 @@ $oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_next_button');
 $oneset->input = $this->CreateInputText($id,'pdt_next_button_text',
 	PWForms\Utils::GetFormOption($formdata,'next_button_text',$this->Lang('button_continue')),30);
+$oneset->help = $this->Lang('help_form_button');
 $displays[] = $oneset;
 
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_prev_button');
 $oneset->input = $this->CreateInputText($id,'pdt_prev_button_text',
 	PWForms\Utils::GetFormOption($formdata,'prev_button_text',$this->Lang('button_previous')),30);
+$oneset->help = $this->Lang('help_form_button');
 $displays[] = $oneset;
 
 $oneset = new stdClass();
@@ -438,21 +441,32 @@ $oneset->input = $this->CreateInputText($id,'pdt_css_class',
 	PWForms\Utils::GetFormOption($formdata,'css_class','powerform'),30);
 $displays[] = $oneset;
 
+$t = PWForms\Utils::GetFormOption($formdata,'css_file','');
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_css_file');
-$oneset->input = $this->CreateInputText($id,'pdt_css_file',
-	PWForms\Utils::GetFormOption($formdata,'css_file',''),40);
+$oneset->input = $this->CreateInputText($id,'pdt_css_file',$t,40);
 $oneset->help = $this->Lang('help_form_css_file');
+$displays[] = $oneset;
+
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_upload_css_file');
+$oneset->input = $this->CreateInputFile($id,'stylesupload','text/css',36,
+	'id="'.$id.'stylesupload" title="'.$this->Lang('tip_upload').'" onchange="file_selected()"');
+if ($t)
+	$oneset->input .= ' '.$this->CreateInputCheckbox($id,'stylesdelete',1,-1).'&nbsp;'.$this->Lang('delete_upload',$t);
 $displays[] = $oneset;
 
 $tplvars['displays'] = $displays;
 
-//TODO file-upload controls
+$jsloads[] = <<<EOS
+function file_selected() {
+//TODO
+}
+EOS;
 
 //====== TEMPLATE TAB
 
-$thisLink = $this->CreateLink($id,'get_template',$returnid,'',array(),'',TRUE);
-$templateList = array(''=>'',
+$templateList = array($this->Lang('select_one')=>'',
 	$this->Lang('default_template')=>'defaultform.tpl',
 	$this->Lang('table_left_template')=>'tableform_lefttitles.tpl',
 	$this->Lang('table_top_template')=>'tableform_toptitles.tpl');
@@ -465,24 +479,37 @@ foreach ($allForms as $one) {
 
 $tplvars['title_load_template'] = $this->Lang('title_load_template');
 $tplvars['input_load_template'] = $this->CreateInputDropdown($id,'template_load',
-	$templateList,-1,'',
-	'id="template_load" onchange="get_template(\''.$this->Lang('confirm_template').'\',\''.$thisLink.'\');"');
+	$templateList,-1,'','id="template_load" onchange="get_template(this);"'); //overwrites downstream-generated id
 
-$jsloads[] = <<<EOS
-function get_template (message,url) {
- if (confirm(message)) {
-  var value = $(this).val();
-  $.ajax({
-   type: 'GET',
-   url: url,
-   data: '&{$id}tid='+value,
-   error: function() {
-    alert(errmsg);
-   },
-   success: function(data) {
-    $('#{$id}form_template').val(data);
-   }
-  });
+$prompt = $this->Lang('confirm_template');
+$errmsg = $this->Lang('err_system');
+$u = $this->create_url($id,'get_template','',array('tid'=>''));
+$offs = strpos($u,'?mact=');
+$u = str_replace('&amp;','&',substr($u,$offs+1)); //template identifier will be appended at runtime
+
+$jsfuncs[] = <<<EOS
+function get_template (sel) {
+ if (confirm('{$prompt}')) {
+  var value = $(sel).val();
+  if (value) {
+   var msg = '{$errmsg}';
+   $.ajax({
+    type: 'POST',
+    url: 'moduleinterface.php',
+    data: '{$u}'+value,
+    dataType: 'text',
+    success: function(data,status) {
+     if (status=='success') {
+      $('#form_template').val(data);
+     } else {
+      alert(msg);
+     }
+    },
+    error: function() {
+     alert(msg);
+    }
+   });
+  }
  }
 }
 EOS;
@@ -495,10 +522,6 @@ else {
 	$ob = CmsLayoutTemplate::load('pwf_'.$form_id);
 	$tpl = $ob->get_content();
 }
-$tplvars['title_form_template'] = $this->Lang('title_form_template');
-//note WYSIWYG is no good, the MCE editor stuffs around with the template contents
-$tplvars['input_form_template'] = $this->CreateSyntaxArea($id,$tpl,'pdt_form_template',
-	'pwf_tallarea','','','',50,24,'','','style="height:30em;"'); //xtra-tall!
 
 $tplvars = $tplvars + array(
 	'title_variable' => $this->Lang('variable'),
@@ -509,6 +532,11 @@ $tplvars = $tplvars + array(
 	'help_fieldvars1' => $this->Lang('help_fieldvars1'),
 	'help_fieldvars2' => $this->Lang('help_fieldvars2')
 );
+
+$tplvars['title_form_template'] = $this->Lang('title_form_template');
+//note WYSIWYG is no good, the MCE editor stuffs around with the template contents
+$tplvars['input_form_template'] = $this->CreateSyntaxArea($id,$tpl,'pdt_form_template',
+	'pwf_tallarea','form_template','','',50,24,'style="height:30em;"'); //xtra-tall!
 
 //help for form-template
 $formvars = array();
@@ -688,7 +716,7 @@ if (!$tpl)
 $tplvars['title_submit_template'] = $this->Lang('title_submit_response');
 //note WYSIWYG is no good, the MCE editor stuffs around with the template contents
 $tplvars['input_submit_template'] = $this->CreateSyntaxArea($id,$tpl,'pdt_submission_template',
-	'pwf_tallarea','','','',50,15);
+	'pwf_tallarea','submission_template','','',50,15);
 //setup to revert to 'sample' submission-template
 $ctlData = array();
 $ctlData['pdt_submission_template']['general_button'] = TRUE;
