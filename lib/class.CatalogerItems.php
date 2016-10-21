@@ -27,7 +27,7 @@ class CatalogerItems extends FieldBase
 		$cataloger = $mod->GetModuleInstance('Cataloger');
 		if ($cataloger)
 			return '';
-		return $mod->Lang('error_module_cataloger');
+		return $mod->Lang('err_module_cataloger');
 	}
 
 	public function GetDisplayableValue($as_string=TRUE)
@@ -78,7 +78,7 @@ class CatalogerItems extends FieldBase
 			}
 			unset($one);
 		} else
-			$main[] = array($this->GetErrorMessage('error_module_cataloger'));
+			$main[] = array($this->GetErrorMessage('err_module_cataloger'));
 
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -88,7 +88,7 @@ class CatalogerItems extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$cataloger = $mod->GetModuleInstance('Cataloger');
 		if (!$cataloger)
-			return $mod->Lang('error_module_cataloger');
+			return $mod->Lang('err_module_cataloger');
 
 		$cataloger->getUserAttributes();
 		$gCms = \cmsms();

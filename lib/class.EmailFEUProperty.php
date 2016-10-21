@@ -55,10 +55,10 @@ class EmailFEUProperty extends EmailBase
 		$mod = $this->formdata->formsmodule;
 		$feu = $mod->GetModuleInstance('FrontEndUsers');
 		if (!$feu)
-			return array('main'=>array($this->GetErrorMessage('error_module_feu')));
+			return array('main'=>array($this->GetErrorMessage('err_module_feu')));
 		$defns = $feu->GetPropertyDefns();
 		if (!is_array($defns))
-			return array('main'=>array($this->GetErrorMessage('error_feudefns')));
+			return array('main'=>array($this->GetErrorMessage('err_feudefns')));
 		// check for dropdown or multiselect fields
 		$opts = array();
 		foreach ($defns as $key => $data) {
@@ -74,7 +74,7 @@ class EmailFEUProperty extends EmailBase
 			}
 		}
 		if (!count($opts))
-			return array('main'=>array($this->GetErrorMessage('error_feudefns')));
+			return array('main'=>array($this->GetErrorMessage('err_feudefns')));
 		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE);
 		$waslast = array_pop($ret['main']); //keep the email to-type selector for last
 		$keys = array_keys($opts);
@@ -120,7 +120,7 @@ class EmailFEUProperty extends EmailBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$feu = $mod->GetModuleInstance('FrontEndUsers');
-		if (!$feu) return array(FALSE,$mod_Lang('error_module_feu'));
+		if (!$feu) return array(FALSE,$mod_Lang('err_module_feu'));
 
 		// get the property name
 		$prop = $this->GetProperty('feu_property');

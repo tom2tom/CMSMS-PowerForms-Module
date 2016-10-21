@@ -43,7 +43,7 @@ class Captcha extends FieldBase
 		if ($captcha) {
 			unset($captcha);
 		} else {
-			return array('main'=>array($this->GetErrorMessage('error_module_captcha')));
+			return array('main'=>array($this->GetErrorMessage('err_module_captcha')));
 		}
 
 		list($main,$adv) = $this->AdminPopulateCommon($id);
@@ -146,7 +146,7 @@ class Captcha extends FieldBase
 		$captcha = $mod->getModuleInstance('Captcha');
 		if (!$captcha) { //should never happen
 			$this->valid = FALSE;
-			$this->ValidationMessage = $mod->Lang('error_module_captcha');
+			$this->ValidationMessage = $mod->Lang('err_module_captcha');
 		} elseif (!$captcha->CheckCaptcha($this->Value)) { //upstream migrated any $params['captcha_input] to this
 			$this->valid = FALSE;
 			$this->ValidationMessage = $this->GetProperty('wrongtext',

@@ -80,7 +80,7 @@ class SubmissionTag extends FieldBase
 		$res = $usertagops->CallUserTag($this->GetProperty('udtname'),$params);
 
 		if ($res === FALSE)
-			return array(FALSE,$mod->Lang('error_usertag'));
+			return array(FALSE,$mod->Lang('err_usertag'));
 		return array(TRUE,'');
 	}
 }

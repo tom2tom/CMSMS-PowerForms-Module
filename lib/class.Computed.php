@@ -137,7 +137,7 @@ class Computed extends FieldBase
 		$val = $this->GetProperty('compute_order');
 		if (!is_numeric($val) || $val < 1) {
 			$ret = FALSE;
-			$messages[] = $mod->Lang('error_typed',$mod->Lang('TODO_order'));
+			$messages[] = $mod->Lang('err_typed',$mod->Lang('TODO_order'));
 		}
 		$msg = ($ret)?'':implode('<br />',$messages);
 		return array($ret,$msg);

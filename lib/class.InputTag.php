@@ -74,6 +74,6 @@ class InputTag extends FieldBase
 		$ret = $usertagops->CallUserTag($udt,$params);
 		if ($ret !== FALSE)
 			return $this->SetClass($tmp);
-		return $mod->Lang('error_usertag_named',$udt);
+		return $mod->Lang('err_usertag_named',$udt);
 	}
 }

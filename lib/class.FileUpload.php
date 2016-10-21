@@ -32,7 +32,7 @@ class FileUpload extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if (!Utils::GetUploadsPath())
-			return $mod->Lang('error_uploads_dir');
+			return $mod->Lang('err_uploads_dir');
 
 		$ms = $this->GetProperty('max_size');
 		$exts = $this->GetProperty('permitted_extensions');
@@ -225,7 +225,7 @@ class FileUpload extends FieldBase
 			$this->valid = FALSE;
 			$this->ValidationMessage = $mod->Lang('required_field_missing');
 		} elseif ($ms && $_FILES[$_id]['size'] > ($ms * 1024)) {
-			$this->ValidationMessage = $mod->Lang('error_large_file'). ' '.$ms.'kb';//($ms * 1024).'kb'; // Stikki mods
+			$this->ValidationMessage = $mod->Lang('err_large_file'). ' '.$ms.'kb';//($ms * 1024).'kb'; // Stikki mods
 			$this->valid = FALSE;
 		} elseif ($exts) {
 			$match = FALSE;
@@ -282,7 +282,7 @@ class FileUpload extends FieldBase
 				$uploads = $mod->GetModuleInstance('Uploads');
 				if (!$uploads) {
 					// no uploads module
-					return array(FALSE,$mod->Lang('error_module_upload'));
+					return array(FALSE,$mod->Lang('err_module_upload'));
 				}
 
 				$parms = array();
@@ -312,7 +312,7 @@ class FileUpload extends FieldBase
 			} else { //we will upload
 				$ud = Utils::GetUploadsPath();
 				if (!$ud)
-					return array(FALSE,'error_uploads_dir');
+					return array(FALSE,'err_uploads_dir');
 
 				$src = $thisFile['tmp_name'];
 				//$dest_path = $this->GetProperty('file_destination',$config['uploads_path']);
@@ -345,7 +345,7 @@ class FileUpload extends FieldBase
 				$dest = $ud.DIRECTORY_SEPARATOR.$destination_name;
 				if (file_exists($dest) && !$this->GetProperty('allow_overwrite',0)) {
 					unlink($src);
-					return array(FALSE,$mod->Lang('error_file_exists',array($destination_name)));
+					return array(FALSE,$mod->Lang('err_file_exists',array($destination_name)));
 				}
 
 				if (move_uploaded_file($src,$dest)) {

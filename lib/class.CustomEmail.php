@@ -166,6 +166,6 @@ class CustomEmail extends EmailBase
 
 			return $ret;
 		}
-		return array(FALSE,$this->formdata->formsmodule->Lang('error_address',''));
+		return array(FALSE,$this->formdata->formsmodule->Lang('err_address',''));
 	}
 }

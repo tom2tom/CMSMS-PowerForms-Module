@@ -26,7 +26,7 @@ class CompanyDirectory extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$CompanyDirectory = $mod->GetModuleInstance('CompanyDirectory');
 		if (!$CompanyDirectory)
-			return $mod->Lang('error_module_CompanyDirectory');
+			return $mod->Lang('err_module_CompanyDirectory');
 		return '';
 	}
 
@@ -59,7 +59,7 @@ class CompanyDirectory extends FieldBase
 		if ($CompanyDirectory)
 			unset($CompanyDirectory);
 		else
-			return array('main'=>array($this->GetErrorMessage('error_module_CompanyDirectory')));
+			return array('main'=>array($this->GetErrorMessage('err_module_CompanyDirectory')));
 
 		$Categories = array('All'=>$mod->Lang('all'));
 		$pre = \cms_db_prefix();
@@ -112,7 +112,7 @@ class CompanyDirectory extends FieldBase
 		if ($CompanyDirectory)
 			unset($CompanyDirectory);
 		else
-			return $mod->Lang('error_module_CompanyDirectory');
+			return $mod->Lang('err_module_CompanyDirectory');
 
 		$results = array();
 

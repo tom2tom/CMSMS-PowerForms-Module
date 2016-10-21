@@ -218,7 +218,7 @@ EOS;
 
 			if (!preg_match($mod->email_regex,$to)) {
 				$ret = FALSE;
-				$messages[] = $mod->Lang('error_email_address',$to);
+				$messages[] = $mod->Lang('err_email_address',$to);
 			}
 			//TODO c.f. mailcheck.js for frontend addresses
 		}
@@ -282,7 +282,7 @@ EOS;
 				}
 				if ($res == FALSE) {
 					$mail->reset();
-					return array(FALSE,$mod->Lang('error_address',$this_ad));
+					return array(FALSE,$mod->Lang('err_address',$this_ad));
 				}
 			} else {
 				$bare = trim($thisDest);
@@ -313,7 +313,7 @@ EOS;
 					}
 				} else {
 					$mail->reset();
-					return array(FALSE,$mod->Lang('error_address',$thisDest));
+					return array(FALSE,$mod->Lang('err_address',$thisDest));
 				}
 			}
 		}
@@ -372,7 +372,7 @@ EOS;
 				$ud = Utils::GetUploadsPath();
 				if (!$ud) {
 					$mail->reset();
-					return array(FALSE,$mod->Lang('error_uploads_dir'));
+					return array(FALSE,$mod->Lang('err_uploads_dir'));
 				}
 
 				$thisAtt = $one->GetDisplayableValue(FALSE);
@@ -393,7 +393,7 @@ EOS;
 						$thisName = array_pop($thisNames);
 						if (!$mail->AddAttachment($filepath,$thisName,'base64',$thisType)) {
 							$mail->reset();
-							return array(FALSE,$mod->Lang('error_attach',
+							return array(FALSE,$mod->Lang('err_attach',
 									array($filepath,$filepath,$onefile)));
 						}
 					}
@@ -413,7 +413,7 @@ EOS;
 
 					if (!$mail->AddAttachment($filepath,$thisName,'base64',$thisType)) {
 						$mail->reset();
-						return array(FALSE,$mod->Lang('error_attach',
+						return array(FALSE,$mod->Lang('err_attach',
 							array($filepath,$filepath,$thisType)));
 					}
 				}

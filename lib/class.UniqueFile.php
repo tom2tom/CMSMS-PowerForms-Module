@@ -48,7 +48,7 @@ class UniqueFile extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if (!Utils::GetUploadsPath($mod))
-			return $mod->Lang('error_uploads_dir');
+			return $mod->Lang('err_uploads_dir');
 		return $this->GetProperty('filespec',$mod->Lang('unspecified'));
 	}
 
@@ -56,7 +56,7 @@ class UniqueFile extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if (!Utils::GetUploadsPath($mod))
-			return array('main'=>array($this->GetErrorMessage('error_uploads_dir')));
+			return array('main'=>array($this->GetErrorMessage('err_uploads_dir')));
 
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
 
@@ -106,12 +106,12 @@ class UniqueFile extends FieldBase
 		$mod = $formdata->formsmodule;
 		$ud = $Utils::GetUploadsPath($mod);
 		if (!$ud)
-			return array(FALSE,$mod->Lang('error_uploads_dir'));
+			return array(FALSE,$mod->Lang('err_uploads_dir'));
 /*MUTEX
 		try {
 			$mx = Utils::GetMutex($mod);
 		} catch (Exception $e) {
-			return array(FALSE,$this->Lang('error_system'));
+			return array(FALSE,$this->Lang('err_system'));
 		}
 */
 		$tplvars = array();
@@ -125,7 +125,7 @@ class UniqueFile extends FieldBase
 /*MUTEX
 		$token = abs(crc32($fn.'mutex'));
 		if (!$mx->lock($token))
-			return array(FALSE,$mod->Lang('error_lock'));
+			return array(FALSE,$mod->Lang('err_lock'));
 */
 		$fp = $ud.DIRECTORY_SEPARATOR.$fn;
 

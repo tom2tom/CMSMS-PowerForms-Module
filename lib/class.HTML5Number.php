@@ -44,17 +44,17 @@ class HTML5Number extends FieldBase
 		$min = $this->GetProperty('min_number');
 		if (!$min || !is_numeric($min)) {
 			$ret = FALSE;
-			$messages[] = $mod->Lang('error_typed',$mod->Lang('minumum'));
+			$messages[] = $mod->Lang('err_typed',$mod->Lang('minumum'));
 		}
 		$max = $this->GetProperty('max_number');
 		if (!$max || !is_numeric($max) || $max <= $min) {
 			$ret = FALSE;
-			$messages[] = $mod->Lang('error_typed',$mod->Lang('maximum'));
+			$messages[] = $mod->Lang('err_typed',$mod->Lang('maximum'));
 		}
 		$step = $this->GetProperty('step_number');
 		if (!$step || !is_numeric($step) || $step >= $max) {
 			$ret = FALSE;
-			$messages[] = $mod->Lang('error_typed',$mod->Lang('increment'));
+			$messages[] = $mod->Lang('err_typed',$mod->Lang('increment'));
 		}
 		$msg = ($ret)?'':implode('<br />',$messages);
 		return array($ret,$msg);

@@ -82,7 +82,7 @@ class FileDirector extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if (!Utils::GetUploadsPath())
-			return $mod->Lang('error_uploads_dir');
+			return $mod->Lang('err_uploads_dir');
 		$opt = $this->GetPropArray('destination_filename');
 		if ($opt)
 			$fileCount = count($opt);
@@ -95,7 +95,7 @@ class FileDirector extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if (!Utils::GetUploadsPath())
-			return array('main'=>array($this->GetErrorMessage('error_uploads_dir')));
+			return array('main'=>array($this->GetErrorMessage('err_uploads_dir')));
 
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$main[] = array($mod->Lang('title_select_one_message'),
@@ -201,12 +201,12 @@ class FileDirector extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$ud = Utils::GetUploadsPath();
 		if (!$ud)
-			return array(FALSE,$mod->Lang('error_uploads_dir'));
+			return array(FALSE,$mod->Lang('err_uploads_dir'));
 /*MUTEX
 		try {
 			$mx = Utils::GetMutex($mod);
 		} catch (Exception $e) {
-			return array(FALSE,$this->Lang('error_system'));
+			return array(FALSE,$this->Lang('err_system'));
 		}
 */
 		$fn = preg_replace('/[^\w\d\.]|\.\./','_',
@@ -214,7 +214,7 @@ class FileDirector extends FieldBase
 		$token = abs(crc32($fn.'mutex'));
 /*MUTEX
 		if (!$mx->lock($token))
-			return array(FALSE,$mod->Lang('error_lock'));
+			return array(FALSE,$mod->Lang('err_lock'));
 */
 		$tplvars = array();
 		$fp = $ud.DIRECTORY_SEPARATOR.$fn;
