@@ -15,25 +15,13 @@ else {
 	$tplstr = $data['longvalue'];
 	if (!$tplstr) $tplstr = $data['value'];
 	if ($tplstr && strncmp($tplstr,'pwf_',4) == 0) {
-		$name = 'tpl::'.substr($tplstr,4);
 		if ($this->before20)
-			$tplstr = $this->GetTemplate($name);
+			$tplstr = $this->GetTemplate($tplstr);
 		else {
-			$ob = CmsLayoutTemplate::load($name);
+			$ob = CmsLayoutTemplate::load($tplstr);
 			$tplstr = $ob->get_content();
 		}
 	}
 }
-
-if ($tplstr) {
-	@ob_clean();
-	@ob_clean();
-	header('Pragma: public');
-	header('Expires: 0');
-	header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-	header('Cache-Control: private',FALSE);
-	header('Content-Description: File Transfer');
-	header('Content-Length: '.strlen($tplstr));
-	echo $tplstr;
-}
+echo $tplstr;
 exit;
