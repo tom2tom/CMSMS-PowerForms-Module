@@ -20,34 +20,34 @@ class Pulldown extends FieldBase
 		$this->Type = 'Pulldown';
 	}
 
-	public function GetOptionAddButton()
+	public function GetOptionAddLabel()
 	{
 		return $this->formdata->formsmodule->Lang('add_options');
 	}
 
-	public function GetOptionDeleteButton()
+	public function GetOptionDeleteLabel()
 	{
 		return $this->formdata->formsmodule->Lang('delete_options');
 	}
 
-	public function DoOptionAdd(&$params)
+	public function OptionAdd(&$params)
 	{
 		$this->optionAdd = TRUE;
 	}
 
-	public function DoOptionDelete(&$params)
+	public function OptionDelete(&$params)
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {
-				$this->RemovePropIndexed('option_name',$indx);
-				$this->RemovePropIndexed('option_value',$indx);
+				$this->RemovePropIndexed('indexed_name',$indx);
+				$this->RemovePropIndexed('indexed_value',$indx);
 			}
 		}
 	}
 
 	public function GetFieldStatus()
 	{
-		$opt = $this->GetProperty('option_name');
+		$opt = $this->GetProperty('indexed_name');
 		if (is_array($opt))
 			$num = count($opt);
 		elseif ($opt)
@@ -60,9 +60,9 @@ class Pulldown extends FieldBase
 	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue())
-			$ret = $this->GetPropIndexed('option_value',$this->Value);
+			$ret = $this->GetPropIndexed('indexed_value',$this->Value);
 		else
-			$ret = $this->GetFormOption('unspecified',
+			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
 
 		if ($as_string)
@@ -84,22 +84,22 @@ class Pulldown extends FieldBase
 			  array($mod->Lang('yes')=>1,$mod->Lang('no')=>0),-1,
 			  $this->GetProperty('sort',0)));
 		if ($this->optionAdd) {
-			$this->AddPropIndexed('option_name','');
-			$this->AddPropIndexed('option_value','');
+			$this->AddPropIndexed('indexed_name','');
+			$this->AddPropIndexed('indexed_value','');
 			$this->optionAdd = FALSE;
 		}
-		$opt = $this->GetPropArray('option_name');
+		$opt = $this->GetPropArray('indexed_name');
 		if ($opt) {
 			$dests = array();
 			$dests[] = array(
-				$mod->Lang('title_option_name'),
-				$mod->Lang('title_option_value'),
+				$mod->Lang('title_indexed_name'),
+				$mod->Lang('title_indexed_value'),
 				$mod->Lang('title_select')
 				);
 			foreach ($opt as $i=>&$one) {
 				$dests[] = array(
-				$mod->CreateInputText($id,'pdt_option_name'.$i,$one,30,128),
-				$mod->CreateInputText($id,'pdt_option_value'.$i,$this->GetPropIndexed('option_value',$i),30,128),
+				$mod->CreateInputText($id,'pdt_indexed_name'.$i,$one,30,128),
+				$mod->CreateInputText($id,'pdt_indexed_value'.$i,$this->GetPropIndexed('indexed_value',$i),30,128),
 				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
@@ -115,12 +115,12 @@ class Pulldown extends FieldBase
 	public function PostAdminAction(&$params)
 	{
 		//cleanup empties
-		$names = $this->GetPropArray('option_name');
+		$names = $this->GetPropArray('indexed_name');
 		if ($names) {
 			foreach ($names as $i=>&$one) {
-				if (!$one || !$this->GetPropIndexed('option_value',$i)) {
-					$this->RemovePropIndexed('option_name',$i);
-					$this->RemovePropIndexed('option_value',$i);
+				if (!$one || !$this->GetPropIndexed('indexed_value',$i)) {
+					$this->RemovePropIndexed('indexed_name',$i);
+					$this->RemovePropIndexed('indexed_value',$i);
 				}
 			}
 			unset($one);
@@ -129,7 +129,7 @@ class Pulldown extends FieldBase
 
 	public function Populate($id,&$params)
 	{
-		$subjects = $this->GetPropArray('option_name');
+		$subjects = $this->GetPropArray('indexed_name');
 		if ($subjects) {
 			$choices = array_flip($subjects);
 			if (count($choices) > 1 && $this->GetProperty('sort'))

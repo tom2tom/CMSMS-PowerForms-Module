@@ -21,7 +21,7 @@ class YearPulldown extends FieldBase
 		if($this->HasValue())
 			$ret = $this->Value;
 		else
-			$ret = $this->GetFormOption('unspecified',
+			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
 
 		if($as_string)

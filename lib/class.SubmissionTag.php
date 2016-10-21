@@ -48,7 +48,7 @@ class SubmissionTag extends FieldBase
 	public function Dispose($id,$returnid)
 	{
 		$mod = $this->formdata->formsmodule;
-		$unspec = $this->GetFormOption('unspecified',$mod->Lang('unspecified'));
+		$unspec = $this->GetFormProperty('unspecified',$mod->Lang('unspecified'));
 
 		$params = array();
 		if ($this->GetProperty('export_form',0))

@@ -53,7 +53,7 @@ class UserEmail extends EmailBase
 	{
 		if (is_array($this->Value)) {
 			if ($as_string)
-				return implode($this->GetFormOption('list_delimiter',','),$this->Value);
+				return implode($this->GetFormProperty('list_delimiter',','),$this->Value);
 			else {
 				$ret = $this->Value;
 				return $ret; //a copy
@@ -61,7 +61,7 @@ class UserEmail extends EmailBase
 		} elseif ($this->Value)
 			$ret = $this->Value;
 		else
-			$ret = $this->GetFormOption('unspecified',
+			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
 
 		if ($as_string)

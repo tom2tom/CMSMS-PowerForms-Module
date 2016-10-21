@@ -94,7 +94,7 @@ class DatePicker extends FieldBase
 				$ret);
 				$ret = html_entity_decode($ret,ENT_QUOTES,'UTF-8');
 		} else
-			$ret = $this->GetFormOption('unspecified',$mod->Lang('unspecified'));
+			$ret = $this->GetFormProperty('unspecified',$mod->Lang('unspecified'));
 
 		if ($as_string)
 			return $ret;

@@ -35,7 +35,7 @@ class CompanyDirectory extends FieldBase
 		if ($this->HasValue()) {
 			if (is_array($this->Value)) {
 				if ($as_string)
-					return implode($this->GetFormOption('list_delimiter',','),$this->Value);
+					return implode($this->GetFormProperty('list_delimiter',','),$this->Value);
 				else {
 					$ret = $this->Value;
 					return $ret; //array copy
@@ -43,7 +43,7 @@ class CompanyDirectory extends FieldBase
 			}
 			$ret = $this->Value;
 		} else {
-			$ret = $this->GetFormOption('unspecified',
+			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
 		}
 		if ($as_string)

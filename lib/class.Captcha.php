@@ -107,7 +107,7 @@ class Captcha extends FieldBase
 		$tplvars = array(
 			'captcha' => $captcha->getCaptcha(),
 			'prompt' => $this->GetProperty('prompt',$mod->Lang('captcha_prompt')).
-				$this->GetFormOption('required_field_symbol','*')
+				$this->GetFormProperty('required_field_symbol','*')
 		);
 		$test = method_exists($captcha,'NeedsInputField') ? $captcha->NeedsInputField() : TRUE;
 		if ($test) {

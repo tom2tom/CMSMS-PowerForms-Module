@@ -26,22 +26,22 @@ class SystemEmail extends EmailBase
 		$this->Type = 'SystemEmail';
 	}
 
-	public function GetOptionAddButton()
+	public function GetOptionAddLabel()
 	{
 		return $this->formdata->formsmodule->Lang('add_address');
 	}
 
-	public function GetOptionDeleteButton()
+	public function GetOptionDeleteLabel()
 	{
 		return $this->formdata->formsmodule->Lang('delete_address');
 	}
 
-	public function DoOptionAdd(&$params)
+	public function OptionAdd(&$params)
 	{
 		$this->addressAdd = TRUE;
 	}
 
-	public function DoOptionDelete(&$params)
+	public function OptionDelete(&$params)
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {

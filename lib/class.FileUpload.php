@@ -31,7 +31,7 @@ class FileUpload extends FieldBase
 	public function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		if (!Utils::GetUploadsPath())
+		if (!Utils::GetUploadsPath($mod))
 			return $mod->Lang('err_uploads_dir');
 
 		$ms = $this->GetProperty('max_size');
@@ -310,7 +310,7 @@ class FileUpload extends FieldBase
 				$this->ResetValue();
 				$this->SetValue($url);
 			} else { //we will upload
-				$ud = Utils::GetUploadsPath();
+				$ud = Utils::GetUploadsPath($mod);
 				if (!$ud)
 					return array(FALSE,'err_uploads_dir');
 

@@ -63,7 +63,7 @@ class TextExpandable extends FieldBase
 	{
 		if (is_array($this->Value)) {
 			if ($as_string)
-				return join($this->GetFormOption('list_delimiter',','),$this->Value);
+				return join($this->GetFormProperty('list_delimiter',','),$this->Value);
 			else {
 				$ret = $this->Value;
 				return $ret;
@@ -71,7 +71,7 @@ class TextExpandable extends FieldBase
 		} elseif ($this->Value)
 			$ret = $this->Value;
 		else
-			$ret = $this->GetFormOption('unspecified',
+			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
 
 		if ($as_string)

@@ -72,7 +72,7 @@ class SiteAdmin extends FieldBase
 		else
 			$ret = FALSE;
 		if (!$ret)
-			$ret = $this->GetFormOption('unspecified',
+			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
 
 		if ($as_string)

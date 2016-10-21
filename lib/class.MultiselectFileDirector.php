@@ -23,22 +23,22 @@ class MultiselectFileDirector extends FieldBase
 		$this->Type = 'MultiselectFileDirector';
 	}
 
-	public function GetOptionAddButton()
+	public function GetOptionAddLabel()
 	{
 		return $this->formdata->formsmodule->Lang('add_file');
 	}
 
-	public function GetOptionDeleteButton()
+	public function GetOptionDeleteLabel()
 	{
 		return $this->formdata->formsmodule->Lang('delete_file');
 	}
 
-	public function DoOptionAdd(&$params)
+	public function OptionAdd(&$params)
 	{
 		$this->fileAdd = TRUE;
 	}
 
-	public function DoOptionDelete(&$params)
+	public function OptionDelete(&$params)
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {
@@ -81,7 +81,7 @@ class MultiselectFileDirector extends FieldBase
 		}
 
 		if ($as_string)
-			$ret = implode($this->GetFormOption('list_delimiter',','),$ret);
+			$ret = implode($this->GetFormProperty('list_delimiter',','),$ret);
 
 		return $ret;
 	}

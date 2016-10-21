@@ -22,22 +22,22 @@ class FileDirector extends FieldBase
 		$this->Type = 'FileDirector';
 	}
 
-	public function GetOptionAddButton()
+	public function GetOptionAddLabel()
 	{
 		return $this->formdata->formsmodule->Lang('add_file');
 	}
 
-	public function GetOptionDeleteButton()
+	public function GetOptionDeleteLabel()
 	{
 		return $this->formdata->formsmodule->Lang('delete_file');
 	}
 
-	public function DoOptionAdd(&$params)
+	public function OptionAdd(&$params)
 	{
 		$this->fileAdd = TRUE;
 	}
 
-	public function DoOptionDelete(&$params)
+	public function OptionDelete(&$params)
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {
@@ -81,7 +81,7 @@ class FileDirector extends FieldBase
 	public function GetFieldStatus()
 	{
 		$mod = $this->formdata->formsmodule;
-		if (!Utils::GetUploadsPath())
+		if (!Utils::GetUploadsPath($mod))
 			return $mod->Lang('err_uploads_dir');
 		$opt = $this->GetPropArray('destination_filename');
 		if ($opt)
@@ -94,7 +94,7 @@ class FileDirector extends FieldBase
 	public function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		if (!Utils::GetUploadsPath())
+		if (!Utils::GetUploadsPath($mod))
 			return array('main'=>array($this->GetErrorMessage('err_uploads_dir')));
 
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
@@ -199,7 +199,7 @@ class FileDirector extends FieldBase
 	public function Dispose($id,$returnid)
 	{
 		$mod = $this->formdata->formsmodule;
-		$ud = Utils::GetUploadsPath();
+		$ud = Utils::GetUploadsPath($mod);
 		if (!$ud)
 			return array(FALSE,$mod->Lang('err_uploads_dir'));
 /*MUTEX

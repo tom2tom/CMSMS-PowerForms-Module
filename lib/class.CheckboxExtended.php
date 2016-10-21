@@ -46,7 +46,7 @@ class CheckboxExtended extends FieldBase
 			$ret = $this->GetProperty('unchecked_value',$mod->Lang('value_unchecked'));
 
 		if (!empty($val['text']))
-			$ret .= $this->GetFormOption('list_delimiter',',').$val['text'];
+			$ret .= $this->GetFormProperty('list_delimiter',',').$val['text'];
 
 		if ($as_string)
 			return $ret;

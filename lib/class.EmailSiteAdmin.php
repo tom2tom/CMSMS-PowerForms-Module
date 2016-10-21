@@ -52,7 +52,7 @@ class EmailSiteAdmin extends EmailBase
 		if (isset($userlist[$this->Value - 1]))
 			$ret = $userlist[$this->Value - 1]->firstname . ' '. $userlist[$this->Value - 1]->lastname;
 		else
-			$ret = $this->GetFormOption('unspecified',
+			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
 
 		if ($as_string)

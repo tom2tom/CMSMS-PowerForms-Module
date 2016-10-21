@@ -53,7 +53,7 @@ class InputTag extends FieldBase
 			$params['FORM'] = $this->formdata;
 
 		$mod = $this->formdata->formsmodule;
-		$unspec = $this->GetFormOption('unspecified',$mod->Lang('unspecified'));
+		$unspec = $this->GetFormProperty('unspecified',$mod->Lang('unspecified'));
 		foreach ($this->formdata->Fields as &$one) {
 			$val = '';
 			if ($one->DisplayInSubmission()) {

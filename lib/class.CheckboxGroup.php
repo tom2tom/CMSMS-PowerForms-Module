@@ -27,25 +27,25 @@ class CheckboxGroup extends FieldBase
 	}
 
 	// Get add-button label
-	public function GetOptionAddButton()
+	public function GetOptionAddLabel()
 	{
 		return $this->formdata->formsmodule->Lang('add_checkboxes');
 	}
 
 	// Get delete-button label
-	public function GetOptionDeleteButton()
+	public function GetOptionDeleteLabel()
 	{
 		return $this->formdata->formsmodule->Lang('delete_checkboxes');
 	}
 
 	// Add action
-	public function DoOptionAdd(&$params)
+	public function OptionAdd(&$params)
 	{
 		$this->boxAdd = TRUE;
 	}
 
 	// Delete action
-	public function DoOptionDelete(&$params)
+	public function OptionDelete(&$params)
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {
@@ -92,12 +92,12 @@ class CheckboxGroup extends FieldBase
 				if ($this->GetProperty('include_labels',0)) {
 					$output = '';
 					foreach ($ret as $key=>$value)
-						$output .= $key.': '.$value.$this->GetFormOption('list_delimiter',',');
+						$output .= $key.': '.$value.$this->GetFormProperty('list_delimiter',',');
 
 					$output = substr($output,0,strlen($output)-1);
 					return $output;
 				}
-				return implode($this->GetFormOption('list_delimiter',','),$ret);
+				return implode($this->GetFormProperty('list_delimiter',','),$ret);
 			} else {
 				return $ret;
 			}

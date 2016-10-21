@@ -20,34 +20,34 @@ class Multiselect extends FieldBase
 		$this->Type = 'Multiselect';
 	}
 
-	public function GetOptionAddButton()
+	public function GetOptionAddLabel()
 	{
 		return $this->formdata->formsmodule->Lang('add_options');
 	}
 
-	public function GetOptionDeleteButton()
+	public function GetOptionDeleteLabel()
 	{
 		return $this->formdata->formsmodule->Lang('delete_options');
 	}
 
-	public function DoOptionAdd(&$params)
+	public function OptionAdd(&$params)
 	{
 		$this->optionAdd = TRUE;
 	}
 
-	public function DoOptionDelete(&$params)
+	public function OptionDelete(&$params)
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx) {
-				$this->RemovePropIndexed('option_name',$indx);
-				$this->RemovePropIndexed('option_value',$indx);
+				$this->RemovePropIndexed('indexed_name',$indx);
+				$this->RemovePropIndexed('indexed_value',$indx);
 			}
 		}
 	}
 
 	public function GetFieldStatus()
 	{
-		$opt = $this->GetProperty('option_name');
+		$opt = $this->GetProperty('indexed_name');
 		if (is_array($opt))
 			$optionCount = count($opt);
 		else
@@ -60,17 +60,17 @@ class Multiselect extends FieldBase
 		if ($this->HasValue()) {
 			if (is_array($this->Value)) {
 				$ret = array();
-				$vals = $this->GetPropArray('option_value');
+				$vals = $this->GetPropArray('indexed_value');
 				foreach ($this->Value as $one)
 					$ret[] = $vals[$one];
 				if ($as_string)
-					return implode($this->GetFormOption('list_delimiter',','),$ret);
+					return implode($this->GetFormProperty('list_delimiter',','),$ret);
 				else
 					return $ret;
 			}
 			$ret = $this->Value;
 		} else {
-			$ret = $this->GetFormOption('unspecified',
+			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
 		}
 		if ($as_string)
@@ -88,22 +88,22 @@ class Multiselect extends FieldBase
 						$mod->CreateInputText($id,'pdt_lines',
 							$this->GetProperty('lines','3'),10,10));
 		if ($this->optionAdd) {
-			$this->AddPropIndexed('option_name','');
-			$this->AddPropIndexed('option_value','');
+			$this->AddPropIndexed('indexed_name','');
+			$this->AddPropIndexed('indexed_value','');
 			$this->optionAdd = FALSE;
 		}
-		$names = $this->GetPropArray('option_name');
+		$names = $this->GetPropArray('indexed_name');
 		if ($names) {
 			$dests = array();
 			$dests[] = array(
-				$mod->Lang('title_option_name'),
-				$mod->Lang('title_option_value'),
+				$mod->Lang('title_indexed_name'),
+				$mod->Lang('title_indexed_value'),
 				$mod->Lang('title_select')
 				);
 			foreach ($names as $i=>&$one) {
 				$dests[] = array(
-				$mod->CreateInputText($id,'pdt_option_name'.$i,$one,30,128),
-				$mod->CreateInputText($id,'pdt_option_value'.$i,$this->GetPropIndexed('option_value',$i),30,128),
+				$mod->CreateInputText($id,'pdt_indexed_name'.$i,$one,30,128),
+				$mod->CreateInputText($id,'pdt_indexed_value'.$i,$this->GetPropIndexed('indexed_value',$i),30,128),
 				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
@@ -119,12 +119,12 @@ class Multiselect extends FieldBase
 	public function PostAdminAction(&$params)
 	{
 		//cleanup empties
-		$names = $this->GetPropArray('option_name');
+		$names = $this->GetPropArray('indexed_name');
 		if ($names) {
 			foreach ($names as $i=>&$one) {
-				if (!$one || !$this->GetPropIndexed('option_value',$i)) {
-					$this->RemovePropIndexed('option_name',$i);
-					$this->RemovePropIndexed('option_value',$i);
+				if (!$one || !$this->GetPropIndexed('indexed_value',$i)) {
+					$this->RemovePropIndexed('indexed_name',$i);
+					$this->RemovePropIndexed('indexed_value',$i);
 				}
 			}
 			unset($one);
@@ -133,7 +133,7 @@ class Multiselect extends FieldBase
 
 	public function Populate($id,&$params)
 	{
-		$choices = $this->GetPropArray('option_name');
+		$choices = $this->GetPropArray('indexed_name');
 		if ($choices) {
 			$choices = array_flip($choices);
 			if (!property_exists($this,'Value'))
