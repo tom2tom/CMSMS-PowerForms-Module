@@ -135,7 +135,7 @@ if (isset($params[$prefix.'formdata'])) {
 
 		if ($donekey) {
 /*			// rate-limit?
-			$num = PWForms\Utils::GetFormOption($formdata,'submit_limit',0);
+			$num = PWForms\Utils::GetFormProperty($formdata,'submit_limit',0);
 			if ($num > 0) {
 				if (!empty($_SERVER['REMOTE_ADDR'])) {
 					$src = $_SERVER['REMOTE_ADDR'];
@@ -213,7 +213,7 @@ EOS;
 						return;
 					}
 					//rate-limit?
-					$limit = PWForms\Utils::GetFormOption($formdata,'submit_limit',0);
+					$limit = PWForms\Utils::GetFormProperty($formdata,'submit_limit',0);
 					if ($limit) {
 						if ($num <= $limit) {
 							$sql = array();
@@ -274,10 +274,10 @@ $this->Crash2();
 			}
 
 			if ($allvalid) {
-				$udt = PWForms\Utils::GetFormOption($formdata,'validate_udt');
+				$udt = PWForms\Utils::GetFormProperty($formdata,'validate_udt');
 				if (!empty($udt)) {
 					$usertagops = cmsms()->GetUserTagOperations(); //TODO ok here ?
-					$unspec = PWForms\Utils::GetFormOption($formdata,'unspecified',$this->Lang('unspecified'));
+					$unspec = PWForms\Utils::GetFormProperty($formdata,'unspecified',$this->Lang('unspecified'));
 
 					$parms = $params;
 					foreach ($formdata->FieldOrders as $one) {
@@ -397,7 +397,7 @@ $this->Crash2();
 				$tplvars['form_done'] = 1;
 				if ($alldisposed) {
 					$cache->delete($cache_key);
-					$act = PWForms\Utils::GetFormOption($formdata,'submit_action','text');
+					$act = PWForms\Utils::GetFormProperty($formdata,'submit_action','text');
 					switch ($act) {
 					 case 'text':
 						$this->SendEvent('OnFormSubmit',$parms);
@@ -406,7 +406,7 @@ $this->Crash2();
 						return;
 					 case 'redir':
 						$this->SendEvent('OnFormSubmit',$parms);
-						$ret = PWForms\Utils::GetFormOption($formdata,'redirect_page',0);
+						$ret = PWForms\Utils::GetFormProperty($formdata,'redirect_page',0);
 						if ($ret > 0)
 							$this->RedirectContent($ret);
 						else {
@@ -477,8 +477,8 @@ $this->Crash2();
 $tplvars['form_has_validation_errors'] = $validerr;
 $tplvars['show_submission_errors'] = 0;
 
-$udtonce = $firsttime && PWForms\Utils::GetFormOption($formdata,'predisplay_udt');
-$udtevery = PWForms\Utils::GetFormOption($formdata,'predisplay_each_udt');
+$udtonce = $firsttime && PWForms\Utils::GetFormProperty($formdata,'predisplay_udt');
+$udtevery = PWForms\Utils::GetFormProperty($formdata,'predisplay_each_udt');
 if ($udtonce || $udtevery) {
 	$parms = $params;
 	$parms['FORM'] =& $formdata;
@@ -500,6 +500,27 @@ $tplvars['form_done'] = 0;
 require __DIR__.DIRECTORY_SEPARATOR.'populate.default.php';
 
 $cache->set($cache_key,$formdata,84600);
+
+$styler = PWForms\Utils::GetFormProperty($formdata,'css_file','');
+if ($styler) {
+	$fp = ''.PWForms\Utils::GetUploadsPath($this).DIRECTORY_SEPARATOR.$styler;
+	if (is_file($fp)) {
+		$url = PWForms\Utils::GetUploadURL($this,$styler);
+	 	$t = <<<EOS
+var linkadd = '<link rel="stylesheet" type="text/css" href="{$url}" />',
+ \$head = $('head'),
+ \$linklast = \$head.find('link[rel="stylesheet"]:last');
+if (\$linklast.length) {
+ \$linklast.after(linkadd);
+} else {
+ \$head.append(linkadd);
+}
+EOS;
+		$jsall = NULL;
+		PWForms\Utils::MergeJS(FALSE,array($t),FALSE,$jsall);
+		echo $jsall;
+	}
+}
 
 echo $form_start.$hidden;
 PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf_'.$form_id,$tplvars,TRUE);
