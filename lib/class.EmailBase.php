@@ -369,7 +369,7 @@ EOS;
  			  !$one->GetProperty('suppress_attachment') && !$one->GetProperty('sendto_uploads'))
 			{
 				// file(s) to be attached to email
-				$ud = Utils::GetUploadsPath();
+				$ud = Utils::GetUploadsPath($mod);
 				if (!$ud) {
 					$mail->reset();
 					return array(FALSE,$mod->Lang('err_uploads_dir'));
