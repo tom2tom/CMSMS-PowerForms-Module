@@ -12,7 +12,7 @@ $formdata->current_prefix.'formdata'=>$cache_key,
 $formdata->current_prefix.'formpage'=>$formdata->Page);
 if (isset($params['resume']))
 	$fmhidden['resume'] = $params['resume'];
-$form_start = $this->CreateFormStart($id,'default',$returnid,'POST',
+$form_start = $this->CreateFormStart($id,'show_form',$returnid,'POST',
 	'multipart/form-data',$inline,'',$fmhidden);
 $form_end = $this->CreateFormEnd();
 
@@ -26,7 +26,7 @@ $tplvars = $tplvars + array(
 	'actionid' => $id
 );
 
-// Build hidden (see also the form hidden-parameters, above)
+// Build other hidden (see also the form hidden-parameters, above)
 $hidden = '';
 //TODO how/when should these be originally set ?
 if (!empty($params['in_browser'])) {
