@@ -272,13 +272,17 @@ class PWForms extends CMSModule
 	public function InitializeFrontend()
 	{
 		$this->RestrictUnknownParams();
+		$this->SetParameterType('captcha_input',CLEAN_STRING);
 		$this->SetParameterType('form',CLEAN_STRING);
 		$this->SetParameterType('form_id',CLEAN_INT);
-		$this->SetParameterType('field_id',CLEAN_INT);
-		$this->SetParameterType('response_id',CLEAN_INT);
-		$this->SetParameterType('captcha_input',CLEAN_STRING);
-		$this->SetParameterType(CLEAN_REGEXP.'/pwfp_\d{3}_.*/',CLEAN_STRING);
-		$this->SetParameterType(CLEAN_REGEXP.'/value_.*/',CLEAN_STRING);
+//		$this->SetParameterType('field_id',CLEAN_INT);
+//		$this->SetParameterType('browser_id',CLEAN_INT);
+//		$this->SetParameterType('in_admin',CLEAN_INT);
+//		$this->SetParameterType('in_browser',CLEAN_INT);
+		$this->SetParameterType('preload',CLEAN_NONE);
+		$this->SetParameterType('resume',CLEAN_STRING);
+		$this->SetParameterType(CLEAN_REGEXP.'/pwfp_\d{3}_.*/',CLEAN_STRING); //or NONE?
+		$this->SetParameterType(CLEAN_REGEXP.'/value_.*/',CLEAN_STRING); //or NONE?
 	}
 
 	/**
@@ -286,12 +290,8 @@ class PWForms extends CMSModule
 	*/
 	public function InitializeAdmin()
 	{
-		//document only the parameters relevant for external (page-tag) usage
+		//document only the parameters relevant for external use
 		$this->CreateParameter('form','',$this->Lang('param_form_alias'),FALSE);
-//		$this->CreateParameter('form_id',-1,$this->Lang('param_form_id'));
-//		$this->CreateParameter('field_id',-1,$this->Lang('param_field_id'));
-//		$this->CreateParameter('response_id',-1,$this->Lang('param_response_id'));
-//		$this->CreateParameter('pwfp_*','',$this->Lang('param_general'));
 		$this->CreateParameter('value_*','',$this->Lang('param_passed_from_tag'));
 	}
 
