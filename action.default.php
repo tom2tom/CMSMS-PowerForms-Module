@@ -4,6 +4,28 @@
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+'form' => alias, first-time opened
+'form_id' => enum or -1
+'action' => 'default'
+'in_admin' (maybe, deprecated)
+'in_browser' (maybe, deprecated)
+'browser_id' (maybe, deprecated)
+'captcha_input' (maybe)
+'preload' => set first-time field values, array, keys=field id or alias, values=what to set
+'resume' (maybe) => action name for cancellation redirect
+
+after first-pass, many with prefix: 'pwfp_\d{3}_'
+ including
+		...field id => field-value from UI
+		...Fe[DX]_ => expand or shrink a multi-element field
+		...previous => pageback clicked
+		...continue => pagenext clicked
+		...done => submit clicked
+		...cancel => cancel clicked
+		...formdata => cache key
+		...formpage => displayed-page index
+*/
 
 if (!function_exists('BlockSource')) {
  function BlockSource()
@@ -34,7 +56,13 @@ if (empty($params['form_id']) || $params['form_id'] == -1) {
 		'error'=>1));
 	return;
 }
+
 list($current,$prior) = $this->_GetTokens(); //fresh pair of fieldname-prefixes
+
+if (isset($params[$current.'cancel']) || isset($params[$prior.'cancel'])) {
+	$this->Redirect($id,$params['resume'],$returnid);
+}
+
 //check that we're current
 $matched = preg_grep('/^pwfp_\d{3}_/',array_keys($params));
 if ($matched) {
@@ -442,7 +470,7 @@ $this->Crash2();
 				$formdata->Page--; //TODO why
 			}
 		}
-	}
+	} // !field expand/shrink
 } else { //first time
 	$funcs = new PWForms\FormOperations();
 	$formdata = $funcs->Load($this,$form_id,$id,$params);
@@ -454,14 +482,32 @@ $this->Crash2();
 			'error'=>1));
 		return;
 	}
+
+	if (isset($params['preload'])) {
+		//set fields' value from externally-supplied values
+		foreach ($params['preload'] as $key=>$val) {
+			if (is_numeric($key)) {
+				$field_id = (int)$key;
+			} else {
+				$field_id = PWForms\Utils::GetFieldIDFromAlias($key);
+				if ($field_id == -1) {
+//TODO warning
+					continue;
+				}
+			}
+			if (isset($formdata->Fields[$field_id])) {
+				$obfield = $formdata->Fields[$field_id];
+				$obfield->SetValue($val);
+			} else {
+//TODO warning
+			}
+		}
+	}
+
 	$firsttime = TRUE;
 	$formdata->Page = 1;
 	$formdata->PagesCount = 1; //we will count
 
-/*	if ($params['action'] == 'show_form') {
-		import & store field data
-	}
-*/
 	$formdata->FieldOrders = array_keys($formdata->Fields);
 	$funcs->Arrange($formdata->Fields,$formdata->FieldOrders);
 
