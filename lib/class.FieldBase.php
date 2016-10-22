@@ -114,27 +114,27 @@ class FieldBase implements \Serializable
 		unset($this->XtraProps[$name]);
 	}
 
-	public function SetProperty($optionName, $optionValue)
+	public function SetProperty($propName, $propValue)
 	{
-		$this->XtraProps[$optionName] = $optionValue;
+		$this->XtraProps[$propName] = $propValue;
 	}
 
 	// Returns a field-property value, or $default if the property doesn't exist
-	public function GetProperty($optionName,$default='')
+	public function GetProperty($propName,$default='')
 	{
-		if (isset($this->XtraProps[$optionName]))
-			return $this->XtraProps[$optionName];
+		if (isset($this->XtraProps[$propName]))
+			return $this->XtraProps[$propName];
 		return $default;
 	}
 
 	// Returns array of property-values (possibly just 0=>NULL), or FALSE
-	// Each array-key is the numeric-suffix to $optionName, & array-value is the stored value
-	public function GetPropArray($optionName)
+	// Each array-key is the numeric-suffix to $propName, & array-value is the stored value
+	public function GetPropArray($propName)
 	{
-		$len = strlen($optionName);
+		$len = strlen($propName);
 		$matches = array();
 		foreach ($this->XtraProps as $key => &$val) {
-			if (strncmp($key,$optionName,$len) == 0) {
+			if (strncmp($key,$propName,$len) == 0) {
 				$o = (int)substr($key,$len);
 				$matches[$o] = $val;
 			}
@@ -147,37 +147,37 @@ class FieldBase implements \Serializable
 			elseif (key($matches) == 0) {
 				$matches[1] = $matches[0];
 				unset($matches[0]);
-				$this->XtraProps[$optionName.'1'] = $matches[1];
-				unset($this->XtraProps[$optionName]);
+				$this->XtraProps[$propName.'1'] = $matches[1];
+				unset($this->XtraProps[$propName]);
 			}
 			return $matches;
 		}
 		return FALSE;
 	  }
 
-	public function SetPropIndexed($optionName, $index, $value)
+	public function SetPropIndexed($propName, $index, $value)
 	{
-		$this->XtraProps[$optionName.$index] = $value;
+		$this->XtraProps[$propName.$index] = $value;
 	}
 
-	public function GetPropIndexed($optionName, $index, $default='')
+	public function GetPropIndexed($propName, $index, $default='')
 	{
-		$so = $optionName.$index;
+		$so = $propName.$index;
 		if (isset($this->XtraProps[$so]))
 			return $this->XtraProps[$so];
 		elseif ($index == 0) {
-			if (isset($this->XtraProps[$optionName]))
-				return $this->XtraProps[$optionName];
+			if (isset($this->XtraProps[$propName]))
+				return $this->XtraProps[$propName];
 		}
 		return $default;
 	}
 
-	public function AddPropIndexed($optionName,$value)
+	public function AddPropIndexed($propName,$value)
 	{
-		$len = strlen($optionName);
+		$len = strlen($propName);
 		$max = -1;
 		foreach ($this->XtraProps as $key => &$one) {
-			if (strpos($key,$optionName) === 0) {
+			if (strpos($key,$propName) === 0) {
 				$o = (int)substr($key,$len);
 				if ($o > $max)
 					$max = $o;
@@ -185,16 +185,16 @@ class FieldBase implements \Serializable
 		}
 		unset($one);
 		$index = ($max > -1) ? $max + 1 : 1;
-		$this->XtraProps[$optionName.$index] = $value;
+		$this->XtraProps[$propName.$index] = $value;
 	}
 
-	public function RemovePropIndexed($optionName,$index)
+	public function RemovePropIndexed($propName,$index)
 	{
-		unset($this->XtraProps[$optionName.$index]);
+		unset($this->XtraProps[$propName.$index]);
 	}
 
 	// Returns a form-option value, or $default if the option doesn't exist
-	public function GetFormOption($optname, $default='')
+	public function GetFormProperty($optname, $default='')
 	{
 		if (isset($this->formdata->XtraProps[$optname]))
 			return $this->formdata->XtraProps[$optname];
@@ -530,13 +530,13 @@ class FieldBase implements \Serializable
 			$ret = $this->Value;
 			if (is_array($ret)) {
 				if ($as_string)
-					return implode($this->GetFormOption('list_delimiter',','),$ret);
+					return implode($this->GetFormProperty('list_delimiter',','),$ret);
 				else
 					return $ret; //assume array members are all displayable
 			} else
 				$ret = (string)$ret;
 		} else {
-			$ret = $this->GetFormOption('unspecified',
+			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
 		}
 		if ($as_string)
@@ -546,12 +546,11 @@ class FieldBase implements \Serializable
 	}
 
 	// Subclass this
-	// Returns array of option values if the option is an array with member(s),
-	// or else FALSE
-	public function GetDisplayableOptionValues()
+	// Returns array of property values or FALSE
+	public function GetIndexedValues()
 	{
-		if (array_key_exists('option_value',$this->XtraProps)) {
-			return $this->XtraProps['option_value']; //array with member(s)
+		if (array_key_exists('indexed_value',$this->XtraProps)) {
+			return $this->XtraProps['indexed_value'];
 		}
 		return FALSE;
 	}
@@ -664,36 +663,36 @@ class FieldBase implements \Serializable
 		return '';
 	}
 
-	//Whether to generate a submit-button labelled 'add',along with the field
-	public function HasAddOp()
+	//Whether to generate a submit-button labelled 'add', along with the field
+	public function HasOptionAdd()
 	{
 		return !empty($this->XtraProps['HasAddOp']);
 	}
 
 	// Subclass this to generate appropriate add-button label
-	public function GetOptionAddButton()
+	public function GetOptionAddLabel()
 	{
 		return $this->formdata->formsmodule->Lang('add_options');
 	}
 
 	// Subclass this when necessary or useful (often, just set a flag)
-	public function DoOptionAdd(&$params)
+	public function OptionAdd(&$params)
 	{
 	}
-	//Whether to generate a submit-button labelled 'delete',along with the field
-	public function HasDeleteOp()
+	//Whether to generate a submit-button labelled 'delete', along with the field
+	public function HasOptionDelete()
 	{
 		return !empty($this->XtraProps['HasDeleteOp']);
 	}
 
 	// Subclass this to generate appropriate delete-button label
-	public function GetOptionDeleteButton()
+	public function GetOptionDeleteLabel()
 	{
 		return $this->formdata->formsmodule->Lang('delete_options');
 	}
 
 	// Subclass this when necessary or useful to delete option-data
-	public function DoOptionDelete(&$params)
+	public function OptionDelete(&$params)
 	{
 	}
 
