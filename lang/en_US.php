@@ -658,8 +658,8 @@ $lang['help_searchable'] = 'Checking this will make all submitted data accessibl
 //$lang['help_show_fieldlevel'] = 'TODO';
 $lang['help_show_limitations'] = 'Display any size and extension restrictions with the upload field?';
 $lang['help_single_check'] = 'The boxes will together behave like a radio group, except that all of them may be unchecked';
-$lang['help_submit_javascript'] = 'Javascript to apply to final \'Submit\' button for handling some event, e.g. onclick="yourfn()".<br />This will probably not work well if you use the "safety script" option above.';
-$lang['help_submit_safety'] = 'Add Javascript to final \'Submit\' button that will help prevent multiple submissions';
+$lang['help_submit_javascript'] = 'Javascript to be included (verbatim) in an onclick-event handler applied to the form\'s buttons. The script may "return false" to abort the submission.';
+$lang['help_submit_safety'] = 'Add javascript to final \'Submit\' button that will help prevent multiple submissions';
 //$lang['help_submit_tab'] = <<<EOS
 //What the module does with submitted data is determined by "Disposition" fields (such as generated emails) in the form, not here.
 //EOS;
