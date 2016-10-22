@@ -295,6 +295,16 @@ class PWForms extends CMSModule
 		$this->CreateParameter('value_*','',$this->Lang('param_passed_from_tag'));
 	}
 
+	public function DoAction($action, $id, $params, $returnid=-1)
+	{
+		switch ($action) {
+		 case 'default':
+			$action = 'show_form';
+			break;
+		}
+		parent::DoAction($action,$id,$params,$returnid);
+	}
+
 // ~~~~~~~~~~~~~~~~~~~~~ NON-CMSModule METHODS ~~~~~~~~~~~~~~~~~~~~~
 
 	public function _CheckAccess($permission='')
