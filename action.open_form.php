@@ -81,16 +81,7 @@ if (isset($params['submit']) || isset($params['apply'])) {
 }
 //stylesfile
 if (!(empty($params['stylesdelete']) || empty($params['pdt_css_file']))) {
-	$fp = $config['uploads_path'];
-	if ($fp && is_dir($fp)) {
-		$rel = $this->GetPreference('uploads_dir','');
-		if ($rel)
-			$fp = cms_join_path($fp,$rel,$params['pdt_css_file']);
-		else
-			$fp = cms_join_path($fp,$params['pdt_css_file']);
-		if (is_file($fp))
-			@unlink($fp);
-	}
+	PWForms\Utils::DeleteUploadFile($this,$params['pdt_css_file'],$form_id);
 //	unset($params['stylesdelete']);
 }
 $t = $id.'stylesupload';

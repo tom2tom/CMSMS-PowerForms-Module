@@ -130,6 +130,11 @@ EOS;
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field WHERE form_id=?';
 		if (!$db->Execute($sql,array($form_id)))
 			$res = FALSE;
+		//no need for longvalue check
+		$file = $db->GetOne('SELECT value FROM '.$pre.'module_pwf_formprops WHERE form_id=? AND name=\'css_file\'');
+		if ($file) {
+			Utils::DeleteUploadFile($mod,$file,$form_id);
+		}
 		$sql = 'DELETE FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
 		if (!$db->Execute($sql,array($form_id)))
 			$res = FALSE;
