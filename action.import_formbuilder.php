@@ -296,8 +296,10 @@ EOS;
 		 'PulldownField',
 		 'RadioGroupField',
 		));
-		if ($sequence)
+		if ($sequence) {
 			$desc = '';
+			$uses = array_count_values(array_column($data,'name'));
+		}
 
 		foreach ($data as $fbrow) {
 			extract($pfrow); //NULL default values
@@ -311,10 +313,16 @@ EOS;
 				if ($name != $desc) {
 					$desc = $name;
 					$indx = 1;
-				} else {
+				}
+				//not all field-properties are sequences (and some that are will be single-valued)
+				if ($uses[$name] > 1) {
+					$name .= $indx;
 					$indx++;
 				}
-				$name .= $indx;
+			}
+			//rename some properties e.g. 'option_'* to 'indexed_'*
+			if (strncmp($name,'option_',7) == 0) {
+				$name = 'indexed_'.substr($name,7);
 			}
 			$value = $value;
 			$longvalue = $longvalue;
@@ -335,7 +343,6 @@ EOS;
 			$db->Execute($sql,$args);
 		}
 		//TODO update $passbacks
-		//TODO rename some properties e.g. 'option_'* to 'indexed_'*
 		foreach ($passdowns as $nm=>$val) {
 //			if ($val) {
 			extract($pfrow); //NULL default values
