@@ -14,7 +14,7 @@
 {if !empty($mainvarhelp)}<br /><div>{$help_subtplvars}</div>{/if}
 {if isset($mainTable)}
   <br />
-  <div class="pageinput pageoverflow">
+  <div class="pageoverflow">
    <table class="pagetable leftwards">
  {section name=r loop=$mainTable}
   {if $smarty.section.r.first}
@@ -31,7 +31,7 @@
   </div>
  {if $add || $del}
   <br />
-  <p class="pageinput">{if $add}{$add}&nbsp;{/if}{if $del}{$del}{/if}</p>
+  <p>{if $add}{$add}&nbsp;{/if}{if $del}{$del}{/if}</p>
  {/if}
  {/if}
  </div>
