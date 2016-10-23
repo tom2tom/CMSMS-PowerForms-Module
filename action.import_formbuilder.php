@@ -91,6 +91,7 @@ EOS;
 	$fb_*					$*
 	fbr_*					pwf_*
 	fb_invalid				invalid_field
+	fbht					help_toggle
 	field_helptext			helptext
 	FormBuilder				PWForms
 	$in_formbrowser			$in_browser
@@ -136,6 +137,7 @@ EOS;
 		'$fb_',
 		'$fbr_id',
 		'fbr_',
+		'fbht',
 		'field_helptext',
 		'$in_formbrowser',
 		'$sub_form_name',
@@ -164,6 +166,7 @@ EOS;
 		'$',
 		'$browser_id',
 		'pwf_',
+		'help_toggle',
 		'helptext',
 		'$in_browser',
 		'$form_name',
@@ -259,7 +262,7 @@ EOS;
 	}
  }
 
- function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, $oldtype, &$xtraopts)
+ function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, $oldtype, &$passdowns, &$passbacks)
  {
 	$sql = 'SELECT * FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY option_id';
 	$data = $db->GetArray($sql,array($oldfid,$oldf));
@@ -302,8 +305,8 @@ EOS;
 			if (!$name)
 				$name = $this->Lang('none');
 			//existing option-value prevails
-			if (isset($xtraopts[$name]))
-				unset($xtraopts[$name]);
+			if (isset($passdowns[$name]))
+				unset($passdowns[$name]);
 			if ($sequence) {
 				if ($name != $desc) {
 					$desc = $name;
@@ -331,8 +334,9 @@ EOS;
 			}
 			$db->Execute($sql,$args);
 		}
-
-		foreach ($xtraopts as $nm=>$val) {
+		//TODO update $passbacks
+		//TODO rename some properties e.g. 'option_'* to 'indexed_'*
+		foreach ($passdowns as $nm=>$val) {
 //			if ($val) {
 			extract($pfrow); //NULL default values
 			$name = ($nm) ? $nm:$this->Lang('none');
@@ -429,12 +433,14 @@ EOS;
 					$more[$one] = $$one;
 				}
 			}
-			Get_FieldOpts($db,$pre,$oldfid,$newfid,$oldf,$newf,$oldtype,$more);
+			$back = array(); //TODO missing keys to get from options
+ 			Get_FieldOpts($db,$pre,$oldfid,$newfid,$oldf,$newf,$oldtype,$more,$back);
+			//TODO handle passbacks
 		}
 	}
  }
 
- function Get_FormOpts(&$mod, &$db, $pre, $oldfid, $newfid, &$xtraopts)
+ function Get_FormOpts(&$mod, &$db, $pre, $oldfid, $newfid, &$passdowns, &$passbacks)
  {
 	$sql = 'SELECT * FROM '.$pre.'module_fb_form_attr WHERE form_id=? ORDER BY form_attr_id';
 	$data = $db->GetArray($sql,array($oldfid));
@@ -479,7 +485,8 @@ EOS;
 			$ares = $db->Execute($sql,array($newid,$newfid,$name,$val,$longval));
 		}
 	}
-	if ($xtraopts) {
+	//TODO handle $passbacks
+	if ($passdowns) {
 $this->Crash(); //TODO
 	}
  }
@@ -569,8 +576,9 @@ $this->Crash();
 					$more[$one] = $$one;
 				}
 			}
-
-			Get_FormOpts($this,$db,$pre,$form_id,$fid,$more);
+			$back = array(); //TODO missing keys to get from options
+			Get_FormOpts($this,$db,$pre,$form_id,$fid,$more,$back);
+			//TODO handle passbacks
 			Get_Fields($db,$pre,$form_id,$fid);
 			Update_Templates($this,$db,$pre,$form_id,$fid);
 			//data may've already been imported by the browser module
