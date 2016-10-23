@@ -11,7 +11,9 @@ $tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$t
 $tplvars['backtoform_nav'] = $this->CreateLink($id,'open_form',$returnid,'&#171; '.$this->Lang('back_form'),
 	array('formedit'=>1,'form_id'=>$params['form_id'],'formdata'=>$params['formdata']));
 
-$jsall = NULL;
+$jsincs = FALSE; //array();
+$jsfuncs = array();
+$jsloads = FALSE; //array();
 
 if ($obfield) { //field data are loaded
 	$fid = $obfield->GetId(); //maybe <= 0, if adding
@@ -38,10 +40,25 @@ if ($obfield) { //field data are loaded
 	$tplvars['tab_end'] = $this->EndTab();
 
 	$tplvars['add'] = ($obfield->HasOptionAdd())?
-		$this->CreateInputSubmit($id,'optionadd',$obfield->GetOptionAddLabel()):'';
+		$this->CreateInputSubmit($id,'optionadd',$obfield->GetOptionAddLabel()):NULL;
 
-	$tplvars['del'] = ($obfield->HasOptionDelete())?
-		$this->CreateInputSubmit($id,'optiondel',$obfield->GetOptionDeleteLabel()):'';
+	if ($obfield->HasOptionDelete()) {
+		$tplvars['del'] = $this->CreateInputSubmit($id,'optiondel',$obfield->GetOptionDeleteLabel(),
+			'onclick="return confirm_selected(this)"');
+		$prompt = $this->Lang('confirm');
+		$jsfuncs['optiondel'] = <<<EOS
+function confirm_selected(btn) {
+ var sel = $(btn).closest('div').find('input[name^="{$id}selected"]:checked');
+ if (sel.length > 0) {
+   return confirm('{$prompt}');
+ } else {
+  return false;
+ }
+}
+EOS;
+	} else {
+		$tplvars['del'] = NULL;
+	}
 
 	$tplvars['requirable'] = (/*!$obfield->IsDisposition() && */!$obfield->GetChangeRequirement())?1:0;
 
@@ -72,7 +89,7 @@ if ($obfield) { //field data are loaded
 	if (isset($allOpts['table']))
 		$tplvars['mainTable'] = $allOpts['table'];
 	if (isset($allOpts['funcs'])) {
-		PWForms\Utils::MergeJS(FALSE,$allOpts['funcs'],FALSE,$jsall);
+		$jsfuncs = array_merge($jsfuncs,$allOpts['funcs']);
 	}
 	if (isset($allOpts['extra'])) {
 		switch ($allOpts['extra']) {
