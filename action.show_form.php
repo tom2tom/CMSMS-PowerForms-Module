@@ -543,17 +543,21 @@ $this->SendEvent('OnFormDisplay',array(
 
 $tplvars['form_done'] = 0;
 
-require __DIR__.DIRECTORY_SEPARATOR.'populate.default.php';
+require __DIR__.DIRECTORY_SEPARATOR.'populate.show.php';
 
 $cache->set($cache_key,$formdata,84600);
 
-$styler = PWForms\Utils::GetFormProperty($formdata,'css_file','');
-if ($styler) {
-	$fp = ''.PWForms\Utils::GetUploadsPath($this).DIRECTORY_SEPARATOR.$styler;
+$styler = '<link rel="stylesheet" type="text/css" href="'.$baseurl.'/css/showform.css" />';
+$t = PWForms\Utils::GetFormProperty($formdata,'css_file','');
+if ($t) {
+	$fp = ''.PWForms\Utils::GetUploadsPath($this).DIRECTORY_SEPARATOR.$t;
 	if (is_file($fp)) {
-		$url = PWForms\Utils::GetUploadURL($this,$styler);
-	 	$t = <<<EOS
-var linkadd = '<link rel="stylesheet" type="text/css" href="{$url}" />',
+		$url = PWForms\Utils::GetUploadURL($this,$t);
+		$styler .= '\n<link rel="stylesheet" type="text/css" href="'.$url.'" />';
+	}
+}
+$t = <<<EOS
+var linkadd = '{$styler}',
  \$head = $('head'),
  \$linklast = \$head.find('link[rel="stylesheet"]:last');
 if (\$linklast.length) {
@@ -562,11 +566,9 @@ if (\$linklast.length) {
  \$head.append(linkadd);
 }
 EOS;
-		$jsall = NULL;
-		PWForms\Utils::MergeJS(FALSE,array($t),FALSE,$jsall);
-		echo $jsall;
-	}
-}
+$jsall = NULL;
+PWForms\Utils::MergeJS(FALSE,array($t),FALSE,$jsall);
+echo $jsall;
 
 echo $form_start.$hidden;
 PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf_'.$form_id,$tplvars,TRUE);
