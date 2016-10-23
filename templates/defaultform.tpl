@@ -30,10 +30,12 @@
 	{foreach from=$fields item=one}
 		{strip}
 		{if $one->display}
-			{if $one->needs_div}<div>{/if}
+			{if $one->needs_div}<div
+			{if $one->required || !empty($one->css_class)} class="{if $one->required}required{/if}{if !empty($one->css_class)} {$one->css_class}{/if}"
+			{/if}>
 			{if !$one->hide_name}
 				<label{if $one->multiple_parts != 1} for="{$one->input_id}"{/if}>{$one->name}
-				{if $one->required_symbol}{$one->required_symbol}{/if}
+				{if $one->required && $one->required_symbol}{$one->required_symbol}{/if}
 				</label>
 			{/if}
 			{if $one->multiple_parts}
@@ -55,6 +57,6 @@
 		{/if}
 		{/strip}
 	{/foreach}
-	<div class="submit_actions">{$prev} {$submit}</div>
+	<div class="submit_actions">{$prev} {$submit} {$cancel}</div>
 	</div>
 {/if}

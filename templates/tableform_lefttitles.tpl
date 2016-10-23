@@ -1,4 +1,4 @@
-{* TABLE FORM LAYOUT / Field titles on Left *}
+{* TABLE FORM LAYOUT / Field titles on left *}
 {* next line sets number of columns for things like checkbox groups *}
 {assign var="cols" value="3"}
 {if $form_done}
@@ -33,10 +33,12 @@
 		{if $one->display && $one->type != 'FieldsetStart' && $one->type != 'FieldsetEnd'}
 		<tr>
 			<td style="text-align:right;vertical-align:top;"
+			{if $one->required || !empty($one->css_class)} class="{if $one->required}required{/if}{if !empty($one->css_class)} {$one->css_class}{/if}"{/if}>
 			{if !$one->hide_name}{$one->name}
-			{if $one->required_symbol}{$one->required_symbol}{/if}
+			{if $one->required && $one->required_symbol}{$one->required_symbol}{/if}
 			{/if}
-			</td><td style="text-align:left;vertical-align:top;">
+			</td><td style="text-align:left;vertical-align:top;"
+			{if $one->required || !empty($one->css_class)} class="{if $one->required}required{/if}{if !empty($one->css_class)} {$one->css_class}{/if}"{/if}>
 			{if $one->multiple_parts}
 			<table>
 				<tr>
@@ -68,6 +70,6 @@
 		{/if}
 		{/strip}
 	{/foreach}
-	<tr><td>{$prev}</td><td>{$submit}</td></tr>
 	</table>
+  <div class="submit_actions">{$prev} {$submit} {$cancel}</div>
 {/if}
