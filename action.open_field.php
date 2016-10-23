@@ -98,7 +98,7 @@ if (isset($params['submit'])) {
 	$refresh = TRUE;
 } elseif (isset($params['optiondel'])) {
 	$obfield->OptionDelete($params);
-	$refresh = TRUE;
+	$refresh = FALSE;
 }
 /*else {
 	// add etc
@@ -110,12 +110,8 @@ if ($refresh) {
 		if (strncmp($key,'pdt_',4) == 0)
 			$obfield->XtraProps[substr($key,4)] = $val;
 	}
-	$obfield->SetName($params['field_name']);
-	$obfield->SetAlias($params['pdt_field_alias']);
-	if (isset($params['hide_label']))
-		$obfield->SetHideLabel((int)$params['hide_label']);
-	if (isset($params['field_required']))
-		$obfield->SetHideLabel((int)$params['field_required']);
+	$obfield->SetName($params['field_Name']);
+	$obfield->SetAlias($params['field_Alias']);
 }
 
 $tplvars = array();
@@ -123,6 +119,9 @@ $tplvars = array();
 require __DIR__.DIRECTORY_SEPARATOR.'populate.open_field.php';
 
 $cache->set($params['formdata'],$formdata,84600);
+F
+$jsall = NULL;
+PWForms\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
 
 echo PWForms\Utils::ProcessTemplate($this,'editfield.tpl',$tplvars);
 if ($jsall)

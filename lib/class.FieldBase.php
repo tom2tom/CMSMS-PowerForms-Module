@@ -61,17 +61,14 @@ class FieldBase implements \Serializable
 		if (isset($params['field_id']))
 			$this->Id = $params['field_id'];
 
-		if (isset($params['field_name']))
-			$this->Name = $params['field_name'];
+		if (isset($params['field_Name']))
+			$this->Name = $params['field_Name'];
+
+		if (isset($params['field_Alias']))
+			$this->Alias = $params['field_Alias'];
 
 		if (isset($params['field_type']))
 			$this->Type = $params['field_type'];
-
-		if (isset($params['hide_label']))
-			$this->XtraProps['HideLabel'] = $params['hide_label'];
-
-		if (isset($params['field_required']))
-			$this->XtraProps['Required'] = $params['field_required'];
 
 		if (isset($params['validation_type']))
 			$this->XtraProps['ValidationType'] = $params['validation_type'];
