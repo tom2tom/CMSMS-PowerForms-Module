@@ -40,14 +40,7 @@ class Utils
 		$config = \cmsms()->GetConfig();
 		$url = (empty($_SERVER['HTTPS'])) ? $config['root_url'] : $config['ssl_url'];
 
-		$basedir = $config['uploads_path'];
-		if (is_dir($basedir)) {
-			$rel = $mod->GetPreference('uploads_dir');
-			if ($rel) {
-				$basedir .= DIRECTORY_SEPARATOR . $rel;
-			}
-		} else
-			$basedir = '';
+		$basedir = ''.self::GetUploadsPath($mod);
 		$pre = \cms_db_prefix();
 
 		$settings = array_merge(
@@ -131,7 +124,7 @@ class Utils
 				'instance'=>((self::$mxtype=='semaphore')?self::$instance:NULL)
 				),
 			'file'=>array(
-				'updir'=>self::GetUploadsPath($mod)
+				'updir'=>''.self::GetUploadsPath($mod)
 				),
 			'database'=>array(
 				'table'=>$pre.'module_pwf_flock'
@@ -268,7 +261,7 @@ class Utils
 		$fa = $a[0];
 		$fb = $b[0];
 		if ($fa == $fb)
-			return(strcmp($a,$b));
+			return(strcmp($a,$b)); //TODO mb_ comparison
 		elseif ($fa == '*')
 			return 1;
 		elseif ($fb == '*')
@@ -284,7 +277,7 @@ class Utils
 			else
 				return -1;
 		} else
-			return(strcmp($a,$b));
+			return(strcmp($a,$b)); //TODO mb-compatible compare using $coll = new Collator('whatever');
 	}
 
 	/**
@@ -343,8 +336,24 @@ class Utils
 			}
 		}
 
-		uksort($mod->field_types,array('self','labelcmp'));
+/*
+	if (class_exists('Collator'))
+		$col = new Collator($utils->GetLocale());
+	else
+		$col = FALSE;
+	uksort($allitems,function($a,$b) use($col)
+		{
+			if ($col) {
+				if ($col->compare($a['name'],$b['name']) == 0)
+					return 0;
+			} else {
+				if (strcmp($a['name'],$b['name']) == 0) //TODO encoding
+					return 0;
+			}
+		}
+ */
 
+		uksort($mod->field_types,array('self','labelcmp')); //TODO mb-compatible sort $coll = new Collator('fr_FR');
 		$mod->std_field_types = array(
 			$mod->Lang('field_type_Checkbox')=>'Checkbox',
 			$mod->Lang('field_type_Pulldown')=>'Pulldown',
@@ -354,7 +363,7 @@ class Utils
 			$mod->Lang('field_type_Text')=>'Text',
 			$mod->Lang('field_type_SystemEmail')=>'SystemEmail',
 			$mod->Lang('field_type_SharedFile')=>'SharedFile');
-		uksort($mod->std_field_types,array('self','labelcmp'));
+		uksort($mod->std_field_types,array('self','labelcmp')); //TODO mb-compatible sort $coll = new Collator('fr_FR');
 	}
 
 	/**
@@ -362,7 +371,7 @@ class Utils
 	Include @classname in the array of available fields (to be used in any add-field pulldown)
 	@mod: reference to PWForms module object
 	@classname: name of class for the field to be added
-	@sort: optional boolean, whether to sort ... , defalut TRUE
+	@sort: optional boolean, whether to sort ... , default TRUE
 	*/
 	public static function Show_Field(&$mod, $classname, $sort=TRUE)
 	{
@@ -381,9 +390,27 @@ class Utils
 				$menulabel = $t.$obfld->mymodule->Lang($obfld->MenuKey);
 				$mod->field_types[$menulabel] = $classname;
 				if ($sort)
-					uksort($mod->field_types,array('self','labelcmp'));
+					uksort($mod->field_types,array('self','labelcmp')); //TODO mb-compatible sort $coll = new Collator('fr_FR');
+
 			}
 		}
+	}
+
+	/**
+	GetFieldIDFromAlias:
+	Interrogates fields table to get the stored id value for field whose alias is @alias
+	@alias: field alias string
+	Returns: the id, or -1 if record for the field is not found
+	*/
+	public static function GetFieldIDFromAlias($alias)
+	{
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
+		$sql = 'SELECT field_id FROM '.$pre.'module_pwf_field WHERE alias = ?';
+		$fid = $db->GetOne($sql,array($alias));
+		if ($fid)
+			return (int)$fid;
+		return -1;
 	}
 
 	/**
@@ -419,7 +446,7 @@ class Utils
 	@maxlen: optional maximum length for the created alias, defualt 48
 	Returns: the alias string
 	*/
-	public static function MakeAlias($string,$maxlen=48)
+	public static function MakeAlias($string, $maxlen=48)
 	{
 		if (!$string)
 			return '';
@@ -484,17 +511,17 @@ class Utils
 	}
 
 	/**
-	GetFormOption:
-	Get the value of option @optname, in the XtraProps array in @formdata
-	@formdata: reference to FormData form data object
-	@optname: name of option to find
-	@default: optional value to return if the requested option value doesn't exist, default ''
-	Returns: value of form option, or @default
+	GetFormProperty:
+	Get the value of @formdata->XtraProps[@propname]
+	@formdata: reference to FormData-class object
+	@propname: name/key of wanted property
+	@default: optional value to return if the requested property doesn't exist, default ''
+	Returns: value of form property if it exists, or else @default
 	*/
-	public static function GetFormOption(&$formdata, $optname, $default='')
+	public static function GetFormProperty(&$formdata, $propname, $default='')
 	{
-		if (isset($formdata->XtraProps[$optname]))
-			return $formdata->XtraProps[$optname];
+		if (isset($formdata->XtraProps[$propname]))
+			return $formdata->XtraProps[$propname];
 		else
 			return $default;
 	}
@@ -555,7 +582,7 @@ class Utils
 		foreach ($formdata->Fields as &$one) {
 			if ($one->DisplayInSubmission()) {
 				$fldref = $one->ForceAlias();
-	 			$ret .= '{if $'.$fldref.' != "" && $'.$fldref.' != "'.self::GetFormOption($formdata,'unspecified',$mod->Lang('unspecified')).'"}';
+	 			$ret .= '{if $'.$fldref.' != "" && $'.$fldref.' != "'.self::GetFormProperty($formdata,'unspecified',$mod->Lang('unspecified')).'"}';
 				$fldref = '{$'.$fldref.'}';
 
 				if ($htmlish)
@@ -593,9 +620,9 @@ class Utils
 	public static function CreateTemplateAction(&$mod, $id, $ctlName, $button_label, $template, $funcName=FALSE)
 	{
 		if (!$funcName)
-			$funcName = $ctlName;
+			$funcName = substr($ctlName,4); //omit 'pdt_' prefix
 		$button = <<<EOS
-<input type="button" class="cms_submit" value="{$button_label}" onclick="javascript:populate_{$funcName}(this.form)" />
+<input type="button" class="cms_submit" value="{$button_label}" onclick="populate_{$funcName}(this.form)" />
 EOS;
 		$prompt = $mod->Lang('confirm');
 		$func = <<<EOS
@@ -834,7 +861,7 @@ EOS;
 			'version' => $mod->GetVersion()
 		);
 
-		$unspec = self::GetFormOption($formdata,'unspecified',$mod->Lang('unspecified'));
+		$unspec = self::GetFormProperty($formdata,'unspecified',$mod->Lang('unspecified'));
 
 		foreach ($formdata->Fields as &$one) {
 			$replVal = $unspec;
@@ -1145,6 +1172,22 @@ EOS;
 	}
 
 	/**
+	GetUploadURL:
+	@mod: reference to current module object
+	@file: name, or relative path, of uploaded or to-be-uploaded file
+	Returns: URL for @file in uploads dir
+	*/
+	public static function GetUploadURL(&$mod, $file)
+	{
+		$config = \cmsms()->GetConfig();
+		$rooturl = (empty($_SERVER['HTTPS'])) ? $config['uploads_url']:$config['ssl_uploads_url'];
+		$ud = $mod->GetPreference('uploads_dir');
+		$lp = ($ud) ? '/'.str_replace('\\','/',$ud) : '';
+		$url = $rooturl.$lp.'/'.str_replace('\\','/',$file);
+		return $url;
+	}
+
+	/**
 	GetUploadsPath:
 	@mod: reference to current module object
 	Returns: absolute filepath, or FALSE
@@ -1163,5 +1206,27 @@ EOS;
 			return $fp;
 		}
 		return FALSE;
+	}
+	
+	/**
+	DeleteUploadFile:
+	@mod: reference to current module object
+	@file: filename
+	@except: form enumerator default FALSE
+	*/
+	public static function DeleteUploadFile(&$mod, $file, $except=FALSE)
+	{
+		if ($except) {
+			$sql = 'SELECT 1 FROM '.$pre.'module_pwf_formprops WHERE form_id!=? AND name=?';
+			$keep = $db->GetOne($sql,array($except,$file));
+			if ($keep)
+				return;
+		}
+		$fp = self::GetUploadsPath($mod);
+		if ($fp) {
+			$fp = $fp.DIRECTORY_SEPARATOR.$file;
+			if (is_file($fp))
+				@unlink($fp);
+		}
 	}
 }
