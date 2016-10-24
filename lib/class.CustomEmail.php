@@ -12,7 +12,7 @@ namespace PWForms;
 
 class CustomEmail extends EmailBase
 {
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->ChangeRequirement = FALSE;
@@ -126,7 +126,7 @@ class CustomEmail extends EmailBase
 		return array($ret,$msg);
 	}
 
-	public function Dispose($id,$returnid)
+	public function Dispose($id, $returnid)
 	{
 		$dests = $this->GetPropArray('destination_address'); //TODO in this case, field id's ?
 		if ($dests) {
