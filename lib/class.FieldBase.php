@@ -352,7 +352,7 @@ class FieldBase implements \Serializable
 		$this->XtraProps['Disposable'] = $state;
 	}
 
-	// Get flag determining whether this disposition field is permitted to be disposed
+	// Get flag determining whether this disposition field is currently permitted to be disposed
 	public function IsDisposable()
 	{
 		return !empty($this->XtraProps['Disposable']);
@@ -376,6 +376,13 @@ class FieldBase implements \Serializable
 	public function GetHideLabel()
 	{
 		return !empty($this->XtraProps['HideLabel']);
+	}
+
+	public function IsDisplayed()
+	{
+		return (!empty($this->XtraProps['DisplayInForm'])
+			 || !empty($this->XtraProps['DisplayInSubmission'])
+			 || !empty($this->XtraProps['DisplayExternal']));
 	}
 
 	public function DisplayExternal()
