@@ -119,7 +119,7 @@ $tplvars = array();
 require __DIR__.DIRECTORY_SEPARATOR.'populate.open_field.php';
 
 $cache->set($params['formdata'],$formdata,84600);
-F
+
 $jsall = NULL;
 PWForms\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
 
