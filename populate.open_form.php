@@ -98,7 +98,7 @@ $total = count($formdata->Fields);
 $dtotal = 0;
 if ($total > 0) {
 	foreach ($formdata->Fields as &$one) {
-		if ($one->IsDisposition())
+		if ($one->IsDisposition() && !$one->IsDisplayed())
 			$dtotal++;
 	}
 	unset($one);
@@ -130,7 +130,7 @@ foreach ($formdata->FieldOrders as $one) {
 		array('fielddelete'=>1,'field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']),
 		'','','','onclick="delete_field(\''.htmlspecialchars($one->GetName()).'\');return false;"');
 
-	if ($one->IsDisposition()) {
+	if ($one->IsDisposition() && !$one->IsDisplayed()) {
 		if ($dcount > 1)
 			$oneset->up = $this->CreateLink($id,'open_form','',
 			$iconup,
