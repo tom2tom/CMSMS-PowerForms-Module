@@ -15,7 +15,6 @@ class FieldsetEnd extends FieldBase
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->HasLabel = FALSE;
-		$this->IsSortable = FALSE;
 		$this->NeedsDiv = FALSE;
 		$this->Type = 'FieldsetEnd';
 	}

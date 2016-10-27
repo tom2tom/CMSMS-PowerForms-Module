@@ -42,7 +42,6 @@ class FieldBase implements \Serializable
 		'IsDisposition' => FALSE,
 		'IsEmailDisposition' => FALSE,
 		'IsInput' => FALSE,
-		'IsSortable' => TRUE,
 		'LabelSubComponents' => TRUE,
 		'MultiPopulate' => FALSE, //whether Populate() generates array of objects
 		'NeedsDiv' => TRUE,

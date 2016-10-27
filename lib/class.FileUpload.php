@@ -12,7 +12,6 @@ class FileUpload extends FieldBase
 	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->IsSortable = FALSE;
 		$this->Type = 'FileUpload';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = array(); //$mod->Lang('validation_none')=>'none');

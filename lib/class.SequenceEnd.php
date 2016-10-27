@@ -15,7 +15,6 @@ class SequenceEnd extends FieldBase
 		$this->DisplayInForm = FALSE; //all handled by SequenceStart
 		$this->DisplayInSubmission = FALSE;
 		$this->HasLabel = FALSE;
-		$this->IsSortable = FALSE;
 		$this->NeedsDiv = FALSE;
 		$this->Type = 'SequenceEnd';
 	}

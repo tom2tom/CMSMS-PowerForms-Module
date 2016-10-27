@@ -9,7 +9,7 @@
 namespace PWForms;
 
 class BrowserIface
-{	
+{
 	//forms are considered browsable if they include a 'DispositionFormBrowser' field
 	//returns array in which key = form id, value = form name
 	public function GetBrowsableForms()
@@ -43,7 +43,7 @@ EOS;
 			foreach ($all as $key=>&$row) {
 				$classPath = 'PWForms\\'.$row['type'];
 				$fld = new $classPath($dummy,$params);
-				if ($fld->IsSortable || $fld->IsInput || $fld->DisplayExternal)
+				if ($fld->IsInput || $fld->DisplayExternal) //TODO check
 					$result[$key] = $row['name'];
 				unset($fld);
 			}

@@ -16,7 +16,6 @@ class SubmissionTag extends FieldBase
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->IsDisposition = TRUE;
-		$this->IsSortable = FALSE;
 		$this->Type = 'SubmissionTag';
 	}
 

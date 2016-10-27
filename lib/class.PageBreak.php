@@ -15,7 +15,6 @@ class PageBreak extends FieldBase
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
-		$this->IsSortable = FALSE;
 		$this->Required = FALSE;
 		$this->Type = 'PageBreak';
 	}

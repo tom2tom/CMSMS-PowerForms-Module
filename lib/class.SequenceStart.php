@@ -16,7 +16,6 @@ class SequenceStart extends FieldBase
 		$this->HasLabel = FALSE;
 //?		$this->HasUserAddOp = TRUE;
 //?		$this->HasUserDeleteOp = TRUE;
-		$this->IsSortable = FALSE;
 //?		$this->MultiPopulate = TRUE;
 		$this->NeedsDiv = FALSE;
 		$this->Type = 'SequenceStart';

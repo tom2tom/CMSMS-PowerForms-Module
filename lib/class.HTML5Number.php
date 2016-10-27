@@ -13,7 +13,6 @@ class HTML5Number extends FieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
-		$this->IsSortable = TRUE;
 		$this->Type = 'HTML5Number';
 	}
 

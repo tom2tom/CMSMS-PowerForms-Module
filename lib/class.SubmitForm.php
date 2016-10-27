@@ -15,7 +15,6 @@ class SubmitForm extends FieldBase
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->IsDisposition = TRUE;
-		$this->IsSortable = FALSE;
 		$this->Type = 'SubmitForm';
 	}
 

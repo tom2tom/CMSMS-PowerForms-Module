@@ -16,7 +16,6 @@ class Computed extends FieldBase
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->IsComputedOnSubmission = TRUE;
-		$this->IsSortable = FALSE;
 		$this->NeedsDiv = FALSE;
 		$this->Type = 'Computed';
 		$this->ValidationTypes = array();

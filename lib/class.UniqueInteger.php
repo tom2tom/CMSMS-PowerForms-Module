@@ -13,7 +13,6 @@ class UniqueInteger extends FieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->ChangeRequirement = FALSE;
-		$this->IsSortable = FALSE;
 		$this->Type = 'UniqueInteger';
 	}
 

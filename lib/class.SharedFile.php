@@ -17,7 +17,6 @@ class SharedFile extends FieldBase
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->IsDisposition = TRUE;
-		$this->IsSortable = FALSE;
 		$this->ChangeRequirement = FALSE;
 		$this->Type = 'SharedFile';
 	}

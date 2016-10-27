@@ -17,7 +17,6 @@ class CheckboxGroup extends FieldBase
 		$this->HasAddOp = TRUE;
 		$this->HasDeleteOp = TRUE;
 		$this->IsInput = TRUE;
-		$this->IsSortable = FALSE;
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'CheckboxGroup';
 		$mod = $formdata->formsmodule;

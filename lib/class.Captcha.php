@@ -16,7 +16,6 @@ class Captcha extends FieldBase
 		parent::__construct($formdata,$params);
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInSubmission = FALSE;
-		$this->IsSortable = FALSE;
 		$this->Required = TRUE;
 		$this->MultiPopulate = FALSE;
 		$this->Type = 'Captcha';

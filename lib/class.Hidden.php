@@ -14,7 +14,6 @@ class Hidden extends FieldBase
 		parent::__construct($formdata,$params);
 		$this->ChangeRequirement = FALSE;
 		$this->HasLabel = FALSE;
-		$this->IsSortable = FALSE;
 		$this->NeedsDiv = FALSE;
 		$this->Type = 'Hidden';
 	}

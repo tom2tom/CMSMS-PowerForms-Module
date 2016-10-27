@@ -18,7 +18,6 @@ class MultiselectFileDirector extends FieldBase
 		$this->HasAddOp = TRUE;
 		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
-		$this->IsSortable = FALSE;
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'MultiselectFileDirector';
 	}

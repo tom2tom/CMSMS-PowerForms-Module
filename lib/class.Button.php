@@ -14,7 +14,6 @@ class Button extends FieldBase
 		parent::__construct($formdata,$params);
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInSubmission = FALSE;
-		$this->IsSortable = FALSE;
 		$this->Type = 'Button';
 	}
 

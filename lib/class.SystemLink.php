@@ -13,7 +13,6 @@ class SystemLink extends FieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->ChangeRequirement = FALSE;
-		$this->IsSortable = FALSE;
 		$this->MultiPopulate = TRUE;
 		$this->Required = FALSE;
 		$this->Type = 'SystemLink';
