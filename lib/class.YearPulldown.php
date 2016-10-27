@@ -34,7 +34,7 @@ class YearPulldown extends FieldBase
 	{
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
-		
+
 		$main[] = array($mod->Lang('title_select_one_message'),
 						$mod->CreateInputText($id,'pdt_select_one',
 						  $this->GetProperty('select_one',$mod->Lang('select_one')),25,128));
