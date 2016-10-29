@@ -5,40 +5,31 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-$inline = (empty($in_browser) && PWForms\Utils::GetFormProperty($formdata,'inline',0));
+$in_browser = !empty($params['in_browser']); //TODO deprecated
+$inline = (!$in_browser && PWForms\Utils::GetFormProperty($formdata,'inline',0));
 $fmhidden = array(
 'form_id'=>$form_id,
 $formdata->current_prefix.'formdata'=>$cache_key,
-$formdata->current_prefix.'formpage'=>$formdata->Page);
-if (isset($params['resume']))
+$formdata->current_prefix.'formpage'=>$formdata->Page,
+'in_browser'=>$in_browser);
+if (isset($params['resume'])) {
 	$fmhidden['resume'] = $params['resume'];
+	if (isset($params['passthru']))
+		$fmhidden['passthru'] = $params['passthru'];
+}
 $form_start = $this->CreateFormStart($id,'show_form',$returnid,'POST',
 	'multipart/form-data',$inline,'',$fmhidden);
 $form_end = $this->CreateFormEnd();
 
 $tplvars = $tplvars + array(
-	'total_pages' => $formdata->PagesCount,
-	'this_page' => $formdata->Page,
-	'title_page_x_of_y' => $this->Lang('title_page_x_of_y',array($formdata->Page,$formdata->PagesCount)),
+	'actionid' => $id,
 	'css_class' => PWForms\Utils::GetFormProperty($formdata,'css_class'),
-	'form_name' => $formdata->Name,
 	'form_id' => $formdata->Id,
-	'actionid' => $id
+	'form_name' => $formdata->Name
 );
 
-// Build other hidden (see also the form hidden-parameters, above)
+// Hidden-controls accumulator (see also the form hidden-parameters, above)
 $hidden = '';
-//TODO how/when should these be originally set ?
-if (!empty($params['in_browser'])) {
-	$in_browser = 1;
-//	$tplvars['browser_id'] = (int)$params['browser_id'];
-	$hidden .= $this->CreateInputHidden($id,'in_browser',1);
-//	.$this->CreateInputHidden($id,'browser_id',$params['browser_id']);
-} else
-	$in_browser = 0;
-$tplvars['in_browser'] = $in_browser;
-$tplvars['in_admin'] = $in_browser; //deprecated template var
-
 $reqSymbol = PWForms\Utils::GetFormProperty($formdata,'required_field_symbol','*');
 // Start building fields
 $fields = array();
@@ -105,8 +96,8 @@ foreach ($formdata->FieldOrders as $field_id) {
 	$oneset = new stdClass();
 	$oneset->alias = $alias;
 //	$oneset->css_class = $obfield->GetProperty('css_class');
-	$oneset->display = $obfield->DisplayInForm()?1:0;
-	$oneset->valid = $obfield->IsValid()?1:0;
+	$oneset->display = $obfield->DisplayInForm();
+	$oneset->valid = $obfield->IsValid();
 	$oneset->error = $oneset->valid?'':$obfield->ValidationMessage;
 	$oneset->has_label = $obfield->HasLabel();
 	$oneset->helptext = $obfield->GetProperty('helptext');
@@ -127,7 +118,7 @@ EOS;
 		}
 	}
 	$oneset->helptext_id = 'pwfp_ht_'.$obfield->GetID();
-	if ((!$obfield->HasLabel() || $obfield->GetHideLabel())
+	if (!$oneset->has_label || $obfield->GetHideLabel()
 /*	 && (!$obfield->GetProperty('browser_edit',0) || empty($params['in_admin']))*/)
 		$oneset->hide_name = 1;
 	else
@@ -135,14 +126,14 @@ EOS;
 	$oneset->id = $obfield->GetId();
 	$oneset->input = $obfield->Populate($id,$params); //flat xhtml or array of objects
 	$oneset->input_id = $obfield->GetInputId();
-	$oneset->label_parts = $obfield->LabelSubComponents()?1:0;
+	$oneset->label_parts = $obfield->LabelSubComponents();
 	$oneset->logic = $obfield->GetFieldLogic();
-	$oneset->multiple_parts = $obfield->GetMultiPopulate()?1:0;
+	$oneset->multiple_parts = $obfield->GetMultiPopulate();
 	$oneset->name = $obfield->GetName();
 	$oneset->needs_div = $obfield->NeedsDiv();
-	$oneset->required = $obfield->IsRequired()?1:0;
+	$oneset->required = $obfield->IsRequired();
 	$oneset->required_symbol = $oneset->required?$reqSymbol:'';
-	$oneset->smarty_eval = $obfield->GetSmartyEval()?1:0;
+	$oneset->smarty_eval = $obfield->GetSmartyEval();
 	$oneset->type = $obfield->GetDisplayType();
 	$oneset->values = $obfield->GetIndexedValues(); //TODO multi-element field, not really values?
 
@@ -152,7 +143,13 @@ EOS;
 
 $formdata->PagesCount = $WalkPage;
 
-$tplvars['fields'] = $fields;
+$tplvars = $tplvars + array(
+	'fields' => $fields,
+	'this_page' => $formdata->Page,
+	'total_pages' => $formdata->PagesCount,
+	'title_page_x_of_y' => $this->Lang('title_page_x_of_y',array($formdata->Page,$formdata->PagesCount)),
+);
+
 //$tplvars['previous'] = $prev;
 $baseurl = $this->GetModuleURLPath();
 
