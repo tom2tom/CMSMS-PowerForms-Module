@@ -46,9 +46,6 @@ if (isset($params['submit']) || isset($params['apply'])) {
 		$message = $this->_PrettyMessage($message,FALSE,FALSE);
 	}
 	$cache->delete($params['formdata']);
-} elseif (isset($params['fielddelete'])) {
-	PWForms\FieldOperations::DeleteField($formdata,$params['field_id']);
-	$message = $this->_PrettyMessage('field_deleted');
 } elseif (isset($params['fieldcopy'])) {
 	$obfield = PWForms\FieldOperations::Replicate($formdata,$params['field_id']);
 	if ($obfield) {
@@ -68,16 +65,6 @@ if (isset($params['submit']) || isset($params['apply'])) {
 	$destIndex = ($params['dir'] == 'up') ? $srcIndex - 1 : $srcIndex + 1;
 	PWForms\FieldOperations::SwapFieldsByIndex($srcIndex,$destIndex);
 	$message = $this->_PrettyMessage('field_order_updated');
-} elseif (isset($params['active'])) {
-	$obfield = $formdata->Fields[$params['field_id']];
-	if ($obfield !== FALSE) {
-//		$obfield->SetRequired(($params['active']=='on'));
-		$obfield->ToggleRequired();
-		$obfield->Store();
-		$message = $this->_PrettyMessage('field_requirement_updated');
-	} else {
-		$message = $this->_PrettyMessage('err_data',FALSE);
-	}
 }
 //stylesfile
 if (!(empty($params['stylesdelete']) || empty($params['pdt_css_file']))) {
