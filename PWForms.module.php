@@ -174,7 +174,10 @@ class PWForms extends CMSModule
 
 	public function get_tasks()
 	{
-		return new PWForms\ClearTablesTask();
+		return array(
+			new PWForms\ClearcacheTask(),
+			new PWForms\ClearTablesTask()
+		);
 	}
 
 	public function MinimumCMSVersion()
