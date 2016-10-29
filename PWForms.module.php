@@ -247,6 +247,10 @@ class PWForms extends CMSModule
 				return TRUE;
 			if (strpos($_SERVER['QUERY_STRING'],'get_template') !== FALSE)
 				return TRUE;
+			if (strpos($_SERVER['QUERY_STRING'],'require_field') !== FALSE)
+				return TRUE;
+			if (strpos($_SERVER['QUERY_STRING'],'delete_field') !== FALSE)
+				return TRUE;
 		}
 		return FALSE;
 	}
