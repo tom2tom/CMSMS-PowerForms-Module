@@ -6,11 +6,11 @@
 
 namespace PWForms;
 
-class ClearTablesTask implements CmsRegularTask
+class ClearTablesTask implements \CmsRegularTask
 {
 	const MODNAME = 'PWForms';
 
-	public function get_name() 
+	public function get_name()
 	{
 		return get_class($this);
 	}
@@ -18,7 +18,7 @@ class ClearTablesTask implements CmsRegularTask
 	public function get_description()
 	{
 		$module = \cms_utils::get_module(self::MODNAME);
-		return $module->Lang('taskdescription_clearold');
+		return $module->Lang('taskdescription_cleartables');
 	}
 
 	public function test($time = '')
