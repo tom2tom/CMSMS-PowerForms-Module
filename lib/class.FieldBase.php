@@ -206,7 +206,7 @@ class FieldBase implements \Serializable
 	// Gets the cached field-id
 	public function GetId()
 	{
-		return $this->Id;
+		return (int)$this->Id;
 	}
 
 	public function SetName($name)
@@ -414,11 +414,11 @@ class FieldBase implements \Serializable
 		$this->XtraProps['Required'] = $state;
 	}
 
-	public function ToggleRequired()
+/*	public function ToggleRequired()
 	{
 		$this->XtraProps['Required'] = empty($this->XtraProps['Required']);
 	}
-
+*/
 	public function SetValidationType($type)
 	{
 		$this->XtraProps['ValidationType'] = $type;
@@ -517,7 +517,7 @@ class FieldBase implements \Serializable
 			'/<option/',
 			),
 			array(
-			'<input type="($1)" class="'.$cls.'"',
+			'<input type="$1" class="'.$cls.'"',
 			'<label class="'.$cls.'"',
 			'<option class="'.$cls.'"',
 			),$html);
@@ -529,7 +529,7 @@ class FieldBase implements \Serializable
 	// Returns field value as a scalar or array (per $as_string), suitable for display in the form
 	public function GetDisplayableValue($as_string=TRUE)
 	{
-		if (property_exists($this,'Value')) {
+		if ($this->Value || is_numeric($this->Value)) { //0-value is acceptable
 			$ret = $this->Value;
 			if (is_array($ret)) {
 				if ($as_string)
@@ -572,7 +572,7 @@ class FieldBase implements \Serializable
 
 /*	public function LoadValue($newvalue)
 	{
-		if (property_exists($this,'Value')) {
+		if ($this->Value || is_numeric($this->Value)) {
 			if (!is_array($this->Value))
 				$this->Value = array($this->Value);
 			if (is_array($newvalue)) {
@@ -602,13 +602,12 @@ class FieldBase implements \Serializable
 	}
 
 	// Subclass this if needed to support some unusual format for the value
-	// Returns boolean T/F indication whether the field value is present and non-default
+	// Returns boolean T/F indicating whether the field value is present and non-default
 	public function HasValue($deny_blank_responses=FALSE)
 	{
-		if (property_exists($this,'Value')) {
-			if (!empty($this->XtraProps['default'])) { // fields with defaults
-				$def = $this->XtraProps['default'];
-				if ($this->Value == $def) //TODO if array
+		if ($this->Value || is_numeric($this->Value)) {
+			if (isset($this->XtraProps['default'])) { // field has default
+				if ($this->Value == $this->XtraProps['default']) //TODO if array
 					return FALSE;
 			}
 			return (!$deny_blank_responses ||
@@ -618,10 +617,10 @@ class FieldBase implements \Serializable
 		return FALSE;
 	}
 
-	// Returns a member of the field-value-array, or if $index == 0, the entire value, or FALSE
+	// Returns a member of the field-value-array, or if the value is not an array and $index == 0, the value, or FALSE
 	public function GetArrayValue($index)
 	{
-		if (property_exists($this,'Value')) {
+		if ($this->Value) {
 			if (is_array($this->Value)) {
 				if (isset($this->Value[$index]))
 					return $this->Value[$index];
@@ -631,11 +630,10 @@ class FieldBase implements \Serializable
 		return FALSE;
 	}
 
-	// Subclass this?
-	// Returns TRUE if $value is contained in array $Value or matches scalar $Value
-	public function FindArrayValue($value)
+	// Returns TRUE if $value is contained in array self::$Value or matches scalar self::$Value
+/*	public function InArrayValue($value)
 	{
-		if (property_exists($this,'Value')) {
+		if ($this->Value || is_numeric($this->Value)) {
 			if (is_array($this->Value))
 				return array_search($value,$this->Value) !== FALSE;
 			elseif ($this->Value == $value)
@@ -643,7 +641,7 @@ class FieldBase implements \Serializable
 		}
 		return FALSE;
 	}
-
+*/
 /*	public function GetFieldInputId($id, &$params)
 	{
 		return $id.$this->formdata->current_prefix.$this->Id;
