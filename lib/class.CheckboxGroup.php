@@ -72,7 +72,7 @@ class CheckboxGroup extends FieldBase
 		if ($names) {
 			$ret = array();
 			foreach ($names as $i=>&$one) {
-				if ($this->FindArrayValue($i) === FALSE) { //TODO sequence
+				if ($this->InArrayValue($i) === FALSE) { //TODO sequence
 					if (!$this->GetProperty('no_empty',0)) {
 						$unchecked = trim($this->GetPropIndexed('box_unchecked',$i));
 						if ($unchecked)
@@ -198,7 +198,7 @@ EOS;
 				$jsl = '';
 			$js = $this->GetScript();
 			$ret = array();
-			foreach ($names as $i=>&$one) {
+			foreach ($names as $i=>&$one) { //$i is 1-based
 				$oneset = new \stdClass();
 				$tid = $this->GetInputId('_'.$i);
 				if ($one) {
@@ -210,12 +210,17 @@ EOS;
 					$oneset->name = '';
 				}
 
-				if (property_exists($this,'Value'))
-					$checked = $this->FindArrayValue($i) ? $i:-1; //TODO
-				elseif ($this->GetPropIndexed('box_is_set',$i) == 'y')
+				if ($this->Value) {
+					$v = $this->GetArrayValue($i-1);
+					if ($v == $this->GetPropIndexed('box_checked',$i))
+						$checked = $i;
+					else
+						$checked = -1;
+				} elseif ($this->GetPropIndexed('box_is_set',$i) == 'y') {
 					$checked = $i;
-				else
+				} else {
 					$checked = -1;
+				}
 				$tmp = $mod->CreateInputCheckbox(
 					$id,$this->formdata->current_prefix.$this->Id.'[]',$i,$checked,
 					'id="'.$tid.'"'.$jsl.$js);

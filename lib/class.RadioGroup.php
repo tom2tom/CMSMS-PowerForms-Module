@@ -155,12 +155,15 @@ class RadioGroup extends FieldBase
 
  				$tmp = '<input type="radio" id="'.$this->GetInputId('_'.$i).'" name="'.
 					$id.$this->formdata->current_prefix.$this->Id.'[]" value="'.$i.'"';
-				if (property_exists($this,'Value'))
-					$checked = $this->FindArrayValue($i); //TODO
-				elseif ($this->GetPropIndexed('button_is_set',$i) == 'y')
+
+				if (($this->Value || is_numeric($this->Value)) &&
+					$this->GetPropIndexed('button_checked',$i) == $this->Value) {
 					$checked = TRUE;
-				else
+				} elseif ($this->GetPropIndexed('button_is_set',$i) == 'y') {
+					$checked = TRUE;
+				} else {
 					$checked = FALSE;
+				}
 				if ($checked)
 					$tmp .= ' checked="checked"';
 				$tmp .= $this->GetScript().' />';

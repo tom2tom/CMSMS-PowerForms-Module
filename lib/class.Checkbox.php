@@ -27,10 +27,10 @@ class Checkbox extends FieldBase
 	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
-		if (!property_exists($this,'Value') || !$this->Value)
-			$ret = $this->GetProperty('unchecked_value',$mod->Lang('value_unchecked'));
-		else
+		if ($this->Value)
 			$ret = $this->GetProperty('checked_value',$mod->Lang('value_checked'));
+		else
+			$ret = $this->GetProperty('unchecked_value',$mod->Lang('value_unchecked'));
 
 		if ($as_string)
 			return $ret;
@@ -60,8 +60,9 @@ class Checkbox extends FieldBase
 
 	public function Populate($id,&$params)
 	{
-		if ((!property_exists($this,'Value') || !$this->Value) && $this->GetProperty('is_checked',0))
+		if ($this->Value || $this->GetProperty('is_checked',0)) {
 			$this->Value = 't';
+		}
 
 		$tid = $this->GetInputId();
 		$tmp = $this->formdata->formsmodule->CreateInputCheckbox(
