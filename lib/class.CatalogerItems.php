@@ -201,11 +201,13 @@ class CatalogerItems extends FieldBase
 			$size = min($lines,count($choices));
 			$size = min(50,$size); // maximum 50 lines, though this is probably big
 
-			$val = array();
-			if (property_exists($this,'Value')) {
-				$val = $this->Value;
-				if (!is_array($this->Value))
+			if ($this->Value) {
+				if (is_array($this->Value))
+					$val = $this->Value;
+				else
 					$val = array($this->Value);
+			} else {
+				$val = array();
 			}
 			$tmp = $mod->CreateInputSelectList(
 				$id,$this->formdata->current_prefix.$this->Id.'[]',

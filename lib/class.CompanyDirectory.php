@@ -203,7 +203,7 @@ EOS;
 			$size = min(50,count($companies)); // maximum 50 lines,though this is probably big
 
 			$val = array();
-			if (property_exists($this,'Value')) {
+			if ($this->Value || is_numeric($this->Value)) {
 				$val = $this->Value;
 				if (!is_array($this->Value))
 					$val = array($this->Value);

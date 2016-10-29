@@ -47,7 +47,7 @@ class DatePicker extends FieldBase
 
 	public function HasValue($deny_blank_responses=FALSE)
 	{
-		if (!property_exists($this,'Value'))
+		if (!$this->Value)
 			return FALSE;
 		if (!is_array($this->Value))
 			return FALSE;

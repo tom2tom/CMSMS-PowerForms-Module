@@ -103,16 +103,14 @@ class Password extends FieldBase
 			}
 			break;
 		 case 'regex_match':
-			if (property_exists($this,'Value') &&
-				!preg_match($this->GetProperty('regex','/.*/'),$this->Value))
+			if (!preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
 			}
 			break;
 		 case 'regex_nomatch':
-			if (property_exists($this,'Value') &&
-				preg_match($this->GetProperty('regex','/.*/'),$this->Value))
+			if (preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);

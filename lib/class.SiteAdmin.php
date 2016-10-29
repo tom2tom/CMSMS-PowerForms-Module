@@ -133,7 +133,7 @@ class SiteAdmin extends FieldBase
 
 	public function Validate($id)
 	{
-		if (property_exists($this,'Value') && $this->Value) {
+		if ($this->Value) { //TODO CHECK anything will do?
 			$this->valid = TRUE;
 			$this->ValidationMessage = '';
 		} else {

@@ -146,7 +146,7 @@ class UserEmail extends EmailBase
 
 	public function PreDisposeAction()
 	{
-		if (property_exists($this,'Value')) {
+		if ($this->HasValue()) {
 			$htm = $this->GetProperty('headers_to_modify','f');
 			foreach ($this->formdata->Fields as &$one) {
 				if ($one->IsDisposition() && is_subclass_of($one,'EmailBase')) {

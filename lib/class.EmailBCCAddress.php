@@ -85,7 +85,7 @@ class EmailBCCAddress extends EmailBase
 
 	public function PreDisposeAction()
 	{
-		if (property_exists($this,'Value')) {
+		if ($this->Value) {
 			foreach ($this->formdata->Fields as &$one) {
 				if ($one->IsDisposition()
 				 && is_subclass_of($one,'pwfEmailBase')

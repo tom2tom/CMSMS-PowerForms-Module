@@ -21,7 +21,7 @@ class Link extends FieldBase
 
 	public function GetDisplayableValue($as_string=TRUE)
 	{
-		if (property_exists($this,'Value') && is_array($this->Value))
+		if (is_array($this->Value))
 			$ret = '<a href="'.$this->Value[0].'">'.$this->Value[1].'</a>';
 		else
 			$ret = '';
@@ -51,7 +51,7 @@ class Link extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$js = $this->GetScript();
 
-		if (property_exists($this,'Value') && is_array($this->Value))
+		if (is_array($this->Value))
 			$val = $this->Value;
 		else
 			$val = array($this->GetProperty('default_link'),$this->GetProperty('default_link_title'));

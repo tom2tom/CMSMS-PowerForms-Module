@@ -41,19 +41,20 @@ class Hidden extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 
-		if (property_exists($this,'Value'))
-			$val = $this->Value;
-		else
-			$val = $this->GetProperty('value');
-
-		if ($this->GetProperty('smarty_eval',0)) {
-			$tplvars = array();
-			$val = Utils::ProcessTemplateFromData($mod,$val,$tplvars);
+		if ($this->Value || is_numeric($this->Value)) {
+			if (!is_numeric($this->Value) && $this->GetProperty('smarty_eval',0)) {
+				$tplvars = array();
+				$val = Utils::ProcessTemplateFromData($mod,$this->Value,$tplvars);
+			} else {
+				$val = $this->Value;
+			}
+		} else {
+			$val = '';
 		}
 
-		if ($this->GetProperty('browser_edit',0) && !empty($params['in_admin'])) //TODO deprecated
-			$type = 'text';
-		else
+//		if ($this->GetProperty('browser_edit',0) && !empty($params['in_admin'])) //TODO deprecated
+//			$type = 'text';
+//		else
 			$type = 'hidden';
 
 		$tmp = '<input type="'.$type.'" id="'.$this->GetInputId().'" name="'.

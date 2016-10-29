@@ -136,12 +136,12 @@ class Multiselect extends FieldBase
 		$choices = $this->GetPropArray('indexed_name');
 		if ($choices) {
 			$choices = array_flip($choices);
-			if (!property_exists($this,'Value'))
+			if (!($this->Value || is_numeric($this->Value)))
 				$val = array();
-			elseif (!is_array($this->Value))
-				$val = array($this->Value);
-			else
+			elseif (is_array($this->Value))
 				$val = $this->Value;
+			else
+				$val = array($this->Value);
 
 			$tmp = $this->formdata->formsmodule->CreateInputSelectList(
 				$id,$this->formdata->current_prefix.$this->Id.'[]',$choices,$val,$this->GetProperty('lines',3),
