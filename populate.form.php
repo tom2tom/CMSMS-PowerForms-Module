@@ -125,7 +125,7 @@ foreach ($formdata->FieldOrders as $one) {
 	$oneset->copylink = $this->CreateLink($id,'open_form','',
 		$iconcopy,
 		array('fieldcopy'=>1,'field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']));
-	$oneset->deletelink = $this->CreateLink($id,'open_form','',
+	$oneset->deletelink = $this->CreateLink($id,'delete_field','',
 		$icondelete,
 		array('fielddelete'=>1,'field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']),
 		'','','','onclick="delete_field(\''.htmlspecialchars($one->GetName()).'\');return false;"');
@@ -150,15 +150,15 @@ foreach ($formdata->FieldOrders as $one) {
 		if (!$one->DisplayInForm() || !$one->GetChangeRequirement())
 			$oneset->required = '';
 		elseif ($one->IsRequired())
-			$oneset->required = $this->CreateLink($id,'open_form','',
+			$oneset->required = $this->CreateLink($id,'require_field','',
 				$icontrue,
-				array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'active'=>'off'),
-				'','','','class="true" onclick="require_field(false);return false;"');
+				array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'reqd'=>'off'),
+				'','','','class="true" onclick="require_field(this,false);return false;"');
 		else
-			$oneset->required = $this->CreateLink($id,'open_form','',
+			$oneset->required = $this->CreateLink($id,'require_field','',
 				$iconfalse,
-				array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'active'=>'on'),
-				'','','','class="false" onclick="require_field(true);return false;"');
+				array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'reqd'=>'on'),
+				'','','','class="false" onclick="require_field(this,true);return false;"');
 
 		if ($count > 1)
 			$oneset->up = $this->CreateLink($id,'open_form','',
@@ -191,7 +191,7 @@ function delete_field (name) {
   var parent = $(this).closest('tr');
   var errmsg = '{$msg}';
   $.ajax({
-   type: 'GET',
+   type: 'POST',
    url: url,
    error: function() {
     alert(errmsg);
@@ -217,9 +217,22 @@ function delete_field (name) {
   });
  }
 }
-function require_field(state) {
- var url = $(this).attr('href');
-//TODO
+function require_field(link,newstate) {
+ var url = $(link).attr('href');
+ $.ajax({
+  type: 'POST',
+  url: url,
+  error: function() {
+   alert('{$msg}');
+  },
+  success: function() {
+   var newurl = (newstate) ? url.replace('reqd=on','reqd=off') : url.replace('reqd=off','reqd=on');
+   var img = (newstate) ?
+    '{$icontrue}':
+    '{$iconfalse}';
+   $(link).attr('href',newurl).html(img);
+  }
+ });
 }
 EOS;
 } else { //no field
