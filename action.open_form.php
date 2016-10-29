@@ -148,7 +148,7 @@ $funcs->Arrange($formdata->Fields,$formdata->FieldOrders);
 
 $tplvars = array();
 
-require __DIR__.DIRECTORY_SEPARATOR.'populate.open_form.php';
+require __DIR__.DIRECTORY_SEPARATOR.'populate.form.php';
 
 $cache->set($params['formdata'],$formdata,84600);
 

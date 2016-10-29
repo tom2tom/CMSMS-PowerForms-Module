@@ -116,7 +116,7 @@ if ($refresh) {
 
 $tplvars = array();
 
-require __DIR__.DIRECTORY_SEPARATOR.'populate.open_field.php';
+require __DIR__.DIRECTORY_SEPARATOR.'populate.field.php';
 
 $cache->set($params['formdata'],$formdata,84600);
 
