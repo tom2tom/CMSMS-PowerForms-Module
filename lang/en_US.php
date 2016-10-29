@@ -1153,15 +1153,45 @@ compatible, and some manual attention will be needed. Specifically:</p>
 <p>The tag used to display each form is shown in the module's admin page. Each tag is like
 <code>{PWForms form='sample_form'}</code>. Placing the relevant tag into the content of
 a website page or template will cause that form to be displayed.</p>
-<br />
-MORE<br />
-<br />
-<h3>Importing field-types</h3>
+<h4>Use by other modules</h4>
+<p>Any other module may initiate display of a form by code like<pre>
+\$pf = cms_utils::get_module('PWForms');
+\$parms = array(&lt;relevant data&gt;);
+\$pf->DoAction('show_form',\$id,\$parms,\$returnid);</pre></p>
+<p>Relevant \$parms:
+<ul>
+<li>'form_id' => form enumerator</li>
+<li>'preload' => (optional) set first-time field values, array, keys=field id or alias, values=what to set</li>
+<li>'resume' => (optional) action name for redirect upon cancellation or submission</li>
+<li>'passthru' => (optional) data to be provided to the redirect action</li>
+<li>'exclude' => (optional) singleton or array of field id(s) or alias(es) to be omitted from the form</li>
+<li>'excludetype' => (optional) singleton or array of field-type(s) to be omitted from the form</li>
+</ul></p>
+<p>\$parms may also include form-template parameters e.g.
+<ul>
+<li>'in_admin'</li>
+<li>'in_browser'</li>
+</ul></p>
+<h4>Importing field-types</h4>
 <p>Other modules may need field-type(s) that are not normally available.
 Such a field can be implemented by creating a suitable class for the field, and
 during installation/uninstallation of the other module, registering/deregistering
-that class. More specific requirements are provided for developers in a README file.
-The PowerBrowse module code provides an example of this process in use.<p>
+that class. The PowerBrowse module provides an example of this process in use.<p>
+<p>Field-types to be used in forms may be registered by<pre>
+\$pf = cms_utils::get_module('PWForms');
+\$pf->RegisterField(\$classpath);
+</pre>
+and de-registered by<pre>
+\$pf = cms_utils::get_module('PWForms');
+\$pf->DeregisterField(\$classpath);
+</pre>
+where \$classpath is the absolute file-system path of the file defining the field-class to be [de]registered.</p>
+<p>Such field-classes must include public properties
+<ul>
+<li>\$MenuKey set to the owner-module's Lang key for this field's menu label</li>
+<li>\$mymodule used for module-object reference</li>
+</ul>
+and may include whatever else is appropriate, including Fieldbase properties and sub-classed methods.</p>
 <h3>Interactions</h3>
 <p>The following modules may be used in relevant contexts, if available:</p>
 <ul>
