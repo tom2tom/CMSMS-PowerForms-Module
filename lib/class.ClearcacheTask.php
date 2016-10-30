@@ -21,25 +21,10 @@ class ClearcacheTask implements \CmsRegularTask
 		return $mod->Lang('taskdescription_clearcache');
 	}
 
-	private function FileCacheDir(&$mod)
-	{
-		$config = \cmsms()->GetConfig();
-		$dir = $config['uploads_path'];
-		$rel = $mod->GetPreference('uploads_dir');
-		if ($rel) {
-			$dir .= DIRECTORY_SEPARATOR.$rel;
-		}
-		$dir .= DIRECTORY_SEPARATOR.'file_cache';
-		if (is_dir($dir)) {
-			return $dir;
-		}
-		return FALSE;
-	}
-
 	public function test($time='')
 	{
 		$mod = \cms_utils::get_module(self::MODNAME);
-		$dir = $this->FileCacheDir($mod);
+		$dir = Utils::GetUploadsPath($mod);
 		if ($dir) {
 			foreach (new DirectoryIterator($dir) as $fInfo) {
 				$fn = $fInfo->getFilename();
@@ -60,12 +45,12 @@ class ClearcacheTask implements \CmsRegularTask
 			$time = time();
 		$time -= 43200; //half-day cache retention-period (as seconds)
 		$mod = \cms_utils::get_module(self::MODNAME);
-		$dir = $this->FileCacheDir($mod);
+		$dir = Utils::GetUploadsPath($mod);
 		if ($dir) {
 			foreach (new DirectoryIterator($dir) as $fInfo) {
 				if ($fInfo->isFile() && !$fInfo->isDot()) {
 					$fn = $fInfo->getFilename();
-					if (strncmp($fn,'pwf',3) == 0)
+					if (strncmp($fn,'pwf',3) == 0) {
 						$mtime = $fInfo->getMTime();
 						if ($mtime < $time) {
 							@unlink($dir.DIRECTORY_SEPARATOR.$fn);
