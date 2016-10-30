@@ -461,7 +461,7 @@ class FieldBase implements \Serializable
 	// Subclass this with a displayable type
 	public function GetDisplayType()
 	{
-		return $this->formdata->formsmodule->Lang('field_type_'.$this->Type);
+		return $this->formdata->formsmodule->Lang('fieldlabel_'.$this->Type);
 	}
 
 	public function GetMultiPopulate()
@@ -900,16 +900,16 @@ class FieldBase implements \Serializable
 	}
 
 	/* Subclass this for fields that need validation
-	Sets 2 field properties
+	Sets field properties valid & ValidationMessage
 	Returns: 2-member array:
-	 [0] = boolean T/F indicating whether or not the value is valid
+	 [0] = boolean T/F indicating whether the field value is valid
 	 [1] = '' or error message
 	*/
 	public function Validate($id)
 	{
 		$this->valid = TRUE;
 		$this->XtraProps['ValidationMessage'] = '';
-		return array($this->valid,$this->XtraProps['ValidationMessage']);
+		return array(TRUE,'');
 	}
 
 	// Subclass this to do stuff (e.g. modify other fields) after validation
