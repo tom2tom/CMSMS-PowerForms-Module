@@ -93,12 +93,14 @@ $flds = '
 cache_id I(2) AUTO KEY,
 keyword C(48),
 value B,
-save_time '.CMS_ADODB_DT;
+savetime I(8),
+lifetime I(4)
+';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_cache',$flds,$taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
 $flds = '
-log_id I(2) KEY AUTO,
+log_id I(2) AUTO KEY,
 src C(40),
 howmany I(2) DEFAULT 1,
 basetime '.CMS_ADODB_DT;
