@@ -9,7 +9,7 @@ if (!empty($message))
 
 $tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$this->Lang('back_top'));
 $tplvars['backtoform_nav'] = $this->CreateLink($id,'open_form',$returnid,'&#171; '.$this->Lang('back_form'),
-	array('formedit'=>1,'form_id'=>$params['form_id'],'formdata'=>$params['formdata']));
+	array('form_id'=>$params['form_id'],'datakey'=>$params['datakey']));
 
 $jsincs = FALSE; //array();
 $jsfuncs = array();
@@ -129,7 +129,7 @@ EOS;
 $tplvars['form_start'] = $this->CreateFormStart($id,'open_field',$returnid,
 	'POST','',FALSE,'',array(
 	'form_id'=>$params['form_id'],
-	'formdata'=>$params['formdata'],
+	'datakey'=>$params['datakey'],
 	'field_id'=>$fid));
 $tplvars['form_end'] = $this->CreateFormEnd();
 

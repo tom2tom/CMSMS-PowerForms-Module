@@ -10,8 +10,7 @@ if (!$this->_CheckAccess('ModifyPFForms')) exit;
 if (isset($params['cancel']))
 	$this->Redirect($id,'open_form',$returnid,array(
 		'form_id'=>$params['form_id'],
-		'formdata'=>$params['formdata'],
-		'formedit'=>1,
+		'datakey'=>$params['datakey'],
 		'active_tab'=>'fieldstab'));
 try {
 	$cache = PWForms\Utils::GetCache($this);
@@ -22,13 +21,13 @@ try {
 
 $newfield = ($params['field_id'] <= 0);
 
-if (isset($params['formdata'])) {
-	$formdata = $cache->get($params['formdata']);
+if (isset($params['datakey'])) {
+	$formdata = $cache->get($params['datakey']);
 	if (is_null($formdata) || !$formdata->Fields) {
 		//probably the system has been shut down
 $this->Crash();
 //		$formdata = $funcs->Load($this,$params['form_id'],$id,$params);
-//		$params['formdata'] = base64_encode($formdata->Id.session_id()); //must persist across requests
+//		$params['datakey'] = 'pwf'.base64_encode($formdata->Id.session_id()); //must persist across requests
 		$this->Redirect($id,'defaultadmin','',array('message'=>$this->_PrettyMessage('err_data',FALSE)));
 	}
 	$formdata->formsmodule = &$this;
@@ -76,13 +75,12 @@ if (isset($params['submit'])) {
 			$formdata->FieldOrders = FALSE; //trigger re-sort
 		}
 		//update cache ready for next use
-		$cache->set($params['formdata'],$formdata,84600);
+		$cache->set($params['datakey'],$formdata,84600);
 		$t = ($newfield) ? 'added':'updated';
 		$message = $this->Lang('field_op',$this->Lang($t));
 		$this->Redirect($id,'open_form',$returnid,array(
 			'form_id'=>$params['form_id'],
-			'formdata'=>$params['formdata'],
-			'formedit'=>1,
+			'datakey'=>$params['datakey'],
 			'active_tab'=>'fieldstab',
 			'message'=>$this->_PrettyMessage($message,TRUE,FALSE)));
 	} else {
@@ -118,7 +116,7 @@ $tplvars = array();
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.field.php';
 
-$cache->set($params['formdata'],$formdata,84600);
+$cache->set($params['datakey'],$formdata,84600);
 
 $jsall = NULL;
 PWForms\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);

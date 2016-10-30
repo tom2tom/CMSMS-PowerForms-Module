@@ -7,14 +7,14 @@
 
 //this action processes ajax-calls
 
-if (isset($params['formdata'])) {
+if (isset($params['datakey'])) {
 	try {
 		$cache = PWForms\Utils::GetCache($this);
 	} catch (Exception $e) {
 		echo '0';
 		exit;
 	}
-	$formdata = $cache->get($params['formdata']);
+	$formdata = $cache->get($params['datakey']);
 	if (is_null($formdata) || !$formdata->Fields) {
 		echo '0';
 		exit;
@@ -25,7 +25,7 @@ $obfield = $formdata->Fields[$params['field_id']];
 if ($obfield !== FALSE) {
 	$obfield->SetRequired(($params['reqd']=='on'));
 //	$obfield->Store();
-	$cache->set($params['formdata'],$formdata,84600);
+	$cache->set($params['datakey'],$formdata,84600);
 }
 
 echo '1';

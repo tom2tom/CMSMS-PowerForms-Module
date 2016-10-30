@@ -13,7 +13,7 @@ $tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$t
 $tplvars['form_start'] = $this->CreateFormStart($id,'open_form',$returnid,
 	'POST','multipart/form-data',FALSE,'',array(
 	'form_id'=>$form_id,
-	'formdata'=>$params['formdata']));
+	'datakey'=>$params['datakey']));
 
 $tab = $this->_GetActiveTab($params);
 $t = $this->StartTabHeaders().
@@ -115,32 +115,32 @@ foreach ($formdata->FieldOrders as $one) {
 		$t = $this->Lang('none');
 	$oneset->order = '<input type="hidden" name="'.$id.'form_FieldOrders[]" value="'.$fid.'" />';
 	$oneset->name = $this->CreateLink($id,'open_field','',$t,
-		array('field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']));
+		array('field_id'=>$fid,'form_id'=>$form_id,'datakey'=>$params['datakey']));
 	$oneset->alias = $one->ForceAlias();
 	$oneset->type = $one->GetDisplayType();
 	$oneset->field_status = $one->GetFieldStatus();
 	$oneset->editlink = $this->CreateLink($id,'open_field','',
 		$iconedit,
-		array('field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']));
+		array('field_id'=>$fid,'form_id'=>$form_id,'datakey'=>$params['datakey']));
 	$oneset->copylink = $this->CreateLink($id,'open_form','',
 		$iconcopy,
-		array('fieldcopy'=>1,'field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']));
+		array('fieldcopy'=>1,'field_id'=>$fid,'form_id'=>$form_id,'datakey'=>$params['datakey']));
 	$oneset->deletelink = $this->CreateLink($id,'delete_field','',
 		$icondelete,
-		array('fielddelete'=>1,'field_id'=>$fid,'form_id'=>$form_id,'formdata'=>$params['formdata']),
+		array('fielddelete'=>1,'field_id'=>$fid,'form_id'=>$form_id,'datakey'=>$params['datakey']),
 		'','','','onclick="delete_field(\''.htmlspecialchars($one->GetName()).'\');return false;"');
 
 	if ($one->IsDisposition() && !$one->IsDisplayed()) {
 		if ($dcount > 1)
 			$oneset->up = $this->CreateLink($id,'open_form','',
 			$iconup,
-			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'up'));
+			array('form_id'=>$form_id,'datakey'=>$params['datakey'],'field_id'=>$fid,'dir'=>'up'));
 		else
 			$oneset->up = '';
 		if ($dcount < $dtotal)
 			$oneset->down = $this->CreateLink($id,'open_form','',
 			$icondown,
-			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'down'));
+			array('form_id'=>$form_id,'datakey'=>$params['datakey'],'field_id'=>$fid,'dir'=>'down'));
 		else
 			$oneset->down = '';
 
@@ -152,24 +152,24 @@ foreach ($formdata->FieldOrders as $one) {
 		elseif ($one->IsRequired())
 			$oneset->required = $this->CreateLink($id,'require_field','',
 				$icontrue,
-				array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'reqd'=>'off'),
+				array('form_id'=>$form_id,'datakey'=>$params['datakey'],'field_id'=>$fid,'reqd'=>'off'),
 				'','','','class="true" onclick="require_field(this,false);return false;"');
 		else
 			$oneset->required = $this->CreateLink($id,'require_field','',
 				$iconfalse,
-				array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'reqd'=>'on'),
+				array('form_id'=>$form_id,'datakey'=>$params['datakey'],'field_id'=>$fid,'reqd'=>'on'),
 				'','','','class="false" onclick="require_field(this,true);return false;"');
 
 		if ($count > 1)
 			$oneset->up = $this->CreateLink($id,'open_form','',
 			$iconup,
-			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'up'));
+			array('form_id'=>$form_id,'datakey'=>$params['datakey'],'field_id'=>$fid,'dir'=>'up'));
 		else
 			$oneset->up = '';
 		if ($count < $total)
 			$oneset->down = $this->CreateLink($id,'open_form','',
 			$icondown,
-			array('form_id'=>$form_id,'formdata'=>$params['formdata'],'field_id'=>$fid,'dir'=>'down'));
+			array('form_id'=>$form_id,'datakey'=>$params['datakey'],'field_id'=>$fid,'dir'=>'down'));
 		else
 			$oneset->down = '';
 
@@ -313,7 +313,7 @@ unset($one);
 
 $linkargs = array(
 	'form_id'=>$form_id,
-	'formdata'=>$params['formdata'],
+	'datakey'=>$params['datakey'],
 	'active_tab'=>NULL,
 	'selectfields'=>$selfield,
 	'selectdispos'=>$seldisp,
@@ -329,11 +329,11 @@ $tplvars['add_field_link'] =
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
 		array('field_id'=>-1,
 		'form_id'=>$form_id,
-		'formdata'=>$params['formdata']),'',FALSE).' '.
+		'datakey'=>$params['datakey']),'',FALSE).' '.
 	$this->CreateLink($id,'open_field',$returnid,$t,
 		array('field_id'=>-1,
 		'form_id'=>$form_id,
-		'formdata'=>$params['formdata']),'',FALSE);
+		'datakey'=>$params['datakey']),'',FALSE);
 //selector
 if ($selfield == 'basic') {
 	$tplvars['input_fieldpick'] = $this->CreateInputDropdown($id,'field_type',
@@ -359,11 +359,11 @@ $tplvars['add_disposition_link'] =
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
 		array('field_id'=>-1,
 		'form_id'=>$form_id,
-		'formdata'=>$params['formdata']),'',FALSE).' '.
+		'datakey'=>$params['datakey']),'',FALSE).' '.
 	$this->CreateLink($id,'open_field',$returnid,$t,
 		array('field_id'=>-1,
 		'form_id'=>$form_id,
-		'formdata'=>$params['formdata']),'',FALSE);
+		'datakey'=>$params['datakey']),'',FALSE);
 //selector
 if ($seldisp == 'basic') {
 	$tplvars['input_fieldpick2'] = $this->CreateInputDropdown($id,'disposition_type',
@@ -391,11 +391,11 @@ $tplvars['add_external_link'] =
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
 		array('field_id'=>-1,
 		'form_id'=>$form_id,
-		'formdata'=>$params['formdata']),'',FALSE).' '.
+		'datakey'=>$params['datakey']),'',FALSE).' '.
 	$this->CreateLink($id,'open_field',$returnid,$t,
 		array('field_id'=>-1,
 		'form_id'=>$form_id,
-		'formdata'=>$params['formdata']),'',FALSE);
+		'datakey'=>$params['datakey']),'',FALSE);
 //selector
 if ($selext == 'basic') {
 	$tplvars['input_fieldpick3'] = $this->CreateInputDropdown($id,'external_type',
@@ -416,7 +416,7 @@ if ($selext == 'basic') {
 $link = $this->CreateLink($id,'open_field',$returnid,'',
 	array('field_id'=>-1,
 	'form_id'=>$form_id,
-	'formdata'=>$params['formdata']),'',TRUE,TRUE);
+	'datakey'=>$params['datakey']),'',TRUE,TRUE);
 $link = str_replace('&amp;','&',$link);
 $jsfuncs[] = <<<EOS
 function add_field(sel,scope) {

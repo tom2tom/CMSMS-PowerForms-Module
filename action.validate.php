@@ -56,6 +56,6 @@ $cache->set($cache_key,$formdata,84600); //expiry ?
 $prefix = $formdata->current_prefix;
 $this->Redirect($id,'default',$returnid,array(
 	'form_id'=>$formdata->Id,
-	$prefix.'formdata'=>$cache_key,
+	$prefix.'datakey'=>$cache_key,
 	$prefix.'done'=>1
 	));

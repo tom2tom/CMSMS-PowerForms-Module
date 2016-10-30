@@ -13,23 +13,23 @@ try {
 	exit;
 }
 if (isset($params['cancel'])) {
-	$cache->delete($params['formdata']);
+	$cache->delete($params['datakey']);
 	$this->Redirect($id,'defaultadmin');
 }
 
 $form_id = (int)$params['form_id'];
 $funcs = new PWForms\FormOperations();
 
-if (isset($params['formdata'])) {
-	$formdata = $cache->get($params['formdata']);
+if (isset($params['datakey'])) {
+	$formdata = $cache->get($params['datakey']);
 	if (is_null($formdata) || !$formdata->Fields) {
 		$formdata = $funcs->Load($this,$form_id,$id,$params,TRUE);
-		$params['formdata'] = base64_encode($form_id.session_id());
+		$params['datakey'] = 'pwf'.base64_encode($form_id.session_id());
 	} else
 		$formdata->formsmodule = &$this;
 } else { //first time
 	$formdata = $funcs->Load($this,$form_id,$id,$params,TRUE);
-	$params['formdata'] = base64_encode($formdata->Id.session_id());
+	$params['datakey'] = 'pwf'.base64_encode($form_id.session_id());
 }
 
 $message = '';
@@ -39,24 +39,24 @@ if (isset($params['submit']) || isset($params['apply'])) {
 		$message = $this->Lang('form_op',$this->Lang('updated'));
 		$message = $this->_PrettyMessage($message,TRUE,FALSE);
 		if (isset($params['submit'])) {
-			$cache->delete($params['formdata']);
+			$cache->delete($params['datakey']);
 			$this->Redirect($id,'defaultadmin','',array('message'=> $message));
 		}
 	} else {
 		$message = $this->_PrettyMessage($message,FALSE,FALSE);
 	}
-	$cache->delete($params['formdata']);
+	$cache->delete($params['datakey']);
 } elseif (isset($params['fieldcopy'])) {
 	$obfield = PWForms\FieldOperations::Replicate($formdata,$params['field_id']);
 	if ($obfield) {
 		$obfield->Store(TRUE);
 		$formdata->Fields[$obfield->Id] = $obfield;
 		//update cache ready for next use
-		$cache->set($params['formdata'],$formdata,84600);
+		$cache->set($params['datakey'],$formdata,84600);
 		$this->Redirect($id,'open_field',$returnid,
 			array('field_id'=>$params['field_id'],
 				'form_id'=>$fid,
-				'formdata'=>$params['formdata']));
+				'datakey'=>$params['datakey']));
 	} else {
 		$message = $this->_PrettyMessage('err_copy',FALSE);
 	}
@@ -137,7 +137,7 @@ $tplvars = array();
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.form.php';
 
-$cache->set($params['formdata'],$formdata,84600);
+$cache->set($params['datakey'],$formdata,84600);
 
 $jsall = NULL;
 PWForms\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
