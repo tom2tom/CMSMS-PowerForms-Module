@@ -38,7 +38,7 @@ if (isset($params['cancel'])) {
 	}
 	unset($funcs);
 	$this->Redirect($id,'open_form','',array(
-		'formedit'=>1,'form_id'=>$newid,'active_tab'=>$seetab)); //no formdata parameter
+		'form_id'=>$newid,'active_tab'=>$seetab)); //no datakey parameter
 }
 
 if (isset($params['form_id'])) {
