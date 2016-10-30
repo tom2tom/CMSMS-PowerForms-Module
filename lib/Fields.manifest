@@ -16,6 +16,7 @@ Computed
 CountryPicker
 CustomEmail
 DatePicker
+DateTime
 EmailAddress
 EmailAddressAgain
 EmailBCCAddress
@@ -46,6 +47,7 @@ PasswordAgain
 ProvincePicker
 Pulldown
 RadioGroup
+#SequenceBreak NOT user-manageable
 SequenceEnd
 SequenceStart
 SharedFile
