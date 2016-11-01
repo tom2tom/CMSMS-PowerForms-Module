@@ -8,12 +8,17 @@
 'form' => alias, first-time opened
 'form_id' => enum or -1
 'action' => 'default'
+'captcha_input' (maybe)
+
+'preload' => set first-time field values, array, keys=field id or alias, values=what to set
+'resume' (maybe) => action name or 'modulename,actionname' for cancellation redirect
+'passthru' => scalar data to be provided as a parameter to the 'resume' action
+'exclude' => singleton or array of field id(s) or alias(es) to be omitted from the form
+'excludetype' => singleton or array of field-type(s) to be omitted from the form
+
+TEMPLATE-SPECIFIC PARAMS E.G. TODO prefix needed
 'in_admin' (maybe, deprecated)
 'in_browser' (maybe, deprecated)
-'browser_id' (maybe, deprecated)
-'captcha_input' (maybe)
-'preload' => set first-time field values, array, keys=field id or alias, values=what to set
-'resume' (maybe) => action name for cancellation redirect
 
 after first-pass, many with prefix: 'pwfp_\d{3}_'
  including
@@ -59,10 +64,6 @@ if (empty($params['form_id']) || $params['form_id'] == -1) {
 
 list($current,$prior) = $this->_GetTokens(); //fresh pair of fieldname-prefixes
 
-if (isset($params[$current.'cancel']) || isset($params[$prior.'cancel'])) {
-	$this->Redirect($id,$params['resume'],$returnid);
-}
-
 //check that we're current
 $matched = preg_grep('/^pwfp_\d{3}_/',array_keys($params));
 if ($matched) {
@@ -90,6 +91,22 @@ if ($matched) {
 } else
 	$prefix = $current;
 
+if (isset($params[$prefix.'cancel'])) {
+	if (isset($params[$prefix.'passthru'])) {
+		$newparms = array('passthru'=>$params[$prefix.'passthru']);
+	} else
+		$newparms = array();
+	if (strpos($params[$prefix.'resume'],',') === FALSE) {
+		$this->Redirect($id,$params[$prefix.'resume'],$returnid,$newparms);
+	} else {
+		list($module,$action) = explode(',',$params[$prefix.'resume']);
+		$mod = cms_utils::get_module($module);
+		$this->LoadRedirectMethods();
+		cms_module_Redirect($mod,$id,$action,$returnid,$newparms);
+		exit;
+	}
+}
+
 $form_id = (int)$params['form_id'];
 $validerr = 0; //default no validation error
 try {
@@ -112,12 +129,12 @@ try {
 	return;
 }
 */
-$tplvars = array();
 
-if (isset($params[$prefix.'formdata'])) {
+if (isset($params[$prefix.'datakey'])) {
 	$firsttime = FALSE; //this is a return-visit
+	$tplvars = array(); //TODO members to preserve c.f. 1st-pass
 
-	$cache_key = $params[$prefix.'formdata'];
+	$cache_key = $params[$prefix.'datakey'];
 	$formdata = $cache->get($cache_key);
 	if (is_null($formdata)) {
 		echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
@@ -202,7 +219,7 @@ EOS;
 */
 			if (!empty($_SERVER['REMOTE_ADDR'])) {
 				$src = $_SERVER['REMOTE_ADDR'];
-				$t = $time();
+				$t = time();
 				$t2 = trim($db->DBTimeStamp($t-3600),"'");
 				$t = trim($db->DBTimeStamp($t),"'");
 				$num = 0;
@@ -271,9 +288,9 @@ EOS;
 			$message = array();
 			$formPageCount = 1;
 			$valPage = $formdata->Page - 1; //TODO off by 1 ?
-			foreach ($formdata->FieldOrders as $one) {
-				$one = $formdata->Fields($one);
-				if ($one->GetFieldType() == 'PageBreak')
+			foreach ($formdata->FieldOrders as $key) {
+				$obfld = $formdata->Fields[$key];
+				if ($obfld->GetFieldType() == 'PageBreak')
 					$formPageCount++;
 /*TODO logic? if ($valPage != $formPageCount) {
 $Crash1;
@@ -281,21 +298,20 @@ $Crash1;
 				}
 */
 				$deny_space_validation = !!$this->GetPreference('blank_invalid');
-				if (// $one->GetChangeRequirement() &&
-					$one->IsRequired() && !$one->HasValue($deny_space_validation)) {
+				if (// $obfld->GetChangeRequirement() &&
+					$obfld->IsRequired() && !$obfld->HasValue($deny_space_validation)) {
 $this->Crash2();
 					$allvalid = FALSE;
-					$one->SetProperty('is_valid',FALSE);
-					$one->valid = FALSE;
-					$one->ValidationMessage = $this->Lang('please_enter_a_value',$one->GetName());
-					$message[] = $one->ValidationMessage;
-				} elseif ($one->GetValue()) {
-					$res = $one->Validate($id);
+					$obfld->valid = FALSE;
+					$obfld->ValidationMessage = $this->Lang('please_enter_a_value',$obfld->GetName());
+					$message[] = $obfld->ValidationMessage;
+				} elseif ($obfld->GetValue()) {
+					$res = $obfld->Validate($id);
 					if ($res[0])
-						$one->SetProperty('is_valid',TRUE);
+						$obfld->valid = TRUE;
 					else {
 						$allvalid = FALSE;
-						$one->SetProperty('is_valid',FALSE);
+						$obfld->valid = FALSE;
 						$message[] = $res[1];
 					}
 				}
@@ -308,19 +324,19 @@ $this->Crash2();
 					$unspec = PWForms\Utils::GetFormProperty($formdata,'unspecified',$this->Lang('unspecified'));
 
 					$parms = $params;
-					foreach ($formdata->FieldOrders as $one) {
-						$one = $formdata->Fields($one);
-						if ($one->DisplayInSubmission()) {
-							$val = $one->GetDisplayableValue();
+					foreach ($formdata->FieldOrders as $key) {
+						$obfld = $formdata->Fields[$key];
+						if ($obfld->DisplayInSubmission()) {
+							$val = $obfld->GetDisplayableValue();
 							if ($val == '')
 								$val = $unspec;
 						} else
 							$val = '';
-						$name = $one->GetVariableName();
+						$name = $obfld->GetVariableName();
 						$parms[$name] = $val;
-						$alias = $one->ForceAlias();
+						$alias = $obfld->ForceAlias();
 						$parms[$alias] = $val;
-						$id = $one->GetId();
+						$id = $obfld->GetId();
 						$parms['fld_'.$id] = $val;
 					}
 
@@ -386,26 +402,26 @@ $this->Crash2();
 */
 				// run all field methods that modify other fields
 				$computes = array();
-				foreach ($formdata->FieldOrders as $one) {
-					$obfld = $formdata->Fields($one);
+				foreach ($formdata->FieldOrders as $key) {
+					$obfld = $formdata->Fields[$key];
 					$obfld->PreDisposeAction();
 					if ($obfld->ComputeOnSubmission())
-						$computes[$one] = $obfld->ComputeOrder();
+						$computes[$key] = $obfld->ComputeOrder();
 				}
 
 				if ($computes) {
 					asort($computes);
-					foreach ($computes as $fid=>$one)
-						$formdata->Fields[$fid]->Compute();
+					foreach ($computes as $key=>$val)
+						$formdata->Fields[$key]->Compute();
 				}
 
 				$alldisposed = TRUE;
 				$message = array();
 				// dispose TODO handle 'blocked' notices
-				foreach ($formdata->FieldOrders as $one) {
-					$one = $formdata->Fields($one);
-					if ($one->IsDisposition() && $one->IsDisposable()) {
-						$res = $one->Dispose($id,$returnid);
+				foreach ($formdata->FieldOrders as $key) {
+					$obfld = $formdata->Fields[$key];
+					if ($obfld->IsDisposition() && $obfld->IsDisposable()) {
+						$res = $obfld->Dispose($id,$returnid);
 						if (!$res[0]) {
 							$alldisposed = FALSE;
 							$message[] = $res[1];
@@ -413,9 +429,9 @@ $this->Crash2();
 					}
 				}
 				// cleanups
-				foreach ($formdata->FieldOrders as $one) {
-					$one = $formdata->Fields($one);
-					$one->PostDisposeAction();
+				foreach ($formdata->FieldOrders as $key) {
+					$obfld = $formdata->Fields[$key];
+					$obfld->PostDisposeAction();
 				}
 
 				$parms = array();
@@ -424,12 +440,13 @@ $this->Crash2();
 
 				$tplvars['form_done'] = 1;
 				if ($alldisposed) {
+					//TODO how to handle $params['resume'] c.f. cancellation
 					$cache->delete($cache_key);
 					$act = PWForms\Utils::GetFormProperty($formdata,'submit_action','text');
 					switch ($act) {
 					 case 'text':
 						$this->SendEvent('OnFormSubmit',$parms);
-						PWForms\Utils::setFinishedFormSmarty($formdata,TRUE);
+						PWForms\Utils::SetupFormVars($formdata,$tplvars);
 						PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf_sub_'.$form_id,$tplvars,TRUE);
 						return;
 					 case 'redir':
@@ -483,6 +500,26 @@ $this->Crash2();
 		return;
 	}
 
+	if (isset($params['excludetype']) {
+	//TODO singleton or array of field-type(s) to be omitted from the form
+	}
+	if (isset($params['exclude']) {
+	//TODO singleton or array of field id(s) or alias(es) to be omitted from the form
+	}
+
+	//make initiator-supplied parameters available TODO may also be needed for later pass(es)
+	$tplvars = array_diff_key($params, array(
+	'action' => 1,
+	'cancel' => 1,
+	'exclude' => 1,
+	'excludetype' => 1,
+	'form' => 1,
+	'form_id' => 1,
+	'passthru' => 1,
+	'preload' => 1,
+	'resume' => 1
+	));
+
 	if (isset($params['preload'])) {
 		//set fields' value from externally-supplied values
 		foreach ($params['preload'] as $key=>$val) {
@@ -511,13 +548,13 @@ $this->Crash2();
 	$formdata->FieldOrders = array_keys($formdata->Fields);
 	$funcs->Arrange($formdata->Fields,$formdata->FieldOrders);
 
-	//construct sufficiently-unique cache key
+	//construct cache key (more random than backend keys)
 	if (!empty($_SERVER['SERVER_ADDR']))
 		$token = $_SERVER['SERVER_ADDR'];
 	else
 		$token = mt_rand(0,999999).'.'.mt_rand(0,999999);
 	$token .= 'SERVER_ADDR'.uniqid().mt_rand(1100,2099).reset($_SERVER).key($_SERVER).end($_SERVER).key($_SERVER);
-	$cache_key = md5($token);
+	$cache_key = 'pwf'.md5($token);
 }
 
 $tplvars['form_has_validation_errors'] = $validerr;
