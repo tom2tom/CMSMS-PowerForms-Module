@@ -27,7 +27,7 @@ if (isset($params['datakey'])) {
 		//probably the system has been shut down
 $this->Crash();
 //		$formdata = $funcs->Load($this,$params['form_id'],$id,$params);
-//		$params['datakey'] = 'pwf'.base64_encode($formdata->Id.session_id()); //must persist across requests
+//		$params['datakey'] = 'pwf'.md5($formdata->Id.session_id()); //must persist across requests
 		$this->Redirect($id,'defaultadmin','',array('message'=>$this->_PrettyMessage('err_data',FALSE)));
 	}
 	$formdata->formsmodule = &$this;

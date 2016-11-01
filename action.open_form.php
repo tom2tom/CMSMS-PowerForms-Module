@@ -24,12 +24,12 @@ if (isset($params['datakey'])) {
 	$formdata = $cache->get($params['datakey']);
 	if (is_null($formdata) || !$formdata->Fields) {
 		$formdata = $funcs->Load($this,$form_id,$id,$params,TRUE);
-		$params['datakey'] = 'pwf'.base64_encode($form_id.session_id());
+		$params['datakey'] = 'pwf'.md5($form_id.session_id());
 	} else
 		$formdata->formsmodule = &$this;
 } else { //first time
 	$formdata = $funcs->Load($this,$form_id,$id,$params,TRUE);
-	$params['datakey'] = 'pwf'.base64_encode($form_id.session_id());
+	$params['datakey'] = 'pwf'.md5($form_id.session_id());
 }
 
 $message = '';
