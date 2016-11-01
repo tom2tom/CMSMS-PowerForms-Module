@@ -339,7 +339,7 @@ EOS;
 
 		$htmlemail = $this->GetProperty('html_email',0);
 
-		Utils::SetupFormVars($this->formdata,$htmlemail,$tplvars);
+		Utils::SetupFormVars($this->formdata,$tplvars,$htmlemail);
 
 		$subject = Utils::ProcessTemplateFromData($mod,$subject,$tplvars);
 		$mail->SetSubject($subject);
