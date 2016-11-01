@@ -631,7 +631,7 @@ class FieldBase implements \Serializable
 	}
 
 	// Returns TRUE if $value is contained in array self::$Value or matches scalar self::$Value
-/*	public function InArrayValue($value)
+	public function InArrayValue($value)
 	{
 		if ($this->Value || is_numeric($this->Value)) {
 			if (is_array($this->Value))
@@ -641,7 +641,7 @@ class FieldBase implements \Serializable
 		}
 		return FALSE;
 	}
-*/
+
 /*	public function GetFieldInputId($id, &$params)
 	{
 		return $id.$this->formdata->current_prefix.$this->Id;
