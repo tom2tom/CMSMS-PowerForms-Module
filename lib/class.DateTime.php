@@ -12,7 +12,7 @@ class DateTime extends FieldBase
 	private $ShowDate = TRUE;
 	private $ShowTime = TRUE;
 	private $DateFormat = 'Y-m-d';
-	private $TimeFormat = 'G:i:s';
+	private $TimeFormat = 'H:i:s';
 	private $LowLimit = 0;
 	private $HighLimit = 0;
 
@@ -53,7 +53,7 @@ class DateTime extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list(main.adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id);
 		//TODO tailor
 		//checkbox date only
 		//input date format
