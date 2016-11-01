@@ -1104,9 +1104,9 @@ $lang['uploads_error'] = 'Error committing file to the uploads module: %s';
 $lang['upload'] = 'Upload';
 $lang['user_approved_submission'] = 'User approved submission %s from %s';
 
-$lang['validation_after'] = 'Not earlier than',
-$lang['validation_before'] = 'Not later than',
-$lang['validation_between'] = 'Between'
+$lang['validation_after'] = 'Not earlier than';
+$lang['validation_before'] = 'Not later than';
+$lang['validation_between'] = 'Between';
 $lang['validation_email_address'] = 'Email address';
 $lang['validation_empty'] = 'Can\'t be empty';
 $lang['validation_integer'] = 'Integer';
