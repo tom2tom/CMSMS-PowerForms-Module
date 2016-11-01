@@ -59,14 +59,31 @@ class RadioGroup extends FieldBase
 		return $ret;
 	}
 
+	public function SetValue($newvalue)
+	{
+		if (is_array($newvalue)) {
+			$this->Value = reset($newvalue);
+		} else {
+			$all = $this->GetPropArray('button_checked');
+			if ($all) {
+				$i = array_search($newvalue,$all); //1-based index
+				if ($i === FALSE)
+					$i = 0;
+			} else {
+				$i = 0; //unknown
+			}
+			$this->Value = $i;
+		}
+	}
+
 	public function GetDisplayableValue($as_string=TRUE)
 	{
-		if ($this->HasValue())
-		   $ret = $this->GetPropIndexed('button_checked',($this->Value - 1)); //TODO index
-		else
+		if ($this->Value) {
+			$ret = $this->GetPropIndexed('button_checked',this->Value);
+		} else {
 			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
-
+		}
 		if ($as_string)
 			return $ret;
 		else
