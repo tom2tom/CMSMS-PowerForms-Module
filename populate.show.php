@@ -9,13 +9,13 @@ $in_browser = !empty($params['in_browser']); //TODO deprecated
 $inline = (!$in_browser && PWForms\Utils::GetFormProperty($formdata,'inline',0));
 $fmhidden = array(
 'form_id'=>$form_id,
-$formdata->current_prefix.'formdata'=>$cache_key,
+$formdata->current_prefix.'datakey'=>$cache_key,
 $formdata->current_prefix.'formpage'=>$formdata->Page,
-'in_browser'=>$in_browser);
+$formdata->current_prefix.'in_browser'=>$in_browser); //TODO deprecated
 if (isset($params['resume'])) {
-	$fmhidden['resume'] = $params['resume'];
+	$fmhidden[$formdata->current_prefix.'resume'] = $params['resume'];
 	if (isset($params['passthru']))
-		$fmhidden['passthru'] = $params['passthru'];
+		$fmhidden[$formdata->current_prefix.'passthru'] = $params['passthru'];
 }
 $form_start = $this->CreateFormStart($id,'show_form',$returnid,'POST',
 	'multipart/form-data',$inline,'',$fmhidden);
