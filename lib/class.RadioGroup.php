@@ -79,7 +79,7 @@ class RadioGroup extends FieldBase
 	public function GetDisplayableValue($as_string=TRUE)
 	{
 		if ($this->Value) {
-			$ret = $this->GetPropIndexed('button_checked',this->Value);
+			$ret = $this->GetPropIndexed('button_checked',$this->Value);
 		} else {
 			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
