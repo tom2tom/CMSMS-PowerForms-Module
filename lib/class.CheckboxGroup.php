@@ -66,13 +66,23 @@ class CheckboxGroup extends FieldBase
 		return $this->formdata->formsmodule->Lang('boxes',$boxCount);
 	}
 
+	public function SetValue($newvalue)
+	{
+		$set = $this->GetPropIndexed('box_checked',1);
+		$unset = array_values($this->GetPropArray('box_unchecked')); //0-based
+		foreach ($newvalue as $key=>$val) {
+			$unset[$key] = $set;
+		}
+		$this->Value = $unset;
+	}
+
 	public function GetDisplayableValue($as_string=TRUE)
 	{
 		$names = $this->GetPropArray('box_name');
 		if ($names) {
 			$ret = array();
 			foreach ($names as $i=>&$one) {
-				if ($this->InArrayValue($i) === FALSE) { //TODO sequence
+				if ($this->InArrayValue($i) === FALSE) { //TODO OR sequence GetArrayValue($index)
 					if (!$this->GetProperty('no_empty',0)) {
 						$unchecked = trim($this->GetPropIndexed('box_unchecked',$i));
 						if ($unchecked)
