@@ -5,12 +5,15 @@
 #If so, lang[] entries for corresponding selector-menu items must be conformed
 
 Button
-Callback
+ByCallback
+ByTag
+ByTemplate
 Captcha
 CatalogerItems
 Checkbox
 CheckboxExtended
 CheckboxGroup
+CheckWhen
 CompanyDirectory
 Computed
 CountryPicker
@@ -33,8 +36,6 @@ FieldsetStart
 FileDirector
 FileUpload
 Hidden
-InputTag
-InputTemplate
 Link
 Multiselect
 MultiselectFileDirector

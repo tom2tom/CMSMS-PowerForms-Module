@@ -402,11 +402,11 @@ EOS;
 		 'FromEmailAddressAgain'=>'EmailAddressAgain',
 		 'FromEmailName'=>'EmailSender',
 		 'FromEmailSubject'=>'EmailSubject',
-		 'ModuleInterface'=>'InputTemplate',
+		 'ModuleInterface'=>'ByTemplate',
 		 'setEnd'=>'FieldsetEnd',
 		 'setStart'=>'FieldsetStart',
 		 'SiteAdmin'=>'EmailSiteAdmin',
-		 'UserTag'=>'InputTag',
+		 'UserTag'=>'ByTag',
 		);
 
 		foreach ($data as $fbrow) {
