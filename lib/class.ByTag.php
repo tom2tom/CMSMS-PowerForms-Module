@@ -9,7 +9,7 @@
 
 namespace PWForms;
 
-class InputTag extends FieldBase
+class ByTag extends FieldBase
 {
 	public function __construct(&$formdata,&$params)
 	{
