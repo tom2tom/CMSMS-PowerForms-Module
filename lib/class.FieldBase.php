@@ -116,7 +116,7 @@ class FieldBase implements \Serializable
 	}
 
 	// Returns a field-property value, or $default if the property doesn't exist
-	public function GetProperty($propName,$default='')
+	public function GetProperty($propName, $default='')
 	{
 		if (isset($this->XtraProps[$propName]))
 			return $this->XtraProps[$propName];
@@ -367,7 +367,7 @@ class FieldBase implements \Serializable
 		return !empty($this->XtraProps['HasLabel']);
 	}
 
-	public function SetHideLabel($state)
+	public function SetHideLabel($state=TRUE)
 	{
 		$this->XtraProps['HideLabel'] = $state;
 	}
@@ -409,7 +409,7 @@ class FieldBase implements \Serializable
 		return !empty($this->XtraProps['Required']);
 	}
 
-	public function SetRequired($state)
+	public function SetRequired($state=TRUE)
 	{
 		$this->XtraProps['Required'] = $state;
 	}
