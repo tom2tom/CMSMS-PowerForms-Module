@@ -17,7 +17,7 @@ class ByTag extends FieldBase
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInSubmission = FALSE;
 //		$this->NeedsDiv = FALSE;
-		$this->Type = 'InputTag';
+		$this->Type = 'ByTag';
 	}
 
 	public function GetFieldStatus()
