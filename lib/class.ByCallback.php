@@ -6,7 +6,7 @@
 
 namespace PWForms;
 
-class Callback extends FieldBase
+class ByCallback extends FieldBase
 {
 	/*
 	handler can be one of
