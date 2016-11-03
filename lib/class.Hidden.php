@@ -24,16 +24,12 @@ class Hidden extends FieldBase
 
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_value'),
-						$mod->CreateInputText($id,'pdt_value',
+						$mod->CreateInputText($id,'fp_value',
 							$this->GetProperty('value'),25,1024));
 		$adv[] = array($mod->Lang('title_smarty_eval'),
-						$mod->CreateInputHidden($id,'pdt_smarty_eval',0).
-						$mod->CreateInputCheckbox($id,'pdt_smarty_eval',1,
-							$this->GetProperty('smarty_eval',0)));
-		$adv[] = array($mod->Lang('title_browser_edit'),
-						$mod->CreateInputHidden($id,'pdt_browser_edit',0).
-						$mod->CreateInputCheckbox($id,'pdt_browser_edit',1,
-							$this->GetProperty('browser_edit',0)));
+						$mod->CreateInputHidden($id,'fp_smarty_eval',0).
+						$mod->CreateInputCheckbox($id,'fp_smarty_eval',1,
+							$this->GetProperty('smarty_eval',0))); //TODO check whether to treat hidden as sub-template
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
