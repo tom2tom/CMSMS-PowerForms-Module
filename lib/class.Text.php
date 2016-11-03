@@ -26,7 +26,7 @@ class Text extends FieldBase
 		);
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		$ret = $mod->Lang('abbreviation_length',$this->GetProperty('length',80));
@@ -49,26 +49,26 @@ class Text extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_maximum_length'),
-						$mod->CreateInputText($id,'pdt_length',
+						$mod->CreateInputText($id,'fp_length',
 							$this->GetProperty('length',80),3,3));
 		$main[] = array($mod->Lang('title_read_only'),
-						$mod->CreateInputHidden($id,'pdt_readonly',0).
-						$mod->CreateInputCheckbox($id,'pdt_readonly',1,
+						$mod->CreateInputHidden($id,'fp_readonly',0).
+						$mod->CreateInputCheckbox($id,'fp_readonly',1,
 							$this->GetProperty('readonly',0)));
 		$adv[] = array($mod->Lang('title_field_regex'),
-						$mod->CreateInputText($id,'pdt_regex',
+						$mod->CreateInputText($id,'fp_regex',
 							$this->GetProperty('regex'),25,1024),
 						$mod->Lang('help_regex_use'));
 		$adv[] = array($mod->Lang('title_field_default_value'),
-						$mod->CreateInputText($id,'pdt_default',
+						$mod->CreateInputText($id,'fp_default',
 							$this->GetProperty('default'),25,1024));
 		$adv[] = array($mod->Lang('title_html5'),
-						$mod->CreateInputHidden($id,'pdt_html5',0).
-						$mod->CreateInputCheckbox($id,'pdt_html5',1,
+						$mod->CreateInputHidden($id,'fp_html5',0).
+						$mod->CreateInputCheckbox($id,'fp_html5',1,
 							$this->GetProperty('html5',0)));
 		$adv[] = array($mod->Lang('title_clear_default'),
-						$mod->CreateInputHidden($id,'pdt_clear_default',0).
-						$mod->CreateInputCheckbox($id,'pdt_clear_default',1,
+						$mod->CreateInputHidden($id,'fp_clear_default',0).
+						$mod->CreateInputCheckbox($id,'fp_clear_default',1,
 							$this->GetProperty('clear_default',0)),
 						$mod->Lang('help_clear_default'));
 		return array('main'=>$main,'adv'=>$adv);

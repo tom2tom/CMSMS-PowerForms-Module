@@ -36,13 +36,13 @@ class YearPulldown extends FieldBase
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_select_one_message'),
-						$mod->CreateInputText($id,'pdt_select_one',
+						$mod->CreateInputText($id,'fp_select_one',
 						  $this->GetProperty('select_one',$mod->Lang('select_one')),25,128));
 		$main[] = array($mod->Lang('title_year_end_message'),
-						$mod->CreateInputText($id,'pdt_year_start',
+						$mod->CreateInputText($id,'fp_year_start',
 						  $this->GetProperty('year_start',1900),25,128));
 		$main[] = array($mod->Lang('sort_options'),
-						$mod->CreateInputDropdown($id,'pdt_sort',
+						$mod->CreateInputDropdown($id,'fp_sort',
 						  array($mod->Lang('yes')=>1,$mod->Lang('no')=>0),-1,
 						  $this->GetProperty('sort',0)));
 		return array('main'=>$main,'adv'=>$adv);

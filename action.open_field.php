@@ -59,9 +59,9 @@ if (isset($params['submit'])) {
 		}
 	}
 	foreach ($params as $key=>$val) {
-		if (strncmp($key,'pdt_',4) == 0)
+		if (strncmp($key,'fp_',3) == 0)
 			//TODO check for prop. array or indexed
-			$obfield->SetProperty(substr($key,4),$val);
+			$obfield->SetProperty(substr($key,3),$val);
 	}
 	$obfield->PostAdminAction($params);
 	list($res,$message) = $obfield->AdminValidate($id);
@@ -105,8 +105,8 @@ if (isset($params['submit'])) {
 
 if ($refresh) {
 	foreach ($params as $key=>$val) {
-		if (strncmp($key,'pdt_',4) == 0)
-			$obfield->XtraProps[substr($key,4)] = $val;
+		if (strncmp($key,'fp_',3) == 0)
+			$obfield->XtraProps[substr($key,3)] = $val;
 	}
 	$obfield->SetName($params['field_Name']);
 	$obfield->SetAlias($params['field_Alias']);

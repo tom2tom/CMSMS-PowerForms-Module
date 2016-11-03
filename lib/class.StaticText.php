@@ -18,7 +18,7 @@ class StaticText extends FieldBase
 		$this->Type = 'StaticText';
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		return $this->formdata->formsmodule->Lang('text_length',strlen($this->GetProperty('text')));
 	}
@@ -39,10 +39,10 @@ class StaticText extends FieldBase
 		
 		$main[] = array($mod->Lang('title_text'),
 						$mod->CreateTextArea((get_preference(get_userid(),'use_wysiwyg')),$id,
-							$this->GetProperty('text'),'pdt_text','pageheadtags'));
+							$this->GetProperty('text'),'fp_text','pageheadtags'));
 		$adv[] = array($mod->Lang('title_smarty_eval'),
-						$mod->CreateInputHidden($id,'pdt_smarty_eval',0).
-						$mod->CreateInputCheckbox($id,'pdt_smarty_eval',1,
+						$mod->CreateInputHidden($id,'fp_smarty_eval',0).
+						$mod->CreateInputCheckbox($id,'fp_smarty_eval',1,
 							$this->GetProperty('smarty_eval',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}

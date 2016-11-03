@@ -20,7 +20,7 @@ class EmailBCCAddress extends EmailBase
 		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_email_address')=>'email');
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 //TODO advice about email addr
 		$target = $this->GetProperty('field_to_modify');
@@ -50,7 +50,7 @@ class EmailBCCAddress extends EmailBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_field_to_modify2'),
-						$mod->CreateInputDropdown($id,'pdt_field_to_modify',$choices,-1,
+						$mod->CreateInputDropdown($id,'fp_field_to_modify',$choices,-1,
 							$this->GetProperty('field_to_modify')));
 		return array('main'=>$main,'adv'=>$adv);
 	}

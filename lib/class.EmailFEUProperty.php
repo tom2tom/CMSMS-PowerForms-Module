@@ -19,7 +19,7 @@ class EmailFEUProperty extends EmailBase
 		$this->Type = 'EmailFEUProperty';
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		$ret = $mod->Lang('title_feu_property').': '.$this->GetProperty('feu_property');
@@ -79,7 +79,7 @@ class EmailFEUProperty extends EmailBase
 		$waslast = array_pop($ret['main']); //keep the email to-type selector for last
 		$keys = array_keys($opts);
 		$main[] = array($mod->Lang('title_feu_property'),
-				$mod->CreateInputDropdown($id,'pdt_feu_property',array_flip($opts),-1,
+				$mod->CreateInputDropdown($id,'fp_feu_property',array_flip($opts),-1,
 					$this->GetProperty('feu_property',$keys[0])),
 				$mod->Lang('help_feu_property'));
 		$main[] = $waslast;

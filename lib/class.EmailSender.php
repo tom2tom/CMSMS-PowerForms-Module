@@ -23,19 +23,19 @@ class EmailSender extends EmailBase
 		$choices = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
 		
 		$main[] = array($mod->Lang('title_headers_to_modify'),
-						$mod->CreateInputDropdown($id,'pdt_headers_to_modify',$choices,-1,
+						$mod->CreateInputDropdown($id,'fp_headers_to_modify',$choices,-1,
 							$this->GetProperty('headers_to_modify','b')));
 		$adv[] = array($mod->Lang('title_field_default_value'),
-						$mod->CreateInputText($id,'pdt_default',
+						$mod->CreateInputText($id,'fp_default',
 							$this->GetProperty('default'),25,1024));
 		$adv[] = array($mod->Lang('title_clear_default'),
-						$mod->CreateInputHidden($id,'pdt_clear_default',0).
-						$mod->CreateInputCheckbox($id,'pdt_clear_default',1,
+						$mod->CreateInputHidden($id,'fp_clear_default',0).
+						$mod->CreateInputCheckbox($id,'fp_clear_default',1,
 							$this->GetProperty('clear_default',0)),
 						$mod->Lang('help_clear_default'));
 		$adv[] = array($mod->Lang('title_html5'),
-						$mod->CreateInputHidden($id,'pdt_html5',0).
-						$mod->CreateInputCheckbox($id,'pdt_html5',1,
+						$mod->CreateInputHidden($id,'fp_html5',0).
+						$mod->CreateInputCheckbox($id,'fp_html5',1,
 							$this->GetProperty('html5',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}

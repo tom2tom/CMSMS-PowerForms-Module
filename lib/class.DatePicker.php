@@ -36,7 +36,7 @@ class DatePicker extends FieldBase
 			$mod->Lang('date_december')=>12);
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		$today = getdate();
@@ -109,26 +109,26 @@ class DatePicker extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_default_blank'),
-						$mod->CreateInputHidden($id,'pdt_default_blank',0).
-						$mod->CreateInputCheckbox($id,'pdt_default_blank',1,
+						$mod->CreateInputHidden($id,'fp_default_blank',0).
+						$mod->CreateInputCheckbox($id,'fp_default_blank',1,
 							$this->GetProperty('default_blank',0)),
 						$mod->Lang('help_default_today'));
 		$main[] = array($mod->Lang('title_start_year'),
-						$mod->CreateInputText($id,'pdt_start_year',
+						$mod->CreateInputText($id,'fp_start_year',
 							$this->GetProperty('start_year',($today['year']-10)),10,10));
 		$main[] = array($mod->Lang('title_end_year'),
-						$mod->CreateInputText($id,'pdt_end_year',
+						$mod->CreateInputText($id,'fp_end_year',
 							$this->GetProperty('end_year',($today['year']+10)),10,10));
 		$main[] = array($mod->Lang('title_default_year'),
-						$mod->CreateInputText($id,'pdt_default_year',
+						$mod->CreateInputText($id,'fp_default_year',
 							$this->GetProperty('default_year','-1'),10,10),
 						$mod->Lang('help_default_year'));
 		$adv[] = array($mod->Lang('title_date_format'),
-						$mod->CreateInputText($id,'pdt_date_format',
+						$mod->CreateInputText($id,'fp_date_format',
 							$this->GetProperty('date_format','j F Y'),25,25),
 						$mod->Lang('help_date_format'));
 		$adv[] = array($mod->Lang('title_date_order'),
-						$mod->CreateInputText($id,'pdt_date_order',
+						$mod->CreateInputText($id,'fp_date_order',
 							$this->GetProperty('date_order','d-m-y'),5,5),
 						$mod->Lang('help_date_order'));
 		return array('main'=>$main,'adv'=>$adv);

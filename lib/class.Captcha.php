@@ -21,7 +21,7 @@ class Captcha extends FieldBase
 		$this->Type = 'Captcha';
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		return $this->ValidationMessage; //TODO useless
 	}
@@ -48,27 +48,27 @@ class Captcha extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$this->RemoveAdminField($main,$mod->Lang('title_field_helptext'));
 		$main[] = array($mod->Lang('title_captcha_prompt'),
-						$mod->CreateInputText($id,'pdt_prompt',
+						$mod->CreateInputText($id,'fp_prompt',
 							$this->GetProperty('prompt',$mod->Lang('captcha_prompt')),60,120));
 		$main[] = array($mod->Lang('title_captcha_wrong'),
-						$mod->CreateInputText($id,'pdt_wrongtext',
+						$mod->CreateInputText($id,'fp_wrongtext',
 							$this->GetProperty('wrongtext',$mod->Lang('captcha_wrong')),60,120));
 		$this->RemoveAdminField($adv,$mod->Lang('title_hide_label'));
 		$this->RemoveAdminField($adv,$mod->Lang('title_field_helptoggle'));
 		$this->RemoveAdminField($adv,$mod->Lang('title_field_javascript'));
 		$this->RemoveAdminField($adv,$mod->Lang('title_field_resources'));
 		$adv[] = array($mod->Lang('title_captcha_label'),
-						$mod->CreateInputHidden($id,'pdt_aslabel',0).
-						$mod->CreateInputCheckbox($id,'pdt_aslabel',1,
+						$mod->CreateInputHidden($id,'fp_aslabel',0).
+						$mod->CreateInputCheckbox($id,'fp_aslabel',1,
 							$this->GetProperty('aslabel',0)),
 						$mod->Lang('help_captcha_label'));
 		//setup to revert to default (a.k.a. 'sample') template
 		list($button,$jsfunc) = Utils::CreateTemplateAction($mod,$id,
-			'pdt_captcha_template',$mod->Lang('title_create_sample_template'),
+			'fp_captcha_template',$mod->Lang('title_create_sample_template'),
 			$this->defaulttemplate);
 		$adv[] = array($mod->Lang('title_captcha_template'),
 						$mod->CreateTextArea(FALSE,$id,$this->GetProperty('captcha_template',$this->defaulttemplate),
-							'pdt_captcha_template','pwf_shortarea','','','',50,5),
+							'fp_captcha_template','pwf_shortarea','','','',50,5),
 						$mod->Lang('help_captcha_template').'<br /><br />'.$button);
 		return array('main'=>$main,'adv'=>$adv,'funcs'=>array($jsfunc));
 	}

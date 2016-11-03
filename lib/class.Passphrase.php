@@ -24,7 +24,7 @@ class Passphrase extends FieldBase
 		);
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		$ret = $mod->Lang('abbreviation_length',$this->GetProperty('min_length','8'));
@@ -44,11 +44,11 @@ class Passphrase extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_minimum_length'),
-						$mod->CreateInputText($id,'pdt_min_length',$this->GetProperty('min_length',8),3,3));
+						$mod->CreateInputText($id,'fp_min_length',$this->GetProperty('min_length',8),3,3));
 		$main[] = array($mod->Lang('title_textarea_rows'),
-						$mod->CreateInputText($id,'pdt_rows',$this->GetProperty('rows',2),2,2));
+						$mod->CreateInputText($id,'fp_rows',$this->GetProperty('rows',2),2,2));
 		$main[] = array($mod->Lang('title_textarea_cols'),
-						$mod->CreateInputText($id,'pdt_columns',$this->GetProperty('columns',40),3,3));
+						$mod->CreateInputText($id,'fp_columns',$this->GetProperty('columns',40),3,3));
 		$choices = array(
 		'*****'=>'all',
 		'*1234'=>'credit',
@@ -57,10 +57,10 @@ class Passphrase extends FieldBase
 		'*******4'=>'see1'
 		);
 		$main[] = array($mod->Lang('title_cloak_type'),
-						$mod->CreateInputDropdown($id,'pdt_style',$choices,-1,$this->GetProperty('style','all')));
+						$mod->CreateInputDropdown($id,'fp_style',$choices,-1,$this->GetProperty('style','all')));
 
 		$adv[] = array($mod->Lang('title_field_regex'),
-						$mod->CreateInputText($id,'pdt_regex',
+						$mod->CreateInputText($id,'fp_regex',
 							$this->GetProperty('regex'),25,1024),
 						$mod->Lang('help_regex_use'));
 		return array('main'=>$main,'adv'=>$adv);

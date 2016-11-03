@@ -56,7 +56,7 @@ class CheckboxGroup extends FieldBase
 		}
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$pt = $this->GetPropArray('box_name');
 		if ($pt)
@@ -119,18 +119,18 @@ class CheckboxGroup extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_no_empty'),
-						$mod->CreateInputHidden($id,'pdt_no_empty',0).
-						$mod->CreateInputCheckbox($id,'pdt_no_empty',1,
+						$mod->CreateInputHidden($id,'fp_no_empty',0).
+						$mod->CreateInputCheckbox($id,'fp_no_empty',1,
 							$this->GetProperty('no_empty',0)),
 						$mod->Lang('help_no_empty'));
 		$adv[] = array($mod->Lang('title_single_check'),
-						$mod->CreateInputHidden($id,'pdt_single_check',0).
-						$mod->CreateInputCheckbox($id,'pdt_single_check',1,
+						$mod->CreateInputHidden($id,'fp_single_check',0).
+						$mod->CreateInputCheckbox($id,'fp_single_check',1,
 							$this->GetProperty('single_check',0)),
 						$mod->Lang('help_single_check'));
 		$adv[] = array($mod->Lang('title_field_includelabels'),
-						$mod->CreateInputHidden($id,'pdt_include_labels',0).
-						$mod->CreateInputCheckbox($id,'pdt_include_labels',1,
+						$mod->CreateInputHidden($id,'fp_include_labels',0).
+						$mod->CreateInputCheckbox($id,'fp_include_labels',1,
 							$this->GetProperty('include_labels',0)),
 						$mod->Lang('help_field_includelabels'));
 
@@ -153,10 +153,10 @@ class CheckboxGroup extends FieldBase
 			$yesNo = array($mod->Lang('no')=>'n',$mod->Lang('yes')=>'y');
 			foreach ($names as $i=>&$one) {
 				$boxes[] = array(
-					$mod->CreateInputText($id,'pdt_box_name'.$i,$one,30,128),
-					$mod->CreateInputText($id,'pdt_box_checked'.$i,$this->GetPropIndexed('box_checked',$i),20,128),
-					$mod->CreateInputText($id,'pdt_box_unchecked'.$i,$this->GetPropIndexed('box_unchecked',$i),20,128),
-					$mod->CreateInputDropdown($id,'pdt_box_is_set'.$i,$yesNo,-1,$this->GetPropIndexed('box_is_set',$i)),
+					$mod->CreateInputText($id,'fp_box_name'.$i,$one,30,128),
+					$mod->CreateInputText($id,'fp_box_checked'.$i,$this->GetPropIndexed('box_checked',$i),20,128),
+					$mod->CreateInputText($id,'fp_box_unchecked'.$i,$this->GetPropIndexed('box_unchecked',$i),20,128),
+					$mod->CreateInputDropdown($id,'fp_box_is_set'.$i,$yesNo,-1,$this->GetPropIndexed('box_is_set',$i)),
 					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}

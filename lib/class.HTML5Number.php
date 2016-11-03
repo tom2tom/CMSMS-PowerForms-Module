@@ -21,13 +21,13 @@ class HTML5Number extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_min_number'),
-						$mod->CreateInputText($id,'pdt_min_number',
+						$mod->CreateInputText($id,'fp_min_number',
 							$this->GetProperty('min_number',0)));
 		$main[] = array($mod->Lang('title_max_number'),
-						$mod->CreateInputText($id,'pdt_max_number',
+						$mod->CreateInputText($id,'fp_max_number',
 							$this->GetProperty('max_number',500)));
 		$main[] = array($mod->Lang('title_step_number'),
-						$mod->CreateInputText($id,'pdt_step_number',
+						$mod->CreateInputText($id,'fp_step_number',
 							$this->GetProperty('step_number',50)));
 		return array('main'=>$main,'adv'=>$adv);
 	}

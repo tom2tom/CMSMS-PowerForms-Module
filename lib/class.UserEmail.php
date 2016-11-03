@@ -44,7 +44,7 @@ class UserEmail extends EmailBase
 			$this->Value = array($newvalue);
  	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		return $this->TemplateStatus();
 	}
@@ -81,17 +81,17 @@ class UserEmail extends EmailBase
 			$mod->Lang('option_user_choice')=>'c',
 			$mod->Lang('option_always')=>'a');
 		$main[] = array($mod->Lang('title_send_user_copy'),
-						$mod->CreateInputDropdown($id,'pdt_send_user_copy',$choices,-1,
+						$mod->CreateInputDropdown($id,'fp_send_user_copy',$choices,-1,
 						$this->GetProperty('send_user_copy','n')));
 		$main[] = array($mod->Lang('title_send_user_label'),
-						$mod->CreateInputText($id,'pdt_send_user_label',
+						$mod->CreateInputText($id,'fp_send_user_label',
 						$this->GetProperty('send_user_label',$mod->Lang('title_send_me_a_copy')),25,125));
 		$choices = array(
 			$mod->Lang('option_from')=>'f',
 			$mod->Lang('option_reply')=>'r',
 			$mod->Lang('option_both')=>'b');
 		$main[] = array($mod->Lang('title_headers_to_modify'),
-						$mod->CreateInputDropdown($id,'pdt_headers_to_modify',$choices,-1,
+						$mod->CreateInputDropdown($id,'fp_headers_to_modify',$choices,-1,
 						$this->GetProperty('headers_to_modify','f')));
 	 	return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
 	}
@@ -115,8 +115,7 @@ class UserEmail extends EmailBase
 		$ret = $this->SetClass($tmp,'emailaddr');
  		if ($toself) {
 			$tid = $this->GetInputId('_2');
-			$tmp = $mod->CreateInputCheckbox(
-				$id,$this->formdata->current_prefix.$this->Id.'[]',1,0,'id="'.$tid.'"');
+			$tmp = $mod->CreateInputCheckbox($id,$this->formdata->current_prefix.$this->Id.'[]',1,0,'id="'.$tid.'"');
 			$ret .= '<br />'.$this->SetClass($tmp);
 			$tmp = '<label class ="" for="'.$tid.'">'.
 				$this->GetProperty('send_user_label',$mod->Lang('title_send_me_a_copy')).'</label>';

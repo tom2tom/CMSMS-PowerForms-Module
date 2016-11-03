@@ -45,7 +45,7 @@ class Multiselect extends FieldBase
 		}
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$opt = $this->GetProperty('indexed_name');
 		if (is_array($opt))
@@ -85,7 +85,7 @@ class Multiselect extends FieldBase
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_lines_to_show'),
-						$mod->CreateInputText($id,'pdt_lines',
+						$mod->CreateInputText($id,'fp_lines',
 							$this->GetProperty('lines','3'),10,10));
 		if ($this->optionAdd) {
 			$this->AddPropIndexed('indexed_name','');
@@ -102,8 +102,8 @@ class Multiselect extends FieldBase
 				);
 			foreach ($names as $i=>&$one) {
 				$dests[] = array(
-				$mod->CreateInputText($id,'pdt_indexed_name'.$i,$one,30,128),
-				$mod->CreateInputText($id,'pdt_indexed_value'.$i,$this->GetPropIndexed('indexed_value',$i),30,128),
+				$mod->CreateInputText($id,'fp_indexed_name'.$i,$one,30,128),
+				$mod->CreateInputText($id,'fp_indexed_value'.$i,$this->GetPropIndexed('indexed_value',$i),30,128),
 				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}

@@ -21,7 +21,7 @@ class CatalogerItems extends FieldBase
 		$this->ValidationTypes = array();
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		$cataloger = $mod->GetModuleInstance('Cataloger');
@@ -60,10 +60,10 @@ class CatalogerItems extends FieldBase
 		$cataloger = $mod->GetModuleInstance('Cataloger');
 		if ($cataloger) {
 			$main[] = array($mod->Lang('title_field_height'),
-							$mod->CreateInputText($id,'pdt_lines',$this->GetProperty('lines','5'),3,3),
+							$mod->CreateInputText($id,'fp_lines',$this->GetProperty('lines','5'),3,3),
 							$mod->Lang('help_field_height'));
 			$main[] = array($mod->Lang('title_name_regex'),
-							$mod->CreateInputText($id,'pdt_nameregex',$this->GetProperty('nameregex'),25,25),
+							$mod->CreateInputText($id,'fp_nameregex',$this->GetProperty('nameregex'),25,25),
 							$mod->Lang('help_name_regex'));
 			$main[] = array('','',$mod->Lang('help_cataloger_attribute_fields'));
 
@@ -72,7 +72,7 @@ class CatalogerItems extends FieldBase
 				if (!$one->is_text) {
 					$safeattr = strtolower(preg_replace('/\W/','',$one->attr));
 					$main[] = array($one->attr,
-									$mod->CreateInputText($id,'pdt_attr_'.$safeattr,
+									$mod->CreateInputText($id,'fp_attr_'.$safeattr,
 									$this->GetProperty('attr_'.$safeattr),30,80));
 				}
 			}

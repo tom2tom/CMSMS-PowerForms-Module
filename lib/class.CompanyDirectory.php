@@ -21,7 +21,7 @@ class CompanyDirectory extends FieldBase
 		$this->Type = 'CompanyDirectory';
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		$CompanyDirectory = $mod->GetModuleInstance('CompanyDirectory');
@@ -94,13 +94,13 @@ class CompanyDirectory extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$main[] = array('','',$mod->Lang('help_company_field'));
 		$main[] = array($mod->Lang('title_pick_categories'),
-						$mod->CreateInputSelectList($id,'pdt_Category',$Categories,$CategorySelected,
+						$mod->CreateInputSelectList($id,'fp_Category',$Categories,$CategorySelected,
 						5,'',TRUE));
 		$main[] = array($mod->Lang('title_pick_fielddef'),
-						$mod->CreateInputSelectList($id,'pdt_FieldDefs',$FieldDefs,$FieldDefsSelected,
+						$mod->CreateInputSelectList($id,'fp_FieldDefs',$FieldDefs,$FieldDefsSelected,
 						5,'',FALSE));
 		$adv[] = array($mod->Lang('title_choose_user_input'),
-						$mod->CreateInputDropdown($id,'pdt_UserInput',$choices,'-1',
+						$mod->CreateInputDropdown($id,'fp_UserInput',$choices,'-1',
 							$this->GetProperty('UserInput')));
 		return array('main'=>$main,'adv'=>$adv);
 	}

@@ -50,7 +50,7 @@ class ByTemplate extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_tag'),
-						$mod->CreateInputText($id,'pdt_value',$this->GetProperty('value'),100,1024),
+						$mod->CreateInputText($id,'fp_value',$this->GetProperty('value'),100,1024),
 						$mod->Lang('help_tag'));
 		return array('main'=>$main,'adv'=>$adv);
 	}

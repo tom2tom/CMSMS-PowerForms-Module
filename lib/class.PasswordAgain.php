@@ -17,7 +17,7 @@ class PasswordAgain extends FieldBase
 		$this->Type = 'PasswordAgain';
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		return $this->formdata->formsmodule->Lang('title_field_id').
 			': '.$this->GetProperty('field_to_validate');
@@ -37,17 +37,17 @@ class PasswordAgain extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$main[] = array(
 					$mod->Lang('title_field_to_validate'),
-					$mod->CreateInputDropdown($id,'pdt_field_to_validate',$choices,-1,
+					$mod->CreateInputDropdown($id,'fp_field_to_validate',$choices,-1,
 						$this->GetProperty('field_to_validate')));
 		$main[] = array($mod->Lang('title_display_length'),
-					$mod->CreateInputText($id,'pdt_length',
+					$mod->CreateInputText($id,'fp_length',
 						$this->GetProperty('length','12'),3,3));
 		$main[] = array($mod->Lang('title_minimum_length'),
-					$mod->CreateInputText($id,'pdt_min_length',
+					$mod->CreateInputText($id,'fp_min_length',
 						$this->GetProperty('min_length','8'),3,3));
 		$main[] = array($mod->Lang('title_hide'),
-					$mod->CreateInputHidden($id,'pdt_hide',0).
-					$mod->CreateInputCheckbox($id,'pdt_hide',1,
+					$mod->CreateInputHidden($id,'fp_hide',0).
+					$mod->CreateInputCheckbox($id,'fp_hide',1,
 						$this->GetProperty('hide',1)),
 					$mod->Lang('title_hide_help'));
 		return array('main'=>$main,'adv'=>$adv);

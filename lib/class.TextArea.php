@@ -21,7 +21,7 @@ class TextArea extends FieldBase
 		);
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		if ($this->ValidationType) {
 //			$this->EnsureArray($this->ValidationTypes);
@@ -49,27 +49,27 @@ class TextArea extends FieldBase
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_use_wysiwyg'),
-						$mod->CreateInputHidden($id,'pdt_wysiwyg',0).
-						$mod->CreateInputCheckbox($id,'pdt_wysiwyg',1,$this->GetProperty('wysiwyg',0)));
+						$mod->CreateInputHidden($id,'fp_wysiwyg',0).
+						$mod->CreateInputCheckbox($id,'fp_wysiwyg',1,$this->GetProperty('wysiwyg',0)));
 		$main[] = array($mod->Lang('title_textarea_rows'),
-						$mod->CreateInputText($id,'pdt_rows',$this->GetProperty('rows',15),2,2));
+						$mod->CreateInputText($id,'fp_rows',$this->GetProperty('rows',15),2,2));
 //TODO this is stupid - prefer 100%
 //		$main[] = array($mod->Lang('title_textarea_cols'),
-//						$mod->CreateInputText($id,'pdt_cols',$this->GetProperty('cols',80),5,5));
+//						$mod->CreateInputText($id,'fp_cols',$this->GetProperty('cols',80),5,5));
 		$main[] = array($mod->Lang('title_textarea_length'),
-						$mod->CreateInputText($id,'pdt_length',$this->GetProperty('length'),5,5));
+						$mod->CreateInputText($id,'fp_length',$this->GetProperty('length'),5,5));
 		//omit "javascript" TODO why ? maybe justified if we add our own (for autogrow)
 		$this->RemoveAdminField($adv,$mod->Lang('title_field_javascript'));
 		$adv[] = array($mod->Lang('title_field_default_value'),
-						$mod->CreateTextArea(FALSE,$id,$this->GetProperty('default'),'pdt_default',
+						$mod->CreateTextArea(FALSE,$id,$this->GetProperty('default'),'fp_default',
 						'pwf_tallarea','','','',50,15));
 		$adv[] = array($mod->Lang('title_clear_default'),
-						$mod->CreateInputHidden($id,'pdt_clear_default',0).
-						$mod->CreateInputCheckbox($id,'pdt_clear_default',1,$this->GetProperty('clear_default',0)),
+						$mod->CreateInputHidden($id,'fp_clear_default',0).
+						$mod->CreateInputCheckbox($id,'fp_clear_default',1,$this->GetProperty('clear_default',0)),
 						$mod->Lang('help_clear_default'));
 		$adv[] = array($mod->Lang('title_html5'),
-						$mod->CreateInputHidden($id,'pdt_html5',0).
-						$mod->CreateInputCheckbox($id,'pdt_html5',1,$this->GetProperty('html5',0)));
+						$mod->CreateInputHidden($id,'fp_html5',0).
+						$mod->CreateInputCheckbox($id,'fp_html5',1,$this->GetProperty('html5',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 

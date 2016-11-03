@@ -118,7 +118,7 @@ foreach ($formdata->FieldOrders as $one) {
 		array('field_id'=>$fid,'form_id'=>$form_id,'datakey'=>$params['datakey']));
 	$oneset->alias = $one->ForceAlias();
 	$oneset->type = $one->GetDisplayType();
-	$oneset->field_status = $one->GetFieldStatus();
+	$oneset->field_status = $one->GetSynopsis();
 	$oneset->editlink = $this->CreateLink($id,'open_field','',
 		$iconedit,
 		array('field_id'=>$fid,'form_id'=>$form_id,'datakey'=>$params['datakey']));
@@ -431,40 +431,40 @@ $displays = array();
 
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_required_symbol');
-$oneset->input = $this->CreateInputText($id,'pdt_required_field_symbol',
+$oneset->input = $this->CreateInputText($id,'fp_required_field_symbol',
 	PWForms\Utils::GetFormProperty($formdata,'required_field_symbol','*'),3);
 $displays[] = $oneset;
 
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_submit_button');
-$oneset->input = $this->CreateInputText($id,'pdt_submit_button_text',
+$oneset->input = $this->CreateInputText($id,'fp_submit_button_text',
 	PWForms\Utils::GetFormProperty($formdata,'submit_button_text',$this->Lang('button_submit')),30);
 $displays[] = $oneset;
 
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_next_button');
-$oneset->input = $this->CreateInputText($id,'pdt_next_button_text',
+$oneset->input = $this->CreateInputText($id,'fp_next_button_text',
 	PWForms\Utils::GetFormProperty($formdata,'next_button_text',$this->Lang('button_continue')),30);
 $oneset->help = $this->Lang('help_form_button');
 $displays[] = $oneset;
 
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_prev_button');
-$oneset->input = $this->CreateInputText($id,'pdt_prev_button_text',
+$oneset->input = $this->CreateInputText($id,'fp_prev_button_text',
 	PWForms\Utils::GetFormProperty($formdata,'prev_button_text',$this->Lang('button_previous')),30);
 $oneset->help = $this->Lang('help_form_button');
 $displays[] = $oneset;
 
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_css_class');
-$oneset->input = $this->CreateInputText($id,'pdt_css_class',
+$oneset->input = $this->CreateInputText($id,'fp_css_class',
 	PWForms\Utils::GetFormProperty($formdata,'css_class','powerform'),30);
 $displays[] = $oneset;
 
 $t = PWForms\Utils::GetFormProperty($formdata,'css_file','');
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_css_file');
-$oneset->input = $this->CreateInputText($id,'pdt_css_file',$t,40);
+$oneset->input = $this->CreateInputText($id,'fp_css_file',$t,40);
 $oneset->help = $this->Lang('help_form_css_file');
 $displays[] = $oneset;
 
@@ -555,7 +555,7 @@ $tplvars = $tplvars + array(
 
 $tplvars['title_form_template'] = $this->Lang('title_form_template');
 //note WYSIWYG is no good, the MCE editor stuffs around with the template contents
-$tplvars['input_form_template'] = $this->CreateSyntaxArea($id,$tpl,'pdt_form_template',
+$tplvars['input_form_template'] = $this->CreateSyntaxArea($id,$tpl,'fp_form_template',
 	'pwf_tallarea','form_template','','',50,24,'style="height:30em;"'); //xtra-tall!
 
 //help for form-template
@@ -646,17 +646,17 @@ foreach ($usertags as $key => $value)
 
 $tplvars['title_form_predisplay_udt'] = $this->Lang('title_form_predisplay_udt');
 $tplvars['input_form_predisplay_udt'] =
-	$this->CreateInputDropdown($id,'pdt_predisplay_udt',$usertaglist,-1,
+	$this->CreateInputDropdown($id,'fp_predisplay_udt',$usertaglist,-1,
 		PWForms\Utils::GetFormProperty($formdata,'predisplay_udt'));
 
 $tplvars['title_form_predisplay_each_udt'] = $this->Lang('title_form_predisplay_each_udt');
 $tplvars['input_form_predisplay_each_udt'] =
-	$this->CreateInputDropdown($id,'pdt_predisplay_each_udt',$usertaglist,-1,
+	$this->CreateInputDropdown($id,'fp_predisplay_each_udt',$usertaglist,-1,
 		PWForms\Utils::GetFormProperty($formdata,'predisplay_each_udt'));
 
 $tplvars['title_form_validate_udt'] = $this->Lang('title_form_validate_udt');
 $tplvars['input_form_validate_udt'] =
-	$this->CreateInputDropdown($id,'pdt_validate_udt',$usertaglist,-1,
+	$this->CreateInputDropdown($id,'fp_validate_udt',$usertaglist,-1,
 		PWForms\Utils::GetFormProperty($formdata,'validate_udt'));
 
 $tplvars['help_udt'] = $this->Lang('help_udt');
@@ -667,27 +667,27 @@ $submits = array();
 
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_list_delimiter');
-$oneset->input = $this->CreateInputText($id,'pdt_list_delimiter',
+$oneset->input = $this->CreateInputText($id,'fp_list_delimiter',
 	PWForms\Utils::GetFormProperty($formdata,'list_delimiter',','),3);
 $submits[] = $oneset;
 
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_unspecified');
-$oneset->input = $this->CreateInputText($id,'pdt_unspecified',
+$oneset->input = $this->CreateInputText($id,'fp_unspecified',
 	PWForms\Utils::GetFormProperty($formdata,'unspecified',$this->Lang('unspecified')),30);
 $submits[] = $oneset;
 
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_submit_limit');
-$oneset->input = $this->CreateInputText($id,'pdt_submit_limit',
+$oneset->input = $this->CreateInputText($id,'fp_submit_limit',
 	PWForms\Utils::GetFormProperty($formdata,'submit_limit',$this->GetPreference('submit_limit')),3,5);
 $submits[] = $oneset;
 
 //no scope for !empty() checks for boolean attrs, so we add hidden 0 for checkboxes
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_submit_button_safety');
-$oneset->input = $this->CreateInputHidden($id,'pdt_input_button_safety',0).
-	$this->CreateInputCheckbox($id,'pdt_input_button_safety',1,
+$oneset->input = $this->CreateInputHidden($id,'fp_input_button_safety',0).
+	$this->CreateInputCheckbox($id,'fp_input_button_safety',1,
 	PWForms\Utils::GetFormProperty($formdata,'input_button_safety',0));
 $oneset->help = $this->Lang('help_submit_safety');
 $submits[] = $oneset;
@@ -696,7 +696,7 @@ $oneset = new stdClass();
 $oneset->title = $this->Lang('title_submit_javascript');
 $oneset->input = $this->CreateTextArea(FALSE,$id,
 	PWForms\Utils::GetFormProperty($formdata,'submit_javascript',''),
-	'pdt_submit_javascript','pwf_shortarea','submit_javascript','','',50,8);
+	'fp_submit_javascript','pwf_shortarea','submit_javascript','','',50,8);
 $oneset->help = $this->Lang('help_submit_javascript');
 $submits[] = $oneset;
 
@@ -706,8 +706,8 @@ $submits = array();
 
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_inline_form');
-$oneset->input = $this->CreateInputHidden($id,'pdt_inline',0).
-	$this->CreateInputCheckbox($id,'pdt_inline',1,
+$oneset->input = $this->CreateInputHidden($id,'fp_inline',0).
+	$this->CreateInputCheckbox($id,'fp_inline',1,
 	PWForms\Utils::GetFormProperty($formdata,'inline',0));
 $oneset->help = $this->Lang('help_inline_form');
 $submits[] = $oneset;
@@ -717,12 +717,12 @@ $tplvars['postsubmits'] = $submits;
 $choices = array($this->Lang('redirect_to_page')=>'redir',$this->Lang('display_text')=>'text');
 $tplvars['title_submit_action'] = $this->Lang('title_submit_action');
 $tplvars['input_submit_action'] =
-	$this->CreateInputRadioGroup($id,'pdt_submit_action',$choices,
+	$this->CreateInputRadioGroup($id,'fp_submit_action',$choices,
 		PWForms\Utils::GetFormProperty($formdata,'submit_action','text'),'','&nbsp;&nbsp;');
 
 $tplvars['title_redirect_page'] = $this->Lang('title_redirect_page');
 $tplvars['input_redirect_page'] =
-	PWForms\Utils::CreateHierarchyPulldown($this,$id,'pdt_redirect_page',
+	PWForms\Utils::CreateHierarchyPulldown($this,$id,'fp_redirect_page',
 		PWForms\Utils::GetFormProperty($formdata,'redirect_page',0));
 
 if ($this->before20)
@@ -735,11 +735,11 @@ if (!$tpl)
 	$tpl = PWForms\Utils::CreateDefaultTemplate($formdata,TRUE,FALSE); //? generate default for CmsLayoutTemplateType
 $tplvars['title_submit_template'] = $this->Lang('title_submit_response');
 //note WYSIWYG is no good, the MCE editor stuffs around with the template contents
-$tplvars['input_submit_template'] = $this->CreateSyntaxArea($id,$tpl,'pdt_submission_template',
+$tplvars['input_submit_template'] = $this->CreateSyntaxArea($id,$tpl,'fp_submission_template',
 	'pwf_tallarea','submission_template','','',50,15);
 //setup to revert to 'sample' submission-template
 $ctlData = array();
-$ctlData['pdt_submission_template']['general_button'] = TRUE;
+$ctlData['fp_submission_template']['general_button'] = TRUE;
 list($buttons,$revertscripts) = PWForms\Utils::TemplateActions($formdata,$id,$ctlData);
 $jsfuncs[] = $revertscripts[0];
 $tplvars = $tplvars + array(

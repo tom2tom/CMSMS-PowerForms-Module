@@ -43,7 +43,7 @@ class UniqueFile extends FieldBase
 		return implode("\t",$fields);
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		if (!Utils::GetUploadsPath($mod))
@@ -60,40 +60,40 @@ class UniqueFile extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
 
 		$main[] = array($mod->Lang('title_file_name'),
-			$mod->CreateInputText($id,'pdt_filespec',
+			$mod->CreateInputText($id,'fp_filespec',
 				$this->GetProperty('filespec',
 				'form_submission_'.date('Y-m-d_His').'.txt'),50,128));
 
 /*		$main[] = array($mod->Lang('title_newline_replacement'),
-			$mod->CreateInputText($id,'pdt_newlinechar',
+			$mod->CreateInputText($id,'fp_newlinechar',
 				$this->GetProperty('newlinechar'),5,15),
 			$mod->Lang('help_newline_replacement'));
 */
 		//setup sample-template buttons and scripts
 		$ctldata = array();
-		$ctldata['pdt_file_template']['is_oneline'] = TRUE;
-		$ctldata['pdt_file_header']['is_oneline'] = TRUE;
-		$ctldata['pdt_file_header']['is_header'] = TRUE;
-		$ctldata['pdt_file_footer']['is_oneline'] = TRUE;
-		$ctldata['pdt_file_footer']['is_footer'] = TRUE;
+		$ctldata['fp_file_template']['is_oneline'] = TRUE;
+		$ctldata['fp_file_header']['is_oneline'] = TRUE;
+		$ctldata['fp_file_header']['is_header'] = TRUE;
+		$ctldata['fp_file_footer']['is_oneline'] = TRUE;
+		$ctldata['fp_file_footer']['is_footer'] = TRUE;
 		list($buttons,$jsfuncs) = Utils::TemplateActions($this->formdata,$id,$ctldata);
 
 		$adv[] = array( $mod->Lang('title_unique_file_template'),
 						$mod->CreateTextArea(FALSE,$id,
 							htmlspecialchars($this->GetProperty('file_template')),
-							'pdt_file_template','pwf_tallarea','','','',50,15),
+							'fp_file_template','pwf_tallarea','','','',50,15),
 						$mod->Lang('help_unique_file_template').'<br /><br />'.$buttons[0]);
 
 		$adv[] = array( $mod->Lang('title_file_header'),
 						$mod->CreateTextArea(FALSE,$id,
 							htmlspecialchars($this->GetProperty('file_header')),
-							'pdt_file_header','pwf_shortarea','','','',50,8),
+							'fp_file_header','pwf_shortarea','','','',50,8),
 						$mod->Lang('help_file_header_template').'<br /><br />'.$buttons[1]);
 
 		$adv[] = array( $mod->Lang('title_file_footer'),
 						$mod->CreateTextArea(FALSE,$id,
 							htmlspecialchars($this->GetProperty('file_footer')),
-							'pdt_file_footer','pwf_shortarea','','','',50,8),
+							'fp_file_footer','pwf_shortarea','','','',50,8),
 						$mod->Lang('help_file_footer_template').'<br /><br />'.$buttons[2]);
 
 		//show variables-help on advanced tab

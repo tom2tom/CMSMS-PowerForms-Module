@@ -44,43 +44,43 @@ class EmailBase extends FieldBase
 
 		//additional main-tab items
 		$main[] = array($mod->Lang('title_email_subject'),
-						$mod->CreateInputText($id,'pdt_email_subject',
+						$mod->CreateInputText($id,'fp_email_subject',
 							$this->GetProperty('email_subject'),50),$mod->Lang('canuse_smarty'));
 		$main[] = array($mod->Lang('title_email_from_name'),
-						$mod->CreateInputText($id,'pdt_email_from_name',
+						$mod->CreateInputText($id,'fp_email_from_name',
 							$this->GetProperty('email_from_name',$mod->Lang('friendly_name')),40,128));
 		$main[] = array($mod->Lang('title_email_from_address'),
-						$mod->CreateInputText($id,'pdt_email_from_address',
+						$mod->CreateInputText($id,'fp_email_from_address',
 							$this->GetProperty('email_from_address'),50,128),
 						$mod->Lang('email_from_addr_help',$_SERVER['SERVER_NAME']));
-		//abandoned here: 'pdt_email_cc_address','pdt_use_bcc'
+		//abandoned here: 'fp_email_cc_address','fp_use_bcc'
 		//code elsewhere assumes this is last in $main[]
 		if ($totype)
 			$main[] = array(
 				$mod->Lang('title_send_using'),
-				$mod->CreateInputRadioGroup($id,'pdt_send_using',
+				$mod->CreateInputRadioGroup($id,'fp_send_using',
 					array($mod->Lang('to')=>'to',$mod->Lang('cc')=>'cc',$mod->Lang('bcc')=>'bc'),
 					$this->GetProperty('send_using','to'),'','&nbsp;&nbsp;'),
 					$mod->Lang('email_to_help'));
 
 		//additional advanced-tab items
 		$adv[] = array($mod->Lang('title_html_email'),
-					$mod->CreateInputHidden($id,'pdt_html_email',0).
-					$mod->CreateInputCheckbox($id,'pdt_html_email',1,
+					$mod->CreateInputHidden($id,'fp_html_email',0).
+					$mod->CreateInputCheckbox($id,'fp_html_email',1,
 						$this->GetProperty('html_email',0)));
 		$adv[] = array($mod->Lang('title_email_encoding'),
-					$mod->CreateInputText($id,'pdt_email_encoding',
+					$mod->CreateInputText($id,'fp_email_encoding',
 						$this->GetProperty('email_encoding','utf-8'),15,128));
 		//setup sample-template buttons and scripts
 		$ctldata = array();
-		$ctldata['pdt_email_template']['html_button'] = TRUE;
-		$ctldata['pdt_email_template']['text_button'] = TRUE;
-		$ctldata['pdt_email_template']['is_email'] = TRUE;
+		$ctldata['fp_email_template']['html_button'] = TRUE;
+		$ctldata['fp_email_template']['text_button'] = TRUE;
+		$ctldata['fp_email_template']['is_email'] = TRUE;
 		list($buttons,$jsfuncs) = Utils::TemplateActions($this->formdata,$id,$ctldata);
 		$adv[] = array($mod->Lang('title_email_template'),
 						$mod->CreateTextArea(FALSE,$id,
 						//($this->GetProperty('html_email',0)?$message:htmlspecialchars($message))
-						$message,'pdt_email_template','pwf_tallarea','','','',50,15,'','html'),
+						$message,'fp_email_template','pwf_tallarea','','','',50,15,'','html'),
 						'<br /><br />'.$buttons[0].'&nbsp;'.$buttons[1]);
 		//show variables-help on advanced tab
 		return array($main,$adv,$jsfuncs,'varshelpadv');
@@ -88,19 +88,19 @@ class EmailBase extends FieldBase
 
 	public function PostAdminActionEmail(&$params)
 	{
-		if (!is_array($params['pdt_destination_address']))
-			$params['pdt_destination_address'] = array($params['pdt_destination_address']);
+		if (!is_array($params['fp_destination_address']))
+			$params['fp_destination_address'] = array($params['fp_destination_address']);
 
-		foreach ($params['pdt_destination_address'] as $i => $to) {
+		foreach ($params['fp_destination_address'] as $i => $to) {
 $mod->Crash;
 			if (isset($params['mailto_'.$i])) {
 				$totype = $params['mailto_'.$i];
 				switch ($totype) {
 				 case 'cc';
-					$params['pdt_destination_address'][$i] = '|cc|'.$to;
+					$params['fp_destination_address'][$i] = '|cc|'.$to;
 					break;
 				 case 'bc':
-					$params['pdt_destination_address'][$i] = '|bc|'.$to;
+					$params['fp_destination_address'][$i] = '|bc|'.$to;
 					break;
 				}
 //TODO ?? somewhere $this->SetPropIndexed('destination_address',[$i or other index],[adjusted]parameter) ??

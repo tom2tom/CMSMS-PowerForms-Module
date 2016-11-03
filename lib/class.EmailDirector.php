@@ -47,7 +47,7 @@ class EmailDirector extends EmailBase
 		}
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$opt = $this->GetProperty('destination_address');
 		if (is_array($opt))
@@ -88,11 +88,11 @@ class EmailDirector extends EmailBase
 		$this->RemoveAdminField($main,
 			$mod->Lang('title_email_subject'));
 		$main[] = array($mod->Lang('title_select_one_message'),
-			$mod->CreateInputText($id,'pdt_select_one',
+			$mod->CreateInputText($id,'fp_select_one',
 			$this->GetProperty('select_one',$mod->Lang('select_one')),25,128));
 		$main[] = array($mod->Lang('title_allow_subject_override'),
-			$mod->CreateInputHidden($id,'pdt_subject_override',0).
-			$mod->CreateInputCheckbox($id,'pdt_subject_override',1,
+			$mod->CreateInputHidden($id,'fp_subject_override',0).
+			$mod->CreateInputCheckbox($id,'fp_subject_override',1,
 				$this->GetProperty('subject_override',0)),
 			$mod->Lang('help_allow_subject_override'));
 		if ($this->addressAdd) {
@@ -110,9 +110,9 @@ class EmailDirector extends EmailBase
 				);
 			foreach ($opt as $i=>&$one) {
 				$dests[] = array(
-				$mod->CreateInputText($id,'pdt_destination_subject'.$i,
+				$mod->CreateInputText($id,'fp_destination_subject'.$i,
 					$this->GetPropIndexed('destination_subject',$i),40,128),
-				$mod->CreateInputText($id,'pdt_destination_address'.$i,$one,50,128),
+				$mod->CreateInputText($id,'fp_destination_address'.$i,$one,50,128),
 				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}

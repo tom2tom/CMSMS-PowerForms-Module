@@ -45,7 +45,7 @@ class PageRedirector extends FieldBase
 		}
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$opt = $this->GetProperty('destination_page');
 		if (is_array($opt))
@@ -77,7 +77,7 @@ class PageRedirector extends FieldBase
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_select_one_message'),
-						$mod->CreateInputText($id,'pdt_select_one',
+						$mod->CreateInputText($id,'fp_select_one',
 							$this->GetProperty('select_one',$mod->Lang('select_one')),30,128));
 		if ($this->addressAdd) {
 			$this->AddPropIndexed('destination_page','');
@@ -94,9 +94,9 @@ class PageRedirector extends FieldBase
 				);
 			foreach ($opt as $i=>&$one) {
 				$dests[] = array(
-					$mod->CreateInputText($id,'pdt_destination_subject'.$i,
+					$mod->CreateInputText($id,'fp_destination_subject'.$i,
 						$this->GetPropIndexed('destination_subject',$i),30,128),
-					Utils::CreateHierarchyPulldown($mod,$id,'pdt_destination_page'.$i,$one),
+					Utils::CreateHierarchyPulldown($mod,$id,'fp_destination_page'.$i,$one),
 					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}

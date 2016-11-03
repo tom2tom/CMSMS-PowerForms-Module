@@ -45,10 +45,10 @@ class OzStatePicker extends FieldBase
 
 		$choices = array_merge(array('No Default'=>''),$this->States);
 		$main[] = array($mod->Lang('title_select_default_state'),
-						$mod->CreateInputDropdown($id,'pdt_default_state',$choices,-1,
+						$mod->CreateInputDropdown($id,'fp_default_state',$choices,-1,
 					  		$this->GetProperty('default_state')));
 		$main[] = array($mod->Lang('title_select_one_message'),
-						$mod->CreateInputText($id,'pdt_select_one',
+						$mod->CreateInputText($id,'fp_select_one',
 							$this->GetProperty('select_one',$mod->Lang('select_one'))));
 		return array('main'=>$main,'adv'=>$adv);
 	}

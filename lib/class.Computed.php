@@ -97,13 +97,13 @@ class Computed extends FieldBase
 
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$main[] = array($mod->Lang('title_compute_value'),
-						$mod->CreateInputText($id,'pdt_value',$this->GetProperty('value'),35,1024),
+						$mod->CreateInputText($id,'fp_value',$this->GetProperty('value'),35,1024),
 						$help);
 		$main[] = array($mod->Lang('title_string_or_number_eval'),
-						$mod->CreateInputRadioGroup($id,'pdt_string_or_number_eval',$choices,
+						$mod->CreateInputRadioGroup($id,'fp_string_or_number_eval',$choices,
 						$this->GetProperty('string_or_number_eval','numeric'),'&nbsp;&nbsp;'));
 		$main[] = array($mod->Lang('title_compute_order'),
-						$mod->CreateInputText($id,'pdt_order',$this->GetProperty('order',1),3),
+						$mod->CreateInputText($id,'fp_order',$this->GetProperty('order',1),3),
 						$mod->Lang('help_compute_order'));
 		return array('main'=>$main,'adv'=>$adv);
 	}

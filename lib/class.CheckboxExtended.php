@@ -22,7 +22,7 @@ class CheckboxExtended extends FieldBase
 			$mod->Lang('validation_empty')=>'empty');
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		$ret = ($this->GetProperty('is_checked',0)?$mod->Lang('checked_by_default'):$mod->Lang('unchecked_by_default'));
@@ -61,24 +61,24 @@ class CheckboxExtended extends FieldBase
 		$this->RemoveAdminField($main,$mod->Lang('title_field_required'));
 
 		$main[] = array($mod->Lang('title_checkbox_label'),
-						$mod->CreateInputText($id,'pdt_box_label',
+						$mod->CreateInputText($id,'fp_box_label',
 							$this->GetProperty('box_label'),25,255));
 		$main[] = array($mod->Lang('title_checked_value'),
-						$mod->CreateInputText($id,'pdt_checked_value',
+						$mod->CreateInputText($id,'fp_checked_value',
 							$this->GetProperty('checked_value',$mod->Lang('yes')),25,255));
 		$main[] = array($mod->Lang('title_unchecked_value'),
-						$mod->CreateInputText($id,'pdt_unchecked_value',
+						$mod->CreateInputText($id,'fp_unchecked_value',
 							$this->GetProperty('unchecked_value',$mod->Lang('no')),25,255));
 		$main[] = array($mod->Lang('title_default_set'),
-						$mod->CreateInputHidden($id,'pdt_is_checked',0).
-						$mod->CreateInputCheckbox($id,'pdt_is_checked',1,
+						$mod->CreateInputHidden($id,'fp_is_checked',0).
+						$mod->CreateInputCheckbox($id,'fp_is_checked',1,
 							$this->GetProperty('is_checked',0)));
 		$main[] = array($mod->Lang('title_textfield_label'),
-						$mod->CreateInputText($id,'pdt_text_label',
+						$mod->CreateInputText($id,'fp_text_label',
 							$this->GetProperty('text_label'),25,255));
 		$main[] = array($mod->Lang('title_show_textfield'),
-						$mod->CreateInputHidden($id,'pdt_show_textfield',0).
-						$mod->CreateInputCheckbox($id,'pdt_show_textfield',1,
+						$mod->CreateInputHidden($id,'fp_show_textfield',0).
+						$mod->CreateInputCheckbox($id,'fp_show_textfield',1,
 							$this->GetProperty('show_textfield',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}

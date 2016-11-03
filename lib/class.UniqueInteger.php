@@ -34,15 +34,15 @@ class UniqueInteger extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_show_to_user'),
-						$mod->CreateInputHidden($id,'pdt_show_to_user',0).
-						$mod->CreateInputCheckbox($id,'pdt_show_to_user',1,
+						$mod->CreateInputHidden($id,'fp_show_to_user',0).
+						$mod->CreateInputCheckbox($id,'fp_show_to_user',1,
 							$this->GetProperty('show_to_user',0)));
 		$adv[] = array($mod->Lang('title_use_random_generator'),
-						$mod->CreateInputHidden($id,'pdt_use_random_generator',0).
-						$mod->CreateInputCheckbox($id,'pdt_use_random_generator',1,
+						$mod->CreateInputHidden($id,'fp_use_random_generator',0).
+						$mod->CreateInputCheckbox($id,'fp_use_random_generator',1,
 							$this->GetProperty('use_random_generator',0)));
 		$adv[] = array($mod->Lang('title_numbers_to_generate'),
-						$mod->CreateInputText($id,'pdt_numbers_to_generate',
+						$mod->CreateInputText($id,'fp_numbers_to_generate',
 							$this->GetProperty('numbers_to_generate',5),25,25));
 		return array('main'=>$main,'adv'=>$adv);
 	}

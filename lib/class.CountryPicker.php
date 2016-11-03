@@ -120,10 +120,10 @@ class CountryPicker extends FieldBase
 
 		$choices = array_merge(array($mod->Lang('no_default')=>''),$this->Countries);
 		$main[] = array($mod->Lang('title_select_default_country'),
-						$mod->CreateInputDropdown($id,'pdt_default_country',$choices,-1,
+						$mod->CreateInputDropdown($id,'fp_default_country',$choices,-1,
 							$this->GetProperty('default_country')));
 		$main[] = array($mod->Lang('title_select_one_message'),
-						$mod->CreateInputText($id,'pdt_select_one',
+						$mod->CreateInputText($id,'fp_select_one',
 							$this->GetProperty('select_one',$mod->Lang('select_one'))));
 		return array('main'=>$main,'adv'=>$adv);
 	}

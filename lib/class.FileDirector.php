@@ -77,7 +77,7 @@ class FileDirector extends FieldBase
 			return $ret;
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		if (!Utils::GetUploadsPath($mod))
@@ -99,10 +99,10 @@ class FileDirector extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
 		$main[] = array($mod->Lang('title_select_one_message'),
 			$mod->CreateInputText($id,
-			'pdt_select_one',
+			'fp_select_one',
 			$this->GetProperty('select_one',$mod->Lang('select_one')),25,128));
 /*		$main[] = array($mod->Lang('title_newline_replacement'),
-				$mod->CreateInputText($id,'pdt_newlinechar',
+				$mod->CreateInputText($id,'fp_newlinechar',
 					$this->GetProperty('newlinechar'),5,15),
 				$mod->Lang('help_newline_replacement'));
 */
@@ -121,8 +121,8 @@ class FileDirector extends FieldBase
 				);
 			foreach ($names as $i=>&$one) {
 				$dests[] = array(
-				$mod->CreateInputText($id,'pdt_destination_displayname'.$i,$this->GetPropIndexed('destination_displayname',$i),30,128),
-				$mod->CreateInputText($id,'pdt_destination_filename'.$i,$one,30,128),
+				$mod->CreateInputText($id,'fp_destination_displayname'.$i,$this->GetPropIndexed('destination_displayname',$i),30,128),
+				$mod->CreateInputText($id,'fp_destination_filename'.$i,$one,30,128),
 				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
@@ -135,27 +135,27 @@ class FileDirector extends FieldBase
 
 		//setup sample-template buttons and scripts
 		$ctldata = array();
-		$ctldata['pdt_file_template']['is_oneline'] = TRUE;
-		$ctldata['pdt_file_header']['is_oneline'] = TRUE;
-		$ctldata['pdt_file_header']['is_header'] = TRUE;
-		$ctldata['pdt_file_footer']['is_oneline'] = TRUE;
-		$ctldata['pdt_file_footer']['is_footer'] = TRUE;
+		$ctldata['fp_file_template']['is_oneline'] = TRUE;
+		$ctldata['fp_file_header']['is_oneline'] = TRUE;
+		$ctldata['fp_file_header']['is_header'] = TRUE;
+		$ctldata['fp_file_footer']['is_oneline'] = TRUE;
+		$ctldata['fp_file_footer']['is_footer'] = TRUE;
 		list($buttons,$jsfuncs) = Utils::TemplateActions($this->formdata,$id,$ctldata);
 
 		$adv[] = array($mod->Lang('title_file_template'),
 			$mod->CreateTextArea(FALSE,$id,
 				htmlspecialchars($this->GetProperty('file_template')),
-				'pdt_file_template','pwf_tallarea','','','',50,15).
+				'fp_file_template','pwf_tallarea','','','',50,15).
 				'<br /><br />'.$buttons[0]);
 		$adv[] = array($mod->Lang('title_file_header'),
 			$mod->CreateTextArea(FALSE,$id,
 				htmlspecialchars($this->GetProperty('file_header')),
-				'pdt_file_header','pwf_shortarea','','','',50,8).
+				'fp_file_header','pwf_shortarea','','','',50,8).
 				'<br /><br />'.$buttons[1]);
 		$adv[] = array($mod->Lang('title_file_footer'),
 			$mod->CreateTextArea(FALSE,$id,
 				htmlspecialchars($this->GetProperty('file_footer')),
-				'pdt_file_footer','pwf_shortarea','','','',50,8).
+				'fp_file_footer','pwf_shortarea','','','',50,8).
 				'<br /><br />'.$buttons[2]);
 
 		if ($dests)

@@ -50,7 +50,7 @@ class SystemEmail extends EmailBase
 		}
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		$ret = $mod->Lang('to').': ';
@@ -135,7 +135,7 @@ class SystemEmail extends EmailBase
 				$btns = self::GetDests($id,$i,$totype);
 
 				$dests[] = array(
-					$mod->CreateInputText($id,'pdt_destination_address'.$i,$addr,50,128),
+					$mod->CreateInputText($id,'fp_destination_address'.$i,$addr,50,128),
 					array_shift($btns),
 					array_shift($btns),
 					array_shift($btns),

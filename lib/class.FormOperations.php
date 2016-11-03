@@ -276,8 +276,8 @@ EOS;
 
 		//store form options
 		foreach ($params as $key=>$val) {
-			if (strncmp($key,'pdt_',4) == 0) {
-				$key = substr($key,4);
+			if (strncmp($key,'fp_',3) == 0) {
+				$key = substr($key,3);
 				$longval = NULL;
 				if (($p = strpos($key,'_template')) !== FALSE) {
 					$type = substr($key,0,$p);

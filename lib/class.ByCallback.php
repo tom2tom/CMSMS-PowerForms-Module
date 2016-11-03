@@ -29,7 +29,7 @@ class ByCallback extends FieldBase
 		$this->Type = 'Callback';
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 	}
 

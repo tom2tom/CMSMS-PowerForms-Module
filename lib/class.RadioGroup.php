@@ -48,7 +48,7 @@ class RadioGroup extends FieldBase
 		}
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$opt = $this->GetPropArray('button_name');
 		if ($opt)
@@ -96,7 +96,7 @@ class RadioGroup extends FieldBase
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_radio_separator'),
-						$mod->CreateInputText($id,'pdt_radio_separator',
+						$mod->CreateInputText($id,'fp_radio_separator',
 							$this->GetProperty('radio_separator','&nbsp;&nbsp;'),15,25),
 						$mod->Lang('help_radio_separator'));
 		if ($this->optionAdd) {
@@ -117,9 +117,9 @@ class RadioGroup extends FieldBase
 			$yesNo = array($mod->Lang('no')=>'n',$mod->Lang('yes')=>'y');
 			foreach ($names as $i=>&$one) {
 				$boxes[] = array(
-					$mod->CreateInputText($id,'pdt_button_name'.$i,$one,25,128),
-					$mod->CreateInputText($id,'pdt_button_checked'.$i,$this->GetPropIndexed('button_checked',$i),25,128),
-					$mod->CreateInputDropdown($id,'pdt_button_is_set'.$i,$yesNo,-1,$this->GetPropIndexed('button_is_set',$i)),
+					$mod->CreateInputText($id,'fp_button_name'.$i,$one,25,128),
+					$mod->CreateInputText($id,'fp_button_checked'.$i,$this->GetPropIndexed('button_checked',$i),25,128),
+					$mod->CreateInputDropdown($id,'fp_button_is_set'.$i,$yesNo,-1,$this->GetPropIndexed('button_is_set',$i)),
 					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				 );
 			}

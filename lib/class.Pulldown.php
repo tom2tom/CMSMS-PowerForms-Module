@@ -45,7 +45,7 @@ class Pulldown extends FieldBase
 		}
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$opt = $this->GetProperty('indexed_name');
 		if (is_array($opt))
@@ -77,10 +77,10 @@ class Pulldown extends FieldBase
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_select_one_message'),
-			$mod->CreateInputText($id,'pdt_select_one',
+			$mod->CreateInputText($id,'fp_select_one',
 			  $this->GetProperty('select_one',$mod->Lang('select_one')),25,128));
 		$main[] = array($mod->Lang('sort_options'),
-			$mod->CreateInputDropdown($id,'pdt_sort',
+			$mod->CreateInputDropdown($id,'fp_sort',
 			  array($mod->Lang('yes')=>1,$mod->Lang('no')=>0),-1,
 			  $this->GetProperty('sort',0)));
 		if ($this->optionAdd) {
@@ -98,8 +98,8 @@ class Pulldown extends FieldBase
 				);
 			foreach ($opt as $i=>&$one) {
 				$dests[] = array(
-				$mod->CreateInputText($id,'pdt_indexed_name'.$i,$one,30,128),
-				$mod->CreateInputText($id,'pdt_indexed_value'.$i,$this->GetPropIndexed('indexed_value',$i),30,128),
+				$mod->CreateInputText($id,'fp_indexed_name'.$i,$one,30,128),
+				$mod->CreateInputText($id,'fp_indexed_value'.$i,$this->GetPropIndexed('indexed_value',$i),30,128),
 				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}

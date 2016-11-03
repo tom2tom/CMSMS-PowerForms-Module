@@ -20,7 +20,7 @@ class ByTag extends FieldBase
 		$this->Type = 'ByTag';
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		return $this->GetProperty('udtname',$this->formdata->formsmodule->Lang('unspecified'));
 	}
@@ -35,11 +35,11 @@ class ByTag extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_udt_name'),
-						$mod->CreateInputDropdown($id,'pdt_udtname',$choices,-1,
+						$mod->CreateInputDropdown($id,'fp_udtname',$choices,-1,
 							$this->GetProperty('udtname')));
 		$adv[] = array($mod->Lang('title_export_form_to_udt'),
-						$mod->CreateInputHidden($id,'pdt_export_form',0).
-						$mod->CreateInputCheckbox($id,'pdt_export_form',1,
+						$mod->CreateInputHidden($id,'fp_export_form',0).
+						$mod->CreateInputCheckbox($id,'fp_export_form',1,
 							$this->GetProperty('export_form',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}

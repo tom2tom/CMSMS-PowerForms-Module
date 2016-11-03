@@ -27,7 +27,7 @@ class FileUpload extends FieldBase
 			return $this->Value;
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		if (!Utils::GetUploadsPath($mod))
@@ -62,18 +62,18 @@ class FileUpload extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_maximum_size'),
-				$mod->CreateInputText($id,'pdt_max_size',$ms,5,5),
+				$mod->CreateInputText($id,'fp_max_size',$ms,5,5),
 				$mod->Lang('help_maximum_size'));
 		$main[] = array($mod->Lang('title_permitted_extensions'),
-				$mod->CreateInputText($id,'pdt_permitted_extensions',$exts,25,80),
+				$mod->CreateInputText($id,'fp_permitted_extensions',$exts,25,80),
 				$mod->Lang('help_permitted_extensions'));
 		$main[] = array($mod->Lang('title_show_limitations'),
-				$mod->CreateInputHidden($id,'pdt_show_details',0).
-				$mod->CreateInputCheckbox($id,'pdt_show_details',1,$show),
+				$mod->CreateInputHidden($id,'fp_show_details',0).
+				$mod->CreateInputCheckbox($id,'fp_show_details',1,$show),
 				$mod->Lang('help_show_limitations'));
 		$main[] = array($mod->Lang('title_allow_overwrite'),
-				$mod->CreateInputHidden($id,'pdt_allow_overwrite',0).
-				$mod->CreateInputCheckbox($id,'pdt_allow_overwrite',1,
+				$mod->CreateInputHidden($id,'fp_allow_overwrite',0).
+				$mod->CreateInputCheckbox($id,'fp_allow_overwrite',1,
 					$this->GetProperty('allow_overwrite',0)),
 				$mod->Lang('help_allow_overwrite'));
 
@@ -84,38 +84,38 @@ class FileUpload extends FieldBase
 		Utils::FormFieldsHelp($this->formdata,array('$ext'=>$mod->Lang('original_file_extension')));
 
 		$adv[] = array($mod->Lang('title_file_rename'),
-						$mod->CreateInputText($id,'pdt_file_rename',
+						$mod->CreateInputText($id,'fp_file_rename',
 						$this->GetProperty('file_rename'),60,255),
 						$help_file_rename);
 		$adv[] = array($mod->Lang('title_suppress_filename'),
-						$mod->CreateInputHidden($id,'pdt_suppress_filename',0).
-						$mod->CreateInputCheckbox($id,'pdt_suppress_filename',1,
+						$mod->CreateInputHidden($id,'fp_suppress_filename',0).
+						$mod->CreateInputCheckbox($id,'fp_suppress_filename',1,
 							$this->GetProperty('suppress_filename',0)));
 		$adv[] = array($mod->Lang('title_suppress_attachment'),
-						$mod->CreateInputHidden($id,'pdt_suppress_attachment',0).
-						$mod->CreateInputCheckbox($id,'pdt_suppress_attachment',1,
+						$mod->CreateInputHidden($id,'fp_suppress_attachment',0).
+						$mod->CreateInputCheckbox($id,'fp_suppress_attachment',1,
 							$this->GetProperty('suppress_attachment',1)));
 		$adv[] = array($mod->Lang('title_remove_file_from_server'),
-						$mod->CreateInputHidden($id,'pdt_remove_file',0).
-						$mod->CreateInputCheckbox($id,'pdt_remove_file',1,
+						$mod->CreateInputHidden($id,'fp_remove_file',0).
+						$mod->CreateInputCheckbox($id,'fp_remove_file',1,
 							$this->GetProperty('remove_file',0)),
 						$mod->Lang('help_ignored_if_upload'));
 /*		$config = \cmsms()->GetConfig();
 		$adv[] = array($mod->Lang('title_file_destination'),
-							$mod->CreateInputText($id,'pdt_file_destination',
+							$mod->CreateInputText($id,'fp_file_destination',
 							$this->GetProperty('file_destination',$config['uploads_path']),60,255),
 							$mod->Lang('help_ignored_if_upload'));
 */
 		if ($uploads) {
 			$categorylist = $uploads->getCategoryList();
 			$adv[] = array($mod->Lang('title_sendto_uploads'),
-				 			$mod->CreateInputDropdown($id,'pdt_sendto_uploads',$sendto_uploads_list,
+				 			$mod->CreateInputDropdown($id,'fp_sendto_uploads',$sendto_uploads_list,
 							$sendto_uploads));
 			$adv[] = array($mod->Lang('title_uploads_category'),
-							$mod->CreateInputDropdown($id,'pdt_uploads_category',$categorylist,'',
+							$mod->CreateInputDropdown($id,'fp_uploads_category',$categorylist,'',
 							$uploads_category));
 			$adv[] = array($mod->Lang('title_uploads_destpage'),
-							self::CreatePageDropdown($id,'pdt_uploads_destpage',$uploads_destpage));
+							self::CreatePageDropdown($id,'fp_uploads_destpage',$uploads_destpage));
 		}
 
 		return array('main'=>$main,'adv'=>$adv);

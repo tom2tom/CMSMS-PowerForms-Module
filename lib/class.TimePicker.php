@@ -25,7 +25,7 @@ class TimePicker extends FieldBase
 			$mod->Lang('title_after_noon')=>$mod->Lang('title_after_noon'));
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		return ($this->GetProperty('24_hour',0)?$mod->Lang('24_hour'):$mod->Lang('12_hour'));
@@ -56,8 +56,8 @@ class TimePicker extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_24_hour'),
-						$mod->CreateInputHidden($id,'pdt_24_hour',0).
-						$mod->CreateInputCheckbox($id,'pdt_24_hour',1,
+						$mod->CreateInputHidden($id,'fp_24_hour',0).
+						$mod->CreateInputCheckbox($id,'fp_24_hour',1,
 							$this->GetProperty('24_hour',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}

@@ -41,12 +41,12 @@ class SystemLink extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_auto_link'),
-						$mod->CreateInputHidden($id,'pdt_auto_link',0).
-						$mod->CreateInputCheckbox($id,'pdt_auto_link',1,
+						$mod->CreateInputHidden($id,'fp_auto_link',0).
+						$mod->CreateInputCheckbox($id,'fp_auto_link',1,
 							$this->GetProperty('auto_link',0)),
 						$mod->Lang('help_auto_link'));
 		$main[] = array($mod->Lang('title_target_page'),
-						Utils::CreateHierarchyPulldown($mod,$id,'pdt_target_page',
+						Utils::CreateHierarchyPulldown($mod,$id,'fp_target_page',
 							$this->GetProperty('target_page',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}

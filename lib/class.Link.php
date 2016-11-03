@@ -38,10 +38,10 @@ class Link extends FieldBase
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_default_link'),
-						$mod->CreateInputText($id,'pdt_default_link',
+						$mod->CreateInputText($id,'fp_default_link',
 							$this->GetProperty('default_link'),25,128));
 		$main[] = array($mod->Lang('title_default_link_title'),
-						$mod->CreateInputText($id,'pdt_default_link_title',
+						$mod->CreateInputText($id,'fp_default_link_title',
 							$this->GetProperty('default_link_title'),25,128));
 		return array('main'=>$main,'adv'=>$adv);
 	}

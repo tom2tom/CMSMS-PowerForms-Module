@@ -67,8 +67,8 @@ if (isset($params['submit']) || isset($params['apply'])) {
 	$message = $this->_PrettyMessage('field_order_updated');
 }
 //stylesfile
-if (!(empty($params['stylesdelete']) || empty($params['pdt_css_file']))) {
-	PWForms\Utils::DeleteUploadFile($this,$params['pdt_css_file'],$form_id);
+if (!(empty($params['stylesdelete']) || empty($params['fp_css_file']))) {
+	PWForms\Utils::DeleteUploadFile($this,$params['fp_css_file'],$form_id);
 //	unset($params['stylesdelete']);
 }
 $t = $id.'stylesupload';
@@ -115,13 +115,13 @@ if (isset($_FILES) && isset($_FILES[$t])) {
 			}
 		}
 		if (empty($umsg))
-			$params['pdt_css_file'] = $file_data['name'];
+			$params['fp_css_file'] = $file_data['name'];
 		else {
 			$message .= '<br />'.$umsg;
 		}
 
 	} else {
-//TODO adding file	$params['pdt_css_file'] = $params['X'];
+//TODO adding file	$params['fp_css_file'] = $params['X'];
 	}
 }
 

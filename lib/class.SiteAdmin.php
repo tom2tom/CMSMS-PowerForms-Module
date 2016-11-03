@@ -50,7 +50,7 @@ class SiteAdmin extends FieldBase
 		return FALSE;
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$ret = '';
 		if ($this->GetProperty('restrict_to_group',0)) {
@@ -91,29 +91,29 @@ class SiteAdmin extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_select_one_message'),
-					$mod->CreateInputText($id,'pdt_select_one',
+					$mod->CreateInputText($id,'fp_select_one',
 					$this->GetProperty('select_one',$mod->Lang('select_one')),25,128));
 		$main[] = array($mod->Lang('title_show_userfirstname'),
-					$mod->CreateInputHidden($id,'pdt_show_userfirstname',0).
-					$mod->CreateInputCheckbox($id,'pdt_show_userfirstname',1,
+					$mod->CreateInputHidden($id,'fp_show_userfirstname',0).
+					$mod->CreateInputCheckbox($id,'fp_show_userfirstname',1,
 						$this->GetProperty('show_userfirstname',1)));
 		$main[] = array($mod->Lang('title_show_userlastname'),
-					$mod->CreateInputHidden($id,'pdt_show_userlastname',0).
-					$mod->CreateInputCheckbox($id,'pdt_show_userlastname',1,
+					$mod->CreateInputHidden($id,'fp_show_userlastname',0).
+					$mod->CreateInputCheckbox($id,'fp_show_userlastname',1,
 						$this->GetProperty('show_userlastname',1)));
 		$main[] = array($mod->Lang('title_show_username'),
-					$mod->CreateInputHidden($id,'pdt_show_username',0).
-					$mod->CreateInputCheckbox($id,'pdt_show_username',1,
+					$mod->CreateInputHidden($id,'fp_show_username',0).
+					$mod->CreateInputCheckbox($id,'fp_show_username',1,
 						$this->GetProperty('show_username',0)));
 		$main[] = array($mod->Lang('title_active_only'),
-					$mod->CreateInputHidden($id,'pdt_active_only',0).
-					$mod->CreateInputCheckbox($id,'pdt_active_only',1,
+					$mod->CreateInputHidden($id,'fp_active_only',0).
+					$mod->CreateInputCheckbox($id,'fp_active_only',1,
 						$this->GetProperty('active_only',1)));
 		$main[] = array($mod->Lang('title_restrict_to_group'),
-					$mod->CreateInputHidden($id,'pdt_restrict_to_group',0).
-					$mod->CreateInputCheckbox($id,'pdt_restrict_to_group',1,
+					$mod->CreateInputHidden($id,'fp_restrict_to_group',0).
+					$mod->CreateInputCheckbox($id,'fp_restrict_to_group',1,
 						$this->GetProperty('restrict_to_group',0)).
-					$mod->CreateInputDropdown($id,'pdt_group',$choices,-1,
+					$mod->CreateInputDropdown($id,'fp_group',$choices,-1,
 						$this->GetProperty('group')));
 		return array('main'=>$main,'adv'=>$adv);
 	}

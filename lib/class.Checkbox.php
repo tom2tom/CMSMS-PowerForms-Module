@@ -17,7 +17,7 @@ class Checkbox extends FieldBase
 		$this->ValidationTypes = array();
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		$ret = ($this->GetProperty('is_checked',0)?$mod->Lang('checked_by_default'):$mod->Lang('unchecked_by_default'));
@@ -43,17 +43,17 @@ class Checkbox extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_checkbox_label'),
-						$mod->CreateInputText($id,'pdt_label',
+						$mod->CreateInputText($id,'fp_label',
 							$this->GetProperty('label'),25,255));
 		$main[] = array($mod->Lang('title_checked_value'),
-						$mod->CreateInputText($id,'pdt_checked_value',
+						$mod->CreateInputText($id,'fp_checked_value',
 							$this->GetProperty('checked_value',$mod->Lang('value_checked')),25,255));
 		$main[] = array($mod->Lang('title_unchecked_value'),
-						$mod->CreateInputText($id,'pdt_unchecked_value',
+						$mod->CreateInputText($id,'fp_unchecked_value',
 							$this->GetProperty('unchecked_value',$mod->Lang('value_unchecked')),25,255));
 		$main[] = array($mod->Lang('title_default_set'),
-						$mod->CreateInputHidden($id,'pdt_is_checked',0).
-						$mod->CreateInputCheckbox($id,'pdt_is_checked',1,
+						$mod->CreateInputHidden($id,'fp_is_checked',0).
+						$mod->CreateInputCheckbox($id,'fp_is_checked',1,
 							$this->GetProperty('is_checked',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}

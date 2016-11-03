@@ -24,7 +24,7 @@ class Password extends FieldBase
 		);
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		$ret = $mod->Lang('abbreviation_length',$this->GetProperty('length','80'));
@@ -44,22 +44,22 @@ class Password extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_display_length'),
-						$mod->CreateInputText($id,'pdt_length',
+						$mod->CreateInputText($id,'fp_length',
 							$this->GetProperty('length',12),3,3));
 		$main[] = array($mod->Lang('title_minimum_length'),
-						$mod->CreateInputText($id,'pdt_min_length',
+						$mod->CreateInputText($id,'fp_min_length',
 							$this->GetProperty('min_length',8),3,3));
 		$main[] = array($mod->Lang('title_hide'),
-						$mod->CreateInputHidden($id,'pdt_hide',0).
-						$mod->CreateInputCheckbox($id,'pdt_hide',1,
+						$mod->CreateInputHidden($id,'fp_hide',0).
+						$mod->CreateInputCheckbox($id,'fp_hide',1,
 							$this->GetProperty('hide',1)),
 					  $mod->Lang('title_hide_help'));
 		$main[] = array($mod->Lang('title_read_only'),
-						$mod->CreateInputHidden($id,'pdt_readonly',0).
-						$mod->CreateInputCheckbox($id,'pdt_readonly',1,
+						$mod->CreateInputHidden($id,'fp_readonly',0).
+						$mod->CreateInputCheckbox($id,'fp_readonly',1,
 							$this->GetProperty('readonly',0)));
 		$adv[] = array($mod->Lang('title_field_regex'),
-						$mod->CreateInputText($id,'pdt_regex',
+						$mod->CreateInputText($id,'fp_regex',
 							$this->GetProperty('regex'),25,1024),
 						$mod->Lang('help_regex_use'));
 		return array('main'=>$main,'adv'=>$adv);

@@ -33,7 +33,7 @@ class FieldsetStart extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_legend'),
-						$mod->CreateInputText($id,'pdt_legend',
+						$mod->CreateInputText($id,'fp_legend',
 							$this->GetProperty('legend'),50));
 		return array('main'=>$main,'adv'=>$adv);
 	}

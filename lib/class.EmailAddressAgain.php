@@ -17,7 +17,7 @@ class EmailAddressAgain extends EmailBase
 		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_email_address')=>'email');
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		return $mod->Lang('title_field_id') . ': ' . $this->GetProperty('field_to_validate');
@@ -37,19 +37,19 @@ class EmailAddressAgain extends EmailBase
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_field_to_validate'),
-						$mod->CreateInputDropdown($id,'pdt_field_to_validate',$choices,-1,
+						$mod->CreateInputDropdown($id,'fp_field_to_validate',$choices,-1,
 							$this->GetProperty('field_to_validate')));
 		$adv[] = array($mod->Lang('title_field_default_value'),
-						$mod->CreateInputText($id,'pdt_default',
+						$mod->CreateInputText($id,'fp_default',
 					  		$this->GetProperty('default'),25,1024));
 		$adv[] = array($mod->Lang('title_clear_default'),
-						$mod->CreateInputHidden($id,'pdt_clear_default',0).
-						$mod->CreateInputCheckbox($id,'pdt_clear_default',1,
+						$mod->CreateInputHidden($id,'fp_clear_default',0).
+						$mod->CreateInputCheckbox($id,'fp_clear_default',1,
 							$this->GetProperty('clear_default',0)),
 						$mod->Lang('help_clear_default'));
 		$adv[] = array($mod->Lang('title_html5'),
-						$mod->CreateInputHidden($id,'pdt_html5',0).
-						$mod->CreateInputCheckbox($id,'pdt_html5',1,
+						$mod->CreateInputHidden($id,'fp_html5',0).
+						$mod->CreateInputCheckbox($id,'fp_html5',1,
 							$this->GetProperty('html5',0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}

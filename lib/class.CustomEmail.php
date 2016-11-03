@@ -23,7 +23,7 @@ class CustomEmail extends EmailBase
 		$this->Type = 'CustomEmail';
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		$mod = $this->formdata->formsmodule;
 		$opt = $this->GetPropArray('destination_address');
@@ -59,16 +59,16 @@ class CustomEmail extends EmailBase
 		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE,FALSE);
 		$waslast = array_pop($main); //keep only the default to-type selector
 		$main[] = array($mod->Lang('title_subject_field'),
-						$mod->CreateInputDropdown($id,'pdt_email_subject',$choices,-1,
+						$mod->CreateInputDropdown($id,'fp_email_subject',$choices,-1,
 						$this->GetProperty('email_subject')));
 		$main[] = array($mod->Lang('title_from_field'),
-						$mod->CreateInputDropdown($id,'pdt_email_from_name',$choices,-1,
+						$mod->CreateInputDropdown($id,'fp_email_from_name',$choices,-1,
 						$this->GetProperty('email_from_name',$mod->Lang('friendly_name'))));
 		$main[] = array($mod->Lang('title_from_address_field'),
-						$mod->CreateInputDropdown($id,'pdt_email_from_address',$choices,-1,
+						$mod->CreateInputDropdown($id,'fp_email_from_address',$choices,-1,
 						$this->GetProperty('email_from_address')));
 		$main[] = array($mod->Lang('title_destination_field'),
-						$mod->CreateInputSelectList($id,'pdt_destination_address'.$i,$displayfields,
+						$mod->CreateInputSelectList($id,'fp_destination_address'.$i,$displayfields,
 						$destfields,5));
 		$main[] = $waslast;
 		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);

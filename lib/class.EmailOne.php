@@ -19,7 +19,7 @@ class EmailOne extends EmailBase
 		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_email_address')=>'email');
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		return $this->TemplateStatus();
 	}

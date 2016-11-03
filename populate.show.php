@@ -124,10 +124,10 @@ EOS;
 	else
 		$oneset->hide_name = 0;
 	$oneset->id = $obfield->GetId();
-	$oneset->input = $obfield->Populate($id,$params); //flat xhtml or array of objects
+	$oneset->input = $obfield->Populate($id,$params); //text or flat xhtml or array of objects
 	$oneset->input_id = $obfield->GetInputId();
 	$oneset->label_parts = $obfield->LabelSubComponents();
-	$oneset->logic = $obfield->GetFieldLogic();
+	$oneset->logic = $obfield->GetLogic();
 	$oneset->multiple_parts = $obfield->GetMultiPopulate();
 	$oneset->name = $obfield->GetName();
 	$oneset->needs_div = $obfield->NeedsDiv();

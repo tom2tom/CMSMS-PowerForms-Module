@@ -31,7 +31,7 @@ class EmailConfirmation extends EmailBase
 		$this->ValidationTypes = array($mod->Lang('validation_email_address')=>'email');
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 //TODO advice about ? return $this->TemplateStatus();
 	}
