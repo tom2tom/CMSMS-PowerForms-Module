@@ -9,7 +9,7 @@
 
 namespace PWForms;
 
-class InputTemplate extends FieldBase
+class ByTemplate extends FieldBase
 {
 	public function __construct(&$formdata,&$params)
 	{
@@ -18,7 +18,7 @@ class InputTemplate extends FieldBase
 		$this->DisplayInSubmission = FALSE;
 //		$this->HasLabel = FALSE;
 		$this->NeedsDiv = FALSE;
-		$this->Type = 'InputTemplate';
+		$this->Type = 'ByTemplate';
 	}
 
 	public function GetDisplayableValue($as_string=TRUE)
