@@ -780,12 +780,12 @@ $jsloads[] = <<<EOS
  .click(function() {
    $(this).parent().parent().find('.showhelp').slideToggle();
  });
- if($('input[name="{$id}pdt_submit_action"]:checked').val() == 'redir') {
+ if($('input[name="{$id}pf_submit_action"]:checked').val() == 'redir') {
   $('#tplobjects').hide();
  } else {
   $('#pageobjects').hide();
  }
- $('input[name="{$id}pdt_submit_action"]').change(function() {
+ $('input[name="{$id}pf_submit_action"]').change(function() {
   if($(this).val() == 'redir') {
    $('#tplobjects').hide();
    $('#pageobjects').show();

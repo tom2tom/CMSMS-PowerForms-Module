@@ -46,7 +46,7 @@ class FieldBase implements \Serializable
 		'MultiPopulate' => FALSE, //whether Populate() generates array of objects
 		'NeedsDiv' => TRUE,
 		'Required' => FALSE,
-		'SmartyEval' => FALSE, //TRUE for textinput field whose value is to be processed via smarty before display
+		'SmartyEval' => FALSE, //whether to process Populate() output as a smarty-template (i.e. treat that output as a sub-template)
 		'ValidationMessage' => '', //post-validation error message, or ''
 		'ValidationType' => 'none',
 		'ValidationTypes' => NULL //array of choices suitable for populating pulldowns to XtraProps[] ?
@@ -73,8 +73,8 @@ class FieldBase implements \Serializable
 			$this->XtraProps['ValidationType'] = $params['validation_type'];
 		//admin parameters present ?
 		foreach ($params as $key=>$val) {
-			if (strncmp($key,'pdt_',4) == 0) {
-				$key = substr($key,4);
+			if (strncmp($key,'fp_',3) == 0) {
+				$key = substr($key,3);
 				if (property_exists($this,$key)) {
 					$this->$key = $val;
 				} else {
@@ -649,7 +649,7 @@ class FieldBase implements \Serializable
 */
 	// Sends logic along with field, also allows smarty logic
 	// Doesn't need subclass in most cases
-	public function GetFieldLogic()
+	public function GetLogic()
 	{
 		if (!empty($this->XtraProps['field_logic'])) {
 			$code = $this->XtraProps['field_logic'];
@@ -658,8 +658,8 @@ class FieldBase implements \Serializable
 		return '';
 	}
 
-	// Subclass this with something to show users
-	public function GetFieldStatus()
+	// Subclass this with something to show in admin fields-list
+	public function GetSynopsis()
 	{
 		return '';
 	}
@@ -764,15 +764,15 @@ class FieldBase implements \Serializable
 						$mod->CreateInputText($id,'field_Name',$this->GetName(),50));
 		$alias = $this->ForceAlias();
 		$main[] = array($mod->Lang('title_field_alias'),
-						$mod->CreateInputText($id,'field_Alias',$alias,30)); //was 'pdt_...
+						$mod->CreateInputText($id,'field_Alias',$alias,30)); //no 'fp_' prefix for maintable properties
 		$main[] = array($mod->Lang('title_field_type'),
 						$mod->CreateInputHidden($id,'field_Type',$this->Type).
 						$this->GetDisplayType());
 
 		if (!$boolean && $visible && !empty($this->XtraProps['ChangeRequirement'])) {
 			$main[] = array($mod->Lang('title_field_required'),
-							$mod->CreateInputHidden($id,'pdt_Required',0). //was field_required
-							$mod->CreateInputCheckbox($id,'pdt_Required',1,
+							$mod->CreateInputHidden($id,'fp_Required',0). //was field_required
+							$mod->CreateInputCheckbox($id,'fp_Required',1,
 								$this->IsRequired()),
 							$mod->Lang('help_field_required'));
 		}
@@ -780,7 +780,7 @@ class FieldBase implements \Serializable
 		if (!$boolean) {
 			//choice of validation type ?
 			if (count($this->GetValidationTypes()) > 1)
-				$validInput = $mod->CreateInputDropdown($id,'pdt_ValidationType', //was validation_type
+				$validInput = $mod->CreateInputDropdown($id,'fp_ValidationType', //was validation_type
 					$this->GetValidationTypes(),-1,$this->GetValidationType());
 			else
 				$validInput = $mod->Lang('automatic'); //or 'none' ?
@@ -791,7 +791,7 @@ class FieldBase implements \Serializable
 		if ($visible && $displayable) {
 			$main[] = array($mod->Lang('title_field_helptext'),
 							$mod->CreateTextArea(FALSE,$id,$this->helptext,
-							'pdt_helptext','pwf_shortarea','','','',50,8));
+							'fp_helptext','pwf_shortarea','','','',50,8));
 			$helper = TRUE;
 		} else {
 			$helper = FALSE;
@@ -801,14 +801,14 @@ class FieldBase implements \Serializable
 		$adv = array();
 		if ($visible && !empty($this->XtraProps['HasLabel'])) {
 			$adv[] = array($mod->Lang('title_hide_label'),
-							$mod->CreateInputHidden($id,'pdt_HideLabel',0).
-							$mod->CreateInputCheckbox($id,'pdt_HideLabel',1,$this->HideLabel),
+							$mod->CreateInputHidden($id,'fp_HideLabel',0).
+							$mod->CreateInputCheckbox($id,'fp_HideLabel',1,$this->HideLabel),
 							$mod->Lang('help_hide_label'));
 		}
 		if ($helper) {
 			$adv[] = array($mod->Lang('title_field_helptoggle'),
-							$mod->CreateInputHidden($id,'pdt_helptoggle',0).
-							$mod->CreateInputCheckbox($id,'pdt_helptoggle',1,
+							$mod->CreateInputHidden($id,'fp_helptoggle',0).
+							$mod->CreateInputCheckbox($id,'fp_helptoggle',1,
 								$this->helptoggle),
 							$mod->Lang('help_field_helptoggle'));
 		}
@@ -816,15 +816,15 @@ class FieldBase implements \Serializable
 		if ($displayable) {
 			if ($visible) {
 				$adv[] = array($mod->Lang('title_field_css_class'),
-								$mod->CreateInputText($id,'pdt_css_class',$this->css_class,30));
+								$mod->CreateInputText($id,'fp_css_class',$this->css_class,30));
 				$adv[] = array($mod->Lang('title_field_javascript'),
 								$mod->CreateTextArea(FALSE,$id,$this->javascript,
-								'pdt_javascript','pwf_shortarea','','','',50,8,'','js'),
+								'fp_javascript','pwf_shortarea','','','',50,8,'','js'),
 								$mod->Lang('help_field_javascript'));
 			}
 			$adv[] = array($mod->Lang('title_field_resources'),
 							$mod->CreateTextArea(FALSE,$id,$this->resources, //was field_logic
-							'pdt_resources','pwf_shortarea','','','',50,8),
+							'fp_resources','pwf_shortarea','','','',50,8),
 							$mod->Lang('help_field_resources'));
 		}
 		return array($main,$adv);
