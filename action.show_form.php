@@ -500,10 +500,10 @@ $this->Crash2();
 		return;
 	}
 
-	if (isset($params['excludetype']) {
+	if (isset($params['excludetype'])) {
 	//TODO singleton or array of field-type(s) to be omitted from the form
 	}
-	if (isset($params['exclude']) {
+	if (isset($params['exclude'])) {
 	//TODO singleton or array of field id(s) or alias(es) to be omitted from the form
 	}
 
