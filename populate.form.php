@@ -455,6 +455,21 @@ $oneset->input = $this->CreateInputText($id,'fp_prev_button_text',
 $oneset->help = $this->Lang('help_form_button');
 $displays[] = $oneset;
 
+$t = PWForms\Utils::GetFormProperty($formdata,'help_icon','');
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_form_help_icon');
+$oneset->input = $this->CreateInputText($id,'fp_help_icon',$t,30);
+$oneset->help = $this->Lang('help_form_help_icon');
+$displays[] = $oneset;
+
+$oneset = new stdClass();
+$oneset->title = $this->Lang('title_upload_help_icon');
+$oneset->input = $this->CreateInputFile($id,'iconupload','image/*',36,
+	'id="'.$id.'iconupload" title="'.$this->Lang('tip_upload').'" onchange="file_selected()"');
+if ($t)
+	$oneset->input .= ' '.$this->CreateInputCheckbox($id,'icondelete',1,-1).'&nbsp;'.$this->Lang('delete_upload',$t);
+$displays[] = $oneset;
+
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_css_class');
 $oneset->input = $this->CreateInputText($id,'fp_css_class',
@@ -464,7 +479,7 @@ $displays[] = $oneset;
 $t = PWForms\Utils::GetFormProperty($formdata,'css_file','');
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_css_file');
-$oneset->input = $this->CreateInputText($id,'fp_css_file',$t,40);
+$oneset->input = $this->CreateInputText($id,'fp_css_file',$t,30);
 $oneset->help = $this->Lang('help_form_css_file');
 $displays[] = $oneset;
 
