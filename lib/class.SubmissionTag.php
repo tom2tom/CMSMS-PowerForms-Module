@@ -5,11 +5,11 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-//This class supplies content from a UDT
+//This class populates by calling a UDT, using only DisplayInSubmission fields
 
 namespace PWForms;
 
-class ByTag extends FieldBase
+class SubmissionTag extends FieldBase
 {
 	public function __construct(&$formdata,&$params)
 	{
@@ -17,12 +17,13 @@ class ByTag extends FieldBase
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInSubmission = FALSE;
 //		$this->NeedsDiv = FALSE;
-		$this->Type = 'ByTag';
+		$this->Type = 'SubmissionTag';
 	}
 
 	public function GetSynopsis()
 	{
-		return $this->GetProperty('udtname',$this->formdata->formsmodule->Lang('unspecified'));
+		$name = $this->GetProperty('udtname',$this->formdata->formsmodule->Lang('unspecified'));
+		return 'UDT: '.$name;
 	}
 
 	public function AdminPopulate($id)
@@ -54,17 +55,16 @@ class ByTag extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$unspec = $this->GetFormProperty('unspecified',$mod->Lang('unspecified'));
 		foreach ($this->formdata->Fields as &$one) {
-			$val = '';
-			if ($one->DisplayInSubmission()) {
-				$val = $one->GetDisplayableValue();
+			if ($one->DisplayInSubmission) {
+				$val = $one->DisplayableValue();
 				if (!$val)
 					$val = $unspec;
+				$params[$name] = $val;
+				$alias = $one->ForceAlias();
+				$params[$alias] = $val;
+				$id = $one->GetId();
+				$params['fld_'.$id] = $val;
 			}
-			$params[$name] = $val;
-			$alias = $one->ForceAlias();
-			$params[$alias] = $val;
-			$id = $one->GetId();
-			$params['fld_'.$id] = $val;
 		}
 		unset($one);
 
@@ -72,7 +72,7 @@ class ByTag extends FieldBase
 		$udt = $this->GetProperty('udtname');
 		$ret = $usertagops->CallUserTag($udt,$params);
 		if ($ret !== FALSE)
-			return $this->SetClass($tmp);
+			return $ret;
 		return $mod->Lang('err_usertag_named',$udt);
 	}
 }
