@@ -563,6 +563,7 @@ $lang['help_form_css_file'] = 'File in uploads directory. See module help for de
 $lang['help_ignored_if_upload'] = '(This field ignored if you use the Uploads module to manage files)';
 $lang['help_import_alias'] = 'Optional replacement alias for the imported form';
 $lang['help_import_name'] = 'Optional replacement name for the imported form';
+$lang['help_smarty_eval'] = 'Pass field content to Smarty eval before inclusion in the form';
 $lang['help_tag'] = <<<EOS
 A template associated with another module may be used to generate content for the form.
 Such template must include a <code>{\$FBid}</code> tag to tie it back to PWForms.
@@ -1029,7 +1030,7 @@ $lang['title_show_userfirstname'] = 'Display user\'s first name';
 $lang['title_show_userlastname'] = 'Display user\'s last name';
 $lang['title_show_username'] = 'Display user\'s login name';
 $lang['title_single_check'] = 'Limit to one selection';
-$lang['title_smarty_eval'] = 'Evaluate field content as a smarty template';
+$lang['title_smarty_eval'] = 'Process field as a sub-template';
 $lang['title_start_year'] = 'Year range start';
 $lang['title_startername']='Runtime identifier of matching start-sequence field';
 $lang['title_string'] = 'String';
