@@ -106,7 +106,7 @@ class DatePicker extends FieldBase
 	{
 		$today = getdate();
 
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_default_blank'),
 						$mod->CreateInputHidden($id,'fp_default_blank',0).

@@ -45,18 +45,20 @@ class Captcha extends FieldBase
 			return array('main'=>array($this->GetErrorMessage('err_module_captcha')));
 		}
 
-		list($main,$adv) = $this->AdminPopulateCommon($id);
-		$this->RemoveAdminField($main,$mod->Lang('title_field_helptext'));
+		$except = array(
+		'title_field_helptext',
+		'title_field_helptoggle',
+		'title_field_javascript',
+		'title_field_resources',
+		'title_hide_label'
+		);
+		list($main,$adv) = $this->AdminPopulateCommon($id,$except);
 		$main[] = array($mod->Lang('title_captcha_prompt'),
 						$mod->CreateInputText($id,'fp_prompt',
 							$this->GetProperty('prompt',$mod->Lang('captcha_prompt')),60,120));
 		$main[] = array($mod->Lang('title_captcha_wrong'),
 						$mod->CreateInputText($id,'fp_wrongtext',
 							$this->GetProperty('wrongtext',$mod->Lang('captcha_wrong')),60,120));
-		$this->RemoveAdminField($adv,$mod->Lang('title_hide_label'));
-		$this->RemoveAdminField($adv,$mod->Lang('title_field_helptoggle'));
-		$this->RemoveAdminField($adv,$mod->Lang('title_field_javascript'));
-		$this->RemoveAdminField($adv,$mod->Lang('title_field_resources'));
 		$adv[] = array($mod->Lang('title_captcha_label'),
 						$mod->CreateInputHidden($id,'fp_aslabel',0).
 						$mod->CreateInputCheckbox($id,'fp_aslabel',1,

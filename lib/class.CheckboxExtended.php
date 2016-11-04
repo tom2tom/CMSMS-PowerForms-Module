@@ -56,9 +56,8 @@ class CheckboxExtended extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main,$adv) = $this->AdminPopulateCommon($id,'title_field_required');
 		$mod = $this->formdata->formsmodule;
-		$this->RemoveAdminField($main,$mod->Lang('title_field_required'));
 
 		$main[] = array($mod->Lang('title_checkbox_label'),
 						$mod->CreateInputText($id,'fp_box_label',

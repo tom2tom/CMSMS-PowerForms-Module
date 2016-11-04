@@ -56,7 +56,7 @@ class CustomEmail extends EmailBase
 		$mod = $this->formdata->formsmodule;
 		$choices = array($mod->Lang('select_one') => '') + $displayfields;
 
-		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE,FALSE);
+		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,TRUE,FALSE);
 		$waslast = array_pop($main); //keep only the default to-type selector
 		$main[] = array($mod->Lang('title_subject_field'),
 						$mod->CreateInputDropdown($id,'fp_email_subject',$choices,-1,

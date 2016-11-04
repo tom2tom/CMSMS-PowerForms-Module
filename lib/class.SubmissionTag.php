@@ -31,7 +31,7 @@ class SubmissionTag extends FieldBase
 		foreach ($usertags as $key => $value)
 			$choices[$value] = $key;
 
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE,FALSE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_udt_name'),
 						$mod->CreateInputDropdown($id,'fp_udtname',$choices,-1,

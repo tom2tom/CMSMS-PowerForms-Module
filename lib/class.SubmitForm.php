@@ -27,7 +27,7 @@ class SubmitForm extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE,FALSE);
 		$mod = $formdata->formsmodule;
 		
 		if (function_exists('curl_init')) {

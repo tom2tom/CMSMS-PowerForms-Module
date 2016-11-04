@@ -57,7 +57,7 @@ class UniqueFile extends FieldBase
 		if (!Utils::GetUploadsPath($mod))
 			return array('main'=>array($this->GetErrorMessage('err_uploads_dir')));
 
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE,FALSE);
 
 		$main[] = array($mod->Lang('title_file_name'),
 			$mod->CreateInputText($id,'fp_filespec',

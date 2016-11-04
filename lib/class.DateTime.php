@@ -9,8 +9,9 @@ namespace PWForms;
 
 class DateTime extends FieldBase
 {
-	private $ShowDate = TRUE;
-	private $ShowTime = TRUE;
+	public $IsTimeStamp = TRUE;
+	public $ShowDate = TRUE;
+	public $ShowTime = TRUE;
 	private $DateFormat = 'Y-m-d';
 	private $TimeFormat = 'H:i:s';
 	private $LowLimit = 0;
@@ -31,7 +32,7 @@ class DateTime extends FieldBase
 		);
 	}
 
-	public function GetFieldStatus()
+	public function GetSynopsis()
 	{
 		//TODO report date/time/date+time, format(s)
 		$ret = '';
@@ -53,14 +54,60 @@ class DateTime extends FieldBase
 
 	public function AdminPopulate($id)
 	{
+/*
+$lang['help_dateformat'] = 'A string including format characters recognised by PHP\'s date() function. For reference, please check the <a href="http://www.php.net/manual/function.date.php">php manual</a>.<br />Remember to escape any characters you don\'t want interpreted as format codes!';
+$lang['help_timeformat'] = 'See advice for date format.';
+$lang['title_date_only'] = 'Show date, not time';
+$lang['title_dateformat'] = 'Template for formatting displayed dates';
+$lang['title_high_limit'] = 'Upper-limit for the value';
+$lang['title_low_limit'] = 'Lower-limit for the value';
+$lang['title_time_only'] = 'Show time, not date';
+$lang['title_timeformat'] = 'Template for formatting displayed times';
+*/
 		list($main,$adv) = $this->AdminPopulateCommon($id);
-		//TODO tailor
-		//checkbox date only
-		//input date format
-		//checkbox time only
-		//input time format
-		//checkbox + input for upper limit
-		//checkbox + input for lower limit
+		$mod = $this->formdata->formsmodule;
+
+		$main[] = array($mod->Lang('title_date_only'),
+				$mod->CreateInputHidden($id,'fp_date_only',0).
+				$mod->CreateInputCheckbox($id,'fp_date_only',1,
+					$this->GetProperty('date_only',0)));
+		$main[] = array($mod->Lang('title_time_only'),
+				$mod->CreateInputHidden($id,'fp_time_only',0).
+				$mod->CreateInputCheckbox($id,'fp_time_only',1,
+					$this->GetProperty('time_only',0)));
+
+		$adv[] = array($mod->Lang('title_dateformat'),
+				$mod->CreateInputText($id,'fp_date_format',
+					$mod->GetPreference('date_format'),10,12),
+					$mod->Lang('help_dateformat'));
+		$adv[] = array($mod->Lang('title_timeformat'),
+				$mod->CreateInputText($id,'fp_time_format',
+					$mod->GetPreference('time_format'),10,12),
+				$mod->Lang('help_timeformat'));
+		$v = $this->GetProperty('low_limit',0);
+		if ($v) {
+			$vs = $this->GetProperty('low_value','');
+//TODO convert stored stamp for display
+		} else {
+			$vs = '';
+		}
+		$adv[] = array($mod->Lang('title_low_limit'),
+				$mod->CreateInputHidden($id,'fp_low_limit',0).
+				$mod->CreateInputCheckbox($id,'fp_low_limit',1,$v)
+				.'&nbsp;'.
+				$mod->CreateInputText($id,'fp_low_value',$vs,20));
+		$v = $this->GetProperty('high_limit',0);
+		if ($v) {
+			$vs = $this->GetProperty('high_value','');
+//TODO convert stored stamp for display
+		} else {
+			$vs = '';
+		}
+		$adv[] = array($mod->Lang('title_high_limit'),
+				$mod->CreateInputHidden($id,'fp_high_limit',0).
+				$mod->CreateInputCheckbox($id,'fp_high_limit',1,$v)
+				.'&nbsp;'.
+				$mod->CreateInputText($id,'fp_high_value',$vs,20));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -68,6 +115,8 @@ class DateTime extends FieldBase
 	{
 		//check date format
 		//check time format
+		//check low value
+		//check high value
 		//$this->ValidationType = func(lower-limit,upper-limit)
 		return array($ret,$msg);
 	}

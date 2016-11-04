@@ -40,7 +40,7 @@ class OzStatePicker extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
 		$mod = $this->formdata->formsmodule;
 
 		$choices = array_merge(array('No Default'=>''),$this->States);

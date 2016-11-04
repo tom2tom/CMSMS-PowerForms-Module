@@ -106,7 +106,7 @@ class SystemEmail extends EmailBase
 	public function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,FALSE);
+		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,FALSE,FALSE);
 		if ($this->addressAdd) {
 			$this->AddPropIndexed('destination_address','');
 			$this->addressAdd = FALSE;

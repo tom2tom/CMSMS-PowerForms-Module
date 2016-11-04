@@ -91,7 +91,7 @@ class CompanyDirectory extends FieldBase
 			$mod->Lang('option_radiogroup')=>'Radio Group'
 		);
 
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
 		$main[] = array('','',$mod->Lang('help_company_field'));
 		$main[] = array($mod->Lang('title_pick_categories'),
 						$mod->CreateInputSelectList($id,'fp_Category',$Categories,$CategorySelected,

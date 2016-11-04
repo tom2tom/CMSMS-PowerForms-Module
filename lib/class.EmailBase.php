@@ -26,6 +26,7 @@ class EmailBase extends FieldBase
 	/**
 	AdminPopulateCommonEmail:
 	@id: id given to the PWForms module on execution
+	@except: optional lang-key, or array of them, to be excluded from the setup, default FALSE
 	@totype: optional bool, whether to include a to/cc/bcc selector dropdown, default=FALSE
 	@visible: optional bool, whether to include some options irrelevant to non-displayed
 	 disposition-fields, default=TRUE
@@ -35,9 +36,9 @@ class EmailBase extends FieldBase
 	 [2] = array of js related to the created stuff
 	 [3] = something?? for upstream 'extra' parameter
 	*/
-	public function AdminPopulateCommonEmail($id, $totype=FALSE, $visible=TRUE)
+	public function AdminPopulateCommonEmail($id, $except=FALSE, $totype=FALSE, $visible=TRUE)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,$visible);
+		list($main,$adv) = $this->AdminPopulateCommon($id,$except,FALSE,$visible);
 
 		$mod = $this->formdata->formsmodule;
 		$message = $this->GetProperty('email_template');

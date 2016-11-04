@@ -70,7 +70,7 @@ class EmailSiteAdmin extends EmailBase
 
 		$mod = $this->formdata->formsmodule;
 
-		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE);
+		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,TRUE);
 		$waslast = array_pop($main); //keep the email to-type selector for later
 		$main[] = array($mod->Lang('title_select_one_message'),
 				$mod->CreateInputText($id,'fp_select_one',

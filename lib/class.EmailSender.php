@@ -18,7 +18,7 @@ class EmailSender extends EmailBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$choices = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
 		

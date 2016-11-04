@@ -18,7 +18,7 @@ class HTML5Number extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_min_number'),
 						$mod->CreateInputText($id,'fp_min_number',

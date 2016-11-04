@@ -95,7 +95,7 @@ class Computed extends FieldBase
 			$mod->Lang('title_string_unspaced')=>'unstring',
 			$mod->Lang('title_compute')=>'compute');
 
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
 		$main[] = array($mod->Lang('title_compute_value'),
 						$mod->CreateInputText($id,'fp_value',$this->GetProperty('value'),35,1024),
 						$help);

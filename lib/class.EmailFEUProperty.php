@@ -75,7 +75,7 @@ class EmailFEUProperty extends EmailBase
 		}
 		if (!count($opts))
 			return array('main'=>array($this->GetErrorMessage('err_feudefns')));
-		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,TRUE);
+		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,TRUE);
 		$waslast = array_pop($ret['main']); //keep the email to-type selector for last
 		$keys = array_keys($opts);
 		$main[] = array($mod->Lang('title_feu_property'),

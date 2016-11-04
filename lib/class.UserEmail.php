@@ -72,9 +72,8 @@ class UserEmail extends EmailBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id);
+		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,'title_email_from_address');
 		$mod = $this->formdata->formsmodule;
-		$this->RemoveAdminField($main,$mod->Lang('title_email_from_address'));
 
 		$choices = array(
 			$mod->Lang('option_never')=>'n',

@@ -82,11 +82,9 @@ class EmailDirector extends EmailBase
 	public function AdminPopulate($id)
 	{
 //		$this->SetEmailJS(); TODO
-		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id);
+		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,'title_email_subject');
 		$mod = $this->formdata->formsmodule;
 		// remove the "email subject" field
-		$this->RemoveAdminField($main,
-			$mod->Lang('title_email_subject'));
 		$main[] = array($mod->Lang('title_select_one_message'),
 			$mod->CreateInputText($id,'fp_select_one',
 			$this->GetProperty('select_one',$mod->Lang('select_one')),25,128));

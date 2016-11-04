@@ -325,7 +325,7 @@ class FieldBase implements \Serializable
 		return '';
 	}
 
-	public function SetSmartyEval($state)
+	public function SetSmartyEval($state=TRUE)
 	{
 		$this->XtraProps['SmartyEval'] = $state;
 	}
@@ -744,6 +744,7 @@ class FieldBase implements \Serializable
 	/**
 	AdminPopulateCommon:
 	@id: id given to the PWForms module on execution
+	@except: optional title-lang-key, or array of them, to be excluded from the setup, default FALSE
 	@boolean: whether to exclude some options irrelevant to boolean-fields, default=FALSE
 	@visible: whether to include some options irrelevant to non-displayed disposition-fields, default=TRUE
 
@@ -754,23 +755,35 @@ class FieldBase implements \Serializable
 	 [0] = array of things for 'main' tab
 	 [1] = (possibly empty) array of things for 'adv' tab
 	*/
-	public function AdminPopulateCommon($id, $boolean=FALSE, $visible=TRUE)
+	public function AdminPopulateCommon($id, $except=FALSE, $boolean=FALSE, $visible=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
 		$displayable = !empty($this->XtraProps['DisplayInForm']) || !empty($this->XtraProps['DisplayExternal']);
+		if ($except && !is_array($except)) {
+			$except = is_array($except);
+		}
 		//init main tab content
 		$main = array();
-		$main[] = array($mod->Lang('title_field_name'),
-						$mod->CreateInputText($id,'field_Name',$this->GetName(),50));
-		$alias = $this->ForceAlias();
-		$main[] = array($mod->Lang('title_field_alias'),
-						$mod->CreateInputText($id,'field_Alias',$alias,30)); //no 'fp_' prefix for maintable properties
-		$main[] = array($mod->Lang('title_field_type'),
+		$key = 'title_field_name';
+		if (!$except || !in_array($key,$except))
+			$main[] = array($mod->Lang($key),
+							$mod->CreateInputText($id,'field_Name',$this->GetName(),50));
+		$key = 'title_field_alias';
+		if (!$except || !in_array($key,$except)) {
+			$alias = $this->ForceAlias();
+			$main[] = array($mod->Lang($key),
+							$mod->CreateInputText($id,'field_Alias',$alias,30)); //no 'fp_' prefix for maintable properties
+		}
+		$key = 'title_field_type';
+		if (!$except || !in_array($key,$except))
+			$main[] = array($mod->Lang($key),
 						$mod->CreateInputHidden($id,'field_Type',$this->Type).
 						$this->GetDisplayType());
 
 		if (!$boolean && $visible && !empty($this->XtraProps['ChangeRequirement'])) {
-			$main[] = array($mod->Lang('title_field_required'),
+			$key = 'title_field_required';
+			if (!$except || !in_array($key,$except))
+				$main[] = array($mod->Lang($key),
 							$mod->CreateInputHidden($id,'fp_Required',0). //was field_required
 							$mod->CreateInputCheckbox($id,'fp_Required',1,
 								$this->IsRequired()),
@@ -778,66 +791,77 @@ class FieldBase implements \Serializable
 		}
 
 		if (!$boolean) {
-			//choice of validation type ?
-			if (count($this->GetValidationTypes()) > 1)
-				$validInput = $mod->CreateInputDropdown($id,'fp_ValidationType', //was validation_type
-					$this->GetValidationTypes(),-1,$this->GetValidationType());
-			else
-				$validInput = $mod->Lang('automatic'); //or 'none' ?
-			$main[] = array($mod->Lang('title_field_validation'),
-							$validInput);
+			$key = 'title_field_validation';
+			if (!$except || !in_array($key,$except)) {
+				//choice of validation type ?
+				if (count($this->GetValidationTypes()) > 1)
+					$validInput = $mod->CreateInputDropdown($id,'fp_ValidationType', //was validation_type
+						$this->GetValidationTypes(),-1,$this->GetValidationType());
+				else
+					$validInput = $mod->Lang('automatic'); //or 'none' ?
+				$main[] = array($mod->Lang($key),$validInput);
+			}
 		}
 
+		$helper = FALSE;
 		if ($visible && $displayable) {
-			$main[] = array($mod->Lang('title_field_helptext'),
+			$key = 'title_field_helptext';
+			if (!$except || !in_array($key,$except)) {
+				$main[] = array($mod->Lang($key),
 							$mod->CreateTextArea(FALSE,$id,$this->helptext,
 							'fp_helptext','pwf_shortarea','','','',50,8));
-			$helper = TRUE;
-		} else {
-			$helper = FALSE;
+				$helper = TRUE;
+			}
 		}
 
 		//init advanced tab content
 		$adv = array();
 		if ($visible && !empty($this->XtraProps['HasLabel'])) {
-			$adv[] = array($mod->Lang('title_hide_label'),
+			$key = 'title_hide_label';
+			if (!$except || !in_array($key,$except))
+				$adv[] = array($mod->Lang($key),
 							$mod->CreateInputHidden($id,'fp_HideLabel',0).
 							$mod->CreateInputCheckbox($id,'fp_HideLabel',1,$this->HideLabel),
 							$mod->Lang('help_hide_label'));
 		}
 		if ($helper) {
-			$adv[] = array($mod->Lang('title_field_helptoggle'),
+			$key = 'title_field_helptoggle';
+			if (!$except || !in_array($key,$except))
+				$adv[] = array($mod->Lang($key),
 							$mod->CreateInputHidden($id,'fp_helptoggle',0).
-							$mod->CreateInputCheckbox($id,'fp_helptoggle',1,
-								$this->helptoggle),
+							$mod->CreateInputCheckbox($id,'fp_helptoggle',1,$this->helptoggle),
 							$mod->Lang('help_field_helptoggle'));
 		}
 
 		if ($displayable) {
 			if ($visible) {
-				$adv[] = array($mod->Lang('title_field_css_class'),
+				$key = 'title_field_css_class';
+				if (!$except || !in_array($key,$except))
+					$adv[] = array($mod->Lang($key),
 								$mod->CreateInputText($id,'fp_css_class',$this->css_class,30));
-				$adv[] = array($mod->Lang('title_field_javascript'),
+				$key = 'title_field_javascript';
+				if (!$except || !in_array($key,$except))
+					$adv[] = array($mod->Lang($key),
 								$mod->CreateTextArea(FALSE,$id,$this->javascript,
 								'fp_javascript','pwf_shortarea','','','',50,8,'','js'),
 								$mod->Lang('help_field_javascript'));
 			}
-			$adv[] = array($mod->Lang('title_field_resources'),
+			$key = 'title_field_resources';
+			if (!$except || !in_array($key,$except))
+				$adv[] = array($mod->Lang($key),
 							$mod->CreateTextArea(FALSE,$id,$this->resources, //was field_logic
 							'fp_resources','pwf_shortarea','','','',50,8),
 							$mod->Lang('help_field_resources'));
 		}
-		return array($main,$adv);
-	}
 
-	public function RemoveAdminField(&$array, $fieldtitle)
-	{
-		foreach ($array as $i=>$data) {
-			if ($data[0] == $fieldtitle) {
-				unset($array[$i]);
-				return;
-			}
-		}
+		$key = 'title_smarty_eval';
+		if (!$except || !in_array($key,$except))
+			$adv[] = array($mod->Lang($key),
+					$mod->CreateInputHidden($id,'fp_SmartyEval',0).
+					$mod->CreateInputCheckbox($id,'fp_SmartyEval',1,$this->SmartyEval),
+					$mod->Lang('help_smarty_eval'));
+
+		return array($main,$adv);
 	}
 
 	/**

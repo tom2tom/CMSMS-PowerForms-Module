@@ -73,7 +73,7 @@ class Pulldown extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_select_one_message'),

@@ -31,7 +31,7 @@ class UniqueInteger extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_show_to_user'),
 						$mod->CreateInputHidden($id,'fp_show_to_user',0).

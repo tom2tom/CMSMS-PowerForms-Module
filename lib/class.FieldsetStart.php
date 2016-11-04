@@ -30,7 +30,7 @@ class FieldsetStart extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE,FALSE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_legend'),
 						$mod->CreateInputText($id,'fp_legend',

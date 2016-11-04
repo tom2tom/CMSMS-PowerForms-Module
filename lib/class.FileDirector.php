@@ -96,7 +96,7 @@ class FileDirector extends FieldBase
 		if (!Utils::GetUploadsPath($mod))
 			return array('main'=>array($this->GetErrorMessage('err_uploads_dir')));
 
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE,FALSE);
+		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE,FALSE);
 		$main[] = array($mod->Lang('title_select_one_message'),
 			$mod->CreateInputText($id,
 			'fp_select_one',

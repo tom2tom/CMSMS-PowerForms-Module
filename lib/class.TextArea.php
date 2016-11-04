@@ -45,7 +45,8 @@ class TextArea extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		//omit "javascript" TODO why ? maybe justified if we add our own (for autogrow)
+		list($main,$adv) = $this->AdminPopulateCommon($id,'title_field_javascript');
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_use_wysiwyg'),
@@ -58,8 +59,7 @@ class TextArea extends FieldBase
 //						$mod->CreateInputText($id,'fp_cols',$this->GetProperty('cols',80),5,5));
 		$main[] = array($mod->Lang('title_textarea_length'),
 						$mod->CreateInputText($id,'fp_length',$this->GetProperty('length'),5,5));
-		//omit "javascript" TODO why ? maybe justified if we add our own (for autogrow)
-		$this->RemoveAdminField($adv,$mod->Lang('title_field_javascript'));
+
 		$adv[] = array($mod->Lang('title_field_default_value'),
 						$mod->CreateTextArea(FALSE,$id,$this->GetProperty('default'),'fp_default',
 						'pwf_tallarea','','','',50,15));
