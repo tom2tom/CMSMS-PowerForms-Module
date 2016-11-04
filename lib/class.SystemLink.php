@@ -16,7 +16,6 @@ class SystemLink extends FieldBase
 		$this->MultiPopulate = TRUE;
 		$this->Required = FALSE;
 		$this->Type = 'SystemLink';
-		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_none')=>'none');
 	}
 
 	public function GetDisplayableValue($as_string=TRUE)

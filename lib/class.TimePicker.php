@@ -19,7 +19,6 @@ class TimePicker extends FieldBase
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'TimePicker';
 		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = array();
 		$this->flag12hour = array(
 			$mod->Lang('title_before_noon')=>$mod->Lang('title_before_noon'),
 			$mod->Lang('title_after_noon')=>$mod->Lang('title_after_noon'));

@@ -18,7 +18,6 @@ class CatalogerItems extends FieldBase
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
 		$this->Type = 'CatalogerItems';
-		$this->ValidationTypes = array();
 	}
 
 	public function GetSynopsis()

@@ -49,10 +49,8 @@ class FieldBase implements \Serializable
 		'SmartyEval' => FALSE, //whether to process Populate() output as a smarty-template (i.e. treat that output as a sub-template)
 		'ValidationMessage' => '', //post-validation error message, or ''
 		'ValidationType' => 'none',
-		'ValidationTypes' => NULL //array of choices suitable for populating pulldowns to XtraProps[] ?
+		'ValidationTypes' => array() //array of choices suitable for populating a pulldown
 		);
-		$this->XtraProps['ValidationTypes'] = array(
-			$formdata->formsmodule->Lang('validation_none')=>'none');
 
 		if (isset($params['form_id']))
 			$this->FormId = $params['form_id'];
@@ -439,9 +437,6 @@ class FieldBase implements \Serializable
 
 	public function GetValidationTypes()
 	{
-		if (empty($this->XtraProps['ValidationTypes']))
-			$this->XtraProps['ValidationTypes'] = array(
-				$formdata->formsmodule->Lang('validation_none')=>'none');
 		return $this->XtraProps['ValidationTypes'];
 	}
 
@@ -794,11 +789,15 @@ class FieldBase implements \Serializable
 			$key = 'title_field_validation';
 			if (!$except || !in_array($key,$except)) {
 				//choice of validation type ?
-				if (count($this->GetValidationTypes()) > 1)
+				$c = count($this->GetValidationTypes());
+				$t = $this->GetValidationType();
+				if ($c > 1)
 					$validInput = $mod->CreateInputDropdown($id,'fp_ValidationType', //was validation_type
-						$this->GetValidationTypes(),-1,$this->GetValidationType());
+						$this->GetValidationTypes(),-1,$t);
+				elseif ($c > 0 || $t)
+					$validInput = $mod->Lang('automatic');
 				else
-					$validInput = $mod->Lang('automatic'); //or 'none' ?
+					$validInput = $mod->Lang('none');
 				$main[] = array($mod->Lang($key),$validInput);
 			}
 		}

@@ -18,7 +18,6 @@ class Computed extends FieldBase
 		$this->IsComputedOnSubmission = TRUE;
 		$this->NeedsDiv = FALSE;
 		$this->Type = 'Computed';
-		$this->ValidationTypes = array();
 	}
 
 	public function ComputeOrder()

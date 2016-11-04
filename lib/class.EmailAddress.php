@@ -17,8 +17,7 @@ class EmailAddress extends EmailBase
 		$this->IsInput = TRUE;
 		$this->Type = 'EmailAddress';
 		$this->ValidationType = 'email';
-		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = array($mod->Lang('validation_email_address')=>'email');
+		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_email_address')=>'email');
 	}
 
 	public function AdminPopulate($id)

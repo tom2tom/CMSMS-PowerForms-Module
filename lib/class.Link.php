@@ -16,7 +16,6 @@ class Link extends FieldBase
 		$this->MultiPopulate = TRUE;
 		$this->Required = FALSE;
 		$this->Type = 'Link';
-		$this->ValidationTypes = array();
 	}
 
 	public function GetDisplayableValue($as_string=TRUE)

@@ -14,7 +14,6 @@ class Checkbox extends FieldBase
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
 		$this->Type = 'Checkbox';
-		$this->ValidationTypes = array();
 	}
 
 	public function GetSynopsis()
