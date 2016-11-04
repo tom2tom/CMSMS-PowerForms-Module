@@ -25,7 +25,7 @@ class ProvincePicker extends FieldBase
 //		ksort($this->Provinces);
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$ret = array_search($this->Value,$this->Provinces);
 		if ($as_string)

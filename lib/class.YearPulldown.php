@@ -16,7 +16,7 @@ class YearPulldown extends FieldBase
 		$this->Type = 'YearPulldown';
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if($this->HasValue())
 			$ret = $this->Value;

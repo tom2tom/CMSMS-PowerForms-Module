@@ -18,6 +18,7 @@ class MultiselectFileDirector extends FieldBase
 		$this->HasAddOp = TRUE;
 		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
+		$this->IsInput = TRUE;
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'MultiselectFileDirector';
 	}
@@ -69,7 +70,7 @@ class MultiselectFileDirector extends FieldBase
 		return implode("\t",$fields);
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$ret = array();
 		if (is_array($this->Value)) {

@@ -67,7 +67,7 @@ class SubmitForm extends FieldBase
 		foreach ($this->formdata->Fields as &$one) {
 			if ($this->GetProperty('sub_'.$one->GetId(),0)) {
 				$payload[] = urlencode($this->GetProperty('fld_'.$one->GetId())).'='.
-				urlencode($one->GetDisplayableValue());
+				urlencode($one->DisplayableValue());
 			}
 		}
 		unset($one);

@@ -45,19 +45,7 @@ class Pulldown extends FieldBase
 		}
 	}
 
-	public function GetSynopsis()
-	{
-		$opt = $this->GetProperty('indexed_name');
-		if (is_array($opt))
-			$num = count($opt);
-		elseif ($opt)
-			$num = 1;
-		else
-			$num = 0;
-		return $this->formdata->formsmodule->Lang('options',$num);
-	}
-
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue())
 			$ret = $this->GetPropIndexed('indexed_value',$this->Value);
@@ -69,6 +57,18 @@ class Pulldown extends FieldBase
 			return $ret;
 		else
 			return array($ret);
+	}
+
+	public function GetSynopsis()
+	{
+		$opt = $this->GetProperty('indexed_name');
+		if (is_array($opt))
+			$num = count($opt);
+		elseif ($opt)
+			$num = 1;
+		else
+			$num = 0;
+		return $this->formdata->formsmodule->Lang('options',$num);
 	}
 
 	public function AdminPopulate($id)

@@ -16,6 +16,7 @@ class UserEmail extends EmailBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsDisposition = TRUE;
+		$this->IsInput = TRUE;
 		$this->Type = 'UserEmail';
 		$this->ValidationType = 'email';
 		$mod = $formdata->formsmodule;
@@ -44,12 +45,7 @@ class UserEmail extends EmailBase
 			$this->Value = array($newvalue);
  	}
 
-	public function GetSynopsis()
-	{
-		return $this->TemplateStatus();
-	}
-
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if (is_array($this->Value)) {
 			if ($as_string)
@@ -68,6 +64,11 @@ class UserEmail extends EmailBase
 			return $ret;
 		else
 			return array($ret);
+	}
+
+	public function GetSynopsis()
+	{
+		return $this->TemplateStatus();
 	}
 
 	public function AdminPopulate($id)

@@ -18,7 +18,7 @@ class SystemLink extends FieldBase
 		$this->Type = 'SystemLink';
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if ($this->GetProperty('auto_link',0)) {
 			$pageinfo = \cmsms()->variables['pageinfo'];

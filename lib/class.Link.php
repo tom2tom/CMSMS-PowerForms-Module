@@ -13,12 +13,13 @@ class Link extends FieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->ChangeRequirement = FALSE;
+		$this->IsInput = TRUE;
 		$this->MultiPopulate = TRUE;
 		$this->Required = FALSE;
 		$this->Type = 'Link';
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if (is_array($this->Value))
 			$ret = '<a href="'.$this->Value[0].'">'.$this->Value[1].'</a>';

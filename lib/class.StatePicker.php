@@ -37,7 +37,7 @@ class StatePicker extends FieldBase
 //		ksort($this->States);
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$ret = array_search($this->Value,$this->States);
 		if ($as_string)

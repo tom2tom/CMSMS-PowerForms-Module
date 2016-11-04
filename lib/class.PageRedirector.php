@@ -17,6 +17,7 @@ class PageRedirector extends FieldBase
 		$this->HasAddOp = TRUE;
 		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
+		$this->IsInput = TRUE;
 		$this->Type = 'PageRedirector';
 	}
 
@@ -45,19 +46,7 @@ class PageRedirector extends FieldBase
 		}
 	}
 
-	public function GetSynopsis()
-	{
-		$opt = $this->GetProperty('destination_page');
-		if (is_array($opt))
-			$num = count($opt);
-		elseif ($opt)
-			$num = 1;
-		else
-			$num = 0;
-		return $this->formdata->formsmodule->Lang('destination_count',$num);
-	}
-
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue())
 			$ret = $this->GetPropIndexed('destination_page',$this->Value);
@@ -69,6 +58,18 @@ class PageRedirector extends FieldBase
 			return $ret;
 		else
 			return array($ret);
+	}
+
+	public function GetSynopsis()
+	{
+		$opt = $this->GetProperty('destination_page');
+		if (is_array($opt))
+			$num = count($opt);
+		elseif ($opt)
+			$num = 1;
+		else
+			$num = 0;
+		return $this->formdata->formsmodule->Lang('destination_count',$num);
 	}
 
 	public function AdminPopulate($id)

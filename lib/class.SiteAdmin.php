@@ -12,7 +12,9 @@ class SiteAdmin extends FieldBase
 	public function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
+		$this->IsInput = TRUE;
 		$this->Type = 'SiteAdmin';
+//		$this->ValidationType = 'notempty';
 	}
 
 	public function buildList($select=FALSE)
@@ -50,21 +52,7 @@ class SiteAdmin extends FieldBase
 		return FALSE;
 	}
 
-	public function GetSynopsis()
-	{
-		$ret = '';
-		if ($this->GetProperty('restrict_to_group',0)) {
-			$groupops = \cmsms()->GetGroupOperations();
-			$group = $groupops->LoadGroupByID($this->GetProperty('group'));
-			if ($group && isset($group->name)) {
-				$mod = $this->formdata->formsmodule;
-				$ret .= $mod->Lang('restricted_to_group',$group->name);
-			}
-		}
-		return $ret;
-	}
-
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$admins = $this->buildList();
 		if ($admins)
@@ -79,6 +67,20 @@ class SiteAdmin extends FieldBase
 			return $ret;
 		else
 			return array($ret);
+	}
+
+	public function GetSynopsis()
+	{
+		$ret = '';
+		if ($this->GetProperty('restrict_to_group',0)) {
+			$groupops = \cmsms()->GetGroupOperations();
+			$group = $groupops->LoadGroupByID($this->GetProperty('group'));
+			if ($group && isset($group->name)) {
+				$mod = $this->formdata->formsmodule;
+				$ret .= $mod->Lang('restricted_to_group',$group->name);
+			}
+		}
+		return $ret;
 	}
 
 	public function AdminPopulate($id)

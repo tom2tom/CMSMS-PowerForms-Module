@@ -45,17 +45,7 @@ class Multiselect extends FieldBase
 		}
 	}
 
-	public function GetSynopsis()
-	{
-		$opt = $this->GetProperty('indexed_name');
-		if (is_array($opt))
-			$optionCount = count($opt);
-		else
-			$optionCount = 0;
-		return $this->formdata->formsmodule->Lang('options',$optionCount);
-	}
-
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue()) {
 			if (is_array($this->Value)) {
@@ -77,6 +67,16 @@ class Multiselect extends FieldBase
 			return $ret;
 		else
 			return array($ret);
+	}
+
+	public function GetSynopsis()
+	{
+		$opt = $this->GetProperty('indexed_name');
+		if (is_array($opt))
+			$optionCount = count($opt);
+		else
+			$optionCount = 0;
+		return $this->formdata->formsmodule->Lang('options',$optionCount);
 	}
 
 	public function AdminPopulate($id)

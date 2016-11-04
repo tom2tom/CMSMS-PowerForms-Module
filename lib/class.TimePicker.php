@@ -30,7 +30,7 @@ class TimePicker extends FieldBase
 		return ($this->GetProperty('24_hour',0)?$mod->Lang('24_hour'):$mod->Lang('12_hour'));
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue()) {
 			if ($this->GetProperty('24_hour',0))

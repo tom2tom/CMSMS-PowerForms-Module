@@ -23,7 +23,7 @@ class StaticText extends FieldBase
 		return $this->formdata->formsmodule->Lang('text_length',strlen($this->GetProperty('text')));
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$ret = '[Static Text Field]';
 		if ($as_string)
