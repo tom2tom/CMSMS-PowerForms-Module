@@ -66,7 +66,50 @@ if (isset($params['submit']) || isset($params['apply'])) {
 	PWForms\FieldOperations::SwapFieldsByIndex($srcIndex,$destIndex);
 	$message = $this->_PrettyMessage('field_order_updated');
 }
-//stylesfile
+
+//helpicon file
+if (!(empty($params['icondelete']) || empty($params['fp_help_icon']))) {
+	PWForms\Utils::DeleteUploadFile($this,$params['fp_help_icon'],$form_id);
+//	unset($params['icondelete']);
+}
+$t = $id.'iconupload';
+if (isset($_FILES) && isset($_FILES[$t])) {
+	$file_data = $_FILES[$t];
+	if ($file_data['name']) {
+		if ($file_data['error'] != 0)
+			$umsg = $this->Lang('err_upload',$this->Lang('err_system'));
+		else {
+			//requires GD[2] extension - TODO check - doesn't support many image-types
+			$lvl = error_reporting(0);
+			$img = @imagecreatefromstring(file_get_contents($file_data['tmp_name']));
+			error_reporting($lvl);
+			if ($img) {
+				imagedestroy($img);
+			} else {
+				$umsg = $this->Lang('err_upload',$this->Lang('err_file'));
+			}
+		}
+		if (empty($umsg)) {
+			$fp = PWForms\Utils::GetUploadsPath($this);
+			if ($fp) {
+				$fp .= DIRECTORY_SEPARATOR.$file_data['name'];
+				if (// !chmod($file_data['tmp_name'],0644) ||
+					!cms_move_uploaded_file($file_data['tmp_name'],$fp)) {
+					$umsg = $this->Lang('err_upload',$this->Lang('err_perm'));
+				}
+			} else
+				$umsg = $this->Lang('err_upload',$this->Lang('err_system'));
+		}
+		if (empty($umsg))
+			$params['fp_help_icon'] = $file_data['name'];
+		else {
+			$message .= '<br />'.$umsg;
+//			unset($umsg); //for next upload?
+		}
+	} else {
+	}
+}
+//styles file
 if (!(empty($params['stylesdelete']) || empty($params['fp_css_file']))) {
 	PWForms\Utils::DeleteUploadFile($this,$params['fp_css_file'],$form_id);
 //	unset($params['stylesdelete']);
@@ -99,13 +142,9 @@ if (isset($_FILES) && isset($_FILES[$t])) {
 					$umsg = $this->Lang('err_upload',$this->Lang('err_perm'));
 			}
 			if (empty($umsg)) {
-				$fp = $config['uploads_path'];
-				if ($fp && is_dir($fp)) {
-					$ud = $this->GetPreference('pref_uploadsdir','');
-					if ($ud)
-						$fp = cms_join_path($fp,$ud,$file_data['name']);
-					else
-						$fp = cms_join_path($fp,$file_data['name']);
+				$fp = PWForms\Utils::GetUploadsPath($this);
+				if ($fp) {
+					$fp .= DIRECTORY_SEPARATOR.$file_data['name'];
 					if (// !chmod($file_data['tmp_name'],0644) ||
 						!cms_move_uploaded_file($file_data['tmp_name'],$fp)) {
 						$umsg = $this->Lang('err_upload',$this->Lang('err_perm'));
@@ -116,10 +155,8 @@ if (isset($_FILES) && isset($_FILES[$t])) {
 		}
 		if (empty($umsg))
 			$params['fp_css_file'] = $file_data['name'];
-		else {
+		else
 			$message .= '<br />'.$umsg;
-		}
-
 	} else {
 //TODO adding file	$params['fp_css_file'] = $params['X'];
 	}
