@@ -19,7 +19,8 @@ class RadioGroup extends FieldBase
 		$this->IsInput = TRUE;
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'RadioGroup';
-		$this->ValidationTypes = array();
+		$this->ValidationType = 'selected'; //require a selection
+		$this->ValidationTypes = array($this->formdata->formsmodule->Lang('validation_selected')=>'selected');
 	}
 
 	public function GetOptionAddLabel()
@@ -61,9 +62,9 @@ class RadioGroup extends FieldBase
 
 	public function SetValue($newvalue)
 	{
-		if (is_array($newvalue)) {
+		if (is_array($newvalue)) { //group-member selected in form
 			$this->Value = reset($newvalue);
-		} else {
+		} elseif ($newvalue) {
 			$all = $this->GetPropArray('button_checked');
 			if ($all) {
 				$i = array_search($newvalue,$all); //1-based index
@@ -73,6 +74,8 @@ class RadioGroup extends FieldBase
 				$i = 0; //unknown
 			}
 			$this->Value = $i;
+		} else { //probably no group-member selected
+			$this->Value = 0;
 		}
 	}
 
@@ -194,5 +197,17 @@ class RadioGroup extends FieldBase
 		}
 		$this->MultiPopulate = FALSE;
 		return '';
+	}
+
+	public function Validate($id)
+	{
+		if ($this->Value) {
+			$this->valid = TRUE;
+			$this->ValidationMessage = '';
+		} else {
+			$this->valid = FALSE;
+			$this->ValidationMessage = $this->formdata->formsmodule->Lang('please_TODO',$this->GetProperty('text_label'));
+		}
+		return array($this->valid,$this->ValidationMessage);
 	}
 }
