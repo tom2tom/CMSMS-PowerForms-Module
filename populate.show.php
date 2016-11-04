@@ -153,9 +153,19 @@ $tplvars = $tplvars + array(
 //$tplvars['previous'] = $prev;
 $baseurl = $this->GetModuleURLPath();
 
-$tplvars['help_icon'] = '<img src="'.$baseurl.'/images/info-small.gif" alt="'.
-	$this->Lang('help').'" title="'.$this->Lang('help_help').'" />';
-
+$t = PWForms\Utils::GetFormProperty($formdata,'help_icon');
+if ($t) {
+	$fp = ''.PWForms\Utils::GetUploadsPath($this).DIRECTORY_SEPARATOR.$t;
+	if (is_file($fp)) {
+		$url = PWForms\Utils::GetUploadURL($this,$t);
+	} else {
+		$url = $baseurl.'/images/info-small.gif';
+	}
+} else {
+	$url = $baseurl.'/images/info-small.gif';
+}
+$tplvars['help_icon'] = '<img src="'.$url.'" alt="'.$this->Lang('help').
+	'" title="'.$this->Lang('help_help').'" />';
 //TODO id="*pwfp_prev" NOW id="*prev"
 if ($formdata->Page > 1)
 	$tplvars['prev'] = '<input type="submit" id="'.$id.'prev" class="cms_submit submit_prev" name="'.
