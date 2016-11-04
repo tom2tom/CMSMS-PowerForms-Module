@@ -74,7 +74,7 @@ class CompanyDirectory extends FieldBase
 		if (!is_array($CategorySelected))
 			$CategorySelected = explode(',',$CategorySelected);
 
-		$FieldDefs = array('none'=>$this->Lang('none2'));
+		$FieldDefs = array('none'=>$this->Lang('none'));
 		$sql = 'SELECT name FROM '.$pre.'module_compdir_fielddefs ORDER BY item_order';
 		$all = $db->GetCol($sql);
 		if ($all) {

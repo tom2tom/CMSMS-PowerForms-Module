@@ -112,7 +112,7 @@ foreach ($formdata->FieldOrders as $one) {
 	$oneset->id = $fid;
 	$t = $one->GetName();
 	if (!$t)
-		$t = $this->Lang('none');
+		$t = $this->Lang('none2');
 	$oneset->order = '<input type="hidden" name="'.$id.'form_FieldOrders[]" value="'.$fid.'" />';
 	$oneset->name = $this->CreateLink($id,'open_field','',$t,
 		array('field_id'=>$fid,'form_id'=>$form_id,'datakey'=>$params['datakey']));
@@ -655,7 +655,7 @@ $tplvars['formvars'] = $formvars;
 $usertagops = cmsms()->GetUserTagOperations();
 $usertags = $usertagops->ListUserTags();
 $usertaglist = array();
-$usertaglist[$this->Lang('none')] = '';
+$usertaglist[$this->Lang('none2')] = '';
 foreach ($usertags as $key => $value)
 	$usertaglist[$value] = $key;
 

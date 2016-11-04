@@ -305,7 +305,7 @@ EOS;
 			extract($pfrow); //NULL default values
 			extract($fbrow);
 			if (!$name)
-				$name = $this->Lang('none');
+				$name = $this->Lang('none2');
 			//existing option-value prevails
 			if (isset($passdowns[$name]))
 				unset($passdowns[$name]);
@@ -346,7 +346,7 @@ EOS;
 		foreach ($passdowns as $nm=>$val) {
 //			if ($val) {
 			extract($pfrow); //NULL default values
-			$name = ($nm) ? $nm:$this->Lang('none');
+			$name = ($nm) ? $nm:$this->Lang('none2');
 			if ($name == 'alias') {
 				$val = PWForms\Utils::MakeAlias($val,24); //length conform to FieldBase::GetVariableName()
 			}
@@ -549,7 +549,7 @@ $this->Crash();
 			extract($pfrow); //default values
 			extract($fbrow);
 			if (!$name) {
-				$name = $this->Lang('none');
+				$name = $this->Lang('none2');
 			}
 			if (!$alias) {
 				$alias = $name;
