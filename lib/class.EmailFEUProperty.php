@@ -21,8 +21,7 @@ class EmailFEUProperty extends EmailBase
 
 	public function GetSynopsis()
 	{
-		$mod = $this->formdata->formsmodule;
-		$ret = $mod->Lang('title_feu_property').': '.$this->GetProperty('feu_property');
+		$ret = $this->formdata->formsmodule->Lang('title_feu_property').': '.$this->GetProperty('feu_property');
 		$status = $this->TemplateStatus();
 		if ($status)
 			$ret .= '<br />'.$status;
@@ -35,7 +34,7 @@ class EmailFEUProperty extends EmailBase
 		$prop = $this->GetProperty('feu_property');
 		$ret = FALSE;
 		if ($prop) {
-			$feu = $mod->GetModuleInstance('FrontEndUsers');
+			$feu = \cms_utils::get_module('FrontEndUsers');
 			$opts = $feu->GetSelectOptions($prop);
 			if (array_key_exists($this->Value,$opts)) //TODO check logic
 				$ret = $opts[$this->Value]; //TODO if FALSE
@@ -52,8 +51,7 @@ class EmailFEUProperty extends EmailBase
 
 	public function AdminPopulate($id)
 	{
-		$mod = $this->formdata->formsmodule;
-		$feu = $mod->GetModuleInstance('FrontEndUsers');
+		$feu = \cms_utils::get_module('FrontEndUsers');
 		if (!$feu)
 			return array('main'=>array($this->GetErrorMessage('err_module_feu')));
 		$defns = $feu->GetPropertyDefns();
@@ -78,6 +76,7 @@ class EmailFEUProperty extends EmailBase
 		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,TRUE);
 		$waslast = array_pop($ret['main']); //keep the email to-type selector for last
 		$keys = array_keys($opts);
+		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_feu_property'),
 				$mod->CreateInputDropdown($id,'fp_feu_property',array_flip($opts),-1,
 					$this->GetProperty('feu_property',$keys[0])),
@@ -88,9 +87,9 @@ class EmailFEUProperty extends EmailBase
 
 	public function Populate($id,&$params)
 	{
-		$mod = $this->formdata->formsmodule;
-		$feu = $mod->GetModuleInstance('FrontEndUsers');
-		if (!$feu) return '';
+		$feu = \cms_utils::get_module('FrontEndUsers');
+		if (!$feu)
+			return '';
 
 		// get the property name and data
 		$prop = $this->GetProperty('feu_property');
@@ -105,7 +104,7 @@ class EmailFEUProperty extends EmailBase
 			// get the property input field
 			$choices = $feu->GetSelectOptions($prop);
 			// rendered all as a dropdown field.
-			$tmp = $mod->CreateInputDropdown(
+			$tmp = $this->formdata->formsmodule->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
 				'id="'.$this->GetInputId().'"'.$this->GetScript());
 			$res = $this->SetClass($tmp);
@@ -118,9 +117,9 @@ class EmailFEUProperty extends EmailBase
 
 	public function Dispose($id,$returnid)
 	{
-		$mod = $this->formdata->formsmodule;
-		$feu = $mod->GetModuleInstance('FrontEndUsers');
-		if (!$feu) return array(FALSE,$mod_Lang('err_module_feu'));
+		$feu = \cms_utils::get_module('FrontEndUsers');
+		if (!$feu)
+			return array(FALSE,$this->formdata->formsmodule->Lang('err_module_feu'));
 
 		// get the property name
 		$prop = $this->GetProperty('feu_property');

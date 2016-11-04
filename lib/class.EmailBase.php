@@ -238,7 +238,7 @@ EOS;
 		if ($destination_array == FALSE || $subject == FALSE)
 			return array(FALSE,$mod->Lang('missing_type',$mod->Lang('destination'))); //TODO if subject
 
-		$mail = $mod->GetModuleInstance('CMSMailer');
+		$mail = \cms_utils::get_module('CMSMailer'); //TODO support CMSMS 2+
 		if (!$mail)
 			return array(FALSE,$mod->Lang('missing_cms_mailer'));
 

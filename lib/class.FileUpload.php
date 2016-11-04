@@ -76,7 +76,7 @@ class FileUpload extends FieldBase
 					$this->GetProperty('allow_overwrite',0)),
 				$mod->Lang('help_allow_overwrite'));
 
-		$uploads = $mod->GetModuleInstance('Uploads');
+		$uploads = \cms_utils::get_module('Uploads');
 		$sendto_uploads_list = array($mod->Lang('no')=>0,$mod->Lang('yes')=>1);
 
 		$help_file_rename = $mod->Lang('help_file_rename').
@@ -277,7 +277,7 @@ class FileUpload extends FieldBase
 
 			if ($this->GetProperty('sendto_uploads')) {
 				// we have a file we can send to the uploads
-				$uploads = $mod->GetModuleInstance('Uploads');
+				$uploads = \cms_utils::get_module('Uploads');
 				if (!$uploads) {
 					// no uploads module
 					return array(FALSE,$mod->Lang('err_module_upload'));

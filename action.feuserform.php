@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-$feu = $this->GetModuleInstance('FrontEndUsers');
+$feu = cms_utils::get_module('FrontEndUsers');
 if ($feu == FALSE || $feu->LoggedIn() == FALSE)
 	return;
 $this->Redirect($id, 'default', $returnid, $params);

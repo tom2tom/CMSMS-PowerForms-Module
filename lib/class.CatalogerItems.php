@@ -22,11 +22,10 @@ class CatalogerItems extends FieldBase
 
 	public function GetSynopsis()
 	{
-		$mod = $this->formdata->formsmodule;
-		$cataloger = $mod->GetModuleInstance('Cataloger');
+		$cataloger = \cms_utils::get_module('Cataloger');
 		if ($cataloger)
 			return '';
-		return $mod->Lang('err_module_cataloger');
+		return $this->formdata->formsmodule->Lang('err_module_cataloger');
 	}
 
 	public function GetDisplayableValue($as_string=TRUE)
@@ -55,9 +54,9 @@ class CatalogerItems extends FieldBase
 	public function AdminPopulate($id)
 	{
 		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
-		$mod = $this->formdata->formsmodule;
-		$cataloger = $mod->GetModuleInstance('Cataloger');
+		$cataloger = \cms_utils::get_module('Cataloger');
 		if ($cataloger) {
+			$mod = $this->formdata->formsmodule;
 			$main[] = array($mod->Lang('title_field_height'),
 							$mod->CreateInputText($id,'fp_lines',$this->GetProperty('lines','5'),3,3),
 							$mod->Lang('help_field_height'));
@@ -85,7 +84,7 @@ class CatalogerItems extends FieldBase
 	public function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$cataloger = $mod->GetModuleInstance('Cataloger');
+		$cataloger = \cms_utils::get_module('Cataloger');
 		if (!$cataloger)
 			return $mod->Lang('err_module_cataloger');
 

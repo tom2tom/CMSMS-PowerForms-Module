@@ -128,7 +128,7 @@ if ($pmod) {
 		'submitxml' => $this->CreateInputSubmit($id,'submitxml',$this->Lang('upload'))
 	);
 
-	$ob = $this->GetModuleInstance('FormBuilder');
+	$ob = cms_utils::get_module('FormBuilder');
 	if ($ob) {
 		unset($ob);
 		$tplvars['legend_fbimport'] = $this->Lang('title_importfb_legend');

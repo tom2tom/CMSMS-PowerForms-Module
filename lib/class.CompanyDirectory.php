@@ -23,10 +23,9 @@ class CompanyDirectory extends FieldBase
 
 	public function GetSynopsis()
 	{
-		$mod = $this->formdata->formsmodule;
-		$CompanyDirectory = $mod->GetModuleInstance('CompanyDirectory');
+		$CompanyDirectory = \cms_utils::get_module('CompanyDirectory');
 		if (!$CompanyDirectory)
-			return $mod->Lang('err_module_CompanyDirectory');
+			return $this->formdata->formsmodule->Lang('err_module_CompanyDirectory');
 		return '';
 	}
 
@@ -55,7 +54,7 @@ class CompanyDirectory extends FieldBase
 	public function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		$CompanyDirectory = $mod->GetModuleInstance('CompanyDirectory');
+		$CompanyDirectory = \cms_utils::get_module('CompanyDirectory');
 		if ($CompanyDirectory)
 			unset($CompanyDirectory);
 		else
@@ -108,7 +107,7 @@ class CompanyDirectory extends FieldBase
 	public function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$CompanyDirectory = $mod->GetModuleInstance('CompanyDirectory');
+		$CompanyDirectory = \cms_utils::get_module('CompanyDirectory');
 		if ($CompanyDirectory)
 			unset($CompanyDirectory);
 		else
