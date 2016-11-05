@@ -118,7 +118,7 @@ class FieldOperations
 		if ($neworder === FALSE) {
 			$sql = 'SELECT MAX(order_by) AS last FROM '.$pre.'module_pwf_field WHERE form_id=?';
 			$neworder = $db->GetOne($sql,array($form_id));
-			if ($neworder == FALSE)
+			if (!$neworder)
 				$neworder = 0;
 			$neworder++;
 		}
