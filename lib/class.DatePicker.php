@@ -59,7 +59,7 @@ class DatePicker extends FieldBase
 		return TRUE;
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
 		if ($this->HasValue()) {

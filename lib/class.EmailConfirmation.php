@@ -25,6 +25,7 @@ class EmailConfirmation extends EmailBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsDisposition = TRUE;
+//		$this->IsInput = TRUE; no preservation of input value
 		$this->Type = 'EmailConfirmation';
 		$this->ValidationType = 'email';
 		$mod = $formdata->formsmodule;

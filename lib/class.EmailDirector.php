@@ -19,6 +19,7 @@ class EmailDirector extends EmailBase
 		$this->HasAddOp = TRUE;
 		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
+//		$this->IsInput = TRUE; no preservation of input data
 		$this->Type = 'EmailDirector';
 	}
 
@@ -65,7 +66,7 @@ class EmailDirector extends EmailBase
 		return $ret;
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue())
 			$ret = $this->GetPropIndexed('destination_subject',$this->Value);
@@ -142,8 +143,8 @@ class EmailDirector extends EmailBase
 	public function AdminValidate($id)
 	{
 		$messages = array();
-  		list($ret,$msg) = parent::AdminValidate($id);
-		if (!ret)
+		list($ret,$msg) = parent::AdminValidate($id);
+		if (!$ret)
 			$messages[] = $msg;
 
 		$mod = $this->formdata->formsmodule;

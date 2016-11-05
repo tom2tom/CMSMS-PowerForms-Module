@@ -21,12 +21,7 @@ class Captcha extends FieldBase
 		$this->Type = 'Captcha';
 	}
 
-	public function GetSynopsis()
-	{
-		return $this->ValidationMessage; //TODO useless
-	}
-
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$ret = '[Captcha]';
 		if ($as_string)
@@ -35,14 +30,21 @@ class Captcha extends FieldBase
 			return array($ret);
 	}
 
+	public function GetSynopsis()
+	{
+		$captcha = \cms_utils::get_module('Captcha');
+		if ($captcha)
+			return '';
+		return $this->formdata->formsmodule->Lang('missing_module','Captcha');
+	}
+
 	public function AdminPopulate($id)
 	{
-		$mod = $this->formdata->formsmodule;
-		$captcha = $mod->getModuleInstance('Captcha');
+		$captcha = \cms_utils::get_module('Captcha');
 		if ($captcha) {
 			unset($captcha);
 		} else {
-			return array('main'=>array($this->GetErrorMessage('err_module_captcha')));
+			return array('main'=>array($this->GetErrorMessage('err_module','Captcha')));
 		}
 
 		$except = array(
@@ -53,6 +55,7 @@ class Captcha extends FieldBase
 		'title_hide_label'
 		);
 		list($main,$adv) = $this->AdminPopulateCommon($id,$except);
+		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_captcha_prompt'),
 						$mod->CreateInputText($id,'fp_prompt',
 							$this->GetProperty('prompt',$mod->Lang('captcha_prompt')),60,120));
@@ -77,11 +80,11 @@ class Captcha extends FieldBase
 
 	public function AdminValidate($id)
 	{
-		$mod = $this->formdata->formsmodule;
 		$messages = array();
-  		list($ret,$msg) = parent::AdminValidate($id);
-		if (!ret)
+		list($ret,$msg) = parent::AdminValidate($id);
+		if (!$ret)
 			$messages[] = $msg;
+		$mod = $this->formdata->formsmodule;
 		$pt = $this->GetProperty('captcha_template');
 		if (!$pt) {
 			$ret = FALSE;
@@ -104,7 +107,10 @@ class Captcha extends FieldBase
 	public function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$captcha = $mod->getModuleInstance('Captcha');
+		$captcha = \cms_utils::get_module('Captcha');
+		if (!$captcha)
+			return $mod->Lang('err_module','Captcha');
+
 		$tplvars = array(
 			'captcha' => $captcha->getCaptcha(),
 			'prompt' => $this->GetProperty('prompt',$mod->Lang('captcha_prompt')).
@@ -141,14 +147,16 @@ class Captcha extends FieldBase
 			$this->Name = $this->RealName;
 			$this->RealName = FALSE;
 		}
-		$this->valid = TRUE;
-		$this->ValidationMessage = '';
+
 		$mod = $this->formdata->formsmodule;
-		$captcha = $mod->getModuleInstance('Captcha');
+		$captcha = \cms_utils::get_module('Captcha');
 		if (!$captcha) { //should never happen
 			$this->valid = FALSE;
-			$this->ValidationMessage = $mod->Lang('err_module_captcha');
-		} elseif (!$captcha->CheckCaptcha($this->Value)) { //upstream migrated any $params['captcha_input] to this
+			$this->ValidationMessage = $mod->Lang('err_module','Captcha');
+		} elseif ($captcha->CheckCaptcha($this->Value)) { //upstream migrated $params['captcha_input] to $this->Value
+			$this->valid = TRUE;
+			$this->ValidationMessage = '';
+		} else {
 			$this->valid = FALSE;
 			$this->ValidationMessage = $this->GetProperty('wrongtext',
 				$mod->Lang('captcha_wrong'));

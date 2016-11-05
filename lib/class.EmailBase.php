@@ -240,7 +240,7 @@ EOS;
 
 		$mail = \cms_utils::get_module('CMSMailer'); //TODO support CMSMS 2+
 		if (!$mail)
-			return array(FALSE,$mod->Lang('missing_cms_mailer'));
+			return array(FALSE,$mod->Lang('err_module','CMSMailer'));
 
 		$mail->reset();
 
@@ -376,7 +376,7 @@ EOS;
 					return array(FALSE,$mod->Lang('err_uploads_dir'));
 				}
 
-				$thisAtt = $one->GetDisplayableValue(FALSE);
+				$thisAtt = $one->DisplayableValue(FALSE);
 
 				if (is_array($thisAtt)) {
 					foreach ($thisAtt as $onefile) {

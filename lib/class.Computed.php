@@ -37,7 +37,7 @@ class Computed extends FieldBase
 		 case 'numeric':
 			foreach ($fids[1] as $field_id) {
 				if (array_key_exists($field_id,$this->formdata->Fields)) {
-					$val = $this->formdata->Fields[$field_id]->GetDisplayableValue();
+					$val = $this->formdata->Fields[$field_id]->DisplayableValue();
 					if (!is_numeric($val))
 						$val = '0';
 					$procstr = str_replace('$fld_'.$field_id,$val,$procstr);
@@ -48,7 +48,7 @@ class Computed extends FieldBase
 		 case 'compute':
 			foreach ($fids[1] as $field_id) {
 				if (array_key_exists($field_id,$this->formdata->Fields)) {
-					$val = $this->formdata->Fields[$field_id]->GetDisplayableValue();
+					$val = $this->formdata->Fields[$field_id]->DisplayableValue();
 					// strip any PHP function from submitted string
 					$arr = get_defined_functions(); // internal and user
 					$val = str_replace($arr['internal'],'',$val);
@@ -110,8 +110,8 @@ class Computed extends FieldBase
 	public function AdminValidate($id)
 	{
 		$messages = array();
-  		list($ret,$msg) = parent::AdminValidate($id);
-		if (!ret)
+		list($ret,$msg) = parent::AdminValidate($id);
+		if (!$ret)
 			$messages[] = $msg;
 		$val = $this->GetProperty('value');
 		if ($val) {

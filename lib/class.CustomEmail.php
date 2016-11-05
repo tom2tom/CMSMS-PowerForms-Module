@@ -82,8 +82,8 @@ class CustomEmail extends EmailBase
 	public function AdminValidate($id)
 	{
 		$messages = array();
-  		list($ret,$msg) = parent::AdminValidate($id);
-		if (!ret)
+		list($ret,$msg) = parent::AdminValidate($id);
+		if (!$ret)
 			$messages[] = $msg;
 
 		$mod = $this->formdata->formsmodule;
@@ -134,16 +134,16 @@ class CustomEmail extends EmailBase
 
 			$senderfld = $this->GetProperty('email_from_name'); //TODO confirm this is field_id?
 			$fld = $formdata->Fields[$senderfld];
-			$this->SetProperty('email_from_name',$fld->GetDisplayableValue());
+			$this->SetProperty('email_from_name',$fld->DisplayableValue());
 
 			$fromfld = $this->GetProperty('email_from_address');
 			$fld = $formdata->Fields[$fromfld];
-			$this->SetProperty('email_from_address',$fld->GetDisplayableValue());
+			$this->SetProperty('email_from_address',$fld->DisplayableValue());
 
 			$addrs = array();
 			foreach ($dests as $field_id) {
 				$fld = $formdata->Fields[$field_id];
-				$value = $fld->GetDisplayableValue();
+				$value = $fld->DisplayableValue();
 				if (strpos($value,',') !== FALSE)
 					$addrs = $addrs + explode(',',$value);
 				else
@@ -152,14 +152,14 @@ class CustomEmail extends EmailBase
 
 /*			$subjectfld = $this->GetProperty('email_subject');
 			$fld = $formdata->Fields[$subjectfld];
-			$this->SetProperty('email_subject',$fld->GetDisplayableValue());
+			$this->SetProperty('email_subject',$fld->DisplayableValue());
 
 			$ret = $this->SendForm($addrs,$this->GetProperty('email_subject'));
 
 			$this->SetProperty('email_subject',$subjectfld);
 */
 			$fld = $formdata->Fields[$this->GetProperty('email_subject')];
-			$ret = $this->SendForm($addrs,$fld->GetDisplayableValue()); //TODO check value(subject) is ok
+			$ret = $this->SendForm($addrs,$fld->DisplayableValue()); //TODO check value(subject) is ok
 
 			$this->SetProperty('email_from_name',$senderfld);
 			$this->SetProperty('email_from_address',$fromfld);

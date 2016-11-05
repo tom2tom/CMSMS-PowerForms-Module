@@ -17,11 +17,14 @@ class ByTemplate extends FieldBase
 //		$this->ChangeRequirement = FALSE;
 		$this->DisplayInSubmission = FALSE;
 //		$this->HasLabel = FALSE;
+//		$this->IsInput = TRUE; TODO runtime property
 		$this->NeedsDiv = FALSE;
 		$this->Type = 'ByTemplate';
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	//?SetValue()
+
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$formdata = $this->formdata;
 
