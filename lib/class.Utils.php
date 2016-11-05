@@ -255,18 +255,48 @@ class Utils
 		return $db->GetArray($sql);
 	}
 
-	//support for field-selection menu-item sorting
+/*	public static function mb_asort(&$array)
+	{
+		if (extension_loaded('intl') === TRUE) {
+			collator_asort(collator_create(NULL),$array); //OR 'root' OR specific locale
+		} else {
+			array_multisort(array_map(function($str)
+			{
+				return preg_replace(
+				'~&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|tilde|uml);~i',
+				'$1'.chr(255).'$2',
+				htmlentities($str,ENT_QUOTES,'UTF-8'));
+			},$array),$array);
+		}
+	}
+
+	public static function mb_strcmp($a,$b)
+	{
+		if (extension_loaded('intl') === TRUE) {
+			static $coll = NULL;
+			if ($coll == NULL)
+				$coll = new \collator(NULL); //OR 'root' OR specific locale
+			return $coll->compare($a,$b);
+		} else {
+//$converted = preg_replace('~[^\w\s]+~','',iconv('UTF-8','ASCII//TRANSLIT',$str));
+//$converted = preg_replace('~&([a-z]{1,2})(acute|cedil|circ|grave|lig|orn|ring|slash|tilde|uml);~i','$1'.chr(255).'$2',htmlentities($str,ENT_QUOTES,'UTF-8'));
+		}
+	}
+	setlocale (LC_COLLATE,'en_US'); or whatever
+	return strcoll($str1,$str2);
+*/
+	//comparer for field-selection menu-item sorting, dipositions last, non-inputs 2nd-last
 	private static function labelcmp($a,$b)
 	{
 		$fa = $a[0];
 		$fb = $b[0];
-		if ($fa == $fb)
+		if ($fa == $fb) {
 			return(strcmp($a,$b)); //TODO mb_ comparison
-		elseif ($fa == '*')
+		} elseif ($fa == '*') //disposition field-prefix
 			return 1;
 		elseif ($fb == '*')
 			return -1;
-		elseif ($fa == '-') {
+		elseif ($fa == '-') { //non-input field-prefix
 			if ($fb == '*')
 				return -1;
 			else
@@ -276,8 +306,9 @@ class Utils
 				return 1;
 			else
 				return -1;
-		} else
-			return(strcmp($a,$b)); //TODO mb-compatible compare using $coll = new Collator('whatever');
+		} else {
+			return(strcmp($a,$b)); //TODO mb_ comparison
+		}
 	}
 
 	/**
@@ -291,34 +322,57 @@ class Utils
 	{
 		if ($mod->field_types)
 			return; //already done
-		$fp = __DIR__.DIRECTORY_SEPARATOR.'Fields.manifest';
-		if (!file_exists($fp))
-			return;
 
-		$feu = $mod->GetModuleInstance('FrontEndUsers');
-		$mail = $mod->GetModuleInstance('CMSMailer');
-/*		if ($mail != FALSE) {
-			if (version_compare($mail->GetVersion(),self::MAILERMINVERSION) < 0)
-				$mail = FALSE;
+		$menu = array();
+		foreach (array(
+			'Checkbox',
+			'Pulldown',
+			'RadioGroup',
+			'StaticText',
+			'TextArea',
+			'Text',
+			'SystemEmail',
+			'SharedFile') as $classname) {
+			$menukey = 'fieldlabel_'.$classname;
+			//TODO dynamically add prefix '*' for dispositions, '-' for non-inputs??
+			$menu[$classname] = $mod->Lang($menukey);
 		}
+		uasort($menu,array('self','labelcmp'));
+		$mod->std_field_types = array_flip($menu);
+
+		$fp = __DIR__.DIRECTORY_SEPARATOR.'Fields.manifest';
+		if (file_exists($fp)) {
+			if ($mod->before20) {
+				$mail = \cms_utils::get_module('CMSMailer');
+/*				if ($mail) {
+					if (version_compare($mail->GetVersion(),self::MAILERMINVERSION) < 0)
+						$mail = FALSE;
+				}
 */
+			} else {
+				$mail = TRUE;
+			}
+			$feu = \cms_utils::get_module('FrontEndUsers');
 
-		$mod->field_types = array();
-
-		$rows = file($fp,FILE_SKIP_EMPTY_LINES); //flag doesn't work!!
-		foreach ($rows as $oneline) {
-			if ($oneline[0] == '#' || ($oneline[0] == '/' && $oneline[1] == '/'))
-				continue;
-			$classname = trim($oneline);
-			if (!$classname)
-				continue;
-			if ($mail == FALSE && strpos($classname,'Email') !== FALSE)
-				continue;
-			if ($feu == FALSE && strpos($classname,'FEU') !== FALSE)
-				continue;
-			//TODO pre-req checks e.g. 'SubmitForm' needs cURL extension
-			$menukey = 'field_type_'.$classname;
-			$mod->field_types[$mod->Lang($menukey)] = $classname;
+			$menu = array();
+			$rows = file($fp,FILE_SKIP_EMPTY_LINES); //flag doesn't work!!
+			foreach ($rows as $oneline) {
+				if ($oneline[0] == '#' || ($oneline[0] == '/' && $oneline[1] == '/'))
+					continue;
+				$classname = trim($oneline);
+				if (!$classname)
+					continue;
+				if (!$mail && strpos($classname,'Email') !== FALSE)
+					continue;
+				if (!$feu && strpos($classname,'FEU') !== FALSE) //DEPRECATED feu-related classes to be $imports members
+					continue;
+				//TODO pre-req checks e.g. 'SubmitForm' needs cURL extension
+				$menukey = 'fieldlabel_'.$classname;
+				//TODO dynamically add prefix '*' for dispositions, '-' for non-inputs? c.f. self::Show_Field()
+				$menu[$classname] = $mod->Lang($menukey);
+			}
+		} else {
+			$menu += array('_' => $mod->Lang('missing_type',$mod->Lang('TODO')));
 		}
 
 		$imports = $mod->GetPreference('imported_fields');
@@ -330,40 +384,13 @@ class Utils
 				$formdata = $mod->_GetFormData($params);
 				$obfld = new $classpath($formdata,$params);
 				if ($obfld) {
-					$t = $obfld->GetDisplayType();
-					$mod->field_types[$t] = $classname;
+					$menu[$classname] = $obfld->GetDisplayType();
 				}
 			}
 		}
 
-/*
-	if (class_exists('Collator'))
-		$col = new Collator($utils->GetLocale());
-	else
-		$col = FALSE;
-	uksort($allitems,function($a,$b) use($col)
-		{
-			if ($col) {
-				if ($col->compare($a['name'],$b['name']) == 0)
-					return 0;
-			} else {
-				if (strcmp($a['name'],$b['name']) == 0) //TODO encoding
-					return 0;
-			}
-		}
- */
-
-		uksort($mod->field_types,array('self','labelcmp')); //TODO mb-compatible sort $coll = new Collator('fr_FR');
-		$mod->std_field_types = array(
-			$mod->Lang('field_type_Checkbox')=>'Checkbox',
-			$mod->Lang('field_type_Pulldown')=>'Pulldown',
-			$mod->Lang('field_type_RadioGroup')=>'RadioGroup',
-			$mod->Lang('field_type_StaticText')=>'StaticText',
-			$mod->Lang('field_type_TextArea')=>'TextArea',
-			$mod->Lang('field_type_Text')=>'Text',
-			$mod->Lang('field_type_SystemEmail')=>'SystemEmail',
-			$mod->Lang('field_type_SharedFile')=>'SharedFile');
-		uksort($mod->std_field_types,array('self','labelcmp')); //TODO mb-compatible sort $coll = new Collator('fr_FR');
+		uasort($menu,array('self','labelcmp'));
+		$mod->field_types = array_flip($menu);
 	}
 
 	/**
@@ -381,17 +408,17 @@ class Utils
 			$classpath = 'PWForms\\'.$classname;
 			$obfld = new $classpath($formdata,$params);
 			if ($obfld) {
-				if (!($obfld->IsInput || $obfld->IsSortable)) //TODO check this
-					$t = '-';
+				if (!$obfld->IsInput) //TODO check this
+					$p = '-';
 				elseif ($obfld->IsDisposition)
-					$t = '*';
+					$p = '*';
 				else
-					$t = '';
-				$menulabel = $t.$obfld->mymodule->Lang($obfld->MenuKey);
+					$p = '';
+				$menulabel = $p.$obfld->mymodule->Lang($obfld->MenuKey);
 				$mod->field_types[$menulabel] = $classname;
-				if ($sort)
+				if ($sort) {
 					uksort($mod->field_types,array('self','labelcmp')); //TODO mb-compatible sort $coll = new Collator('fr_FR');
-
+				}
 			}
 		}
 	}
@@ -578,7 +605,7 @@ class Utils
 				$ret .= '-------------------------------------------------'.PHP_EOL;
 			 return $ret;
 		}
-
+//TODO support field-sequences
 		foreach ($formdata->Fields as &$one) {
 			if ($one->DisplayInSubmission()) {
 				$fldref = $one->ForceAlias();
@@ -587,12 +614,13 @@ class Utils
 
 				if ($htmlish)
 					$ret .= '<strong>'.$one->GetName().'</strong>: '.$fldref.'<br />';
-				elseif ($oneline && !$header)
-					$ret .= $fldref."\t";
-				elseif ($oneline && $header)
-					$ret .= $one->GetName()."\t";
-				else
-					$ret .= $one->GetName().': '.$fldref;
+				elseif ($oneline) {
+					if ($header)
+						$ret .= $one->GetName();
+					else
+						$ret .= $fldref;
+				} else
+					$ret .= $one->GetName().':'.PHP_EOL.$fldref.PHP_EOL;
 				$ret .= '{/if}'.PHP_EOL;
 			}
 		}
@@ -606,7 +634,7 @@ class Utils
 	For use when editing a form or field containing a template.
 	@mod: reference to PWForms module object
 	@id: id given to the Powerforms module on execution
-	@ctlName: name of the control, by convention like 'pdt_'.field-prop-name,
+	@ctlName: name of the control, by convention like 'fp_'.field-prop-name,
 		here, it may have appended suffix 'text'
 	@$button_label: text for button label
 	@template: template to be inserted into the control, upon button-click.
@@ -620,7 +648,7 @@ class Utils
 	public static function CreateTemplateAction(&$mod, $id, $ctlName, $button_label, $template, $funcName=FALSE)
 	{
 		if (!$funcName)
-			$funcName = substr($ctlName,4); //omit 'pdt_' prefix
+			$funcName = substr($ctlName,3); //omit 'fp_' prefix
 		$button = <<<EOS
 <input type="button" class="cms_submit" value="{$button_label}" onclick="populate_{$funcName}(this.form)" />
 EOS;
@@ -651,12 +679,12 @@ EOS;
 		and their respective values being boolean
 		e.g. for 3 controls:
 		array
-		  'pdt_file_template' => array
+		  'fp_file_template' => array
 			  'is_oneline' => true
-		  'pdt_file_header' => array
+		  'fp_file_header' => array
 			  'is_oneline' => true
 			  'is_header' => true
-		  'pdt_file_footer' => array
+		  'fp_file_footer' => array
 			  'is_oneline' => true
 			  'is_footer' => true
 	Returns: 2-member array
@@ -867,7 +895,7 @@ EOS;
 			$replVal = $unspec;
 			$replVals = array();
 			if ($one->DisplayInSubmission()) {
-				$replVal = $one->GetDisplayableValue();
+				$replVal = $one->DisplayableValue();
 				if ($htmlemail) {
 					// allow <BR> as delimiter or in content
 					$replVal = preg_replace(
@@ -1156,7 +1184,6 @@ EOS;
 	CleanTables:
 	Removes from the ip_log table all records older than 30-minutes before @time
 	Removes from the record table all records older than 24-hours before @time
-	Removes from the cache table all records older than 24-hours before @time
 	@time: timestamp, optional, default 0 (meaning current time)
 	*/
 	public static function CleanTables($time=0)
@@ -1168,7 +1195,6 @@ EOS;
 		$db->Execute('DELETE FROM '.$pre.'module_pwf_ip_log WHERE basetime<'.$limit);
 		$limit = $db->DbTimeStamp($time-86400);
 		$db->Execute('DELETE FROM '.$pre.'module_pwf_record WHERE submitted<'.$limit);
-		$db->Execute('DELETE FROM '.$pre.'module_pwf_cache WHERE save_time<'.$limit);
 	}
 
 	/**
@@ -1207,7 +1233,7 @@ EOS;
 		}
 		return FALSE;
 	}
-	
+
 	/**
 	DeleteUploadFile:
 	@mod: reference to current module object
