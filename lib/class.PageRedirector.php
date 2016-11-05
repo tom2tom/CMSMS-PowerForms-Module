@@ -129,7 +129,7 @@ class PageRedirector extends FieldBase
 	{
 		$messages = array();
   		list($ret,$msg) = parent::AdminValidate($id);
-		if (!ret)
+		if (!$ret)
 			$messages[] = $msg;
 
 		if (!$this->GetProperty('destination_page')) {

@@ -169,7 +169,7 @@ class SystemEmail extends EmailBase
 	{
 		$messages = array();
 		list($ret,$msg) = parent::AdminValidate($id);
-		if (!ret)
+		if (!$ret)
 			$messages[] = $msg;
 
 		$mod = $this->formdata->formsmodule;
