@@ -9,6 +9,8 @@ namespace PWForms;
 
 class EmailBase extends FieldBase
 {
+	protected  $pattern = '/.+@.+\..+/';
+
 	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata,$params);
@@ -235,14 +237,19 @@ EOS;
 	public function SendForm($destination_array, $subject, $tplvars=array())
 	{
 		$mod = $this->formdata->formsmodule;
-		if ($destination_array == FALSE || $subject == FALSE)
-			return array(FALSE,$mod->Lang('missing_type',$mod->Lang('destination'))); //TODO if subject
+		if (!$subject)
+			return array(FALSE,$mod->Lang('missing_type',$mod->Lang('TODO')));
+		if (!$destination_array)
+			return array(FALSE,$mod->Lang('missing_type',$mod->Lang('destination')));
 
-		$mail = \cms_utils::get_module('CMSMailer'); //TODO support CMSMS 2+
-		if (!$mail)
-			return array(FALSE,$mod->Lang('err_module','CMSMailer'));
-
-		$mail->reset();
+		if ($mod->before20) {
+			$mail = \cms_utils::get_module('CMSMailer');
+			if (!$mail)
+				return array(FALSE,$mod->Lang('err_module','CMSMailer'));
+			$mail->reset();
+		} else {
+			$mail = new \cms_mailer();
+		}
 
 		$defto = $this->GetProperty('send_using','to');
 		if (!is_array($destination_array))
@@ -281,7 +288,7 @@ EOS;
 						$res = TRUE;
 					}
 				}
-				if ($res == FALSE) {
+				if (!$res) {
 					$mail->reset();
 					return array(FALSE,$mod->Lang('err_address',$this_ad));
 				}
