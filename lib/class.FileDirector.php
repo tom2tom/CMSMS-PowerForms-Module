@@ -18,6 +18,7 @@ class FileDirector extends FieldBase
 		$this->HasAddOp = TRUE;
 		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
+		$this->IsInput = TRUE;
 		$this->Type = 'FileDirector';
 	}
 
@@ -68,7 +69,7 @@ class FileDirector extends FieldBase
 		return implode("\t",$fields);
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$ret = $this->GetPropIndexed('destination_displayname',$this->Value); //TODO
 		if ($as_string)
