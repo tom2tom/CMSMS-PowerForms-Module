@@ -386,12 +386,7 @@ $lang['err_file_exists'] = 'File %s already exists, and cannot be overwritten.';
 $lang['err_form_import'] = 'Form import failed! There was a problem with the format of the XML file.';
 $lang['err_large_file'] = 'Uploaded file is too large! Maximum size is:';
 //QUEUE $lang['err_lock'] = 'Error. Unable to obtain exclusive access.';
-$lang['err_module_CompanyDirectory'] = 'The Company Directory module is not available!';
-$lang['err_module_captcha'] = 'The Captcha module is not available';
-$lang['err_module_cataloger'] = 'The Cataloger module is not available.';
-$lang['err_module_feu'] = 'The FrontEndUsers module is not available. This field will not function.';
-$lang['err_module_upload'] = 'The Uploads module is not available';
-//$lang['err_no_browser_field'] = 'Error! Either the form has no Form Browser Disposition, or it failed to instantiate (due to memory issues?)';
+$lang['err_module'] = 'The %s module is not available'; //see also 'missing_module'
 $lang['err_parm'] = 'Parameter error';
 $lang['err_perm'] = 'No permission';
 $lang['err_server'] = 'Server error';
@@ -448,7 +443,6 @@ $lang['field_op'] = 'Field %s';
 $lang['fieldlabel_field'] = 'Field Type Not Set';
 $lang['fieldlabel_Button'] = 'Button';
 $lang['fieldlabel_ByCallback'] = '-Field populated by a PHP callback';
-$lang['fieldlabel_ByTag'] = '-Field populated by calling User Defined Tag';
 $lang['fieldlabel_ByTemplate'] = '-Field populated by processing a template';
 $lang['fieldlabel_Captcha'] = 'Captcha protection for form';
 $lang['fieldlabel_CatalogerItems'] = 'Select cataloger item(s)';
@@ -499,6 +493,7 @@ $lang['fieldlabel_SharedFile'] = '*Save submitted data in shared file';
 $lang['fieldlabel_SiteAdmin'] = 'Site admin';
 $lang['fieldlabel_StatePicker'] = 'U.S. state picker';
 $lang['fieldlabel_StaticText'] = '-Static text';
+$lang['fieldlabel_SubmissionTag'] = '-Field populated by calling User Defined Tag';
 $lang['fieldlabel_SubmitForm'] = '*Submit to a specified form action';
 $lang['fieldlabel_SystemEmail'] = '*Email to specified address(es)';
 $lang['fieldlabel_SystemLink'] = '-Static link';
@@ -709,7 +704,7 @@ $lang['mcrypt'] = 'PHP mcrypt Library';
 $lang['merid'] = 'Meridian';
 $lang['min'] = 'Minute';
 $lang['minumum'] = 'minimum';
-$lang['missing_cms_mailer'] = 'Cannot find required module CMSMailer!';
+$lang['missing_module'] = 'No %s module'; //see also longer-form 'err_module'
 $lang['missing_type'] = 'No %s';
 $lang['mon'] = 'Month';
 $lang['movedn'] = 'move down';
@@ -870,6 +865,7 @@ $lang['title_dateformat'] = 'Template for formatting displayed dates';
 $lang['title_default_blank'] = 'Default to blank';
 $lang['title_default_link'] = 'Default link URL';
 $lang['title_default_link_title'] = 'Default link text';
+$lang['title_default_sel'] = 'Selected by default';
 $lang['title_default_set'] = 'Checked by default';
 $lang['title_default_year'] = 'Default year';
 $lang['title_del_button_text'] = 'Delete button text';
@@ -999,7 +995,7 @@ $lang['title_pick_fielddef'] = 'Pull a field definition\'s value (single) <em>op
 $lang['title_private_key'] = 'Private key to use for encrypting data';
 $lang['title_privatename']='Name used for runtime identification';
 $lang['title_pulldown_details'] = 'Pulldown options';
-$lang['title_radio_label'] = 'Radio button label';
+$lang['title_radio_label'] = 'Button label';
 $lang['title_radio_separator'] = 'Button separator';
 $lang['title_radiogroup_details'] = 'Radio button group details';
 $lang['title_read_only'] = 'Read Only';
@@ -1017,6 +1013,7 @@ $lang['title_select_default_country'] = 'Default selection';
 $lang['title_select_default_province'] = 'Default selection';
 $lang['title_select_default_state'] = 'Default selection';
 $lang['title_select_one_message'] = '"Select One" text';
+$lang['title_selected_value'] = 'Value when selected';
 $lang['title_selection_displayname'] = 'Selection display name';
 $lang['title_selection_subject'] = 'Selection subject';
 $lang['title_selection_value'] = 'Selection value';
@@ -1207,7 +1204,7 @@ and may include whatever else is appropriate, including Fieldbase properties and
 <h3>Interactions</h3>
 <p>The following modules may be used in relevant contexts, if available:</p>
 <ul>
-<li>CMSMailer</li>
+<li>CMSMailer (for CMSMS < 2.0)</li>
 <li>Captcha</li>
 <li>Cataloger</li>
 <li>CompanyDirectory</li>
@@ -1271,4 +1268,3 @@ All rights reserved.</p>
 <a href="http://www.gnu.org/licenses/licenses.html#AGPL">GNU Affero Public License</a>.
 The module must not be used otherwise than in acccordance with that license.</p>
 EOS;
-
