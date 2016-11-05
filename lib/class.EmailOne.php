@@ -13,6 +13,7 @@ class EmailOne extends EmailBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsDisposition = TRUE;
+		$this->IsInput = TRUE;
 		$this->Required = TRUE;
 		$this->Type = 'EmailOne';
 		$this->ValidationType = 'email';
