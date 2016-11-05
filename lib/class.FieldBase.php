@@ -22,6 +22,10 @@ class FieldBase implements \Serializable
 	public $Type = '';
 	public $Value; //when set, can be scalar or array, with all content processed by Utils::html_myentities_decode()
 	public $XtraProps; //container for other properties
+	//field-edit-script accumulators (won't work in XtraProps[])
+	public $jsincs;
+	public $jsfuncs;
+	public $jsloads;
 
 	public function __construct(&$formdata, &$params)
 	{
@@ -868,15 +872,14 @@ class FieldBase implements \Serializable
 	/**
 	AdminPopulate:
 	@id: id given to the PWForms module on execution
-	Construct content for field edit. Subclass this.
-	Array keys presently recognised are: 'main','adv','table','extra','funcs'.
+	Generate content for field editing. Subclass this.
+	Returns: associative array with 0 or more keys recognised in action.open_field.php.
+	Array keys presently recognised are: 'main','adv','table','extra'.
 	'main' and 'adv', if present, refer to arrays of content for the main and
 	advanced settings tabs shown when adding/editing the field. Each member of
 	those arrays is itself an array of 1 to 3 members, for respectively generating
 	title, (optional) input and (optional) help.
 	That input should of course be a form input suitable for that field attribute/option.
-	'funcs' if present refers to array of js functions to be applied (not inc's or load's)
-	Returns: associative array with 0 or more keys recognised in method.open_field.php.
 	*/
 	public function AdminPopulate($id)
 	{

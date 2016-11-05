@@ -27,8 +27,8 @@ class EmailOne extends EmailBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id);
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
+		list($main,$adv,$extra) = $this->AdminPopulateCommonEmail($id);
+		return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
 	}
 
 	public function Populate($id,&$params)

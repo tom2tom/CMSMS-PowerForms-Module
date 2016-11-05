@@ -76,6 +76,7 @@ class SharedFile extends FieldBase
 		$ctldata['fp_file_footer']['is_oneline'] = TRUE;
 		$ctldata['fp_file_footer']['is_footer'] = TRUE;
 		list($buttons,$jsfuncs) = Utils::TemplateActions($this->formdata,$id,$ctldata);
+		$this->jsfuncs[] = $jsfuncs;
 
 		$adv[] = array($mod->Lang('title_file_template'),
 						$mod->CreateTextArea(FALSE,$id,
@@ -94,9 +95,8 @@ class SharedFile extends FieldBase
 							htmlspecialchars($this->GetProperty('file_footer')),
 							'fp_file_footer','pwf_shortarea','','','',50,8),
 						'<br /><br />'.$buttons[2]);
-
 		//show variables-help on advanced tab
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>'varshelpadv');
+		return array('main'=>$main,'adv'=>$adv,'extra'=>'varshelpadv');
 	}
 
 	public function Dispose($id,$returnid)

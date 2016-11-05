@@ -9,8 +9,6 @@ namespace PWForms;
 
 class EmailBase extends FieldBase
 {
-	protected  $pattern = '/.+@.+\..+/';
-
 	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata,$params);
@@ -32,11 +30,10 @@ class EmailBase extends FieldBase
 	@totype: optional bool, whether to include a to/cc/bcc selector dropdown, default=FALSE
 	@visible: optional bool, whether to include some options irrelevant to non-displayed
 	 disposition-fields, default=TRUE
-	Returns: 4-member array of stuff for use ultimately in method.open_field.php
+	Returns: 3-member array of stuff for use ultimately in method.open_field.php
 	 [0] = array of things for 'main' tab
 	 [1] = (possibly empty) array of things for 'adv' tab
-	 [2] = array of js related to the created stuff
-	 [3] = something?? for upstream 'extra' parameter
+	 [2] = something?? for upstream 'extra' parameter
 	*/
 	public function AdminPopulateCommonEmail($id, $except=FALSE, $totype=FALSE, $visible=TRUE)
 	{
@@ -80,13 +77,15 @@ class EmailBase extends FieldBase
 		$ctldata['fp_email_template']['text_button'] = TRUE;
 		$ctldata['fp_email_template']['is_email'] = TRUE;
 		list($buttons,$jsfuncs) = Utils::TemplateActions($this->formdata,$id,$ctldata);
+		$this->jsfuncs[] = $jsfuncs;
+
 		$adv[] = array($mod->Lang('title_email_template'),
 						$mod->CreateTextArea(FALSE,$id,
 						//($this->GetProperty('html_email',0)?$message:htmlspecialchars($message))
 						$message,'fp_email_template','pwf_tallarea','','','',50,15,'','html'),
 						'<br /><br />'.$buttons[0].'&nbsp;'.$buttons[1]);
 		//show variables-help on advanced tab
-		return array($main,$adv,$jsfuncs,'varshelpadv');
+		return array($main,$adv,'varshelpadv');
 	}
 
 	public function PostAdminActionEmail(&$params)

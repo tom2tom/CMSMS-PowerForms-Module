@@ -83,7 +83,7 @@ class EmailDirector extends EmailBase
 	public function AdminPopulate($id)
 	{
 //		$this->SetEmailJS(); TODO
-		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,'title_email_subject');
+		list($main,$adv,$extra) = $this->AdminPopulateCommonEmail($id,'title_email_subject');
 		$mod = $this->formdata->formsmodule;
 		// remove the "email subject" field
 		$main[] = array($mod->Lang('title_select_one_message'),
@@ -116,11 +116,10 @@ class EmailDirector extends EmailBase
 				);
 			}
 			unset($one);
-//			$main[] = array($mod->Lang('title_director_details'),$dests);
-			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'funcs'=>$jsfuncs,'extra'=>$extra);
+			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'extra'=>$extra);
 		} else {
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('destination')));
-			return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
+			return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
 		}
 	}
 

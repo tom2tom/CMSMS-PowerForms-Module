@@ -91,7 +91,7 @@ class EmailFEUProperty extends EmailBase
 		}
 		if (!$opts)
 			return array('main'=>array($this->GetErrorMessage('err_feudefns')));
-		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,TRUE);
+		list($main,$adv,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,TRUE);
 		$waslast = array_pop($ret['main']); //keep the email to-type selector for last
 		$keys = array_keys($opts);
 		$mod = $this->formdata->formsmodule;
@@ -100,7 +100,7 @@ class EmailFEUProperty extends EmailBase
 					$this->GetProperty('feu_property',$keys[0])),
 				$mod->Lang('help_feu_property'));
 		$main[] = $waslast;
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
+		return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
 	}
 
 	public function Populate($id,&$params)

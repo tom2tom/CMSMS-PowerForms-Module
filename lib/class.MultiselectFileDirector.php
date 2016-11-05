@@ -153,6 +153,7 @@ class MultiselectFileDirector extends FieldBase
 		$ctldata['fp_file_footer']['is_oneline']=TRUE;
 		$ctldata['fp_file_footer']['is_footer']=TRUE;
 		list($buttons,$jsfuncs) = Utils::TemplateActions($this->formdata,$id,$ctldata);
+		$this->jsfuncs[] = $jsfuncs;
 
 		$adv[] = array($mod->Lang('title_file_template'),
 			$mod->CreateTextArea(FALSE,$id,
@@ -169,12 +170,11 @@ class MultiselectFileDirector extends FieldBase
 			htmlspecialchars($this->GetProperty('file_footer')),
 			'fp_file_footer','pwf_shortarea','','','',50,8).
 			'<br /><br />'.$buttons[2]);
-
+		//show variables-help on advanced tab
 		if ($dests)
-			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'funcs'=>$jsfuncs,
-				'extra'=>'varshelpadv');//show variables-help on advanced tab
+			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'extra'=>'varshelpadv');
 		else
-			return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>'varshelpadv');
+			return array('main'=>$main,'adv'=>$adv,'extra'=>'varshelpadv');
 	}
 
 	public function PostAdminAction(&$params)

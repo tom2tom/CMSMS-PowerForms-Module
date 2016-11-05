@@ -73,7 +73,7 @@ class UserEmail extends EmailBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,'title_email_from_address');
+		list($main,$adv,$extra) = $this->AdminPopulateCommonEmail($id,'title_email_from_address');
 		$mod = $this->formdata->formsmodule;
 
 		$choices = array(
@@ -93,7 +93,7 @@ class UserEmail extends EmailBase
 		$main[] = array($mod->Lang('title_headers_to_modify'),
 						$mod->CreateInputDropdown($id,'fp_headers_to_modify',$choices,-1,
 						$this->GetProperty('headers_to_modify','f')));
-	 	return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
+	 	return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
 	}
 
 	public function Populate($id,&$params)

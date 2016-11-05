@@ -47,8 +47,8 @@ class EmailConfirmation extends EmailBase
 		//log extra tag for use in template-help
 		Utils::AddTemplateVariable($this->formdata,'confirm_url','title_confirmation_url');
 
-		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id);
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>$jsfuncs,'extra'=>$extra);
+		list($main,$adv,$extra) = $this->AdminPopulateCommonEmail($id);
+		return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
 	}
 
 	public function Populate($id,&$params)

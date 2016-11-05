@@ -71,11 +71,13 @@ class Captcha extends FieldBase
 		list($button,$jsfunc) = Utils::CreateTemplateAction($mod,$id,
 			'fp_captcha_template',$mod->Lang('title_create_sample_template'),
 			$this->defaulttemplate);
+		$this->jsfuncs[] = $jsfunc;
+
 		$adv[] = array($mod->Lang('title_captcha_template'),
 						$mod->CreateTextArea(FALSE,$id,$this->GetProperty('captcha_template',$this->defaulttemplate),
 							'fp_captcha_template','pwf_shortarea','','','',50,5),
 						$mod->Lang('help_captcha_template').'<br /><br />'.$button);
-		return array('main'=>$main,'adv'=>$adv,'funcs'=>array($jsfunc));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	public function AdminValidate($id)
