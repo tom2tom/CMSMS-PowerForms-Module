@@ -6,15 +6,14 @@
 
 Button
 ByCallback
-ByTag
 ByTemplate
 Captcha
-CatalogerItems
+#CatalogerItems DEPRECATED in favour of imported class
 Checkbox
 CheckboxExtended
 CheckboxGroup
 CheckWhen
-CompanyDirectory
+#CompanyDirectory DEPRECATED in favour of imported class
 Computed
 CountryPicker
 CustomEmail
@@ -26,7 +25,7 @@ EmailBCCAddress
 EmailCCAddress
 EmailConfirmation
 EmailDirector
-EmailFEUProperty
+#EmailFEUProperty DEPRECATED in favour of imported class
 EmailOne
 EmailSender
 EmailSiteAdmin
@@ -55,6 +54,7 @@ SharedFile
 SiteAdmin
 StatePicker
 StaticText
+SubmissionTag
 SubmitForm
 SystemEmail
 SystemLink
