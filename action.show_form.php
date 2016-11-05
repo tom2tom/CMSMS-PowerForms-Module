@@ -170,7 +170,7 @@ if (isset($params[$prefix.'datakey'])) {
 							if (isset($params['captcha_input']))
 								$val = $params['captcha_input'];
 //							if (!$val)
-//								$val = -.-; //ensure invalid-value if empty
+//								$val = '-.-'; //ensure invalid-value if empty
 						}
 						$fld->SetValue($val);
 					}
@@ -179,87 +179,48 @@ if (isset($params[$prefix.'datakey'])) {
 		}
 
 		if ($donekey) {
-/*			// rate-limit?
-			$num = PWForms\Utils::GetFormProperty($formdata,'submit_limit',0);
-			if ($num > 0) {
+			$limit = PWForms\Utils::GetFormProperty($formdata,'submit_limit',0);
+			if ($limit > 0) { // rate-limiting applies
 				if (!empty($_SERVER['REMOTE_ADDR'])) {
 					$src = $_SERVER['REMOTE_ADDR'];
-					$t = $time();
+					$t = time();
 					$t2 = trim($db->DBTimeStamp($t-3600),"'");
 					$t = trim($db->DBTimeStamp($t),"'");
-
+					$num = 0;
 					$pre = cms_db_prefix();
-					$sql = array();
-					$sql[] = <<<EOS
-DELETE FROM {$pre}module_pwf_ip_log WHERE src=? AND basetime<?
-EOS;
-					$args = array(array($src,$t2));
-					$sql[] = <<<EOS
-UPDATE {$pre}module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?
-EOS;
-					$args[] = array($src,$num+1);
-					$sql[] = <<<EOS
-INSERT INTO {$pre}module_pwf_ip_log (src,howmany,basetime)
-SELECT ?,1,? FROM (SELECT 1 AS dmy) Z
-WHERE NOT EXISTS (SELECT 1 FROM {$pre}module_pwf_ip_log T WHERE T.src=?)
-EOS;
-					$args[] = array($src,$t,$src);
-					PWForms\Utils::SafeExec($sql,$args);
+					$sql = 'DELETE FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<?';
+					$args = array($src,$t2);
+					$sql2 = 'SELECT COUNT(*) AS num FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<=?';
+					$args2 = array(array($src,$t));
 
-					$sql = 'SELECT COUNT(src_ip) AS sent FROM '.$pre.'module_pwf_ip_log WHERE src_ip=?';
-					$sent = PWForms\Utils::SafeGet($sql,array($src),'one');
-					if ($sent > $num) {
-						EarlyExit($this,2);
-						return;
+					$nt = 10;
+					while ($nt > 0) {
+						$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'); //this isn't perfect!
+						$db->StartTrans();
+						$db->Execute($sql,$args);
+						$num = $db->GetOne($sql2,$args2);
+						if ($db->CompleteTrans())
+							break;
+						else {
+							$nt--;
+							usleep(50000);
+						}
 					}
-				}
-			} else {
-				//TODO check for blocked after EarlyExit::expired
-			}
-*/
-			if (!empty($_SERVER['REMOTE_ADDR'])) {
-				$src = $_SERVER['REMOTE_ADDR'];
-				$t = time();
-				$t2 = trim($db->DBTimeStamp($t-3600),"'");
-				$t = trim($db->DBTimeStamp($t),"'");
-				$num = 0;
-				$pre = cms_db_prefix();
-				$sql = 'DELETE FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<?';
-				$args = array($src,$t2);
-				$sql2 = 'SELECT COUNT(*) AS num FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<=?';
-				$args2 = array(array($src,$t));
-
-				$nt = 10;
-				while ($nt > 0) {
-					$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'); //this isn't perfect!
-					$db->StartTrans();
-					$db->Execute($sql,$args);
-					$num = $db->GetOne($sql2,$args2);
-					if ($db->CompleteTrans())
-						break;
-					else {
-						$nt--;
-						usleep(50000);
-					}
-				}
-				if ($nt == 0) {
-					echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
-						'title'=>$this->Lang('title_aborted'),
-						'message'=>$this->Lang('system_data'),
-						'error'=>1));
-					return;
-				}
-				if ($num) {
-					if ($num == 255) { //blocked due to expiry
-						BlockSource(); //again!
+					if ($nt == 0) {
 						echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
 							'title'=>$this->Lang('title_aborted'),
-							'message'=>$this->Lang('comeback_expired')));
+							'message'=>$this->Lang('system_data'),
+							'error'=>1));
 						return;
 					}
-					//rate-limit?
-					$limit = PWForms\Utils::GetFormProperty($formdata,'submit_limit',0);
-					if ($limit) {
+					if ($num) {
+						if ($num == 255) { //blocked due to expiry
+							BlockSource(); //again!
+							echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+								'title'=>$this->Lang('title_aborted'),
+								'message'=>$this->Lang('comeback_expired')));
+							return;
+						}
 						if ($num <= $limit) {
 							$sql = array();
 							$sql[] = <<<EOS
@@ -327,7 +288,7 @@ $this->Crash2();
 					foreach ($formdata->FieldOrders as $key) {
 						$obfld = $formdata->Fields[$key];
 						if ($obfld->DisplayInSubmission()) {
-							$val = $obfld->GetDisplayableValue();
+							$val = $obfld->DisplayableValue();
 							if ($val == '')
 								$val = $unspec;
 						} else
@@ -533,8 +494,8 @@ $this->Crash2();
 				}
 			}
 			if (isset($formdata->Fields[$field_id])) {
-				$obfield = $formdata->Fields[$field_id];
-				$obfield->SetValue($val);
+				$obfld = $formdata->Fields[$field_id];
+				$obfld->SetValue($val);
 			} else {
 //TODO warning
 			}

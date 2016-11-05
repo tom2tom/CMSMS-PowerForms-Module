@@ -133,7 +133,7 @@ if (isset($_FILES) && isset($_FILES[$t])) {
 					//basic validation of file-content
 					$content = fread($fh,512);
 					fclose($fh);
-					if ($content == FALSE)
+					if (!$content)
 						$umsg = $this->Lang('err_upload',$this->Lang('err_perm'));
 //					elseif (!preg_match('/\.bkgtitle/',$content)) //TODO some relevant test
 //						$umsg = $this->Lang('err_upload',$this->Lang('err_file'));

@@ -6,6 +6,6 @@
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 $feu = cms_utils::get_module('FrontEndUsers');
-if ($feu == FALSE || $feu->LoggedIn() == FALSE)
+if (!$feu || !$feu->LoggedIn())
 	return;
 $this->Redirect($id, 'default', $returnid, $params);

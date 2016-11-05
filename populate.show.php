@@ -76,7 +76,7 @@ foreach ($formdata->FieldOrders as $field_id) {
 			if ($obfield->DisplayInSubmission()) {
 /*TODO			if ($WalkPage < $formdata->Page) {
 					$oneset = new stdClass();
-					$oneset->value = $obfield->GetDisplayableValue();
+					$oneset->value = $obfield->DisplayableValue();
 					$tplvars[$obfield->GetName()] = $oneset;
 					$tplvars[$obfield->ForceAlias()] = $oneset;
 					$prev[] = $oneset;
