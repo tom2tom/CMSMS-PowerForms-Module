@@ -144,24 +144,40 @@ class CheckboxGroup extends FieldBase
 		if ($names) {
 			$boxes = array();
 			$boxes[] = array(
+				$mod->Lang('title_default_check'),
 				$mod->Lang('title_checkbox_label'),
 				$mod->Lang('title_checked_value'),
 				$mod->Lang('title_unchecked_value'),
-				$mod->Lang('title_default_set'),
 				$mod->Lang('title_select')
 			);
-			$yesNo = array($mod->Lang('no')=>'n',$mod->Lang('yes')=>'y');
-			foreach ($names as $i=>&$one) {
+			$fieldclass = 'field'.$this->Id;
+			foreach ($names as $i=>$one) {
+				$tmp = $mod->CreateInputCheckbox($id,'fp_box_is_set['.$i.']' ,'y',$this->GetPropIndexed('box_is_set',$i),
+					'style="display:block;margin:auto;"');
 				$boxes[] = array(
+					$mod->CreateInputHidden($id,'fp_box_is_set['.$i.']','n').
+						str_replace('class="','class="'.$fieldclass.' ',$tmp),
 					$mod->CreateInputText($id,'fp_box_name'.$i,$one,30,128),
 					$mod->CreateInputText($id,'fp_box_checked'.$i,$this->GetPropIndexed('box_checked',$i),20,128),
 					$mod->CreateInputText($id,'fp_box_unchecked'.$i,$this->GetPropIndexed('box_unchecked',$i),20,128),
-					$mod->CreateInputDropdown($id,'fp_box_is_set'.$i,$yesNo,-1,$this->GetPropIndexed('box_is_set',$i)),
 					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
 				);
 			}
-			unset($one);
-//			$main[] = array('','',$mod->Lang('title_checkbox_details'),$boxes);
+/*			//TODO js for field e.g.
+			$this->jsfuncs['X'] = <<<'EOS'
+function select_only(cb,fclass) {
+ if (cb.checked) {
+  $('input.'+fclass).attr('checked',false);
+  cb.checked = true;
+ }
+}
+EOS;
+			$this->jsloads[] = <<<EOS
+ $('input.{$fieldclass}').change(function(){
+  select_only(this,'{$fieldclass}');
+ });
+EOS;
+*/
 			return array('main'=>$main,'adv'=>$adv,'table'=>$boxes);
 		} else {
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('member')));
@@ -197,7 +213,8 @@ class CheckboxGroup extends FieldBase
 			$limit = $this->GetProperty('single_check',0);
 			if ($limit) {
 				if (!isset($this->formdata->jsfuncs['cbgroup'])) {
-					$this->formdata->jsfuncs['cbgroup'] = <<<EOS
+//TODO correct js for array of boxes
+					$this->formdata->jsfuncs['cbgroup'] = <<<'EOS'
 function select_only(cb) {
  if (cb.checked) {
   $('input:checkbox[name="'+cb.name+'"]').attr('checked',false);
