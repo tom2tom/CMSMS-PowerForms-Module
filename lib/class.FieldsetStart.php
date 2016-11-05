@@ -19,7 +19,7 @@ class FieldsetStart extends FieldBase
 		$this->Type = 'FieldsetStart';
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$ret = '[Begin Fieldset: '.$this->Value.']';
 		if ($as_string)
