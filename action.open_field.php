@@ -59,9 +59,16 @@ if (isset($params['submit'])) {
 		}
 	}
 	foreach ($params as $key=>$val) {
-		if (strncmp($key,'fp_',3) == 0)
-			//TODO check for prop. array or indexed
-			$obfield->SetProperty(substr($key,3),$val);
+		if (strncmp($key,'fp_',3) == 0) {
+			$key = substr($key,3);
+			if (is_array($val)) {
+				foreach ($val as $i=>$ival) {
+					$obfield->SetPropIndexed($key,$i,$ival);
+				}
+			} else {
+				$obfield->SetProperty($key,$val);
+			}
+		}
 	}
 	$obfield->PostAdminAction($params);
 	list($res,$message) = $obfield->AdminValidate($id);
@@ -116,10 +123,13 @@ $tplvars = array();
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.field.php';
 
-$cache->set($params['datakey'],$formdata,84600);
-
 $jsall = NULL;
-PWForms\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
+PWForms\Utils::MergeJS($obfield->jsincs,$obfield->jsfuncs,$obfield->jsloads,$jsall);
+$obfield->jsincs = FALSE;
+$obfield->jsfuncs = FALSE;
+$obfield->jsloads = FALSE;
+
+$cache->set($params['datakey'],$formdata,84600);
 
 echo PWForms\Utils::ProcessTemplate($this,'editfield.tpl',$tplvars);
 if ($jsall)
