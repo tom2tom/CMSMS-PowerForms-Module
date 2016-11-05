@@ -5,30 +5,36 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-/* This class provides a dynamic multiselect list to allow selecting one or
-more items from the cataloger module. The list is filtered by an array of
-options specified in the admin
+/*
+ This class provides a dynamic multiselect list to allow selecting one or more
+ items from the cataloger module. The list is filtered by an array of options
+ specified in the admin
+ DEPRECATED - should be applied dynamically by Cataloger module
 */
 namespace PWForms;
 
 class CatalogerItems extends FieldBase
 {
+	const MODNAME = 'Cataloger'; //initiator/owner module name
+	public $MenuKey = 'field_label'; //owner-module lang key for this field's menu label, used by PWForms
+	public $mymodule; //used also by PWForms, do not rename
+
 	public function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
 		$this->Type = 'CatalogerItems';
+		$this->mymodule = \cms_utils::get_module(self::MODNAME);
 	}
 
 	public function GetSynopsis()
 	{
-		$cataloger = \cms_utils::get_module('Cataloger');
-		if ($cataloger)
+		if ($this->mymodule)
 			return '';
-		return $this->formdata->formsmodule->Lang('err_module_cataloger');
+		return $this->formdata->formsmodule->Lang('missing_module',self::MODNAME);
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue()) {
 			if (is_array($this->Value)) {
@@ -44,49 +50,52 @@ class CatalogerItems extends FieldBase
 			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
 		}
-
 		if ($as_string)
 			return $ret;
 		else
 			return array($ret);
 	}
 
+	public function GetDisplayType()
+	{
+		return $this->mymodule->Lang($this->MenuKey);
+	}
+
 	public function AdminPopulate($id)
 	{
+		if (!$this->mymodule) {
+			return array('main'=>array($this->GetErrorMessage('err_module',self::MODNAME)));
+		}
+
 		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
-		$cataloger = \cms_utils::get_module('Cataloger');
-		if ($cataloger) {
-			$mod = $this->formdata->formsmodule;
-			$main[] = array($mod->Lang('title_field_height'),
-							$mod->CreateInputText($id,'fp_lines',$this->GetProperty('lines','5'),3,3),
-							$mod->Lang('help_field_height'));
-			$main[] = array($mod->Lang('title_name_regex'),
-							$mod->CreateInputText($id,'fp_nameregex',$this->GetProperty('nameregex'),25,25),
-							$mod->Lang('help_name_regex'));
-			$main[] = array('','',$mod->Lang('help_cataloger_attribute_fields'));
+		$mod = $this->formdata->formsmodule;
+		$main[] = array($mod->Lang('title_field_height'),
+						$mod->CreateInputText($id,'fp_lines',$this->GetProperty('lines','5'),3,3),
+						$mod->Lang('help_field_height'));
+		$main[] = array($mod->Lang('title_name_regex'),
+						$mod->CreateInputText($id,'fp_nameregex',$this->GetProperty('nameregex'),25,25),
+						$mod->Lang('help_name_regex'));
+		$main[] = array('','',$mod->Lang('help_cataloger_attribute_fields'));
 
-			$attrs = \cmsms()->variables['catalog_attrs']; //TODO bad module behaviour
-			foreach ($attrs as &$one) {
-				if (!$one->is_text) {
-					$safeattr = strtolower(preg_replace('/\W/','',$one->attr));
-					$main[] = array($one->attr,
-									$mod->CreateInputText($id,'fp_attr_'.$safeattr,
-									$this->GetProperty('attr_'.$safeattr),30,80));
-				}
+		$attrs = \cmsms()->variables['catalog_attrs']; //TODO bad module behaviour
+		foreach ($attrs as &$one) {
+			if (!$one->is_text) {
+				$safeattr = strtolower(preg_replace('/\W/','',$one->attr));
+				$main[] = array($one->attr,
+								$mod->CreateInputText($id,'fp_attr_'.$safeattr,
+								$this->GetProperty('attr_'.$safeattr),30,80));
 			}
-			unset($one);
-		} else
-			$main[] = array($this->GetErrorMessage('err_module_cataloger'));
-
+		}
+		unset($one);
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	public function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$cataloger = \cms_utils::get_module('Cataloger');
+		$cataloger = $this->mymodule;
 		if (!$cataloger)
-			return $mod->Lang('err_module_cataloger');
+			return $mod->Lang('err_module',self::MODNAME);
 
 		$cataloger->getUserAttributes();
 		$gCms = \cmsms();
@@ -212,7 +221,21 @@ class CatalogerItems extends FieldBase
 				$choices,$val,$size,'id="'.$this->GetInputId().'"');
 			return $this->SetClass($tmp);
 		}
-
 		return ''; // error
+	}
+
+	public function __toString()
+	{
+ 		$ob = $this->mymodule;
+		$this->mymodule = NULL;
+		$ret = parent::__toString();
+		$this->mymodule = $ob;
+		return $ret;
+	}
+
+	public function unserialize($serialized)
+	{
+		parent::unserialize($serialized);
+		$this->mymodule = \cms_utils::get_module(self::MODNAME);
 	}
 }

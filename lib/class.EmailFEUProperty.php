@@ -5,30 +5,42 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-//This class sends a pre-defined message to a destination selected from addresses
-//recorded as a property of the FrontEndUsers module
-
+/*
+ This class sends a pre-defined message to a destination selected from addresses
+ recorded as a property of the FrontEndUsers module
+ DEPRECATED - should be applied dynamically by FrontEndUsers module
+*/
 namespace PWForms;
 
 class EmailFEUProperty extends EmailBase
 {
+	const MODNAME = 'FrontEndUsers'; //initiator/owner module name
+	public $MenuKey = 'field_label'; //owner-module lang key for this field's menu label, used by PWForms
+	public $mymodule; //used also by PWForms, do not rename
+
 	public function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->ChangeRequirement = FALSE;
+		$this->IsDisposition = TRUE;
+		$this->IsInput = TRUE;
 		$this->Type = 'EmailFEUProperty';
+		$this->mymodule = \cms_utils::get_module(self::MODNAME);
 	}
 
 	public function GetSynopsis()
 	{
-		$ret = $this->formdata->formsmodule->Lang('title_feu_property').': '.$this->GetProperty('feu_property');
-		$status = $this->TemplateStatus();
-		if ($status)
-			$ret .= '<br />'.$status;
-		return $ret;
+		if ($this->mymodule) {
+			$ret = $this->formdata->formsmodule->Lang('title_feu_property').': '.$this->GetProperty('feu_property');
+			$status = $this->TemplateStatus();
+			if ($status)
+				$ret .= '<br />'.$status;
+			return $ret;
+		}
+		return $this->formdata->formsmodule->Lang('missing_module',self::MODNAME);
 	}
 
-	public function GetDisplayableValue($as_string = TRUE)
+	public function DisplayableValue($as_string = TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
 		$prop = $this->GetProperty('feu_property');
@@ -49,11 +61,17 @@ class EmailFEUProperty extends EmailBase
 			return array($ret);
 	}
 
+	public function GetDisplayType()
+	{
+		return $this->mymodule->Lang($this->MenuKey);
+	}
+
 	public function AdminPopulate($id)
 	{
-		$feu = \cms_utils::get_module('FrontEndUsers');
-		if (!$feu)
-			return array('main'=>array($this->GetErrorMessage('err_module_feu')));
+		$feu = $this->mymodule;
+		if (!$feu) {
+			return array('main'=>array($this->GetErrorMessage('err_module',self::MODNAME)));
+		}
 		$defns = $feu->GetPropertyDefns();
 		if (!is_array($defns))
 			return array('main'=>array($this->GetErrorMessage('err_feudefns')));
@@ -71,7 +89,7 @@ class EmailFEUProperty extends EmailBase
 				break;
 			}
 		}
-		if (!count($opts))
+		if (!$opts)
 			return array('main'=>array($this->GetErrorMessage('err_feudefns')));
 		list($main,$adv,$jsfuncs,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,TRUE);
 		$waslast = array_pop($ret['main']); //keep the email to-type selector for last
@@ -87,9 +105,10 @@ class EmailFEUProperty extends EmailBase
 
 	public function Populate($id,&$params)
 	{
-		$feu = \cms_utils::get_module('FrontEndUsers');
+		$mod = $this->formdata->formsmodule;
+		$feu = $this->mymodule;
 		if (!$feu)
-			return '';
+			return $mod->Lang('err_module',self::MODNAME);
 
 		// get the property name and data
 		$prop = $this->GetProperty('feu_property');
@@ -104,7 +123,7 @@ class EmailFEUProperty extends EmailBase
 			// get the property input field
 			$choices = $feu->GetSelectOptions($prop);
 			// rendered all as a dropdown field.
-			$tmp = $this->formdata->formsmodule->CreateInputDropdown(
+			$tmp = $mod->CreateInputDropdown(
 				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
 				'id="'.$this->GetInputId().'"'.$this->GetScript());
 			$res = $this->SetClass($tmp);
@@ -117,9 +136,9 @@ class EmailFEUProperty extends EmailBase
 
 	public function Dispose($id,$returnid)
 	{
-		$feu = \cms_utils::get_module('FrontEndUsers');
+		$feu = $this->mymodule;
 		if (!$feu)
-			return array(FALSE,$this->formdata->formsmodule->Lang('err_module_feu'));
+			return array(FALSE,$this->formdata->formsmodule->Lang('err_module',self::MODNAME));
 
 		// get the property name
 		$prop = $this->GetProperty('feu_property');

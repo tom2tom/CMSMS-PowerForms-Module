@@ -9,35 +9,40 @@
  to provide a dynamic multiselect list to allow selecting one or more
  items from the CompanyDirectory module.
  The list is filtered by an array of options as specified in the admin.
+ DEPRECATED - should be applied dynamically by CompanyDirectory module
 */
 namespace PWForms;
 
 class CompanyDirectory extends FieldBase
 {
+	const MODNAME = 'CompanyDirectory'; //initiator/owner module name
+	public $MenuKey = 'field_label'; //owner-module lang key for this field's menu label, used by PWForms
+	public $mymodule; //used also by PWForms, do not rename
+
 	public function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
 		$this->Type = 'CompanyDirectory';
+		$this->mymodule = \cms_utils::get_module(self::MODNAME);
 	}
 
 	public function GetSynopsis()
 	{
-		$CompanyDirectory = \cms_utils::get_module('CompanyDirectory');
-		if (!$CompanyDirectory)
-			return $this->formdata->formsmodule->Lang('err_module_CompanyDirectory');
-		return '';
+		if ($this->mymodule)
+			return '';
+		return $this->formdata->formsmodule->Lang('missing_module',self::MODNAME);
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue()) {
 			if (is_array($this->Value)) {
 				if ($as_string)
 					return implode($this->GetFormProperty('list_delimiter',','),$this->Value);
 				else {
-					$ret = $this->Value;
-					return $ret; //array copy
+					$ret = $this->Value; //copy
+					return $ret;
 				}
 			}
 			$ret = $this->Value;
@@ -51,15 +56,18 @@ class CompanyDirectory extends FieldBase
 			return array($ret);
 	}
 
+	public function GetDisplayType()
+	{
+		return $this->mymodule->Lang($this->MenuKey);
+	}
+
 	public function AdminPopulate($id)
 	{
-		$mod = $this->formdata->formsmodule;
-		$CompanyDirectory = \cms_utils::get_module('CompanyDirectory');
-		if ($CompanyDirectory)
-			unset($CompanyDirectory);
-		else
-			return array('main'=>array($this->GetErrorMessage('err_module_CompanyDirectory')));
+		if (!$this->mymodule) {
+			return array('main'=>array($this->GetErrorMessage('err_module',self::MODNAME)));
+		}
 
+		$mod = $this->formdata->formsmodule;
 		$Categories = array('All'=>$mod->Lang('all'));
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT name FROM '.$pre.'module_compdir_categories';
@@ -107,11 +115,9 @@ class CompanyDirectory extends FieldBase
 	public function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$CompanyDirectory = \cms_utils::get_module('CompanyDirectory');
-		if ($CompanyDirectory)
-			unset($CompanyDirectory);
-		else
-			return $mod->Lang('err_module_CompanyDirectory');
+		$CompanyDirectory = $this->mymodule;
+		if (!$CompanyDirectory)
+			return $mod->Lang('err_module',self::MODNAME);
 
 		$results = array();
 
@@ -234,5 +240,20 @@ EOS;
 				return $this->SetClass($tmp);
 		}
 		return ''; // error
+	}
+
+	public function __toString()
+	{
+ 		$ob = $this->mymodule;
+		$this->mymodule = NULL;
+		$ret = parent::__toString();
+		$this->mymodule = $ob;
+		return $ret;
+	}
+
+	public function unserialize($serialized)
+	{
+		parent::unserialize($serialized);
+		$this->mymodule = \cms_utils::get_module(self::MODNAME);
 	}
 }
