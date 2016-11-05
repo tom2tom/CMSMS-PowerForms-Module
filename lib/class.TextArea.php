@@ -100,7 +100,7 @@ class TextArea extends FieldBase
 			$xclass = 'formarea';
 			//arrange for all such fields to be cleared
 			if (!isset($this->formdata->jsloads['cleararea'])) {
-				$this->formdata->jsloads['cleararea'] = <<<EOS
+				$this->formdata->jsloads['cleararea'] = <<<'EOS'
  $('.formarea').focus(function() {
   if (this.value == this.defaultValue) {
    this.value = '';
