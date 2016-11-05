@@ -406,7 +406,7 @@ EOS;
 		 'setEnd'=>'FieldsetEnd',
 		 'setStart'=>'FieldsetStart',
 		 'SiteAdmin'=>'EmailSiteAdmin',
-		 'UserTag'=>'ByTag',
+		 'UserTag'=>'SubmissionTag',
 		);
 
 		foreach ($data as $fbrow) {
@@ -458,7 +458,7 @@ EOS;
 		foreach ($data as $row) {
 			if (strpos($row['name'],'captcha') !== FALSE) //ignore redundant options
 				continue;
-			if (strpos($row['name'],'udt') !== FALSE && ($row['value'] == FALSE || $row['value'] == -1))
+			if (strpos($row['name'],'udt') !== FALSE && (!$row['value'] || $row['value'] == -1))
 				continue;
 			$val = $row['value'];
 			$longval = NULL;
