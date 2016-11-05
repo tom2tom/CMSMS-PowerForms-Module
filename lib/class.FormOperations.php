@@ -268,7 +268,7 @@ EOS;
 			$res = $db->Execute($sql,array($params['form_Name'],$params['form_Alias'],$form_id));
 			$done = array();
 		}
-		if ($res == FALSE)
+		if (!$res)
 			return array(FALSE,$mod->Lang('database_error'));
 
 		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
@@ -479,11 +479,11 @@ EOS;
 			//use form-properties data from first-found
 			foreach ($form_id as $one) {
 				$properties = $db->GetRow($sql,array($one));
-				if ($properties != FALSE)
+				if ($properties)
 					break;
 			}
 		}
-		if ($properties == FALSE)
+		if (!$properties)
 			return FALSE;
 
 		$outxml = array();
@@ -713,7 +713,7 @@ EOS;
 	public function ImportXML(&$mod, $xmlfile)
 	{
 		$data = self::ParseXML($xmlfile);
-		if ($data == FALSE)
+		if (!$data)
 			return FALSE;
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
