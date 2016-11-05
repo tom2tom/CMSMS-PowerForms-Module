@@ -492,7 +492,7 @@ EOS;
 			$t .= ' encoding="'.strtoupper($charset).'"';
 		$outxml[] = $t.'?>';
 		if ($dtd) {
-			$xml[] = <<<EOS
+			$xml[] = <<<'EOS'
 <!DOCTYPE powerforms [
 <!ELEMENT powerforms (version,date,count,form)>
 <!ELEMENT version (#PCDATA)>
