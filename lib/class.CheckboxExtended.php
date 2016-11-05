@@ -35,7 +35,7 @@ class CheckboxExtended extends FieldBase
 		return $ret;
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
 		$val = $this->Value;
@@ -92,6 +92,9 @@ class CheckboxExtended extends FieldBase
 		$js = $this->GetScript();
 		$ret = array();
 
+		$hidden = $this->formdata->formsmodule->CreateInputHidden(
+			$id,$this->formdata->current_prefix.$this->Id,0);
+
 		$oneset = new \stdClass();
 		$oneset->title = '';
 		$label = $this->GetProperty('box_label');
@@ -142,7 +145,7 @@ class CheckboxExtended extends FieldBase
 			$ret[] = $oneset;
 		}
 
-		return $ret;
+		return $hidden.$ret;
 	}
 
 	public function Validate($id)

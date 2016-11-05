@@ -23,7 +23,7 @@ class Checkbox extends FieldBase
 		return $ret;
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
 		if ($this->Value)
@@ -63,6 +63,8 @@ class Checkbox extends FieldBase
 			$this->Value = 't';
 		}
 
+		$hidden = $this->formdata->formsmodule->CreateInputHidden(
+			$id,$this->formdata->current_prefix.$this->Id,0);
 		$tid = $this->GetInputId();
 		$tmp = $this->formdata->formsmodule->CreateInputCheckbox(
 			$id,$this->formdata->current_prefix.$this->Id,'t',$this->Value,
@@ -73,6 +75,6 @@ class Checkbox extends FieldBase
 			$label = '<label for="'.$tid.'">'.$label.'</label>';
 			$label = '&nbsp;'.$this->SetClass($label);
 		}
-		return $tmp.$label;
+		return $hidden.$tmp.$label;
 	}
 }

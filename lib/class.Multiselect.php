@@ -135,6 +135,8 @@ class Multiselect extends FieldBase
 	{
 		$choices = $this->GetPropArray('indexed_name');
 		if ($choices) {
+			$hidden = $this->formdata->formsmodule->CreateInputHidden(
+				$id,$this->formdata->current_prefix.$this->Id,0);
 			$choices = array_flip($choices);
 			if (!($this->Value || is_numeric($this->Value)))
 				$val = array();
@@ -146,7 +148,7 @@ class Multiselect extends FieldBase
 			$tmp = $this->formdata->formsmodule->CreateInputSelectList(
 				$id,$this->formdata->current_prefix.$this->Id.'[]',$choices,$val,$this->GetProperty('lines',3),
 			 	'id="'.$this->GetInputId().'"'.$this->GetScript());
-			return $this->SetClass($tmp);
+			return $hidden.$this->SetClass($tmp);
 		 }
 		 return '';
 	}

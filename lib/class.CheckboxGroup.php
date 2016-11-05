@@ -76,7 +76,7 @@ class CheckboxGroup extends FieldBase
 		$this->Value = $unset;
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$names = $this->GetPropArray('box_name');
 		if ($names) {
@@ -191,6 +191,9 @@ class CheckboxGroup extends FieldBase
 		$names = $this->GetPropArray('box_name');
 		if ($names) {
 			$mod = $this->formdata->formsmodule;
+			$hidden = $mod->CreateInputHidden(
+				$id,$this->formdata->current_prefix.$this->Id,0);
+
 			$limit = $this->GetProperty('single_check',0);
 			if ($limit) {
 				if (!isset($this->formdata->jsfuncs['cbgroup'])) {
@@ -239,7 +242,7 @@ EOS;
 			}
 			unset($one);
 			$this->MultiPopulate = TRUE;
-			return $ret;
+			return $hidden.$ret;
 		}
 		$this->MultiPopulate = FALSE;
 		return '';

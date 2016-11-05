@@ -198,6 +198,8 @@ class MultiselectFileDirector extends FieldBase
 		if ($names) {
 			$mod = $this->formdata->formsmodule;
 			$js = $this->GetScript();
+			$hidden = $mod->CreateInputHidden(
+				$id,$this->formdata->current_prefix.$this->Id,0);
 			$ret = array();
 
 			foreach ($names as $i=>&$one) {
@@ -214,7 +216,7 @@ class MultiselectFileDirector extends FieldBase
 			}
 			unset($one);
 			$this->MultiPopulate = TRUE;
-			return $ret;
+			return $hidden.$ret;
 		}
 		$this->MultiPopulate = FALSE;
 		return '';
