@@ -19,8 +19,6 @@ class RadioGroup extends FieldBase
 		$this->IsInput = TRUE;
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'RadioGroup';
-		$this->ValidationType = 'selected'; //require a selection
-		$this->ValidationTypes = array($this->formdata->formsmodule->Lang('validation_selected')=>'selected');
 	}
 
 	public function GetOptionAddLabel()
@@ -49,17 +47,6 @@ class RadioGroup extends FieldBase
 		}
 	}
 
-	public function GetSynopsis()
-	{
-		$opt = $this->GetPropArray('button_name');
-		if ($opt)
-			$optionCount = count($opt);
-		else
-			$optionCount = 0;
-		$ret = $this->formdata->formsmodule->Lang('options',$optionCount);
-		return $ret;
-	}
-
 	public function SetValue($newvalue)
 	{
 		if (is_array($newvalue)) { //group-member selected in form
@@ -79,7 +66,7 @@ class RadioGroup extends FieldBase
 		}
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if ($this->Value) {
 			$ret = $this->GetPropIndexed('button_checked',$this->Value);
@@ -91,6 +78,25 @@ class RadioGroup extends FieldBase
 			return $ret;
 		else
 			return array($ret);
+	}
+
+	public function GetSynopsis()
+	{
+		$opt = $this->GetPropArray('button_is_set');
+		if ($opt) {
+			$optionCount = count($opt);
+			foreach ($opt as $i=>$val) {
+				if ($val == 'y') {
+					$def = ',default value '.$this->GetPropIndexed('button_checked',$i); //TODO $lang[]
+					break;
+				}
+			}
+		} else {
+			$optionCount = 0;
+			$def = '';
+		}
+		$ret = $this->formdata->formsmodule->Lang('options',$optionCount).$def;
+		return $ret;
 	}
 
 	public function AdminPopulate($id)
@@ -113,8 +119,8 @@ class RadioGroup extends FieldBase
 			$boxes = array();
 			$boxes[] = array(
 				$mod->Lang('title_radio_label'),
-				$mod->Lang('title_checked_value'),
-				$mod->Lang('title_default_set'),
+				$mod->Lang('title_selected_value'),
+				$mod->Lang('title_default_sel'),
 				$mod->Lang('title_select')
 				);
 			$yesNo = array($mod->Lang('no')=>'n',$mod->Lang('yes')=>'y');
@@ -132,6 +138,32 @@ class RadioGroup extends FieldBase
 		} else {
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('member')));
 			return array('main'=>$main,'adv'=>$adv);
+		}
+	}
+
+	public function AdminValidate($id)
+	{
+		$messages = array();
+		list($ret,$msg) = parent::AdminValidate($id);
+		if (!$ret)
+			$messages[] = $msg;
+		$mod = $this->formdata->formsmodule;
+		$sets = $this->GetPropArray('button_is_set');
+		if ($sets) {
+			foreach ($sets as $val) {
+				if ($val != 'n') {
+					break;
+				}
+			}
+			if ($val == 'n')
+				$messages[] = $mod->Lang('validation_selected');
+		} else {
+			$messages[] = $mod->Lang('missing_type',$mod->Lang('member'));
+		}
+		if ($messages) {
+			return array(FALSE,implode('<br />',$messages));
+		} else {
+			return array(TRUE,'');
 		}
 	}
 
@@ -197,17 +229,5 @@ class RadioGroup extends FieldBase
 		}
 		$this->MultiPopulate = FALSE;
 		return '';
-	}
-
-	public function Validate($id)
-	{
-		if ($this->Value) {
-			$this->valid = TRUE;
-			$this->ValidationMessage = '';
-		} else {
-			$this->valid = FALSE;
-			$this->ValidationMessage = $this->formdata->formsmodule->Lang('please_TODO',$this->GetProperty('text_label'));
-		}
-		return array($this->valid,$this->ValidationMessage);
 	}
 }
