@@ -11,17 +11,16 @@ $tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$t
 $tplvars['backtoform_nav'] = $this->CreateLink($id,'open_form',$returnid,'&#171; '.$this->Lang('back_form'),
 	array('form_id'=>$params['form_id'],'datakey'=>$params['datakey']));
 
-$jsincs = FALSE; //array();
-$jsfuncs = array();
-$jsloads = FALSE; //array();
-
 if ($obfield) { //field data are loaded
 	$fid = $obfield->GetId(); //maybe <= 0, if adding
 	$nm = 'submit'; //submit-control name
 
-	$allOpts = $obfield->AdminPopulate($id);
-	$hasmain = (isset($allOpts['main']) && count($allOpts['main']) > 0);
-	$hasadv = (isset($allOpts['adv']) && count($allOpts['adv']) > 0);
+	$obfield->jsincs = array();
+	$obfield->jsfuncs = array();
+	$obfield->jsloads = array();
+	$populators = $obfield->AdminPopulate($id);
+	$hasmain = (isset($populators['main']) && count($populators['main']) > 0);
+	$hasadv = (isset($populators['adv']) && count($populators['adv']) > 0);
 
 	$tab = $this->_GetActiveTab($params);
 	$t = $this->StartTabHeaders();
@@ -46,7 +45,7 @@ if ($obfield) { //field data are loaded
 		$tplvars['del'] = $this->CreateInputSubmit($id,'optiondel',$obfield->GetOptionDeleteLabel(),
 			'onclick="return confirm_selected(this)"');
 		$prompt = $this->Lang('confirm');
-		$jsfuncs['optiondel'] = <<<EOS
+		$obfield->jsfuncs['optiondel'] = <<<EOS
 function confirm_selected(btn) {
  var sel = $(btn).closest('div').find('input[name^="{$id}selected"]:checked');
  if (sel.length > 0) {
@@ -64,7 +63,7 @@ EOS;
 
 	$mainList = array();
 	if ($hasmain) {
-		foreach ($allOpts['main'] as $item) {
+		foreach ($populators['main'] as $item) {
 			$oneset = new stdClass();
 			$oneset->title = (isset($item[0]))?$item[0]:'';
 			if (!empty($item[1])) $oneset->input = $item[1]; //optional
@@ -76,7 +75,7 @@ EOS;
 
 	$advList = array();
 	if ($hasadv) {
-		foreach ($allOpts['adv'] as $item) {
+		foreach ($populators['adv'] as $item) {
 			$oneset = new stdClass();
 			$oneset->title = (isset($item[0]))?$item[0]:'';
 			if (!empty($item[1])) $oneset->input = $item[1]; //optional
@@ -86,13 +85,11 @@ EOS;
 	}
 	$tplvars['advList'] = $advList;
 
-	if (isset($allOpts['table']))
-		$tplvars['mainTable'] = $allOpts['table'];
-	if (isset($allOpts['funcs'])) {
-		$jsfuncs = array_merge($jsfuncs,$allOpts['funcs']);
-	}
-	if (isset($allOpts['extra'])) {
-		switch ($allOpts['extra']) {
+	if (isset($populators['table']))
+		$tplvars['multiControls'] = $populators['table'];
+
+	if (isset($populators['extra'])) {
+		switch ($populators['extra']) {
 		 case 'varshelpmain':
 			if ($hasmain)
 				$tplvars['mainvarhelp'] = 1;
@@ -133,6 +130,6 @@ $tplvars['form_start'] = $this->CreateFormStart($id,'open_field',$returnid,
 	'field_id'=>$fid));
 $tplvars['form_end'] = $this->CreateFormEnd();
 
-$t = ($fid > 0) ? 'update':'add'; //field edit or add
+$t = ($fid > 0) ? 'save':'add'; //field save or add
 $tplvars['submit'] = $this->CreateInputSubmit($id,$nm,$this->Lang($t));
 $tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
