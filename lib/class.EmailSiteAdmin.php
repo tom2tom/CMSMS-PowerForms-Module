@@ -15,6 +15,7 @@ class EmailSiteAdmin extends EmailBase
 	{
 		parent::__construct($formdata,$params);
 		$this->IsDisposition = TRUE;
+//		$this->IsInput = TRUE; no need to preserve input value
 		$this->Required = TRUE;
 		$this->Type = 'EmailSiteAdmin';
 		$this->ValidationType = 'email';
@@ -41,7 +42,7 @@ class EmailSiteAdmin extends EmailBase
 		return $ret;
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$userops = \cmsms()->GetUserOperations();
 		if ($this->GetProperty('restrict_to_group',0))
@@ -100,7 +101,7 @@ class EmailSiteAdmin extends EmailBase
 	{
 		$messages = array();
   		list($ret,$msg) = parent::AdminValidate($id);
-		if (!ret)
+		if (!$ret)
 			$messages[] = $msg;
 
 		$addr = $this->GetProperty('email_from_address');
