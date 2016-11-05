@@ -41,7 +41,7 @@ class FieldBase implements \Serializable
 		'IsComputedOnSubmission' => FALSE,
 		'IsDisposition' => FALSE,
 		'IsEmailDisposition' => FALSE,
-		'IsInput' => FALSE,
+		'IsInput' => FALSE, //whether Populate() generates user-input control(s) AND their values are to be preserved e.g. for browsing
 		'LabelSubComponents' => TRUE,
 		'MultiPopulate' => FALSE, //whether Populate() generates array of objects
 		'NeedsDiv' => TRUE,
@@ -446,11 +446,13 @@ class FieldBase implements \Serializable
 			$this->XtraProps['ValidationMessage'] : '';
 	}
 
-	protected function GetErrorMessage($key)
+	protected function GetErrorMessage()
 	{
-		return '<span style="color:red">'.
-			$this->formdata->formsmodule->Lang('error').'</span> '.
-			$this->formdata->formsmodule->Lang($key);
+		$mod = $this->formdata->formsmodule;
+		$ret = '<span style="color:red">'.$mod->Lang('error').'</span> ';
+		$args = func_get_args();
+		$ret .= call_user_func_array(array($mod,'Lang'),$args);
+		return $ret;
 	}
 
 	// Subclass this with a displayable type
@@ -522,7 +524,7 @@ class FieldBase implements \Serializable
 
 	// Subclass this
 	// Returns field value as a scalar or array (per $as_string), suitable for display in the form
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if ($this->Value || is_numeric($this->Value)) { //0-value is acceptable
 			$ret = $this->Value;
