@@ -12,18 +12,18 @@
 {if !empty($entry->help)}<p>{$entry->help}</p>{/if}
 {/foreach}
 {if !empty($mainvarhelp)}<br /><div>{$help_subtplvars}</div>{/if}
-{if isset($mainTable)}
-  <br />
+{if isset($multiControls)}
   <div class="pageoverflow">
    <table class="pagetable leftwards">
- {section name=r loop=$mainTable}
+ {section name=r loop=$multiControls}
+ {cycle name=multiControls values='row2,row1' assign=rowclass}
   {if $smarty.section.r.first}
    <thead>
-   <tr class="pagetext">{section name=c loop=$mainTable[r]}<th>{$mainTable[r][c]}</th>{/section}</tr>
+   <tr class="pagetext">{section name=c loop=$multiControls[r]}<th>{$multiControls[r][c]}</th>{/section}</tr>
    </thead>
    <tbody>
   {else}
-	 <tr class="row1">{section name=c loop=$mainTable[r]}<td>{$mainTable[r][c]}</td>{/section}</tr>
+   <tr class="{$rowclass}">{section name=c loop=$multiControls[r]}<td>{$multiControls[r][c]}</td>{/section}</tr>
   {/if}
  {/section}
    </tbody>
