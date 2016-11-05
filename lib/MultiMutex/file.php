@@ -22,7 +22,7 @@ class Mutex_file implements iMutex
 		else {
 			$sysconfig = \cmsms()->GetConfig();
 			$ud = $sysconfig['uploads_path'];
-			if ($ud == FALSE)
+			if (!$ud)
 				throw new \Exception('Error getting file lock');
 		}
 		$dir = $ud.DIRECTORY_SEPARATOR.'file_locks';

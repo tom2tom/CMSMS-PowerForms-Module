@@ -46,7 +46,7 @@ class Mutex_semaphore implements iMutex
 		else {
 			$key = $this->keybase + $this->hash(''.$token);
 			$res = sem_get($key,1,0660,0); //preserve past end-of-request == LEAK ?
-			if ($res == FALSE)
+			if (!$res)
 				return FALSE;
 			$this->gets[$token] = $res;
 		}
