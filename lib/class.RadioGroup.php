@@ -118,22 +118,36 @@ class RadioGroup extends FieldBase
 		if ($names) {
 			$boxes = array();
 			$boxes[] = array(
+				$mod->Lang('title_default_sel'),
 				$mod->Lang('title_radio_label'),
 				$mod->Lang('title_selected_value'),
-				$mod->Lang('title_default_sel'),
 				$mod->Lang('title_select')
 				);
-			$yesNo = array($mod->Lang('no')=>'n',$mod->Lang('yes')=>'y');
-			foreach ($names as $i=>&$one) {
+			$fieldclass = 'field'.$this->Id;
+			foreach ($names as $i=>$one) {
+				$tmp = $mod->CreateInputCheckbox($id,'fp_button_is_set['.$i.']' ,'y',$this->GetPropIndexed('button_is_set',$i),
+					'style="display:block;margin:auto;"');
 				$boxes[] = array(
+					$mod->CreateInputHidden($id,'fp_button_is_set['.$i.']','n').
+						str_replace('class="','class="'.$fieldclass.' ',$tmp),
 					$mod->CreateInputText($id,'fp_button_name'.$i,$one,25,128),
 					$mod->CreateInputText($id,'fp_button_checked'.$i,$this->GetPropIndexed('button_checked',$i),25,128),
-					$mod->CreateInputDropdown($id,'fp_button_is_set'.$i,$yesNo,-1,$this->GetPropIndexed('button_is_set',$i)),
-					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
+					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="display:block;margin:auto;"')
 				 );
 			}
-			unset($one);
-//			$main[] = array($mod->Lang('title_radiogroup_details'),$boxes);
+			$this->jsfuncs['checkone'] = <<<'EOS'
+function select_only(cb,fclass) {
+ if (cb.checked) {
+  $('input.'+fclass).attr('checked',false);
+  cb.checked = true;
+ }
+}
+EOS;
+			$this->jsloads[] = <<<EOS
+ $('input.{$fieldclass}').change(function(){
+  select_only(this,'{$fieldclass}');
+ });
+EOS;
 			return array('main'=>$main,'adv'=>$adv,'table'=>$boxes);
 		} else {
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('member')));
