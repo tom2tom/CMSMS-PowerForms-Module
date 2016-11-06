@@ -161,7 +161,7 @@ class CheckboxGroup extends FieldBase
 					$mod->CreateInputText($id,'fp_box_name'.$arf,$one,30,128),
 					$mod->CreateInputText($id,'fp_box_checked'.$arf,$this->GetPropIndexed('box_checked',$i),20,128),
 					$mod->CreateInputText($id,'fp_box_unchecked'.$arf,$this->GetPropIndexed('box_unchecked',$i),20,128),
-					$mod->CreateInputCheckbox($id,'selected'.$arf',1,-1,'style="display:block;margin:auto;"')
+					$mod->CreateInputCheckbox($id,'selected'.$arf,1,-1,'style="display:block;margin:auto;"')
 				);
 			}
 /*			//TODO js for field e.g.
