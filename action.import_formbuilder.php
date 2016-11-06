@@ -556,10 +556,10 @@ $this->Crash();
 			}
 			$alias = PWForms\Utils::MakeAlias($alias,18); //maybe shorten
 			$ta = $alias;
-			$i = 1;
+			$indx = 1;
 			while (!$funcs->NewID(FALSE,$ta)) {
-				$ta = $alias."[$i]";
-				$i++;
+				$ta = $alias."[$indx]";
+				$indx++;
 			}
 			$alias = $ta;
 
