@@ -14,20 +14,25 @@
 {if !empty($mainvarhelp)}<br /><div>{$help_subtplvars}</div>{/if}
 {if isset($multiControls)}
   <div class="pageoverflow">
-   <table class="pagetable leftwards">
+   <table id="controls" class="pagetable leftwards">
  {section name=r loop=$multiControls}
  {cycle name=multiControls values='row2,row1' assign=rowclass}
   {if $smarty.section.r.first}
    <thead>
-   <tr class="pagetext">{section name=c loop=$multiControls[r]}<th>{$multiControls[r][c]}</th>{/section}</tr>
+   <tr class="pagetext">
+   {section name=c loop=$multiControls[r]}<th>{$multiControls[r][c]}</th>{/section}
+   </tr>
    </thead>
    <tbody>
   {else}
-   <tr class="{$rowclass}">{section name=c loop=$multiControls[r]}<td>{$multiControls[r][c]}</td>{/section}</tr>
+   <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
+   {section name=c loop=$multiControls[r]}<td>{$multiControls[r][c]}</td>{/section}
+   </tr>
   {/if}
  {/section}
    </tbody>
    </table>
+ {if isset($dndhelp)}<div id="helpdnd" style="margin:1em 0;display:none;">{$dndhelp}</div>{/if}
   </div>
  {if $add || $del}
   <br />
