@@ -67,6 +67,7 @@ class CustomEmail extends EmailBase
 		$main[] = array($mod->Lang('title_from_address_field'),
 						$mod->CreateInputDropdown($id,'fp_email_from_address',$choices,-1,
 						$this->GetProperty('email_from_address')));
+//TODO what is $i ?
 		$main[] = array($mod->Lang('title_destination_field'),
 						$mod->CreateInputSelectList($id,'fp_destination_address'.$i,$displayfields,
 						$destfields,5));

@@ -154,7 +154,7 @@ class MultiselectFileDirector extends FieldBase
 		$ctldata['fp_file_footer']['is_oneline']=TRUE;
 		$ctldata['fp_file_footer']['is_footer']=TRUE;
 		list($buttons,$jsfuncs) = Utils::TemplateActions($this->formdata,$id,$ctldata);
-		$this->jsfuncs[] = $jsfuncs;
+		$this->jsfuncs = array_merge($this->jsfuncs,$jsfuncs);
 
 		$adv[] = array($mod->Lang('title_file_template'),
 			$mod->CreateTextArea(FALSE,$id,

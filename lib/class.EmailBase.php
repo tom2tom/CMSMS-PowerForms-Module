@@ -77,7 +77,7 @@ class EmailBase extends FieldBase
 		$ctldata['fp_email_template']['text_button'] = TRUE;
 		$ctldata['fp_email_template']['is_email'] = TRUE;
 		list($buttons,$jsfuncs) = Utils::TemplateActions($this->formdata,$id,$ctldata);
-		$this->jsfuncs[] = $jsfuncs;
+		$this->jsfuncs = array_merge($this->jsfuncs,$jsfuncs);
 
 		$adv[] = array($mod->Lang('title_email_template'),
 						$mod->CreateTextArea(FALSE,$id,
