@@ -46,14 +46,15 @@ class FieldBase implements \Serializable
 		'IsDisposition' => FALSE,
 		'IsEmailDisposition' => FALSE,
 		'IsInput' => FALSE, //whether Populate() generates user-input control(s) AND their values are to be preserved e.g. for browsing
-		'LabelSubComponents' => TRUE,
-		'MultiPopulate' => FALSE, //whether Populate() generates array of objects
+		'LabelSubComponents' => TRUE, //if MultiPopulate = TRUE, give each component its own label
+		'MultiPopulate' => FALSE, //whether Populate() generates array of objects (i.e. not necessarily relevant for admin)
+		'MultiComponent' => FALSE, //whether AdminPopulate() generates array of compoents for tabular editing
 		'NeedsDiv' => TRUE,
 		'Required' => FALSE,
 		'SmartyEval' => FALSE, //whether to process Populate() output as a smarty-template (i.e. treat that output as a sub-template)
 		'ValidationMessage' => '', //post-validation error message, or ''
-		'ValidationType' => 'none',
-		'ValidationTypes' => array() //array of choices suitable for populating a pulldown
+		'ValidationType' => 'none', //chosen member of ValidationTypes
+		'ValidationTypes' => array() //array of label=>val suitable for populating a pulldown
 		);
 
 		if (isset($params['form_id']))

@@ -19,6 +19,7 @@ class FileDirector extends FieldBase
 		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
 		$this->IsInput = TRUE;
+		$this->MultiComponent = TRUE;
 		$this->Type = 'FileDirector';
 	}
 

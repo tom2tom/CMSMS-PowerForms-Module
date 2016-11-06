@@ -17,6 +17,7 @@ class Pulldown extends FieldBase
 		$this->HasAddOp = TRUE;
 		$this->HasDeleteOp = TRUE;
 		$this->IsInput = TRUE;
+		$this->MultiComponent = TRUE;
 		$this->Type = 'Pulldown';
 	}
 

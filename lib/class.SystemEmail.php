@@ -23,6 +23,7 @@ class SystemEmail extends EmailBase
 		$this->HasAddOp = TRUE;
 		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
+		$this->MultiComponent = TRUE;
 		$this->Type = 'SystemEmail';
 	}
 

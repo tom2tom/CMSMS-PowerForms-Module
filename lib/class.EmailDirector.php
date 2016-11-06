@@ -20,6 +20,7 @@ class EmailDirector extends EmailBase
 		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
 //		$this->IsInput = TRUE; no preservation of input data
+		$this->MultiComponent = TRUE;
 		$this->Type = 'EmailDirector';
 	}
 
