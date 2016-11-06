@@ -102,7 +102,7 @@ class SystemEmail extends EmailBase
 			foreach ($opt as $i=>&$one) {
 				$arf = '['.$i.']';
 
-				$totype = $this->GetPropIndexed('address_type',$i.'to');
+				$totype = $this->GetPropIndexed('address_type',$i,'to');
 				$btns = array();
 				for ($c=0; $c<3; $c++)
 				{
