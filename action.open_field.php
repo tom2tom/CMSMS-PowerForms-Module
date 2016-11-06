@@ -61,9 +61,11 @@ if (isset($params['submit'])) {
 	foreach ($params as $key=>$val) {
 		if (strncmp($key,'fp_',3) == 0) {
 			$key = substr($key,3);
-			if (is_array($val)) {
-				foreach ($val as $i=>$ival) {
+			if (is_array($val) && $obfield->GetMultiPopulate()) {
+				$i = 1; //use custom-index, in case rows have been re-ordered
+				foreach ($val as $ival) {
 					$obfield->SetPropIndexed($key,$i,$ival);
+					$i++;
 				}
 			} else {
 				$obfield->SetProperty($key,$val);
