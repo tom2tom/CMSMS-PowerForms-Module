@@ -17,7 +17,6 @@ class Captcha extends FieldBase
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->Required = TRUE;
-		$this->MultiPopulate = FALSE;
 		$this->Type = 'Captcha';
 	}
 
