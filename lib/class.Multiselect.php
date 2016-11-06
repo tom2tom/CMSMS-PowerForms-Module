@@ -38,7 +38,7 @@ class Multiselect extends FieldBase
 	public function OptionDelete(&$params)
 	{
 		if (isset($params['selected'])) {
-			foreach ($params['selected'] as $indx) {
+			foreach ($params['selected'] as $indx=>$val) {
 				$this->RemovePropIndexed('indexed_name',$indx);
 				$this->RemovePropIndexed('indexed_value',$indx);
 			}
@@ -101,10 +101,11 @@ class Multiselect extends FieldBase
 				$mod->Lang('title_select')
 				);
 			foreach ($names as $i=>&$one) {
+				$arf = '['.$i.']';
 				$dests[] = array(
-				$mod->CreateInputText($id,'fp_indexed_name'.$i,$one,30,128),
-				$mod->CreateInputText($id,'fp_indexed_value'.$i,$this->GetPropIndexed('indexed_value',$i),30,128),
-				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
+				$mod->CreateInputText($id,'fp_indexed_name'.$arf,$one,30,128),
+				$mod->CreateInputText($id,'fp_indexed_value'.$arf,$this->GetPropIndexed('indexed_value',$i),30,128),
+				$mod->CreateInputCheckbox($id,'selected'.$arf,1,-1,'style="display:block;margin:auto;"')
 				);
 			}
 			unset($one);

@@ -47,7 +47,7 @@ class CheckboxGroup extends FieldBase
 	public function OptionDelete(&$params)
 	{
 		if (isset($params['selected'])) {
-			foreach ($params['selected'] as $indx) {
+			foreach ($params['selected'] as $indx=>$val) {
 				$this->RemovePropIndexed('box_name',$indx);
 				$this->RemovePropIndexed('box_checked',$indx);
 				$this->RemovePropIndexed('box_unchecked',$indx);
@@ -152,15 +152,16 @@ class CheckboxGroup extends FieldBase
 			);
 			$fieldclass = 'field'.$this->Id;
 			foreach ($names as $i=>$one) {
-				$tmp = $mod->CreateInputCheckbox($id,'fp_box_is_set['.$i.']' ,'y',$this->GetPropIndexed('box_is_set',$i),
+				$arf = '['.$i.']';
+				$tmp = $mod->CreateInputCheckbox($id,'fp_box_is_set'.$arf,'y',$this->GetPropIndexed('box_is_set',$i),
 					'style="display:block;margin:auto;"');
 				$boxes[] = array(
-					$mod->CreateInputHidden($id,'fp_box_is_set['.$i.']','n').
+					$mod->CreateInputHidden($id,'fp_box_is_set'.$arf,'n').
 						str_replace('class="','class="'.$fieldclass.' ',$tmp),
-					$mod->CreateInputText($id,'fp_box_name'.$i,$one,30,128),
-					$mod->CreateInputText($id,'fp_box_checked'.$i,$this->GetPropIndexed('box_checked',$i),20,128),
-					$mod->CreateInputText($id,'fp_box_unchecked'.$i,$this->GetPropIndexed('box_unchecked',$i),20,128),
-					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
+					$mod->CreateInputText($id,'fp_box_name'.$arf,$one,30,128),
+					$mod->CreateInputText($id,'fp_box_checked'.$arf,$this->GetPropIndexed('box_checked',$i),20,128),
+					$mod->CreateInputText($id,'fp_box_unchecked'.$arf,$this->GetPropIndexed('box_unchecked',$i),20,128),
+					$mod->CreateInputCheckbox($id,'selected'.$arf',1,-1,'style="display:block;margin:auto;"')
 				);
 			}
 /*			//TODO js for field e.g.

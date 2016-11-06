@@ -39,7 +39,7 @@ class RadioGroup extends FieldBase
 	public function OptionDelete(&$params)
 	{
 		if (isset($params['selected'])) {
-			foreach ($params['selected'] as $indx) {
+			foreach ($params['selected'] as $indx=>$val) {
 				$this->RemovePropIndexed('button_name',$indx);
 				$this->RemovePropIndexed('button_checked',$indx);
 				$this->RemovePropIndexed('button_is_set',$indx);
@@ -125,14 +125,15 @@ class RadioGroup extends FieldBase
 				);
 			$fieldclass = 'field'.$this->Id;
 			foreach ($names as $i=>$one) {
-				$tmp = $mod->CreateInputCheckbox($id,'fp_button_is_set['.$i.']' ,'y',$this->GetPropIndexed('button_is_set',$i),
+				$tmp = $mod->CreateInputCheckbox($id,'fp_button_is_set'.$arf,'y',$this->GetPropIndexed('button_is_set',$i),
 					'style="display:block;margin:auto;"');
+				$arf = '['.$i.']';
 				$boxes[] = array(
-					$mod->CreateInputHidden($id,'fp_button_is_set['.$i.']','n').
+					$mod->CreateInputHidden($id,'fp_button_is_set'.$arf,'n').
 						str_replace('class="','class="'.$fieldclass.' ',$tmp),
-					$mod->CreateInputText($id,'fp_button_name'.$i,$one,25,128),
-					$mod->CreateInputText($id,'fp_button_checked'.$i,$this->GetPropIndexed('button_checked',$i),25,128),
-					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="display:block;margin:auto;"')
+					$mod->CreateInputText($id,'fp_button_name'.$arf,$one,25,128),
+					$mod->CreateInputText($id,'fp_button_checked'.$arf,$this->GetPropIndexed('button_checked',$i),25,128),
+					$mod->CreateInputCheckbox($id,'selected'.$arf,1,-1,'style="display:block;margin:auto;"')
 				 );
 			}
 			$this->jsfuncs['checkone'] = <<<'EOS'

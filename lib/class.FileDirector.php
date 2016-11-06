@@ -40,7 +40,7 @@ class FileDirector extends FieldBase
 	public function OptionDelete(&$params)
 	{
 		if (isset($params['selected'])) {
-			foreach ($params['selected'] as $indx) {
+			foreach ($params['selected'] as $indx=>$val) {
 				$this->RemovePropIndexed('destination_filename',$indx);
 				$this->RemovePropIndexed('destination_displayname',$indx);
 			}
@@ -121,10 +121,11 @@ class FileDirector extends FieldBase
 				$mod->Lang('title_select')
 				);
 			foreach ($names as $i=>&$one) {
+				$arf = '['.$i.']';
 				$dests[] = array(
-				$mod->CreateInputText($id,'fp_destination_displayname'.$i,$this->GetPropIndexed('destination_displayname',$i),30,128),
-				$mod->CreateInputText($id,'fp_destination_filename'.$i,$one,30,128),
-				$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
+				$mod->CreateInputText($id,'fp_destination_displayname'.$arf,$this->GetPropIndexed('destination_displayname',$i),30,128),
+				$mod->CreateInputText($id,'fp_destination_filename'.$arf,$one,30,128),
+				$mod->CreateInputCheckbox($id,'selected'.$arf,1,-1,'style="display:block;margin:auto;"')
 				);
 			}
 			unset($one);
