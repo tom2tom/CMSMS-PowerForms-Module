@@ -18,6 +18,8 @@ if ($obfield) { //field data are loaded
 	$obfield->jsincs = array();
 	$obfield->jsfuncs = array();
 	$obfield->jsloads = array();
+	$baseurl = $this->GetModuleURLPath();
+
 	$populators = $obfield->AdminPopulate($id);
 	$hasmain = (isset($populators['main']) && count($populators['main']) > 0);
 	$hasadv = (isset($populators['adv']) && count($populators['adv']) > 0);
@@ -85,8 +87,42 @@ EOS;
 	}
 	$tplvars['advList'] = $advList;
 
-	if (isset($populators['table']))
+	if (isset($populators['table'])) {
 		$tplvars['multiControls'] = $populators['table'];
+		if (count($populators['table']) > 2) { //titles + >1 options-row
+			$tplvars['dndhelp'] = $this->Lang('help_can_drag');
+			$obfield->jsincs[] = <<<EOS
+<script type="text/javascript" src="{$baseurl}/include/jquery.tablednd.min.js"></script>
+EOS;
+			$obfield->jsloads[] = <<<'EOS'
+ $('#helpdnd').show();
+ $('#controls').addClass('table_drag').tableDnD({
+  dragClass: 'row1hover',
+  onDrop: function(table,droprows) {
+   var $tbl = $(table),
+    odd = true,
+    oddclass = 'row1',
+    evenclass = 'row2';
+   $tbl.find('tbody tr').each(function() {
+    var name = odd ? oddclass : evenclass;
+    if (this === droprows[0]) {
+     name = name+'hover';
+    }
+    $(this).removeClass().addClass(name);
+    odd = !odd;
+   });
+  }
+ }).find('tbody tr').removeAttr('onmouseover').removeAttr('onmouseout').mouseover(function() {
+  var now = $(this).attr('class');
+  $(this).attr('class', now+'hover');
+ }).mouseout(function() {
+  var now = $(this).attr('class');
+  var to = now.indexOf('hover');
+  $(this).attr('class', now.substring(0,to));
+ });
+EOS;
+		}
+	}
 
 	if (isset($populators['extra'])) {
 		switch ($populators['extra']) {
