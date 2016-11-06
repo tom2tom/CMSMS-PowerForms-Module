@@ -44,8 +44,9 @@ class SystemEmail extends EmailBase
 	public function OptionDelete(&$params)
 	{
 		if (isset($params['selected'])) {
-			foreach ($params['selected'] as $indx) {
+			foreach ($params['selected'] as $indx=>$val) {
 				$this->RemovePropIndexed('destination_address',$indx);
+				$this->RemovePropIndexed('address_type',$indx);
 			}
 		}
 	}
@@ -54,27 +55,19 @@ class SystemEmail extends EmailBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$ret = $mod->Lang('to').': ';
-		$dests = $this->GetProperty('destination_address');
-		if (is_array($dests)) {
-			if (count($dests) > 1) {
-				$ret.= count($dests).' '.$mod->Lang('recipients');
+		$dests = $this->GetPropArray('destination_address');
+		if ($dests) {
+			$c = count($dests);
+			if ($c > 1) {
+				$ret .= $c.' '.$mod->Lang('recipients');
 			} else {
-				$pre = substr($dests[0],0,4);
-				if ($pre == '|cc|')
-					$ret = $mod->Lang('cc').': '.substr($dests[0],4);
-				elseif ($pre == '|bc|')
-					$ret = $mod->Lang('bcc').': '.substr($dests[0],4);
-				else
-					$ret.= $dests[0];
+				$type = $this->GetPropIndexed('address_type',1,'to');
+				if ($type == 'cc')
+					$ret = $mod->Lang('cc').': ';
+ 				elseif ($type == 'bc')
+					$ret = $mod->Lang('bcc').': ';
+				$ret .= $dests[1];
 			}
-		} elseif ($dests) {
-			$pre = substr($dests,0,4);
-			if ($pre == '|cc|')
-				$ret = $mod->Lang('cc').': '.substr($dests,4);
-			elseif ($pre == '|bc|')
-				$ret = $mod->Lang('bcc').': '.substr($dests,4);
-			else
-				$ret .= $dests;
 		} else {
 			$ret.= $mod->Lang('unspecified');
 		}
@@ -84,25 +77,6 @@ class SystemEmail extends EmailBase
 		return $ret;
 	}
 
-	public function GetDests($id, $row, $sel)
-	{
-		$id = \cms_htmlentities($id);
-		$name = $id.$this->formdata->current_prefix.'mailto_'.$row; //must be distinct for each address
-		$totypes = array ('to','cc','bc');
-		$btns = array();
-		for ($i=0; $i<3; $i++)
-		{
-			$text = '<input type="radio" id="'.$id.'mailto_'.$row.$i. //'pwfp_' removed from id
-			'" class="cms_radio" style="margin-left:5px;" name="'.
-			$name.'" value="'.$totypes[$i].'"';
-			if ($sel == $totypes[$i])
-				$text .= ' checked="checked"';
-			$text .= ' />';
-			$btns[] = $text;
-		}
-		return $btns;
-	}
-
 	public function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
@@ -110,10 +84,12 @@ class SystemEmail extends EmailBase
 
 		if ($this->addressAdd) {
 			$this->AddPropIndexed('destination_address','');
+			$this->AddPropIndexed('address_type','to');
 			$this->addressAdd = FALSE;
 		}
 		$opt = $this->GetPropArray('destination_address');
 		if ($opt) {
+			$totypes = array ('to','cc','bc');
 			$dests = array();
 			$dests[] = array(
 				$mod->Lang('title_destination_address'),
@@ -123,24 +99,25 @@ class SystemEmail extends EmailBase
 				$mod->Lang('title_select')
 				);
 			foreach ($opt as $i=>&$one) {
-				if (strncmp($one,'|cc|',4) == 0) {
-					$totype = 'cc';
-					$addr = substr($one,4);
-				} elseif (strncmp($one,'|bc|',4) == 0) {
-					$totype = 'bc';
-					$addr = substr($one,4);
-				} else {
-					$totype = 'to';
-					$addr = $one; //maybe empty
-				}
-				$btns = self::GetDests($id,$i,$totype);
+				$arf = '['.$i.']';
 
+				$totype = $this->GetPropIndexed('address_type',$i.'to');
+				$btns = array();
+				for ($c=0; $c<3; $c++)
+				{
+					$t = '<input type="radio" class="cms_radio" name="'.$id.'fp_address_type'.$arf.
+					'" id="'.$id.'address_type'.$i.$c.'" value="'.$totypes[$c].'"';
+					if ($totype == $totypes[$c])
+						$t .= ' checked="checked"';
+					$t .= ' style="margin-left:5px;" />';
+					$btns[] = $t;
+				}
 				$dests[] = array(
-					$mod->CreateInputText($id,'fp_destination_address'.$i,$addr,50,128),
-					array_shift($btns),
-					array_shift($btns),
-					array_shift($btns),
-					$mod->CreateInputCheckbox($id,'selected[]',$i,-1,'style="margin-left:1em;"')
+					$mod->CreateInputText($id,'fp_destination_address'.$arf,$one,50,128),
+					$btns[0],
+					$btns[1],
+					$btns[2],
+					$mod->CreateInputCheckbox($id,'selected'.$arf,1,-1,'style="display:block;margin:auto;"')
 				);
 			}
 			unset($one);
