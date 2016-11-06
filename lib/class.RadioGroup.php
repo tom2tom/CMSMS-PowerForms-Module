@@ -82,6 +82,7 @@ class RadioGroup extends FieldBase
 
 	public function GetSynopsis()
 	{
+		$def = '';
 		$opt = $this->GetPropArray('button_is_set');
 		if ($opt) {
 			$optionCount = count($opt);
@@ -93,7 +94,6 @@ class RadioGroup extends FieldBase
 			}
 		} else {
 			$optionCount = 0;
-			$def = '';
 		}
 		$ret = $this->formdata->formsmodule->Lang('options',$optionCount).$def;
 		return $ret;
@@ -125,9 +125,9 @@ class RadioGroup extends FieldBase
 				);
 			$fieldclass = 'field'.$this->Id;
 			foreach ($names as $i=>$one) {
+				$arf = '['.$i.']';
 				$tmp = $mod->CreateInputCheckbox($id,'fp_button_is_set'.$arf,'y',$this->GetPropIndexed('button_is_set',$i),
 					'style="display:block;margin:auto;"');
-				$arf = '['.$i.']';
 				$boxes[] = array(
 					$mod->CreateInputHidden($id,'fp_button_is_set'.$arf,'n').
 						str_replace('class="','class="'.$fieldclass.' ',$tmp),
