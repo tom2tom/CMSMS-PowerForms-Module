@@ -389,7 +389,7 @@ $lang['err_uploads_dir'] = 'Error! There is no uploads directory.';
 $lang['err_usertag'] = 'User defined tag returned an error';
 $lang['err_usertag_named'] = 'User defined tag %s returned an error.';
 
-$lang['event_help_OnFormDisplay'] = <<< EOS
+$lang['event_help_OnFormDisplay'] = <<<'EOS'
 <p>Event triggered when a PWForms form is displayed</p>
 <h4>Parameters</h4>
 <ul>
@@ -397,7 +397,7 @@ $lang['event_help_OnFormDisplay'] = <<< EOS
 <li><em>form_id</em> - The internal form id (int)</li>
 </ul>
 EOS;
-$lang['event_help_OnFormSubmitError'] = <<<EOS
+$lang['event_help_OnFormSubmitError'] = <<<'EOS'
 <p>Event triggered if there is an error when a PWForms form is submitted</p>
 <h4>Parameters</h4>
 <ul>
@@ -406,7 +406,7 @@ $lang['event_help_OnFormSubmitError'] = <<<EOS
 <li><em>error</em> - A list of all known errors (string)</li>
 </ul>
 EOS;
-$lang['event_help_OnFormSubmit'] = <<<EOS
+$lang['event_help_OnFormSubmit'] = <<<'EOS'
 <p>Event triggered when a PWForms form is submitted.</p>
 <h4>Parameters</h4>
 <ul>
@@ -507,19 +507,19 @@ $lang['friendly_name'] = 'Power Forms';
 
 $lang['help'] = 'Help';
 $lang['help_blank_invalid'] = 'Each required field must include at least one alphanumeric character';
-$lang['help_captcha_label'] =<<<EOS
+$lang['help_captcha_label'] =<<<'EOS'
 If checked, the Captcha image and prompt will substituted for the field label. Otherwise,
 they will treated as part of the field input, together with the captcha-text input field.
 EOS;
-$lang['help_captcha_template'] = <<<EOS
+$lang['help_captcha_template'] = <<<'EOS'
 The content constructed from this template will be substituted for either the
 field label or field input, in accordance with the 'replace label' setting above.
-Include in the template <code>{\$prompt}</code> and <code>{\$captcha}</code>,
-and if replacing the label, <code>{\$captcha_input}</code>, plus anything else
+Include in the template <code>{$prompt}</code> and <code>{$captcha}</code>,
+and if replacing the label, <code>{$captcha_input}</code>, plus anything else
 that's relevant, in whatever layout best suits the form.<br />
 TODO styling description.
 EOS;
-$lang['help_cataloger_attribute_fields'] = <<<EOS
+$lang['help_cataloger_attribute_fields'] = <<<'EOS'
 Below is a list of the attributes available from the Cataloger module.<br />
 You can optionally specify valid ranges, values, or numerous values to be used in filtering the list of items that is displayed to the user.<br />
 <br />
@@ -530,7 +530,7 @@ Ranges can be specified by signifying a minimum and maximum value using this syn
 To specify multiple values for an attribute use the syntax &quot;multi: value1|value2|value3&quot;<br />
 <br />
 <strong>Values from hidden fields</strong><br />
-To specify a value from a hidden field use the syntax {\$fld_id}<br />
+To specify a value from a hidden field use the syntax {$fld_id}<br />
 <br />
 EOS;
 $lang['help_confirm'] = 'An email has been sent to the address nominated for confirmation. After that email is processed, this form will be submitted.';
@@ -549,22 +549,22 @@ $lang['help_ignored_if_upload'] = '(This field ignored if you use the Uploads mo
 $lang['help_import_alias'] = 'Optional replacement alias for the imported form';
 $lang['help_import_name'] = 'Optional replacement name for the imported form';
 $lang['help_smarty_eval'] = 'Pass field content to Smarty eval before inclusion in the form';
-$lang['help_tag'] = <<<EOS
+$lang['help_tag'] = <<<'EOS'
 A template associated with another module may be used to generate content for the form.
-Such template must include a <code>{\$FBid}</code> tag to tie it back to PWForms.
+Such template must include a <code>{$FBid}</code> tag to tie it back to PWForms.
 For example, to include form options based on the Products module, create the following template in Products:<br />
 <pre>
-{foreach from=\$items item=entry}
+{foreach from=$items item=entry}
  {assign var=MData value=''}
  {assign var=Cd value=''}
- {foreach from=\$FBvalue item=MData}
-  {assign var=MData value='::'|explode:\$MData}
-  {if \$MData[1]==\$entry->id}
+ {foreach from=$FBvalue item=MData}
+  {assign var=MData value='::'|explode:$MData}
+  {if $MData[1]==$entry->id}
    {assign var=Cd value=' checked="checked"'}
   {/if}
  {/foreach}
  &lt;div class="ProductDirectoryItem">
- &lt;input type="checkbox" value="{\$entry->price}::{\$entry->id}" name="{\$FBid}[]" {\$Cd} />{\$entry->product_name} ({\$entry->weight}{\$weight_units}) &pound;{\$entry->price}
+ &lt;input type="checkbox" value="{$entry->price}::{$entry->id}" name="{$FBid}[]" {$Cd} />{$entry->product_name} ({$entry->weight}{$weight_units}) &pound;{$entry->price}
  &lt;/div>
 {/foreach}
 </pre>
@@ -574,29 +574,29 @@ EOS;
 $lang['help_module_version'] = 'PWForms module version';
 $lang['help_name_regex'] = 'A regular expression to allow filtering cataloger items by name';
 //$lang['help_object_example'] = '<em>e.g.</em> you could use "{$fld_1_obj->name} = {$fld_1_obj->value}"';
-$lang['help_operators'] = <<<EOS
+$lang['help_operators'] = <<<'EOS'
 For string evaluation, the only operation available is concatenation (+).
 For number evaluation, some basic, very simple math (+ - * /) is possible.
 For computed/PHP evaluation, you can use any function you want, but things
-must be quoted (substitution occurs before evaluation), e.g. substr('\$fld_22',0,2).'\$fld_23'.
+must be quoted (substitution occurs before evaluation), e.g. substr('$fld_22',0,2).'$fld_23'
 EOS;
 $lang['help_other_fields'] = 'Other fields will be available as you add them to the form.';
 $lang['help_require_fieldnames'] = 'Each field must have a name, and it must be unique';
 $lang['help_rtf_file_template'] = 'Specify a file located in the PWForms/templates/ folder. This field is ignored if you use TXT as your file type.';
-$lang['help_rtf_template_type'] = <<<EOS
+$lang['help_rtf_template_type'] = <<<'EOS'
 Basic: Use the textarea below to layout the field names/values in a single block.<br />
 Advanced: Specify smarty variables in the RTF template file as you would below,
 but arrange them however you like and add formatting.<br />
-You can still use the %%HEADER%% and %%FOOTER%% sections in the RTF file.
+You can still use the %HEADER% and %FOOTER% sections in the RTF file.
 EOS;
 $lang['help_server_name'] = 'Your server';
 $lang['help_submission_date'] = 'Date of submission';
 $lang['help_submit_limit'] = 'Primitive, secondary, spam management mechanism. This sets the default value for each form, 0 (no limit) or 1 to 250. Usually not needed, especially if the form includes a captcha field.';
 $lang['help_sub_source'] = 'IP address of form user';
 $lang['help_form_url'] = 'URL of page containing form';
-$lang['help_unique_file_template'] = <<<EOS
+$lang['help_unique_file_template'] = <<<'EOS'
 For TXT, this will be immediately after the Header Template.<br />
-For RTF, this will replace the %%FIELDS%% string in the template file if RTF template type is set to "Basic".<br />
+For RTF, this will replace the %FIELDS% string in the template file if RTF template type is set to "Basic".<br />
 This field will be ignored if using "RTF" as file type and "Advanced" as RTF template type.
 EOS;
 $lang['help_variable_name'] = 'Smarty variable';
@@ -628,7 +628,7 @@ $lang['help_field_siblings'] = 'Dropdown lists all siblings of this field and al
 $lang['help_hide_label'] = 'Don\'t show this field\'s name on the form';
 $lang['help_feu_property'] = 'Only certain property types can be used for matching (dropdowns, multiselect fields, etc).';
 $lang['help_help'] = 'more information';
-$lang['help_initial_count'] = 'How many times the sequence is to be repeated when the form is first-shown';
+$lang['help_initial_count'] = 'Number of times (>0) to repeat this sequence when the form is first displayed';
 $lang['help_inline_form'] = 'If activated, any form followup will replace the page/template <code>{PWForms}</code> tag, otherwise the <code>{content}</code> tag will be replaced.';
 $lang['help_limit_count'] = '0 or empty means no limit';
 $lang['help_maximum_size'] = 'This limitation is in addition to any limits set by the php or web server configuration';
@@ -648,32 +648,32 @@ $lang['help_show_limitations'] = 'Display any size and extension restrictions wi
 $lang['help_single_check'] = 'The boxes will together behave like a radio group, except that all of them may be unchecked';
 $lang['help_submit_javascript'] = 'Javascript to be included (verbatim) in an onclick-event handler applied to the form\'s buttons. The script may "return false" to abort the submission.';
 $lang['help_submit_safety'] = 'Add javascript to final \'Submit\' button that will help prevent multiple submissions';
-//$lang['help_submit_tab'] = <<<EOS
+//$lang['help_submit_tab'] = <<<'EOS'
 //What the module does with submitted data is determined by "Disposition" fields (such as generated emails) in the form, not here.
 //EOS;
-$lang['help_submit_template'] = <<<EOS
+$lang['help_submit_template'] = <<<'EOS'
 This template is to generate content displayed to the user after the form is submitted and processed.<br />
 The template is not relevant to form-field disposition.<br />Disposition-specific templates are (where appropriate)
 set in the "advanced" tab displayed when editing a disposition field, as listed above.
 EOS;
 $lang['help_timeformat'] = 'See advice for date format.';
-$lang['help_tpl_vars'] = <<<EOS
-At minimum, a <code>{\$submit}</code> tag must be included in the template, or else the form cannot work.
+$lang['help_tpl_vars'] = <<<'EOS'
+At minimum, a <code>{$submit}</code> tag must be included in the template, or else the form cannot work.
 EOS;
 $lang['help_udt'] = 'Parameters supplied to each called tag: \'FORM\' which provides a reference to the form\'s FormData-class object, together with all current request-parameters';
 $lang['help_uploads_dir']='Filesystem path relative to website-host uploads directory. No leading or trailing path-separator, and any intermediate path-separator must be host-system-specific e.g. \'\\\' on Windows. If left blank, the default will be used.';
 $lang['help_url'] = 'Entire URL, including protocol and path (e.g. http://myhost.com/form_handler.cgi)';
-$lang['help_fieldvars1'] = <<<EOS
-Form fields can be accessed either using the <code>{\$fields}</code> array or by directly
-accessing fields by their name e.g. <code>{\$myfield}</code>. Alternate field names can
+$lang['help_fieldvars1'] = <<<'EOS'
+Form fields can be accessed either using the <code>{$fields}</code> array or by directly
+accessing fields by their name e.g. <code>{$myfield}</code>. Alternate field names can
 be used interchangeably (especially useful if Smarty is choking on characters outside of ASCII 32-126).<br /><br />
-Each field has the following properties, accessible by e.g. <code>{\$myfield-&gt;input}</code>:
+Each field has the following properties, accessible by e.g. <code>{$myfield-&gt;input}</code>:
 EOS;
-$lang['help_fieldvars2'] = <<<EOS
+$lang['help_fieldvars2'] = <<<'EOS'
 When field->multiple_parts is TRUE, field->input is actually an array of objects rather than a single input-control.
 This happens, for example, in CheckBoxGroups or RadioButtonGroups. For those, you
-can iterate through <code>\$field->input->name</code> and <code>\$field->input->input</code>
-(and for runtime-expandable field-types, <code>\$field->input->op</code>, which are add/delete buttons).
+can iterate through <code>$field->input->name</code> and <code>$field->input->input</code>
+(and for runtime-expandable field-types, <code>$field->input->op</code>, which are add/delete buttons).
 EOS;
 $lang['hour'] = 'Hour';
 
@@ -696,13 +696,12 @@ $lang['link_label'] = 'Link Label';
 
 $lang['maximum'] = 'maximum';
 $lang['maximum_size'] = 'Max. Size';
-$lang['mcrypt'] = 'PHP mcrypt Library';
 $lang['merid'] = 'Meridian';
-$lang['min'] = 'Minute';
-$lang['minumum'] = 'minimum';
+$lang['minimum'] = 'minimum';
+$lang['minute'] = 'Minute';
 $lang['missing_module'] = 'No %s module'; //see also longer-form 'err_module'
 $lang['missing_type'] = 'No %s';
-$lang['mon'] = 'Month';
+$lang['month'] = 'Month';
 $lang['movedn'] = 'move down';
 $lang['moveup'] = 'move up';
 //missing types
@@ -963,7 +962,7 @@ $lang['title_include_in_submission'] = 'Include field in submission';
 $lang['title_indexed_name'] = 'Option name';
 $lang['title_indexed_value'] = 'Value submitted';
 $lang['title_initial_count'] = 'Initial repetitions';
-$lang['title_initial_count']='Number of repeats when form is opened';
+$lang['title_initial_count']='Default repetitions';
 $lang['title_inline_form'] = 'Inline display';
 $lang['title_install_curl'] = 'This won\'t work, because the PHP install doesn\'t support CURL. Refer to the <a href="http://www.php.net/manual/en/book.curl.php">CURL manual</a>.';
 $lang['title_install_feu'] = 'Please install the Frontend User module to connect a form and its data to a specific user';
@@ -974,7 +973,7 @@ $lang['title_load_template'] = 'Get a different template';
 $lang['title_low_limit'] = 'Lower-limit for the value';
 $lang['title_maps_to'] = 'Map field "%s" to form submission variable';
 $lang['title_max_count'] = 'Maximum repetitions';
-$lang['title_max_count']='Maximum number of repeats';
+$lang['title_max_count']='Maximum repetitions';
 $lang['title_maximum_length'] = 'Maximum length';
 $lang['title_maximum_size'] = 'Maximum upload file size (kilobytes)';
 $lang['title_method'] = 'Form method';
@@ -999,7 +998,7 @@ $lang['title_php_variable'] = 'PHP variable';
 $lang['title_pick_categories'] = 'Pick a category (multiple)';
 $lang['title_pick_fielddef'] = 'Pull a field definition\'s value (single) <em>optional</em>';
 $lang['title_private_key'] = 'Private key to use for encrypting data';
-$lang['title_privatename'] = 'Unique identifier for cross-referencing';
+$lang['title_privatename'] = 'Form-unique identifier for cross-referencing';
 $lang['title_pulldown_details'] = 'Pulldown options';
 $lang['title_radio_label'] = 'Button label';
 $lang['title_radio_separator'] = 'Button separator';
@@ -1142,7 +1141,7 @@ $lang['yes'] = 'Yes';
 $lang['you_must_check'] = 'You must check "%s" in order to continue.';
 $lang['you_need_permission'] = 'To perform that operation, you must be authorised to %s.';
 
-$lang['help_module'] = <<<EOS
+$lang['help_module'] = <<<'EOS'
 <h3>What does this module do?</h3>
 <p>The module provides a powerful and flexible mechanism for creating forms to be displayed
 on the website. Each form may contain many kinds of inputs, may have validation applied to
@@ -1170,10 +1169,10 @@ compatible, and some manual attention will be needed. Specifically:</p>
 a website page or template will cause that form to be displayed.</p>
 <h4>Use by other modules</h4>
 <p>Any other module may initiate display of a form by code like<pre>
-\$pf = cms_utils::get_module('PWForms');
-\$parms = array(&lt;relevant data&gt;);
-\$pf->DoAction('show_form',\$id,\$parms,\$returnid);</pre></p>
-<p>Relevant \$parms:
+$pf = cms_utils::get_module('PWForms');
+$parms = array(&lt;relevant data&gt;);
+$pf->DoAction('show_form',$id,$parms,$returnid);</pre></p>
+<p>Relevant $parms:
 <ul>
 <li>'form_id' => form enumerator</li>
 <li>'preload' => (optional) set first-time field values, array, keys=field id or alias, values=what to set</li>
@@ -1182,10 +1181,10 @@ a website page or template will cause that form to be displayed.</p>
 <li>'exclude' => (optional) singleton or array of field id(s) or alias(es) to be omitted from the form</li>
 <li>'excludetype' => (optional) singleton or array of field-type(s) to be omitted from the form</li>
 </ul></p>
-<p>\$parms may also include form-template parameters e.g.
+<p>$parms may also include form-template parameters e.g.
 <ul>
 <li>'in_admin'</li>
-<li>'in_browser'</li>
+<li>'in_browser' DEPRECATED</li>
 </ul></p>
 <h4>Importing field-types</h4>
 <p>Other modules may need field-type(s) that are not normally available.
@@ -1193,18 +1192,18 @@ Such a field can be implemented by creating a suitable class for the field, and
 during installation/uninstallation of the other module, registering/deregistering
 that class. The PowerBrowse module provides an example of this process in use.<p>
 <p>Field-types to be used in forms may be registered by<pre>
-\$pf = cms_utils::get_module('PWForms');
-\$pf->RegisterField(\$classpath);
+$pf = cms_utils::get_module('PWForms');
+$pf->RegisterField($classpath);
 </pre>
 and de-registered by<pre>
-\$pf = cms_utils::get_module('PWForms');
-\$pf->DeregisterField(\$classpath);
+$pf = cms_utils::get_module('PWForms');
+$pf->DeregisterField($classpath);
 </pre>
-where \$classpath is the absolute file-system path of the file defining the field-class to be [de]registered.</p>
+where $classpath is the absolute file-system path of the file defining the field-class to be [de]registered.</p>
 <p>Such field-classes must include public properties
 <ul>
-<li>\$MenuKey set to the owner-module's Lang key for this field's menu label</li>
-<li>\$mymodule used for module-object reference</li>
+<li>$MenuKey set to the owner-module's Lang key for this field's menu label</li>
+<li>$mymodule used for module-object reference</li>
 </ul>
 and may include whatever else is appropriate, including Fieldbase properties and sub-classed methods.</p>
 <h3>Interactions</h3>
