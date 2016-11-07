@@ -18,6 +18,7 @@ class SequenceStart extends FieldBase
 		$this->HasLabel = TRUE;
 		//name/label not user-modifiable for this class
 		$this->Name = $formdata->formsmodule->Lang('sequence_start').' &#187;&#187;'; //right angle quotes
+		$this->Alias = uniqid('start_'.$this->formdata->Id);
 		$this->NeedsDiv = FALSE;
 		$this->Type = 'SequenceStart';
 	}
@@ -91,8 +92,9 @@ class SequenceStart extends FieldBase
 
 	public function GetSynopsis()
 	{
-		$t = $this->formdata->formsmodule->Lang('title_privatename');
-		return $t.': '.$this->GetProperty('privatename');
+		$mod = $this->formdata->formsmodule;
+		$t = $this->GetProperty('privatename',$mod->Lang('none2'));
+		return $mod->Lang('identifier').': '.$t;
 	}
 
 	public function AdminPopulate($id)
@@ -107,10 +109,10 @@ class SequenceStart extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,$except,TRUE); // !$visible?
 		$mod = $this->formdata->formsmodule;
 
-		$alias = $this->ForceAlias(htmlentities($this->Name));
+		$def = uniqid('s'.$this->formdata->Id,FALSE);
 		$main[] = array($mod->Lang('title_privatename'),
 						$mod->CreateInputText($id,'fp_privatename',
-							$this->GetProperty('privatename',$alias),20,50));
+							$this->GetProperty('privatename',$def),25,50));
 		$main[] = array($mod->Lang('title_initial_count'),
 						$mod->CreateInputText($id,'fp_repeatcount',
 							$this->GetProperty('repeatcount',1),2,2),

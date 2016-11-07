@@ -26,6 +26,8 @@ class SequenceEnd extends SequenceStart
 		$this->Name = ($state) ?
 			$this->formdata->formsmodule->Lang('sequence_end').' &#171;&#171;': //left angle quotes
 			$this->formdata->formsmodule->Lang('sequence_break').' &#166;&#166;'; //broken vertical bars
+		$pre = ($state) ? 'end_':'break_';
+		$this->Alias = uniqid($pre.$this->formdata->Id);
 	}
 
 	//TODO method to set all $LastBreak properties in the form
@@ -44,7 +46,7 @@ class SequenceEnd extends SequenceStart
 
 		$main[] = array($mod->Lang('title_privatename'),
 						$mod->CreateInputText($id,'fp_privatename',
-							$this->GetProperty('privatename',''),20,50),
+							$this->GetProperty('privatename',''),25,50),
 						$mod->Lang('help_privatename'));
 		$main[] = array($mod->Lang('title_add_button_seqpre'),
 						$mod->CreateInputText($id,'fp_insertpre_label',
