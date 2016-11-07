@@ -6,65 +6,90 @@
 
 namespace PWForms;
 
-class SequenceEnd extends FieldBase
+class SequenceEnd extends SequenceStart
 {
-	public function __construct(&$formdata, &$params)
+	public $LastBreak = TRUE;
+
+	public function __construct(&$formdata,&$params)
 	{
-		parent::__construct($formdata, $params);
-		$this->ChangeRequirement = FALSE;
-		$this->DisplayInForm = FALSE; //all handled by SequenceStart
-		$this->DisplayInSubmission = FALSE;
-		$this->HasLabel = FALSE;
-		$this->NeedsDiv = FALSE;
+		parent::__construct($formdata,$params);
+		if (0) {
+			$this->LastBreak = $X;
+		}
+		$this->SetLast($this->LastBreak);
 		$this->Type = 'SequenceEnd';
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function SetLast($state=TRUE)
 	{
-		$ret = '[End FieldSequence: '.$this->GetProperty('starter').']';
-		if ($as_string)
-			return $ret;
-		else
-			return array($ret);
+		$this->LastBreak = $state;
+		$this->Name = ($state) ?
+			$this->formdata->formsmodule->Lang('sequence_end').' &#171;&#171;': //left angle quotes
+			$this->formdata->formsmodule->Lang('sequence_break').' &#166;&#166;'; //broken vertical bars
 	}
+
+	//TODO method to set all $LastBreak properties in the form
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,TRUE); // !$visible?
+		$except = array(
+		'title_field_name',
+		'title_field_alias',
+		'title_field_helptext',
+		'title_field_javascript',
+		'title_field_resources',
+		'title_smarty_eval');
+		list($main,$adv) = $this->AdminPopulateCommon($id,$except,TRUE); // !$visible?
 		$mod = $this->formdata->formsmodule;
-//		$this->RemoveAdminField($main,$mod->Lang('title_field_alias'));
-		$this->RemoveAdminField($main,$mod->Lang('title_field_helptext'));
-/*		$choices = array of current starter fields + notyet
-		$main[] = array($mod->Lang(''),
-						$mod->CreateInputDropdown($id,'pdt_starter',$choices,
-							-1,$this->GetProperty('starter')));
-*/
+
 		$main[] = array($mod->Lang('title_privatename'),
-						$mod->CreateInputText($id,'pdt_privatename',
-							$this->GetProperty('privatename',htmlentities($this->Name)),20,50));
+						$mod->CreateInputText($id,'fp_privatename',
+							$this->GetProperty('privatename',$alias),20,50));
+		$main[] = array($mod->Lang('title_add_button_seqpre'),
+						$mod->CreateInputText($id,'fp_insertpre_label',
+							$this->GetProperty('insertpre_label',$mod->Lang('insert_seqpre')),25,30));
+		$main[] = array($mod->Lang('title_del_button_seqpre'),
+						$mod->CreateInputText($id,'fp_deletepre_label',
+							$this->GetProperty('deletepre_label',$mod->Lang('delete_seqpre')),25,30));
+		$main[] = array($mod->Lang('title_add_button_seq'),
+						$mod->CreateInputText($id,'fp_insert_label',
+							$this->GetProperty('insert_label',$mod->Lang('insert_sequence')),25,30));
+		$main[] = array($mod->Lang('title_del_button_seq'),
+						$mod->CreateInputText($id,'fp_delete_label',
+							$this->GetProperty('delete_label',$mod->Lang('delete_sequence')),25,30));
 
-		$main[] = array($mod->Lang('title_startername'),
-						$mod->CreateInputText($id,'pdt_starter',
-							$this->GetProperty('starter'),20,50));
-		return array('main'=>$main,'adv'=>array());
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
-/*	public function PostAdminAction(&$params)
+/*	public function AdminValidate($id)
 	{
-		'starter' option = that_field ->XtraProps['name'], not ->Name
-		conform any starterfield::opt_ender
-	}
-
-	public function AdminValidate($id)
-	{
-		unique privatenamename
-		warn if startername not found
-		warn if order is not after corresponding sequence start
+		TODO relevant $this->GetProperty('privatename') or else warn user;
 	}
 */
-/*	public function Populate($id,&$params)
+	public function Populate($id,&$params)
 	{
-		return '</div><!-- end sequence '.$this->GetProperty('starter').' -->';
+	//TODO no 'insert_label'(s) sometimes, no 'delete_label'(s) sometimes
+		if ($this->LastBreak) {
+			$propkeys = array('insertpre_label','deletepre_label');
+		} else {
+			$propkeys = array('insertpre_label','deletepre_label','insert_label','delete_label');
+		}
+		$html = '';
+		$bnm = $id.$this->formdata->current_prefix.$this->Id;
+		$bid = $this->GetInputId();
+
+		foreach ($propkeys as $key) {
+			$c = $TODO;
+			$tmp = '<input type="button" name="'.$bnm.$c.'" id="'.$bid.$c.
+			'" value="'.$this->GetProperty($key).'" />';
+			$html .= $this->SetClass($tmp).' ';
+		}
+		if ($this->LastBreak) {
+			$html .= '&#171;&#171;';
+		} else {
+			$html .= '&#166;&#166;';
+		}
+		//no js
+		return $html;
 	}
-*/
 }
