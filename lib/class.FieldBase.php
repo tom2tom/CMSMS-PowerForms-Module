@@ -121,8 +121,11 @@ class FieldBase implements \Serializable
 	// Returns a field-property value, or $default if the property doesn't exist
 	public function GetProperty($propName, $default='')
 	{
-		if (isset($this->XtraProps[$propName]))
-			return $this->XtraProps[$propName];
+		if (isset($this->XtraProps[$propName])) {
+			$val = $this->XtraProps[$propName];
+			if ($val || !$default)
+				return $val;
+		}
 		return $default;
 	}
 
