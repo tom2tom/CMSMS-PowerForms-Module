@@ -33,12 +33,12 @@ $this->Crash();
 	$formdata->formsmodule = &$this;
 
 	if (!$newfield) {
-		$obfield = $formdata->Fields[$params['field_id']];
+		$obfld = $formdata->Fields[$params['field_id']];
 	} elseif (isset($params['field_pick'])) { //we know what type of field to add
 		unset($params['field_id']); //-1 no use
-		$obfield = PWForms\FieldOperations::NewField($formdata,$params);
+		$obfld = PWForms\FieldOperations::NewField($formdata,$params);
 	} else { //add field, whose type is to be selected
-		$obfield = FALSE;
+		$obfld = FALSE;
 	}
 	$refresh = FALSE;
 } else {
@@ -48,6 +48,10 @@ $this->Crash();
 
 $message = '';
 if (isset($params['submit'])) {
+	if ($newfield) {
+		$params['field_pick'] = $params['field_Type'];
+		$obfld = PWForms\FieldOperations::NewField($formdata,$params);
+	}
 	//migrate $params to field data
 	foreach (array(
 		'field_Name'=>'SetName',
@@ -55,32 +59,32 @@ if (isset($params['submit'])) {
 	) as $key=>$val)
 	{
 		if (array_key_exists($key,$params)) {
-			$obfield->$val($params[$key]);
+			$obfld->$val($params[$key]);
 		}
 	}
 	foreach ($params as $key=>$val) {
 		if (strncmp($key,'fp_',3) == 0) {
 			$key = substr($key,3);
-			if (is_array($val) && $obfield->MultiComponent) {
+			if (is_array($val) && $obfld->MultiComponent) {
 				$i = 1; //use custom-index, in case rows have been re-ordered
 				foreach ($val as $ival) {
-					$obfield->SetPropIndexed($key,$i,$ival);
+					$obfld->SetPropIndexed($key,$i,$ival);
 					$i++;
 				}
 			} else {
-				$obfield->SetProperty($key,$val);
+				$obfld->SetProperty($key,$val);
 			}
 		}
 	}
-	$obfield->PostAdminAction($params);
-	list($res,$message) = $obfield->AdminValidate($id);
+	$obfld->PostAdminAction($params);
+	list($res,$message) = $obfld->AdminValidate($id);
 	if ($res) {
 		if ($newfield) {
 			//TODO eliminate race-risk here
 			$key = count($formdata->Fields) + 1;
-			$obfield->SetId(-$key); //Id < 0, so it gets inserted upon form-submit
-			$obfield->SetOrder($key); //order last
-			$formdata->Fields[-$key] = $obfield;
+			$obfld->SetId(-$key); //Id < 0, so it gets inserted upon form-submit
+			$obfld->SetOrder($key); //order last
+			$formdata->Fields[-$key] = $obfld;
 			$formdata->FieldOrders = FALSE; //trigger re-sort
 		}
 		//update cache ready for next use
@@ -95,16 +99,16 @@ if (isset($params['submit'])) {
 	} else {
 		//start again //TODO if imported field with no tabled data
 		if ($newfield)
-			$obfield = PWForms\FieldOperations::NewField($formdata,$params);
+			$obfld = PWForms\FieldOperations::NewField($formdata,$params);
 		else
-			$obfield->Load($id,$params); //TODO check for failure
+			$obfld->Load($id,$params); //TODO check for failure
 		$message = $this->_PrettyMessage($message,FALSE,FALSE);
 	}
 } elseif (isset($params['optionadd'])) {
-	$obfield->OptionAdd($params);
+	$obfld->OptionAdd($params);
 	$refresh = TRUE;
 } elseif (isset($params['optiondel'])) {
-	$obfield->OptionDelete($params);
+	$obfld->OptionDelete($params);
 	$refresh = FALSE;
 }
 /*else {
@@ -115,10 +119,10 @@ if (isset($params['submit'])) {
 if ($refresh) {
 	foreach ($params as $key=>$val) {
 		if (strncmp($key,'fp_',3) == 0)
-			$obfield->XtraProps[substr($key,3)] = $val;
+			$obfld->XtraProps[substr($key,3)] = $val;
 	}
-	$obfield->SetName($params['field_Name']);
-	$obfield->SetAlias($params['field_Alias']);
+	$obfld->SetName($params['field_Name']);
+	$obfld->SetAlias($params['field_Alias']);
 }
 
 $tplvars = array();
@@ -126,10 +130,10 @@ $tplvars = array();
 require __DIR__.DIRECTORY_SEPARATOR.'populate.field.php';
 
 $jsall = NULL;
-PWForms\Utils::MergeJS($obfield->jsincs,$obfield->jsfuncs,$obfield->jsloads,$jsall);
-$obfield->jsincs = FALSE;
-$obfield->jsfuncs = FALSE;
-$obfield->jsloads = FALSE;
+PWForms\Utils::MergeJS($obfld->jsincs,$obfld->jsfuncs,$obfld->jsloads,$jsall);
+$obfld->jsincs = FALSE;
+$obfld->jsfuncs = FALSE;
+$obfld->jsloads = FALSE;
 
 $cache->set($params['datakey'],$formdata,84600);
 
