@@ -98,7 +98,7 @@ class TimePicker extends FieldBase
 
 			$oneset = new \stdClass();
 			$tid = $this->GetInputId('_min');
-			$oneset->title = $mod->Lang('min');
+			$oneset->title = $mod->Lang('minute');
 			$tmp = '<label for="'.$tid.'">'.$oneset->title.'</label>';
 			$oneset->name = $this->SetClass($tmp);
 			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',
@@ -139,7 +139,7 @@ class TimePicker extends FieldBase
 
 			$oneset = new \stdClass();
 			$tid = $this->GetInputId('_min');
-			$oneset->title = $mod->Lang('min');
+			$oneset->title = $mod->Lang('minute');
 			$tmp = '<label class= "" for="'.$tid.'">'.$oneset->title.'</label>';
 			$oneset->name = $this->SetClass($tmp);
 			$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',

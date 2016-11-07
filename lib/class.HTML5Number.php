@@ -43,7 +43,7 @@ class HTML5Number extends FieldBase
 		$min = $this->GetProperty('min_number');
 		if (!$min || !is_numeric($min)) {
 			$ret = FALSE;
-			$messages[] = $mod->Lang('err_typed',$mod->Lang('minumum'));
+			$messages[] = $mod->Lang('err_typed',$mod->Lang('minimum'));
 		}
 		$max = $this->GetProperty('max_number');
 		if (!$max || !is_numeric($max) || $max <= $min) {

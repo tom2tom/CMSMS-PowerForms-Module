@@ -158,7 +158,7 @@ class DatePicker extends FieldBase
 
 		$mon = new \stdClass();
 		$tid = $this->GetInputId('_month');
-		$mon->title = $mod->Lang('mon');
+		$mon->title = $mod->Lang('month');
 		$tmp = '<label for="'.$tid.'">'.$mon->title.'</label>';
 		$mon->name = $this->SetClass($tmp);
 		$tmp = $mod->CreateInputDropdown($id,$this->formdata->current_prefix.$this->Id.'[]',$this->Months,-1,
