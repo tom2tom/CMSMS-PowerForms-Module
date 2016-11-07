@@ -45,21 +45,7 @@ class TextExpandable extends FieldBase
 		return $siblings;
 	}
 
-	public function GetSynopsis()
-	{
-		$mod = $this->formdata->formsmodule;
-		$ret = $mod->Lang('abbreviation_length',$this->GetProperty('length',80));
-		if ($this->ValidationType) {
-//			$this->EnsureArray($this->ValidationTypes);
-			if (is_object($this->ValidationTypes))
-				$this->ValidationTypes = (array)$this->ValidationTypes;
-			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
-		}
-
-		return $ret;
-	}
-
-	public function DisplayableValue($as_string = TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		if (is_array($this->Value)) {
 			if ($as_string)
@@ -78,6 +64,20 @@ class TextExpandable extends FieldBase
 			return $ret;
 		else
 			return array($ret);
+	}
+
+	public function GetSynopsis()
+	{
+		$mod = $this->formdata->formsmodule;
+		$ret = $mod->Lang('abbreviation_length',$this->GetProperty('length',80));
+		if ($this->ValidationType) {
+//			$this->EnsureArray($this->ValidationTypes);
+			if (is_object($this->ValidationTypes))
+				$this->ValidationTypes = (array)$this->ValidationTypes;
+			$ret .= ','.array_search($this->ValidationType,$this->ValidationTypes);
+		}
+
+		return $ret;
 	}
 
 	public function AdminPopulate($id)
