@@ -334,12 +334,12 @@ EOS;
 
 		// store fields
 		$newfields = array();
-		foreach ($formdata->Fields as $key=>&$obfield) {
-			$obfield->Store(TRUE);
+		foreach ($formdata->Fields as $key=>&$obfld) {
+			$obfld->Store(TRUE);
 			if ($key <= 0) //new field, after save it will include an actual id
-				$newfields[$key] = $obfield->GetId();
+				$newfields[$key] = $obfld->GetId();
 		}
-		unset($obfield);
+		unset($obfld);
 		// conform array-keys of new fields
 		foreach ($newfields as $key=>$newkey) {
 			$formdata->Fields[$newkey] = $formdata->Fields[$key];
@@ -444,10 +444,10 @@ EOS;
 					$row = array_merge($row,$params); //make field id/values available
 				}
 				// create the field object
-				$obfield = FieldOperations::NewField($formdata,$row);
-				if ($obfield) {
-					$formdata->Fields[$obfield->Id] = $obfield;
-					if ($obfield->Type == 'PageBreak')
+				$obfld = FieldOperations::NewField($formdata,$row);
+				if ($obfld) {
+					$formdata->Fields[$obfld->Id] = $obfld;
+					if ($obfld->Type == 'PageBreak')
 						$formdata->PagesCount++;
 				}
 			}

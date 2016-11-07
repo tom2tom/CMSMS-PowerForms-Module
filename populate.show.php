@@ -37,10 +37,10 @@ $fields = array();
 $WalkPage = 1; //'current' page for field-walk purposes
 
 foreach ($formdata->FieldOrders as $field_id) {
-	$obfield = $formdata->Fields[$field_id];
-	$alias = $obfield->ForceAlias();
+	$obfld = $formdata->Fields[$field_id];
+	$alias = $obfld->ForceAlias();
 
-	if ($obfield->GetFieldType() == 'PageBreak')
+	if ($obfld->GetFieldType() == 'PageBreak')
 		$WalkPage++;
 
 	if ($WalkPage != $formdata->Page) {
@@ -48,12 +48,12 @@ foreach ($formdata->FieldOrders as $field_id) {
 		// remember other-page field-values which haven't yet been saved ?
 		//TODO checkme double-underscore use ?
 		//FormBuilder uses 'fbrp__' lots (apparently for all 'input' fields)
-//		$valueindx = 'pwfp__'.$obfield->GetId();
+//		$valueindx = 'pwfp__'.$obfld->GetId();
 //		if (isset($params[$valueindx]))
-		if ($obfield->IsInputField()) { //TODO check logic
-/*			$valueindx = $formdata->current_prefix.$obfield->GetId();
+		if ($obfld->IsInputField()) { //TODO check logic
+/*			$valueindx = $formdata->current_prefix.$obfld->GetId();
 			if (empty($params[$valueindx])) {
-				$valueindx2 = $formdata->prior_prefix.$obfield->GetId();
+				$valueindx2 = $formdata->prior_prefix.$obfld->GetId();
 				if (empty($params[$valueindx2]))
 					$params[$valueindx] = 0; //assume an unchecked checkbox
 				else
@@ -73,12 +73,12 @@ foreach ($formdata->FieldOrders as $field_id) {
 						   PWForms\Utils::html_myentities_decode($params[$valueindx]));
 			}
 */
-			if ($obfield->DisplayInSubmission()) {
+			if ($obfld->DisplayInSubmission()) {
 /*TODO			if ($WalkPage < $formdata->Page) {
 					$oneset = new stdClass();
-					$oneset->value = $obfield->DisplayableValue();
-					$tplvars[$obfield->GetName()] = $oneset;
-					$tplvars[$obfield->ForceAlias()] = $oneset;
+					$oneset->value = $obfld->DisplayableValue();
+					$tplvars[$obfld->GetName()] = $oneset;
+					$tplvars[$obfld->ForceAlias()] = $oneset;
 					$prev[] = $oneset;
 				}
 */
@@ -95,12 +95,12 @@ foreach ($formdata->FieldOrders as $field_id) {
 
 	$oneset = new stdClass();
 	$oneset->alias = $alias;
-//	$oneset->css_class = $obfield->GetProperty('css_class');
-	$oneset->display = $obfield->DisplayInForm();
-	$oneset->valid = $obfield->IsValid();
-	$oneset->error = $oneset->valid?'':$obfield->ValidationMessage;
-	$oneset->has_label = $obfield->HasLabel();
-	$oneset->helptext = $obfield->GetProperty('helptext');
+//	$oneset->css_class = $obfld->GetProperty('css_class');
+	$oneset->display = $obfld->DisplayInForm();
+	$oneset->valid = $obfld->IsValid();
+	$oneset->error = $oneset->valid?'':$obfld->ValidationMessage;
+	$oneset->has_label = $obfld->HasLabel();
+	$oneset->helptext = $obfld->GetProperty('helptext');
 	if ($oneset->helptext) {
 		if (!isset($formdata->jsfuncs['helptoggle'])) {
 /*TODO func*/	$formdata->jsfuncs['helptoggle'] = <<<EOS
@@ -117,25 +117,25 @@ function help_toggle(htid) {
 EOS;
 		}
 	}
-	$oneset->helptext_id = 'pwfp_ht_'.$obfield->GetID();
-	if (!$oneset->has_label || $obfield->GetHideLabel()
-/*	 && (!$obfield->GetProperty('browser_edit',0) || empty($params['in_admin']))*/)
+	$oneset->helptext_id = 'pwfp_ht_'.$obfld->GetID();
+	if (!$oneset->has_label || $obfld->GetHideLabel()
+/*	 && (!$obfld->GetProperty('browser_edit',0) || empty($params['in_admin']))*/)
 		$oneset->hide_name = 1;
 	else
 		$oneset->hide_name = 0;
-	$oneset->id = $obfield->GetId();
-	$oneset->input = $obfield->Populate($id,$params); //text or flat xhtml or array of objects
-	$oneset->input_id = $obfield->GetInputId();
-	$oneset->label_parts = $obfield->LabelSubComponents();
-	$oneset->logic = $obfield->GetLogic();
-	$oneset->multiple_parts = $obfield->GetMultiPopulate();
-	$oneset->name = $obfield->GetName();
-	$oneset->needs_div = $obfield->NeedsDiv();
-	$oneset->required = $obfield->IsRequired();
+	$oneset->id = $obfld->GetId();
+	$oneset->input = $obfld->Populate($id,$params); //text or flat xhtml or array of objects
+	$oneset->input_id = $obfld->GetInputId();
+	$oneset->label_parts = $obfld->LabelSubComponents();
+	$oneset->logic = $obfld->GetLogic();
+	$oneset->multiple_parts = $obfld->GetMultiPopulate();
+	$oneset->name = $obfld->GetName();
+	$oneset->needs_div = $obfld->NeedsDiv();
+	$oneset->required = $obfld->IsRequired();
 	$oneset->required_symbol = $oneset->required?$reqSymbol:'';
-	$oneset->smarty_eval = $obfield->GetSmartyEval();
-	$oneset->type = $obfield->GetDisplayType();
-	$oneset->values = $obfield->GetIndexedValues(); //TODO multi-element field, not really values?
+	$oneset->smarty_eval = $obfld->GetSmartyEval();
+	$oneset->type = $obfld->GetDisplayType();
+	$oneset->values = $obfld->GetIndexedValues(); //TODO multi-element field, not really values?
 
 	$tplvars[$alias] = $oneset;
 	$fields[$oneset->input_id] = $oneset;

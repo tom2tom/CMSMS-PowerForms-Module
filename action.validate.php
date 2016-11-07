@@ -41,8 +41,8 @@ if ($formdata === FALSE) {
 }
 
 $field_id = $params[$key.'d'];
-$obfield = $formdata->Fields[$field_id];
-$obfield->ApproveToGo($record_id); //setup to 'really' dispose the form
+$obfld = $formdata->Fields[$field_id];
+$obfld->ApproveToGo($record_id); //setup to 'really' dispose the form
 
 //cache data for next action
 if (!empty($_SERVER['SERVER_ADDR']))

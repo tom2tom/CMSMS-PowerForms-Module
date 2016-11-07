@@ -23,7 +23,7 @@ class FieldOperations
 	*/
 	public static function NewField(&$formdata, &$params)
 	{
-		$obfield = FALSE;
+		$obfld = FALSE;
 		if (!empty($params['field_id'])) {
 			// we're loading an extant field
 			if (empty($params['type'])) {
@@ -40,17 +40,17 @@ class FieldOperations
 				$classPath = __DIR__.DIRECTORY_SEPARATOR.'class.'.$className.'.php';
 				if (is_file($classPath)) {
 					$classPath = 'PWForms\\'.$className;
-					$obfield = new $classPath($formdata,$params);
-					if (self::LoadField($obfield)) {
+					$obfld = new $classPath($formdata,$params);
+					if (self::LoadField($obfld)) {
 //TODO rationalise value setting
-						if (!empty($params[$formdata->current_prefix.$obfield->Id])) {
-							$obfield->SetValue($params[$formdata->current_prefix.$obfield->Id]);
-						} elseif (!empty($params[$formdata->prior_prefix.$obfield->Id])) {
-							$obfield->SetValue($params[$formdata->prior_prefix.$obfield->Id]);
-						} elseif (!empty($params['value_'.$obfield->Name])) {
-							$obfield->SetValue($params['value_'.$obfield->Name]);
-						} elseif (!empty($params['value_fld'.$obfield->Id])) {
-							$obfield->SetValue($params['value_fld'.$obfield->Id]);
+						if (!empty($params[$formdata->current_prefix.$obfld->Id])) {
+							$obfld->SetValue($params[$formdata->current_prefix.$obfld->Id]);
+						} elseif (!empty($params[$formdata->prior_prefix.$obfld->Id])) {
+							$obfld->SetValue($params[$formdata->prior_prefix.$obfld->Id]);
+						} elseif (!empty($params['value_'.$obfld->Name])) {
+							$obfld->SetValue($params['value_'.$obfld->Name]);
+						} elseif (!empty($params['value_fld'.$obfld->Id])) {
+							$obfld->SetValue($params['value_fld'.$obfld->Id]);
 						}
 					}
 				}
@@ -61,33 +61,33 @@ class FieldOperations
 			$classPath = __DIR__.DIRECTORY_SEPARATOR.'class.'.$className.'.php';
 			if (is_file($classPath)) {
 				$classPath = 'PWForms\\'.$className;
-				$obfield = new $classPath($formdata,$params);
+				$obfld = new $classPath($formdata,$params);
 				if (isset($params['in'])) {
 					switch ($params['in']) {
 						case 'disposition':
-							if (!$obfield->GetProperty('IsDisposition')) {
-								$obfield = FALSE;
+							if (!$obfld->GetProperty('IsDisposition')) {
+								$obfld = FALSE;
 							}
 							break;
 						case 'external':
-							if ($obfield->GetProperty('IsDisposition')) {
-								$obfield = FALSE;
+							if ($obfld->GetProperty('IsDisposition')) {
+								$obfld = FALSE;
 							} else {
-								$obfield->SetProperty('DisplayExternal',TRUE);
+								$obfld->SetProperty('DisplayExternal',TRUE);
 							}
 							break;
 						case 'form':
-							if ($obfield->GetProperty('IsDisposition')) {
-								$obfield = FALSE;
+							if ($obfld->GetProperty('IsDisposition')) {
+								$obfld = FALSE;
 							} else {
-								$obfield->SetProperty('DisplayInForm',TRUE);
+								$obfld->SetProperty('DisplayInForm',TRUE);
 							}
 							break;
 					}
 				}
 			}
 		}
-		return $obfield;
+		return $obfld;
 	}
 
 	/**
@@ -151,58 +151,58 @@ class FieldOperations
 	*/
 	public static function Replicate(&$formdata, $field_id)
 	{
-		$obfield = FALSE;//may need ref to this
+		$obfld = FALSE;//may need ref to this
 		if (isset($formdata->Fields[$field_id])) {
 			$field = $formdata->Fields[$field_id];
-			$obfield = clone($field);
-			$obfield->Id = 0;
-			$obfield->SetName($field->GetName().' '.$formdata->formsmodule->Lang('copy'));
-			$obfield->SetOrder(count($formdata->Fields)+1); //bit racy!
+			$obfld = clone($field);
+			$obfld->Id = 0;
+			$obfld->SetName($field->GetName().' '.$formdata->formsmodule->Lang('copy'));
+			$obfld->SetOrder(count($formdata->Fields)+1); //bit racy!
 		}
-		return $obfield;
+		return $obfld;
 	}
 
 	/**
 	StoreField:
-	@obfield: reference to field data object
+	@obfld: reference to field-object
 	@allprops: optional boolean, whether to also save all field properties, default=FALSE
-	Stores (by insert or update) data for @obfield in database tables.
+	Stores (by insert or update) data for @obfld in database tables.
 	Multi-valued (array) options are saved merely as multiple records with same name
-	Sets @obfield->Id to real value if it was -1 i.e. a new field
+	Sets @obfld->Id to real value if it was -1 i.e. a new field
 	Returns: boolean T/F per success of executed db commands
 	*/
-	public static function StoreField(&$obfield, $allprops=FALSE)
+	public static function StoreField(&$obfld, $allprops=FALSE)
 	{
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
-		if ($obfield->Id <= 0) {
-			$obfield->Id = $db->GenID($pre.'module_pwf_field_seq');
+		if ($obfld->Id <= 0) {
+			$obfld->Id = $db->GenID($pre.'module_pwf_field_seq');
 			$sql = 'INSERT INTO '.$pre.'module_pwf_field
 (field_id,form_id,name,alias,type,order_by) VALUES (?,?,?,?,?,?)';
 			$res = $db->Execute($sql,array(
-				$obfield->Id,
-				$obfield->FormId,
-				$obfield->Name,
-				$obfield->Alias,
-				$obfield->Type,
-				$obfield->OrderBy));
+				$obfld->Id,
+				$obfld->FormId,
+				$obfld->Name,
+				$obfld->Alias,
+				$obfld->Type,
+				$obfld->OrderBy));
 		} else {
 			$sql = 'UPDATE '.$pre.'module_pwf_field SET name=?,alias=?,order_by=? WHERE field_id=?';
 			$res = $db->Execute($sql,array(
-				$obfield->Name,
-				$obfield->Alias,
-				$obfield->OrderBy,
-				$obfield->Id));
+				$obfld->Name,
+				$obfld->Alias,
+				$obfld->OrderBy,
+				$obfld->Id));
 		}
 
 		if ($allprops) {
 			// drop all current properties
 			$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops where field_id=?';
-			$res = $db->Execute($sql,array($obfield->Id)) && $res;
+			$res = $db->Execute($sql,array($obfld->Id)) && $res;
 			// add back current ones
 			$sql = 'INSERT INTO '.$pre.'module_pwf_fieldprops
 (prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
-			foreach ($obfield->XtraProps as $name=>$value) {
+			foreach ($obfld->XtraProps as $name=>$value) {
 				if (!is_scalar($value)) {
 					$value = json_encode($value);
 				}
@@ -215,7 +215,7 @@ class FieldOperations
 					$lval = $value;
 				}
 				$res = $db->Execute($sql,
-					array($newid,$obfield->Id,$obfield->FormId,$name,$sval,$lval)) && $res;
+					array($newid,$obfld->Id,$obfld->FormId,$name,$sval,$lval)) && $res;
 			}
 		}
 		return $res;
@@ -223,31 +223,31 @@ class FieldOperations
 
 	/**
 	LoadField:
-	@obfield: reference to field data object, including (at least) the appropriate Id
-	Populates @obfield data from database tables.
+	@obfld: reference to field-object, including (at least) the appropriate Id
+	Populates @obfld data from database tables.
 	Table data replace existing data TODO OK?
 	Returns: boolean T/F indicating successful operation
 	*/
-	public static function LoadField(&$obfield)
+	public static function LoadField(&$obfld)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
 		$db = \cmsms()->GetDb();
-		if ($row = $db->GetRow($sql,array($obfield->Id))) {
-			$obfield->FormId = (int)$row['form_id'];
-			if (!$obfield->Name)
-				$obfield->Name = $row['name'];
-			if (!$obfield->Alias)
-				$obfield->Alias = $row['alias'];
-			$obfield->Type = $row['type'];
-			$obfield->OrderBy = (int)$row['order_by'];
+		if ($row = $db->GetRow($sql,array($obfld->Id))) {
+			$obfld->FormId = (int)$row['form_id'];
+			if (!$obfld->Name)
+				$obfld->Name = $row['name'];
+			if (!$obfld->Alias)
+				$obfld->Alias = $row['alias'];
+			$obfld->Type = $row['type'];
+			$obfld->OrderBy = (int)$row['order_by'];
 		} else
 			return FALSE;
 
-		$obfield->loaded = TRUE;
+		$obfld->loaded = TRUE;
 
 		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE field_id=? ORDER BY prop_id';
-		$defaults = $db->GetArray($sql,array($obfield->Id));
+		$defaults = $db->GetArray($sql,array($obfld->Id));
 		if ($defaults) {
 			$merged = array();
 			$rc = count($defaults);
@@ -273,10 +273,10 @@ class FieldOperations
 						$val = is_array($ar) ? $ar : (array)$ar;
 					}
 				}
-				if (property_exists($obfield,$nm)) {
-					$obfield->$nm = $val;
+				if (property_exists($obfld,$nm)) {
+					$obfld->$nm = $val;
 				} else {
-					$obfield->XtraProps[$nm] = $val;
+					$obfld->XtraProps[$nm] = $val;
 				}
 			}
 		}
@@ -285,17 +285,17 @@ class FieldOperations
 
 	/**
 	RealDeleteField:
-	@obfield: reference to field data object, including (at least) the appropriate Id
+	@obfld: reference to field-object, including (at least) the appropriate Id
 	Returns: boolean T/F indicating success
 	*/
-	public static function RealDeleteField(&$obfield)
+	public static function RealDeleteField(&$obfld)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field where field_id=?';
 		$db = \cmsms()->GetDb();
-		$res = $db->Execute($sql,array($obfield->Id));
+		$res = $db->Execute($sql,array($obfld->Id));
 		$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops where field_id=?';
-		$res = $db->Execute($sql,array($obfield->Id)) && $res;
+		$res = $db->Execute($sql,array($obfld->Id)) && $res;
 		return $res;
 	}
 

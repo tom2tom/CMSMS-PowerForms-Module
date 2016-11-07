@@ -11,16 +11,16 @@ $tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$t
 $tplvars['backtoform_nav'] = $this->CreateLink($id,'open_form',$returnid,'&#171; '.$this->Lang('back_form'),
 	array('form_id'=>$params['form_id'],'datakey'=>$params['datakey']));
 
-if ($obfield) { //field data are loaded
-	$fid = $obfield->GetId(); //maybe <= 0, if adding
+if ($obfld) { //field data are loaded
+	$fid = $obfld->GetId(); //maybe <= 0, if adding
 	$nm = 'submit'; //submit-control name
 
-	$obfield->jsincs = array();
-	$obfield->jsfuncs = array();
-	$obfield->jsloads = array();
+	$obfld->jsincs = array();
+	$obfld->jsfuncs = array();
+	$obfld->jsloads = array();
 	$baseurl = $this->GetModuleURLPath();
 
-	$populators = $obfield->AdminPopulate($id);
+	$populators = $obfld->AdminPopulate($id);
 	$hasmain = (isset($populators['main']) && count($populators['main']) > 0);
 	$hasadv = (isset($populators['adv']) && count($populators['adv']) > 0);
 
@@ -40,14 +40,14 @@ if ($obfield) { //field data are loaded
 		$tplvars['advancedtab_start'] = $this->StartTab('advancedtab');
 	$tplvars['tab_end'] = $this->EndTab();
 
-	$tplvars['add'] = ($obfield->HasOptionAdd())?
-		$this->CreateInputSubmit($id,'optionadd',$obfield->GetOptionAddLabel()):NULL;
+	$tplvars['add'] = ($obfld->HasOptionAdd())?
+		$this->CreateInputSubmit($id,'optionadd',$obfld->GetOptionAddLabel()):NULL;
 
-	if ($obfield->HasOptionDelete()) {
-		$tplvars['del'] = $this->CreateInputSubmit($id,'optiondel',$obfield->GetOptionDeleteLabel(),
+	if ($obfld->HasOptionDelete()) {
+		$tplvars['del'] = $this->CreateInputSubmit($id,'optiondel',$obfld->GetOptionDeleteLabel(),
 			'onclick="return confirm_selected(this)"');
 		$prompt = $this->Lang('confirm');
-		$obfield->jsfuncs['optiondel'] = <<<EOS
+		$obfld->jsfuncs['optiondel'] = <<<EOS
 function confirm_selected(btn) {
  var sel = $(btn).closest('div').find('input[name^="{$id}selected"]:checked');
  if (sel.length > 0) {
@@ -61,7 +61,7 @@ EOS;
 		$tplvars['del'] = NULL;
 	}
 
-	$tplvars['requirable'] = (/*!$obfield->IsDisposition() && */!$obfield->GetChangeRequirement())?1:0;
+	$tplvars['requirable'] = (/*!$obfld->IsDisposition() && */!$obfld->GetChangeRequirement())?1:0;
 
 	$mainList = array();
 	if ($hasmain) {
@@ -91,10 +91,10 @@ EOS;
 		$tplvars['multiControls'] = $populators['table'];
 		if (count($populators['table']) > 2) { //titles + >1 options-row
 			$tplvars['dndhelp'] = $this->Lang('help_can_drag');
-			$obfield->jsincs[] = <<<EOS
+			$obfld->jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/include/jquery.tablednd.min.js"></script>
 EOS;
-			$obfield->jsloads[] = <<<'EOS'
+			$obfld->jsloads[] = <<<'EOS'
  $('#helpdnd').show();
  $('#controls').addClass('table_drag').tableDnD({
   dragClass: 'row1hover',

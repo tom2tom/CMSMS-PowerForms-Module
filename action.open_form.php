@@ -47,10 +47,10 @@ if (isset($params['submit']) || isset($params['apply'])) {
 	}
 	$cache->delete($params['datakey']);
 } elseif (isset($params['fieldcopy'])) {
-	$obfield = PWForms\FieldOperations::Replicate($formdata,$params['field_id']);
-	if ($obfield) {
-		$obfield->Store(TRUE);
-		$formdata->Fields[$obfield->Id] = $obfield;
+	$obfld = PWForms\FieldOperations::Replicate($formdata,$params['field_id']);
+	if ($obfld) {
+		$obfld->Store(TRUE);
+		$formdata->Fields[$obfld->Id] = $obfld;
 		//update cache ready for next use
 		$cache->set($params['datakey'],$formdata,84600);
 		$this->Redirect($id,'open_field',$returnid,

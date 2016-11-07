@@ -21,10 +21,10 @@ if (isset($params['datakey'])) {
 	}
 }
 
-$obfield = $formdata->Fields[$params['field_id']];
-if ($obfield !== FALSE) {
-	$obfield->SetRequired(($params['reqd']=='on'));
-//	$obfield->Store();
+$obfld = $formdata->Fields[$params['field_id']];
+if ($obfld !== FALSE) {
+	$obfld->SetRequired(($params['reqd']=='on'));
+//	$obfld->Store();
 	$cache->set($params['datakey'],$formdata,84600);
 }
 
