@@ -327,11 +327,11 @@ $tplvars['title_fieldpick'] = $t;
 $tplvars['add_field_link'] =
 	$this->CreateLink($id,'open_field',$returnid,
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
-		array('field_id'=>-1,
+		array('field_id'=>0,
 		'form_id'=>$form_id,
 		'datakey'=>$params['datakey']),'',FALSE).' '.
 	$this->CreateLink($id,'open_field',$returnid,$t,
-		array('field_id'=>-1,
+		array('field_id'=>0,
 		'form_id'=>$form_id,
 		'datakey'=>$params['datakey']),'',FALSE);
 //selector
@@ -357,11 +357,11 @@ $tplvars['title_fieldpick2'] = $t;
 $tplvars['add_disposition_link'] =
 	$this->CreateLink($id,'open_field',$returnid,
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
-		array('field_id'=>-1,
+		array('field_id'=>0,
 		'form_id'=>$form_id,
 		'datakey'=>$params['datakey']),'',FALSE).' '.
 	$this->CreateLink($id,'open_field',$returnid,$t,
-		array('field_id'=>-1,
+		array('field_id'=>0,
 		'form_id'=>$form_id,
 		'datakey'=>$params['datakey']),'',FALSE);
 //selector
@@ -389,11 +389,11 @@ $tplvars['title_fieldpick3'] = $t;
 $tplvars['add_external_link'] =
 	$this->CreateLink($id,'open_field',$returnid,
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
-		array('field_id'=>-1,
+		array('field_id'=>0,
 		'form_id'=>$form_id,
 		'datakey'=>$params['datakey']),'',FALSE).' '.
 	$this->CreateLink($id,'open_field',$returnid,$t,
-		array('field_id'=>-1,
+		array('field_id'=>0,
 		'form_id'=>$form_id,
 		'datakey'=>$params['datakey']),'',FALSE);
 //selector
@@ -414,7 +414,7 @@ if ($selext == 'basic') {
 }
 //js to add selected field
 $link = $this->CreateLink($id,'open_field',$returnid,'',
-	array('field_id'=>-1,
+	array('field_id'=>0,
 	'form_id'=>$form_id,
 	'datakey'=>$params['datakey']),'',TRUE,TRUE);
 $link = str_replace('&amp;','&',$link);

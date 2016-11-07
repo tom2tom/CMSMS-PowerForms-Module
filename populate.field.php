@@ -166,6 +166,6 @@ $tplvars['form_start'] = $this->CreateFormStart($id,'open_field',$returnid,
 	'field_id'=>$fid));
 $tplvars['form_end'] = $this->CreateFormEnd();
 
-$t = ($fid > 0) ? 'save':'add'; //field save or add
+$t = ($fid != 0) ? 'save':'add'; //field save or add
 $tplvars['submit'] = $this->CreateInputSubmit($id,$nm,$this->Lang($t));
 $tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));

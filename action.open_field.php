@@ -19,7 +19,7 @@ try {
 	exit;
 }
 
-$newfield = ($params['field_id'] <= 0);
+$newfield = ($params['field_id'] == 0);
 
 if (isset($params['datakey'])) {
 	$formdata = $cache->get($params['datakey']);
