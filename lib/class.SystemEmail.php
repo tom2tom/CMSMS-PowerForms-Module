@@ -70,11 +70,11 @@ class SystemEmail extends EmailBase
 				$ret .= $dests[1];
 			}
 		} else {
-			$ret.= $mod->Lang('unspecified');
+			$ret .= $mod->Lang('unspecified');
 		}
 		$status = $this->TemplateStatus();
 		if ($status)
-			$ret.='<br />'.$status;
+			$ret .= '<br />'.$status;
 		return $ret;
 	}
 
