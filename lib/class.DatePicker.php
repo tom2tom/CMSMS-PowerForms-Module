@@ -19,20 +19,12 @@ class DatePicker extends FieldBase
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'DatePicker';
 		$mod = $formdata->formsmodule;
-		$this->Months = array(
-			''=>'',
-			$mod->Lang('date_january')=>1,
-			$mod->Lang('date_february')=>2,
-			$mod->Lang('date_march')=>3,
-			$mod->Lang('date_april')=>4,
-			$mod->Lang('date_may')=>5,
-			$mod->Lang('date_june')=>6,
-			$mod->Lang('date_july')=>7,
-			$mod->Lang('date_august')=>8,
-			$mod->Lang('date_september')=>9,
-			$mod->Lang('date_october')=>10,
-			$mod->Lang('date_november')=>11,
-			$mod->Lang('date_december')=>12);
+		$months = explode(',',$mod->Lang('all_months'));
+		$this->Months = array_flip($months); //0-based
+		foreach ($this->Months as $name=>&$val) {
+			$val++;	//1-based
+		}
+		unset ($val);
 	}
 
 	public function GetSynopsis()
@@ -76,21 +68,7 @@ class DatePicker extends FieldBase
 			$ret = date($this->GetProperty('date_format','j F Y'),$theDate);
 
 			$ret = str_replace(array('January','February','March','April','May','June','July','August','September','October','November','December'),
-				array(
-					$mod->Lang('date_january'),
-					$mod->Lang('date_february'),
-					$mod->Lang('date_march'),
-					$mod->Lang('date_april'),
-					$mod->Lang('date_may'),
-					$mod->Lang('date_june'),
-					$mod->Lang('date_july'),
-					$mod->Lang('date_august'),
-					$mod->Lang('date_september'),
-					$mod->Lang('date_october'),
-					$mod->Lang('date_november'),
-					$mod->Lang('date_december')
-					),
-				$ret);
+					explode(',',$mod->Lang('all_months')),$ret);
 				$ret = html_entity_decode($ret,ENT_QUOTES,'UTF-8');
 		} else
 			$ret = $this->GetFormProperty('unspecified',$mod->Lang('unspecified'));
