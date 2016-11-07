@@ -44,7 +44,8 @@ class SequenceEnd extends SequenceStart
 
 		$main[] = array($mod->Lang('title_privatename'),
 						$mod->CreateInputText($id,'fp_privatename',
-							$this->GetProperty('privatename',$alias),20,50));
+							$this->GetProperty('privatename',''),20,50),
+						$mod->Lang('help_privatename'));
 		$main[] = array($mod->Lang('title_add_button_seqpre'),
 						$mod->CreateInputText($id,'fp_insertpre_label',
 							$this->GetProperty('insertpre_label',$mod->Lang('insert_seqpre')),25,30));
