@@ -677,11 +677,10 @@ can iterate through <code>$field->input->name</code> and <code>$field->input->in
 EOS;
 $lang['hour'] = 'Hour';
 
+$lang['identifier'] = 'Identifier';
 $lang['illegal_file'] = 'Attempted upload of illegal file type (%s) from %s';
 $lang['illegal_file_type'] = 'This type of file may not be uploaded. Please check that the extension is correct.';
-
 $lang['import'] = 'Import';
-
 $lang['import_fb'] = 'Import Forms';
 $lang['import_browsedata'] = 'Conform Browsers';
 $lang['increment'] = 'increment';
