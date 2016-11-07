@@ -637,6 +637,7 @@ $lang['help_newline_replacement'] = 'Leave blank to allow newlines and carriage 
 $lang['help_no_empty'] = 'Check this if you want only checked boxes to return values';
 $lang['help_not_ready'] = 'please add disposition-field(s) to the form';
 $lang['help_permitted_extensions'] = 'Enter a comma-separated list, excluding the dot (e.g. "jpg,gif,jpeg"). Spaces will be ignored. Leaving this blank means there will be no restrictions.';
+$lang['help_privatename'] = 'Identifier specified in corresponding SequenceStart field';
 $lang['help_radio_separator'] = 'Xhtml string, such as \' \' (unquoted) or &amp;nbsp; or &lt;br /&gt;';
 $lang['help_regex_use'] = 'This regular expression will only be used if "validation type" is set to a regex-related option. Include a full Perl-style regex, including the start/stop slashes and flags (e.g., "/image\.(\d+)/i")';
 $lang['help_save_order'] = 'You must "save" or "apply" to make the new field-order permanent.';
