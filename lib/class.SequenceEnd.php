@@ -8,6 +8,7 @@ namespace PWForms;
 
 class SequenceEnd extends SequenceStart
 {
+	public $Instance = 1; //current number c.f. parent::Repeats
 	public $LastBreak = TRUE;
 
 	public function __construct(&$formdata,&$params)
@@ -29,8 +30,6 @@ class SequenceEnd extends SequenceStart
 		$pre = ($state) ? 'end_':'break_';
 		$this->Alias = uniqid($pre.$this->formdata->Id);
 	}
-
-	//TODO method to set all $LastBreak properties in the form
 
 	public function AdminPopulate($id)
 	{
@@ -64,26 +63,58 @@ class SequenceEnd extends SequenceStart
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-/*	public function AdminValidate($id)
+	public function AdminValidate($id)
 	{
-		TODO relevant $this->GetProperty('privatename') or else warn user;
+		$mod = $this->formdata->formsmodule;
+		$ret = TRUE;
+		$msg = '';
+		$ref = $this->GetProperty('privatename');
+		if ($ref) {
+			//check property is ok
+			$starter = FALSE;
+			$multi = FALSE;
+			foreach ($this->formdata->Fields as $obfld) {
+				$t = $obfld->Type;
+				if ($t == 'SequenceStart' || ($t == 'SequenceEnd' && $obfld != $this)) {
+					$p = $obfld->GetProperty('privatename');
+					if ($p == $ref) {
+						if ($t == 'SequenceStart') {
+							$starter = TRUE;
+						} else {
+							$multi = TRUE;
+						}
+					}
+				}
+			}
+			if ($multi) {
+				$ret = FALSE;
+				$msg = $mod->Lang('err_typed',$mod->Lang('sequenceid'));
+			} elseif (!$starter) {
+				$msg = $mod->Lang('missing_type',$mod->Lang(''));
+			}
+		} else {
+			$msg = $mod->Lang('missing_type',$mod->Lang('sequenceid')); //not fatal, warn user
+		}
+		return array($ret,$msg);
 	}
-*/
+
 	public function Populate($id,&$params)
 	{
-	//TODO no 'insert_label'(s) sometimes, no 'delete_label'(s) sometimes
+		//at this stage, don't know whether all buttons are relevant
 		if ($this->LastBreak) {
 			$propkeys = array('insertpre_label','deletepre_label');
+			$nm = array('_SeI','_SeD');
 		} else {
 			$propkeys = array('insertpre_label','deletepre_label','insert_label','delete_label');
+			$nm = array('_SeI','_SeD','_SeX','_SeW');
 		}
 		$html = '';
 		$bnm = $id.$this->formdata->current_prefix.$this->Id;
 		$bid = $this->GetInputId();
 
-		foreach ($propkeys as $key) {
-			$c = $TODO;
-			$tmp = '<input type="button" name="'.$bnm.$c.'" id="'.$bid.$c.
+		foreach ($propkeys as $i=>$key) {
+			$m = $nm[$i];
+			$tmp = '<input type="button" name="'.$bnm.$m.'" id="'.$bid.$m.
 			'" value="'.$this->GetProperty($key).'" />';
 			$html .= $this->SetClass($tmp).' ';
 		}
@@ -92,7 +123,6 @@ class SequenceEnd extends SequenceStart
 		} else {
 			$html .= '&#166;&#166;';
 		}
-		//no js
 		return $html;
 	}
 }

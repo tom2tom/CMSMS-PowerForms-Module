@@ -9,85 +9,18 @@ namespace PWForms;
 class SequenceStart extends FieldBase
 {
 	public $IsSequence = TRUE;
-	public $Repeats = 1;
+	public $Repeats = 1; //total number
 
 	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata, $params);
 		$this->DisplayInSubmission = FALSE;
 		$this->HasLabel = TRUE;
-		//name/label not user-modifiable for this class
+		//name/alias not user-modifiable for this class
 		$this->Name = $formdata->formsmodule->Lang('sequence_start').' &#187;&#187;'; //right angle quotes
 		$this->Alias = uniqid('start_'.$this->formdata->Id);
 		$this->NeedsDiv = FALSE;
 		$this->Type = 'SequenceStart';
-	}
-
-	protected function CountSequences(){
-		$nm = $this->GetProperty('privatename'); //sequence identifier
-		$count = 0;
-		$ender = NULL;
-		foreach ($this->formdata->Fields as $obfld) { //TODO per field-orders
-			if ($obfld->Type == 'SequenceEnd') {
-				if ($obfld->GetProperty('privatename') == $nm) { //belongs to this sequence
-					$ender = $obfld;
-					$obfld->SetLast(FALSE);
-					$count++;
-				}
-			}
-		}
-		if ($ender) {
-			$ender->SetLast(TRUE);
-		}
-		$this->Repeats = $count;
-		return $count;
-	}
-
-	protected function CopySequenceFields()
-	{
-		$c = $this->GetProperty('maxcount');
-		if ($c > 0) {
-			$cn = $this->CountSequences();
-			if ($cn > $c)
-				return; //TODO advice for user
-		}
-		foreach ($this->formdata->Fields as $obfld) {
-			if ($obfld == $this) {
-/*
-	note position
-  find next break
-  get all intemediate fields
-  append break field
-  'insert' after/before this position (append?)
-  update $LastBreak's
-  update orders
-*/
-			}
-		}
-	}
-
-	private function DeleteSequenceFields()
-	{
-		$c = $this->GetProperty('mincount');
-		if ($c > 1) {
-			$cn = $this->CountSequences();
-			if ($cn <= $c)
-				return; //TODO advice for user
-		}
-		foreach ($this->formdata->Fields as $obfld) {
-			if ($obfld == $this) {
-/*
-	note position
-  find next break
-  get all intemediate fields
-    delete them
-   if following break field
-    delete that
-   update $LastBreak's
-   update orders 
-*/
-			}
-		}
 	}
 
 	public function GetSynopsis()
@@ -135,28 +68,70 @@ class SequenceStart extends FieldBase
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-/*	public function AdminValidate($id)
+	public function AdminValidate($id)
 	{
-		TODO
-		unique privatename
-		max adds 0..20?
-		repeatcount 1..Max
+		$messages = array();
+		$mod = $this->formdata->formsmodule;
+		$ret = TRUE;
+		$ref = $this->GetProperty('privatename');
+		if ($ref) {
+			foreach ($this->formdata->Fields as $obfld) {
+				if ($obfld->Type == 'SequenceStart') {
+					$p = $obfld->GetProperty('privatename');
+					if ($p == $ref) {
+						$ret = FALSE;
+						$messages[] = $mod->Lang('err_typed',$mod->Lang('sequenceid'));
+						break;
+					}
+				}
+			}
+		} else {
+			$messages[] = $mod->Lang('missing_type',$mod->Lang('sequenceid')); //not fatal, warn user
+		}
+
+		$num = $this->GetProperty('mincount');
+		if (!$num || $num < 1) {
+			$num = 1;
+			$this->SetProperty('mincount',1);
+		}
+		$num2 = $this->GetProperty('maxcount');
+		if ($num2) {
+			if ($num2 > 10) {
+				$this->SetProperty('maxcount',10);
+				$messages[] = $mod->Lang('err_typed',$mod->Lang('count')).': MAX';
+			} elseif ($num2 < $num)
+				$this->SetProperty('maxcount',$num);
+		}
+		$num3 = $this->GetProperty('repeatcount');
+		if ($num3) {
+			if ($num3 < $num || ($num2 && $num3 > $num2)) {
+				$this->setProperty('repeatcount',$num);
+				$messages[] = $mod->Lang('err_typed',$mod->Lang('count')).': INITIAL';
+			}
+		} else {
+			$this->setProperty('repeatcount',$num);
+			$messages[] = $mod->Lang('missing_type',$mod->Lang('count')).': INITIAL';
+		}
+			
+		$msg = ($messages)?implode('<br />',$messages):'';
+		return array($ret,$msg);
 	}
-*/
+
 	public function Populate($id,&$params)
 	{
 		$html = '';
 		$bnm = $id.$this->formdata->current_prefix.$this->Id;
 		$bid = $this->GetInputId();
-//TODO no 'insert_label' sometimes, no 'delete_label' sometimes
-		foreach (array('insert_label','delete_label') as $key) {
-			$c = $TODO;
-			$tmp = '<input type="button" name="'.$bnm.$c.'" id="'.$bid.$c.
+		//at this stage, don't know whether either/both buttons are relevant
+		$propkeys = array('insert_label','delete_label');
+		$nm = array('_SeX','_SeW');
+		foreach ($propkeys as $i=>$key) {
+			$m = $nm[$i];
+			$tmp = '<input type="button" name="'.$bnm.$m.'" id="'.$bid.$m.
 			'" value="'.$this->GetProperty($key).'" />';
 			$html .= $this->SetClass($tmp).' ';
 		}
-		$html .= $this->Name;
-		//no js
+		$html .= '&#187;&#187;';
 		return $html;
 	}
 }
