@@ -163,7 +163,11 @@ $tplvars['form_start'] = $this->CreateFormStart($id,'open_field',$returnid,
 	'POST','',FALSE,'',array(
 	'form_id'=>$params['form_id'],
 	'datakey'=>$params['datakey'],
-	'field_id'=>$fid));
+	'field_id'=>$fid,
+	'selectfields'=>$params['selectfields'],
+	'selectdispos'=>$params['selectdispos'],
+	'selectextern'=>$params['selectextern']
+	));
 $tplvars['form_end'] = $this->CreateFormEnd();
 
 $t = ($fid != 0) ? 'save':'add'; //field save or add
