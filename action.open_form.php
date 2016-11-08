@@ -54,9 +54,13 @@ if (isset($params['submit']) || isset($params['apply'])) {
 		//update cache ready for next use
 		$cache->set($params['datakey'],$formdata,84600);
 		$this->Redirect($id,'open_field',$returnid,
-			array('field_id'=>$params['field_id'],
-				'form_id'=>$fid,
-				'datakey'=>$params['datakey']));
+			array('form_id'=>$fid,
+				'datakey'=>$params['datakey'],
+				'field_id'=>$params['field_id'],
+				'selectfields'=>$params['selectfields'],
+				'selectdispos'=>$params['selectdispos'],
+				'selectextern'=>$params['selectextern']
+				));
 	} else {
 		$message = $this->_PrettyMessage('err_copy',FALSE);
 	}
@@ -67,48 +71,53 @@ if (isset($params['submit']) || isset($params['apply'])) {
 	$message = $this->_PrettyMessage('field_order_updated');
 }
 
-//helpicon file
-if (!(empty($params['icondelete']) || empty($params['fp_help_icon']))) {
-	PWForms\Utils::DeleteUploadFile($this,$params['fp_help_icon'],$form_id);
-//	unset($params['icondelete']);
-}
-$t = $id.'iconupload';
-if (isset($_FILES) && isset($_FILES[$t])) {
-	$file_data = $_FILES[$t];
-	if ($file_data['name']) {
-		if ($file_data['error'] != 0)
-			$umsg = $this->Lang('err_upload',$this->Lang('err_system'));
-		else {
-			//requires GD[2] extension - TODO check - doesn't support many image-types
-			$lvl = error_reporting(0);
-			$img = @imagecreatefromstring(file_get_contents($file_data['tmp_name']));
-			error_reporting($lvl);
-			if ($img) {
-				imagedestroy($img);
-			} else {
-				$umsg = $this->Lang('err_upload',$this->Lang('err_file'));
-			}
-		}
-		if (empty($umsg)) {
-			$fp = PWForms\Utils::GetUploadsPath($this);
-			if ($fp) {
-				$fp .= DIRECTORY_SEPARATOR.$file_data['name'];
-				if (// !chmod($file_data['tmp_name'],0644) ||
-					!cms_move_uploaded_file($file_data['tmp_name'],$fp)) {
-					$umsg = $this->Lang('err_upload',$this->Lang('err_perm'));
-				}
-			} else
+if (extension_loaded('GD')) {
+	//helpicon file
+	if (!(empty($params['icondelete']) || empty($params['fp_help_icon']))) {
+		PWForms\Utils::DeleteUploadFile($this,$params['fp_help_icon'],$form_id);
+	//	unset($params['icondelete']);
+	}
+	$t = $id.'iconupload';
+	if (isset($_FILES) && isset($_FILES[$t])) {
+		$file_data = $_FILES[$t];
+		if ($file_data['name']) {
+			if ($file_data['error'] != 0)
 				$umsg = $this->Lang('err_upload',$this->Lang('err_system'));
-		}
-		if (empty($umsg))
-			$params['fp_help_icon'] = $file_data['name'];
-		else {
-			$message .= '<br />'.$umsg;
+			else {
+				$lvl = error_reporting(0);
+				$img = @imagecreatefromstring(file_get_contents($file_data['tmp_name']));
+				error_reporting($lvl);
+				if ($img) {
+					if (imagesx($img) > 36 || imagesy($img) > 36) {
+						$umsg = $this->Lang('err_upload',$this->Lang('err_file'));
+					}
+					imagedestroy($img);
+				} else {
+					$umsg = $this->Lang('err_upload',$this->Lang('err_file'));
+				}
+			}
+			if (empty($umsg)) {
+				$fp = PWForms\Utils::GetUploadsPath($this);
+				if ($fp) {
+					$fp .= DIRECTORY_SEPARATOR.$file_data['name'];
+					if (// !chmod($file_data['tmp_name'],0644) ||
+						!cms_move_uploaded_file($file_data['tmp_name'],$fp)) {
+						$umsg = $this->Lang('err_upload',$this->Lang('err_perm'));
+					}
+				} else
+					$umsg = $this->Lang('err_upload',$this->Lang('err_system'));
+			}
+			if (empty($umsg))
+				$params['fp_help_icon'] = $file_data['name'];
+			else {
+				$message .= '<br />'.$umsg;
 //			unset($umsg); //for next upload?
+			}
+		} else {
 		}
-	} else {
 	}
 }
+
 //styles file
 if (!(empty($params['stylesdelete']) || empty($params['fp_css_file']))) {
 	PWForms\Utils::DeleteUploadFile($this,$params['fp_css_file'],$form_id);
