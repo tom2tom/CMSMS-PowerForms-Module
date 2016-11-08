@@ -237,7 +237,7 @@ class Utils
 		return FALSE;
 	}
 
-//	const MAILERMINVERSION = '1.73'; //minumum acceptable version of CMSMailer module
+//	const MAILERMINVERSION = '1.73'; //minimum acceptable version of CMSMailer module
 	/**
 	GetForms:
 	@orderby: forms-table field name, optional, default 'name'
@@ -257,7 +257,7 @@ class Utils
 
 /*	public static function mb_asort(&$array)
 	{
-		if (extension_loaded('intl') === TRUE) {
+		if (extension_loaded('intl')) {
 			collator_asort(collator_create(NULL),$array); //OR 'root' OR specific locale
 		} else {
 			array_multisort(array_map(function($str)
@@ -272,7 +272,7 @@ class Utils
 
 	public static function mb_strcmp($a,$b)
 	{
-		if (extension_loaded('intl') === TRUE) {
+		if (extension_loaded('intl')) {
 			static $coll = NULL;
 			if ($coll == NULL)
 				$coll = new \collator(NULL); //OR 'root' OR specific locale
@@ -642,7 +642,7 @@ class Utils
 		must be escaped, and any js-unfriendly content must be resolved.
 	@funcName: identifier for use when multiple buttons populate the same control, default ''
 	Returns: 2-member array:
-	 [0] XHTML for a button
+	 [0] XHTML for a button, including 'onclick' js
 	 [1] js onclick handler for the button, sets object value
 	*/
 	public static function CreateTemplateAction(&$mod, $id, $ctlName, $button_label, $template, $funcName=FALSE)
@@ -688,7 +688,7 @@ EOS;
 			  'is_oneline' => true
 			  'is_footer' => true
 	Returns: 2-member array
-	 [0] = array of XHTML button-strings
+	 [0] = array of XHTML button-strings, each including 'onclick=...' js
 	 [1] = corresponding array of onclick handler-funcs for buttons in [0]
 	 The scripts install a 'sample template' into the corresponding control.
 	 For some combinations of options, pairs of buttons & scripts are created.
@@ -851,14 +851,14 @@ EOS;
 			$tplvars['fieldvars'] = $fieldvars;
 		}
 
-/*		$obfields = array();
+/*		$obflds = array();
 		foreach (array ('name','type','id','value','valuearray') as $name) {
 			$oneset = new \stdClass();
 			$oneset->name = $name;
 			$oneset->title = $mod->Lang('title_field_'.$name);
-			$obfields[] = $oneset;
+			$obflds[] = $oneset;
 		}
-		$tplvars['obfields'] = $obfields;
+		$tplvars['obfields'] = $obflds;
 
 //		$oneset->title = $mod->Lang('title_field_id2');
 		$tplvars['help_field_values'] = $mod->Lang('help_field_values'));
@@ -1019,7 +1019,7 @@ EOS;
 			$all = array();
 		}
 		if ($jsfuncs || $jsloads) {
-			$all[] =<<<EOS
+			$all[] =<<<'EOS'
 <script type="text/javascript">
 //<![CDATA[
 EOS;
@@ -1029,7 +1029,7 @@ EOS;
 				$all[] = $jsfuncs;
 			}
 			if ($jsloads) {
-				$all[] =<<<EOS
+				$all[] =<<<'EOS'
 $(document).ready(function() {
 EOS;
 				if (is_array($jsloads)) {
@@ -1041,7 +1041,7 @@ EOS;
 });
 EOS;
 			}
-			$all[] =<<<EOS
+			$all[] =<<<'EOS'
 //]]>
 </script>
 EOS;
