@@ -77,7 +77,7 @@ if (isset($params['submit'])) {
 		}
 	}
 	$obfld->PostAdminAction($params);
-	list($res,$message) = $obfld->AdminValidate($id);
+	list($res,$msg) = $obfld->AdminValidate($id);
 	if ($res) {
 		if ($newfield) {
 			//TODO eliminate race-risk here
@@ -89,12 +89,19 @@ if (isset($params['submit'])) {
 		}
 		//update cache ready for next use
 		$cache->set($params['datakey'],$formdata,84600);
+
 		$t = ($newfield) ? 'added':'updated';
 		$message = $this->Lang('field_op',$this->Lang($t));
+		if ($msg) {
+			$message = $msg.'<br />'.$message;
+		}
 		$this->Redirect($id,'open_form',$returnid,array(
 			'form_id'=>$params['form_id'],
 			'datakey'=>$params['datakey'],
 			'active_tab'=>'fieldstab',
+			'selectfields'=>$params['selectfields'],
+			'selectdispos'=>$params['selectdispos'],
+			'selectextern'=>$params['selectextern'],
 			'message'=>$this->_PrettyMessage($message,TRUE,FALSE)));
 	} else {
 		//start again //TODO if imported field with no tabled data
@@ -102,7 +109,7 @@ if (isset($params['submit'])) {
 			$obfld = PWForms\FieldOperations::NewField($formdata,$params);
 		else
 			$obfld->Load($id,$params); //TODO check for failure
-		$message = $this->_PrettyMessage($message,FALSE,FALSE);
+		$message = $this->_PrettyMessage($msg,FALSE,FALSE);
 	}
 } elseif (isset($params['optionadd'])) {
 	$obfld->OptionAdd($params);
