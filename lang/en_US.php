@@ -705,11 +705,13 @@ $lang['movedn'] = 'move down';
 $lang['moveup'] = 'move up';
 //missing types
 $lang['admin'] = 'admininstrator';
+$lang['count'] = 'item count';
 $lang['destination'] = 'destination address';
 $lang['file'] = 'file';
 $lang['item'] = 'item';
 $lang['member'] = 'member';
 $lang['page'] = 'website page';
+$lang['sequenceid'] = 'sequence identifier';
 $lang['source'] = 'source address';
 $lang['subject'] = 'email subject';
 
