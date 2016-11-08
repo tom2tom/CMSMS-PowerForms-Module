@@ -898,7 +898,7 @@ class FieldBase implements \Serializable
 	/* Subclass this if needed
 	Returns: 2-member array:
 	 [0] = boolean T/F indicating whether or not everything is ok
-	 [1] = '' or a (possibly multi-line) message
+	 [1] = '' or a (possibly multi-line) message (whether or not [0] is TRUE)
 	*/
 	public function AdminValidate($id)
 	{
