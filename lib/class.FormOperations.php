@@ -335,11 +335,13 @@ EOS;
 		// store fields
 		$newfields = array();
 		foreach ($formdata->Fields as $key=>&$obfld) {
-			if ($obfld instanceof FieldBase) {
+			if ($obfld) {
 				$obfld->Store(TRUE);
 				if ($key <= 0) //new field, after save it will include an actual id
 					$newfields[$key] = $obfld->GetId();
-			} else { //stdClass object == marked for deletion
+			} else { //marked for deletion
+				$obfld = new stdClass();
+				$obfld->Id = $key;
 				FieldOperations::RealDeleteField($obfld);
 			}
 		}

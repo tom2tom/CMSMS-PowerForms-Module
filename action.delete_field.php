@@ -5,9 +5,11 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-//this action processes ajax-calls
-
-if (isset($params['datakey'])) {
+if (isset($params['action'])) {
+	//we've reached here via a request or redirect
+	//TODO
+} else {
+	//we've reached here via an ajax-call
 	try {
 		$cache = PWForms\Utils::GetCache($this);
 	} catch (Exception $e) {
@@ -19,26 +21,24 @@ if (isset($params['datakey'])) {
 		echo '0';
 		exit;
 	}
-}
-//mark field(s) for deletion during Store
-if (strpos($params['field_id'],',') !== FALSE) {
-	$all = explode(',',$params['field_id']);
-} else {
-	$all = array($params['field_id']);
-}
-foreach($all as $one) {
-	$fid = (int)$one;
-	$ob = new stdClass();
-	$ob->Id = $fid;
-	$formdata->Fields[$fid] = $ob;
-	if ($formdata->FieldOrders) {
-		$key = array_search($fid,$formdata->FieldOrders);
-		if ($key !== FALSE)
-			unset($formdata->FieldOrders[$key]);
+	//mark field(s) for deletion during Store
+	if (strpos($params['field_id'],',') !== FALSE) {
+		$all = explode(',',$params['field_id']);
+	} else {
+		$all = array($params['field_id']);
 	}
+	foreach($all as $one) {
+		$fid = (int)$one;
+		$formdata->Fields[$fid] = NULL;
+		if ($formdata->FieldOrders) {
+			$key = array_search($fid,$formdata->FieldOrders);
+			if ($key !== FALSE)
+				unset($formdata->FieldOrders[$key]);
+		}
+	}
+
+	$cache->set($params['datakey'],$formdata,84600);
+
+	echo '1';
+	exit;
 }
-
-$cache->set($params['datakey'],$formdata,84600);
-
-echo '1';
-exit;
