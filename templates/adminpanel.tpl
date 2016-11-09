@@ -14,7 +14,7 @@
   <th class="pageicon"></th>
 {/if}
   <th class="pageicon"></th>
-  <th class="checkbox" style="width:20px;">{$selectall_forms}</th>
+  <th class="checkbox">{$selectall_forms}</th>
  </tr></thead>
  <tbody>
 {foreach from=$forms item=entry}{cycle values='row1,row2' assign=rowclass}
