@@ -51,16 +51,17 @@ $tplvars = $tplvars + array(
 	'help_can_drag' => $this->Lang('help_can_drag'),
 	'help_save_order' => $this->Lang('help_save_order'),
 
-	'title_field_alias' => $this->Lang('title_field_alias_short'),
-	'title_field_id' => $this->Lang('title_field_id'),
-	'title_field_name' => $this->Lang('title_field_name'),
-	'title_field_required_abbrev' => $this->Lang('title_field_required_abbrev'),
-	'title_field_type' => $this->Lang('title_field_type'),
+	'text_alias' => $this->Lang('title_field_alias_short'),
+	'text_id' => $this->Lang('title_field_id'),
+	'text_info' => $this->Lang('information'),
+	'text_move' => $this->Lang('move'),
+	'text_name' => $this->Lang('title_field_name'),
+	'text_required' => $this->Lang('title_field_required_abbrev'),
+	'text_type' => $this->Lang('title_field_type'),
 
 	'title_form_fields' => $this->Lang('title_form_fields'),
 	'title_form_main' => $this->Lang('title_form_main'),
 
-	'title_information' => $this->Lang('information'),
 //	'title_order' => $this->Lang('order'),
 	'title_form_dispositions' => $this->Lang('title_form_dispositions'),
 	'title_form_externals' => $this->Lang('title_form_externals')
@@ -90,47 +91,75 @@ $icondelete = $theme->DisplayImage('icons/system/delete.gif',$this->Lang('delete
 $iconup = $theme->DisplayImage('icons/system/arrow-u.gif',$this->Lang('moveup'),'','','systemicon');
 $icondown = $theme->DisplayImage('icons/system/arrow-d.gif',$this->Lang('movedn'),'','','systemicon');
 
-$fields = array(); //non-disposition fields
+$fields = array(); //ordinary fields
 $dispositions = array(); //disposition fields
-$count = 1;
+$externals = array(); //external-use fields
+$count = 1; //move-icon counters
 $dcount = 1;
+$ecount = 1;
 $total = count($formdata->Fields);
 $dtotal = 0;
+$etotal = 0;
 if ($total > 0) {
-	foreach ($formdata->Fields as &$one) {
-		if ($one->IsDisposition() && !$one->IsDisplayed())
+	foreach ($formdata->Fields as $obfld) {
+		if ($obfld->IsDisposition() && !$obfld->IsDisplayed())
 			$dtotal++;
+		elseif ($obfld->DisplayExternal()) {
+			$etotal++;
+		}
 	}
-	unset($one);
 	$total -= $dtotal;
+	$total -= $etotal;
 }
 
+if (!isset($params['selectfields'])) { //first time
+	$selfield = $this->GetPreference('adder_fields','basic');
+	$seldisp = $selfield;
+	$selext = $selfield;
+} else {
+	$selfield = $params['selectfields'];
+	$seldisp = $params['selectdispos'];
+	$selext = $params['selectextern'];
+}
+
+$hidden[] = $this->CreateInputHidden($id,'selectfields',$selfield);
+$hidden[] = $this->CreateInputHidden($id,'selectdispos',$seldisp);
+$hidden[] = $this->CreateInputHidden($id,'selectextern',$selext);
+
+$linkargs = array(
+'field_id'=>0,
+'form_id'=>$form_id,
+'datakey'=>$params['datakey'],
+'active_tab'=>'fieldstab',
+'selectfields'=>$selfield,
+'selectdispos'=>$seldisp,
+'selectextern'=>$selext
+);
+
 foreach ($formdata->FieldOrders as $one) {
-	$one = $formdata->Fields[$one];
+	$obfld = $formdata->Fields[$one];
 	$oneset = new stdClass();
-	$fid = (int)$one->GetId();
+	$fid = (int)$obfld->GetId();
 	$oneset->id = $fid;
-	$t = $one->GetName();
+	$t = $obfld->GetName();
 	if (!$t)
 		$t = $this->Lang('none2');
 	$oneset->order = '<input type="hidden" name="'.$id.'form_FieldOrders[]" value="'.$fid.'" />';
-	$oneset->name = $this->CreateLink($id,'open_field','',$t,
-		array('field_id'=>$fid,'form_id'=>$form_id,'datakey'=>$params['datakey']));
-	$oneset->alias = $one->ForceAlias();
-	$oneset->type = $one->GetDisplayType();
-	$oneset->field_status = $one->GetSynopsis();
-	$oneset->editlink = $this->CreateLink($id,'open_field','',
-		$iconedit,
-		array('field_id'=>$fid,'form_id'=>$form_id,'datakey'=>$params['datakey']));
-	$oneset->copylink = $this->CreateLink($id,'open_form','',
-		$iconcopy,
-		array('fieldcopy'=>1,'field_id'=>$fid,'form_id'=>$form_id,'datakey'=>$params['datakey']));
-	$oneset->deletelink = $this->CreateLink($id,'delete_field','',
-		$icondelete,
-		array('fielddelete'=>1,'field_id'=>$fid,'form_id'=>$form_id,'datakey'=>$params['datakey']),
-		'','','','onclick="delete_field(\''.htmlspecialchars($one->GetName()).'\');return false;"');
+	$linkargs['field_id'] = $fid;
+	$oneset->name = $this->CreateLink($id,'open_field','',$t,$linkargs);
+	$oneset->alias = $obfld->ForceAlias();
+	$oneset->type = $obfld->GetDisplayType();
+	$oneset->field_status = $obfld->GetSynopsis();
+	$oneset->edit = $this->CreateLink($id,'open_field','',$iconedit,
+		$linkargs);
+	$oneset->copy = $this->CreateLink($id,'open_form','',$iconcopy,
+		$linkargs + array('fieldcopy'=>1));
+	$oneset->delete = $this->CreateLink($id,'delete_field','',$icondelete,
+		$linkargs + array('fielddelete'=>1),
+		'','','','onclick="delete_field(this,\''.htmlspecialchars($obfld->GetName()).'\');return false;"');
+	$oneset->select = $this->CreateInputCheckbox($id,'selected[]',$fid,-1);
 
-	if ($one->IsDisposition() && !$one->IsDisplayed()) {
+	if ($obfld->IsDisposition() && !$obfld->IsDisplayed()) {
 		if ($dcount > 1)
 			$oneset->up = $this->CreateLink($id,'open_form','',
 			$iconup,
@@ -146,10 +175,26 @@ foreach ($formdata->FieldOrders as $one) {
 
 		$dispositions[] = $oneset;
 		$dcount++;
+	} elseif ($obfld->DisplayExternal()) {
+		if ($ecount > 1)
+			$oneset->up = $this->CreateLink($id,'open_form','',
+			$iconup,
+			array('form_id'=>$form_id,'datakey'=>$params['datakey'],'field_id'=>$fid,'dir'=>'up'));
+		else
+			$oneset->up = '';
+		if ($ecount < $etotal)
+			$oneset->down = $this->CreateLink($id,'open_form','',
+			$icondown,
+			array('form_id'=>$form_id,'datakey'=>$params['datakey'],'field_id'=>$fid,'dir'=>'down'));
+		else
+			$oneset->down = '';
+
+		$externals[] = $oneset;
+		$ecount++;
 	} else {
-		if (!$one->DisplayInForm() || !$one->GetChangeRequirement())
+		if (!$obfld->DisplayInForm() || !$obfld->GetChangeRequirement())
 			$oneset->required = '';
-		elseif ($one->IsRequired())
+		elseif ($obfld->IsRequired())
 			$oneset->required = $this->CreateLink($id,'require_field','',
 				$icontrue,
 				array('form_id'=>$form_id,'datakey'=>$params['datakey'],'field_id'=>$fid,'reqd'=>'off'),
@@ -178,45 +223,10 @@ foreach ($formdata->FieldOrders as $one) {
 	}
 }
 
+$tplvars['fields'] = $fields;
 if ($fields) {
-	$tplvars['fields'] = $fields;
-
-	$prompt = $this->Lang('confirm_delete_field','%s');
 	$msg = $this->Lang('err_server');
 	$jsfuncs[] = <<<EOS
-function delete_field (name) {
- var message = '{$prompt}'.replace('%s',name);
- if (confirm(message)) {
-  var url = $(this).attr('href');
-  var parent = $(this).closest('tr');
-  var errmsg = '{$msg}';
-  $.ajax({
-   type: 'POST',
-   url: url,
-   error: function() {
-    alert(errmsg);
-   },
-   success: function() {
-    parent.fadeOut('1000', function() {
-     parent.remove();
-     var odd = true;
-     var oddclass = 'row1';
-     var evenclass = 'row2';
-     $('.pwf_table').find('tbody tr').each(function() {
-      var name = odd ? oddclass : evenclass;
-      $(this).removeClass().addClass(name)
-      .removeAttr('onmouseover').mouseover(function() {
-        $(this).attr('class',name+'hover');
-      }).removeAttr('onmouseout').mouseout(function() {
-        $(this).attr('class',name);
-      });
-      odd = !odd;
-     });
-    });
-   }
-  });
- }
-}
 function require_field(link,newstate) {
  var url = $(link).attr('href');
  $.ajax({
@@ -244,11 +254,9 @@ EOS;
 	);
 }
 
+$tplvars['dispositions'] = $dispositions;
 if ($dispositions) {
-	$tplvars = $tplvars + array(
-		'dispositions' => $dispositions,
-		'text_ready' => $this->Lang('title_ready')
-	);
+	$tplvars['text_ready'] = $this->Lang('title_ready');
 } else {
 	$tplvars = $tplvars + array(
 		'nodispositions' => $this->Lang('no_dispositions'),
@@ -258,165 +266,212 @@ if ($dispositions) {
 	);
 }
 
-$externals = array(); //TODO
+$tplvars['externals'] = $externals;
 if ($externals) {
-	$tplvars['externals'] = $externals;
 } else {
 	$tplvars['noexternals'] = $this->Lang('no_externals');
 }
 
-if (!isset($params['selectfields'])) { //first time
-	$selfield = $this->GetPreference('adder_fields','basic');
-	$seldisp = $selfield;
-	$selext = $selfield;
+if ($count || $dcount || $ecount) {
+	$tplvars['delete'] = $this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
+		'title="'.$this->Lang('tip_delselfield').
+		'" onclick="return confirm_selected(this,\''.$this->Lang('confirm').'\');"');
+	$prompt = $this->Lang('confirm_delete_field','%s');
+	$msg = $this->Lang('err_server');
+	$jsfuncs[] = <<<EOS
+function confirm_selected(btn,prompt) {
+ var sel = $(btn).closest('div').prev('table').find('tbody input[name^="{$id}selected"]:checked');
+ if (sel.length > 0) {
+  if (confirm(prompt)) {
+   var url = TODO;
+   $.ajax({
+    type: 'POST',
+    url: url,
+    error: function() {
+     alert('{$msg}');
+    },
+    success: function() {
+     var \$bod = $(btn).closest('div').prev('table').find('tbody');
+     //TODO remove selected row(s)
+     var odd = true,
+      oddclass = 'row1',
+      evenclass = 'row2';
+     \$bod.find('tr').each(function() {
+      var \$r = $(this),
+        name = odd ? oddclass : evenclass;
+      \$r.removeClass().addClass(name)
+      .removeAttr('onmouseover').mouseover(function() {
+        \$r.attr('class',name+'hover');
+      }).removeAttr('onmouseout').mouseout(function() {
+        \$r.attr('class',name);
+      });
+      odd = !odd;
+     });
+    }
+   });
+  }
+ }
+ return false;
+}
+function delete_field (link,name) {
+ var message = '{$prompt}'.replace('%s',name);
+ if (confirm(message)) {
+  var \$l = $(link),
+   url = \$l.attr('href');
+  $.ajax({
+   type: 'POST',
+   url: url,
+   error: function() {
+    alert('{$msg}');
+   },
+   success: function() {
+    var \$row = \$l.closest('tr');
+    \$row.fadeOut('1000', function() {
+     var odd = true,
+      oddclass = 'row1',
+      evenclass = 'row2',
+      \$bod = \$row.closest('tbody');
+     \$row.remove();
+     \$bod.find('tr').each(function() {
+      var \$r = $(this),
+        name = odd ? oddclass : evenclass;
+      \$r.removeClass().addClass(name)
+      .removeAttr('onmouseover').mouseover(function() {
+        \$r.attr('class',name+'hover');
+      }).removeAttr('onmouseout').mouseout(function() {
+        \$r.attr('class',name);
+      });
+      odd = !odd;
+     });
+    });
+   }
+  });
+ }
+}
+EOS;
 } else {
-	$selfield = $params['selectfields'];
-	$seldisp = $params['selectdispos'];
-	$selext = $params['selectextern'];
+	$tplvars['delete'] = NULL;
+}
+if ($count > 1 || $dcount > 1 || $ecount > 1) {
+	$tplvars['selectall'] = $this->CreateInputCheckbox($id,'selectall',1,-1,'onclick="select_all(this);"');
+	$jsfuncs[] = <<<EOS
+function select_all(cb) {
+ var st = cb.checked;
+ $(cb).closest('table').find('tbody input[type="checkbox"]').attr('checked',st);
+}
+EOS;
+} else {
+	$tplvars['selectall'] = NULL;
 }
 
-$hidden[] = $this->CreateInputHidden($id,'selectfields',$selfield);
-$hidden[] = $this->CreateInputHidden($id,'selectdispos',$seldisp);
-$hidden[] = $this->CreateInputHidden($id,'selectextern',$selext);
-
-$basicfields = array($this->Lang('select_type')=>''); //non-disposition fields
-$basicdispos = $basicfields; //disposition fields
-$advancedfields = $basicfields; //non-disposition fields
-$advanceddispos = $basicfields; //disposition fields
+$basicfields = array($this->Lang('select_type')=>''); //non-disposition fields accumulator
+$basicdispos = $basicfields; //disposition fields accumulator
+$extendedfields = $basicfields; //extended non-disposition fields accumulator
+$extendeddispos = $basicfields; //extended disposition fields accumulator
 
 PWForms\Utils::Collect_Fields($this);
 foreach ($this->std_field_types as $l=>$t) {
 	$classPath = 'PWForms\\'.$t;
-	$one = new $classPath($formdata,$params);
-	if ($one->IsDisposition()) {
-		if ($one->IsInput)
+	$obfld = new $classPath($formdata,$params);
+	if ($obfld->IsDisposition()) {
+		if ($obfld->IsInput)
 			$basicfields[$l] = $t;
 		else
 			$basicdispos[$l] = $t;
 	} else
 		$basicfields[$l] = $t;
 }
-unset($one);
+unset($obfld);
 
 foreach ($this->field_types as $l=>$t) {
 	$classPath = 'PWForms\\'.$t;
-	$one = new $classPath($formdata,$params);
-	if ($one->IsDisposition()) {
-		if ($one->IsInput)
-			$advancedfields[$l] = $t;
+	$obfld = new $classPath($formdata,$params);
+	if ($obfld->IsDisposition()) {
+		if ($obfld->IsInput)
+			$extendedfields[$l] = $t;
 		else
-			$advanceddispos[$l] = $t;
+			$extendeddispos[$l] = $t;
 	} else
-		$advancedfields[$l] = $t;
+		$extendedfields[$l] = $t;
 }
-unset($one);
+unset($obfld);
 
-$linkargs = array(
-	'form_id'=>$form_id,
-	'datakey'=>$params['datakey'],
-	'active_tab'=>NULL,
-	'selectfields'=>$selfield,
-	'selectdispos'=>$seldisp,
-	'selectextern'=>$selext);
-$t1 = $this->Lang('title_switch_advanced');
-$t2 = $this->Lang('title_switch_basic');
-
-//fields
+//ordinary fields
 $t = $this->Lang('title_add_new_field');
 $tplvars['title_fieldpick'] = $t;
+$linkargs['field_id'] = 0; //new-field indicator
 $tplvars['add_field_link'] =
 	$this->CreateLink($id,'open_field',$returnid,
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
-		array('field_id'=>0,
-		'form_id'=>$form_id,
-		'datakey'=>$params['datakey']),'',FALSE).' '.
+		$linkargs,'',FALSE).' '.
 	$this->CreateLink($id,'open_field',$returnid,$t,
-		array('field_id'=>0,
-		'form_id'=>$form_id,
-		'datakey'=>$params['datakey']),'',FALSE);
+		$linkargs,'',FALSE);
 //selector
 if ($selfield == 'basic') {
 	$tplvars['input_fieldpick'] = $this->CreateInputDropdown($id,'field_type',
 		$basicfields,-1,'','onchange="add_field(this,\'form\');"');
-	$tplvars['help_fieldpick'] =
-		$t1.
-		$this->CreateLink($id,'open_form',$returnid,$this->Lang('title_switch_advanced_link'),
-		array('active_tab'=>'fieldstab','selectfields'=>'advanced') + $linkargs);
+	$tplvars['help_fieldpick'] = $this->CreateLink($id,'open_form',$returnid,
+		$this->Lang('title_switch_advanced_link'),
+		array('selectfields'=>'advanced') + $linkargs);
 } else { //advanced
 	$tplvars['input_fieldpick'] = $this->CreateInputDropdown($id,'field_type',
-		$advancedfields,-1,'','onchange="add_field(this,\'form\');"');
-	$tplvars['help_fieldpick'] =
-		$t2.
-		$this->CreateLink($id,'open_form',$returnid,$this->Lang('title_switch_basic_link'),
-		array('active_tab'=>'fieldstab','selectfields'=>'basic') + $linkargs);
+		$extendedfields,-1,'','onchange="add_field(this,\'form\');"');
+	$tplvars['help_fieldpick'] = $this->CreateLink($id,'open_form',$returnid,
+		$this->Lang('title_switch_basic_link'),
+		array('selectfields'=>'basic') + $linkargs);
 }
 
 //dispositions
 $t = $this->Lang('title_add_new_disposition');
 $tplvars['title_fieldpick2'] = $t;
+$linkargs['active_tab'] = 'submittab';
 $tplvars['add_disposition_link'] =
 	$this->CreateLink($id,'open_field',$returnid,
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
-		array('field_id'=>0,
-		'form_id'=>$form_id,
-		'datakey'=>$params['datakey']),'',FALSE).' '.
+		$linkargs,'',FALSE).' '.
 	$this->CreateLink($id,'open_field',$returnid,$t,
-		array('field_id'=>0,
-		'form_id'=>$form_id,
-		'datakey'=>$params['datakey']),'',FALSE);
+		$linkargs,'',FALSE);
 //selector
 if ($seldisp == 'basic') {
 	$tplvars['input_fieldpick2'] = $this->CreateInputDropdown($id,'disposition_type',
 		$basicdispos,-1,'','onchange="add_field(this,\'disposition\');"');
-	$t = $this->Lang('title_switch_advanced2');
-	$tplvars['help_fieldpick2'] =
-		$t.
-		$this->CreateLink($id,'open_form',$returnid,$this->Lang('title_switch_advanced_link'),
-		array('active_tab'=>'submittab','selectdispos'=>'advanced') + $linkargs);
+	$tplvars['help_fieldpick2'] = $this->CreateLink($id,'open_form',$returnid,
+		$this->Lang('title_switch_advanced_link'),
+		array('selectdispos'=>'advanced') + $linkargs);
 } else { //advanced
 	$tplvars['input_fieldpick2'] = $this->CreateInputDropdown($id,'disposition_type',
-		$advanceddispos,-1,'','onchange="add_field(this,\'disposition\');"');
-	$t = $this->Lang('title_switch_basic2');
-	$tplvars['help_fieldpick2'] =
-		$t.
-		$this->CreateLink($id,'open_form',$returnid,$this->Lang('title_switch_basic_link'),
-		array('active_tab'=>'submittab','selectdispos'=>'basic') + $linkargs);
+		$extendeddispos,-1,'','onchange="add_field(this,\'disposition\');"');
+	$tplvars['help_fieldpick2'] = $this->CreateLink($id,'open_form',$returnid,
+		$this->Lang('title_switch_basic_link'),
+		array('selectdispos'=>'basic') + $linkargs);
 }
 
 //externals
 $t = $this->Lang('title_add_new_external');
 $tplvars['title_fieldpick3'] = $t;
+$linkargs['active_tab'] = 'externtab';
 $tplvars['add_external_link'] =
 	$this->CreateLink($id,'open_field',$returnid,
 		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
-		array('field_id'=>0,
-		'form_id'=>$form_id,
-		'datakey'=>$params['datakey']),'',FALSE).' '.
+		$linkargs,'',FALSE).' '.
 	$this->CreateLink($id,'open_field',$returnid,$t,
-		array('field_id'=>0,
-		'form_id'=>$form_id,
-		'datakey'=>$params['datakey']),'',FALSE);
+		$linkargs,'',FALSE);
 //selector
 if ($selext == 'basic') {
 	$tplvars['input_fieldpick3'] = $this->CreateInputDropdown($id,'external_type',
 		$basicfields,-1,'','onchange="add_field(this,\'external\');"');
-	$tplvars['help_fieldpick3'] =
-		$t1.
-		$this->CreateLink($id,'open_form',$returnid,$this->Lang('title_switch_advanced_link'),
-		array('active_tab'=>'externtab','selectextern'=>'advanced') + $linkargs);
+	$tplvars['help_fieldpick3'] = $this->CreateLink($id,'open_form',$returnid,
+		$this->Lang('title_switch_advanced_link'),
+		array('selectextern'=>'advanced') + $linkargs);
 } else { //advanced
 	$tplvars['input_fieldpick3'] = $this->CreateInputDropdown($id,'external_type',
-		$advancedfields,-1,'','onchange="add_field(this,\'external\');"');
-	$tplvars['help_fieldpick3'] =
-		$t2.
-		$this->CreateLink($id,'open_form',$returnid,$this->Lang('title_switch_basic_link'),
-		array('active_tab'=>'externtab','selectextern'=>'basic') + $linkargs);
+		$extendedfields,-1,'','onchange="add_field(this,\'external\');"');
+	$tplvars['help_fieldpick3'] = $this->CreateLink($id,'open_form',$returnid,
+		$this->Lang('title_switch_basic_link'),
+		array('selectextern'=>'basic') + $linkargs);
 }
 //js to add selected field
-$link = $this->CreateLink($id,'open_field',$returnid,'',
-	array('field_id'=>0,
-	'form_id'=>$form_id,
-	'datakey'=>$params['datakey']),'',TRUE,TRUE);
+$link = $this->CreateLink($id,'open_field',$returnid,'',$linkargs,'',TRUE,TRUE);
 $link = str_replace('&amp;','&',$link);
 $jsfuncs[] = <<<EOS
 function add_field(sel,scope) {
@@ -698,6 +753,7 @@ $oneset = new stdClass();
 $oneset->title = $this->Lang('title_submit_limit');
 $oneset->input = $this->CreateInputText($id,'fp_submit_limit',
 	PWForms\Utils::GetFormProperty($formdata,'submit_limit',$this->GetPreference('submit_limit')),3,5);
+$oneset->help = $this->Lang('help_limit_count');
 $submits[] = $oneset;
 
 //no scope for !empty() checks for boolean attrs, so we add hidden 0 for checkboxes
