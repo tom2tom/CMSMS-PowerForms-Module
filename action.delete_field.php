@@ -20,17 +20,24 @@ if (isset($params['datakey'])) {
 		exit;
 	}
 }
-
-//mark for deletion during Store
-$fid = (int)$params['field_id'];
-$ob = new stdClass();
-$ob->Id = $fid;
-$formdata->Fields[$fid] = $ob;
-if ($formdata->FieldOrders) {
-	$key = array_search($fid,$formdata->FieldOrders);
-	if ($key !== FALSE)
-		unset($formdata->FieldOrders[$key]);
+//mark field(s) for deletion during Store
+if (strpos($params['field_id'],',') !== FALSE) {
+	$all = explode(',',$params['field_id']);
+} else {
+	$all = array($params['field_id']);
 }
+foreach($all as $one) {
+	$fid = (int)$one;
+	$ob = new stdClass();
+	$ob->Id = $fid;
+	$formdata->Fields[$fid] = $ob;
+	if ($formdata->FieldOrders) {
+		$key = array_search($fid,$formdata->FieldOrders);
+		if ($key !== FALSE)
+			unset($formdata->FieldOrders[$key]);
+	}
+}
+
 $cache->set($params['datakey'],$formdata,84600);
 
 echo '1';
