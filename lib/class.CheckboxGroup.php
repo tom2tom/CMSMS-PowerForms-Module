@@ -255,12 +255,17 @@ EOS;
 				$tmp = $mod->CreateInputCheckbox(
 					$id,$this->formdata->current_prefix.$this->Id.'[]',$i,$checked,
 					'id="'.$tid.'"'.$jsl.$js);
-				$oneset->input = $this->SetClass($tmp);
+				if ($hidden) {
+					$oneset->input = $hidden.$this->SetClass($tmp);
+					$hidden = NULL;
+				} else {
+					$oneset->input = $this->SetClass($tmp);
+				}
 				$ret[] = $oneset;
 			}
 			unset($one);
 			$this->MultiPopulate = TRUE;
-			return $hidden.$ret;
+			return $ret;
 		}
 		$this->MultiPopulate = FALSE;
 		return '';

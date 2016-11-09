@@ -112,12 +112,13 @@ class CheckboxExtended extends FieldBase
 			}
 		} else
 			$hasvalue = FALSE;
+
 		$tmp = $mod->CreateInputCheckbox(
 			$id,$this->formdata->current_prefix.$this->Id.'[box]','t',
 			($hasvalue?$this->Value['box']:0),
 			'id="'.$tid.'"'.$js);
 		$oneset->input = $this->SetClass($tmp);
-		$ret[] = $oneset;
+		$ret[] = $hidden.$oneset;
 
 		if ($show) {
 			$tid = $this->GetInputId('_1');
@@ -145,7 +146,7 @@ class CheckboxExtended extends FieldBase
 			$ret[] = $oneset;
 		}
 
-		return $hidden.$ret;
+		return $ret;
 	}
 
 	public function Validate($id)
