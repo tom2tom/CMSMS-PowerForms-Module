@@ -11,12 +11,17 @@ class CountryPicker extends FieldBase
 {
 	private $Countries;
 
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata,$params);
 		$this->IsInput = TRUE;
 		$this->Type = 'CountryPicker';
-		$mod = $formdata->formsmodule;
+		$this->InitCountries();
+	}
+
+	protected function InitCountries()
+	{
+		$mod = $this->formdata->formsmodule;
 		$this->Countries = array(
 			$mod->Lang('AF') =>'AF',$mod->Lang('AX') =>'AX',$mod->Lang('AL') =>'AL',
 			$mod->Lang('DZ') =>'DZ',$mod->Lang('AS') =>'AS',$mod->Lang('AD') =>'AD',
@@ -101,11 +106,14 @@ class CountryPicker extends FieldBase
 			$mod->Lang('WF') =>'WF',$mod->Lang('EH') =>'EH',$mod->Lang('YE') =>'YE',
 			$mod->Lang('YU') =>'YU',$mod->Lang('ZM') =>'ZM',$mod->Lang('ZW') =>'ZW'
 			);
-			ksort($this->Countries);
-		}
+		ksort($this->Countries); //TODO mb_ compatible sort
+	}
 
 	public function DisplayableValue($as_string=TRUE)
 	{
+		if (!$this->Countries) {
+			$this->InitCountries();
+		}
 		$ret = array_search($this->Value,$this->Countries);
 		if ($as_string)
 			return $ret;
@@ -115,9 +123,11 @@ class CountryPicker extends FieldBase
 
 	public function AdminPopulate($id)
 	{
+		if (!$this->Countries) {
+			$this->InitCountries();
+		}
 		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
 		$mod = $this->formdata->formsmodule;
-
 		$choices = array_merge(array($mod->Lang('no_default')=>''),$this->Countries);
 		$main[] = array($mod->Lang('title_select_default_country'),
 						$mod->CreateInputDropdown($id,'fp_default_country',$choices,-1,
