@@ -58,11 +58,11 @@ if ($allforms) {
 		if ($pmod) {
 			$oneset->name = $this->CreateLink($id,'open_form','',
 				$one['name'],array('form_id'=>$fid)); //no datakey
-			$oneset->editlink = $this->CreateLink($id,'open_form','',
+			$oneset->edit = $this->CreateLink($id,'open_form','',
 				$iconedit,array('form_id'=>$fid));
-			$oneset->copylink = $this->CreateLink($id,'add_form','',
+			$oneset->copy = $this->CreateLink($id,'add_form','',
 				$iconcopy,array('form_id'=>$fid));
-			$oneset->deletelink = $this->CreateLink($id,'delete_form','',
+			$oneset->delete = $this->CreateLink($id,'delete_form','',
 				$icondelete,array('form_id'=>$fid),
 				$this->Lang('confirm_delete_form',$one['name']));
 		} else {
@@ -72,7 +72,7 @@ if ($allforms) {
 			'{'.$modname.' form=\''.$one['alias'].'\'}' : $one['alias'];
 		$oneset->exportlink = $this->CreateLink($id,'export_form','',
 			$iconexport,array('form_id'=>$fid));
-		$oneset->selected = $this->CreateInputCheckbox($id,'selected[]',$fid,-1);
+		$oneset->select = $this->CreateInputCheckbox($id,'selected[]',$fid,-1);
 		$data[] = $oneset;
 	}
 	$tplvars['forms'] = $data;
@@ -89,8 +89,8 @@ if ($allforms) {
 		$tplvars['clonebtn'] = $this->CreateInputSubmit($id,'clone',$this->Lang('copy'),
 			'title="'.$this->Lang('tip_clonesel').'" onclick="return any_selected();"');
 		$tplvars['deletebtn'] = $this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
-			'title="'.$this->Lang('tip_deletesel').'" onclick="return confirm_selected(\''.
-			$this->Lang('confirm').'\');"');
+			'title="'.$this->Lang('tip_deletesel').
+			'" onclick="return confirm_selected(\''.$this->Lang('confirm').'\');"');
 	}
 } else {
 	$tplvars['noforms'] = $this->Lang('no_forms');

@@ -22,12 +22,12 @@
   <td>{$entry->name}</td>
   <td>{$entry->alias}</td>
 {if $pmod}
-  <td>{$entry->editlink}</td>
-  <td>{$entry->copylink}</td>
-  <td>{$entry->deletelink}</td>
+  <td>{$entry->edit}</td>
+  <td>{$entry->copy}</td>
+  <td>{$entry->delete}</td>
 {/if}
   <td>{$entry->exportlink}</td>
-  <td class="checkbox">{$entry->selected}</td>
+  <td class="checkbox">{$entry->select}</td>
  </tr>
 {/foreach}
 </tbody>
