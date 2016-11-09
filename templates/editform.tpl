@@ -20,36 +20,36 @@
   <div class="saveordermsg"><p>{$help_save_order}</p></div>
   </div>
   {/if}
-  <table id="fields" class="pagetable{if count($fields)>1} tabledrag{/if}">
+  <table id="fields" class="pagetable leftwards{if count($fields)>1} tabledrag{/if}">
    <thead><tr>
-  {if isset($title_field_id)}<th>{$title_field_id}</th>{/if}
-    <th style="max-width:15em;">{$title_field_name}</th>
-  {if isset($title_field_alias)}<th style="width:10em;">{$title_field_alias}</th>{/if}
-    <th style="max-width:20em;">{$title_field_type}</th>
-    <th style="max-width:25em;">{$title_information}</th>
-    <th class="pageicon">{$title_field_required_abbrev}</th>
-    <th class="updown" style="width:20px;">&nbsp;</th>
-    <th class="updown" style="width:20px;">&nbsp;</th>
+  {if isset($text_id)}<th>{$text_id}</th>{/if}
+    <th style="max-width:15em;">{$text_name}</th>
+  {if isset($text_alias)}<th style="width:10em;">{$text_alias}</th>{/if}
+    <th style="max-width:20em;">{$text_type}</th>
+    <th style="max-width:25em;">{$text_info}</th>
+    <th class="pageicon">{$text_required}</th>
+    <th class="updown">{$text_move}</th>
     <th class="pageicon"></th>
     <th class="pageicon"></th>
     <th class="pageicon"></th>
+    <th{if count($fields)>1} class="checkbox">{$selectall}{else}>{/if}</th>
    </tr></thead>
    <tbody>
   {foreach from=$fields item=entry}
    {cycle name=fields values='row1,row2' assign=rowclass}
-  	 <tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
-   {if isset($title_field_id)}<td>{$entry->id}</td>{/if}
+  	<tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
+   {if isset($text_id)}<td>{$entry->id}</td>{/if}
      <td>{$entry->order}{$entry->name}</td>
-   {if isset($title_field_alias)}<td>{$entry->alias}</td>{/if}
+   {if isset($text_alias)}<td>{$entry->alias}</td>{/if}
      <td>{$entry->type}</td>
      <td>{$entry->field_status}</td>
      <td>{$entry->required}</td>
-     <td class="updown">{$entry->up}</td>
-     <td class="updown">{$entry->down}</td>
-     <td>{$entry->editlink}</td>
-     <td>{$entry->copylink}</td>
-     <td>{$entry->deletelink}</td>
-     </tr>
+     <td class="updown">{$entry->up}{$entry->down}</td>
+     <td>{$entry->edit}</td>
+     <td>{$entry->copy}</td>
+     <td>{$entry->delete}</td>
+     <td class="checkbox">{$entry->select}</td>
+    </tr>
   {/foreach}
    </tbody>
   </table>
@@ -58,9 +58,9 @@
  {/if}
    <div class="addfast">
     <p class="pagetext">{$title_fieldpick}</p>
-    <div>{$input_fieldpick}<br />{$help_fieldpick}</div>
+    <div>{$input_fieldpick} {$help_fieldpick}{if $fields}<span style="margin-left:5em;">{$delete}</span>{/if}</div>
    </div>
-   <div class="addslow">{$add_field_link}</div>
+   <div class="addslow">{$add_field_link}{if $fields}<span style="margin-left:5em;">{$delete}</span>{/if}</div>
   </div>
 {$tab_end}{$displaytab_start}
  <div class="pageinput pageoverflow">
@@ -130,30 +130,30 @@
   <div class="saveordermsg"><p>{$help_save_order}</p></div>
   </div>
   {/if}
-  <table id="dispositions" class="leftwards{if count($dispositions)>1} tabledrag{/if}">
+  <table id="dispositions" class="pagetable leftwards{if count($dispositions)>1} tabledrag{/if}">
    <thead><tr>
-    <th style="max-width:15em;">{$title_field_name}</th>
-    <th style="max-width:20em;">{$title_field_type}</th>
-    <th style="max-width:25em;">{$title_information}</th>
-    <th class="updown" style="width:20px;">&nbsp;</th>
-    <th class="updown" style="width:20px;">&nbsp;</th>
+    <th style="max-width:15em;">{$text_name}</th>
+    <th style="max-width:20em;">{$text_type}</th>
+    <th style="max-width:25em;">{$text_info}</th>
+    <th class="updown">{$text_move}</th>
     <th class="pageicon"></th>
     <th class="pageicon"></th>
     <th class="pageicon"></th>
+    <th{if count($dispositions)>1} class="checkbox">{$selectall}{else}>{/if}</th>
    </tr></thead>
    <tbody>
   {foreach from=$dispositions item=entry}
    {cycle name=fields values='row1,row2' assign=rowclass}
-  	 <tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
+  	<tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
      <td>{$entry->order}{$entry->name}</td>
      <td>{$entry->type}</td>
      <td>{$entry->field_status}</td>
-     <td class="updown">{$entry->up}</td>
-     <td class="updown">{$entry->down}</td>
-     <td>{$entry->editlink}</td>
-     <td>{$entry->copylink}</td>
-     <td>{$entry->deletelink}</td>
-     </tr>
+     <td class="updown">{$entry->up}{$entry->down}</td>
+     <td>{$entry->edit}</td>
+     <td>{$entry->copy}</td>
+     <td>{$entry->delete}</td>
+     <td class="checkbox">{$entry->select}</td>
+    </tr>
   {/foreach}
    </tbody>
   </table>
@@ -162,9 +162,9 @@
  {/if}
  <div class="addfast">
   <p class="pagetext">{$title_fieldpick2}</p>
-  <div>{$input_fieldpick2}<br />{$help_fieldpick2}</div>
+  <div>{$input_fieldpick2} {$help_fieldpick2}{if $dispositions}<span style="margin-left:5em;">{$delete}</span>{/if}</div>
  </div>
- <div class="addslow">{$add_disposition_link}</div>
+ <div class="addslow">{$add_disposition_link}{if $dispositions}<span style="margin-left:5em;">{$delete}</span>{/if}</div>
   <br />
   <p class="pagetext">{$title_submit_action}:</p>
   <p>{$input_submit_action}</p>
@@ -194,30 +194,30 @@
   <div class="saveordermsg"><p>{$help_save_order}</p></div>
   </div>
   {/if}
-  <table id="externalfield" class="leftwards{if count($externals)>1} tabledrag{/if}">
+  <table id="externalfield" class="pagetable leftwards{if count($externals)>1} tabledrag{/if}">
    <thead><tr>
-    <th style="max-width:15em;">{$title_field_name}</th>
-    <th style="max-width:20em;">{$title_field_type}</th>
-    <th style="max-width:25em;">{$title_information}</th>
-    <th class="updown" style="width:20px;">&nbsp;</th>
-    <th class="updown" style="width:20px;">&nbsp;</th>
+    <th style="max-width:15em;">{$text_name}</th>
+    <th style="max-width:20em;">{$text_type}</th>
+    <th style="max-width:25em;">{$text_info}</th>
+    <th class="updown">{$text_move}</th>
     <th class="pageicon"></th>
     <th class="pageicon"></th>
     <th class="pageicon"></th>
+    <th{if count($externals)>1} class="checkbox">{$selectall}{else}>{/if}</th>
    </tr></thead>
    <tbody>
   {foreach from=$externals item=entry}
    {cycle name=fields values='row1,row2' assign=rowclass}
-  	 <tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
+  	<tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
      <td>{$entry->order}{$entry->name}</td>
      <td>{$entry->type}</td>
      <td>{$entry->field_status}</td>
-     <td class="updown">{$entry->up}</td>
-     <td class="updown">{$entry->down}</td>
-     <td>{$entry->editlink}</td>
-     <td>{$entry->copylink}</td>
-     <td>{$entry->deletelink}</td>
-     </tr>
+     <td class="updown">{$entry->up}{$entry->down}</td>
+     <td>{$entry->edit}</td>
+     <td>{$entry->copy}</td>
+     <td>{$entry->delete}</td>
+     <td class="checkbox">{$entry->select}</td>
+    </tr>
   {/foreach}
    </tbody>
   </table>
@@ -226,9 +226,9 @@
  {/if}
  <div class="addfast">
   <p class="pagetext">{$title_fieldpick}</p>
-  <div>{$input_fieldpick3}<br />{$help_fieldpick3}</div>
+  <div>{$input_fieldpick3} {$help_fieldpick3}{if $externals}<span style="margin-left:5em;">{$delete}</span>{/if}</div>
  </div>
- <div class="addslow">{$add_external_link}</div>
+ <div class="addslow">{$add_external_link}{if $externals}<span style="margin-left:5em;">{$delete}</span>{/if}</div>
  </div>
 {$tab_end}
 {$tabs_end}
