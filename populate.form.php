@@ -156,7 +156,7 @@ foreach ($formdata->FieldOrders as $one) {
 		$linkargs + array('fieldcopy'=>1));
 	$oneset->delete = $this->CreateLink($id,'delete_field','',$icondelete,
 		$linkargs + array('fielddelete'=>1),
-		'','','','onclick="delete_field(this,\''.htmlspecialchars($obfld->GetName()).'\');return false;"');
+		'','','','onclick="delete_field(this,'.$fid.',\''.htmlspecialchars($obfld->GetName()).'\');return false;"');
 	$oneset->select = $this->CreateInputCheckbox($id,'selected[]',$fid,-1);
 
 	if ($obfld->IsDisposition() && !$obfld->IsDisplayed()) {
@@ -198,12 +198,12 @@ foreach ($formdata->FieldOrders as $one) {
 			$oneset->required = $this->CreateLink($id,'require_field','',
 				$icontrue,
 				array('form_id'=>$form_id,'datakey'=>$params['datakey'],'field_id'=>$fid,'reqd'=>'off'),
-				'','','','class="true" onclick="require_field(this,false);return false;"');
+				'','','','class="true" onclick="require_field(this,'.$fid.',false);return false;"');
 		else
 			$oneset->required = $this->CreateLink($id,'require_field','',
 				$iconfalse,
 				array('form_id'=>$form_id,'datakey'=>$params['datakey'],'field_id'=>$fid,'reqd'=>'on'),
-				'','','','class="false" onclick="require_field(this,true);return false;"');
+				'','','','class="false" onclick="require_field(this,'.$fid.',true);return false;"');
 
 		if ($count > 1)
 			$oneset->up = $this->CreateLink($id,'open_form','',
@@ -225,22 +225,31 @@ foreach ($formdata->FieldOrders as $one) {
 
 $tplvars['fields'] = $fields;
 if ($fields) {
-	$msg = $this->Lang('err_server');
+	$u = $this->create_url($id,'require_field','',array('datakey'=>$params['datakey'],'reqd'=>'off','field_id'=>''));
+	$offs = strpos($u,'?mact=');
+	$u = str_replace('&amp;','&',substr($u,$offs+1)); //field identifier will be appended at runtime
+	$errmsg = $this->Lang('err_server');
 	$jsfuncs[] = <<<EOS
-function require_field(link,newstate) {
- var url = $(link).attr('href');
+function require_field(link,fid,newstate) {
+ var udata = '{$u}'+fid;
+ if (newstate) {
+   udata = udata.replace('reqd=off','reqd=on');
+ }
  $.ajax({
   type: 'POST',
-  url: url,
+  url: 'moduleinterface.php',
+  data: udata,
   error: function() {
-   alert('{$msg}');
+   alert('{$errmsg}');
   },
   success: function() {
+   var \$l = $(link),
+    url = \$l.attr('href'),
+    js = \$l.attr('onclick');
    var newurl = (newstate) ? url.replace('reqd=on','reqd=off') : url.replace('reqd=off','reqd=on');
-   var img = (newstate) ?
-    '{$icontrue}':
-    '{$iconfalse}';
-   $(link).attr('href',newurl).html(img);
+   var newjs = (newstate) ? js.replace(',true',',false') : js.replace(',false',',true');
+   var img = (newstate) ? '{$icontrue}':'{$iconfalse}';
+   \$l.attr('href',newurl).attr('onclick',newjs).html(img);
   }
  });
 }
@@ -275,58 +284,26 @@ if ($externals) {
 if ($count || $dcount || $ecount) {
 	$tplvars['delete'] = $this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
 		'title="'.$this->Lang('tip_delselfield').
-		'" onclick="return confirm_selected(this,\''.$this->Lang('confirm').'\');"');
+		'" onclick="delete_selected(this,\''.$this->Lang('confirm').'\');return false;"');
 	$prompt = $this->Lang('confirm_delete_field','%s');
-	$msg = $this->Lang('err_server');
+	$u = $this->create_url($id,'delete_field','',array('datakey'=>$params['datakey'],'field_id'=>''));
+	$offs = strpos($u,'?mact=');
+	$u = str_replace('&amp;','&',substr($u,$offs+1)); //field identifier will be appended at runtime
+	$errmsg = $this->Lang('err_server');
 	$jsfuncs[] = <<<EOS
-function confirm_selected(btn,prompt) {
- var sel = $(btn).closest('div').prev('table').find('tbody input[name^="{$id}selected"]:checked');
- if (sel.length > 0) {
-  if (confirm(prompt)) {
-   var url = TODO;
-   $.ajax({
-    type: 'POST',
-    url: url,
-    error: function() {
-     alert('{$msg}');
-    },
-    success: function() {
-     var \$bod = $(btn).closest('div').prev('table').find('tbody');
-     //TODO remove selected row(s)
-     var odd = true,
-      oddclass = 'row1',
-      evenclass = 'row2';
-     \$bod.find('tr').each(function() {
-      var \$r = $(this),
-        name = odd ? oddclass : evenclass;
-      \$r.removeClass().addClass(name)
-      .removeAttr('onmouseover').mouseover(function() {
-        \$r.attr('class',name+'hover');
-      }).removeAttr('onmouseout').mouseout(function() {
-        \$r.attr('class',name);
-      });
-      odd = !odd;
-     });
-    }
-   });
-  }
- }
- return false;
-}
-function delete_field (link,name) {
- var message = '{$prompt}'.replace('%s',name);
+function delete_field (link,fid,fname) {
+ var message = '{$prompt}'.replace('%s',fname);
  if (confirm(message)) {
-  var \$l = $(link),
-   url = \$l.attr('href');
   $.ajax({
    type: 'POST',
-   url: url,
+   url: 'moduleinterface.php',
+   data: '{$u}'+fid,
    error: function() {
-    alert('{$msg}');
+    alert('{$errmsg}');
    },
    success: function() {
-    var \$row = \$l.closest('tr');
-    \$row.fadeOut('1000', function() {
+    var \$row = $(link).closest('tr');
+    \$row.fadeOut('500', function() {
      var odd = true,
       oddclass = 'row1',
       evenclass = 'row2',
@@ -346,6 +323,44 @@ function delete_field (link,name) {
     });
    }
   });
+ }
+}
+function delete_selected(btn,prompt) {
+ var \$sel = $(btn).closest('div[class^="add"]').prev('table').find('tbody input[name^="{$id}selected"]:checked');
+ if (\$sel.length > 0) {
+  if (confirm(prompt)) {
+   var fids = \$sel.map(function() {
+    return this.value;
+   }).get();
+   $.ajax({
+    type: 'POST',
+    url: 'moduleinterface.php',
+    data: '{$u}'+fids,
+    error: function() {
+     alert('{$errmsg}');
+    },
+    success: function() {
+     \$sel.each(function() {
+      $(this).closest('tr').remove();
+     });
+     var \$bod = $(btn).closest('div[class^="add"]').prev('table').find('tbody');
+      odd = true,
+      oddclass = 'row1',
+      evenclass = 'row2';
+     \$bod.find('tr').each(function() {
+      var \$r = $(this),
+        name = odd ? oddclass : evenclass;
+      \$r.removeClass().addClass(name)
+      .removeAttr('onmouseover').mouseover(function() {
+        \$r.attr('class',name+'hover');
+      }).removeAttr('onmouseout').mouseout(function() {
+        \$r.attr('class',name);
+      });
+      odd = !odd;
+     });
+    }
+   });
+  }
  }
 }
 EOS;
