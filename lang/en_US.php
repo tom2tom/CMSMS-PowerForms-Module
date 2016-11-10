@@ -721,7 +721,6 @@ $lang['no'] = 'No';
 $lang['no_admins'] = 'No site administrator is available';
 $lang['no_default'] = 'No Default';
 $lang['no_dispositions'] = 'The form has no diposition-fields';
-$lang['no_externals'] = 'The form has no external-use fields';
 $lang['no_field_assigned'] = 'No field assigned for %s';
 $lang['no_fields'] = 'The form has no fields';
 $lang['no_forms'] = 'No form is registered';
@@ -797,7 +796,6 @@ $lang['suspected_spam'] = 'Too many emails generated from your IP address. Anti-
 
 $lang['tab_advanced'] = 'Advanced Settings';
 $lang['tab_display'] = 'Presentation';
-$lang['tab_external'] = 'External Use';
 $lang['tab_field'] = 'Field';
 $lang['tab_fields'] = 'Fields';
 $lang['tab_form'] = 'Form';

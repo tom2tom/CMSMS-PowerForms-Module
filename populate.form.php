@@ -17,15 +17,14 @@ $tplvars['form_start'] = $this->CreateFormStart($id,'open_form',$returnid,
 
 $tab = $this->_GetActiveTab($params);
 $t = $this->StartTabHeaders().
-	$this->SetTabHeader('maintab',$this->Lang('tab_form'),($tab == 'maintab'));
+	$this->SetTabHeader('maintab',$this->Lang('tab_form'),($tab == 'maintab')).
+	$this->SetTabHeader('displaytab',$this->Lang('tab_display'),($tab == 'displaytab'));
 if ($form_id > 0)
 	$t .= $this->SetTabHeader('fieldstab',$this->Lang('tab_fields'),($tab == 'fieldstab'));
 $t .=
-	$this->SetTabHeader('displaytab',$this->Lang('tab_display'),($tab == 'displaytab')).
 	$this->SetTabHeader('templatetab',$this->Lang('tab_templatelayout'),($tab == 'templatetab')).
 	$this->SetTabHeader('udttab',$this->Lang('tab_udt'),($tab == 'udttab')).
 	$this->SetTabHeader('submittab',$this->Lang('tab_submit'),($tab == 'submittab')).
-	$this->SetTabHeader('externtab',$this->Lang('tab_external'),($tab == 'externtab')).
 	$this->EndTabHeaders().$this->StartTabContent();
 $tplvars['tabs_start'] = $t;
 if ($form_id > 0)
@@ -37,19 +36,14 @@ $tplvars = $tplvars + array(
 	'templatetab_start' => $this->StartTab('templatetab'),
 	'udttab_start' => $this->StartTab('udttab'),
 	'submittab_start' => $this->StartTab('submittab'),
-	'externtab_start' => $this->StartTab('externtab'),
 	'tab_end' => $this->EndTab(),
 	'form_end' => $this->CreateFormEnd(),
 
-	'title_form_name' => $this->Lang('title_form_name'),
-	'input_form_name' => $this->CreateInputText($id,'form_Name',$formdata->Name,50), //NB object name = 'form_'.property-name
-	'title_form_alias' => $this->Lang('title_form_alias'),
-	'input_form_alias' => $this->CreateInputText($id,'form_Alias',$formdata->Alias,50), //ditto
-	'help_form_alias' => $this->Lang('help_form_alias'),
-	'title_form_status' => $this->Lang('title_form_status'),
-
 	'help_can_drag' => $this->Lang('help_can_drag'),
+	'help_form_alias' => $this->Lang('help_form_alias'),
 	'help_save_order' => $this->Lang('help_save_order'),
+	'input_form_alias' => $this->CreateInputText($id,'form_Alias',$formdata->Alias,50), //NB object name = 'form_'.property-name
+	'input_form_name' => $this->CreateInputText($id,'form_Name',$formdata->Name,50), //ditto
 
 	'text_alias' => $this->Lang('title_field_alias_short'),
 	'text_id' => $this->Lang('title_field_id'),
@@ -59,15 +53,12 @@ $tplvars = $tplvars + array(
 	'text_required' => $this->Lang('title_field_required_abbrev'),
 	'text_type' => $this->Lang('title_field_type'),
 
+	'title_form_alias' => $this->Lang('title_form_alias'),
+	'title_form_dispositions' => $this->Lang('title_form_dispositions'),
 	'title_form_fields' => $this->Lang('title_form_fields'),
 	'title_form_main' => $this->Lang('title_form_main'),
-
-//	'title_order' => $this->Lang('order'),
-	'title_form_dispositions' => $this->Lang('title_form_dispositions'),
-	'title_form_externals' => $this->Lang('title_form_externals')
-//	'title_submit_actions' => $this->Lang('title_submit_actions'),
-//	'title_submit_labels' => $this->Lang('title_submit_labels'),
-//	'security_key' => CMS_SECURE_PARAM_NAME.'='.$_SESSION[CMS_USER_KEY]
+	'title_form_name' => $this->Lang('title_form_name'),
+	'title_form_status' => $this->Lang('title_form_status')
 );
 
 $theme = ($this->before20) ? cmsms()->variables['admintheme']:
@@ -93,10 +84,8 @@ $icondown = $theme->DisplayImage('icons/system/arrow-d.gif',$this->Lang('movedn'
 
 $fields = array(); //ordinary fields
 $dispositions = array(); //disposition fields
-$externals = array(); //external-use fields
 $count = 1; //move-icon counters
 $dcount = 1;
-$ecount = 1;
 $total = count($formdata->Fields);
 $dtotal = 0;
 $etotal = 0;
@@ -104,27 +93,20 @@ if ($total > 0) {
 	foreach ($formdata->Fields as $obfld) {
 		if ($obfld->IsDisposition() && !$obfld->IsDisplayed())
 			$dtotal++;
-		elseif ($obfld->DisplayExternal()) {
-			$etotal++;
-		}
 	}
 	$total -= $dtotal;
-	$total -= $etotal;
 }
 
 if (!isset($params['selectfields'])) { //first time
 	$selfield = $this->GetPreference('adder_fields','basic');
 	$seldisp = $selfield;
-	$selext = $selfield;
 } else {
 	$selfield = $params['selectfields'];
 	$seldisp = $params['selectdispos'];
-	$selext = $params['selectextern'];
 }
 
 $hidden[] = $this->CreateInputHidden($id,'selectfields',$selfield);
 $hidden[] = $this->CreateInputHidden($id,'selectdispos',$seldisp);
-$hidden[] = $this->CreateInputHidden($id,'selectextern',$selext);
 
 $linkargs = array(
 'field_id'=>0,
@@ -132,8 +114,7 @@ $linkargs = array(
 'datakey'=>$params['datakey'],
 'active_tab'=>'fieldstab',
 'selectfields'=>$selfield,
-'selectdispos'=>$seldisp,
-'selectextern'=>$selext
+'selectdispos'=>$seldisp
 );
 
 foreach ($formdata->FieldOrders as $one) {
@@ -175,22 +156,6 @@ foreach ($formdata->FieldOrders as $one) {
 
 		$dispositions[] = $oneset;
 		$dcount++;
-	} elseif ($obfld->DisplayExternal()) {
-		if ($ecount > 1)
-			$oneset->up = $this->CreateLink($id,'open_form','',
-			$iconup,
-			array('form_id'=>$form_id,'datakey'=>$params['datakey'],'field_id'=>$fid,'dir'=>'up'));
-		else
-			$oneset->up = '';
-		if ($ecount < $etotal)
-			$oneset->down = $this->CreateLink($id,'open_form','',
-			$icondown,
-			array('form_id'=>$form_id,'datakey'=>$params['datakey'],'field_id'=>$fid,'dir'=>'down'));
-		else
-			$oneset->down = '';
-
-		$externals[] = $oneset;
-		$ecount++;
 	} else {
 		if (!$obfld->DisplayInForm() || !$obfld->GetChangeRequirement())
 			$oneset->required = '';
@@ -275,13 +240,7 @@ if ($dispositions) {
 	);
 }
 
-$tplvars['externals'] = $externals;
-if ($externals) {
-} else {
-	$tplvars['noexternals'] = $this->Lang('no_externals');
-}
-
-if ($count || $dcount || $ecount) {
+if ($count || $dcount) {
 	$tplvars['delete'] = $this->CreateInputSubmit($id,'delete',$this->Lang('delete'),
 		'title="'.$this->Lang('tip_delselfield').
 		'" onclick="delete_selected(this,\''.$this->Lang('confirm').'\');return false;"');
@@ -367,7 +326,7 @@ EOS;
 } else {
 	$tplvars['delete'] = NULL;
 }
-if ($count > 1 || $dcount > 1 || $ecount > 1) {
+if ($count > 1 || $dcount > 1) {
 	$tplvars['selectall'] = $this->CreateInputCheckbox($id,'selectall',1,-1,'onclick="select_all(this);"');
 	$jsfuncs[] = <<<EOS
 function select_all(cb) {
@@ -461,30 +420,6 @@ if ($seldisp == 'basic') {
 		array('selectdispos'=>'basic') + $linkargs);
 }
 
-//externals
-$t = $this->Lang('title_add_new_external');
-$tplvars['title_fieldpick3'] = $t;
-$linkargs['active_tab'] = 'externtab';
-$tplvars['add_external_link'] =
-	$this->CreateLink($id,'open_field',$returnid,
-		$theme->DisplayImage('icons/system/newobject.gif',$t,'','','systemicon'),
-		$linkargs,'',FALSE).' '.
-	$this->CreateLink($id,'open_field',$returnid,$t,
-		$linkargs,'',FALSE);
-//selector
-if ($selext == 'basic') {
-	$tplvars['input_fieldpick3'] = $this->CreateInputDropdown($id,'external_type',
-		$basicfields,-1,'','onchange="add_field(this,\'external\');"');
-	$tplvars['help_fieldpick3'] = $this->CreateLink($id,'open_form',$returnid,
-		$this->Lang('title_switch_advanced_link'),
-		array('selectextern'=>'advanced') + $linkargs);
-} else { //advanced
-	$tplvars['input_fieldpick3'] = $this->CreateInputDropdown($id,'external_type',
-		$extendedfields,-1,'','onchange="add_field(this,\'external\');"');
-	$tplvars['help_fieldpick3'] = $this->CreateLink($id,'open_form',$returnid,
-		$this->Lang('title_switch_basic_link'),
-		array('selectextern'=>'basic') + $linkargs);
-}
 //js to add selected field
 $link = $this->CreateLink($id,'open_field',$returnid,'',$linkargs,'',TRUE,TRUE);
 $link = str_replace('&amp;','&',$link);

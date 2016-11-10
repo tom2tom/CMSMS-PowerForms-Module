@@ -58,8 +58,7 @@ if (isset($params['submit']) || isset($params['apply'])) {
 				'datakey'=>$params['datakey'],
 				'field_id'=>$params['field_id'],
 				'selectfields'=>$params['selectfields'],
-				'selectdispos'=>$params['selectdispos'],
-				'selectextern'=>$params['selectextern']
+				'selectdispos'=>$params['selectdispos']
 				));
 	} else {
 		$message = $this->_PrettyMessage('err_copy',FALSE);

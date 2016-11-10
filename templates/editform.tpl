@@ -184,52 +184,6 @@
   {if !empty($entry->help)}<p>{$entry->help}</p>{/if}
  {/foreach}
  </div>
-{$tab_end}{$externtab_start}
- <div class="pageinput">
- {if !empty($externals)}
-  <p class="pagetext">{$title_form_externals}</p>
- {if count($externals)>1}
-  <div class="reordermsg pagemessage">
-  <p>{$help_can_drag}</p>
-  <div class="saveordermsg"><p>{$help_save_order}</p></div>
-  </div>
-  {/if}
-  <table id="externalfield" class="pagetable leftwards{if count($externals)>1} tabledrag{/if}">
-   <thead><tr>
-    <th style="max-width:15em;">{$text_name}</th>
-    <th style="max-width:20em;">{$text_type}</th>
-    <th style="max-width:25em;">{$text_info}</th>
-    <th class="updown">{$text_move}</th>
-    <th class="pageicon"></th>
-    <th class="pageicon"></th>
-    <th class="pageicon"></th>
-    <th{if count($externals)>1} class="checkbox">{$selectall}{else}>{/if}</th>
-   </tr></thead>
-   <tbody>
-  {foreach from=$externals item=entry}
-   {cycle name=fields values='row1,row2' assign=rowclass}
-  	<tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
-     <td>{$entry->order}{$entry->name}</td>
-     <td>{$entry->type}</td>
-     <td>{$entry->field_status}</td>
-     <td class="updown">{$entry->up}{$entry->down}</td>
-     <td>{$entry->edit}</td>
-     <td>{$entry->copy}</td>
-     <td>{$entry->delete}</td>
-     <td class="checkbox">{$entry->select}</td>
-    </tr>
-  {/foreach}
-   </tbody>
-  </table>
- {else}
- <p>{$noexternals}</p>
- {/if}
- <div class="addfast">
-  <p class="pagetext">{$title_fieldpick}</p>
-  <div>{$input_fieldpick3} {$help_fieldpick3}{if $externals}<span style="margin-left:5em;">{$delete}</span>{/if}</div>
- </div>
- <div class="addslow">{$add_external_link}{if $externals}<span style="margin-left:5em;">{$delete}</span>{/if}</div>
- </div>
 {$tab_end}
 {$tabs_end}
 <div class="pageinput" style="margin-top:1em;">{$save} {$cancel} {$apply}</div>

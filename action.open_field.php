@@ -101,7 +101,6 @@ if (isset($params['submit'])) {
 			'active_tab'=>'fieldstab',
 			'selectfields'=>$params['selectfields'],
 			'selectdispos'=>$params['selectdispos'],
-			'selectextern'=>$params['selectextern'],
 			'message'=>$this->_PrettyMessage($message,TRUE,FALSE)));
 	} else {
 		//start again //TODO if imported field with no tabled data

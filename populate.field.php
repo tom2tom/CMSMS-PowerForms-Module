@@ -165,8 +165,7 @@ $tplvars['form_start'] = $this->CreateFormStart($id,'open_field',$returnid,
 	'datakey'=>$params['datakey'],
 	'field_id'=>$fid,
 	'selectfields'=>$params['selectfields'],
-	'selectdispos'=>$params['selectdispos'],
-	'selectextern'=>$params['selectextern']
+	'selectdispos'=>$params['selectdispos']
 	));
 $tplvars['form_end'] = $this->CreateFormEnd();
 
