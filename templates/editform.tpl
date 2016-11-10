@@ -11,6 +11,14 @@
   <p class="pagetext">{$title_form_status}:</p>
   <p>{if $text_ready}{$text_ready}{else}<strong>{$text_notready}</strong> - {$help_notready}{/if}</p>
  </div>
+{$tab_end}{$displaytab_start}
+ <div class="pageinput pageoverflow">
+ {foreach from=$displays item=entry}
+  <p class="pagetext">{$entry->title}:</p>
+  <div>{$entry->input}</div>
+  {if !empty($entry->help)}<p>{$entry->help}</p>{/if}
+ {/foreach}
+ </div>
 {$tab_end}{$fieldstab_start}
  <div class="pageinput pageoverflow">
  {if !empty($fields)}
@@ -62,20 +70,7 @@
    </div>
    <div class="addslow">{$add_field_link}{if $fields}<span style="margin-left:5em;">{$delete}</span>{/if}</div>
   </div>
-{$tab_end}{$displaytab_start}
- <div class="pageinput pageoverflow">
- {foreach from=$displays item=entry}
-  <p class="pagetext">{$entry->title}:</p>
-  <div>{$entry->input}</div>
-  {if !empty($entry->help)}<p>{$entry->help}</p>{/if}
- {/foreach}
- </div>
 {$tab_end}{$templatetab_start}
- <div class="pageinput">
-  <p class="pagetext">{$title_load_template}:</p>
-  <p>{$input_load_template}</p>
- </div>
- <br />
  <div class="pageinput pageoverflow">
   <p style="font-weight:bold;">{$title_form_template}:{$icon_info}</p>
   <p>{$input_form_template}</p>
@@ -103,6 +98,10 @@
   <p>{$help_fieldvars2}</p>
 {/if}{*!empty($fieldprops)*}
   </div>
+ </div>
+ <div class="pageinput">
+  <p class="pagetext">{$title_load_template}:</p>
+  <p>{$input_load_template}</p>
  </div>
 {$tab_end}{$udttab_start}
  <div class="pageinput pageoverflow">
