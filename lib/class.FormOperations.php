@@ -367,10 +367,10 @@ EOS;
 	@form_id: enumerator of form to be processed
 	@id: module id
 	@params: reference to array of request-parameters
-	@withtemplates: optional boolean whether to also load templates, default FALSE
+	@admin: optional boolean whether to load for administration, default FALSE
 	Returns: a FormData object, or FALSE
 	*/
-	public function Load(&$mod, $form_id, $id, &$params, $withtemplates=FALSE)
+	public function Load(&$mod, $form_id, $id, &$params, $admin=FALSE)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT name,alias FROM '.$pre.'module_pwf_form WHERE form_id=?';
@@ -413,7 +413,7 @@ EOS;
 				$formdata->XtraProps[$nm] = $val;
 		}
 
-		if ($withtemplates) {
+		if ($admin) {
 			$val = $formdata->XtraProps['form_template'];
 			if ($mod->before20)
 				$tpl = $mod->GetTemplate($val);
@@ -437,6 +437,7 @@ EOS;
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
 		$fields = $db->GetArray($sql,array($form_id));
 		if ($fields) {
+//TODO if (!$admin) { populate sequences }
 			foreach ($fields as &$row) {
 				$fid = $row['field_id'];
 				//TODO ensure data are present for field setup: value etc
