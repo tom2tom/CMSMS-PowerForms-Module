@@ -69,13 +69,6 @@ class FieldOperations
 								$obfld = FALSE;
 							}
 							break;
-						case 'external':
-							if ($obfld->GetProperty('IsDisposition')) {
-								$obfld = FALSE;
-							} else {
-								$obfld->SetProperty('DisplayExternal',TRUE);
-							}
-							break;
 						case 'form':
 							if ($obfld->GetProperty('IsDisposition')) {
 								$obfld = FALSE;

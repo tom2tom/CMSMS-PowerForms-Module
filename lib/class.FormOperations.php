@@ -819,27 +819,24 @@ EOS;
 		{
 			$fa = $fields[$orders[$a]];
 			$fb = $fields[$orders[$b]];
-			if ($fa->DisplayExternal == $fb->DisplayExternal) {
-				if ($fa->IsDisposition) {
-					if ($fb->IsDisposition) {
-						if ($fb->Type == 'PageRedirector') //page redirect last
-							return -1;
-						elseif ($fb->DisplayInForm) //email confirmation first
-							return 1;
-						elseif ($fa->Type == 'PageRedirector')
-							return 1;
-						elseif ($fa->DisplayInForm)
-							return -1;
-					} elseif (!$fa->DisplayInForm)//includes $fa->Type == 'PageRedirector'
+			if ($fa->IsDisposition) {
+				if ($fb->IsDisposition) {
+					if ($fb->Type == 'PageRedirector') //page redirect last
+						return -1;
+					elseif ($fb->DisplayInForm) //email confirmation first
 						return 1;
-				} elseif ($fb->IsDisposition) {
-					if (!$fb->DisplayInForm)
+					elseif ($fa->Type == 'PageRedirector')
 						return 1;
-				}
-				//TODO field type '...start' before corresponding type '...end'
-				return $a - $b; //stet current order
+					elseif ($fa->DisplayInForm)
+						return -1;
+				} elseif (!$fa->DisplayInForm)//includes $fa->Type == 'PageRedirector'
+					return 1;
+			} elseif ($fb->IsDisposition) {
+				if (!$fb->DisplayInForm)
+					return 1;
 			}
-			return ($fa->DisplayExternal - $fb->DisplayExternal);
+			//TODO field type '...start' before corresponding type '...end'
+			return $a - $b; //stet current order
 		});
 		// update source-arrays accordingly
 		$neworder = array();

@@ -32,7 +32,6 @@ class FieldBase implements \Serializable
 		$this->formdata = $formdata;
 		$this->XtraProps = array(
 		'ChangeRequirement' => TRUE, //whether admin user may change 'Required' state
-		'DisplayExternal' => FALSE, //whether field is for use in another module e.g. browser
 		'DisplayInForm' => TRUE,
 		'DisplayInSubmission' => TRUE, //whether field value is shown in submission template (if used) (effectively ~ self::IsInput)
 		'Disposable' => TRUE, //a field-status, not so much a continuing property
@@ -386,13 +385,7 @@ class FieldBase implements \Serializable
 	public function IsDisplayed()
 	{
 		return (!empty($this->XtraProps['DisplayInForm'])
-			 || !empty($this->XtraProps['DisplayInSubmission'])
-			 || !empty($this->XtraProps['DisplayExternal']));
-	}
-
-	public function DisplayExternal()
-	{
-		return !empty($this->XtraProps['DisplayExternal']);
+			 || !empty($this->XtraProps['DisplayInSubmission']));
 	}
 
 	public function DisplayInForm()
@@ -763,7 +756,7 @@ class FieldBase implements \Serializable
 	public function AdminPopulateCommon($id, $except=FALSE, $boolean=FALSE, $visible=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
-		$displayable = !empty($this->XtraProps['DisplayInForm']) || !empty($this->XtraProps['DisplayExternal']);
+		$displayable = !empty($this->XtraProps['DisplayInForm']);
 		if ($except && !is_array($except)) {
 			$except = is_array($except);
 		}
