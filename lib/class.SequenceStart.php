@@ -15,10 +15,10 @@ class SequenceStart extends FieldBase
 	{
 		parent::__construct($formdata, $params);
 		$this->DisplayInSubmission = FALSE;
+		$this->Alias = uniqid('start_'.$this->formdata->Id); //not user editable
 		$this->HasLabel = TRUE;
-		//name/alias not user-modifiable for this class
-		$this->Name = $formdata->formsmodule->Lang('sequence_start').' &#187;&#187;'; //right angle quotes
-		$this->Alias = uniqid('start_'.$this->formdata->Id);
+		$this->LabelSubComponents = FALSE;
+		$this->MultiPopulate = TRUE;
 		$this->NeedsDiv = FALSE;
 		$this->Type = 'SequenceStart';
 	}
@@ -33,14 +33,14 @@ class SequenceStart extends FieldBase
 	public function AdminPopulate($id)
 	{
 		$except = array(
-		'title_field_name',
 		'title_field_alias',
-		'title_field_helptext',
 		'title_field_javascript',
 		'title_field_resources',
 		'title_smarty_eval');
-		list($main,$adv) = $this->AdminPopulateCommon($id,$except,TRUE); // !$visible?
+		list($main,$adv) = $this->AdminPopulateCommon($id,$except,TRUE);
 		$mod = $this->formdata->formsmodule;
+		//name-help
+		$main[0][] = $mod->Lang('help_sequence_name','&#187;&#187;','&amp;nbsp;&amp;#187;&amp#187;');
 
 		$def = uniqid('s'.$this->formdata->Id,FALSE);
 		$main[] = array($mod->Lang('title_privatename'),
@@ -68,6 +68,15 @@ class SequenceStart extends FieldBase
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
+	public function PostAdminAction(&$params)
+	{
+		//ensure field name ends as expected
+		$nm = $this->Name;
+		if (strpos($nm,'&nbsp;&#187;&#187;',2) === FALSE) {
+			$this->Name = $nm.'&nbsp;&#187;&#187;';
+		}
+	}
+
 	public function AdminValidate($id)
 	{
 		$messages = array();
@@ -78,7 +87,7 @@ class SequenceStart extends FieldBase
 			foreach ($this->formdata->Fields as $obfld) {
 				if ($obfld->Type == 'SequenceStart') {
 					$p = $obfld->GetProperty('privatename');
-					if ($p == $ref) {
+					if ($p == $ref && $obfld != $this) {
 						$ret = FALSE;
 						$messages[] = $mod->Lang('err_typed',$mod->Lang('sequenceid'));
 						break;
@@ -112,14 +121,14 @@ class SequenceStart extends FieldBase
 			$this->setProperty('repeatcount',$num);
 			$messages[] = $mod->Lang('missing_type',$mod->Lang('count')).': INITIAL';
 		}
-			
+
 		$msg = ($messages)?implode('<br />',$messages):'';
 		return array($ret,$msg);
 	}
 
 	public function Populate($id,&$params)
 	{
-		$html = '';
+		$ret = array();
 		$bnm = $id.$this->formdata->current_prefix.$this->Id;
 		$bid = $this->GetInputId();
 		//at this stage, don't know whether either/both buttons are relevant
@@ -127,11 +136,18 @@ class SequenceStart extends FieldBase
 		$nm = array('_SeX','_SeW');
 		foreach ($propkeys as $i=>$key) {
 			$m = $nm[$i];
+			$oneset = new \stdClass();
+			$oneset->name = '';
+			$oneset->title = '';
+			$oneset->input = '';
 			$tmp = '<input type="button" name="'.$bnm.$m.'" id="'.$bid.$m.
 			'" value="'.$this->GetProperty($key).'" />';
-			$html .= $this->SetClass($tmp).' ';
+			$oneset->op = $this->SetClass($tmp);
+			if ($i == 1) {
+				$oneset->op .= ' &#187;&#187;';
+			}
+			$ret[] = $oneset;
 		}
-		$html .= '&#187;&#187;';
-		return $html;
+		return $ret;
 	}
 }

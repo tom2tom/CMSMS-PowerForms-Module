@@ -15,7 +15,7 @@ class SequenceEnd extends SequenceStart
 	{
 		parent::__construct($formdata,$params);
 		if (0) {
-			$this->LastBreak = $X;
+			$this->LastBreak = FALSE;
 		}
 		$this->SetLast($this->LastBreak);
 		$this->Type = 'SequenceEnd';
@@ -24,25 +24,39 @@ class SequenceEnd extends SequenceStart
 	public function SetLast($state=TRUE)
 	{
 		$this->LastBreak = $state;
-		$this->Name = ($state) ?
-			$this->formdata->formsmodule->Lang('sequence_end').' &#171;&#171;': //left angle quotes
-			$this->formdata->formsmodule->Lang('sequence_break').' &#166;&#166;'; //broken vertical bars
-		$pre = ($state) ? 'end_':'break_';
-		$this->Alias = uniqid($pre.$this->formdata->Id);
+		if ($state) {
+			$flag = '&#171;&#171;&nbsp;'; //left angle quotes
+			$pre = 'end_';
+		} else {
+			$flag = '&#166;&#166;&nbsp;'; //broken vertical bars
+			$pre = 'break_';
+		}
+		if ($this->Name) { //not a fresh load
+			$l = strpos($this->Name,'&nbsp;');
+			$post = substr($this->Name,$l+6);
+			$this->Name = $flag.$post;
+		}
+		if ($this->Alias) {
+			$post = explode('_',$this->Alias);
+			$this->Alias = $pre.end($post);
+		} else {
+			$this->Alias = uniqid($pre.$this->formdata->Id);
+		}
 	}
 
 	public function AdminPopulate($id)
 	{
 		$except = array(
-		'title_field_name',
 		'title_field_alias',
-		'title_field_helptext',
 		'title_field_javascript',
 		'title_field_resources',
 		'title_smarty_eval');
-		list($main,$adv) = $this->AdminPopulateCommon($id,$except,TRUE); // !$visible?
+		list($main,$adv) = $this->AdminPopulateCommon($id,$except,TRUE);
 		$mod = $this->formdata->formsmodule;
+		//name-help
+		$main[0][] = $mod->Lang('help_sequence_name2','&#171;&#171;','&amp;#171;&amp#171;&amp;nbsp;');
 
+		//TODO MAYBE a picklist of available names
 		$main[] = array($mod->Lang('title_privatename'),
 						$mod->CreateInputText($id,'fp_privatename',
 							$this->GetProperty('privatename',''),25,50),
@@ -61,6 +75,15 @@ class SequenceEnd extends SequenceStart
 							$this->GetProperty('delete_label',$mod->Lang('delete_sequence')),25,30));
 
 		return array('main'=>$main,'adv'=>$adv);
+	}
+
+	public function PostAdminAction(&$params)
+	{
+		//ensure field name begins as expected
+		$nm = $this->Name;
+		if (strpos($nm,'&nbsp;&#171;&#171;') !== 0) {
+			$this->Name = '&#171;&#171;&nbsp;'.$nm;
+		}
 	}
 
 	public function AdminValidate($id)
@@ -102,27 +125,37 @@ class SequenceEnd extends SequenceStart
 	{
 		//at this stage, don't know whether all buttons are relevant
 		if ($this->LastBreak) {
+			$l = 1;
 			$propkeys = array('insertpre_label','deletepre_label');
 			$nm = array('_SeI','_SeD');
 		} else {
+			$l = 3;
 			$propkeys = array('insertpre_label','deletepre_label','insert_label','delete_label');
 			$nm = array('_SeI','_SeD','_SeX','_SeW');
 		}
-		$html = '';
+		$ret = array();
 		$bnm = $id.$this->formdata->current_prefix.$this->Id;
 		$bid = $this->GetInputId();
 
 		foreach ($propkeys as $i=>$key) {
 			$m = $nm[$i];
+			$oneset = new \stdClass();
+			$oneset->name = '';
+			$oneset->title = '';
+			$oneset->input = '';
 			$tmp = '<input type="button" name="'.$bnm.$m.'" id="'.$bid.$m.
 			'" value="'.$this->GetProperty($key).'" />';
-			$html .= $this->SetClass($tmp).' ';
+			$oneset->op = $this->SetClass($tmp);
+			if ($i == $l) {
+				if ($this->LastBreak) {
+					$post = '&#171;&#171;';
+				} else {
+					$post = '&#166;&#166;';
+				}
+				$oneset->op .= ' '.$post;
+			}
+			$ret[] = $oneset;
 		}
-		if ($this->LastBreak) {
-			$html .= '&#171;&#171;';
-		} else {
-			$html .= '&#166;&#166;';
-		}
-		return $html;
+		return $ret;
 	}
 }
