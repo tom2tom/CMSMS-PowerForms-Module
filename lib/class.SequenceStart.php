@@ -9,7 +9,6 @@ namespace PWForms;
 class SequenceStart extends FieldBase
 {
 	public $IsSequence = TRUE;
-	public $Repeats = 1; //total number
 
 	public function __construct(&$formdata, &$params)
 	{
@@ -32,6 +31,10 @@ class SequenceStart extends FieldBase
 
 	public function AdminPopulate($id)
 	{
+		$nm = $this->Name;
+		if ($nm && ($p=strpos($nm,'&nbsp;&#187;&#187;',2)) !== FALSE) {
+			$this->Name = substr($nm,0,$p);
+		}
 		$except = array(
 		'title_field_alias',
 		'title_field_javascript',
@@ -40,7 +43,7 @@ class SequenceStart extends FieldBase
 		list($main,$adv) = $this->AdminPopulateCommon($id,$except,TRUE);
 		$mod = $this->formdata->formsmodule;
 		//name-help
-		$main[0][] = $mod->Lang('help_sequence_name','&#187;&#187;','&amp;nbsp;&amp;#187;&amp#187;');
+		$main[0][] = $mod->Lang('help_sequence_name','&#187;&#187;');
 
 		$def = uniqid('s'.$this->formdata->Id,FALSE);
 		$main[] = array($mod->Lang('title_privatename'),
@@ -71,10 +74,7 @@ class SequenceStart extends FieldBase
 	public function PostAdminAction(&$params)
 	{
 		//ensure field name ends as expected
-		$nm = $this->Name;
-		if (strpos($nm,'&nbsp;&#187;&#187;',2) === FALSE) {
-			$this->Name = $nm.'&nbsp;&#187;&#187;';
-		}
+		$this->Name .= '&nbsp;&#187;&#187;';
 	}
 
 	public function AdminValidate($id)
@@ -131,7 +131,7 @@ class SequenceStart extends FieldBase
 		$ret = array();
 		$bnm = $id.$this->formdata->current_prefix.$this->Id;
 		$bid = $this->GetInputId();
-		//at this stage, don't know whether either/both buttons are relevant
+		//at this stage, don't know whether either/both buttons are relevant, can't tailor
 		$propkeys = array('insert_label','delete_label');
 		$nm = array('_SeX','_SeW');
 		foreach ($propkeys as $i=>$key) {
@@ -141,7 +141,12 @@ class SequenceStart extends FieldBase
 			$oneset->title = '';
 			$oneset->input = '';
 			$tmp = '<input type="button" name="'.$bnm.$m.'" id="'.$bid.$m.
-			'" value="'.$this->GetProperty($key).'" />';
+			'" value="'.$this->GetProperty($key);
+			if ($i == 0) {
+				$tmp .= '" />';
+			} else {
+				$tmp .= '" onclick="return confirm(\''.$this->formdata->formsmodule->Lang('confirm').'\');" />';
+			}
 			$oneset->op = $this->SetClass($tmp);
 			if ($i == 1) {
 				$oneset->op .= ' &#187;&#187;';

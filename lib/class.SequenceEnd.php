@@ -8,7 +8,6 @@ namespace PWForms;
 
 class SequenceEnd extends SequenceStart
 {
-	public $Instance = 1; //current number c.f. parent::Repeats
 	public $LastBreak = TRUE;
 
 	public function __construct(&$formdata,&$params)
@@ -46,6 +45,12 @@ class SequenceEnd extends SequenceStart
 
 	public function AdminPopulate($id)
 	{
+		$nm = $this->Name;
+		$pre = '&#171;&#171;&nbsp;';
+		$p = strlen($pre);
+		if ($nm && (strncmp($nm,$pre,$p)) == 0) {
+			$this->Name = substr($nm,$p);
+		}
 		$except = array(
 		'title_field_alias',
 		'title_field_javascript',
@@ -54,7 +59,7 @@ class SequenceEnd extends SequenceStart
 		list($main,$adv) = $this->AdminPopulateCommon($id,$except,TRUE);
 		$mod = $this->formdata->formsmodule;
 		//name-help
-		$main[0][] = $mod->Lang('help_sequence_name2','&#171;&#171;','&amp;#171;&amp#171;&amp;nbsp;');
+		$main[0][] = $mod->Lang('help_sequence_name2','&#171;&#171;');
 
 		//TODO MAYBE a picklist of available names
 		$main[] = array($mod->Lang('title_privatename'),
@@ -80,10 +85,7 @@ class SequenceEnd extends SequenceStart
 	public function PostAdminAction(&$params)
 	{
 		//ensure field name begins as expected
-		$nm = $this->Name;
-		if (strpos($nm,'&nbsp;&#171;&#171;') !== 0) {
-			$this->Name = '&#171;&#171;&nbsp;'.$nm;
-		}
+		$this->Name = '&#171;&#171;&nbsp;'.$this->Name;
 	}
 
 	public function AdminValidate($id)
@@ -123,7 +125,7 @@ class SequenceEnd extends SequenceStart
 
 	public function Populate($id,&$params)
 	{
-		//at this stage, don't know whether all buttons are relevant
+		//at this stage, don't know whether all buttons are relevant, can't tailor them
 		if ($this->LastBreak) {
 			$l = 1;
 			$propkeys = array('insertpre_label','deletepre_label');
@@ -144,7 +146,12 @@ class SequenceEnd extends SequenceStart
 			$oneset->title = '';
 			$oneset->input = '';
 			$tmp = '<input type="button" name="'.$bnm.$m.'" id="'.$bid.$m.
-			'" value="'.$this->GetProperty($key).'" />';
+			'" value="'.$this->GetProperty($key);
+			if ($i%2 == 0) {
+ 				$tmp .= '" />';
+			} else {
+				$tmp .= '" onclick="return confirm(\''.$this->formdata->formsmodule->Lang('confirm').'\');" />';
+			}
 			$oneset->op = $this->SetClass($tmp);
 			if ($i == $l) {
 				if ($this->LastBreak) {
