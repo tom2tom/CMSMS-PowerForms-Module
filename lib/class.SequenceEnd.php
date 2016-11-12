@@ -43,6 +43,13 @@ class SequenceEnd extends SequenceStart
 		}
 	}
 
+	public function GetSynopsis()
+	{
+		$mod = $this->formdata->formsmodule;
+		$t = $this->GetProperty('privatename',$mod->Lang('none2'));
+		return $mod->Lang('identifier').': '.$t;
+	}
+
 	public function AdminPopulate($id)
 	{
 		$nm = $this->Name;
