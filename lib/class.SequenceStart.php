@@ -26,7 +26,9 @@ class SequenceStart extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$t = $this->GetProperty('privatename',$mod->Lang('none2'));
-		return $mod->Lang('identifier').': '.$t;
+		$ret = $mod->Lang('identifier').': '.$t;
+		$ret .= ','.$this->GetProperty('repeatcount').' time(s)'; //TODO lang
+		return $ret;
 	}
 
 	public function AdminPopulate($id)
@@ -114,11 +116,11 @@ class SequenceStart extends FieldBase
 		$num3 = $this->GetProperty('repeatcount');
 		if ($num3) {
 			if ($num3 < $num || ($num2 && $num3 > $num2)) {
-				$this->setProperty('repeatcount',$num);
+				$this->SetProperty('repeatcount',$num);
 				$messages[] = $mod->Lang('err_typed',$mod->Lang('count')).': INITIAL';
 			}
 		} else {
-			$this->setProperty('repeatcount',$num);
+			$this->SetProperty('repeatcount',$num);
 			$messages[] = $mod->Lang('missing_type',$mod->Lang('count')).': INITIAL';
 		}
 
