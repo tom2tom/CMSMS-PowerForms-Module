@@ -65,7 +65,8 @@ if (empty($params['form_id']) || $params['form_id'] == -1) {
 list($current,$prior) = $this->_GetTokens(); //fresh pair of fieldname-prefixes
 
 //check that we're current
-$matched = preg_grep('/^pwfp_\d{3}_/',array_keys($params));
+$pkeys = array_keys($params);
+$matched = preg_grep('/^pwfp_\d{3}_/',$pkeys);
 if ($matched) {
 	$key = reset($matched);
 	if (strpos($key,$current) === 0)
@@ -145,8 +146,9 @@ if (isset($params[$prefix.'datakey'])) {
 	}
 	$formdata->formsmodule = &$this;
 
-	$matched = preg_grep('/^pwfp_\d{3}_Fe[DX]_/',array_keys($params)); //expanding or shrinking a field
-	if (!$matched) {
+	$adjust = preg_grep('/^pwfp_\d{3}_Fe[DX]_/',$pkeys) //expanding or shrinking a field
+			|| preg_grep('/^pwfp_\d{3}_Se[DIWX]_/',$pkeys); //adding or deleting a sequence
+	if (!$adjust) {
 		$donekey = (isset($params[$prefix.'done'])) ? $prefix.'done' : FALSE;
 
 		if (isset($params[$prefix.'continue']))
