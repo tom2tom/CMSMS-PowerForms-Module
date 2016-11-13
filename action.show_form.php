@@ -146,8 +146,8 @@ if (isset($params[$prefix.'datakey'])) {
 	}
 	$formdata->formsmodule = &$this;
 
-	$adjust = preg_grep('/^pwfp_\d{3}_Fe[DX]_/',$pkeys) //expanding or shrinking a field
-			|| preg_grep('/^pwfp_\d{3}_Se[DIWX]_/',$pkeys); //adding or deleting a sequence
+	$adjust = preg_grep('/^pwfp_\d{3}_\d+_Fe[DX]/',$pkeys) //expanding or shrinking a field
+		|| preg_grep('/^pwfp_\d{3}_\d+_Se[DIWX]/',$pkeys); //adding or deleting a sequence
 	if (!$adjust) {
 		$donekey = (isset($params[$prefix.'done'])) ? $prefix.'done' : FALSE;
 
