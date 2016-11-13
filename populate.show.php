@@ -28,6 +28,40 @@ $tplvars = $tplvars + array(
 	'form_name' => $formdata->Name
 );
 
+if (!$firsttime && ($matches=preg_grep('/^pwfp_\d{3}_Se[DIWX]_/',$pkeys))) {
+	//add or delete a sequence
+	$key = reset($matches);
+	switch ($key[11]) {
+	 case 'D': //delete before
+	 	$del = TRUE;
+	 	$after = FALSE;
+		break;
+	 case 'I': //insert before
+	 	$del = FALSE;
+	 	$after = FALSE;
+		break;
+	 case 'W': //delete after
+	 	$del = TRUE;
+	 	$after = TRUE;
+		break;
+	 case 'X': //insert after
+	 	$del = FALSE;
+	 	$after = TRUE;
+		break;
+	}
+	$seqs = new PWForms\SeqOperations();
+	$field_id = substr($key,13);
+$this->Crash();
+	$obfld = $formdata->Fields[$field_id];
+	if ($del) {
+		$seqs->DeleteSequenceFields($obfld,$after);
+	} else {
+		$seqs->CopySequenceFields($obfld,$after);
+	}
+} else {
+	$seqs = FALSE;
+}
+
 // Hidden-controls accumulator (see also the form hidden-parameters, above)
 $hidden = '';
 $reqSymbol = PWForms\Utils::GetFormProperty($formdata,'required_field_symbol','*');
@@ -36,11 +70,26 @@ $fields = array();
 //$prev = array(); //make other-page field-values available to templates
 $WalkPage = 1; //'current' page for field-walk purposes
 
-foreach ($formdata->FieldOrders as $field_id) {
+$total = count($formdata->FieldOrders);
+for ($o=0; $o<$total; $o++) { //NOT foreach, cuz the array can change during the loop
+	$field_id = $formdata->FieldOrders[$o];
 	$obfld = $formdata->Fields[$field_id];
+	$type = $obfld->GetFieldType();
+
+	if ($type == 'SequenceStart' && $firsttime) {
+		$times = $obfld->GetProperty('repeatcount');
+		if ($times > 1) {
+			if (!$seqs) {
+				$seqs = new PWForms\SeqOperations();
+			}
+			$seqs->CopySequenceFields($obfld,TRUE,$times-1); //adjusts various parameters
+			$total = count($formdata->FieldOrders);
+		}
+	}
+
 	$alias = $obfld->ForceAlias();
 
-	if ($obfld->GetFieldType() == 'PageBreak')
+	if ($type == 'PageBreak')
 		$WalkPage++;
 
 	if ($WalkPage != $formdata->Page) {
@@ -139,7 +188,7 @@ EOS;
 
 	$tplvars[$alias] = $oneset;
 	$fields[$oneset->input_id] = $oneset;
-} //foreach FieldOrders
+} //FieldOrders[] loop
 
 $formdata->PagesCount = $WalkPage;
 
