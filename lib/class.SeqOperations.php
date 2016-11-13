@@ -137,32 +137,35 @@ class SeqOperations
 
 		$aid = $actor->GetID();
 		$ao = array_search($aid,$fdata->FieldOrders);
-		$ao = array_search($ao,$members);
+		$mo = array_search($ao,$members);
 		if ($after) {
-			$f0 = $members[$ao];//pre-sequence starter/ender field-order
-			$f1 = $members[$ao + 1]; //post-sequence ender
+			$f0 = $members[$mo];//pre-sequence starter/ender field-order
+			$f1 = $members[$mo + 1]; //post-sequence ender
 		} else {
-			$f0 = $members[$ao - 1];
-			$f1 = $members[$ao];
+			$f0 = $members[$mo - 1];
+			$f1 = $members[$mo];
 		}
 
-		$iter = new \ArrayIterator($fdata->FieldOrders);
-		foreach (new \LimitIterator($iter,$f0+1,$f1-$f0-1) as $fid) {
-			unset($fdata->Fields[$fid]); // = NULL;?
-			$o = array_search($fid,$fdata->FieldOrders);
+		//field_id's to be removed (excluding ender)
+		$batch = array_slice($fdata->FieldOrders,$f0+1,$f1-$f0-1,TRUE);
+		foreach ($batch as $o=>$fid) {
+			unset($fdata->Fields[$fid]);
 			unset($fdata->FieldOrders[$o]);
 		}
 
-		if ($ao == 0) { //$actor == $starter
+		if ($mo == 0) { //$actor == $starter
 			if (count($members) > 2) { //can delete next breaker
-				unset($fdata->Fields[$f1]); // = NULL;
-				unset($fdata->FieldOrders[$members[1]]);
+				$c = $members[1];
+				$fid = $fdata->FieldOrders[$c];
+				unset($fdata->Fields[$fid]);
+				unset($fdata->FieldOrders[$c]);
 				unset($members[1]); //exclude from further processing
 			}
 		} else { //delete $actor
-			unset($fdata->Fields[$aid]); // = NULL;
-			unset($fdata->FieldOrders[$fo]);
-			unset($members[$a0]);
+			unset($fdata->Fields[$aid]);
+			$c = ($after) ? $f0:$f1;
+			unset($fdata->FieldOrders[$c]);
+			unset($members[$mo]);
 		}
 
 		foreach ($members as $i=>$o) {
