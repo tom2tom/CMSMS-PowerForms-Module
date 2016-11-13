@@ -1,18 +1,22 @@
-This is a form-constructor/displayer for <a href="http://www.cmsmadesimple.org"><strong>CMS Made Simple</strong></a>&#8482;, inspired by Samuel Goldstein's FormBuilder module.
+## Overview
 
-It is NOT YET feature-complete.
+This is a form-constructor/displayer module for <a href="http://www.cmsmadesimple.org"><strong>CMS Made Simple</strong></a>&#8482;, inspired somewhat by Samuel Goldstein's FormBuilder module.
 
 If you want to compare it with FormBuilder ...
-<ul>
-<li>easier to use e.g. simpler templates</li>
-<li>optimised for high-load processing</li>
-<li>revised spam-management</li>
-<li>a couple of additional field-types, notably one for Captcha's</li>
-<li>a few field-types have less options</li>
-<li>a few field-types have more options</li>
-<li>other modules may [de]register field-type(s) relevant to them</li>
-<li>fewer (or at least, different) bugs</li>
-</ul>
 
-FormBuilder forms can be imported.
-The module includes an interface for exchanging data with the companion PowerBrowse module (which is also being developed).
+* more-polished UI
+* easier to use
+* optimised for high-load processing
+* revised spam-management
+* other modules may initiate [re]display of a form
+* other modules may [de]register field-type(s) relevant to them
+* supports user/runtime addition and removal of sequences of fields
+* several additional field-types, notably one for Captcha's
+* several field-types not supported, mostly the ones that should be provided by another module
+* a few field-types have fewer options
+* a few field-types have more options
+* fewer (or at least, different) bugs
+
+## Usage
+
+FormBuilder forms can be imported. However migration of imported templates can't be 100% effective, and some manual tuning will be needed.
