@@ -152,7 +152,7 @@ class SequenceEnd extends SequenceStart
 			$oneset->name = '';
 			$oneset->title = '';
 			$oneset->input = '';
-			$tmp = '<input type="button" name="'.$bnm.$m.'" id="'.$bid.$m.
+			$tmp = '<input type="submit" name="'.$bnm.$m.'" id="'.$bid.$m.
 			'" value="'.$this->GetProperty($key);
 			if ($i%2 == 0) {
  				$tmp .= '" />';

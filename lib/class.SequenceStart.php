@@ -142,7 +142,7 @@ class SequenceStart extends FieldBase
 			$oneset->name = '';
 			$oneset->title = '';
 			$oneset->input = '';
-			$tmp = '<input type="button" name="'.$bnm.$m.'" id="'.$bid.$m.
+			$tmp = '<input type="submit" name="'.$bnm.$m.'" id="'.$bid.$m.
 			'" value="'.$this->GetProperty($key);
 			if ($i == 0) {
 				$tmp .= '" />';
