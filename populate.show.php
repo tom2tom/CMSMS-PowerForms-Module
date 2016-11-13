@@ -28,11 +28,11 @@ $tplvars = $tplvars + array(
 	'form_name' => $formdata->Name
 );
 
-if (!$firsttime && ($matches=preg_grep('/^pwfp_\d{3}_\d+_Se[DIWX]$/',$pkeys))) {
+if (!$firsttime && ($matches=preg_grep('/^pwfp_\d{3}_Se[DIWX]_\d+$/',$pkeys))) {
 	//add or delete a sequence
 	$key = reset($matches);
-	preg_match('/_(\d+)_Se([DIWX])/',$key,$matches);
-	switch ($matches[2]) {
+	preg_match('/_Se([DIWX])_(\d+)/',$key,$matches);
+	switch ($matches[1]) {
 	 case 'D': //delete before
 	 	$del = TRUE;
 	 	$after = FALSE;
@@ -51,7 +51,7 @@ if (!$firsttime && ($matches=preg_grep('/^pwfp_\d{3}_\d+_Se[DIWX]$/',$pkeys))) {
 		break;
 	}
 	$seqs = new PWForms\SeqOperations();
-	$obfld = $formdata->Fields[$matches[1]];
+	$obfld = $formdata->Fields[$matches[2]];
 	if ($del) {
 		$seqs->DeleteSequenceFields($obfld,$after);
 	} else {
