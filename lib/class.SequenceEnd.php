@@ -75,16 +75,16 @@ class SequenceEnd extends SequenceStart
 						$mod->Lang('help_privatename'));
 		$main[] = array($mod->Lang('title_add_button_seqpre'),
 						$mod->CreateInputText($id,'fp_insertpre_label',
-							$this->GetProperty('insertpre_label',$mod->Lang('insert_seqpre')),25,30));
+							$this->GetProperty('insertpre_label',$mod->Lang('insert')),25,30));
 		$main[] = array($mod->Lang('title_del_button_seqpre'),
 						$mod->CreateInputText($id,'fp_deletepre_label',
-							$this->GetProperty('deletepre_label',$mod->Lang('delete_seqpre')),25,30));
+							$this->GetProperty('deletepre_label',$mod->Lang('delete')),25,30));
 		$main[] = array($mod->Lang('title_add_button_seq'),
 						$mod->CreateInputText($id,'fp_insert_label',
-							$this->GetProperty('insert_label',$mod->Lang('insert_sequence')),25,30));
+							$this->GetProperty('insert_label',$mod->Lang('insert')),25,30));
 		$main[] = array($mod->Lang('title_del_button_seq'),
 						$mod->CreateInputText($id,'fp_delete_label',
-							$this->GetProperty('delete_label',$mod->Lang('delete_sequence')),25,30));
+							$this->GetProperty('delete_label',$mod->Lang('delete')),25,30));
 
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -134,17 +134,20 @@ class SequenceEnd extends SequenceStart
 	{
 		//at this stage, don't know whether all buttons are relevant, can't tailor them
 		if ($this->LastBreak) {
-			$l = 2;
 			$propkeys = array('insertpre_label','deletepre_label','insert_label');
-			$nm = array('_SeI_','_SeD_','_SeX_');
+			$nm = array('SeI_','SeD_','SeX_');
 		} else {
-			$l = 3;
 			$propkeys = array('insertpre_label','deletepre_label','insert_label','delete_label');
-			$nm = array('_SeI_','_SeD_','_SeX_','_SeW_');
+			$nm = array('SeI_','SeD_','SeX_','SeW_');
 		}
 		$ret = array();
 		$bnm = $id.$this->formdata->current_prefix;
 		$bid = $this->GetInputId();
+		if ($this->LastBreak) {
+			$pre = '&#171;&#171;';
+		} else {
+			$pre = '&#166;&#166;';
+		}
 
 		foreach ($propkeys as $i=>$key) {
 			$m = $nm[$i];
@@ -154,19 +157,22 @@ class SequenceEnd extends SequenceStart
 			$oneset->input = '';
 			$tmp = '<input type="submit" name="'.$bnm.$m.$this->Id.'" id="'.$bid.$m.
 			'" value="'.$this->GetProperty($key);
-			if ($i%2 == 0) {
- 				$tmp .= '" />';
+			if ($i < 2) {
+				$tmp .= ' &uarr;"';	
 			} else {
-				$tmp .= '" onclick="return confirm(\''.$this->formdata->formsmodule->Lang('confirm').'\');" />';
+				$tmp .= ' &darr;"';	
 			}
-			$oneset->op = $this->SetClass($tmp);
-			if ($i == $l) {
-				if ($this->LastBreak) {
-					$post = '&#171;&#171;';
-				} else {
-					$post = '&#166;&#166;';
-				}
-				$oneset->op .= ' '.$post;
+			if ($i%2 == 0) {
+				$t = $this->formdata->formsmodule->Lang('tip_sequence_add');
+ 				$tmp .= ' title="'.$t.'" />';
+			} else {
+				$t = $this->formdata->formsmodule->Lang('tip_sequence_del');
+				$tmp .= ' title="'.$t.'" onclick="return confirm(\''.$this->formdata->formsmodule->Lang('confirm').'\');" />';
+			}
+			if ($i == 0) {
+				$oneset->op = $pre.' '.$this->SetClass($tmp);
+			} else {
+				$oneset->op = $this->SetClass($tmp);
 			}
 			$ret[] = $oneset;
 		}

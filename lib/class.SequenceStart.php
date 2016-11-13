@@ -65,10 +65,10 @@ class SequenceStart extends FieldBase
 						$mod->Lang('help_limit_count'));
 		$main[] = array($mod->Lang('title_add_button_seq'),
 						$mod->CreateInputText($id,'fp_insert_label',
-							$this->GetProperty('insert_label',$mod->Lang('insert_sequence')),25,30));
+							$this->GetProperty('insert_label',$mod->Lang('insert')),25,30));
 		$main[] = array($mod->Lang('title_del_button_seq'),
 						$mod->CreateInputText($id,'fp_delete_label',
-							$this->GetProperty('delete_label',$mod->Lang('delete_sequence')),25,30));
+							$this->GetProperty('delete_label',$mod->Lang('delete')),25,30));
 
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -135,7 +135,7 @@ class SequenceStart extends FieldBase
 		$bid = $this->GetInputId();
 		//at this stage, don't know whether either/both buttons are relevant, can't tailor
 		$propkeys = array('insert_label','delete_label');
-		$nm = array('_SeX_','_SeW_');
+		$nm = array('SeX_','SeW_');
 		foreach ($propkeys as $i=>$key) {
 			$m = $nm[$i];
 			$oneset = new \stdClass();
@@ -143,11 +143,13 @@ class SequenceStart extends FieldBase
 			$oneset->title = '';
 			$oneset->input = '';
 			$tmp = '<input type="submit" name="'.$bnm.$m.$this->Id.'" id="'.$bid.$m.
-			'" value="'.$this->GetProperty($key);
+			'" value="'.$this->GetProperty($key).' &darr;"';
 			if ($i == 0) {
-				$tmp .= '" />';
+				$t = $this->formdata->formsmodule->Lang('tip_sequence_add');
+				$tmp .= ' title="'.$t.'" />';
 			} else {
-				$tmp .= '" onclick="return confirm(\''.$this->formdata->formsmodule->Lang('confirm').'\');" />';
+				$t = $this->formdata->formsmodule->Lang('tip_sequence_del');
+				$tmp .= ' title="'.$t.'" onclick="return confirm(\''.$this->formdata->formsmodule->Lang('confirm').'\');" />';
 			}
 			$oneset->op = $this->SetClass($tmp);
 			if ($i == 1) {
