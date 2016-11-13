@@ -75,8 +75,8 @@ class SeqOperations
 				$obfld = clone($fdata->Fields[$fid]);
 				$i = $fid + $c + $times;
 				$obfld->Id = $i;
+				$obfld->Alias .= '_'.$aid.$times.count($members); //unique alias required
 				$obfld->Value = NULL; //OK?
-				// ->OrderBy = ? ->Alias = ?
 				$xfields[$i] = $obfld;
 				$xords[$o++] = $i;
 			}
