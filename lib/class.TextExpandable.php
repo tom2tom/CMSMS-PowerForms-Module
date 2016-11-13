@@ -123,14 +123,14 @@ class TextExpandable extends FieldBase
 		$matched = preg_grep('/^pwfp_\d{3}_Fe[DX]_/',array_keys($params));
 		if ($matched) {
 			foreach ($matched as $key) {
-				$pts = explode('_',$key);
-				if ($pts[3] == $this->Id || $pts[3] == $sibling_id) {
-					if ($key[11] == 'X') { //add row
+				preg_match('/_Fe([DX])_(\d+)_(\d+)/',$key,$pts);
+				if ($pts[2] == $this->Id || $pts[2] == $sibling_id) {
+					if ($pts[1] == 'X') { //add row
 						$this->Value[$vals] = '';
 						$vals++;
-					} else { // $key[11] == 'D' delete row
+					} else { //delete row
 						if (isset($this->Value[$pts[3]]))
-							array_splice($this->Value,$pts[3],1);
+							array_splice($this->Value,$pts[3],1); //TODO check off-by-1
 						$vals--;
 					}
 				}
