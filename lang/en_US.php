@@ -307,8 +307,6 @@ $lang['delete_checkboxes'] = 'Delete Selected Checkboxes';
 $lang['delete_destination'] = 'Delete Selected Destinations';
 $lang['delete_file'] = 'Delete Selected Files';
 $lang['delete_options'] = 'Delete Selected Options';
-$lang['delete_seqpre'] = 'Delete Previous Sequence';
-$lang['delete_sequence'] = 'Delete Next Sequence';
 $lang['delete_upload'] = 'Delete uploaded file(s) <strong>%s</strong>';
 
 $lang['desc_actionid'] = 'id given to the module on execution';
@@ -688,8 +686,7 @@ $lang['import_fb'] = 'Import Forms';
 $lang['import_browsedata'] = 'Conform Browsers';
 $lang['increment'] = 'increment';
 $lang['information'] = 'Parameters';
-$lang['insert_seqpre'] = 'Insert Sequence Before';
-$lang['insert_sequence'] = 'Insert Sequence After';
+$lang['insert'] = 'Insert';
 $lang['installed'] = 'Module version %s installed.';
 
 $lang['lackpermission'] = 'Sorry! You don\'t have adequate privileges to access this section.';
