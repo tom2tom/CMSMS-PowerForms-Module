@@ -134,16 +134,16 @@ class SequenceEnd extends SequenceStart
 	{
 		//at this stage, don't know whether all buttons are relevant, can't tailor them
 		if ($this->LastBreak) {
-			$l = 1;
-			$propkeys = array('insertpre_label','deletepre_label');
-			$nm = array('_SeI','_SeD');
+			$l = 2;
+			$propkeys = array('insertpre_label','deletepre_label','insert_label');
+			$nm = array('_SeI_','_SeD_','_SeX_');
 		} else {
 			$l = 3;
 			$propkeys = array('insertpre_label','deletepre_label','insert_label','delete_label');
-			$nm = array('_SeI','_SeD','_SeX','_SeW');
+			$nm = array('_SeI_','_SeD_','_SeX_','_SeW_');
 		}
 		$ret = array();
-		$bnm = $id.$this->formdata->current_prefix.$this->Id;
+		$bnm = $id.$this->formdata->current_prefix;
 		$bid = $this->GetInputId();
 
 		foreach ($propkeys as $i=>$key) {
@@ -152,7 +152,7 @@ class SequenceEnd extends SequenceStart
 			$oneset->name = '';
 			$oneset->title = '';
 			$oneset->input = '';
-			$tmp = '<input type="submit" name="'.$bnm.$m.'" id="'.$bid.$m.
+			$tmp = '<input type="submit" name="'.$bnm.$m.$this->Id.'" id="'.$bid.$m.
 			'" value="'.$this->GetProperty($key);
 			if ($i%2 == 0) {
  				$tmp .= '" />';

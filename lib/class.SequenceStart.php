@@ -131,18 +131,18 @@ class SequenceStart extends FieldBase
 	public function Populate($id,&$params)
 	{
 		$ret = array();
-		$bnm = $id.$this->formdata->current_prefix.$this->Id;
+		$bnm = $id.$this->formdata->current_prefix;
 		$bid = $this->GetInputId();
 		//at this stage, don't know whether either/both buttons are relevant, can't tailor
 		$propkeys = array('insert_label','delete_label');
-		$nm = array('_SeX','_SeW');
+		$nm = array('_SeX_','_SeW_');
 		foreach ($propkeys as $i=>$key) {
 			$m = $nm[$i];
 			$oneset = new \stdClass();
 			$oneset->name = '';
 			$oneset->title = '';
 			$oneset->input = '';
-			$tmp = '<input type="submit" name="'.$bnm.$m.'" id="'.$bid.$m.
+			$tmp = '<input type="submit" name="'.$bnm.$m.$this->Id.'" id="'.$bid.$m.
 			'" value="'.$this->GetProperty($key);
 			if ($i == 0) {
 				$tmp .= '" />';
