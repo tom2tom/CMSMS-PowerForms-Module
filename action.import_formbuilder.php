@@ -268,6 +268,23 @@ EOS;
 	$data = $db->GetArray($sql,array($oldfid,$oldf));
 	if ($data) {
 		$fbfields = array_keys($data[0]);
+		//exclude irrelevant stuff
+		foreach (array(
+		'crypt',
+		'searchable',
+		'sortfield1',
+		'sortfield2',
+		'sortfield3',
+		'sortfield4',
+		'sortfield5',
+		) as $one) {
+			$p = array_search($one,$fbfields);
+			if ($p !== FALSE)
+				unset($fbfields[$p]);
+			$p = array_search($one,$passdowns);
+			if ($p !== FALSE)
+				unset($passdowns[$p]);
+		}
 		$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_fieldprops');
 		if (!$pfrow) {
 			$db->Execute('INSERT INTO '.$pre.'module_pwf_fieldprops (prop_id) VALUES (-1)');
