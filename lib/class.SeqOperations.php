@@ -125,6 +125,8 @@ class SeqOperations
 	public function DeleteSequenceFields(&$actor, $after=TRUE)
 	{
 		$members = $this->LogMarkers($actor);
+		if (count($members) <= 2)
+			return; //no more deletions
 		$fdata = $actor->formdata;
 		$fid = $fdata->FieldOrders[$members[0]];
 		$starter = $fdata->Fields[$fid];
