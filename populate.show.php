@@ -32,6 +32,7 @@ $tplvars = $tplvars + array(
 $formdata->jsincs = array();
 $formdata->jsfuncs = array();
 $formdata->jsloads = array();
+$togglehelp = FALSE;
 // Hidden-controls accumulator (see also the form hidden-parameters, above)
 $hidden = '';
 $reqSymbol = PWForms\Utils::GetFormProperty($formdata,'required_field_symbol','*');
@@ -40,9 +41,7 @@ $fields = array();
 //$prev = array(); //make other-page field-values available to templates
 $WalkPage = 1; //'current' page for field-walk purposes
 
-$total = count($formdata->FieldOrders);
-for ($o=0; $o<$total; $o++) { //NOT foreach, to save on copying
-	$field_id = $formdata->FieldOrders[$o];
+foreach ($formdata->FieldOrders as $field_id) {
 	$obfld = $formdata->Fields[$field_id];
 	$type = $obfld->GetFieldType();
 	$alias = $obfld->ForceAlias();
@@ -102,29 +101,16 @@ for ($o=0; $o<$total; $o++) { //NOT foreach, to save on copying
 
 	$oneset = new stdClass();
 	$oneset->alias = $alias;
-//	$oneset->css_class = $obfld->GetProperty('css_class');
+	$oneset->css_class = $obfld->GetProperty('css_class');
 	$oneset->display = $obfld->DisplayInForm();
 	$oneset->valid = $obfld->IsValid();
 	$oneset->error = $oneset->valid?'':$obfld->ValidationMessage;
 	$oneset->has_label = $obfld->HasLabel();
 	$oneset->helptext = $obfld->GetProperty('helptext');
-	if ($oneset->helptext) {
-		if (!isset($formdata->jsfuncs['helptoggle'])) {
-/*TODO func*/	$formdata->jsfuncs['helptoggle'] = <<<EOS
-function help_toggle(htid) {
- var help_container=document.getElementById(htid);
- if (help_container) {
-  if (help_container.style.display == 'none') {
-   help_container.style.display = 'inline';
-  } else {
-   help_container.style.display = 'none';
-  }
- }
-}
-EOS;
-		}
+	if ($oneset->helptext && $obfld->GetProperty('helptoggle')) {
+		$togglehelp = TRUE;
 	}
-	$oneset->helptext_id = 'pwfp_ht_'.$obfld->GetID();
+	$oneset->helptext_id = 'ht_'.$field_id;
 	if (!$oneset->has_label || $obfld->GetHideLabel()
 /*	 && (!$obfld->GetProperty('browser_edit',0) || empty($params['in_admin']))*/)
 		$oneset->hide_name = 1;
@@ -142,11 +128,26 @@ EOS;
 	$oneset->required_symbol = $oneset->required?$reqSymbol:'';
 	$oneset->smarty_eval = $obfld->GetSmartyEval();
 	$oneset->type = $obfld->GetDisplayType();
-	$oneset->values = $obfld->GetIndexedValues(); //TODO multi-element field, not really values?
+	$oneset->values = $obfld->GetIndexedValues(); //array of allowed values for multi-element field
 
 	$tplvars[$alias] = $oneset;
 	$fields[$oneset->input_id] = $oneset;
-} //FieldOrders[] loop
+} //foreach FieldOrders[]
+
+if ($togglehelp) {
+	$formdata->jsfuncs[] = <<<'EOS'
+function help_toggle(htid) {
+ var help_container=document.getElementById(htid);
+ if (help_container) {
+  if (help_container.style.display == 'none') {
+   help_container.style.display = 'inline';
+  } else {
+   help_container.style.display = 'none';
+  }
+ }
+}
+EOS;
+}
 
 $formdata->PagesCount = $WalkPage;
 
