@@ -1,6 +1,6 @@
 ### Overview
 
-This is a form-constructor/displayer module for <a href="http://www.cmsmadesimple.org"><strong>CMS Made Simple</strong></a>&#8482;, inspired somewhat by Samuel Goldstein's FormBuilder module.
+This is a form-constructor/displayer module for <a href="http://www.cmsmadesimple.org"><strong>CMS Made Simple</strong></a>&#8482;, descended from Samuel Goldstein's FormBuilder module.
 
 If you want to compare it with FormBuilder ...
 
