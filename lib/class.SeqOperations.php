@@ -49,7 +49,7 @@ class SeqOperations
 		$aid = $actor->GetID();
 		$ao = array_search($aid,$fdata->FieldOrders);
 		$mo = array_search($ao,$members);
-		if ($after) {
+		if ($after && isset($members[$mo + 1])) {
 			$f0 = $members[$mo];//pre-sequence starter/ender field-order
 			$f1 = $members[$mo + 1]; //post-sequence ender
 		} else {
