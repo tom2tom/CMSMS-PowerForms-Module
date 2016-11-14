@@ -146,8 +146,44 @@ if (isset($params[$prefix.'datakey'])) {
 	}
 	$formdata->formsmodule = &$this;
 
-	$adjust = $matched && (preg_grep('/_Fe[DX]_/',$matched) //expanding or shrinking a field
-		|| preg_grep('/_Se[DIWX]_/',$matched)); //adding or deleting a sequence
+	$adjust = FALSE;
+	if ($matched && ($matches=preg_grep('/_Se[DIWX]_\d+$/',$matched))) {
+		//add or delete a sequence
+		$key = reset($matches);
+		preg_match('/_Se([DIWX])_(\d+)/',$key,$matches);
+		if (array_key_exists($matches[2],$formdata->Fields)) { //may be deleted already
+			switch ($matches[1]) {
+			 case 'D': //delete before
+				$del = TRUE;
+				$after = FALSE;
+				break;
+			 case 'I': //insert before
+				$del = FALSE;
+				$after = FALSE;
+				break;
+			 case 'W': //delete after
+				$del = TRUE;
+				$after = TRUE;
+				break;
+			 case 'X': //insert after
+				$del = FALSE;
+				$after = TRUE;
+				break;
+			}
+			$seqs = new PWForms\SeqOperations();
+			$obfld = $formdata->Fields[$matches[2]];
+			if ($del) {
+				$seqs->DeleteSequenceFields($obfld,$after);
+			} else {
+				$seqs->CopySequenceFields($obfld,$after);
+			}
+			$adjust = TRUE;
+		}
+		unset($params[$key]);
+	}
+
+	$adjust &= $matched && preg_grep('/_Fe[DX]_/',$matched); //expanding or shrinking a textfield
+
 	if (!$adjust) {
 		$donekey = (isset($params[$prefix.'done'])) ? $prefix.'done' : FALSE;
 
@@ -425,7 +461,7 @@ $this->Crash2();
 							return;
 						}
 					 case 'confirm':
-					 	//confirmation needed before submission
+					 	//'external' confirmation needed before acceptance
 						//after confirmation, formdata will be different
 						echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
 							'title'=>$this->Lang('title_confirm'),
@@ -463,11 +499,50 @@ $this->Crash2();
 		return;
 	}
 
+	$formdata->FieldOrders = array_keys($formdata->Fields);
+	$funcs->Arrange($formdata->Fields,$formdata->FieldOrders);
+
 	if (isset($params['excludetype'])) {
-	//TODO singleton or array of field-type(s) to be omitted from the form
+		if (is_array($params['excludetype'])) {
+			$notypes = $params['excludetype'];
+		} else {
+			$notypes = array($params['excludetype']);
+		}
+	} else {
+		$notypes = FALSE;
 	}
 	if (isset($params['exclude'])) {
-	//TODO singleton or array of field id(s) or alias(es) to be omitted from the form
+		if (is_array($params['exclude'])) {
+			$nofields = $params['exclude'];
+		} else {
+			$nofields = array($params['exclude']);
+		}
+	} else {
+		$nofields = FALSE;
+	}
+
+	$seqs = FALSE;
+	$total = count($formdata->FieldOrders);
+	for ($o=0; $o<$total; $o++) { //NOT foreach, cuz array content may change during loop
+		$field_id = $formdata->FieldOrders[$o];
+		$obfld = $formdata->Fields[$field_id];
+		$type = $obfld->GetFieldType();
+		if ($notypes && in_array($type,$notypes)) {
+			unset($formdata->Fields[$field_id]);
+			unset($formdata->FieldOrders[$o]); //TODO collapse array members: splice?
+		} elseif ($nofields && 0) { //TODO
+			unset($formdata->Fields[$field_id]);
+			unset($formdata->FieldOrders[$o]);
+		} elseif ($type == 'SequenceStart') {
+			$times = $obfld->GetProperty('repeatcount');
+			if ($times > 1) {
+				if (!$seqs) {
+					$seqs = new PWForms\SeqOperations();
+				}
+				$seqs->CopySequenceFields($obfld,TRUE,$times-1); //adjusts various parameters
+				$total = count($formdata->FieldOrders);
+			}
+		}
 	}
 
 	//make initiator-supplied parameters available TODO may also be needed for later pass(es)
@@ -508,9 +583,6 @@ $this->Crash2();
 	$formdata->Page = 1;
 	$formdata->PagesCount = 1; //we will count
 
-	$formdata->FieldOrders = array_keys($formdata->Fields);
-	$funcs->Arrange($formdata->Fields,$formdata->FieldOrders);
-
 	//construct cache key (more random than backend keys)
 	if (!empty($_SERVER['SERVER_ADDR']))
 		$token = $_SERVER['SERVER_ADDR'];
@@ -545,6 +617,12 @@ $tplvars['form_done'] = 0;
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.show.php';
 
+$jsincs = $formdata->jsincs;
+$formdata->jsincs = NULL;
+$jsfuncs = $formdata->jsfuncs;
+$formdata->jsfuncs = NULL;
+$jsloads = $formdata->jsloads;
+$formdata->jsloads = NULL;
 $cache->set($cache_key,$formdata,84600);
 
 $styler = '<link rel="stylesheet" type="text/css" href="'.$baseurl.'/css/showform.css" />';
@@ -575,6 +653,6 @@ PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf_'.$form_id,$tplvars,TRUE);
 echo $form_end;
 //inject constructed js after other content (pity we can't get to </body> or </html> from here)
 $jsall = NULL;
-PWForms\Utils::MergeJS($formdata->jsincs,$formdata->jsfuncs,$formdata->jsloads,$jsall);
+PWForms\Utils::MergeJS($jsincs,$jsfuncs,$jsloads,$jsall);
 if ($jsall)
 	echo $jsall;

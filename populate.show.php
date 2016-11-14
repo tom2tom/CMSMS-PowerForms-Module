@@ -28,39 +28,10 @@ $tplvars = $tplvars + array(
 	'form_name' => $formdata->Name
 );
 
-if (!$firsttime && ($matches=preg_grep('/^pwfp_\d{3}_Se[DIWX]_\d+$/',$pkeys))) {
-	//add or delete a sequence
-	$key = reset($matches);
-	preg_match('/_Se([DIWX])_(\d+)/',$key,$matches);
-	switch ($matches[1]) {
-	 case 'D': //delete before
-	 	$del = TRUE;
-	 	$after = FALSE;
-		break;
-	 case 'I': //insert before
-	 	$del = FALSE;
-	 	$after = FALSE;
-		break;
-	 case 'W': //delete after
-	 	$del = TRUE;
-	 	$after = TRUE;
-		break;
-	 case 'X': //insert after
-	 	$del = FALSE;
-	 	$after = TRUE;
-		break;
-	}
-	$seqs = new PWForms\SeqOperations();
-	$obfld = $formdata->Fields[$matches[2]];
-	if ($del) {
-		$seqs->DeleteSequenceFields($obfld,$after);
-	} else {
-		$seqs->CopySequenceFields($obfld,$after);
-	}
-} else {
-	$seqs = FALSE;
-}
-
+//fresh start for js accumulators
+$formdata->jsincs = array();
+$formdata->jsfuncs = array();
+$formdata->jsloads = array();
 // Hidden-controls accumulator (see also the form hidden-parameters, above)
 $hidden = '';
 $reqSymbol = PWForms\Utils::GetFormProperty($formdata,'required_field_symbol','*');
@@ -70,22 +41,10 @@ $fields = array();
 $WalkPage = 1; //'current' page for field-walk purposes
 
 $total = count($formdata->FieldOrders);
-for ($o=0; $o<$total; $o++) { //NOT foreach, cuz the array can change during the loop
+for ($o=0; $o<$total; $o++) { //NOT foreach, to save on copying
 	$field_id = $formdata->FieldOrders[$o];
 	$obfld = $formdata->Fields[$field_id];
 	$type = $obfld->GetFieldType();
-
-	if ($type == 'SequenceStart' && $firsttime) {
-		$times = $obfld->GetProperty('repeatcount');
-		if ($times > 1) {
-			if (!$seqs) {
-				$seqs = new PWForms\SeqOperations();
-			}
-			$seqs->CopySequenceFields($obfld,TRUE,$times-1); //adjusts various parameters
-			$total = count($formdata->FieldOrders);
-		}
-	}
-
 	$alias = $obfld->ForceAlias();
 
 	if ($type == 'PageBreak')
@@ -249,7 +208,7 @@ if (PWForms\Utils::GetFormProperty($formdata,'input_button_safety')) {
     $('input[class*=" submit_"]').each(function() {
      this.disabled = true;
     });
-   },0);
+   },10);
 EOS;
 } else {
 	$safejs = '';
