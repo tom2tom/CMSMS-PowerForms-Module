@@ -374,11 +374,9 @@ EOS;
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT name,alias FROM '.$pre.'module_pwf_form WHERE form_id=?';
-		$db = \cmsms()->GetDb();
-		$row = $db->GetRow($sql,array($form_id));
+		$row = Utils::SafeGet($sql,array($form_id),'row');
 		if (!$row) {
-			$ret = FALSE;
-			return $ret;
+			return FALSE;
 		}
 
 		$formdata = $mod->_GetFormData($params);
@@ -390,7 +388,7 @@ EOS;
 
 		//no form data value is an array, so no records with same name
 		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
-		$data = $db->GetArray($sql,array($form_id));
+		$data = Utils::SafeGet($sql,array($form_id));
 		foreach ($data as $one) {
 			$nm = $one['name'];
 /*			TODO support arrays when 'name' field like A[B...
@@ -435,7 +433,7 @@ EOS;
 		}
 
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
-		$fields = $db->GetArray($sql,array($form_id));
+		$fields = Utils::SafeGet($sql,array($form_id));
 		if ($fields) {
 //TODO if (!$admin) { populate sequences }
 			foreach ($fields as &$row) {
