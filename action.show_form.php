@@ -504,21 +504,21 @@ $this->Crash2();
 
 	if (isset($params['excludetype'])) {
 		if (is_array($params['excludetype'])) {
-			$notypes = $params['excludetype'];
+			$extypes = $params['excludetype'];
 		} else {
-			$notypes = array($params['excludetype']);
+			$extypes = array($params['excludetype']);
 		}
 	} else {
-		$notypes = FALSE;
+		$extypes = FALSE;
 	}
 	if (isset($params['exclude'])) {
 		if (is_array($params['exclude'])) {
-			$nofields = $params['exclude'];
+			$exfields = $params['exclude'];
 		} else {
-			$nofields = array($params['exclude']);
+			$exfields = array($params['exclude']);
 		}
 	} else {
-		$nofields = FALSE;
+		$exfields = FALSE;
 	}
 
 	$seqs = FALSE;
@@ -527,10 +527,10 @@ $this->Crash2();
 		$field_id = $formdata->FieldOrders[$o];
 		$obfld = $formdata->Fields[$field_id];
 		$type = $obfld->GetFieldType();
-		if ($notypes && in_array($type,$notypes)) {
+		if ($extypes && in_array($type,$extypes)) {
 			unset($formdata->Fields[$field_id]);
-			unset($formdata->FieldOrders[$o]); //TODO collapse array members: splice?
-		} elseif ($nofields && 0) { //TODO
+			unset($formdata->FieldOrders[$o]); //TODO collapse array indices: splice?
+		} elseif ($exfields && 0) { //TODO in_array(??,$exfields)
 			unset($formdata->Fields[$field_id]);
 			unset($formdata->FieldOrders[$o]);
 		} elseif ($type == 'SequenceStart') {
