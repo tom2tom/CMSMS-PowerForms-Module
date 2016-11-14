@@ -547,7 +547,7 @@ class FieldBase implements \Serializable
 	}
 
 	// Subclass this
-	// Returns array of property values or FALSE
+	// Returns array of all acceptable field-values, or FALSE
 	public function GetIndexedValues()
 	{
 		if (array_key_exists('indexed_value',$this->XtraProps)) {
