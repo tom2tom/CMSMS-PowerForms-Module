@@ -384,7 +384,7 @@ EOS;
 		if (empty($params['form_name']))
 			$formdata->Name = $row['name'];
 		if (empty($params['form_alias']))
-			$formdata->Alias = $row['alias'];
+			$formdata->Alias = $row['alias']; //alias used only for admin
 
 		//no form data value is an array, so no records with same name
 		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
