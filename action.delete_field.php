@@ -5,7 +5,7 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if (isset($params['action'])) {
+if (isset($params['active_tab'])) {
 	//we've reached here via a request or redirect
 	//TODO
 } else {
@@ -36,7 +36,6 @@ if (isset($params['action'])) {
 				unset($formdata->FieldOrders[$key]);
 		}
 	}
-
 	$cache->set($params['datakey'],$formdata,84600);
 
 	echo '1';
