@@ -71,8 +71,8 @@ class CheckboxGroup extends FieldBase
 		$set = $this->GetPropIndexed('box_checked',1);
 		$unset = array_values($this->GetPropArray('box_unchecked')); //0-based
 		if (is_array($newvalue)) {
-			foreach ($newvalue as $key=>$val) {
-				$unset[$key] = $set;
+			foreach ($newvalue as $val) { //$val = 1-based index
+				$unset[$val-1] = $set;
 			}
 		}
 		$this->Value = $unset;
@@ -245,10 +245,11 @@ EOS;
 
 				if ($this->Value) {
 					$v = $this->GetArrayValue($i-1);
-					if ($v == $this->GetPropIndexed('box_checked',$i))
+					if ($v == $this->GetPropIndexed('box_checked',$i)) {
 						$checked = $i;
-					else
+					} else {
 						$checked = -1;
+					}
 				} elseif ($this->GetPropIndexed('box_is_set',$i) == 'y') {
 					$checked = $i;
 				} else {
