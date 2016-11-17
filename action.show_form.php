@@ -24,6 +24,7 @@ after first-pass, many with prefix: 'pwfp_\d{3}_'
  including
 		...field id => field-value from UI
 		...Fe[DX]_ => expand or shrink a multi-element field
+		...Se[DIWX]_ => expand or shrink a multi-element field
 		...previous => pageback clicked
 		...continue => pagenext clicked
 		...done => submit clicked
@@ -50,6 +51,15 @@ WHERE NOT EXISTS (SELECT 1 FROM '.$pre.'module_pwf_ip_log T WHERE T.src=?)';
 		PWForms\Utils::SafeExec($sql,$args);
 	}
  }
+
+ function ClearFormCache($cache, $params)
+ {
+	$matches = preg_grep('/datakey$/',array_keys($params));
+	if ($matches) {
+		$cache_key = reset($matches);
+		$cache->delete($cache_key);
+	}
+ }
 }
 
 if (!isset($params['form_id']) && isset($params['form'])) // got the form by alias
@@ -58,6 +68,16 @@ if (empty($params['form_id']) || $params['form_id'] == -1) {
 	echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
 		'title'=>$this->Lang('title_aborted'),
 		'message'=>$this->Lang('err_data'),
+		'error'=>1));
+	return;
+}
+
+try {
+	$cache = PWForms\Utils::GetCache($this);
+} catch (Exception $e) {
+	echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+		'title'=>$this->Lang('title_aborted'),
+		'message'=>$this->Lang('err_system').' NO CACHE MECHANISM',
 		'error'=>1));
 	return;
 }
@@ -74,7 +94,7 @@ if ($matched) {
 		$prefix = $prior;
 	else {
 		BlockSource();
-		//TODO delete cached formdata, if any
+		ClearFormCache($cache,$params);
 		echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
 			'title'=>$this->Lang('title_aborted'),
 			'message'=>$this->Lang('comeback_expired')));
@@ -83,7 +103,7 @@ if ($matched) {
 	while ($key = next($matched)) {
 		if (strpos($key,$prefix) !== 0) {
 			BlockSource();
-			//TODO delete cached formdata, if any
+			ClearFormCache($cache,$params);
 			echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
 				'title'=>$this->Lang('title_aborted'),
 				'message'=>$this->Lang('comeback_expired')));
@@ -94,11 +114,12 @@ if ($matched) {
 	$prefix = $current;
 
 if (isset($params[$prefix.'cancel'])) {
+	ClearFormCache($cache,$params);
 	if (isset($params[$prefix.'passthru'])) {
 		$newparms = array('passthru'=>$params[$prefix.'passthru']);
-	} else
+	} else {
 		$newparms = array();
-	//TODO delete cached formdata, if any
+	}
 	if (strpos($params[$prefix.'resume'],',') === FALSE) {
 		$this->Redirect($id,$params[$prefix.'resume'],$returnid,$newparms);
 	} else {
@@ -110,15 +131,6 @@ if (isset($params[$prefix.'cancel'])) {
 	}
 }
 
-try {
-	$cache = PWForms\Utils::GetCache($this);
-} catch (Exception $e) {
-	echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
-		'title'=>$this->Lang('title_aborted'),
-		'message'=>$this->Lang('err_system').' NO CACHE MECHANISM',
-		'error'=>1));
-	return;
-}
 /*QUEUE
 try {
 	$mx = PWForms\Utils::GetMutex($this);
@@ -149,10 +161,308 @@ if (isset($params[$prefix.'datakey'])) {
 	}
 	$formdata->formsmodule = &$this;
 
-	//are we here in response to a non-submit-button click?
-	$adjust = FALSE;
-	if ($matched && ($matches=preg_grep('/_Se[DIWX]_\d+$/',$matched))) {
-		//add or delete a sequence
+	//update cached field data from $params[]
+	foreach ($matched as $key) {
+		$pid = substr($key,9); //ignore 'pwfp_NNN_' prefix
+		if (is_numeric($pid)) {
+			if (isset($formdata->Fields[$pid])) {
+				$obfld = $formdata->Fields[$pid];
+				if ($obfld->Type != 'Captcha') {
+					$val = $params[$key];
+				} else {
+					if (isset($params['captcha_input']))
+						$val = $params['captcha_input'];
+						if (!$val)
+							$val = '-.-'; //ensure invalid-value if empty
+				}
+				$obfld->SetValue($val);
+			}
+		}
+	}
+
+	if (isset($params[$prefix.'done'])) { //form finally-submitted
+		$limit = PWForms\Utils::GetFormProperty($formdata,'submit_limit',0);
+		if ($limit > 0) { // rate-limiting applies
+			if (!empty($_SERVER['REMOTE_ADDR'])) {
+				$src = $_SERVER['REMOTE_ADDR'];
+				$t = time();
+				$t2 = trim($db->DBTimeStamp($t-3600),"'");
+				$t = trim($db->DBTimeStamp($t),"'");
+				$num = 0;
+				$pre = cms_db_prefix();
+				$sql = 'DELETE FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<?';
+				$args = array($src,$t2);
+				$sql2 = 'SELECT COUNT(*) AS num FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<=?';
+				$args2 = array(array($src,$t));
+
+				$nt = 10;
+				while ($nt > 0) {
+					$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'); //this isn't perfect!
+					$db->StartTrans();
+					$db->Execute($sql,$args);
+					$num = $db->GetOne($sql2,$args2);
+					if ($db->CompleteTrans())
+						break;
+					else {
+						$nt--;
+						usleep(50000);
+					}
+				}
+				if ($nt == 0) {
+					$cache->delete($cache_key);
+					echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+						'title'=>$this->Lang('title_aborted'),
+						'message'=>$this->Lang('system_data'),
+						'error'=>1));
+					return;
+				}
+				if ($num) {
+					if ($num == 255) { //blocked due to expiry
+						BlockSource(); //again!
+						$cache->delete($cache_key);
+						echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+							'title'=>$this->Lang('title_aborted'),
+							'message'=>$this->Lang('comeback_expired')));
+						return;
+					}
+					if ($num <= $limit) {
+						$sql = array();
+						$sql[] = <<<EOS
+UPDATE {$pre}module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?
+EOS;
+						$args = array(array($src,$num+1));
+						$sql[] = <<<EOS
+INSERT INTO {$pre}module_pwf_ip_log (src,howmany,basetime)
+SELECT ?,1,? FROM (SELECT 1 AS dmy) Z
+WHERE NOT EXISTS (SELECT 1 FROM {$pre}module_pwf_ip_log T WHERE T.src=?)
+EOS;
+						$args[] = array($src,$t,$src);
+						PWForms\Utils::SafeExec($sql,$args);
+					} else {
+						$cache->delete($cache_key);
+						echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+							'title'=>$this->Lang('title_aborted'),
+							'message'=>$this->Lang('comeback_toomany')));
+						return;
+					}
+				}
+			}
+		}
+
+		// validate form fields
+		$allvalid = TRUE;
+		$notempty = PWForms\Utils::GetFormProperty($formdata,'blank_invalid',
+			$this->GetPreference('blank_invalid'));
+		$message = array();
+//			$formPage = 1;
+//			$valPage = $formdata->Page - 1; //TODO off by 1 ?
+
+		foreach ($formdata->FieldOrders as $field_id) {
+			$obfld = $formdata->Fields[$field_id];
+/*TODO multi-page-form field validation and feedback
+			if ($obfld->GetFieldType() == 'PageBreak')
+				$formPage++;
+			if ($valPage != $formPage) {
+				continue;
+			}
+*/
+			if (// $obfld->GetChangeRequirement() &&
+				$obfld->IsRequired() && !$obfld->HasValue($notempty)) {
+				$allvalid = FALSE;
+				$obfld->valid = FALSE;
+				$obfld->ValidationMessage = $this->Lang('please_enter_a_value',$obfld->GetName());
+				$message[] = $obfld->ValidationMessage;
+			} elseif ($obfld->GetValue()) {
+				$res = $obfld->Validate($id);
+				if ($res[0])
+					$obfld->valid = TRUE;
+				else {
+					$allvalid = FALSE;
+					$obfld->valid = FALSE;
+					$message[] = $res[1];
+				}
+			}
+		}
+
+		if ($allvalid) {
+			$udt = PWForms\Utils::GetFormProperty($formdata,'validate_udt');
+			if (!empty($udt)) {
+				$usertagops = cmsms()->GetUserTagOperations(); //TODO ok here ?
+				$unspec = PWForms\Utils::GetFormProperty($formdata,'unspecified',$this->Lang('unspecified'));
+
+				$parms = $params;
+				foreach ($formdata->FieldOrders as $field_id) {
+					$obfld = $formdata->Fields[$field_id];
+					if ($obfld->DisplayInSubmission()) {
+						$val = $obfld->DisplayableValue();
+						if ($val == '')
+							$val = $unspec;
+					} else
+						$val = '';
+					$name = $obfld->GetVariableName();
+					$parms[$name] = $val;
+					$alias = $obfld->ForceAlias();
+					$parms[$alias] = $val;
+					$id = $obfld->GetId();
+					$parms['fld_'.$id] = $val;
+				}
+
+				$res = $usertagops->CallUserTag($udt,$parms);
+				if (!$res[0]) {
+					$allvalid = FALSE;
+					$message[] = $res[1];
+				}
+			}
+		}
+
+		if ($allvalid) {
+/*QUEUE (php with async post-callback is bogus !?
+			$token = abs(crc32($this->GetName().'Qmutex')); //same token as in action.run_queue.php
+			if (!$mx->lock($token)) {
+				echo $this->Lang('err_lock');
+				exit;
+			}
+			$queue = $cache->get('pwfQarray');
+			if (!$queue)
+				$queue = array();
+			unset($formdata->formsmodule); //no need to cache this
+			$queue[] = array(
+				'data' => $formdata, //CHECKME encrypted?
+				'submitted' => time(),
+				'pageid' => $id);
+			$cache->set('pwfQarray',$queue,0); //no expiry
+			$formdata->formsmodule = &$this;
+			$mx->unlock($token);
+			if (!$cache->get('pwfQrunning')) {
+				//initiate async queue processing
+				if ($this->ch) {
+					while (curl_multi_info_read($this->mh))
+						usleep(20000);
+					curl_multi_remove_handle($this->mh,$this->ch);
+					curl_close($this->ch);
+					$this->ch = FALSE;
+				}
+
+				$ch = curl_init($this->Qurl);
+				curl_setopt_array($ch,array(
+				CURLOPT_FAILONERROR=>TRUE,
+				CURLOPT_FOLLOWLOCATION=>TRUE,
+				CURLOPT_FORBID_REUSE=>TRUE,
+				CURLOPT_FRESH_CONNECT=>TRUE,
+				CURLOPT_HEADER=>FALSE,
+				CURLOPT_RETURNTRANSFER=>TRUE,
+				CURLOPT_SSL_VERIFYPEER=>FALSE)	//in case ...
+				);
+
+				curl_multi_add_handle($this->mh,$ch);
+				$runcount = 0;
+				do
+				{
+					$mrc = curl_multi_exec($this->mh,$runcount);
+				} while ($mrc == CURLM_CALL_MULTI_PERFORM); //irrelevant for curl 7.20.0+ (2010-02-11)
+//					if ($mrc != CURLM_OK) i.e. CURLM_OUT_OF_MEMORY, CURLM_INTERNAL_ERROR
+				if ($runcount) {
+					$this->ch = $ch; //cache for later cleanup
+				} else {
+					curl_multi_remove_handle($this->mh,$ch);
+					curl_close($ch);
+				}
+			}
+*/
+			// run all field methods that modify other fields
+			$computes = array();
+			foreach ($formdata->FieldOrders as $field_id) {
+				$obfld = $formdata->Fields[$field_id];
+				$obfld->PreDisposeAction();
+				if ($obfld->ComputeOnSubmission())
+					$computes[$field_id] = $obfld->ComputeOrder();
+			}
+
+			if ($computes) {
+				asort($computes);
+				foreach ($computes as $field_id=>$val)
+					$formdata->Fields[$field_id]->Compute();
+			}
+
+			$alldisposed = TRUE;
+			$message = array();
+			// dispose TODO handle 'blocked' notices
+			foreach ($formdata->FieldOrders as $field_id) {
+				$obfld = $formdata->Fields[$field_id];
+				if ($obfld->IsDisposition() && $obfld->IsDisposable()) {
+					$res = $obfld->Dispose($id,$returnid);
+					if (!$res[0]) {
+						$alldisposed = FALSE;
+						$message[] = $res[1];
+					}
+				}
+			}
+			// cleanups
+			foreach ($formdata->FieldOrders as $field_id) {
+				$obfld = $formdata->Fields[$field_id];
+				$obfld->PostDisposeAction();
+			}
+
+			$parms = array();
+			$parms['form_id'] = $form_id;
+			$parms['form_name'] = PWForms\Utils::GetFormNameFromID($form_id);
+
+			$tplvars['form_done'] = 1;
+			if ($alldisposed) {
+				//TODO how to handle $params['resume'] c.f. cancellation
+				$cache->delete($cache_key);
+				$act = PWForms\Utils::GetFormProperty($formdata,'submit_action','text');
+				switch ($act) {
+				 case 'text':
+					$this->SendEvent('OnFormSubmit',$parms);
+					PWForms\Utils::SetupFormVars($formdata,$tplvars);
+					PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf_sub_'.$form_id,$tplvars,TRUE);
+					return;
+				 case 'redir':
+					$this->SendEvent('OnFormSubmit',$parms);
+					$ret = PWForms\Utils::GetFormProperty($formdata,'redirect_page',0);
+					if ($ret > 0)
+						$this->RedirectContent($ret);
+					else {
+						echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+							'title'=>$this->Lang('missing_type',$this->Lang('page')),
+							'message'=>$this->Lang('cannot_show_TODO'),
+							'error'=>1));
+						return;
+					}
+				 case 'confirm':
+					//'external' confirmation needed before acceptance
+					//after confirmation, formdata will be different
+					echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+						'title'=>$this->Lang('title_confirm'),
+						'message'=>$this->Lang('help_confirm')));
+					return;
+				 default:
+					exit;
+				}
+			} else {
+				$this->SendEvent('OnFormSubmitError',$parms);
+				$tplvars = $tplvars + array(
+					'submission_error' => $this->Lang('err_submission'),
+					'submission_error_list' => $message,
+					'show_submission_errors' => !$this->GetPreference('hide_errors')
+				);
+			}
+			unset($parms);
+// end of synchronous processing
+		} else { // validation error(s)
+			$validerr = 1;
+			$tplvars['form_validation_errors'] = $message;
+			$formdata->Page--; //TODO why
+		}
+
+	} elseif (isset($params[$prefix.'continue'])) { //not submitted/done
+			$formdata->Page++;
+	} elseif (isset($params[$prefix.'previous'])) {
+		$formdata->Page--;
+		if ($formdata->Page < 1)
+			$formdata->Page = 1;
+	} elseif ($matched && ($matches=preg_grep('/_Se[DIWX]_\d+$/',$matched))) { //add or delete a sequence
 		$key = reset($matches);
 		preg_match('/_Se([DIWX])_(\d+)/',$key,$matches);
 		if (array_key_exists($matches[2],$formdata->Fields)) { //may be deleted already
@@ -185,308 +495,23 @@ if (isset($params[$prefix.'datakey'])) {
 		}
 		unset($params[$key]);
 	}
+	//any textfield expansion/contraction handled in the relevant field
+	//$matched && preg_grep('/_Fe[DX]_/',$matched);
 
-	$adjust &= $matched && preg_grep('/_Fe[DX]_/',$matched); //expanding or shrinking a textfield
-
-	if (!$adjust) { //one of the 'main' submit buttons clicked
-		//update cached field data from $params[]
-		foreach ($matched as $key) {
-			$pid = substr($key,9); //ignore 'pwfp_NNN_' prefix
-			if (is_numeric($pid)) {
-				if (isset($formdata->Fields[$pid])) {
-					$obfld = $formdata->Fields[$pid];
-					if ($obfld->Type != 'Captcha') {
-						$val = $params[$key];
-					} else {
-						if (isset($params['captcha_input']))
-							$val = $params['captcha_input'];
-							if (!$val)
-								$val = '-.-'; //ensure invalid-value if empty
-					}
-					$obfld->SetValue($val);
-				}
-			}
-		}
-
-		if (isset($params[$prefix.'done'])) { //form submitted
-			$limit = PWForms\Utils::GetFormProperty($formdata,'submit_limit',0);
-			if ($limit > 0) { // rate-limiting applies
-				if (!empty($_SERVER['REMOTE_ADDR'])) {
-					$src = $_SERVER['REMOTE_ADDR'];
-					$t = time();
-					$t2 = trim($db->DBTimeStamp($t-3600),"'");
-					$t = trim($db->DBTimeStamp($t),"'");
-					$num = 0;
-					$pre = cms_db_prefix();
-					$sql = 'DELETE FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<?';
-					$args = array($src,$t2);
-					$sql2 = 'SELECT COUNT(*) AS num FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<=?';
-					$args2 = array(array($src,$t));
-
-					$nt = 10;
-					while ($nt > 0) {
-						$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'); //this isn't perfect!
-						$db->StartTrans();
-						$db->Execute($sql,$args);
-						$num = $db->GetOne($sql2,$args2);
-						if ($db->CompleteTrans())
-							break;
-						else {
-							$nt--;
-							usleep(50000);
-						}
-					}
-					if ($nt == 0) {
-						echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
-							'title'=>$this->Lang('title_aborted'),
-							'message'=>$this->Lang('system_data'),
-							'error'=>1));
-						return;
-					}
-					if ($num) {
-						if ($num == 255) { //blocked due to expiry
-							BlockSource(); //again!
-							echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
-								'title'=>$this->Lang('title_aborted'),
-								'message'=>$this->Lang('comeback_expired')));
-							return;
-						}
-						if ($num <= $limit) {
-							$sql = array();
-							$sql[] = <<<EOS
-UPDATE {$pre}module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?
-EOS;
-							$args = array(array($src,$num+1));
-							$sql[] = <<<EOS
-INSERT INTO {$pre}module_pwf_ip_log (src,howmany,basetime)
-SELECT ?,1,? FROM (SELECT 1 AS dmy) Z
-WHERE NOT EXISTS (SELECT 1 FROM {$pre}module_pwf_ip_log T WHERE T.src=?)
-EOS;
-							$args[] = array($src,$t,$src);
-							PWForms\Utils::SafeExec($sql,$args);
-						} else {
-							echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
-								'title'=>$this->Lang('title_aborted'),
-								'message'=>$this->Lang('comeback_toomany')));
-							return;
-						}
-					}
-				}
-			}
-
-			// validate form
-			$allvalid = TRUE;
-			$notempty = PWForms\Utils::GetFormProperty($formdata,'blank_invalid',
-				$this->GetPreference('blank_invalid'));
-			$message = array();
-//			$formPage = 1;
-//			$valPage = $formdata->Page - 1; //TODO off by 1 ?
-
-			foreach ($formdata->FieldOrders as $field_id) {
-				$obfld = $formdata->Fields[$field_id];
-/*TODO multi-page-form field validation and feedback
-				if ($obfld->GetFieldType() == 'PageBreak')
-					$formPage++;
-				if ($valPage != $formPage) {
-					continue;
-				}
+/*TODO make initiator-supplied parameters available as per 1st-pass
+	$tplvars = array_diff_key($params, array(
+	'action' => 1,
+	'cancel' => 1,
+	'exclude' => 1,
+	'excludetype' => 1,
+	'form' => 1,
+	'form_id' => 1,
+	'passthru' => 1,
+	'preload' => 1,
+	'resume' => 1
+	));
 */
-				if (// $obfld->GetChangeRequirement() &&
-					$obfld->IsRequired() && !$obfld->HasValue($notempty)) {
-					$allvalid = FALSE;
-					$obfld->valid = FALSE;
-					$obfld->ValidationMessage = $this->Lang('please_enter_a_value',$obfld->GetName());
-					$message[] = $obfld->ValidationMessage;
-				} elseif ($obfld->GetValue()) {
-					$res = $obfld->Validate($id);
-					if ($res[0])
-						$obfld->valid = TRUE;
-					else {
-						$allvalid = FALSE;
-						$obfld->valid = FALSE;
-						$message[] = $res[1];
-					}
-				}
-			}
 
-			if ($allvalid) {
-				$udt = PWForms\Utils::GetFormProperty($formdata,'validate_udt');
-				if (!empty($udt)) {
-					$usertagops = cmsms()->GetUserTagOperations(); //TODO ok here ?
-					$unspec = PWForms\Utils::GetFormProperty($formdata,'unspecified',$this->Lang('unspecified'));
-
-					$parms = $params;
-					foreach ($formdata->FieldOrders as $field_id) {
-						$obfld = $formdata->Fields[$field_id];
-						if ($obfld->DisplayInSubmission()) {
-							$val = $obfld->DisplayableValue();
-							if ($val == '')
-								$val = $unspec;
-						} else
-							$val = '';
-						$name = $obfld->GetVariableName();
-						$parms[$name] = $val;
-						$alias = $obfld->ForceAlias();
-						$parms[$alias] = $val;
-						$id = $obfld->GetId();
-						$parms['fld_'.$id] = $val;
-					}
-
-					$res = $usertagops->CallUserTag($udt,$parms);
-					if (!$res[0]) {
-						$allvalid = FALSE;
-						$message[] = $res[1];
-					}
-				}
-			}
-
-			if ($allvalid) {
-/*QUEUE (php with async post-callback is bogus !?
-				$token = abs(crc32($this->GetName().'Qmutex')); //same token as in action.run_queue.php
-				if (!$mx->lock($token)) {
-					echo $this->Lang('err_lock');
-					exit;
-				}
-				$queue = $cache->get('pwfQarray');
-				if (!$queue)
-					$queue = array();
-				unset($formdata->formsmodule); //no need to cache this
-				$queue[] = array(
-					'data' => $formdata, //CHECKME encrypted?
-					'submitted' => time(),
-					'pageid' => $id);
-				$cache->set('pwfQarray',$queue,0); //no expiry
-				$formdata->formsmodule = &$this;
-				$mx->unlock($token);
-				if (!$cache->get('pwfQrunning')) {
-					//initiate async queue processing
-					if ($this->ch) {
-						while (curl_multi_info_read($this->mh))
-							usleep(20000);
-						curl_multi_remove_handle($this->mh,$this->ch);
-						curl_close($this->ch);
-						$this->ch = FALSE;
-					}
-
-					$ch = curl_init($this->Qurl);
-					curl_setopt($ch,CURLOPT_FAILONERROR,TRUE);
-					curl_setopt($ch,CURLOPT_FOLLOWLOCATION,TRUE);
-					curl_setopt($ch,CURLOPT_FORBID_REUSE,TRUE);
-					curl_setopt($ch,CURLOPT_FRESH_CONNECT,TRUE);
-					curl_setopt($ch,CURLOPT_HEADER,FALSE);
-					curl_setopt($ch,CURLOPT_RETURNTRANSFER,TRUE);
-					curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,FALSE);	//in case ...
-
-					curl_multi_add_handle($this->mh,$ch);
-					$runcount = 0;
-					do
-					{
-						$mrc = curl_multi_exec($this->mh,$runcount);
-					} while ($mrc == CURLM_CALL_MULTI_PERFORM); //irrelevant for curl 7.20.0+ (2010-02-11)
-//					if ($mrc != CURLM_OK) i.e. CURLM_OUT_OF_MEMORY, CURLM_INTERNAL_ERROR
-					if ($runcount) {
-						$this->ch = $ch; //cache for later cleanup
-					} else {
-						curl_multi_remove_handle($this->mh,$ch);
-						curl_close($ch);
-					}
-				}
-*/
-				// run all field methods that modify other fields
-				$computes = array();
-				foreach ($formdata->FieldOrders as $field_id) {
-					$obfld = $formdata->Fields[$field_id];
-					$obfld->PreDisposeAction();
-					if ($obfld->ComputeOnSubmission())
-						$computes[$field_id] = $obfld->ComputeOrder();
-				}
-
-				if ($computes) {
-					asort($computes);
-					foreach ($computes as $field_id=>$val)
-						$formdata->Fields[$field_id]->Compute();
-				}
-
-				$alldisposed = TRUE;
-				$message = array();
-				// dispose TODO handle 'blocked' notices
-				foreach ($formdata->FieldOrders as $field_id) {
-					$obfld = $formdata->Fields[$field_id];
-					if ($obfld->IsDisposition() && $obfld->IsDisposable()) {
-						$res = $obfld->Dispose($id,$returnid);
-						if (!$res[0]) {
-							$alldisposed = FALSE;
-							$message[] = $res[1];
-						}
-					}
-				}
-				// cleanups
-				foreach ($formdata->FieldOrders as $field_id) {
-					$obfld = $formdata->Fields[$field_id];
-					$obfld->PostDisposeAction();
-				}
-
-				$parms = array();
-				$parms['form_id'] = $form_id;
-				$parms['form_name'] = PWForms\Utils::GetFormNameFromID($form_id);
-
-				$tplvars['form_done'] = 1;
-				if ($alldisposed) {
-					//TODO how to handle $params['resume'] c.f. cancellation
-					$cache->delete($cache_key);
-					$act = PWForms\Utils::GetFormProperty($formdata,'submit_action','text');
-					switch ($act) {
-					 case 'text':
-						$this->SendEvent('OnFormSubmit',$parms);
-						PWForms\Utils::SetupFormVars($formdata,$tplvars);
-						PWForms\Utils::ProcessTemplateFromDatabase($this,'pwf_sub_'.$form_id,$tplvars,TRUE);
-						return;
-					 case 'redir':
-						$this->SendEvent('OnFormSubmit',$parms);
-						$ret = PWForms\Utils::GetFormProperty($formdata,'redirect_page',0);
-						if ($ret > 0)
-							$this->RedirectContent($ret);
-						else {
-							echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
-								'title'=>$this->Lang('missing_type',$this->Lang('page')),
-								'message'=>$this->Lang('cannot_show_TODO'),
-								'error'=>1));
-							return;
-						}
-					 case 'confirm':
-					 	//'external' confirmation needed before acceptance
-						//after confirmation, formdata will be different
-						echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
-							'title'=>$this->Lang('title_confirm'),
-							'message'=>$this->Lang('help_confirm')));
-						return;
-					 default:
-						exit;
-					}
-				} else {
-					$this->SendEvent('OnFormSubmitError',$parms);
-					$tplvars = $tplvars + array(
-						'submission_error' => $this->Lang('err_submission'),
-						'submission_error_list' => $message,
-						'show_submission_errors' => !$this->GetPreference('hide_errors')
-					);
-				}
-				unset($parms);
-// end of synchronous processing
-			} else { // validation error(s)
-				$validerr = 1;
-				$tplvars['form_validation_errors'] = $message;
-				$formdata->Page--; //TODO why
-			}
-
-		} elseif (isset($params[$prefix.'continue'])) { //not submitted/done
-			$formdata->Page++;
-		} elseif (isset($params[$prefix.'previous'])) {
-			$formdata->Page--;
-			if ($formdata->Page < 1)
-				$formdata->Page = 1;
-		}
-	} // !$adjust
 } else { //first time
 	$funcs = new PWForms\FormOperations();
 	$formdata = $funcs->Load($this,$form_id,$id,$params);
