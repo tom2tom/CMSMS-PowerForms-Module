@@ -39,7 +39,7 @@ $reqSymbol = PWForms\Utils::GetFormProperty($formdata,'required_field_symbol','*
 // Start building fields
 $fields = array();
 //$prev = array(); //make other-page field-values available to templates
-$WalkPage = 1; //'current' page for field-walk purposes
+$formPage = 1; //'current' page for field-walk purposes
 
 foreach ($formdata->FieldOrders as $field_id) {
 	$obfld = $formdata->Fields[$field_id];
@@ -47,91 +47,48 @@ foreach ($formdata->FieldOrders as $field_id) {
 	$alias = $obfld->ForceAlias();
 
 	if ($type == 'PageBreak')
-		$WalkPage++;
+		$formPage++;
 
-	if ($WalkPage != $formdata->Page) {
-		// not processing the 'current' form-page
-		// remember other-page field-values which haven't yet been saved ?
-		//TODO checkme double-underscore use ?
-		//FormBuilder uses 'fbrp__' lots (apparently for all 'input' fields)
-//		$valueindx = 'pwfp__'.$obfld->GetId();
-//		if (isset($params[$valueindx]))
-		if ($obfld->IsInputField()) { //TODO check logic
-/*			$valueindx = $formdata->current_prefix.$obfld->GetId();
-			if (empty($params[$valueindx])) {
-				$valueindx2 = $formdata->prior_prefix.$obfld->GetId();
-				if (empty($params[$valueindx2]))
-					$params[$valueindx] = 0; //assume an unchecked checkbox
-				else
-					$params[$valueindx] = $params[$valueindx2]; //prior-period-form value
-			}
-			if (is_array($params[$valueindx])) {
-				//hide all members of the value
-				foreach ($params[$valueindx] as $val) {
-					$hidden .= $this->CreateInputHidden($id,
-								$valueindx.'[]',
-								PWForms\Utils::html_myentities_decode($val));
-				}
-			} else {
-				//hide the value
-				$hidden .= $this->CreateInputHidden($id,
-						   $valueindx,
-						   PWForms\Utils::html_myentities_decode($params[$valueindx]));
-			}
-*/
-			if ($obfld->DisplayInSubmission()) {
-/*TODO			if ($WalkPage < $formdata->Page) {
-					$oneset = new stdClass();
-					$oneset->value = $obfld->DisplayableValue();
-					$tplvars[$obfld->GetName()] = $oneset;
-					$tplvars[$obfld->ForceAlias()] = $oneset;
-					$prev[] = $oneset;
-				}
-*/
-				$oneset = new stdClass();
-				if (is_array($params[$valueindx]))
-					$oneset->values = $params[$valueindx]; //CHECKME readable-version?
-				else
-					$oneset->values = array($params[$valueindx]);
-				$tplvars[$alias] = $oneset;
-			}
+	if ($formPage == $formdata->Page) {
+		$oneset = new stdClass();
+		$oneset->alias = $alias;
+		$oneset->css_class = $obfld->GetProperty('css_class');
+		$oneset->display = $obfld->DisplayInForm();
+		$oneset->valid = $obfld->IsValid();
+		$oneset->error = $oneset->valid?'':$obfld->ValidationMessage;
+		$oneset->has_label = $obfld->HasLabel();
+		$oneset->helptext = $obfld->GetProperty('helptext');
+		if ($oneset->helptext && $obfld->GetProperty('helptoggle')) {
+			$togglehelp = TRUE;
 		}
-		continue; //only current-page fields get the full suite of data
-	}
+		$oneset->helptext_id = 'ht_'.$field_id;
+		if (!$oneset->has_label || $obfld->GetHideLabel()
+// && (!$obfld->GetProperty('browser_edit',0) || empty($params['in_admin']))
+		)
+			$oneset->hide_name = 1;
+		else
+			$oneset->hide_name = 0;
+		$oneset->id = $obfld->GetId();
+		$oneset->input = $obfld->Populate($id,$params); //text or flat xhtml or array of objects
+		$oneset->input_id = $obfld->GetInputId();
+		$oneset->label_parts = $obfld->LabelSubComponents();
+		$oneset->logic = $obfld->GetLogic();
+		$oneset->multiple_parts = $obfld->GetMultiPopulate();
+		$oneset->name = $obfld->GetName();
+		$oneset->needs_div = $obfld->NeedsDiv();
+		$oneset->required = $obfld->IsRequired();
+		$oneset->required_symbol = $oneset->required?$reqSymbol:'';
+		$oneset->smarty_eval = $obfld->GetSmartyEval();
+		$oneset->type = $obfld->GetDisplayType();
+		$oneset->values = $obfld->GetIndexedValues(); //array of allowed values for multi-element field
 
-	$oneset = new stdClass();
-	$oneset->alias = $alias;
-	$oneset->css_class = $obfld->GetProperty('css_class');
-	$oneset->display = $obfld->DisplayInForm();
-	$oneset->valid = $obfld->IsValid();
-	$oneset->error = $oneset->valid?'':$obfld->ValidationMessage;
-	$oneset->has_label = $obfld->HasLabel();
-	$oneset->helptext = $obfld->GetProperty('helptext');
-	if ($oneset->helptext && $obfld->GetProperty('helptoggle')) {
-		$togglehelp = TRUE;
+		$tplvars[$alias] = $oneset;
+		$fields[$oneset->input_id] = $oneset;
+	} else { // not processing the 'current' form-page
+		if ($obfld->IsInput && $obfld->DisplayInForm) {
+//TODO populate relevant smarty variables for use in template formulae
+		}
 	}
-	$oneset->helptext_id = 'ht_'.$field_id;
-	if (!$oneset->has_label || $obfld->GetHideLabel()
-/*	 && (!$obfld->GetProperty('browser_edit',0) || empty($params['in_admin']))*/)
-		$oneset->hide_name = 1;
-	else
-		$oneset->hide_name = 0;
-	$oneset->id = $obfld->GetId();
-	$oneset->input = $obfld->Populate($id,$params); //text or flat xhtml or array of objects
-	$oneset->input_id = $obfld->GetInputId();
-	$oneset->label_parts = $obfld->LabelSubComponents();
-	$oneset->logic = $obfld->GetLogic();
-	$oneset->multiple_parts = $obfld->GetMultiPopulate();
-	$oneset->name = $obfld->GetName();
-	$oneset->needs_div = $obfld->NeedsDiv();
-	$oneset->required = $obfld->IsRequired();
-	$oneset->required_symbol = $oneset->required?$reqSymbol:'';
-	$oneset->smarty_eval = $obfld->GetSmartyEval();
-	$oneset->type = $obfld->GetDisplayType();
-	$oneset->values = $obfld->GetIndexedValues(); //array of allowed values for multi-element field
-
-	$tplvars[$alias] = $oneset;
-	$fields[$oneset->input_id] = $oneset;
 } //foreach FieldOrders[]
 
 if ($togglehelp) {
@@ -149,7 +106,9 @@ function help_toggle(htid) {
 EOS;
 }
 
-$formdata->PagesCount = $WalkPage;
+$formdata->PagesCount = $formPage;
+if ($formdata->Page > $formPage)
+	$formdata->Page = $formPage; //maybe page-redisplay goof
 
 $tplvars = $tplvars + array(
 	'fields' => $fields,
@@ -158,7 +117,6 @@ $tplvars = $tplvars + array(
 	'title_page_x_of_y' => $this->Lang('title_page_x_of_y',array($formdata->Page,$formdata->PagesCount)),
 );
 
-//$tplvars['previous'] = $prev;
 $baseurl = $this->GetModuleURLPath();
 
 $t = PWForms\Utils::GetFormProperty($formdata,'help_icon');
@@ -174,26 +132,26 @@ if ($t) {
 }
 $tplvars['help_icon'] = '<img src="'.$url.'" alt="'.$this->Lang('help').
 	'" title="'.$this->Lang('help_help').'" />';
-//TODO id="*pwfp_prev" NOW id="*prev"
+
 if ($formdata->Page > 1)
-	$tplvars['prev'] = '<input type="submit" id="'.$id.'prev" class="cms_submit submit_prev" name="'.
+	$tplvars['prev'] = '<input type="submit" id="submit_prev" class="cms_submit submit_prev" name="'.
 	$id.$formdata->current_prefix.'previous" value="'.
 	PWForms\Utils::GetFormProperty($formdata,'prev_button_text',$this->Lang('previous')).'"/>';
 else
 	$tplvars['prev'] = NULL;
 
 if ($formdata->Page < $formdata->PagesCount) {
-	$tplvars['submit'] = '<input type="submit" id="'.$id.'submit" class="cms_submit submit_next" name="'.
+	$tplvars['submit'] = '<input type="submit" id="submit_next" class="cms_submit submit_next" name="'.
 	$id.$formdata->current_prefix.'continue" value="'.
 	PWForms\Utils::GetFormProperty($formdata,'next_button_text',$this->Lang('next')).'"/>';
 } else {
-	$tplvars['submit'] = '<input type="submit" id="'.$id.'submit" class="cms_submit submit_current" name="'.
+	$tplvars['submit'] = '<input type="submit" id="submit_current" class="cms_submit submit_current" name="'.
 	$id.$formdata->current_prefix.'done" value="'.
 	PWForms\Utils::GetFormProperty($formdata,'submit_button_text',$this->Lang('submit')).'"/>';
 }
 
 if (isset($params['resume'])) {
-	$tplvars['cancel'] = '<input type="submit" id="'.$id.'cancel" class="cms_submit" name="'.
+	$tplvars['cancel'] = '<input type="submit" id="submit_cancel" class="cms_submit" name="'.
 	$id.$formdata->current_prefix.'cancel" value="'.$this->Lang('cancel').'"/>';
 } else {
 	$tplvars['cancel'] = NULL;
@@ -206,7 +164,7 @@ if (PWForms\Utils::GetFormProperty($formdata,'input_button_safety')) {
 	$safejs = <<<EOS
 
    setTimeout(function() {
-    $('input[class*=" submit_"]').each(function() {
+    $('input[id^="submit_"]').each(function() {
      this.disabled = true;
     });
    },10);
