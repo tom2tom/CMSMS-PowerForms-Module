@@ -694,6 +694,14 @@ $oneset->input = $this->CreateInputText($id,'fp_list_delimiter',
 $submits[] = $oneset;
 
 $oneset = new stdClass();
+$oneset->title = $this->Lang('title_blank_invalid');
+$oneset->input = $this->CreateInputHidden($id,'fp_blank_invalid',0).
+	$this->CreateInputCheckbox($id,'fp_blank_invalid',1,
+	PWForms\Utils::GetFormProperty($formdata,'blank_invalid',$this->GetPreference('blank_invalid')));
+$oneset->help = $this->Lang('help_blank_invalid');
+$submits[] = $oneset;
+
+$oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_unspecified');
 $oneset->input = $this->CreateInputText($id,'fp_unspecified',
 	PWForms\Utils::GetFormProperty($formdata,'unspecified',$this->Lang('unspecified')),30);
