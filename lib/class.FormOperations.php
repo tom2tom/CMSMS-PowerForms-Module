@@ -340,7 +340,7 @@ EOS;
 				if ($key <= 0) //new field, after save it will include an actual id
 					$newfields[$key] = $obfld->GetId();
 			} else { //marked for deletion
-				$obfld = new stdClass();
+				$obfld = new \stdClass();
 				$obfld->Id = $key;
 				FieldOperations::RealDeleteField($obfld);
 			}
