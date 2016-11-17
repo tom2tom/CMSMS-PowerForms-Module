@@ -97,7 +97,8 @@ class FormData implements \Serializable
 						foreach ($one as $i=>$mdata) {
 							$i = (int)$i;
 							$members[$i] = unserialize($mdata);
-							$members[$i]->formdata =& $this;
+							if ($members[$i]) //not marked for delete
+								$members[$i]->formdata =& $this;
 						}
 						$this->$key = $members;
 						break;
