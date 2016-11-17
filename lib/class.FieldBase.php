@@ -601,14 +601,14 @@ class FieldBase implements \Serializable
 
 	// Subclass this if needed to support some unusual format for the value
 	// Returns boolean T/F indicating whether the field value is present and non-default
-	public function HasValue($deny_blank_responses=FALSE)
+	public function HasValue($empty_notaccepted=FALSE)
 	{
 		if ($this->Value || is_numeric($this->Value)) {
 			if (isset($this->XtraProps['default'])) { // field has default
 				if ($this->Value == $this->XtraProps['default']) //TODO if array
 					return FALSE;
 			}
-			return (!$deny_blank_responses ||
+			return (!$empty_notaccepted ||
 					is_array($this->Value) ||
 					trim($this->Value));
 		}
