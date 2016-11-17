@@ -7,11 +7,6 @@
 
 if (!$this->_CheckAccess('ModifyPFForms')) exit;
 
-if (isset($params['cancel']))
-	$this->Redirect($id,'open_form',$returnid,array(
-		'form_id'=>$params['form_id'],
-		'datakey'=>$params['datakey'],
-		'active_tab'=>'fieldstab'));
 try {
 	$cache = PWForms\Utils::GetCache($this);
 } catch (Exception $e) {
@@ -44,6 +39,15 @@ $this->Crash();
 } else {
 	//should never happen
 	$this->Crash();
+}
+
+if (isset($params['cancel'])) {
+	$obfld = $formdata->Fields[$params['field_id']];
+	$t = ($obfld->IsDisposition()) ? 'submittab':'fieldstab';
+	$this->Redirect($id,'open_form',$returnid,array(
+		'form_id'=>$params['form_id'],
+		'datakey'=>$params['datakey'],
+		'active_tab'=>$t));
 }
 
 $message = '';
@@ -95,10 +99,11 @@ if (isset($params['submit'])) {
 		if ($msg) {
 			$message = $msg.'<br />'.$message;
 		}
+		$t = ($obfld->IsDisposition()) ? 'submittab':'fieldstab';
 		$this->Redirect($id,'open_form',$returnid,array(
 			'form_id'=>$params['form_id'],
 			'datakey'=>$params['datakey'],
-			'active_tab'=>'fieldstab',
+			'active_tab'=>$t,
 			'selectfields'=>$params['selectfields'],
 			'selectdispos'=>$params['selectdispos'],
 			'message'=>$this->_PrettyMessage($message,TRUE,FALSE)));
