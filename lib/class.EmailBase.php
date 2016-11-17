@@ -94,7 +94,6 @@ class EmailBase extends FieldBase
 			$params['fp_destination_address'] = array($params['fp_destination_address']);
 
 		foreach ($params['fp_destination_address'] as $i => $to) {
-$mod->Crash;
 			if (isset($params['mailto_'.$i])) {
 				$totype = $params['mailto_'.$i];
 				switch ($totype) {
