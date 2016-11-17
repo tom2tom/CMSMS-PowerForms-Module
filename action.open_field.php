@@ -128,12 +128,20 @@ if (isset($params['submit'])) {
 */
 
 if ($refresh) {
-	foreach ($params as $key=>$val) {
-		if (strncmp($key,'fp_',3) == 0)
-			$obfld->XtraProps[substr($key,3)] = $val;
-	}
 	$obfld->SetName($params['field_Name']);
 	$obfld->SetAlias($params['field_Alias']);
+	foreach ($params as $key=>$val) {
+		if (strncmp($key,'fp_',3) == 0) {
+			$key = substr($key,3);
+			if (is_array($val) && $obfld->MultiComponent) {
+				foreach ($val as $i=>$subval) {
+					$obfld->SetPropIndexed($key,$i,$subval);
+				}
+			} else {
+				$obfld->SetProperty($key,$val);
+			}
+		}
+	}
 }
 
 $tplvars = array();
