@@ -135,12 +135,13 @@ class SystemEmail extends EmailBase
 		$addrs = $this->GetPropArray('destination_address');
 		if ($addrs) {
 			foreach ($addrs as $i=>&$one) {
-				if (!$one)
+				if (!$one) {
 					$this->RemovePropIndexed('destination_address',$i);
+					$this->RemovePropIndexed('address_type',$i);
+				}
 			}
 			unset($one);
 		}
-		$this->PostAdminActionEmail($params);
 	}
 
 	public function AdminValidate($id)
