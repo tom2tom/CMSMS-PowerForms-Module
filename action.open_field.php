@@ -134,8 +134,9 @@ if ($refresh) {
 		if (strncmp($key,'fp_',3) == 0) {
 			$key = substr($key,3);
 			if (is_array($val) && $obfld->MultiComponent) {
-				foreach ($val as $i=>$subval) {
-					$obfld->SetPropIndexed($key,$i,$subval);
+				//pending 'submit', doesn't matter if components have been re-ordered
+				foreach ($val as $i=>$ival) {
+					$obfld->SetPropIndexed($key,$i,$ival);
 				}
 			} else {
 				$obfld->SetProperty($key,$val);
