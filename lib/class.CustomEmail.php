@@ -75,11 +75,6 @@ class CustomEmail extends EmailBase
 		return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
 	}
 
-	public function PostAdminAction(&$params)
-	{
-		$this->PostAdminActionEmail($params);
-	}
-
 	public function AdminValidate($id)
 	{
 		$messages = array();

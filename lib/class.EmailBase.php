@@ -88,28 +88,6 @@ class EmailBase extends FieldBase
 		return array($main,$adv,'varshelpadv');
 	}
 
-	public function PostAdminActionEmail(&$params)
-	{
-		if (!is_array($params['fp_destination_address']))
-			$params['fp_destination_address'] = array($params['fp_destination_address']);
-
-		foreach ($params['fp_destination_address'] as $i => $to) {
-			if (isset($params['mailto_'.$i])) {
-				$totype = $params['mailto_'.$i];
-				switch ($totype) {
-				 case 'cc';
-					$params['fp_destination_address'][$i] = '|cc|'.$to;
-					break;
-				 case 'bc':
-					$params['fp_destination_address'][$i] = '|bc|'.$to;
-					break;
-				}
-//TODO ?? somewhere $this->SetPropIndexed('destination_address',[$i or other index],[adjusted]parameter) ??
-				unset($params[$totype]);
-			}
-		}
-	}
-
 	// override as necessary, return TRUE to include sender-address header in email
 	public function SetFromAddress()
 	{

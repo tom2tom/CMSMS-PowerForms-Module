@@ -138,7 +138,6 @@ class EmailDirector extends EmailBase
 			}
 			unset($one);
 		}
-		$this->PostAdminActionEmail($params);
 	}
 
 	public function AdminValidate($id)
