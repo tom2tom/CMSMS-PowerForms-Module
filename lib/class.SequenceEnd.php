@@ -73,6 +73,10 @@ class SequenceEnd extends SequenceStart
 						$mod->CreateInputText($id,'fp_privatename',
 							$this->GetProperty('privatename',''),25,50),
 						$mod->Lang('help_privatename'));
+		$main[] = array($mod->Lang('title_change_count'),
+						$mod->CreateInputHidden($id,'fp_change_count',0).
+						$mod->CreateInputCheckbox($id,'fp_change_count',1,
+							$this->GetProperty('change_count',1)));
 		$main[] = array($mod->Lang('title_add_button_seqpre'),
 						$mod->CreateInputText($id,'fp_insertpre_label',
 							$this->GetProperty('insertpre_label',$mod->Lang('insert')),25,30));
@@ -127,11 +131,16 @@ class SequenceEnd extends SequenceStart
 		} else {
 			$msg = $mod->Lang('missing_type',$mod->Lang('sequenceid')); //not fatal, warn user
 		}
+		//TODO conform 'change_count' property with SequenceStart, if any
 		return array($ret,$msg);
 	}
 
 	public function Populate($id,&$params)
 	{
+		if (!$this->GetProperty('change_count',1)) {
+			$this->MultiPopulate = FALSE;
+			return '';
+		}
 		//at this stage, don't know whether all buttons are relevant, can't tailor them
 		if ($this->LastBreak) {
 			$propkeys = array('insertpre_label','deletepre_label','insert_label');
@@ -158,9 +167,9 @@ class SequenceEnd extends SequenceStart
 			$tmp = '<input type="submit" name="'.$bnm.$m.$this->Id.'" id="'.$bid.$m.
 			'" value="'.$this->GetProperty($key);
 			if ($i < 2) {
-				$tmp .= ' &uarr;"';	
+				$tmp .= ' &uarr;"';
 			} else {
-				$tmp .= ' &darr;"';	
+				$tmp .= ' &darr;"';
 			}
 			if ($i%2 == 0) {
 				$t = $this->formdata->formsmodule->Lang('tip_sequence_add');

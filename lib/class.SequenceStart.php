@@ -55,6 +55,10 @@ class SequenceStart extends FieldBase
 						$mod->CreateInputText($id,'fp_repeatcount',
 							$this->GetProperty('repeatcount',1),2,2),
 						$mod->Lang('help_initial_count'));
+		$main[] = array($mod->Lang('title_change_count'),
+						$mod->CreateInputHidden($id,'fp_change_count',0).
+						$mod->CreateInputCheckbox($id,'fp_change_count',1,
+							$this->GetProperty('change_count',1)));
 		$main[] = array($mod->Lang('title_min_count'),
 						$mod->CreateInputText($id,'fp_mincount',
 							$this->GetProperty('mincount',1),2,2),
@@ -123,13 +127,17 @@ class SequenceStart extends FieldBase
 			$this->SetProperty('repeatcount',$num);
 			$messages[] = $mod->Lang('missing_type',$mod->Lang('count')).': INITIAL';
 		}
-
+		//TODO conform 'change_count' property with SequenceEnd
 		$msg = ($messages)?implode('<br />',$messages):'';
 		return array($ret,$msg);
 	}
 
 	public function Populate($id,&$params)
 	{
+		if (!$this->GetProperty('change_count',1)) {
+			$this->MultiPopulate = FALSE;
+			return '';
+		}
 		$ret = array();
 		$bnm = $id.$this->formdata->current_prefix;
 		$bid = $this->GetInputId();
