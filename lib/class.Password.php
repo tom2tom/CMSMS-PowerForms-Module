@@ -99,21 +99,21 @@ class Password extends FieldBase
 		 	$ln = $this->GetProperty('min_length',0);
 			if ($ln > 0 && strlen($this->Value) < $ln) {
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_at_least',$ln);
+				$this->ValidationMessage = $mod->Lang('enter_at_least',$ln);
 			}
 			break;
 		 case 'regex_match':
 			if (!preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
+				$this->ValidationMessage = $mod->Lang('enter_valid',$this->Name);
 			}
 			break;
 		 case 'regex_nomatch':
 			if (preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
+				$this->ValidationMessage = $mod->Lang('enter_valid',$this->Name);
 			}
 			break;
 		}

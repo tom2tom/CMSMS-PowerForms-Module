@@ -270,7 +270,7 @@ EOS;
 				$obfld->IsRequired() && !$obfld->HasValue($notempty)) {
 				$allvalid = FALSE;
 				$obfld->valid = FALSE;
-				$obfld->ValidationMessage = $this->Lang('please_enter_a_value',$obfld->GetName());
+				$obfld->ValidationMessage = $this->Lang('enter_a_value',$obfld->GetName());
 				$message[] = $obfld->ValidationMessage;
 			} elseif ($obfld->GetValue()) {
 				$res = $obfld->Validate($id);

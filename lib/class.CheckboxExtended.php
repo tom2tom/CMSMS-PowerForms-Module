@@ -161,7 +161,7 @@ class CheckboxExtended extends FieldBase
 			case 'empty':
 			if (empty($this->Value['text'])) {
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_a_value',$this->GetProperty('text_label'));
+				$this->ValidationMessage = $mod->Lang('enter_a_value',$this->GetProperty('text_label'));
 			}
 			break;
 		}

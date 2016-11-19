@@ -109,7 +109,7 @@ EOS;
 			if (is_numeric($length) && $length > 0) {
 				if (strlen($this->Value) < $length) {
 					$this->valid = FALSE;
-					$this->ValidationMessage = $mod->Lang('please_enter_no_shorter',$length);
+					$this->ValidationMessage = $mod->Lang('enter_no_shorter',$length);
 				}
 			}
 			break;
@@ -117,14 +117,14 @@ EOS;
 			if (!preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
+				$this->ValidationMessage = $mod->Lang('enter_valid',$this->Name);
 			}
 			break;
 		 case 'regex_nomatch':
 			if (preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
+				$this->ValidationMessage = $mod->Lang('enter_valid',$this->Name);
 			}
 			break;
 		}

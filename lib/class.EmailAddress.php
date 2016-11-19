@@ -72,7 +72,7 @@ class EmailAddress extends EmailBase
 			//no ','-separator support
 			if (!$this->Value || !preg_match($mod->email_regex,$this->Value)) {
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_an_email',$this->Name);
+				$this->ValidationMessage = $mod->Lang('enter_an_email',$this->Name);
 			}
 			break;
 		}

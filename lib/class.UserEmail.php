@@ -137,7 +137,7 @@ class UserEmail extends EmailBase
 				}
 			} else {
 				$this->valid = FALSE;
-				$this->ValidationMessage = $this->formdata->formsmodule->Lang('please_enter_an_email',$this->Name);
+				$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_an_email',$this->Name);
 			}
 		}
 		return array($this->valid,$this->ValidationMessage);

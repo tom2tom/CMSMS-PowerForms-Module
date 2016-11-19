@@ -197,38 +197,38 @@ class TextExpandable extends FieldBase
 			 case 'numeric':
 				if ($one && !preg_match('/^[\d\.\,]+$/',$one)) {
 					$res = FALSE;
-					$messages[] = $mod->Lang('please_enter_a_number',$this->Name);
+					$messages[] = $mod->Lang('enter_a_number',$this->Name);
 				}
 				break;
 			 case 'integer':
 				if ($one && !preg_match('/^\d+$/',$one) || (int)$one != $one) {
 					$res = FALSE;
-					$messages[] = $mod->Lang('please_enter_an_integer',$this->Name);
+					$messages[] = $mod->Lang('enter_an_integer',$this->Name);
 				}
 				break;
 			 case 'email':
 				if ($one && !preg_match($mod->email_regex,$one)) {
 					$res = FALSE;
-					$messages[] = $mod->Lang('please_enter_an_email',$this->Name);
+					$messages[] = $mod->Lang('enter_an_email',$this->Name);
 				}
 				break;
 			 case 'regex_match':
 				if ($one && !preg_match($this->GetProperty('regex','/.*/'),$one)) {
 					$res = FALSE;
-					$messages[] = $mod->Lang('please_enter_valid',$this->Name);
+					$messages[] = $mod->Lang('enter_valid',$this->Name);
 				}
 				break;
 			 case 'regex_nomatch':
 				if ($one && preg_match($this->GetProperty('regex','/.*/'),$one)) {
 					$res = FALSE;
-					$messages[] = $mod->Lang('please_enter_valid',$this->Name);
+					$messages[] = $mod->Lang('enter_valid',$this->Name);
 				}
 				break;
 			}
 
 			if ($l > 0 && strlen($one) > $l) {
 				$res = FALSE;
-				$messages[] = $mod->Lang('please_enter_no_longer',$l);
+				$messages[] = $mod->Lang('enter_no_longer',$l);
 			}
 		}
 		if ($res) {

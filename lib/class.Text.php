@@ -114,7 +114,7 @@ class Text extends FieldBase
 			if ($this->Value) $this->Value = trim($this->Value);
 			if ($this->Value && !preg_match('/^[\d\.\,]+$',$this->Value)) {
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_a_number',$this->Name);
+				$this->ValidationMessage = $mod->Lang('enter_a_number',$this->Name);
 			}
 			break;
 		 case 'integer':
@@ -123,14 +123,14 @@ class Text extends FieldBase
 				(int)$this->Value != $this->Value)
 			{
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_an_integer',$this->Name);
+				$this->ValidationMessage = $mod->Lang('enter_an_integer',$this->Name);
 			}
 			break;
 		 case 'email':
 			if ($this->Value) $this->Value = trim($this->Value);
 			if ($this->Value && !preg_match($mod->email_regex,$this->Value)) {
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_an_email',$this->Name);
+				$this->ValidationMessage = $mod->Lang('enter_an_email',$this->Name);
 			}
 			break;
 		 case 'usphone':
@@ -140,7 +140,7 @@ class Text extends FieldBase
 			$this->Value))
 			{
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_a_phone',$this->Name);
+				$this->ValidationMessage = $mod->Lang('enter_a_phone',$this->Name);
 			}
 			break;
 		 case 'regex_match':
@@ -148,7 +148,7 @@ class Text extends FieldBase
 				!preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
+				$this->ValidationMessage = $mod->Lang('enter_valid',$this->Name);
 			}
 			break;
 		 case 'regex_nomatch':
@@ -156,7 +156,7 @@ class Text extends FieldBase
 				preg_match($this->GetProperty('regex','/.*/'),$this->Value))
 			{
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_enter_valid',$this->Name);
+				$this->ValidationMessage = $mod->Lang('enter_valid',$this->Name);
 			}
 			break;
 		}
@@ -164,7 +164,7 @@ class Text extends FieldBase
 		$lm = $this->GetProperty('length',0);
 		if ($lm && strlen($this->Value) > $lm) {
 			$this->valid = FALSE;
-			$this->ValidationMessage = $mod->Lang('please_enter_no_longer',$lm);
+			$this->ValidationMessage = $mod->Lang('enter_no_longer',$lm);
 		}
 
 		return array($this->valid,$this->ValidationMessage);
