@@ -663,35 +663,35 @@ class FieldBase implements \Serializable
 	}
 
 	//Whether to generate a submit-button labelled 'add', along with the field
-	public function HasOptionAdd()
+	public function HasComponentAdd()
 	{
 		return !empty($this->XtraProps['HasAddOp']);
 	}
 
 	// Subclass this to generate appropriate add-button label
-	public function GetOptionAddLabel()
+	public function ComponentAddLabel()
 	{
 		return $this->formdata->formsmodule->Lang('add_options');
 	}
 
 	// Subclass this when necessary or useful (often, just set a flag)
-	public function OptionAdd(&$params)
+	public function ComponentAdd(&$params)
 	{
 	}
 	//Whether to generate a submit-button labelled 'delete', along with the field
-	public function HasOptionDelete()
+	public function HasComponentDelete()
 	{
 		return !empty($this->XtraProps['HasDeleteOp']);
 	}
 
 	// Subclass this to generate appropriate delete-button label
-	public function GetOptionDeleteLabel()
+	public function ComponentDeleteLabel()
 	{
 		return $this->formdata->formsmodule->Lang('delete_options');
 	}
 
-	// Subclass this when necessary or useful to delete option-data
-	public function OptionDelete(&$params)
+	// Subclass this when necessary or useful to delete component-data
+	public function ComponentDelete(&$params)
 	{
 	}
 

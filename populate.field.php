@@ -40,11 +40,11 @@ if ($obfld) { //field data are loaded
 		$tplvars['advancedtab_start'] = $this->StartTab('advancedtab');
 	$tplvars['tab_end'] = $this->EndTab();
 
-	$tplvars['add'] = ($obfld->HasOptionAdd())?
-		$this->CreateInputSubmit($id,'optionadd',$obfld->GetOptionAddLabel()):NULL;
+	$tplvars['add'] = ($obfld->HasComponentAdd())?
+		$this->CreateInputSubmit($id,'compadd',$obfld->ComponentAddLabel()):NULL;
 
-	if ($obfld->HasOptionDelete()) {
-		$tplvars['del'] = $this->CreateInputSubmit($id,'optiondel',$obfld->GetOptionDeleteLabel(),
+	if ($obfld->HasComponentDelete()) {
+		$tplvars['del'] = $this->CreateInputSubmit($id,'compdel',$obfld->ComponentDeleteLabel(),
 			'onclick="return confirm_selected(this)"');
 		$prompt = $this->Lang('confirm');
 		$obfld->jsfuncs['optiondel'] = <<<EOS
@@ -170,5 +170,5 @@ $tplvars['form_start'] = $this->CreateFormStart($id,'open_field',$returnid,
 $tplvars['form_end'] = $this->CreateFormEnd();
 
 $t = ($fid != 0) ? 'close':'add'; //field use or add
-$tplvars['submit'] = $this->CreateInputSubmit($id,$nm,$this->Lang($t));
+$tplvars['submit'] = $this->CreateInputSubmit($id,$nm,$this->Lang($t),'onclick="alert(\''.$this->Lang('save_form').'\')"');
 $tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));

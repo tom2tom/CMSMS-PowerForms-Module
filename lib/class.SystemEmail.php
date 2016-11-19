@@ -21,28 +21,26 @@ class SystemEmail extends EmailBase
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
 		$this->HasAddOp = TRUE;
-		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
-		$this->MultiComponent = TRUE;
 		$this->Type = 'SystemEmail';
 	}
 
-	public function GetOptionAddLabel()
+	public function ComponentAddLabel()
 	{
 		return $this->formdata->formsmodule->Lang('add_address');
 	}
 
-	public function GetOptionDeleteLabel()
+	public function ComponentDeleteLabel()
 	{
 		return $this->formdata->formsmodule->Lang('delete_address');
 	}
 
-	public function OptionAdd(&$params)
+	public function ComponentAdd(&$params)
 	{
 		$this->addressAdd = TRUE;
 	}
 
-	public function OptionDelete(&$params)
+	public function ComponentDelete(&$params)
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx=>$val) {
@@ -122,8 +120,12 @@ class SystemEmail extends EmailBase
 				);
 			}
 			unset($one);
+			$this->MultiComponent = TRUE;
+			$this->HasDeleteOp = TRUE;
 			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'extra'=>$extra);
 		} else {
+			$this->MultiComponent = FALSE;
+			$this->HasDeleteOp = FALSE;
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('destination')));
 			return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
 		}

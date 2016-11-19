@@ -15,7 +15,6 @@ class CheckboxGroup extends FieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->HasAddOp = TRUE;
-		$this->HasDeleteOp = TRUE;
 		$this->IsInput = TRUE;
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'CheckboxGroup';
@@ -26,25 +25,25 @@ class CheckboxGroup extends FieldBase
 	}
 
 	// Get add-button label
-	public function GetOptionAddLabel()
+	public function ComponentAddLabel()
 	{
 		return $this->formdata->formsmodule->Lang('add_checkboxes');
 	}
 
 	// Get delete-button label
-	public function GetOptionDeleteLabel()
+	public function ComponentDeleteLabel()
 	{
 		return $this->formdata->formsmodule->Lang('delete_checkboxes');
 	}
 
 	// Add action
-	public function OptionAdd(&$params)
+	public function ComponentAdd(&$params)
 	{
 		$this->boxAdd = TRUE;
 	}
 
 	// Delete action
-	public function OptionDelete(&$params)
+	public function ComponentDelete(&$params)
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx=>$val) {
@@ -181,8 +180,12 @@ EOS;
  });
 EOS;
 */
+			$this->MultiComponent = TRUE;
+			$this->HasDeleteOp = TRUE;
 			return array('main'=>$main,'adv'=>$adv,'table'=>$boxes);
 		} else {
+			$this->MultiComponent = FALSE;
+			$this->HasDeleteOp = FALSE;
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('member')));
 			return array('main'=>$main,'adv'=>$adv);
 		}
@@ -286,7 +289,7 @@ EOS;
 			case 'empty':
 			if (0) { //TODO
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('please_TODO',$this->GetProperty('text_label'));
+				$this->ValidationMessage = $mod->Lang('TODO',$this->GetProperty('text_label'));
 			}
 			break;
 		}

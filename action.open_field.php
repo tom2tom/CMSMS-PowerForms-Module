@@ -115,11 +115,11 @@ if (isset($params['submit'])) {
 			$obfld->Load($id,$params); //TODO check for failure
 		$message = $this->_PrettyMessage($msg,FALSE,FALSE);
 	}
-} elseif (isset($params['optionadd'])) {
-	$obfld->OptionAdd($params);
+} elseif (isset($params['compadd'])) {
+	$obfld->ComponentAdd($params);
 	$refresh = TRUE;
-} elseif (isset($params['optiondel'])) {
-	$obfld->OptionDelete($params);
+} elseif (isset($params['compdel'])) {
+	$obfld->ComponentDelete($params);
 	$refresh = FALSE;
 }
 /*else {

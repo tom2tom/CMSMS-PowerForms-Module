@@ -16,29 +16,28 @@ class MultiselectFileDirector extends FieldBase
 		parent::__construct($formdata,$params);
 		$this->DisplayInSubmission = FALSE;
 		$this->HasAddOp = TRUE;
-		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
 		$this->IsInput = TRUE;
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'MultiselectFileDirector';
 	}
 
-	public function GetOptionAddLabel()
+	public function ComponentAddLabel()
 	{
 		return $this->formdata->formsmodule->Lang('add_file');
 	}
 
-	public function GetOptionDeleteLabel()
+	public function ComponentDeleteLabel()
 	{
 		return $this->formdata->formsmodule->Lang('delete_file');
 	}
 
-	public function OptionAdd(&$params)
+	public function ComponentAdd(&$params)
 	{
 		$this->fileAdd = TRUE;
 	}
 
-	public function OptionDelete(&$params)
+	public function ComponentDelete(&$params)
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx=>$val) {
@@ -140,9 +139,12 @@ class MultiselectFileDirector extends FieldBase
 				);
 			}
 			unset($one);
-//		$main[] = array($mod->Lang('title_director_details'),$dests);
+			$this->MultiComponent = TRUE;
+			$this->HasDeleteOp = TRUE;
 		} else {
 			$dests = FALSE;
+			$this->MultiComponent = FALSE;
+			$this->HasDeleteOp = FALSE;
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('file')));
 		}
 

@@ -17,29 +17,27 @@ class EmailDirector extends EmailBase
 	{
 		parent::__construct($formdata,$params);
 		$this->HasAddOp = TRUE;
-		$this->HasDeleteOp = TRUE;
 		$this->IsDisposition = TRUE;
 //		$this->IsInput = TRUE; no preservation of input data
-		$this->MultiComponent = TRUE;
 		$this->Type = 'EmailDirector';
 	}
 
-	public function GetOptionAddLabel()
+	public function ComponentAddLabel()
 	{
 		return $this->formdata->formsmodule->Lang('add_destination');
 	}
 
-	public function GetOptionDeleteLabel()
+	public function ComponentDeleteLabel()
 	{
 		return $this->formdata->formsmodule->Lang('delete_destination');
 	}
 
-	public function OptionAdd(&$params)
+	public function ComponentAdd(&$params)
 	{
 		$this->addressAdd = TRUE;
 	}
 
-	public function OptionDelete(&$params)
+	public function ComponentDelete(&$params)
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx=>$val) {
@@ -118,8 +116,12 @@ class EmailDirector extends EmailBase
 				);
 			}
 			unset($one);
+			$this->MultiComponent = TRUE;
+			$this->HasDeleteOp = TRUE;
 			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'extra'=>$extra);
 		} else {
+			$this->MultiComponent = FALSE;
+			$this->HasDeleteOp = FALSE;
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('destination')));
 			return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
 		}

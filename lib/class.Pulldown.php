@@ -15,28 +15,26 @@ class Pulldown extends FieldBase
 	{
 		parent::__construct($formdata,$params);
 		$this->HasAddOp = TRUE;
-		$this->HasDeleteOp = TRUE;
 		$this->IsInput = TRUE;
-		$this->MultiComponent = TRUE;
 		$this->Type = 'Pulldown';
 	}
 
-	public function GetOptionAddLabel()
+	public function ComponentAddLabel()
 	{
 		return $this->formdata->formsmodule->Lang('add_options');
 	}
 
-	public function GetOptionDeleteLabel()
+	public function ComponentDeleteLabel()
 	{
 		return $this->formdata->formsmodule->Lang('delete_options');
 	}
 
-	public function OptionAdd(&$params)
+	public function ComponentAdd(&$params)
 	{
 		$this->optionAdd = TRUE;
 	}
 
-	public function OptionDelete(&$params)
+	public function ComponentDelete(&$params)
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx=>$val) {
@@ -106,9 +104,12 @@ class Pulldown extends FieldBase
 				);
 			}
 			unset($one);
-//			$main[] = array($mod->Lang('title_pulldown_details'),$dests);
+			$this->MultiComponent = TRUE;
+			$this->HasDeleteOp = TRUE;
 			return array('main'=>$main,'adv'=>$adv,'table'=>$dests);
 		} else {
+			$this->MultiComponent = FALSE;
+			$this->HasDeleteOp = FALSE;
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('member')));
 			return array('main'=>$main,'adv'=>$adv);
 		}
