@@ -55,16 +55,6 @@ class CheckboxGroup extends FieldBase
 		}
 	}
 
-	public function GetSynopsis()
-	{
-		$pt = $this->GetPropArray('box_name');
-		if ($pt)
-			$boxCount = count($pt);
-		else
-			$boxCount = 0;
-		return $this->formdata->formsmodule->Lang('boxes',$boxCount);
-	}
-
 	public function SetValue($newvalue)
 	{
 		$set = $this->GetPropIndexed('box_checked',1);
@@ -113,6 +103,16 @@ class CheckboxGroup extends FieldBase
 			}
 		}
 		return ''; //TODO upspecified
+	}
+
+	public function GetSynopsis()
+	{
+		$pt = $this->GetPropArray('box_name');
+		if ($pt)
+			$boxCount = count($pt);
+		else
+			$boxCount = 0;
+		return $this->formdata->formsmodule->Lang('boxes',$boxCount);
 	}
 
 	public function AdminPopulate($id)
@@ -181,11 +181,9 @@ EOS;
 EOS;
 */
 			$this->MultiComponent = TRUE;
-			$this->HasDeleteOp = TRUE;
 			return array('main'=>$main,'adv'=>$adv,'table'=>$boxes);
 		} else {
 			$this->MultiComponent = FALSE;
-			$this->HasDeleteOp = FALSE;
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('member')));
 			return array('main'=>$main,'adv'=>$adv);
 		}

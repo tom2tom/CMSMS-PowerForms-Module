@@ -117,11 +117,9 @@ class EmailDirector extends EmailBase
 			}
 			unset($one);
 			$this->MultiComponent = TRUE;
-			$this->HasDeleteOp = TRUE;
 			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'extra'=>$extra);
 		} else {
 			$this->MultiComponent = FALSE;
-			$this->HasDeleteOp = FALSE;
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('destination')));
 			return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
 		}

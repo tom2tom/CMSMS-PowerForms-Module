@@ -140,11 +140,9 @@ class MultiselectFileDirector extends FieldBase
 			}
 			unset($one);
 			$this->MultiComponent = TRUE;
-			$this->HasDeleteOp = TRUE;
 		} else {
 			$dests = FALSE;
 			$this->MultiComponent = FALSE;
-			$this->HasDeleteOp = FALSE;
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('file')));
 		}
 

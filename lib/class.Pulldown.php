@@ -105,11 +105,9 @@ class Pulldown extends FieldBase
 			}
 			unset($one);
 			$this->MultiComponent = TRUE;
-			$this->HasDeleteOp = TRUE;
 			return array('main'=>$main,'adv'=>$adv,'table'=>$dests);
 		} else {
 			$this->MultiComponent = FALSE;
-			$this->HasDeleteOp = FALSE;
 			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('member')));
 			return array('main'=>$main,'adv'=>$adv);
 		}
