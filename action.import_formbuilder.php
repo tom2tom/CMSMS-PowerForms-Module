@@ -277,6 +277,9 @@ EOS;
 		'sortfield3',
 		'sortfield4',
 		'sortfield5',
+		'HasDeleteOp',
+		'HasUserAddOp',
+		'HasUserDeleteOp',
 		) as $one) {
 			$p = array_search($one,$fbfields);
 			if ($p !== FALSE)

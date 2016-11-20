@@ -97,6 +97,7 @@ class TextExpandable extends FieldBase
 						$mod->CreateInputDropdown($id,'fp_siblings',$this->GetFieldSiblings(),-1,
 							$this->GetProperty('siblings')),
 						$mod->Lang('help_field_siblings'));
+		//TODO c.f. $this->HasUserAddOp, $this->HasUserDeleteOp
 		$adv[] = array($mod->Lang('title_field_hidebuttons'),
 						$mod->CreateInputHidden($id,'fp_hidebuttons',0).
 						$mod->CreateInputCheckbox($id,'fp_hidebuttons',1,$this->GetProperty('hidebuttons',0)),
