@@ -271,7 +271,9 @@ EOS;
 		//exclude irrelevant stuff
 		foreach (array(
 		'crypt',
+		'modifiesOtherFields',
 		'searchable',
+		'sortable',
 		'sortfield1',
 		'sortfield2',
 		'sortfield3',
