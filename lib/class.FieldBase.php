@@ -35,11 +35,10 @@ class FieldBase implements \Serializable
 		'DisplayInForm' => TRUE,
 		'DisplayInSubmission' => TRUE, //whether field value is shown in submission template (if used) (effectively ~ self::IsInput)
 		'Disposable' => TRUE, //a field-status, not so much a continuing property
-		'HasAddOp' => FALSE,
-		'HasDeleteOp' => FALSE,
+		'HasAddOp' => FALSE, //whether AdminPopulate() supports component-addition
 		'HasLabel' => TRUE,
-		'HasUserAddOp' => FALSE,
-		'HasUserDeleteOp' => FALSE,
+//		'HasUserAddOp' => FALSE, //whether Populate() supports component-addition
+//		'HasUserDeleteOp' => FALSE,//whether Populate() supports component-deletion
 		'HideLabel' => FALSE,
 		'IsComputedOnSubmission' => FALSE,
 		'IsDisposition' => FALSE,
@@ -47,7 +46,7 @@ class FieldBase implements \Serializable
 		'IsInput' => FALSE, //whether Populate() generates user-input control(s) AND their values are to be preserved e.g. for browsing
 		'LabelSubComponents' => TRUE, //if MultiPopulate = TRUE, give each component its own label
 		'MultiPopulate' => FALSE, //whether Populate() generates array of objects (i.e. not necessarily relevant for admin)
-		'MultiComponent' => FALSE, //whether AdminPopulate() generates array of compoents for tabular editing
+		'MultiComponent' => FALSE, //whether AdminPopulate() currently generates array of components for tabular editing
 		'NeedsDiv' => TRUE,
 		'Required' => FALSE,
 		'SmartyEval' => FALSE, //whether to process Populate() output as a smarty-template (i.e. treat that output as a sub-template)
@@ -492,7 +491,7 @@ class FieldBase implements \Serializable
 
 /*	public function HasMultipleValues()
 	{
-		return (!empty($this->XtraProps['MultiPopulate']) || 1empty($this->XtraProps['HasUserAddOp'])); //TODO multipopulate not relevant
+		return (!empty($this->XtraProps['MultiPopulate']) || !empty($this->XtraProps['HasUserAddOp'])); //TODO multipopulate not relevant
 	}
 */
 	//apply frontend class(es) to string $html
@@ -681,7 +680,7 @@ class FieldBase implements \Serializable
 	//Whether to generate a submit-button labelled 'delete', along with the field
 	public function HasComponentDelete()
 	{
-		return !empty($this->XtraProps['HasDeleteOp']);
+		return !empty($this->XtraProps['>MultiComponent']);
 	}
 
 	// Subclass this to generate appropriate delete-button label

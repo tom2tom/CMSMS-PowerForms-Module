@@ -12,8 +12,8 @@ class TextExpandable extends FieldBase
 	public function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->HasUserAddOp = TRUE;
-		$this->HasUserDeleteOp = TRUE;
+//		$this->HasUserAddOp = TRUE;
+//		$this->HasUserDeleteOp = TRUE;
 		$this->IsInput = TRUE;
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'TextExpandable';
@@ -113,6 +113,7 @@ class TextExpandable extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$sibling_id = $this->GetProperty('siblings');
+		//TODO c.f. $this->HasUserAddOp, $this->HasUserDeleteOp
 		$hidebuttons = $this->GetProperty('hidebuttons');
 
 		if (!is_array($this->Value))
