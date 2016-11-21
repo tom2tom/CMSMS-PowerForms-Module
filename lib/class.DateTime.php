@@ -1,7 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
 # Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
@@ -32,38 +31,81 @@ class DateTime extends FieldBase
 		);
 	}
 
-	public function GetSynopsis()
+	public function SetProperty($propName, $propValue)
 	{
-		//TODO report date/time/date+time, format(s)
-		$ret = '';
-		if ($this->ShowDate) {
+		if (!is_int($propValue)) {
+			$dt = new \DateTime('@0',NULL);
+			$lvl = error_reporting(0);
+			$res = $dt->modify($propValue);
+			error_reporting($lvl);
+			if ($res) {
+				$propValue = $dt->getTimestamp();
+			}
 		}
-		if ($this->ShowTime) {
-		}
-		return $ret;
+		parent::SetProperty($propName,$propValue);
 	}
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
-		$ret = '';
+		if ($this->Value) {
+			$dt = new \DateTime('@'.$this->Value,NULL);
+			if ($this->ShowDate && $this->ShowTime) {
+				$fmt = trim($this->DateFormat.' '.$this->TimeFormat);
+			} elseif ($this->ShowDate) {
+				$fmt = $this->DateFormat;
+			} else {
+				$fmt = $this->TimeFormat;
+			}
+			$ret = $dt->format($fmt);
+		} else {
+			$ret = $this->formdata->formsmodule->Lang('none2');
+		}
 		if ($as_string)
 			return $ret;
 		else
 			return array($ret);
 	}
 
+	public function GetSynopsis()
+	{
+		$dt = new \DateTime('@0',NULL);
+		if ($this->ShowDate && $this->ShowTime) {
+			$fmt = $this->DateFormat.' '.$this->TimeFormat;
+		} elseif ($this->ShowDate) {
+			$fmt = $this->DateFormat;
+		} else {
+			$fmt = $this->TimeFormat;
+		}
+
+		if ($this->GetProperty('low_limit')) {
+			$val1 = $this->GetProperty('low_value');
+			$dt->setTimestamp($val1);
+			$val1 = $dt->format($fmt);
+		} else {
+			$val1 = FALSE;
+		}
+		if ($this->GetProperty('high_limit')) {
+			$val2 = $this->GetProperty('high_value');
+			$dt->setTimestamp($val2);
+			$val2 = $dt->format($fmt);
+		} else {
+			$val2 = FALSE;
+		}
+		if ($val1 && $val2) {
+			$ret = $this->formdata->formsmodule->Lang('validation_between').' '.$val1.','.$val2.', ';
+		} elseif ($val1) {
+			$ret = '>= '.$val1.', ';
+		} elseif ($val2) {
+			$ret = '<= '.$val2.', ';
+		} else {
+			$ret = '';
+		}
+		$ret .= 'as '.$fmt; //TODO lang
+		return $ret;
+	}
+
 	public function AdminPopulate($id)
 	{
-/*
-$lang['help_dateformat'] = 'A string including format characters recognised by PHP\'s date() function. For reference, please check the <a href="http://www.php.net/manual/function.date.php">php manual</a>.<br />Remember to escape any characters you don\'t want interpreted as format codes!';
-$lang['help_timeformat'] = 'See advice for date format.';
-$lang['title_date_only'] = 'Show date, not time';
-$lang['title_dateformat'] = 'Template for formatting displayed dates';
-$lang['title_high_limit'] = 'Upper-limit for the value';
-$lang['title_low_limit'] = 'Lower-limit for the value';
-$lang['title_time_only'] = 'Show time, not date';
-$lang['title_timeformat'] = 'Template for formatting displayed times';
-*/
 		list($main,$adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 
@@ -78,16 +120,22 @@ $lang['title_timeformat'] = 'Template for formatting displayed times';
 
 		$adv[] = array($mod->Lang('title_dateformat'),
 				$mod->CreateInputText($id,'fp_date_format',
-					$mod->GetPreference('date_format'),10,12),
+					$this->GetProperty('date_format',
+						$mod->GetPreference('date_format')),10,12),
 					$mod->Lang('help_dateformat'));
 		$adv[] = array($mod->Lang('title_timeformat'),
 				$mod->CreateInputText($id,'fp_time_format',
-					$mod->GetPreference('time_format'),10,12),
+				$this->GetProperty('time_format',
+					$mod->GetPreference('time_format')),10,12),
 				$mod->Lang('help_timeformat'));
 		$v = $this->GetProperty('low_limit',0);
 		if ($v) {
 			$vs = $this->GetProperty('low_value','');
-//TODO convert stored stamp for display
+			if ($vs) {
+				$dt = new \DateTime('@'.$vs,NULL);
+				$fmt = trim(GetPreference('date_format').' '.GetPreference('time_format'));
+				$vs = $dt->format($fmt);
+			}
 		} else {
 			$vs = '';
 		}
@@ -99,7 +147,15 @@ $lang['title_timeformat'] = 'Template for formatting displayed times';
 		$v = $this->GetProperty('high_limit',0);
 		if ($v) {
 			$vs = $this->GetProperty('high_value','');
-//TODO convert stored stamp for display
+			if ($vs) {
+				if (isset($dt)) {
+					$dt->setTimestamp($vs);
+				} else {
+					$dt = new \DateTime('@'.$vs,NULL);
+					$fmt = trim(GetPreference('date_format').' '.GetPreference('time_format'));
+				}
+				$vs = $dt->format($fmt);
+			}
 		} else {
 			$vs = '';
 		}
@@ -113,32 +169,92 @@ $lang['title_timeformat'] = 'Template for formatting displayed times';
 
 	public function AdminValidate($id)
 	{
-		//check date format
-		//check time format
-		//check low value
-		//check high value
-		//$this->ValidationType = func(lower-limit,upper-limit)
+		$ret = TRUE;
+		$messages = array();
+		$dt = new \DateTime('@'.time(),NULL);
+
+		if (!$this->GetProperty('time_only')) {
+			$fmt = $this->GetProperty('date_format');
+			$lvl = error_reporting(0);
+			$res = $dt->format($fmt);
+			error_reporting($lvl);
+			if (!$res) {
+				$ret = FALSE;
+				$messages[] = $this->formdata->formsmodule->Lang('TODO');
+			}
+		}
+		if (!$this->GetProperty('date_only')) {
+			$fmt = $this->GetProperty('time_format');
+			$lvl = error_reporting(0);
+			$res = $dt->format($fmt);
+			error_reporting($lvl);
+			if (!$res) {
+				$ret = FALSE;
+				$messages[] = $this->formdata->formsmodule->Lang('TODO');
+			}
+		}
+		if ($this->GetProperty('low_limit')) {
+			$val1 = $this->GetProperty('low_value');
+		} else {
+			$val1 = FALSE;
+		}
+		if ($this->GetProperty('high_limit')) {
+			$val2 = $this->GetProperty('high_value');
+		} else {
+			$val2 = FALSE;
+		}
+		if ($val1 && $val2) {
+			if ($val2 > $val1) {
+				$this->ValidationType = 'between';
+			} else {
+				$ret = FALSE;
+				$messages[] = $this->formdata->formsmodule->Lang('TODO');
+			}
+		} elseif ($val1) {
+			$this->ValidationType = 'after';
+		} elseif ($val2) {
+			$this->ValidationType = 'before';
+		}
+		$msg = ($ret)?'':implode('<br />',$messages);
 		return array($ret,$msg);
 	}
 
 	public function Populate($id,&$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$l1 = strlen($this->DateFormat);
-		$l2 = strlen($this->TimeFormat);
+  		$baseurl = $mod->GetModuleURLPath();
+		$this->formdata->jsincs[] = <<<EOS
+<script type="text/javascript" src="{$baseurl}/include/jquery.watermark.min.js"></script>
+EOS;
 		if ($this->ShowDate && $this->ShowTime) {
-			$ln = $l1 + $l2 + 2;
+			$fmt = $this->DateFormat.' '.$this->TimeFormat;
 		} elseif ($this->ShowDate) {
-			$ln = $l1 + 2;
+			$fmt = $this->DateFormat;
 		} else {
-			$ln = $l2 + 2;
+			$fmt = $this->TimeFormat;
 		}
-		//TODO format value
-		$val = $this->Value;
-		//TODO actual or fake watermark
+		$dt = new \DateTime('@'.time(),NULL);
+		$example = $dt->format($fmt);
+		$xl1 = strlen($example)+1;
+		$example = $mod->Lang('tip_example',$example);
+		$xl2 = strlen($example);
+
+		if ($this->Value) {
+			$dt->setTimestamp($this->Value);
+			$val = $dt->format($fmt);
+		} else {
+			$val = '';
+		}
+
+		$t = $this->GetInputId();
+		$this->formdata->jsloads[] = <<<EOS
+ setTimeout(function() {
+  $('#{$t}').watermark();
+ },10);
+EOS;
 		$tmp = $mod->CreateInputText($id,$this->formdata->current_prefix.$this->Id,
-				$val,$ln,$ln,$this->GetScript());
-		$tmp = preg_replace('/id="\S+"/','id="'.$this->GetInputId().'"',$tmp);
+				$val,$xl1,$xl2,'title="'.$example.'"'.$this->GetScript());
+		$tmp = preg_replace('/id="\S+"/','id="'.$t.'"',$tmp);
 		return $this->SetClass($tmp);
 	}
 
@@ -149,7 +265,7 @@ $lang['title_timeformat'] = 'Template for formatting displayed times';
 		if ($this->ValidationType != 'none') {
 			$key = FALSE;
 			$lvl = error_reporting(0);
-			$dt = new \DateTime($this->Value,NULL); //TODO current timezone ok?
+			$dt = new \DateTime($this->Value,NULL);
 			error_reporting($lvl);
 			if ($dt) {
 				$st = $dt->getTimestamp();
