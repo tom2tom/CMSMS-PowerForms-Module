@@ -812,6 +812,7 @@ $lang['thebox'] = 'the box';
 $lang['tip_clonesel']='clone selected forms';
 $lang['tip_deletesel']='delete selected forms';
 $lang['tip_delselfield']='delete selected fields';
+$lang['tip_example'] = 'like %s';
 $lang['tip_exportsel']='export selected forms';
 $lang['tip_import_browsedata'] = 'update PowerBrowse module data to match imported forms';
 $lang['tip_import_fb'] = 'import all forms from FormBuilder module';
