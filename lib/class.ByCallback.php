@@ -12,11 +12,9 @@ class ByCallback extends FieldBase
 	handler can be one of
 	 an array (classname,methodname) where methodname is static and the method returns boolean for success
 	 a string 'classname::methodname' where the method returns boolean for success
-	 an array (modulename,actionname) AND the action should be a 'doer', not a 'shower', returns HTML code
 	 an array (modulename,'method.whatever') to be included, the code must conclude with variable $res = T/F indicating success
 	 a string 'absolute-path-to-whatever.php' to be included, the code must conclude with variable $res = T/F indicating success
-	 an URL like <server-root-url>/index.php?mact=<modulename>,cntnt01,<actionname>,0
-	 	- provided the PHP curl extension is available
+
 	 NOT a closure in a static context (PHP 5.3+) OR static closure (PHP 5.4+)
 	 cuz info about those isn't transferrable between requests
 	*/
@@ -26,14 +24,12 @@ class ByCallback extends FieldBase
 	public function __construct(&$formdata,&$params)
 	{
 		parent::__construct($formdata,$params);
-		$this->Type = 'Callback';
+		$this->Type = 'ByCallback';
 	}
 
-	public function GetSynopsis()
-	{
-	}
+	//?SetValue()
 
-	public function GetDisplayableValue($as_string=TRUE)
+	public function DisplayableValue($as_string=TRUE)
 	{
 		$ret = '[Callback to '.$this->handler.']';
 		if ($as_string)
@@ -42,13 +38,25 @@ class ByCallback extends FieldBase
 			return array($ret);
 	}
 
+	public function GetSynopsis()
+	{
+		//Callback: $this->handler;
+	}
+
 	public function AdminPopulate($id)
 	{
+		list($main,$adv) = $this->AdminPopulateCommon($id);
+		$main[] = array($mod->Lang('title_handler'),
+				$mod->CreateInputText($id,'fp_handler',
+					$this->GetProperty('handler'),30,40),
+				$mod->Lang('help_handler'));
+		return array('main'=>$main,'adv'=>$adv);
 	}
 
 	public function AdminValidate($id)
 	{
 		$type = FALSE;
+		$handler = $this->GetProperty('handler');
 		if (is_callable($handler)) { //BUT the class may have a __call() method
 			if (is_array($handler && count($handler) == 2)) {
 				$method = new \ReflectionMethod($handler);
@@ -61,21 +69,13 @@ class ByCallback extends FieldBase
 				if ($method && $method->isStatic()) {
 					$type = 1;
 				}
-			} /* elseif (is_object($handler) && ($handler instanceof Closure)) {
-				if ($this->isStatic($handler)) {
-					$type = 2;
-				}
 			}
-*/
 		} elseif (is_array($handler) && count($handler) == 2) {
 			$ob = \cms_utils::get_module($handler[0]);
 			if ($ob) {
 				$dir = $ob->GetModulePath();
 				unset($ob);
-				$fp = $dir.DIRECTORY_SEPARATOR.'action.'.$handler[1].'.php';
-				if (@is_file($fp)) {
-					$type = 3;
-				} elseif (strpos($handler[1],'method.') === 0) {
+				if (strpos($handler[1],'method.') === 0) {
 					$fp = $dir.DIRECTORY_SEPARATOR.$handler[1].'.php';
 					if (@is_file($fp)) {
 						$type = 4;
@@ -87,27 +87,39 @@ class ByCallback extends FieldBase
 				if (substr_compare($handler,'.php',-4,4,TRUE) === 0) {
 					$type = 5;
 				}
-			} elseif ($TODO) { //curl is installed
-				$config = \cmsms()->GetConfig();
-				$u = (empty($_SERVER['HTTPS'])) ? $config['root_url'] : $config['ssl_url'];
-				$u .= '/index.php?mact=';
-				$len = strlen($u);
-				if (strncasecmp($u,$handler,$len) == 0) {
-					$type = 6;
-				}
 			}
 		}
 
 		if ($type !== FALSE) {
 			$this->handlertype = $type;
 			$this->handler = $handler;
-			return TRUE;
+			return array(TRUE.'');
 		}
-		return FALSE;
+		return array(FALSE,$this->formdata->formsmodule->Lang('TODO'));
 	}
 
 	public function Populate($id,&$params)
 	{
+		switch ($this->type) {
+		 case 1: //callable, 2-member array or string like 'ClassName::methodName'
+			$res = call_user_func_array($this->handler,$id,$params);
+			break;
+		 case 4: //code inclusion
+			$ob = \cms_utils::get_module($this->handler[0]);
+			$fp = $ob->GetModulePath().DIRECTORY_SEPARATOR.$this->handler[1].'.php';
+			unset($ob);
+			$res = FALSE;
+			require $fp;
+			break;
+		 case 5: //code inclusion
+			$res = FALSE;
+			require $this->handler;
+			break;
+		}
+		//TODO handle $res == FALSE
+		//TODO update object properties, methods e.g. $this->IsInput, $this->Validate
+
+		return $res;
 	}
 
 	public function Validate($id)
