@@ -31,6 +31,18 @@ class DateTime extends FieldBase
 		);
 	}
 
+	private function CurrentFormat()
+	{
+		if ($this->ShowDate && $this->ShowTime) {
+			$fmt = $this->DateFormat.' '.$this->TimeFormat;
+		} elseif ($this->ShowDate) {
+			$fmt = $this->DateFormat;
+		} else {
+			$fmt = $this->TimeFormat;
+		}
+		return trim($fmt);
+	}
+
 	public function SetProperty($propName, $propValue)
 	{
 		if (!is_int($propValue)) {
@@ -49,13 +61,7 @@ class DateTime extends FieldBase
 	{
 		if ($this->Value) {
 			$dt = new \DateTime('@'.$this->Value,NULL);
-			if ($this->ShowDate && $this->ShowTime) {
-				$fmt = trim($this->DateFormat.' '.$this->TimeFormat);
-			} elseif ($this->ShowDate) {
-				$fmt = $this->DateFormat;
-			} else {
-				$fmt = $this->TimeFormat;
-			}
+			$fmt = $this->CurrentFormat();
 			$ret = $dt->format($fmt);
 		} else {
 			$ret = $this->formdata->formsmodule->Lang('none2');
@@ -69,13 +75,7 @@ class DateTime extends FieldBase
 	public function GetSynopsis()
 	{
 		$dt = new \DateTime('@0',NULL);
-		if ($this->ShowDate && $this->ShowTime) {
-			$fmt = $this->DateFormat.' '.$this->TimeFormat;
-		} elseif ($this->ShowDate) {
-			$fmt = $this->DateFormat;
-		} else {
-			$fmt = $this->TimeFormat;
-		}
+		$fmt = $this->CurrentFormat();
 
 		if ($this->GetProperty('low_limit')) {
 			$val1 = $this->GetProperty('low_value');
@@ -180,7 +180,7 @@ class DateTime extends FieldBase
 			error_reporting($lvl);
 			if (!$res) {
 				$ret = FALSE;
-				$messages[] = $this->formdata->formsmodule->Lang('TODO');
+				$messages[] = $this->formdata->formsmodule->Lang('err_format');
 			}
 		}
 		if (!$this->GetProperty('date_only')) {
@@ -190,7 +190,7 @@ class DateTime extends FieldBase
 			error_reporting($lvl);
 			if (!$res) {
 				$ret = FALSE;
-				$messages[] = $this->formdata->formsmodule->Lang('TODO');
+				$messages[] = $this->formdata->formsmodule->Lang('err_format');
 			}
 		}
 		if ($this->GetProperty('low_limit')) {
@@ -208,7 +208,7 @@ class DateTime extends FieldBase
 				$this->ValidationType = 'between';
 			} else {
 				$ret = FALSE;
-				$messages[] = $this->formdata->formsmodule->Lang('TODO');
+				$messages[] = $this->formdata->formsmodule->Lang('err_values');
 			}
 		} elseif ($val1) {
 			$this->ValidationType = 'after';
@@ -226,14 +226,8 @@ class DateTime extends FieldBase
 		$this->formdata->jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/include/jquery.watermark.min.js"></script>
 EOS;
-		if ($this->ShowDate && $this->ShowTime) {
-			$fmt = $this->DateFormat.' '.$this->TimeFormat;
-		} elseif ($this->ShowDate) {
-			$fmt = $this->DateFormat;
-		} else {
-			$fmt = $this->TimeFormat;
-		}
 		$dt = new \DateTime('@'.time(),NULL);
+		$fmt = $this->CurrentFormat();
 		$example = $dt->format($fmt);
 		$xl1 = strlen($example)+1;
 		$example = $mod->Lang('tip_example',$example);
@@ -263,7 +257,7 @@ EOS;
 		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 		if ($this->ValidationType != 'none') {
-			$key = FALSE;
+			$msg = FALSE;
 			$lvl = error_reporting(0);
 			$dt = new \DateTime($this->Value,NULL);
 			error_reporting($lvl);
@@ -272,26 +266,37 @@ EOS;
 				switch ($this->ValidationType) {
 				 case 'before':
 					if ($st > $this->HighLimit) {
-						$key = 'TODO';
+						$dt->setTimestamp($this->HighLimit);
+						$fmt = $this->CurrentFormat();
+						$t = $dt->format($fmt);
+						$msg = $this->formdata->formsmodule->Lang('when_before',$t);
 					}
 					break;
 				 case 'after':
 					if ($st < $this->LowLimit) {
-						$key = 'TODO';
+						$dt->setTimestamp($this->LowLimit);
+						$fmt = $this->CurrentFormat();
+						$t = $dt->format($fmt);
+						$msg = $this->formdata->formsmodule->Lang('when_after',$t);
 					}
 					break;
 				 case 'between':
 					if ($st < $this->LowLimit || $st > $this->HighLimit) {
-						$key = 'TODO';
+						$dt->setTimestamp($this->LowLimit);
+						$fmt = $this->CurrentFormat();
+						$t = $dt->format($fmt);
+						$dt->setTimestamp($this->HighLimit);
+						$t2 = $dt->format($fmt);
+						$msg = $this->formdata->formsmodule->Lang('when_between',$t,$t2);
 					}
 					break;
 				}
 			} else {
-				$key = 'TODO';
+				$msg = $this->formdata->formsmodule->Lang('err_format');
 			}
-			if ($key) {
+			if ($msg) {
 				$this->valid = FALSE;
-				$this->ValidationMessage = $this->formdata->formsmodule->Lang($key);
+				$this->ValidationMessage = $msg;
 			}
 		}
 		return array($this->valid,$this->ValidationMessage);
