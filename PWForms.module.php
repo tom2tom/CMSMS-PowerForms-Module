@@ -50,28 +50,33 @@ class PWForms extends CMSModule
 		$sep = strpos($url,'&amp;');
 		$this->Qurl = substr($url,0,$sep);
 */
-		spl_autoload_register(array($this,'cmsms_spacedload'));
+//		spl_autoload_register(array($this,'cmsms_spacedload'));
+		if (!function_exists('cmsms_spacedload')) {
+			require __DIR__.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'CMSMSSpacedClassLoader.php';
+			spl_autoload_register('cmsms_spacedload');
+		}
+
 		require_once cms_join_path(__DIR__,'lib','class.FormData.php');
 
 		$this->RegisterModulePlugin(TRUE);
 	}
 
-	public function __destruct()
+/*	public function __destruct()
 	{
-/*		if ($this->ch) {
+/ *		if ($this->ch) {
 			curl_multi_remove_handle($this->mh,$this->ch);
 			curl_close($this->ch);
 		}
 		if ($this->mh)
 			curl_multi_close($this->mh);
-*/
+* /
 		spl_autoload_unregister(array($this,'cmsms_spacedload'));
 		if (function_exists('parent::__destruct'))
 			parent::__destruct();
 	}
-
+*/
 	/* namespace autoloader - CMSMS default autoloader doesn't do spacing */
-	private function cmsms_spacedload($class)
+/*	private function cmsms_spacedload($class)
 	{
 		$prefix = get_class().'\\'; //our namespace prefix
 		// ignore if $class doesn't have the prefix
@@ -104,7 +109,7 @@ class PWForms extends CMSModule
 				include $fp;
 		}
 	}
-
+*/
 	public function AllowAutoInstall()
 	{
 		return FALSE;
