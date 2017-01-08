@@ -28,7 +28,7 @@ abstract class CacheBase
 		if ((int)$lifetime < 0) {
 			$lifetime = 157680000; //3600*24*365*5
 		}
-		return $this->_upsert($this->getKey($keyword),$value,$lifetime);
+		return $this->_upsert($this->getKey($keyword), $value, $lifetime);
 	}
 
 	/**
@@ -44,7 +44,7 @@ abstract class CacheBase
 		if ((int)$lifetime < 0) {
 			$lifetime = 157680000; //3600*24*365*5
 		}
-		return $this->_newsert($this->getKey($keyword),$value,$lifetime);
+		return $this->_newsert($this->getKey($keyword), $value, $lifetime);
 	}
 
 	/**
@@ -74,7 +74,7 @@ abstract class CacheBase
 	*/
 	public function has($keyword)
 	{
-		if (method_exists($this,'_has')) {
+		if (method_exists($this, '_has')) {
 			return $this->_has($this->getKey($keyword));
 		}
 		$value = $this->_get($this->getKey($keyword));
@@ -108,10 +108,12 @@ abstract class CacheBase
 	*/
 	public function setKeySpace($name)
 	{
-		if ($name)
-			$name = trim($name,'\\/ \t');
-		if (!$name)
+		if ($name) {
+			$name = trim($name, '\\/ \t');
+		}
+		if (!$name) {
 			$name = __NAMESPACE__;
+		}
 		$this->keyspace = $name.'\\';
 	}
 
@@ -121,7 +123,7 @@ abstract class CacheBase
 	*/
 	public function getKeySpace()
 	{
-		return substr($this->keyspace,0,strlen($this->keyspace)-1);
+		return substr($this->keyspace, 0, strlen($this->keyspace)-1);
 	}
 	/* Support */
 	protected function getKey($keyword)
@@ -129,8 +131,8 @@ abstract class CacheBase
 		return $this->keyspace.$keyword;
 	}
 
-   	/*
-   	Decide whether cache-item with @keyword and @value is 'wanted'
+	/*
+	Decide whether cache-item with @keyword and @value is 'wanted'
 	$filter may be:
 	 FALSE
 	 a regex to match against keyword, must NOT be end-user supplied (injection-risk)
@@ -144,15 +146,15 @@ abstract class CacheBase
 		if ($filter) {
 			//strip 'cache-namespace'
 			$offs = strlen($this->keyspace);
-			$keyword = substr($keyword,$offs);
+			$keyword = substr($keyword, $offs);
 			if (is_string($filter)) {
-				if (@preg_match($filter,'') !== FALSE) {
-					return preg_match($filter,$keyword);
+				if (@preg_match($filter, '') !== FALSE) {
+					return preg_match($filter, $keyword);
 				} else {
-					return (strpos($keyword,$filter) === 0);
+					return (strpos($keyword, $filter) === 0);
 				}
 			} elseif (is_callable($filter)) {
-				return $filter($keyword,$value);
+				return $filter($keyword, $value);
 			}
 		}
 		return TRUE;
