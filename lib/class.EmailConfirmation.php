@@ -37,7 +37,7 @@ class EmailConfirmation extends EmailBase
 		//TODO advice about ? return $this->TemplateStatus();
 	}
 
-	public function ApproveToGo($record_id)
+	public function ApproveToGo($sid)
 	{
 		$this->approvedToGo = TRUE;
 	}
@@ -117,14 +117,20 @@ class EmailConfirmation extends EmailBase
 		//cache form data, pending confirmation
 		$pre = \cms_db_prefix();
 		$db = \cmsms()->GetDb();
-		$record_id = $db->GenID($pre.'module_pwf_record_seq');
-		$t = time();
-		$pub = substr(md5(session_id().$t), 0, 12);
+		$sid = $db->GenID($pre.'module_pwf_session_seq');
+
+		$chars = 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6';
+		$cl = strlen($chars) - 1;
+		$pref = '';
+		for ($i = 0; $i < 20; $i++) {
+			$pref .= $chars[mt_rand(0,$cl)];
+		}
+		$pub = sha1(uniqid($pref, TRUE)); //easy 40-byte hash
 		$pw = $pub.Utils::Unfusc($mod->GetPreference('masterpass'));
-		$when = $db->DbTimeStamp($t);
+		$when = time();
 		$cont = Utils::Encrypt(serialize($this->formdata), $pw);
-		$db->Execute('INSERT INTO '.$pre.'module_pwf_record
-(record_id,pubkey,submitted,contents) VALUES (?,?,?,?)', array($record_id, $pub, $when, $cont));
+		$db->Execute('INSERT INTO '.$pre.'module_pwf_session
+(sess_id,pubkey,submitted,contents) VALUES (?,?,?,?)', array($sid, $pub, $when, $cont));
 		$this->formdata->formsmodule = $mod; //reinstate
 		//set url variable for email template
 		$tplvars = array();
@@ -132,10 +138,10 @@ class EmailConfirmation extends EmailBase
 		$tplvars['confirm_url'] =
 			$this->formdata->formsmodule->CreateFrontendLink('', $returnid, 'validate', '',
 			array(
-				$pref.'c'=>$code,
+				$pref.'c'=>$pub,
 				$pref.'d'=>$this->Id,
 //				$pref.'f'=>$this->formdata->Id,
-				$pref.'r'=>$record_id),
+				$pref.'s'=>$sid),
 			'', TRUE, FALSE, '', TRUE);
 		return $this->SendForm($this->GetValue(), $this->GetProperty('email_subject'), $tplvars);
 	}
