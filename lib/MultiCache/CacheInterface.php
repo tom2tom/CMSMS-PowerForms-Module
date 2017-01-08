@@ -31,7 +31,7 @@ interface CacheInterface
 	 *  - a regex to match against cache keywords, must NOT be end-user supplied (injection-risk)
 	 *  - the prefix of wanted keywords or a whole keyword
 	 *  - a callable with arguments (keyword,value), and returning boolean representing wanted,
-	 *      must NOT be end-user supplied (due to injection-risk)
+	 *	  must NOT be end-user supplied (due to injection-risk)
 	 */
 	public function _getall($filter);
 
@@ -55,7 +55,7 @@ interface CacheInterface
 	 *  - a regex to match against cache keywords, must NOT be end-user supplied (injection-risk)
 	 *  - the prefix of wanted keywords or a whole keyword
 	 *  - a callable with arguments (keyword,value), and returning boolean representing wanted,
-	 *      must NOT be end-user supplied (due to injection-risk)
+	 *	  must NOT be end-user supplied (due to injection-risk)
 	 */
 	public function _clean($filter);
 }
