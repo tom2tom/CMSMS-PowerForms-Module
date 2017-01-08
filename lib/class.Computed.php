@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -9,9 +9,9 @@ namespace PWForms;
 
 class Computed extends FieldBase
 {
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
-		parent::__construct($formdata,$params);
+		parent::__construct($formdata, $params);
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
@@ -22,7 +22,7 @@ class Computed extends FieldBase
 
 	public function ComputeOrder()
 	{
-		return $this->GetProperty('order',1); //user-supplied number
+		return $this->GetProperty('order', 1); //user-supplied number
 	}
 
 	public function Compute()
@@ -30,30 +30,31 @@ class Computed extends FieldBase
 		$fids = array();
 		$procstr = $this->GetProperty('value');
 		//TODO if fields not named like '$fld_N' in the string ?
-		preg_match_all('/\$fld_(\d+)/',$procstr,$fids);
+		preg_match_all('/\$fld_(\d+)/', $procstr, $fids);
 
-		$etype = $this->GetProperty('string_or_number_eval','numeric');
+		$etype = $this->GetProperty('string_or_number_eval', 'numeric');
 		switch ($etype) {
 		 case 'numeric':
 			foreach ($fids[1] as $field_id) {
-				if (array_key_exists($field_id,$this->formdata->Fields)) {
+				if (array_key_exists($field_id, $this->formdata->Fields)) {
 					$val = $this->formdata->Fields[$field_id]->DisplayableValue();
-					if (!is_numeric($val))
+					if (!is_numeric($val)) {
 						$val = '0';
-					$procstr = str_replace('$fld_'.$field_id,$val,$procstr);
+					}
+					$procstr = str_replace('$fld_'.$field_id, $val, $procstr);
 				}
 			}
 			$eval_string = TRUE;
 			break;
 		 case 'compute':
 			foreach ($fids[1] as $field_id) {
-				if (array_key_exists($field_id,$this->formdata->Fields)) {
+				if (array_key_exists($field_id, $this->formdata->Fields)) {
 					$val = $this->formdata->Fields[$field_id]->DisplayableValue();
 					// strip any PHP function from submitted string
 					$arr = get_defined_functions(); // internal and user
-					$val = str_replace($arr['internal'],'',$val);
-					$val = str_replace($arr['user'],'',$val);
-					$procstr = str_replace('$fld_'.$field_id,$val,$procstr);
+					$val = str_replace($arr['internal'], '', $val);
+					$val = str_replace($arr['user'], '', $val);
+					$procstr = str_replace('$fld_'.$field_id, $val, $procstr);
 				}
 			}
 			$eval_string = TRUE;
@@ -61,10 +62,11 @@ class Computed extends FieldBase
 		 default:
 			$this->Value = '';
 			foreach ($fids[1] as $field_id) {
-				if (array_key_exists($field_id,$this->formdata->Fields)) {
+				if (array_key_exists($field_id, $this->formdata->Fields)) {
 					$this->Value .= $this->formdata->Fields[$field_id]->GetValue();
-					if ($etype != 'unstring')
+					if ($etype != 'unstring') {
 						$this->Value .= ' ';
+					}
 				}
 			}
 			$eval_string = FALSE;
@@ -75,10 +77,11 @@ class Computed extends FieldBase
 			// see if we can trap an error
 			// this is vulnerable to an evil form designer, but not an evil form user
 			ob_start();
-			if (eval('function testcfield'.mt_rand(100,200).'() {\$this->Value=$procstr;}') === FALSE)
-				$this->Value = $this->formdata->formsmodule->Lang('title_bad_function',$procstr);
-			else
+			if (eval('function testcfield'.mt_rand(100, 200).'() {\$this->Value=$procstr;}') === FALSE) {
+				$this->Value = $this->formdata->formsmodule->Lang('title_bad_function', $procstr);
+			} else {
 				eval($val);
+			}
 			ob_end_clean();
 		}
 	}
@@ -94,15 +97,15 @@ class Computed extends FieldBase
 			$mod->Lang('title_string_unspaced')=>'unstring',
 			$mod->Lang('title_compute')=>'compute');
 
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$main[] = array($mod->Lang('title_compute_value'),
-						$mod->CreateInputText($id,'fp_value',$this->GetProperty('value'),35,1024),
+						$mod->CreateInputText($id, 'fp_value', $this->GetProperty('value'), 35, 1024),
 						$help);
 		$main[] = array($mod->Lang('title_string_or_number_eval'),
-						$mod->CreateInputRadioGroup($id,'fp_string_or_number_eval',$choices,
-						$this->GetProperty('string_or_number_eval','numeric'),'&nbsp;&nbsp;'));
+						$mod->CreateInputRadioGroup($id, 'fp_string_or_number_eval', $choices,
+						$this->GetProperty('string_or_number_eval', 'numeric'), '&nbsp;&nbsp;'));
 		$main[] = array($mod->Lang('title_compute_order'),
-						$mod->CreateInputText($id,'fp_order',$this->GetProperty('order',1),3),
+						$mod->CreateInputText($id, 'fp_order', $this->GetProperty('order', 1), 3),
 						$mod->Lang('help_compute_order'));
 		return array('main'=>$main,'adv'=>$adv);
 	}
@@ -110,34 +113,36 @@ class Computed extends FieldBase
 	public function AdminValidate($id)
 	{
 		$messages = array();
-		list($ret,$msg) = parent::AdminValidate($id);
-		if (!$ret)
+		list($ret, $msg) = parent::AdminValidate($id);
+		if (!$ret) {
 			$messages[] = $msg;
+		}
 		$val = $this->GetProperty('value');
 		if ($val) {
 			//PROCESSING ARBITRARY INPUT WITH EVAL() IS NOT SAFE!!!
 			// but throw in a few checks for $val sanity
 			$se = new SaferEval();
-			$errs = $se->checkScript($val,FALSE);
+			$errs = $se->checkScript($val, FALSE);
 			if ($errs) {
 				$ret = FALSE;
 				foreach ($errs as $edata) {
 					$msg = $edata['name'];
-					if (!empty($edata['line']))
+					if (!empty($edata['line'])) {
 						$msg .= ': line '.$edata['line'];
+					}
 					$messages[] = $msg;
 				}
 			}
 		} else {
 			$ret = FALSE;
-			$messages[] = $mod->Lang('missing_type',$mod->Lang('TODO_eval'));
+			$messages[] = $mod->Lang('missing_type', $mod->Lang('TODO_eval'));
 		}
 		$val = $this->GetProperty('compute_order');
 		if (!is_numeric($val) || $val < 1) {
 			$ret = FALSE;
-			$messages[] = $mod->Lang('err_typed',$mod->Lang('TODO_order'));
+			$messages[] = $mod->Lang('err_typed', $mod->Lang('TODO_order'));
 		}
-		$msg = ($ret)?'':implode('<br />',$messages);
+		$msg = ($ret)?'':implode('<br />', $messages);
 		return array($ret,$msg);
 	}
 }

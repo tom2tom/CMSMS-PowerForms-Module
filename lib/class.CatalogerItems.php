@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -19,9 +19,9 @@ class CatalogerItems extends FieldBase
 	public $MenuKey = 'field_label'; //owner-module lang key for this field's menu label, used by PWForms
 	public $mymodule; //used also by PWForms, do not rename
 
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
-		parent::__construct($formdata,$params);
+		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->Type = 'CatalogerItems';
 		$this->mymodule = \cms_utils::get_module(self::MODNAME);
@@ -29,18 +29,19 @@ class CatalogerItems extends FieldBase
 
 	public function GetSynopsis()
 	{
-		if ($this->mymodule)
+		if ($this->mymodule) {
 			return '';
-		return $this->formdata->formsmodule->Lang('missing_module',self::MODNAME);
+		}
+		return $this->formdata->formsmodule->Lang('missing_module', self::MODNAME);
 	}
 
 	public function DisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue()) {
 			if (is_array($this->Value)) {
-				if ($as_string)
-					return implode($this->GetFormProperty('list_delimiter',','),$this->Value);
-				else {
+				if ($as_string) {
+					return implode($this->GetFormProperty('list_delimiter', ','), $this->Value);
+				} else {
 					$ret = $this->Value; //copy
 					return $ret;
 				}
@@ -50,10 +51,11 @@ class CatalogerItems extends FieldBase
 			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
 		}
-		if ($as_string)
+		if ($as_string) {
 			return $ret;
-		else
+		} else {
 			return array($ret);
+		}
 	}
 
 	public function GetDisplayType()
@@ -64,48 +66,49 @@ class CatalogerItems extends FieldBase
 	public function AdminPopulate($id)
 	{
 		if (!$this->mymodule) {
-			return array('main'=>array($this->GetErrorMessage('err_module',self::MODNAME)));
+			return array('main'=>array($this->GetErrorMessage('err_module', self::MODNAME)));
 		}
 
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_field_height'),
-						$mod->CreateInputText($id,'fp_lines',$this->GetProperty('lines','5'),3,3),
+						$mod->CreateInputText($id, 'fp_lines', $this->GetProperty('lines', '5'), 3, 3),
 						$mod->Lang('help_field_height'));
 		$main[] = array($mod->Lang('title_name_regex'),
-						$mod->CreateInputText($id,'fp_nameregex',$this->GetProperty('nameregex'),25,25),
+						$mod->CreateInputText($id, 'fp_nameregex', $this->GetProperty('nameregex'), 25, 25),
 						$mod->Lang('help_name_regex'));
 		$main[] = array('','',$mod->Lang('help_cataloger_attribute_fields'));
 
 		$attrs = \cmsms()->variables['catalog_attrs']; //TODO bad module behaviour
 		foreach ($attrs as &$one) {
 			if (!$one->is_text) {
-				$safeattr = strtolower(preg_replace('/\W/','',$one->attr));
+				$safeattr = strtolower(preg_replace('/\W/', '', $one->attr));
 				$main[] = array($one->attr,
-								$mod->CreateInputText($id,'fp_attr_'.$safeattr,
-								$this->GetProperty('attr_'.$safeattr),30,80));
+								$mod->CreateInputText($id, 'fp_attr_'.$safeattr,
+								$this->GetProperty('attr_'.$safeattr), 30, 80));
 			}
 		}
 		unset($one);
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-	public function Populate($id,&$params)
+	public function Populate($id, &$params)
 	{
 		$mod = $this->formdata->formsmodule;
 		$cataloger = $this->mymodule;
-		if (!$cataloger)
-			return $mod->Lang('err_module',self::MODNAME);
+		if (!$cataloger) {
+			return $mod->Lang('err_module', self::MODNAME);
+		}
 
 		$cataloger->getUserAttributes();
 		$gCms = \cmsms();
 		$tmp_attrs = $gCms->variables['catalog_attrs']; //BAD MODULE BEHAVIOUR!!
-		$lines = (int)$this->GetProperty('lines',5);
+		$lines = (int)$this->GetProperty('lines', 5);
 		$nameregex = trim($this->GetProperty('nameregex'));
 
 		$attrs = array();
 		foreach ($tmp_attrs as $one) {
-			$safeattr = strtolower(preg_replace('/\W/','',$one->attr));
+			$safeattr = strtolower(preg_replace('/\W/', '', $one->attr));
 			$val = trim($this->GetProperty('attr_'.$safeattr));
 			if ($val) {
 				$one->input = $val;
@@ -117,7 +120,9 @@ class CatalogerItems extends FieldBase
 		// put the hidden fields into smarty
 		if (!isset($gCms->variables['pwf_smarty_vars_set'])) { //FIXME
 			foreach ($this->formdata->Fields as &$one) {
-				if ($one->GetFieldType() != 'Hidden') continue;
+				if ($one->GetFieldType() != 'Hidden') {
+					continue;
+				}
 				$tplvars[$one->ForceAlias()] = $one->Value;
 				$tplvars['fld_'.$one->GetId()] = $one->Value;
 			}
@@ -133,14 +138,18 @@ class CatalogerItems extends FieldBase
 			$content = $onepage->GetContent();
 
 			// if it's not a cataloger item continue
-			if ($content->Type() != 'catalogitem') continue;
+			if ($content->Type() != 'catalogitem') {
+				continue;
+			}
 
 			// if it's not active or shown in menu continue
-			if (!$content->Active() || !$content->ShowInMenu()) continue;
+			if (!$content->Active() || !$content->ShowInMenu()) {
+				continue;
+			}
 
 			// if the nameregex string is not empty,and the name does not
 			// match the regex,continue
-			if (!empty($nameregex) && !preg_match('/'.$nameregex.'/',$content->Name())) {
+			if (!empty($nameregex) && !preg_match('/'.$nameregex.'/', $content->Name())) {
 				continue;
 			}
 
@@ -148,8 +157,10 @@ class CatalogerItems extends FieldBase
 			$passed = TRUE;
 			foreach ($attrs as $oneattr) {
 				// parse the field value through smarty, without cacheing
-				$expr = Utils::ProcessTemplateFromData($mod,$oneattr->input,$tplvars);
-				if (empty($expr)) continue; // no expression for this field. pass
+				$expr = Utils::ProcessTemplateFromData($mod, $oneattr->input, $tplvars);
+				if (empty($expr)) {
+					continue;
+				} // no expression for this field. pass
 
 				// get the value for this attribute for this content
 				$currentval = $content->GetPropertyValue($oneattr->attr);
@@ -160,7 +171,7 @@ class CatalogerItems extends FieldBase
 					break;
 				}
 
-				list($type,$expr) = explode(':',$expr,2);
+				list($type, $expr) = explode(':', $expr, 2);
 				$type = trim($type);
 				$expr = trim($expr);
 
@@ -169,7 +180,7 @@ class CatalogerItems extends FieldBase
 				 case 'range':
 					// for ranges:
 					// grab min and max values
-					list($minval,$maxval) = explode('to',$expr);
+					list($minval, $maxval) = explode('to', $expr);
 					$minval = trim($minval); $maxval = trim($maxval);
 					// check for numeric
 					if (!is_numeric($minval) || !is_numeric($maxval)) {
@@ -187,8 +198,8 @@ class CatalogerItems extends FieldBase
 					break;
 				 case 'multi':
 					// for multi
-					$tmp = explode('|',$expr);
-					$res = in_array($currentval,$tmp);
+					$tmp = explode('|', $expr);
+					$res = in_array($currentval, $tmp);
 					break;
 				}
 
@@ -205,20 +216,21 @@ class CatalogerItems extends FieldBase
 
 		// Do we have something to display?
 		if ($choices) {
-			$size = min($lines,count($choices));
-			$size = min(50,$size); // maximum 50 lines, though this is probably big
+			$size = min($lines, count($choices));
+			$size = min(50, $size); // maximum 50 lines, though this is probably big
 
 			if ($this->Value) {
-				if (is_array($this->Value))
+				if (is_array($this->Value)) {
 					$val = $this->Value;
-				else
+				} else {
 					$val = array($this->Value);
+				}
 			} else {
 				$val = array();
 			}
 			$tmp = $mod->CreateInputSelectList(
-				$id,$this->formdata->current_prefix.$this->Id.'[]',
-				$choices,$val,$size,'id="'.$this->GetInputId().'"');
+				$id, $this->formdata->current_prefix.$this->Id.'[]',
+				$choices, $val, $size, 'id="'.$this->GetInputId().'"');
 			return $this->SetClass($tmp);
 		}
 		return ''; // error
@@ -226,7 +238,7 @@ class CatalogerItems extends FieldBase
 
 	public function __toString()
 	{
- 		$ob = $this->mymodule;
+		$ob = $this->mymodule;
 		$this->mymodule = NULL;
 		$ret = parent::__toString();
 		$this->mymodule = $ob;

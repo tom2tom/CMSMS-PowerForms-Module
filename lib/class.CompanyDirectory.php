@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -19,9 +19,9 @@ class CompanyDirectory extends FieldBase
 	public $MenuKey = 'field_label'; //owner-module lang key for this field's menu label, used by PWForms
 	public $mymodule; //used also by PWForms, do not rename
 
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
-		parent::__construct($formdata,$params);
+		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->Type = 'CompanyDirectory';
 		$this->mymodule = \cms_utils::get_module(self::MODNAME);
@@ -29,18 +29,19 @@ class CompanyDirectory extends FieldBase
 
 	public function GetSynopsis()
 	{
-		if ($this->mymodule)
+		if ($this->mymodule) {
 			return '';
-		return $this->formdata->formsmodule->Lang('missing_module',self::MODNAME);
+		}
+		return $this->formdata->formsmodule->Lang('missing_module', self::MODNAME);
 	}
 
 	public function DisplayableValue($as_string=TRUE)
 	{
 		if ($this->HasValue()) {
 			if (is_array($this->Value)) {
-				if ($as_string)
-					return implode($this->GetFormProperty('list_delimiter',','),$this->Value);
-				else {
+				if ($as_string) {
+					return implode($this->GetFormProperty('list_delimiter', ','), $this->Value);
+				} else {
 					$ret = $this->Value; //copy
 					return $ret;
 				}
@@ -50,10 +51,11 @@ class CompanyDirectory extends FieldBase
 			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
 		}
-		if ($as_string)
+		if ($as_string) {
 			return $ret;
-		else
+		} else {
 			return array($ret);
+		}
 	}
 
 	public function GetDisplayType()
@@ -64,7 +66,7 @@ class CompanyDirectory extends FieldBase
 	public function AdminPopulate($id)
 	{
 		if (!$this->mymodule) {
-			return array('main'=>array($this->GetErrorMessage('err_module',self::MODNAME)));
+			return array('main'=>array($this->GetErrorMessage('err_module', self::MODNAME)));
 		}
 
 		$mod = $this->formdata->formsmodule;
@@ -74,22 +76,24 @@ class CompanyDirectory extends FieldBase
 		$db = \cmsms()->GetDb();
 		$all = $db->GetCol($sql);
 		if ($all) {
-			$Categories += array_combine($all,$all);
+			$Categories += array_combine($all, $all);
 		}
 		$CategorySelected = $this->GetProperty('Category');
 		//check and force the right type
-		if (!is_array($CategorySelected))
-			$CategorySelected = explode(',',$CategorySelected);
+		if (!is_array($CategorySelected)) {
+			$CategorySelected = explode(',', $CategorySelected);
+		}
 
 		$FieldDefs = array('none'=>$this->Lang('none'));
 		$sql = 'SELECT name FROM '.$pre.'module_compdir_fielddefs ORDER BY item_order';
 		$all = $db->GetCol($sql);
 		if ($all) {
-			$FieldDefs += array_combine($all,$all);
+			$FieldDefs += array_combine($all, $all);
 		}
 		$FieldDefsSelected = $this->GetProperty('FieldDefs');
-		if (!is_array($FieldDefsSelected))
-			$FieldDefsSelected = explode(',',$FieldDefsSelected);
+		if (!is_array($FieldDefsSelected)) {
+			$FieldDefsSelected = explode(',', $FieldDefsSelected);
+		}
 
 		$choices = array(
 			$mod->Lang('option_dropdown')=>'Dropdown',
@@ -98,36 +102,38 @@ class CompanyDirectory extends FieldBase
 			$mod->Lang('option_radiogroup')=>'Radio Group'
 		);
 
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$main[] = array('','',$mod->Lang('help_company_field'));
 		$main[] = array($mod->Lang('title_pick_categories'),
-						$mod->CreateInputSelectList($id,'fp_Category',$Categories,$CategorySelected,
-						5,'',TRUE));
+						$mod->CreateInputSelectList($id, 'fp_Category', $Categories, $CategorySelected,
+						5, '', TRUE));
 		$main[] = array($mod->Lang('title_pick_fielddef'),
-						$mod->CreateInputSelectList($id,'fp_FieldDefs',$FieldDefs,$FieldDefsSelected,
-						5,'',FALSE));
+						$mod->CreateInputSelectList($id, 'fp_FieldDefs', $FieldDefs, $FieldDefsSelected,
+						5, '', FALSE));
 		$adv[] = array($mod->Lang('title_choose_user_input'),
-						$mod->CreateInputDropdown($id,'fp_UserInput',$choices,'-1',
+						$mod->CreateInputDropdown($id, 'fp_UserInput', $choices, '-1',
 							$this->GetProperty('UserInput')));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-	public function Populate($id,&$params)
+	public function Populate($id, &$params)
 	{
 		$mod = $this->formdata->formsmodule;
 		$CompanyDirectory = $this->mymodule;
-		if (!$CompanyDirectory)
-			return $mod->Lang('err_module',self::MODNAME);
+		if (!$CompanyDirectory) {
+			return $mod->Lang('err_module', self::MODNAME);
+		}
 
 		$results = array();
 
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
-		$Like = $this->GetProperty('Category','%');
-		if ($Like=='' || $Like=='%' || $Like=='All')
+		$Like = $this->GetProperty('Category', '%');
+		if ($Like=='' || $Like=='%' || $Like=='All') {
 			$processPath=" LIKE '%'";
-		else
+		} else {
 			$processPath='=?';
+		}
 
 		$sql = <<<EOS
 SELECT com.id,com.company_name FROM {$pre}module_compdir_company_categories AS comcat
@@ -145,15 +151,16 @@ EOS;
 		$companies = array();
 		$field = $this->GetProperty('FieldDefs');
 		if ($Like=='' || $Like=='%' || $Like=='All') {
-			$rs = $db->Execute($sql,array());
+			$rs = $db->Execute($sql, array());
 			if ($rs) {
 				while ($row = $rs->FetchRow()) {
 					$company = $row['company_name'];
 					$FDval = '';
-					$rs2 = $db->Execute($sql2,array($company,$field));
+					$rs2 = $db->Execute($sql2, array($company, $field));
 					if ($rs2) {
-						while ($row = $rs2->FetchRow())
+						while ($row = $rs2->FetchRow()) {
 							$FDval = $row['value'];
+						}
 						$rs2->Close();
 					}
 
@@ -164,15 +171,16 @@ EOS;
 		} else {
 			if (is_array($Like)) {
 				foreach ($Like as $key => $value) {
-					$rs = $db->Execute($sql,array($value));
+					$rs = $db->Execute($sql, array($value));
 					if ($rs) {
 						while ($row = $rs->FetchRow()) {
 							$company = $row['company_name'];
 							$FDval = '';
-							$rs2 = $db->Execute($sql2,array($company,$field));
+							$rs2 = $db->Execute($sql2, array($company, $field));
 							if ($rs2) {
-								while ($row = $rs2->FetchRow())
+								while ($row = $rs2->FetchRow()) {
 									$FDval = $row['value'];
+								}
 								$rs2->Close();
 							}
 							$companies[$company] = $FDval;
@@ -181,15 +189,16 @@ EOS;
 					}
 				}
 			} else {
-				$rs = $db->Execute($sql ,array($Like));
+				$rs = $db->Execute($sql, array($Like));
 				if ($rs) {
 					while ($row = $rs->FetchRow()) {
 						$company=$row['company_name'];
 						$FDval='';
-						$rs2 = $db->Execute($sql2 ,array($company,$field));
+						$rs2 = $db->Execute($sql2, array($company, $field));
 						if ($rs2) {
-							while ($row = $rs2->FetchRow())
+							while ($row = $rs2->FetchRow()) {
 								$FDval = $row['value'];
+							}
 							$rs2->Close();
 						}
 						$companies[$company] = $FDval;
@@ -200,51 +209,54 @@ EOS;
 		}
 
 		foreach ($companies as $key=>$val) {
-			if (empty($val))
+			if (empty($val)) {
 				$companies[$key] = $key;
+			}
 		}
 		// Do we have something to display?
 		if ($companies) {
-			$size = min(50,count($companies)); // maximum 50 lines,though this is probably big
+			$size = min(50, count($companies)); // maximum 50 lines,though this is probably big
 
 			$val = array();
 			if ($this->Value || is_numeric($this->Value)) {
 				$val = $this->Value;
-				if (!is_array($this->Value))
+				if (!is_array($this->Value)) {
 					$val = array($this->Value);
+				}
 			}
 
-			switch ($this->GetProperty('UserInput','Dropdown')) {
+			switch ($this->GetProperty('UserInput', 'Dropdown')) {
 			 case 'Dropdown':
 				$tmp = $mod->CreateInputDropdown(
-					$id,$this->formdata->current_prefix.$this->Id,
-					$companies,'-1',$val);
+					$id, $this->formdata->current_prefix.$this->Id,
+					$companies, '-1', $val);
 			 case 'Radio Group':
 				$tmp = $mod->CreateInputRadioGroup(
-					$id,$this->formdata->current_prefix.$this->Id,
-					$companies,$val,'','&nbsp;&nbsp;');
+					$id, $this->formdata->current_prefix.$this->Id,
+					$companies, $val, '', '&nbsp;&nbsp;');
 			 case 'Select List-single':
 				$tmp = $mod->CreateInputSelectList(
-					$id,$this->formdata->current_prefix.$this->Id.'[]',
-					$companies,$val,$size,
-					'id="'.$this->GetInputId().'"'.$this->GetScript(),FALSE);
+					$id, $this->formdata->current_prefix.$this->Id.'[]',
+					$companies, $val, $size,
+					'id="'.$this->GetInputId().'"'.$this->GetScript(), FALSE);
 			 case 'Select List-multiple':
 				$tmp = $mod->CreateInputSelectList(
-					$id,$this->formdata->current_prefix.$this->Id.'[]',
-					$companies,$val,$size,
+					$id, $this->formdata->current_prefix.$this->Id.'[]',
+					$companies, $val, $size,
 					'id="'.$this->GetInputId().'"'.$this->GetScript());
 			 default:
-			 	$tmp = FALSE;
+				$tmp = FALSE;
 			}
-			if ($tmp)
+			if ($tmp) {
 				return $this->SetClass($tmp);
+			}
 		}
 		return ''; // error
 	}
 
 	public function __toString()
 	{
- 		$ob = $this->mymodule;
+		$ob = $this->mymodule;
 		$this->mymodule = NULL;
 		$ret = parent::__toString();
 		$this->mymodule = $ob;

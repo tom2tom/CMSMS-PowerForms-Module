@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -14,7 +14,7 @@ class CustomEmail extends EmailBase
 {
 	public function __construct(&$formdata, &$params)
 	{
-		parent::__construct($formdata,$params);
+		parent::__construct($formdata, $params);
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
@@ -27,13 +27,15 @@ class CustomEmail extends EmailBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$opt = $this->GetPropArray('destination_address');
-		if ($opt)
+		if ($opt) {
 			$ret = $mod->Lang('to').': '.count($opt).' '.$mod->Lang('fields');
-		else
-			$ret = $mod->Lang('missing_type',$mod->Lang('destination'));
+		} else {
+			$ret = $mod->Lang('missing_type', $mod->Lang('destination'));
+		}
 		$status = $this->TemplateStatus();
-		if ($status)
+		if ($status) {
 			$ret .= '<br />'.$status;
+		}
 		return $ret;
 	}
 
@@ -41,36 +43,38 @@ class CustomEmail extends EmailBase
 	{
 		$displayfields = array();
 		foreach ($this->formdata->Fields as &$one) {
-			if ($one->DisplayInForm)
+			if ($one->DisplayInForm) {
 				$displayfields[$one->GetName()] = $one->GetId();
+			}
 		}
 		unset($one);
 		$destfields = array();
 		$opt = $this->GetPropArray('destination_address');
 		if ($opt) {
 			foreach ($displayfields as $k=>$v) {
-				if (in_array($v,$opt))
+				if (in_array($v, $opt)) {
 					$destfields[$k] = $v;
+				}
 			}
 		}
 		$mod = $this->formdata->formsmodule;
 		$choices = array($mod->Lang('select_one') => '') + $displayfields;
 
-		list($main,$adv,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,TRUE,FALSE);
+		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, FALSE, TRUE, FALSE);
 		$waslast = array_pop($main); //keep only the default to-type selector
 		$main[] = array($mod->Lang('title_subject_field'),
-						$mod->CreateInputDropdown($id,'fp_email_subject',$choices,-1,
+						$mod->CreateInputDropdown($id, 'fp_email_subject', $choices, -1,
 						$this->GetProperty('email_subject')));
 		$main[] = array($mod->Lang('title_from_field'),
-						$mod->CreateInputDropdown($id,'fp_email_from_name',$choices,-1,
-						$this->GetProperty('email_from_name',$mod->Lang('friendly_name'))));
+						$mod->CreateInputDropdown($id, 'fp_email_from_name', $choices, -1,
+						$this->GetProperty('email_from_name', $mod->Lang('friendly_name'))));
 		$main[] = array($mod->Lang('title_from_address_field'),
-						$mod->CreateInputDropdown($id,'fp_email_from_address',$choices,-1,
+						$mod->CreateInputDropdown($id, 'fp_email_from_address', $choices, -1,
 						$this->GetProperty('email_from_address')));
 //TODO what is $i ?
 		$main[] = array($mod->Lang('title_destination_field'),
-						$mod->CreateInputSelectList($id,'fp_destination_address'.$i,$displayfields,
-						$destfields,5));
+						$mod->CreateInputSelectList($id, 'fp_destination_address'.$i, $displayfields,
+						$destfields, 5));
 		$main[] = $waslast;
 		return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
 	}
@@ -78,47 +82,48 @@ class CustomEmail extends EmailBase
 	public function AdminValidate($id)
 	{
 		$messages = array();
-		list($ret,$msg) = parent::AdminValidate($id);
-		if (!$ret)
+		list($ret, $msg) = parent::AdminValidate($id);
+		if (!$ret) {
 			$messages[] = $msg;
+		}
 
 		$mod = $this->formdata->formsmodule;
 		if (!$this->GetProperty('email_subject')) {
 			$ret = FALSE;
-			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_email_subject'));
+			$messages[] = $mod->Lang('no_field_assigned', $mod->Lang('title_email_subject'));
 		}
 		if (!$this->GetProperty('email_from_name')) {
 			$ret = FALSE;
-			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_email_from_name'));
+			$messages[] = $mod->Lang('no_field_assigned', $mod->Lang('title_email_from_name'));
 		}
 		$opt = $this->GetProperty('email_from_address');
 		if ($opt) {
-			list($rv,$msg) = $this->validateEmailAddr($opt);
+			list($rv, $msg) = $this->validateEmailAddr($opt);
 			if (!$rv) {
 				$ret = FALSE;
 				$messages[] = $msg;
 			}
 		} else {
 			$ret = FALSE;
-			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_email_from_address'));
+			$messages[] = $mod->Lang('no_field_assigned', $mod->Lang('title_email_from_address'));
 		}
 		$opt = $this->GetPropArray('destination_address');
 		if ($opt) {
-			list($rv,$msg) = $this->validateEmailAddr($opt);
+			list($rv, $msg) = $this->validateEmailAddr($opt);
 			if (!$rv) {
 				$ret = FALSE;
 				$messages[] = $msg;
 			}
 		} else {
 			$ret = FALSE;
-			$messages[] = $mod->Lang('no_field_assigned',$mod->Lang('title_destination_address'));
+			$messages[] = $mod->Lang('no_field_assigned', $mod->Lang('title_destination_address'));
 		}
 		$msg = $this->TemplateStatus();
 		if ($msg) {
 			$ret = FALSE;
 			$messages[] = $msg;
 		}
-		$msg = ($ret)?'':implode('<br />',$messages);
+		$msg = ($ret)?'':implode('<br />', $messages);
 		return array($ret,$msg);
 	}
 
@@ -130,20 +135,21 @@ class CustomEmail extends EmailBase
 
 			$senderfld = $this->GetProperty('email_from_name'); //TODO confirm this is field_id?
 			$fld = $formdata->Fields[$senderfld];
-			$this->SetProperty('email_from_name',$fld->DisplayableValue());
+			$this->SetProperty('email_from_name', $fld->DisplayableValue());
 
 			$fromfld = $this->GetProperty('email_from_address');
 			$fld = $formdata->Fields[$fromfld];
-			$this->SetProperty('email_from_address',$fld->DisplayableValue());
+			$this->SetProperty('email_from_address', $fld->DisplayableValue());
 
 			$addrs = array();
 			foreach ($dests as $field_id) {
 				$fld = $formdata->Fields[$field_id];
 				$value = $fld->DisplayableValue();
-				if (strpos($value,',') !== FALSE)
-					$addrs = $addrs + explode(',',$value);
-				else
+				if (strpos($value, ',') !== FALSE) {
+					$addrs = $addrs + explode(',', $value);
+				} else {
 					$addrs[] = $value;
+				}
 			}
 
 /*			$subjectfld = $this->GetProperty('email_subject');
@@ -155,13 +161,13 @@ class CustomEmail extends EmailBase
 			$this->SetProperty('email_subject',$subjectfld);
 */
 			$fld = $formdata->Fields[$this->GetProperty('email_subject')];
-			$ret = $this->SendForm($addrs,$fld->DisplayableValue()); //TODO check value(subject) is ok
+			$ret = $this->SendForm($addrs, $fld->DisplayableValue()); //TODO check value(subject) is ok
 
-			$this->SetProperty('email_from_name',$senderfld);
-			$this->SetProperty('email_from_address',$fromfld);
+			$this->SetProperty('email_from_name', $senderfld);
+			$this->SetProperty('email_from_address', $fromfld);
 
 			return $ret;
 		}
-		return array(FALSE,$this->formdata->formsmodule->Lang('err_address',''));
+		return array(FALSE,$this->formdata->formsmodule->Lang('err_address', ''));
 	}
 }

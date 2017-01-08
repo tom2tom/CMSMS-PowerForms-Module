@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
@@ -16,9 +16,9 @@ class DateTime extends FieldBase
 	private $LowLimit = 0;
 	private $HighLimit = 0;
 
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
-		parent::__construct($formdata,$params);
+		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->Type = 'DateTime';
 		$this->ValidationType = 'none';
@@ -46,7 +46,7 @@ class DateTime extends FieldBase
 	public function SetProperty($propName, $propValue)
 	{
 		if (!is_int($propValue)) {
-			$dt = new \DateTime('@0',NULL);
+			$dt = new \DateTime('@0', NULL);
 			$lvl = error_reporting(0);
 			$res = $dt->modify($propValue);
 			error_reporting($lvl);
@@ -54,27 +54,28 @@ class DateTime extends FieldBase
 				$propValue = $dt->getTimestamp();
 			}
 		}
-		parent::SetProperty($propName,$propValue);
+		parent::SetProperty($propName, $propValue);
 	}
 
 	public function DisplayableValue($as_string=TRUE)
 	{
 		if ($this->Value) {
-			$dt = new \DateTime('@'.$this->Value,NULL);
+			$dt = new \DateTime('@'.$this->Value, NULL);
 			$fmt = $this->CurrentFormat();
 			$ret = $dt->format($fmt);
 		} else {
 			$ret = $this->formdata->formsmodule->Lang('none2');
 		}
-		if ($as_string)
+		if ($as_string) {
 			return $ret;
-		else
+		} else {
 			return array($ret);
+		}
 	}
 
 	public function GetSynopsis()
 	{
-		$dt = new \DateTime('@0',NULL);
+		$dt = new \DateTime('@0', NULL);
 		$fmt = $this->CurrentFormat();
 
 		if ($this->GetProperty('low_limit')) {
@@ -106,33 +107,33 @@ class DateTime extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id);
+		list($main, $adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_date_only'),
-				$mod->CreateInputHidden($id,'fp_date_only',0).
-				$mod->CreateInputCheckbox($id,'fp_date_only',1,
-					$this->GetProperty('date_only',0)));
+				$mod->CreateInputHidden($id, 'fp_date_only', 0).
+				$mod->CreateInputCheckbox($id, 'fp_date_only', 1,
+					$this->GetProperty('date_only', 0)));
 		$main[] = array($mod->Lang('title_time_only'),
-				$mod->CreateInputHidden($id,'fp_time_only',0).
-				$mod->CreateInputCheckbox($id,'fp_time_only',1,
-					$this->GetProperty('time_only',0)));
+				$mod->CreateInputHidden($id, 'fp_time_only', 0).
+				$mod->CreateInputCheckbox($id, 'fp_time_only', 1,
+					$this->GetProperty('time_only', 0)));
 
 		$adv[] = array($mod->Lang('title_dateformat'),
-				$mod->CreateInputText($id,'fp_date_format',
+				$mod->CreateInputText($id, 'fp_date_format',
 					$this->GetProperty('date_format',
-						$mod->GetPreference('date_format')),10,12),
+						$mod->GetPreference('date_format')), 10, 12),
 					$mod->Lang('help_dateformat'));
 		$adv[] = array($mod->Lang('title_timeformat'),
-				$mod->CreateInputText($id,'fp_time_format',
+				$mod->CreateInputText($id, 'fp_time_format',
 				$this->GetProperty('time_format',
-					$mod->GetPreference('time_format')),10,12),
+					$mod->GetPreference('time_format')), 10, 12),
 				$mod->Lang('help_timeformat'));
-		$v = $this->GetProperty('low_limit',0);
+		$v = $this->GetProperty('low_limit', 0);
 		if ($v) {
-			$vs = $this->GetProperty('low_value','');
+			$vs = $this->GetProperty('low_value', '');
 			if ($vs) {
-				$dt = new \DateTime('@'.$vs,NULL);
+				$dt = new \DateTime('@'.$vs, NULL);
 				$fmt = trim(GetPreference('date_format').' '.GetPreference('time_format'));
 				$vs = $dt->format($fmt);
 			}
@@ -140,18 +141,18 @@ class DateTime extends FieldBase
 			$vs = '';
 		}
 		$adv[] = array($mod->Lang('title_low_limit'),
-				$mod->CreateInputHidden($id,'fp_low_limit',0).
-				$mod->CreateInputCheckbox($id,'fp_low_limit',1,$v)
+				$mod->CreateInputHidden($id, 'fp_low_limit', 0).
+				$mod->CreateInputCheckbox($id, 'fp_low_limit', 1, $v)
 				.'&nbsp;'.
-				$mod->CreateInputText($id,'fp_low_value',$vs,20));
-		$v = $this->GetProperty('high_limit',0);
+				$mod->CreateInputText($id, 'fp_low_value', $vs, 20));
+		$v = $this->GetProperty('high_limit', 0);
 		if ($v) {
-			$vs = $this->GetProperty('high_value','');
+			$vs = $this->GetProperty('high_value', '');
 			if ($vs) {
 				if (isset($dt)) {
 					$dt->setTimestamp($vs);
 				} else {
-					$dt = new \DateTime('@'.$vs,NULL);
+					$dt = new \DateTime('@'.$vs, NULL);
 					$fmt = trim(GetPreference('date_format').' '.GetPreference('time_format'));
 				}
 				$vs = $dt->format($fmt);
@@ -160,10 +161,10 @@ class DateTime extends FieldBase
 			$vs = '';
 		}
 		$adv[] = array($mod->Lang('title_high_limit'),
-				$mod->CreateInputHidden($id,'fp_high_limit',0).
-				$mod->CreateInputCheckbox($id,'fp_high_limit',1,$v)
+				$mod->CreateInputHidden($id, 'fp_high_limit', 0).
+				$mod->CreateInputCheckbox($id, 'fp_high_limit', 1, $v)
 				.'&nbsp;'.
-				$mod->CreateInputText($id,'fp_high_value',$vs,20));
+				$mod->CreateInputText($id, 'fp_high_value', $vs, 20));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
@@ -171,7 +172,7 @@ class DateTime extends FieldBase
 	{
 		$ret = TRUE;
 		$messages = array();
-		$dt = new \DateTime('@'.time(),NULL);
+		$dt = new \DateTime('@'.time(), NULL);
 
 		if (!$this->GetProperty('time_only')) {
 			$fmt = $this->GetProperty('date_format');
@@ -215,22 +216,22 @@ class DateTime extends FieldBase
 		} elseif ($val2) {
 			$this->ValidationType = 'before';
 		}
-		$msg = ($ret)?'':implode('<br />',$messages);
+		$msg = ($ret)?'':implode('<br />', $messages);
 		return array($ret,$msg);
 	}
 
-	public function Populate($id,&$params)
+	public function Populate($id, &$params)
 	{
 		$mod = $this->formdata->formsmodule;
-  		$baseurl = $mod->GetModuleURLPath();
+		$baseurl = $mod->GetModuleURLPath();
 		$this->formdata->jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/include/jquery.watermark.min.js"></script>
 EOS;
-		$dt = new \DateTime('@'.time(),NULL);
+		$dt = new \DateTime('@'.time(), NULL);
 		$fmt = $this->CurrentFormat();
 		$example = $dt->format($fmt);
 		$xl1 = strlen($example)+1;
-		$example = $mod->Lang('tip_example',$example);
+		$example = $mod->Lang('tip_example', $example);
 		$xl2 = strlen($example);
 
 		if ($this->Value) {
@@ -246,9 +247,9 @@ EOS;
   $('#{$t}').watermark();
  },10);
 EOS;
-		$tmp = $mod->CreateInputText($id,$this->formdata->current_prefix.$this->Id,
-				$val,$xl1,$xl2,'title="'.$example.'"'.$this->GetScript());
-		$tmp = preg_replace('/id="\S+"/','id="'.$t.'"',$tmp);
+		$tmp = $mod->CreateInputText($id, $this->formdata->current_prefix.$this->Id,
+				$val, $xl1, $xl2, 'title="'.$example.'"'.$this->GetScript());
+		$tmp = preg_replace('/id="\S+"/', 'id="'.$t.'"', $tmp);
 		return $this->SetClass($tmp);
 	}
 
@@ -259,7 +260,7 @@ EOS;
 		if ($this->ValidationType != 'none') {
 			$msg = FALSE;
 			$lvl = error_reporting(0);
-			$dt = new \DateTime($this->Value,NULL);
+			$dt = new \DateTime($this->Value, NULL);
 			error_reporting($lvl);
 			if ($dt) {
 				$st = $dt->getTimestamp();
@@ -269,7 +270,7 @@ EOS;
 						$dt->setTimestamp($this->HighLimit);
 						$fmt = $this->CurrentFormat();
 						$t = $dt->format($fmt);
-						$msg = $this->formdata->formsmodule->Lang('when_before',$t);
+						$msg = $this->formdata->formsmodule->Lang('when_before', $t);
 					}
 					break;
 				 case 'after':
@@ -277,7 +278,7 @@ EOS;
 						$dt->setTimestamp($this->LowLimit);
 						$fmt = $this->CurrentFormat();
 						$t = $dt->format($fmt);
-						$msg = $this->formdata->formsmodule->Lang('when_after',$t);
+						$msg = $this->formdata->formsmodule->Lang('when_after', $t);
 					}
 					break;
 				 case 'between':
@@ -287,7 +288,7 @@ EOS;
 						$t = $dt->format($fmt);
 						$dt->setTimestamp($this->HighLimit);
 						$t2 = $dt->format($fmt);
-						$msg = $this->formdata->formsmodule->Lang('when_between',$t,$t2);
+						$msg = $this->formdata->formsmodule->Lang('when_between', $t, $t2);
 					}
 					break;
 				}
