@@ -70,15 +70,15 @@ $db->CreateSequence($pre.'module_pwf_fieldprops_seq');
 $db->Execute('CREATE INDEX '.$pre.'module_pwf_fieldprops_idx ON '.$pre.'module_pwf_fieldprops (field_id,form_id)');
 
 $flds = '
-record_id I(4) KEY,
-pubkey C(16),
-submitted '.CMS_ADODB_DT.',
+sess_id I(4) KEY,
+pubkey C(40),
+submitted I,
 content B
 ';
-$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_record', $flds, $taboptarray);
+$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_session', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pre.'module_pwf_record_seq');
+$db->CreateSequence($pre.'module_pwf_session_seq');
 
 /*MUTEX
 $flds = '
@@ -103,7 +103,8 @@ $flds = '
 log_id I(2) AUTO KEY,
 src C(40),
 howmany I(2) DEFAULT 1,
-basetime '.CMS_ADODB_DT;
+basetime I
+';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_ip_log', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
