@@ -1229,10 +1229,10 @@ EOS;
 		}
 		$pre = \cms_db_prefix();
 		$db = \cmsms()->GetDb();
-		$limit = $db->DbTimeStamp($time-1800);
+		$limit = $time-1800;
 		$db->Execute('DELETE FROM '.$pre.'module_pwf_ip_log WHERE basetime<'.$limit);
-		$limit = $db->DbTimeStamp($time-86400);
-		$db->Execute('DELETE FROM '.$pre.'module_pwf_record WHERE submitted<'.$limit);
+		$limit = $time-86400; //ignore DST
+		$db->Execute('DELETE FROM '.$pre.'module_pwf_session WHERE submitted<'.$limit);
 	}
 
 	/**

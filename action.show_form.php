@@ -38,8 +38,8 @@ if (!function_exists('BlockSource')) {
 	{
 		if (!empty($_SERVER['REMOTE_ADDR'])) {
 			$t = $time();
-			$t2 = trim($db->DBTimeStamp($t-900), "'"); //after 900 more seconds, it will be erased
-		$src = $_SERVER['REMOTE_ADDR'];
+			$t2 = $t-900; //after 900 more seconds, it will be erased
+			$src = $_SERVER['REMOTE_ADDR'];
 			global $db;
 			$pre = cms_db_prefix();
 			$sql = array('UPDATE '.$pre.'module_pwf_ip_log SET howmany=255,basetime=? WHERE src=?');
@@ -190,8 +190,7 @@ if (isset($params[$prefix.'datakey'])) {
 			if (!empty($_SERVER['REMOTE_ADDR'])) {
 				$src = $_SERVER['REMOTE_ADDR'];
 				$t = time();
-				$t2 = trim($db->DBTimeStamp($t-3600), "'");
-				$t = trim($db->DBTimeStamp($t), "'");
+				$t2 = $t-3600;
 				$num = 0;
 				$pre = cms_db_prefix();
 				$sql = 'DELETE FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<?';
