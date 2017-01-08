@@ -9,7 +9,7 @@ namespace PWForms;
 
 class StatePicker extends FieldBase
 {
-	public $States;
+	private $States;
 
 	public function __construct(&$formdata, &$params)
 	{
