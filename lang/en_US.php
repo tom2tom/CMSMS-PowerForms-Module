@@ -1,4 +1,8 @@
 <?php
+# This file is part of CMS Made Simple module: PWForms
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+# Refer to licence and other details at the top of file PWForms.module.php
+# More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 $lang['AF'] = 'Afghanistan';
 $lang['AX'] = 'Aland Islands';
@@ -347,7 +351,7 @@ $lang['desc_title_page_x_of_y'] = 'displays "page x of y" for multi-page forms';
 $lang['desc_total_pages'] = 'number of pages for multi-page forms';
 $lang['desc_type'] = 'the field\'s classname/type';
 $lang['desc_valid'] = 'true if the field has been validated successfully';
-$lang['desc_values'] = 'for a multiple-choice field, array of allowed values, otherwise FALSE';
+$lang['desc_values'] = 'for a multiple-choice field, array of allowed values, otherwise false';
 $lang['description'] = 'Description';
 //$lang['desc_browser_id'] = 'Browser ID if form is being viewed or edited from PowerBrowse';
 //$lang['desc_in_admin'] = 'true if the form is being viewed or edited from PowerBrowse';
@@ -681,7 +685,7 @@ be used interchangeably (especially useful if Smarty is choking on characters ou
 Each field has the following properties, accessible by e.g. <code>{$myfield-&gt;input}</code>:
 EOS;
 $lang['help_fieldvars2'] = <<<'EOS'
-When field->multiple_parts is TRUE, field->input is actually an array of objects rather than a single input-control.
+When field->multiple_parts is true, field->input is actually an array of objects rather than a single input-control.
 This happens, for example, in CheckBoxGroups or RadioButtonGroups. For those, you
 can iterate through <code>$field->input->name</code> and <code>$field->input->input</code>
 (and for runtime-expandable field-types, <code>$field->input->op</code>, which are add/delete buttons).
@@ -1269,7 +1273,7 @@ to help you with it:</p>
 </li>
 </ul>
 <h3>Copyright and license</h3>
-<p>Copyright &copy; 2012-2016 Tom Phane &lt;tpgww@onepost.net&gt;<br />
+<p>Copyright &copy; 2012-2017 Tom Phane &lt;tpgww@onepost.net&gt;<br />
 Derived from code copyright &copy; 2006-2012 Samuel Goldstein &lt;sjg@cmsmodules.com&gt;<br />
 All rights reserved.</p>
 <p>This module has been released under version 3 of the

@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 /*
@@ -302,9 +302,9 @@ $templates['Advanced_captcha'] =<<<EOS
 {\$prompt}<br />{\$captcha_input}<br />{\$captcha}
 EOS;
 
-$fh = fopen(__DIR__.DIRECTORY_SEPARATOR.'encoded-templates.xml','w');
+$fh = fopen(__DIR__.DIRECTORY_SEPARATOR.'encoded-templates.xml', 'w');
 foreach ($templates as $key=>&$value) {
-	fwrite($fh,'<'.$key.'_template>]][['.urlencode($value).'</'.$key.'_template>'.PHP_EOL.PHP_EOL);
+    fwrite($fh, '<'.$key.'_template>]][['.urlencode($value).'</'.$key.'_template>'.PHP_EOL.PHP_EOL);
 }
 
 unset($value);
