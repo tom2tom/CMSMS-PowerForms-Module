@@ -8,17 +8,17 @@
 *
 */
 
-$allowedVariables = array (
+$allowedVariables = array(
 	'$v',
 	'$i',
 );
 
-$globalVariables = array (
+$globalVariables = array(
 	'v',
 	'x',
 );
 
-$allowedCalls = array (
+$allowedCalls = array(
 	// Function Handling Functions
 //	'func_get_arg',		// Return an item from the argument list
 //	'func_get_args',	// Returns an array comprising a function's argument list
@@ -26,11 +26,11 @@ $allowedCalls = array (
 //	'function_exists', 	// Return TRUE if the given function has been defined
 
 	// Mathematical functions
-	'ceil',         // Round fractions up
-	'floor',        // Round fractions down
+	'ceil',		// Round fractions up
+	'floor',	// Round fractions down
 	'fmod',		// Returns the floating point remainder (modulo) of the division of the arguments
 	'log',		// Natural logarithm
-	'mt_rand',	// Generate a better random value
+	'mt_rand',// Generate a better random value
 	'mt_srand',	// Seed the better random number generator
 	'pow',		// Exponential expression
 	'rand',		// Generate a random integer
@@ -38,7 +38,7 @@ $allowedCalls = array (
 	'srand',	// Seed the random number generator
 
 	// Variable handling
-	'empty', 	// Determine whether a variable is empty
+	'empty',	// Determine whether a variable is empty
 	'floatval',	// Get float value of a variable
 	'intval',	// Get the integer value of a variable
 	'is_array',	// Finds whether a variable is an array
@@ -60,7 +60,7 @@ $allowedCalls = array (
 	'unset',	// Unset a given variable
 
 	// Array functions
-	'array_change_key_case',// Changes all keys in an array
+	'array_change_key_case', // Changes all keys in an array
 	'array_chunk',		// Split an array into chunks
 	'array_combine',	// Creates an array by using one array for keys and another for its values
 	'array_count_values',	// Counts all the values of an array
@@ -70,12 +70,12 @@ $allowedCalls = array (
 	'array_fill_keys',	// Fill an array with values, specifying keys
 	'array_fill',		// Fill an array with values
 	'array_flip',		// Exchanges all keys with their associated values in an array
-	'array_intersect_assoc',// Computes the intersection of arrays with additional index check
+	'array_intersect_assoc', // Computes the intersection of arrays with additional index check
 	'array_intersect_key',	// Computes the intersection of arrays using keys for comparison
 	'array_intersect',	// Computes the intersection of arrays
 	'array_key_exists',	// Checks if the given key or index exists in the array
 	'array_keys',		// Return all the keys of an array
-	'array_merge_recursive',// Merge two or more arrays recursively
+	'array_merge_recursive', // Merge two or more arrays recursively
 	'array_merge',		// Merge one or more arrays
 	'array_multisort',	// Sort multiple or multi-dimensional arrays
 	'array_pad',		// Pad array to the specified length with a value
@@ -117,68 +117,68 @@ $allowedCalls = array (
 	'sort',			// Sort an array
 
 	// Strings Functions
-	'chop', 		// Alias of rtrim
-	'count_chars', 		// Return information about characters used in a string
-	'explode', 		// Split a string by string
-	'implode', 		// Join array elements with a string
-	'join', 		// Alias of implode
-	'levenshtein', 		// Calculate Levenshtein distance between two strings
-	'ltrim', 		// Strip whitespace (or other characters) from the beginning of a string
-	'metaphone', 		// Calculate the metaphone key of a string
-	'money_format', 	// Formats a number as a currency string
+	'chop',		// Alias of rtrim
+	'count_chars',		// Return information about characters used in a string
+	'explode',		// Split a string by string
+	'implode',		// Join array elements with a string
+	'join',		// Alias of implode
+	'levenshtein',		// Calculate Levenshtein distance between two strings
+	'ltrim',		// Strip whitespace (or other characters) from the beginning of a string
+	'metaphone',		// Calculate the metaphone key of a string
+	'money_format',	// Formats a number as a currency string
 	'number_format',	// Format a number with grouped thousands
-	'rtrim', 		// Strip whitespace (or other characters) from the end of a string
-	'similar_text', 	// Calculate the similarity between two strings
-	'soundex', 		// Calculate the soundex key of a string
-	'str_getcsv', 		// Parse a CSV string into an array
-	'str_ireplace', 	// Case-insensitive version of str_replace.
-	'str_pad', 		// Pad a string to a certain length with another string
-	'str_repeat', 		// Repeat a string
-	'str_replace', 		// Replace all occurrences of the search string with the replacement string
-	'str_rot13', 		// Perform the rot13 transform on a string
-	'str_shuffle', 		// Randomly shuffles a string
-	'str_split', 		// Convert a string to an array
+	'rtrim',		// Strip whitespace (or other characters) from the end of a string
+	'similar_text',	// Calculate the similarity between two strings
+	'soundex',		// Calculate the soundex key of a string
+	'str_getcsv',		// Parse a CSV string into an array
+	'str_ireplace',	// Case-insensitive version of str_replace.
+	'str_pad',		// Pad a string to a certain length with another string
+	'str_repeat',		// Repeat a string
+	'str_replace',		// Replace all occurrences of the search string with the replacement string
+	'str_rot13',		// Perform the rot13 transform on a string
+	'str_shuffle',		// Randomly shuffles a string
+	'str_split',		// Convert a string to an array
 	'str_word_count',	// Return information about words used in a string
-	'strcasecmp', 		// Binary safe case-insensitive string comparison
-	'strchr', 		// Alias of strstr
-	'strcmp', 		// Binary safe string comparison
-	'strcspn', 		// Find length of initial segment not matching mask
-	'stripos', 		// Find position of first occurrence of a case-insensitive string
-	'stristr', 		// Case-insensitive strstr
-	'strlen', 		// Get string length
-	'strnatcasecmp', 	// Case insensitive string comparisons using a "natural order" algorithm
-	'strnatcmp', 		// String comparisons using a "natural order" algorithm
-	'strncasecmp', 		// Binary safe case-insensitive string comparison of the first n characters
-	'strncmp', 		// Binary safe string comparison of the first n characters
-	'strpbrk', 		// Search a string for any of a set of characters
-	'strpos', 		// Find position of first occurrence of a string
-	'strrchr', 		// Find the last occurrence of a character in a string
-	'strrev', 		// Reverse a string
-	'strripos', 		// Find position of last occurrence of a case-insensitive string in a string
-	'strrpos', 		// Find position of last occurrence of a char in a string
-	'strspn', 		// Find length of initial segment matching mask
-	'strstr', 		// Find first occurrence of a string
-	'strtolower', 		// Make a string lowercase
-	'strtoupper', 		// Make a string uppercase
-	'strtr', 		// Translate certain characters
-	'substr_compare', 	// Binary safe comparison of 2 strings from an offset, up to length characters
-	'substr_count', 	// Count the number of substring occurrences
-	'substr_replace', 	// Replace text within a portion of a string
-	'substr', 		// Return part of a string
-	'trim', 		// Strip whitespace (or other characters) from the beginning and end of a string
-	'ucfirst', 		// Make a string's first character uppercase
-	'ucwords', 		// Uppercase the first character of each word in a string
-	'wordwrap', 		// Wraps a string to a given number of characters
+	'strcasecmp',		// Binary safe case-insensitive string comparison
+	'strchr',		// Alias of strstr
+	'strcmp',		// Binary safe string comparison
+	'strcspn',		// Find length of initial segment not matching mask
+	'stripos',		// Find position of first occurrence of a case-insensitive string
+	'stristr',		// Case-insensitive strstr
+	'strlen',		// Get string length
+	'strnatcasecmp',	// Case insensitive string comparisons using a "natural order" algorithm
+	'strnatcmp',		// String comparisons using a "natural order" algorithm
+	'strncasecmp',		// Binary safe case-insensitive string comparison of the first n characters
+	'strncmp',		// Binary safe string comparison of the first n characters
+	'strpbrk',		// Search a string for any of a set of characters
+	'strpos',		// Find position of first occurrence of a string
+	'strrchr',		// Find the last occurrence of a character in a string
+	'strrev',		// Reverse a string
+	'strripos',		// Find position of last occurrence of a case-insensitive string in a string
+	'strrpos',		// Find position of last occurrence of a char in a string
+	'strspn',		// Find length of initial segment matching mask
+	'strstr',		// Find first occurrence of a string
+	'strtolower',		// Make a string lowercase
+	'strtoupper',		// Make a string uppercase
+	'strtr',		// Translate certain characters
+	'substr_compare',	// Binary safe comparison of 2 strings from an offset, up to length characters
+	'substr_count',	// Count the number of substring occurrences
+	'substr_replace',	// Replace text within a portion of a string
+	'substr',		// Return part of a string
+	'trim',		// Strip whitespace (or other characters) from the beginning and end of a string
+	'ucfirst',		// Make a string's first character uppercase
+	'ucwords',		// Uppercase the first character of each word in a string
+	'wordwrap',		// Wraps a string to a given number of characters
 
-);   
+);
 
-$allowedTokens = array (
+$allowedTokens = array(
 	'T_AND_EQUAL',			// assignment operators
 	'T_ARRAY',			// array(), array syntax
 	'T_ARRAY_CAST',			// type-casting
 	'T_AS',				// foreach
 	'T_BOOLEAN_AND',		// logical operators
-	'T_BOOLEAN_OR', 		// logical operators
+	'T_BOOLEAN_OR',		// logical operators
 	'T_BOOL_CAST',			// type-casting
 	'T_BREAK',			// break
 	'T_CASE',			// switch
@@ -186,7 +186,7 @@ $allowedTokens = array (
 //	'T_COMMENT',			// comments
 	'T_CONCAT_EQUAL',		// assignment operators
 	'T_CONSTANT_ENCAPSED_STRING',	// string syntax
-	'T_CONTINUE',			// 
+	'T_CONTINUE',			//
 	'T_CURLY_OPEN',			//
 	'T_DEC',			// incrementing/decrementing operators
 	'T_DECLARE',			// declare
@@ -196,7 +196,7 @@ $allowedTokens = array (
 	'T_DO',				// do..while
 	'T_DOUBLE_ARROW',		// array syntax
 	'T_DOUBLE_CAST',		// type-casting
-//	'T_ECHO',                       //
+//	'T_ECHO',					   //
 	'T_ELSE',			// else
 	'T_ELSEIF',			// elseif
 	'T_EMPTY',			// empty()
@@ -242,11 +242,11 @@ $allowedTokens = array (
 	'T_UNSET_CAST',			// (not documented; casts to NULL)
 	'T_VARIABLE',			// variables
 	'T_WHILE',			// while, do..while
-	'T_WHITESPACE',			// 
+	'T_WHITESPACE',			//
 	'T_XOR_EQUAL',			// assignment operators
 );
 
-$disallowedExpressions = array ( 	// Probably unsafe to change these
+$disallowedExpressions = array(	// Probably unsafe to change these
 
 	'/`/',				// Shell execution operator: "`"
 	'/\$\W/',			// Variable variables: any "$" which is not "$_" or "$alphanumeric"
@@ -256,5 +256,3 @@ $disallowedExpressions = array ( 	// Probably unsafe to change these
 //	'/(\]|\})\s*\//',		// Comment after parentheses: "] /" or "} /"
 
 );
-
-?>

@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -16,7 +16,7 @@ class SystemEmail extends EmailBase
 
 	public function __construct(&$formdata, &$params)
 	{
-		parent::__construct($formdata,$params);
+		parent::__construct($formdata, $params);
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
@@ -44,8 +44,8 @@ class SystemEmail extends EmailBase
 	{
 		if (isset($params['selected'])) {
 			foreach ($params['selected'] as $indx=>$val) {
-				$this->RemovePropIndexed('destination_address',$indx);
-				$this->RemovePropIndexed('address_type',$indx);
+				$this->RemovePropIndexed('destination_address', $indx);
+				$this->RemovePropIndexed('address_type', $indx);
 			}
 		}
 	}
@@ -60,35 +60,37 @@ class SystemEmail extends EmailBase
 			if ($c > 1) {
 				$ret .= $c.' '.$mod->Lang('recipients');
 			} else {
-				$type = $this->GetPropIndexed('address_type',1,'to');
-				if ($type == 'cc')
+				$type = $this->GetPropIndexed('address_type', 1, 'to');
+				if ($type == 'cc') {
 					$ret = $mod->Lang('cc').': ';
- 				elseif ($type == 'bc')
+				} elseif ($type == 'bc') {
 					$ret = $mod->Lang('bcc').': ';
+				}
 				$ret .= $dests[1];
 			}
 		} else {
 			$ret .= $mod->Lang('unspecified');
 		}
 		$status = $this->TemplateStatus();
-		if ($status)
+		if ($status) {
 			$ret .= '<br />'.$status;
+		}
 		return $ret;
 	}
 
 	public function AdminPopulate($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		list($main,$adv,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,FALSE,FALSE);
+		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, FALSE, FALSE, FALSE);
 
 		if ($this->addressAdd) {
-			$this->AddPropIndexed('destination_address','');
-			$this->AddPropIndexed('address_type','to');
+			$this->AddPropIndexed('destination_address', '');
+			$this->AddPropIndexed('address_type', 'to');
 			$this->addressAdd = FALSE;
 		}
 		$opt = $this->GetPropArray('destination_address');
 		if ($opt) {
-			$totypes = array ('to','cc','bc');
+			$totypes = array('to', 'cc', 'bc');
 			$dests = array();
 			$dests[] = array(
 				$mod->Lang('title_destination_address'),
@@ -100,23 +102,23 @@ class SystemEmail extends EmailBase
 			foreach ($opt as $i=>&$one) {
 				$arf = '['.$i.']';
 
-				$totype = $this->GetPropIndexed('address_type',$i,'to');
+				$totype = $this->GetPropIndexed('address_type', $i, 'to');
 				$btns = array();
-				for ($c=0; $c<3; $c++)
-				{
+				for ($c=0; $c<3; $c++) {
 					$t = '<input type="radio" class="cms_radio" name="'.$id.'fp_address_type'.$arf.
 					'" id="'.$id.'address_type'.$i.$c.'" value="'.$totypes[$c].'"';
-					if ($totype == $totypes[$c])
+					if ($totype == $totypes[$c]) {
 						$t .= ' checked="checked"';
+					}
 					$t .= ' style="margin-left:5px;" />';
 					$btns[] = $t;
 				}
 				$dests[] = array(
-					$mod->CreateInputText($id,'fp_destination_address'.$arf,$one,50,128),
+					$mod->CreateInputText($id, 'fp_destination_address'.$arf, $one, 50, 128),
 					$btns[0],
 					$btns[1],
 					$btns[2],
-					$mod->CreateInputCheckbox($id,'selected'.$arf,1,-1,'style="display:block;margin:auto;"')
+					$mod->CreateInputCheckbox($id, 'selected'.$arf, 1, -1, 'style="display:block;margin:auto;"')
 				);
 			}
 			unset($one);
@@ -124,7 +126,7 @@ class SystemEmail extends EmailBase
 			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'extra'=>$extra);
 		} else {
 			$this->MultiComponent = FALSE;
-			$main[] = array('','',$mod->Lang('missing_type',$mod->Lang('destination')));
+			$main[] = array('','',$mod->Lang('missing_type', $mod->Lang('destination')));
 			return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
 		}
 	}
@@ -136,8 +138,8 @@ class SystemEmail extends EmailBase
 		if ($addrs) {
 			foreach ($addrs as $i=>&$one) {
 				if (!$one) {
-					$this->RemovePropIndexed('destination_address',$i);
-					$this->RemovePropIndexed('address_type',$i);
+					$this->RemovePropIndexed('destination_address', $i);
+					$this->RemovePropIndexed('address_type', $i);
 				}
 			}
 			unset($one);
@@ -147,28 +149,29 @@ class SystemEmail extends EmailBase
 	public function AdminValidate($id)
 	{
 		$messages = array();
-		list($ret,$msg) = parent::AdminValidate($id);
-		if (!$ret)
+		list($ret, $msg) = parent::AdminValidate($id);
+		if (!$ret) {
 			$messages[] = $msg;
+		}
 
 		$mod = $this->formdata->formsmodule;
 		$opt = $this->GetProperty('email_from_address');
 		if ($opt) {
-			list($rv,$msg) = $this->validateEmailAddr($opt);
+			list($rv, $msg) = $this->validateEmailAddr($opt);
 			if (!$rv) {
 				$ret = FALSE;
 				$messages[] = $msg;
 			}
 		} else {
 			$ret = FALSE;
-			$messages[] = $mod->Lang('missing_type',$mod->Lang('source'));
+			$messages[] = $mod->Lang('missing_type', $mod->Lang('source'));
 		}
 
 		$dests = $this->GetPropArray('destination_address');
 		if ($dests) {
 			foreach ($dests as &$one) {
-				list($rv,$msg) = $this->validateEmailAddr($one);
-			 	if (!$rv) {
+				list($rv, $msg) = $this->validateEmailAddr($one);
+				if (!$rv) {
 					$ret = FALSE;
 					$messages[] = $msg;
 				}
@@ -176,10 +179,10 @@ class SystemEmail extends EmailBase
 			unset($one);
 		} else {
 			$ret = FALSE;
-			$messages[] = $mod->Lang('missing_type',$mod->Lang('destination'));
+			$messages[] = $mod->Lang('missing_type', $mod->Lang('destination'));
 		}
 
-		$msg = ($ret)? '' : implode('<br />',$messages);
+		$msg = ($ret)? '' : implode('<br />', $messages);
 		return array($ret,$msg);
 	}
 
@@ -201,6 +204,6 @@ class SystemEmail extends EmailBase
 	public function Dispose($id, $returnid)
 	{
 		$dests = $this->GetPropArray('destination_address');
-		return $this->SendForm($dests,$this->GetProperty('email_subject'));
+		return $this->SendForm($dests, $this->GetProperty('email_subject'));
 	}
 }

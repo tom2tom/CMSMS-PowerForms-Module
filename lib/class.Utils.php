@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -28,10 +28,11 @@ class Utils
 	 */
 	public static function GetCache(&$mod, $storage='auto', $settings=array())
 	{
-//		if (self::$cache == NULL && isset($_SESSION['pwfcache']))
+		//		if (self::$cache == NULL && isset($_SESSION['pwfcache']))
 //			self::$cache = $_SESSION['pwfcache'];
-		if (self::$cache)
+		if (self::$cache) {
 			return self::$cache;
+		}
 
 		$path = __DIR__ . DIRECTORY_SEPARATOR . 'MultiCache' . DIRECTORY_SEPARATOR;
 		require_once($path.'CacheInterface.php'); //prevent repeated creation crash
@@ -45,41 +46,45 @@ class Utils
 
 		$settings = array_merge(
 			array(
- 			'memcache' => array(
-			  array('host'=>$url,'port'=>11211)
+			'memcache'=>array(
+			  array('host'=>$url, 'port'=>11211)
 			),
-/*			  'memcached' => array(
+/*			  'memcached'=>array(
 			  array('host'=>$url,'port'=>11211,'persist'=>1)
 			  ),
 */
-			'redis' => array(
-				'host' => $url //TODO CHECKME
+			'redis'=>array(
+				'host'=>$url //TODO CHECKME
 			),
-			'predis' => array(
-				'host' => $url
+			'predis'=>array(
+				'host'=>$url
 			),
-			'file' => array(
-				'path' => $basedir
+			'file'=>array(
+				'path'=>$basedir
 			),
 			'database' => array(
-				'table' => $pre . 'module_pwf_cache'
+				'table'=>$pre.'module_pwf_cache'
 			)
 			), $settings);
 
 		if ($storage) {
 			$storage = strtolower($storage);
-		} else
+		} else {
 			$storage = 'auto';
-		if (strpos($storage, 'auto') !== FALSE)
+		}
+		if (strpos($storage, 'auto') !== FALSE) {
 			$storage = 'yac,apc,apcu,wincache,xcache,memcache,redis,predis,file,database';
+		}
 
 		$types = explode(',', $storage);
 		foreach ($types as $one) {
 			$one = trim($one);
-			if (!isset($settings[$one]))
+			if (!isset($settings[$one])) {
 				$settings[$one] = array();
-			if (empty($settings[$one]['namespace']))
+			}
+			if (empty($settings[$one]['namespace'])) {
 				$settings[$one]['namespace'] = $mod->GetName();
+			}
 			$class = 'MultiCache\Cache_' . $one;
 			try {
 				require($path.$one.'.php');
@@ -96,7 +101,7 @@ class Utils
 
 	public static function ClearCache()
 	{
-//		unset($_SESSION['bkrcache']);
+		//		unset($_SESSION['bkrcache']);
 		unset(self::$cache);
 		self::$cache = NULL;
 	}
@@ -183,24 +188,24 @@ class Utils
 			$db->StartTrans();
 			switch ($mode) {
 			 case 'one':
-				$ret = $db->GetOne($sql,$args);
+				$ret = $db->GetOne($sql, $args);
 				break;
 			 case 'row':
-				$ret = $db->GetRow($sql,$args);
+				$ret = $db->GetRow($sql, $args);
 				break;
 			 case 'col':
-				$ret = $db->GetCol($sql,$args);
+				$ret = $db->GetCol($sql, $args);
 				break;
 			 case 'assoc':
-				$ret = $db->GetAssoc($sql,$args);
+				$ret = $db->GetAssoc($sql, $args);
 				break;
 			 default:
-				$ret = $db->GetArray($sql,$args);
+				$ret = $db->GetArray($sql, $args);
 				break;
 			}
-			if ($db->CompleteTrans())
+			if ($db->CompleteTrans()) {
 				return $ret;
-			else {
+			} else {
 				$nt--;
 				usleep(50000);
 			}
@@ -223,13 +228,15 @@ class Utils
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE'); //this isn't perfect!
 			$db->StartTrans();
 			if (is_array($sql)) {
-				foreach ($sql as $i=>$cmd)
-					$db->Execute($cmd,$args[$i]);
-			} else
-				$db->Execute($sql,$args);
-			if ($db->CompleteTrans())
+				foreach ($sql as $i=>$cmd) {
+					$db->Execute($cmd, $args[$i]);
+				}
+			} else {
+				$db->Execute($sql, $args);
+			}
+			if ($db->CompleteTrans()) {
 				return TRUE;
-			else {
+			} else {
 				$nt--;
 				usleep(50000);
 			}
@@ -247,8 +254,8 @@ class Utils
 	{
 		// DO NOT parameterise $orderby! ADODB would quote it, then the SQL is not valid
 		// instead,rudimentary security checks
-		$orderby = preg_replace('/\s/','',$orderby);
-		$orderby = preg_replace('/[^\w\-.]/','_',$orderby);
+		$orderby = preg_replace('/\s/', '', $orderby);
+		$orderby = preg_replace('/[^\w\-.]/', '_', $orderby);
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_form ORDER BY '.$orderby;
 		$db = \cmsms()->GetDb();
@@ -286,28 +293,30 @@ class Utils
 	return strcoll($str1,$str2);
 */
 	//comparer for field-selection menu-item sorting, dipositions last, non-inputs 2nd-last
-	private static function labelcmp($a,$b)
+	private static function labelcmp($a, $b)
 	{
 		$fa = $a[0];
 		$fb = $b[0];
 		if ($fa == $fb) {
-			return(strcmp($a,$b)); //TODO mb_ comparison
-		} elseif ($fa == '*') //disposition field-prefix
+			return(strcmp($a, $b)); //TODO mb_ comparison
+		} elseif ($fa == '*') { //disposition field-prefix
 			return 1;
-		elseif ($fb == '*')
+		} elseif ($fb == '*') {
 			return -1;
-		elseif ($fa == '-') { //non-input field-prefix
-			if ($fb == '*')
+		} elseif ($fa == '-') { //non-input field-prefix
+			if ($fb == '*') {
 				return -1;
-			else
+			} else {
 				return 1;
+			}
 		} elseif ($fb == '-') {
-			if ($fa == '*')
+			if ($fa == '*') {
 				return 1;
-			else
+			} else {
 				return -1;
+			}
 		} else {
-			return(strcmp($a,$b)); //TODO mb_ comparison
+			return(strcmp($a, $b)); //TODO mb_ comparison
 		}
 	}
 
@@ -320,8 +329,9 @@ class Utils
 	*/
 	public static function Collect_Fields(&$mod)
 	{
-		if ($mod->field_types)
-			return; //already done
+		if ($mod->field_types) {
+			return;
+		} //already done
 
 		$menu = array();
 		foreach (array(
@@ -337,7 +347,7 @@ class Utils
 			//TODO dynamically add prefix '*' for dispositions, '-' for non-inputs??
 			$menu[$classname] = $mod->Lang($menukey);
 		}
-		uasort($menu,array('self','labelcmp'));
+		uasort($menu, array('self', 'labelcmp'));
 		$mod->std_field_types = array_flip($menu);
 
 		$fp = __DIR__.DIRECTORY_SEPARATOR.'Fields.manifest';
@@ -355,24 +365,28 @@ class Utils
 			$feu = \cms_utils::get_module('FrontEndUsers');
 
 			$menu = array();
-			$rows = file($fp,FILE_SKIP_EMPTY_LINES); //flag doesn't work!!
+			$rows = file($fp, FILE_SKIP_EMPTY_LINES); //flag doesn't work!!
 			foreach ($rows as $oneline) {
-				if ($oneline[0] == '#' || ($oneline[0] == '/' && $oneline[1] == '/'))
+				if ($oneline[0] == '#' || ($oneline[0] == '/' && $oneline[1] == '/')) {
 					continue;
+				}
 				$classname = trim($oneline);
-				if (!$classname)
+				if (!$classname) {
 					continue;
-				if (!$mail && strpos($classname,'Email') !== FALSE)
+				}
+				if (!$mail && strpos($classname, 'Email') !== FALSE) {
 					continue;
-				if (!$feu && strpos($classname,'FEU') !== FALSE) //DEPRECATED feu-related classes to be $imports members
+				}
+				if (!$feu && strpos($classname, 'FEU') !== FALSE) { //DEPRECATED feu-related classes to be $imports members
 					continue;
+				}
 				//TODO pre-req checks e.g. 'SubmitForm' needs cURL extension
 				$menukey = 'fieldlabel_'.$classname;
 				//TODO dynamically add prefix '*' for dispositions, '-' for non-inputs? c.f. self::Show_Field()
 				$menu[$classname] = $mod->Lang($menukey);
 			}
 		} else {
-			$menu += array('_' => $mod->Lang('missing_type',$mod->Lang('TODO')));
+			$menu += array('_' => $mod->Lang('missing_type', $mod->Lang('TODO')));
 		}
 
 		$imports = $mod->GetPreference('imported_fields');
@@ -382,14 +396,14 @@ class Utils
 				$classpath = 'PWForms\\'.$classname;
 				$params = array();
 				$formdata = $mod->_GetFormData($params);
-				$obfld = new $classpath($formdata,$params);
+				$obfld = new $classpath($formdata, $params);
 				if ($obfld) {
 					$menu[$classname] = $obfld->GetDisplayType();
 				}
 			}
 		}
 
-		uasort($menu,array('self','labelcmp'));
+		uasort($menu, array('self', 'labelcmp'));
 		$mod->field_types = array_flip($menu);
 	}
 
@@ -406,18 +420,19 @@ class Utils
 			$params = array();
 			$formdata = $mod->_GetFormData($params);
 			$classpath = 'PWForms\\'.$classname;
-			$obfld = new $classpath($formdata,$params);
+			$obfld = new $classpath($formdata, $params);
 			if ($obfld) {
-				if (!$obfld->IsInput) //TODO check this
+				if (!$obfld->IsInput) { //TODO check this
 					$p = '-';
-				elseif ($obfld->IsDisposition)
+				} elseif ($obfld->IsDisposition) {
 					$p = '*';
-				else
+				} else {
 					$p = '';
+				}
 				$menulabel = $p.$obfld->mymodule->Lang($obfld->MenuKey);
 				$mod->field_types[$menulabel] = $classname;
 				if ($sort) {
-					uksort($mod->field_types,array('self','labelcmp')); //TODO mb-compatible sort $coll = new Collator('fr_FR');
+					uksort($mod->field_types, array('self', 'labelcmp')); //TODO mb-compatible sort $coll = new Collator('fr_FR');
 				}
 			}
 		}
@@ -434,9 +449,10 @@ class Utils
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT field_id FROM '.$pre.'module_pwf_field WHERE alias = ?';
-		$fid = $db->GetOne($sql,array($alias));
-		if ($fid)
+		$fid = $db->GetOne($sql, array($alias));
+		if ($fid) {
 			return (int)$fid;
+		}
 		return -1;
 	}
 
@@ -447,7 +463,7 @@ class Utils
 	*/
 	public static function FileClassName($filename)
 	{
-		$shortname = str_replace(array('class.','.php'),array('',''),$filename);
+		$shortname = str_replace(array('class.', '.php'), array('', ''), $filename);
 		return self::MakeClassName($shortname);
 	}
 
@@ -459,7 +475,7 @@ class Utils
 	public static function MakeClassName($type)
 	{
 		// rudimentary security, cuz' $type could come from a form
-		$type = preg_replace('~[\W]|\.\.~','_',$type); //TODO
+		$type = preg_replace('~[\W]|\.\.~', '_', $type); //TODO
 		if ($type) {
 			return $type;
 		}
@@ -475,15 +491,17 @@ class Utils
 	*/
 	public static function MakeAlias($string, $maxlen=48)
 	{
-		if (!$string)
+		if (!$string) {
 			return '';
-		$alias = strtolower(trim($string,"\t\n\r\0 _"));
-		if (!$alias)
+		}
+		$alias = strtolower(trim($string, "\t\n\r\0 _"));
+		if (!$alias) {
 			return '';
-		$alias = preg_replace('/[^\w]+/','_',$alias);
-		$parts = array_slice(explode('_',$alias),0,5);
-		$alias = substr(implode('_',$parts),0,$maxlen);
-		return trim($alias,'_');
+		}
+		$alias = preg_replace('/[^\w]+/', '_', $alias);
+		$parts = array_slice(explode('_', $alias), 0, 5);
+		$alias = substr(implode('_', $parts), 0, $maxlen);
+		return trim($alias, '_');
 	}
 
 	/**
@@ -497,9 +515,10 @@ class Utils
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT name FROM '.$pre.'module_pwf_form WHERE form_id=?';
-		$name = $db->GetOne($sql,array($form_id));
-		if ($name)
+		$name = $db->GetOne($sql, array($form_id));
+		if ($name) {
 			return $name;
+		}
 		return '';
 	}
 
@@ -514,9 +533,10 @@ class Utils
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT alias FROM '.$pre.'module_pwf_form WHERE form_id=?';
-		$alias = $db->GetOne($sql,array($form_id));
-		if ($alias)
+		$alias = $db->GetOne($sql, array($form_id));
+		if ($alias) {
 			return $alias;
+		}
 		return '';
 	}
 
@@ -531,9 +551,10 @@ class Utils
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT form_id FROM '.$pre.'module_pwf_form WHERE alias = ?';
-		$fid = $db->GetOne($sql,array($form_alias));
-		if ($fid)
+		$fid = $db->GetOne($sql, array($form_alias));
+		if ($fid) {
 			return (int)$fid;
+		}
 		return -1;
 	}
 
@@ -547,10 +568,11 @@ class Utils
 	*/
 	public static function GetFormProperty(&$formdata, $propname, $default='')
 	{
-		if (isset($formdata->XtraProps[$propname]))
+		if (isset($formdata->XtraProps[$propname])) {
 			return $formdata->XtraProps[$propname];
-		else
+		} else {
 			return $default;
+		}
 	}
 
 	/**
@@ -563,16 +585,17 @@ class Utils
 	@footer: whether the template is to be the end (of another template), default FALSE
 	*/
 	public static function CreateDefaultTemplate(&$formdata,
-		$htmlish=FALSE,$email=TRUE,$oneline=FALSE,$header=FALSE,$footer=FALSE)
+		$htmlish= FALSE, $email=TRUE, $oneline= FALSE, $header= FALSE, $footer= FALSE)
 	{
 		$mod = $formdata->formsmodule;
 		$ret = '';
 
 		if ($email) {
-			if ($htmlish)
+			if ($htmlish) {
 				$ret .= '<h3>'.$mod->Lang('email_default_template').'</h3>'.PHP_EOL;
-			else
+			} else {
 				$ret .= $mod->Lang('email_default_template').PHP_EOL;
+			}
 
 			foreach (array(
 			 'form_name' => 'title_form_name',
@@ -580,51 +603,56 @@ class Utils
 			 'form_host' => 'help_server_name',
 			 'sub_date' => 'help_submission_date',
 			 'sub_source' => 'help_sub_source',
-			 'version' => 'help_module_version') as $key=>$val)
-			{
-				if ($htmlish)
+			 'version' => 'help_module_version') as $key=>$val) {
+				if ($htmlish) {
 					$ret .= '<strong>'.$mod->Lang($val).'</strong>: {$'.$key.'}<br />';
-				else
+				} else {
 					$ret .= $mod->Lang($val).': {$'.$key.'}';
+				}
 				$ret .= PHP_EOL;
 			}
 
-			if ($htmlish)
+			if ($htmlish) {
 				$ret .= PHP_EOL.'<hr />'.PHP_EOL;
-			else
+			} else {
 				$ret .= PHP_EOL.'-------------------------------------------------'.PHP_EOL;
+			}
 		} elseif (!$oneline) {
-			if ($htmlish)
+			if ($htmlish) {
 				$ret .= '<h4>'.$mod->Lang('thanks').'</h4>'.PHP_EOL;
-			else
+			} else {
 				$ret .= $mod->Lang('thanks').PHP_EOL;
+			}
 		} elseif ($footer) {
-			if ($htmlish)
+			if ($htmlish) {
 				$ret .= '<hr />'.PHP_EOL.'<!--EOF-->'.PHP_EOL;
-			else
+			} else {
 				$ret .= '-------------------------------------------------'.PHP_EOL;
-			 return $ret;
+			}
+			return $ret;
 		}
 //TODO support field-sequences
 		foreach ($formdata->Fields as &$one) {
 			if ($one->DisplayInSubmission()) {
 				$fldref = $one->ForceAlias();
-	 			$ret .= '{if $'.$fldref.' != "" && $'.$fldref.' != "'.self::GetFormProperty($formdata,'unspecified',$mod->Lang('unspecified')).'"}';
+				$ret .= '{if $'.$fldref.' != "" && $'.$fldref.' != "'.self::GetFormProperty($formdata, 'unspecified', $mod->Lang('unspecified')).'"}';
 				$fldref = '{$'.$fldref.'}';
 
-				if ($htmlish)
+				if ($htmlish) {
 					$ret .= '<strong>'.$one->GetName().'</strong>: '.$fldref.'<br />';
-				elseif ($oneline) {
-					if ($header)
+				} elseif ($oneline) {
+					if ($header) {
 						$ret .= $one->GetName();
-					else
+					} else {
 						$ret .= $fldref;
-				} else
+					}
+				} else {
 					$ret .= $one->GetName().':'.PHP_EOL.$fldref.PHP_EOL;
+				}
 				$ret .= '{/if}'.PHP_EOL;
 			}
 		}
-		unset ($one);
+		unset($one);
 		return $ret;
 	}
 
@@ -645,10 +673,11 @@ class Utils
 	 [0] XHTML for a button, including 'onclick' js
 	 [1] js onclick handler for the button, sets object value
 	*/
-	public static function CreateTemplateAction(&$mod, $id, $ctlName, $button_label, $template, $funcName=FALSE)
+	public static function CreateTemplateAction(&$mod, $id, $ctlName, $button_label, $template, $funcName= FALSE)
 	{
-		if (!$funcName)
-			$funcName = substr($ctlName,3); //omit 'fp_' prefix
+		if (!$funcName) {
+			$funcName = substr($ctlName, 3);
+		} //omit 'fp_' prefix
 		$button = <<<EOS
 <input type="button" class="cms_submit" value="{$button_label}" onclick="populate_{$funcName}(this.form)" />
 EOS;
@@ -680,13 +709,13 @@ EOS;
 		e.g. for 3 controls:
 		array
 		  'fp_file_template' => array
-			  'is_oneline' => true
+			  'is_oneline' => TRUE
 		  'fp_file_header' => array
-			  'is_oneline' => true
-			  'is_header' => true
+			  'is_oneline' => TRUE
+			  'is_header' => TRUE
 		  'fp_file_footer' => array
-			  'is_oneline' => true
-			  'is_footer' => true
+			  'is_oneline' => TRUE
+			  'is_footer' => TRUE
 	Returns: 2-member array
 	 [0] = array of XHTML button-strings, each including 'onclick=...' js
 	 [1] = corresponding array of onclick handler-funcs for buttons in [0]
@@ -710,34 +739,36 @@ EOS;
 			$nl = PHP_EOL;
 			$l = strlen($nl);
 			$breaker = '';
-			for ($i=0;$i<$l;$i++)
+			for ($i=0; $i<$l; $i++) {
 				$breaker .= (ord($nl[$i])==10) ? '\n':'\r';
+			}
 
 			if ($html_button && $text_button) {
-				$tplstr = self::CreateDefaultTemplate($formdata,FALSE,
-					$is_email,$is_oneline,$is_header,$is_footer);
+				$tplstr = self::CreateDefaultTemplate($formdata, FALSE,
+					$is_email, $is_oneline, $is_header, $is_footer);
 				//adjust the string for js
-				$tplstr = str_replace(array("'",PHP_EOL),array("\\'",$breaker),$tplstr);
-				list($b,$f) = self::CreateTemplateAction($mod,$id,$ctlname,
-					$mod->Lang('title_create_sample_template'),$tplstr,$ctlname.'_1');
+				$tplstr = str_replace(array("'", PHP_EOL), array("\\'", $breaker), $tplstr);
+				list($b, $f) = self::CreateTemplateAction($mod, $id, $ctlname,
+					$mod->Lang('title_create_sample_template'), $tplstr, $ctlname.'_1');
 				$buttons[] = $b;
 				$funcs[] = $f;
 			}
 
-			if ($html_button)
+			if ($html_button) {
 				$button_text = $mod->Lang('title_create_sample_html_template');
-			elseif ($is_header)
+			} elseif ($is_header) {
 				$button_text = $mod->Lang('title_create_sample_header_template');
-			elseif ($is_footer)
+			} elseif ($is_footer) {
 				$button_text = $mod->Lang('title_create_sample_footer_template');
-			else
+			} else {
 				$button_text = $mod->Lang('title_create_sample_template');
+			}
 
-			$tplstr = self::CreateDefaultTemplate($formdata,$html_button || $gen_button,
-				$is_email,$is_oneline,$is_header,$is_footer);
+			$tplstr = self::CreateDefaultTemplate($formdata, $html_button || $gen_button,
+				$is_email, $is_oneline, $is_header, $is_footer);
 			//adjust the string for js
-			$tplstr = str_replace(array("'",PHP_EOL),array("\\'",$breaker),$tplstr);
-			list($b,$f) = self::CreateTemplateAction($mod,$id,$ctlname,$button_text,$tplstr);
+			$tplstr = str_replace(array("'", PHP_EOL), array("\\'", $breaker), $tplstr);
+			list($b, $f) = self::CreateTemplateAction($mod, $id, $ctlname, $button_text, $tplstr);
 			$buttons[] = $b;
 			$funcs[] = $f;
 		}
@@ -765,7 +796,7 @@ EOS;
 		having key=id, value=name default = empty array
 	Returns: xhtml string which generates a tabular help description
 	*/
-	public static function FormFieldsHelp(&$formdata,&$extras=array())
+	public static function FormFieldsHelp(&$formdata, &$extras=array())
 	{
 		$rows = array();
 		foreach ($formdata->Fields as &$one) {
@@ -792,7 +823,7 @@ EOS;
 			'rows' => $rows
 		);
 
-		return self::ProcessTemplate($mod,'varshelp.tpl',$tplvars);
+		return self::ProcessTemplate($mod, 'varshelp.tpl', $tplvars);
 	}
 
 	/**
@@ -819,8 +850,7 @@ EOS;
 		 'form_host' => 'help_server_name',
 		 'sub_date' => 'help_submission_date',
 		 'sub_source' => 'help_sub_source',
-		 'version' => 'help_module_version') as $name=>$langkey)
-		{
+		 'version' => 'help_module_version') as $name=>$langkey) {
 			$oneset = new \stdClass();
 			$oneset->name = '{$'.$name.'}';
 			$oneset->title = $mod->Lang($langkey);
@@ -843,7 +873,7 @@ EOS;
 					$oneset->alias = $one->ForceAlias();
 					$oneset->name = $one->GetVariableName();
 					$oneset->id = $one->GetId();
-					$oneset->escaped = str_replace("'","\\'",$oneset->title);
+					$oneset->escaped = str_replace("'", "\\'", $oneset->title);
 					$fieldvars[] = $oneset;
 				}
 			}
@@ -866,7 +896,7 @@ EOS;
 */
 		$tplvars['help_other_fields'] = $mod->Lang('help_other_fields');
 
-		$tplvars['help_subtplvars'] = self::ProcessTemplate($mod,'varshelp.tpl',$tplvars);
+		$tplvars['help_subtplvars'] = self::ProcessTemplate($mod, 'varshelp.tpl', $tplvars);
 	}
 
 	/**
@@ -876,7 +906,7 @@ EOS;
 	@tplvars: reference to template-variables array
 	@htmlemail: optional boolean, whether processing a form for html email, default FALSE
 	*/
-	public static function SetupFormVars(&$formdata, &$tplvars, $htmlemail=FALSE)
+	public static function SetupFormVars(&$formdata, &$tplvars, $htmlemail= FALSE)
 	{
 		$mod = $formdata->formsmodule;
 		// general variables
@@ -889,7 +919,7 @@ EOS;
 			'version' => $mod->GetVersion()
 		);
 
-		$unspec = self::GetFormProperty($formdata,'unspecified',$mod->Lang('unspecified'));
+		$unspec = self::GetFormProperty($formdata, 'unspecified', $mod->Lang('unspecified'));
 
 		foreach ($formdata->Fields as &$one) {
 			$replVal = $unspec;
@@ -899,27 +929,24 @@ EOS;
 				if ($htmlemail) {
 					// allow <BR> as delimiter or in content
 					$replVal = preg_replace(
-						array('/<br(\s)*(\/)*>/i','/[\n\r]+/'),array('|BR|','|BR|'),
+						array('/<br(\s)*(\/)*>/i', '/[\n\r]+/'), array('|BR|', '|BR|'),
 						$replVal);
 					$replVal = htmlspecialchars($replVal);
-					$replVal = str_replace('|BR|','<br />',$replVal);
+					$replVal = str_replace('|BR|', '<br />', $replVal);
 				}
-				if ($replVal == '')
+				if ($replVal == '') {
 					$replVal = $unspec;
+				}
 			}
 
 			$name = $one->GetVariableName();
-//			$fldobj = $one->ExportObject();
 			$tplvars[$name] = $replVal;
-//			$tplvars[$name.'_obj'] = $fldobj;
 			$alias = $one->ForceAlias();
 			$tplvars[$alias] = $replVal;
-//			$tplvars[$alias.'_obj'] = $fldobj;
 			$id = $one->GetId();
 			$tplvars['fld_'.$id] = $replVal;
-//			$tplvars['fld_'.$id.'_obj'] = $fldobj;
 		}
-		unset ($one);
+		unset($one);
 	}
 
 	/**
@@ -934,7 +961,7 @@ EOS;
 	{
 		global $smarty;
 		if ($mod->before20) {
-//			$smarty->clearAllAssign();
+			//			$smarty->clearAllAssign();
 			$smarty->assign($tplvars);
 			return $mod->ProcessTemplate($tplname);
 		} else {
@@ -942,11 +969,12 @@ EOS;
 				$cache_id = md5('pwf'.$tplname.serialize(array_keys($tplvars)));
 				$lang = CmsNlsOperations::get_current_language();
 				$compile_id = md5('pwf'.$tplname.$lang);
-				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),$cache_id,$compile_id,$smarty);
-				if (!$tpl->isCached())
+				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname), $cache_id, $compile_id, $smarty);
+				if (!$tpl->isCached()) {
 					$tpl->assign($tplvars);
+				}
 			} else {
-				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname),NULL,NULL,$smarty,$tplvars);
+				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname), NULL, NULL, $smarty, $tplvars);
 			}
 			return $tpl->fetch();
 		}
@@ -972,11 +1000,12 @@ EOS;
 				$cache_id = md5('pwf'.$tplname.serialize(array_keys($tplvars)));
 				$lang = CmsNlsOperations::get_current_language();
 				$compile_id = md5('pwf'.$tplname.$lang);
-				$tpl = $smarty->CreateTemplate($mod->GetTemplateResource($tplname),$cache_id,$compile_id,$smarty);
-				if (!$tpl->isCached())
+				$tpl = $smarty->CreateTemplate($mod->GetTemplateResource($tplname), $cache_id, $compile_id, $smarty);
+				if (!$tpl->isCached()) {
 					$tpl->assign($tplvars);
+				}
 			} else {
-				$tpl = $smarty->CreateTemplate($mod->GetTemplateResource($tplname),NULL,NULL,$smarty,$tplvars);
+				$tpl = $smarty->CreateTemplate($mod->GetTemplateResource($tplname), NULL, NULL, $smarty, $tplvars);
 			}
 			$tpl->display();
 		}
@@ -997,7 +1026,7 @@ EOS;
 			$smarty->assign($tplvars);
 			return $mod->ProcessTemplateFromData($data);
 		} else {
-			$tpl = $smarty->CreateTemplate('eval:'.$data,NULL,NULL,$smarty,$tplvars);
+			$tpl = $smarty->CreateTemplate('eval:'.$data, NULL, NULL, $smarty, $tplvars);
 			return $tpl->fetch();
 		}
 	}
@@ -1024,7 +1053,7 @@ EOS;
 //<![CDATA[
 EOS;
 			if (is_array($jsfuncs)) {
-				$all = array_merge($all,$jsfuncs);
+				$all = array_merge($all, $jsfuncs);
 			} elseif ($jsfuncs) {
 				$all[] = $jsfuncs;
 			}
@@ -1033,7 +1062,7 @@ EOS;
 $(document).ready(function() {
 EOS;
 				if (is_array($jsloads)) {
-					$all = array_merge($all,$jsloads);
+					$all = array_merge($all, $jsloads);
 				} else {
 					$all[] = $jsloads;
 				}
@@ -1046,7 +1075,7 @@ EOS;
 </script>
 EOS;
 		}
-		$merged = implode(PHP_EOL,$all);
+		$merged = implode(PHP_EOL, $all);
 	}
 
 	/**
@@ -1058,13 +1087,14 @@ EOS;
 	*/
 	public static function html_myentities_decode($val)
 	{
-		if ($val == '')
+		if ($val == '') {
 			return '';
+		}
 
-		$val = html_entity_decode($val,ENT_COMPAT|ENT_XHTML);
+		$val = html_entity_decode($val, ENT_COMPAT|ENT_XHTML);
 		$val = str_replace(
-		array('&amp;','&#60;&#33;--','--&#62;','&gt;','&lt;','&quot;','&#39;','&#036;','&#33;'),
-		array('&'    ,'<!--'        ,'-->'    ,'>'   ,'<'   ,'"'     ,"'"    ,'$'     ,'!'    ),
+		array('&amp;', '&#60;&#33;--', '--&#62;', '&gt;', '&lt;', '&quot;', '&#39;', '&#036;', '&#33;'),
+		array('&', '<!--', '-->', '>', '<', '"', "'", '$', '!'	),
 		$val);
 		return $val;
 	}
@@ -1079,21 +1109,23 @@ EOS;
 	*/
 	public static function Encrypt(&$mod, $source, $pass_phrase='')
 	{
-		if (!$source)
+		if (!$source) {
 			return '';
+		}
 		if (!$pass_phrase) {
 			$pass_phrase = self::Unfusc($mod->GetPreference('masterpass'));
 		}
 		if ($pass_phrase && $mod->havemcrypt) {
 			$flag = (defined('MCRYPT_DEV_URANDOM')) ? MCRYPT_DEV_URANDOM : MCRYPT_RAND;
-			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128,MCRYPT_MODE_CBC),$flag);
+			$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC), $flag);
 			$encrypt = serialize($source);
 			$key = hash('sha256', $pass_phrase); // $key is a 64-character hexadecimal string
-			$mac = hash_hmac('sha256', $encrypt, substr($key,-32));
-			$passcrypt = mcrypt_encrypt(MCRYPT_RIJNDAEL_128,substr($key,32),$encrypt.$mac,MCRYPT_MODE_CBC,$iv);
+			$mac = hash_hmac('sha256', $encrypt, substr($key, -32));
+			$passcrypt = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, substr($key, 32), $encrypt.$mac, MCRYPT_MODE_CBC, $iv);
 			return base64_encode($passcrypt).'|'.base64_encode($iv);
-		} else
+		} else {
 			return self::Fusc($pass_phrase.$source);
+		}
 	}
 
 	/**
@@ -1106,8 +1138,9 @@ EOS;
 	*/
 	public static function Decrypt(&$mod, $source, $pass_phrase='')
 	{
-		if (!$source)
+		if (!$source) {
 			return '';
+		}
 		if (!$pass_phrase) {
 			$pass_phrase = self::Unfusc($mod->GetPreference('masterpass'));
 		}
@@ -1115,18 +1148,21 @@ EOS;
 			$decrypt = explode('|', $source.'|');
 			$decoded = base64_decode($decrypt[0]);
 			$iv = base64_decode($decrypt[1]);
-			if (strlen($iv) !== mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128,MCRYPT_MODE_CBC))
+			if (strlen($iv) !== mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC)) {
 				return FALSE;
-			$key = hash('sha256',$pass_phrase);
-			$decrypted = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128,substr($key,32),$decoded,MCRYPT_MODE_CBC,$iv));
-			$mac = substr($decrypted,-64);
-			$decrypted = substr($decrypted,0,-64);
-			$calcmac = hash_hmac('sha256',$decrypted,substr($key,-32));
-			if ($calcmac === $mac)
+			}
+			$key = hash('sha256', $pass_phrase);
+			$decrypted = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_128, substr($key, 32), $decoded, MCRYPT_MODE_CBC, $iv));
+			$mac = substr($decrypted, -64);
+			$decrypted = substr($decrypted, 0, -64);
+			$calcmac = hash_hmac('sha256', $decrypted, substr($key, -32));
+			if ($calcmac === $mac) {
 				return unserialize($decrypted);
+			}
 			return FALSE;
-		} else
-			return substr(strlen($pass_phrase),self::Unfusc($source));
+		} else {
+			return substr(strlen($pass_phrase), self::Unfusc($source));
+		}
 	}
 
 	/**
@@ -1137,7 +1173,7 @@ EOS;
 	public static function Fusc($str)
 	{
 		if ($str) {
-			$s = substr(base64_encode(md5(microtime())),0,5);
+			$s = substr(base64_encode(md5(microtime())), 0, 5);
 			return $s.base64_encode($s.$str);
 		}
 		return '';
@@ -1151,8 +1187,8 @@ EOS;
 	public static function Unfusc($str)
 	{
 		if ($str) {
-			$s = base64_decode(substr($str,5));
-			return substr($s,5);
+			$s = base64_decode(substr($str, 5));
+			return substr($s, 5);
 		}
 		return '';
 	}
@@ -1170,12 +1206,12 @@ EOS;
 	{
 		$contentops = \cmsms()->GetContentOperations();
 		$name = $id.$name;
-		$sel = $contentops->CreateHierarchyDropdown('',$current,$name);
+		$sel = $contentops->CreateHierarchyDropdown('', $current, $name);
 		if ($sel) {
 			$srch = array('<select name="'.$name.'" id="'.$name.'">',
 						'<option value="-1">none</option>');
 			$repl = array($srch[0].'<option value="0">'.$mod->Lang('select_one').'</option>','');
-			return str_replace($srch,$repl,$sel);
+			return str_replace($srch, $repl, $sel);
 		}
 		return '';
 	}
@@ -1188,7 +1224,9 @@ EOS;
 	*/
 	public static function CleanTables($time=0)
 	{
-		if (!$time) $time = time();
+		if (!$time) {
+			$time = time();
+		}
 		$pre = \cms_db_prefix();
 		$db = \cmsms()->GetDb();
 		$limit = $db->DbTimeStamp($time-1800);
@@ -1208,8 +1246,8 @@ EOS;
 		$config = \cmsms()->GetConfig();
 		$rooturl = (empty($_SERVER['HTTPS'])) ? $config['uploads_url']:$config['ssl_uploads_url'];
 		$ud = $mod->GetPreference('uploads_dir');
-		$lp = ($ud) ? '/'.str_replace('\\','/',$ud) : '';
-		$url = $rooturl.$lp.'/'.str_replace('\\','/',$file);
+		$lp = ($ud) ? '/'.str_replace('\\', '/', $ud) : '';
+		$url = $rooturl.$lp.'/'.str_replace('\\', '/', $file);
 		return $url;
 	}
 
@@ -1226,8 +1264,9 @@ EOS;
 			$ud = $mod->GetPreference('uploads_dir');
 			if ($ud) {
 				$ud = $fp.DIRECTORY_SEPARATOR.$ud;
-				if (is_dir($ud))
+				if (is_dir($ud)) {
 					return $ud;
+				}
 			}
 			return $fp;
 		}
@@ -1240,19 +1279,21 @@ EOS;
 	@file: filename
 	@except: form enumerator default FALSE
 	*/
-	public static function DeleteUploadFile(&$mod, $file, $except=FALSE)
+	public static function DeleteUploadFile(&$mod, $file, $except= FALSE)
 	{
 		if ($except) {
 			$sql = 'SELECT 1 FROM '.$pre.'module_pwf_formprops WHERE form_id!=? AND name=?';
-			$keep = $db->GetOne($sql,array($except,$file));
-			if ($keep)
+			$keep = $db->GetOne($sql, array($except, $file));
+			if ($keep) {
 				return;
+			}
 		}
 		$fp = self::GetUploadsPath($mod);
 		if ($fp) {
 			$fp = $fp.DIRECTORY_SEPARATOR.$file;
-			if (is_file($fp))
+			if (is_file($fp)) {
 				@unlink($fp);
+			}
 		}
 	}
 }

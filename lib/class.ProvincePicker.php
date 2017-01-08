@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -9,11 +9,11 @@ namespace PWForms;
 
 class ProvincePicker extends FieldBase
 {
-	var $Provinces;
+	public $Provinces;
 
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
-		parent::__construct($formdata,$params);
+		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->Type = 'ProvincePicker';
 		$this->Provinces = array(
@@ -27,39 +27,41 @@ class ProvincePicker extends FieldBase
 
 	public function DisplayableValue($as_string=TRUE)
 	{
-		$ret = array_search($this->Value,$this->Provinces);
-		if ($as_string)
+		$ret = array_search($this->Value, $this->Provinces);
+		if ($as_string) {
 			return $ret;
-		else
+		} else {
 			return array($ret);
+		}
 	}
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
 
-		$choices = array_merge(array('No Default'=>''),$this->Provinces);
+		$choices = array_merge(array('No Default'=>''), $this->Provinces);
 		$main[] = array($mod->Lang('title_select_default_province'),
-						$mod->CreateInputDropdown($id,'fp_default_province',$choices,-1,
+						$mod->CreateInputDropdown($id, 'fp_default_province', $choices, -1,
 							$this->GetProperty('default_province')));
 		$main[] = array($mod->Lang('title_select_one_message'),
-						$mod->CreateInputText($id,'fp_select_one',
-							$this->GetProperty('select_one',$mod->Lang('select_one'))));
+						$mod->CreateInputText($id, 'fp_select_one',
+							$this->GetProperty('select_one', $mod->Lang('select_one'))));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-	public function Populate($id,&$params)
+	public function Populate($id, &$params)
 	{
 		$mod = $this->formdata->formsmodule;
 
-		$choices = array_merge(array($this->GetProperty('select_one',$mod->Lang('select_one'))=>-1),$this->Provinces);
+		$choices = array_merge(array($this->GetProperty('select_one', $mod->Lang('select_one'))=>-1), $this->Provinces);
 
-		if (!$this->HasValue() && $this->GetProperty('default_province'))
+		if (!$this->HasValue() && $this->GetProperty('default_province')) {
 			$this->SetValue($this->GetProperty('default_province'));
+		}
 
 		$tmp = $mod->CreateInputDropdown(
-			$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
+			$id, $this->formdata->current_prefix.$this->Id, $choices, -1, $this->Value,
 			'id="'.$this->GetInputId().'"'.$this->GetScript());
 		return $this->SetClass($tmp);
 	}

@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) Tapio "Stikki" L�ytty <tapsa@blackmilk.fi>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -9,63 +9,68 @@ namespace PWForms;
 
 class YearPulldown extends FieldBase
 {
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
-		parent::__construct($formdata,$params);
+		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->Type = 'YearPulldown';
 	}
 
 	public function DisplayableValue($as_string=TRUE)
 	{
-		if($this->HasValue())
+		if ($this->HasValue()) {
 			$ret = $this->Value;
-		else
+		} else {
 			$ret = $this->GetFormProperty('unspecified',
 				$this->formdata->formsmodule->Lang('unspecified'));
+		}
 
-		if($as_string)
+		if ($as_string) {
 			return $ret;
-		else
+		} else {
 			return array($ret);
+		}
 	}
 
 	public function AdminPopulate($id)
 	{
-		list($main,$adv) = $this->AdminPopulateCommon($id,FALSE,TRUE);
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = array($mod->Lang('title_select_one_message'),
-						$mod->CreateInputText($id,'fp_select_one',
-						  $this->GetProperty('select_one',$mod->Lang('select_one')),25,128));
+						$mod->CreateInputText($id, 'fp_select_one',
+						  $this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128));
 		$main[] = array($mod->Lang('title_year_end_message'),
-						$mod->CreateInputText($id,'fp_year_start',
-						  $this->GetProperty('year_start',1900),25,128));
+						$mod->CreateInputText($id, 'fp_year_start',
+						  $this->GetProperty('year_start', 1900), 25, 128));
 		$main[] = array($mod->Lang('sort_options'),
-						$mod->CreateInputDropdown($id,'fp_sort',
-						  array($mod->Lang('yes')=>1,$mod->Lang('no')=>0),-1,
-						  $this->GetProperty('sort',0)));
+						$mod->CreateInputDropdown($id, 'fp_sort',
+						  array($mod->Lang('yes')=>1, $mod->Lang('no')=>0), -1,
+						  $this->GetProperty('sort', 0)));
 		return array('main'=>$main,'adv'=>$adv);
 	}
 
-	public function Populate($id,&$params)
+	public function Populate($id, &$params)
 	{
-		if($this->GetProperty('year_start'))
+		if ($this->GetProperty('year_start')) {
 			$count_from = $this->GetProperty('year_start');
-		else
+		} else {
 			$count_from = 1900;
+		}
 
 		$choices = array();
-		for($i=date('Y'); $i>=$count_from; $i--)
+		for ($i=date('Y'); $i>=$count_from; $i--) {
 			$choices[$i] = $i;
+		}
 
-		if($this->GetProperty('sort'))
+		if ($this->GetProperty('sort')) {
 			ksort($choices);
+		}
 
 		$mod = $this->formdata->formsmodule;
-		$choices = array($this->GetProperty('select_one',$mod->Lang('select_one'))=>-1) + $choices;
+		$choices = array($this->GetProperty('select_one', $mod->Lang('select_one'))=>-1) + $choices;
 		$tmp = $mod->CreateInputDropdown(
-			$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
+			$id, $this->formdata->current_prefix.$this->Id, $choices, -1, $this->Value,
 			'id="'.$this->GetInputId().'"'.$this->GetScript());
 		return $this->SetClass($tmp);
 	}

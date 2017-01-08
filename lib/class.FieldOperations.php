@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -30,7 +30,7 @@ class FieldOperations
 				$pre = \cms_db_prefix();
 				$sql = 'SELECT type FROM '.$pre.'module_pwf_field WHERE field_id=?';
 				$db = \cmsms()->GetDb();
-				$type = $db->GetOne($sql,array($params['field_id']));
+				$type = $db->GetOne($sql, array($params['field_id']));
 			} else {
 				$type = $params['type'];
 			}
@@ -40,9 +40,9 @@ class FieldOperations
 				$classPath = __DIR__.DIRECTORY_SEPARATOR.'class.'.$className.'.php';
 				if (is_file($classPath)) {
 					$classPath = 'PWForms\\'.$className;
-					$obfld = new $classPath($formdata,$params);
+					$obfld = new $classPath($formdata, $params);
 					if (self::LoadField($obfld)) {
-//TODO rationalise value setting
+						//TODO rationalise value setting
 						if (!empty($params[$formdata->current_prefix.$obfld->Id])) {
 							$obfld->SetValue($params[$formdata->current_prefix.$obfld->Id]);
 						} elseif (!empty($params[$formdata->prior_prefix.$obfld->Id])) {
@@ -61,7 +61,7 @@ class FieldOperations
 			$classPath = __DIR__.DIRECTORY_SEPARATOR.'class.'.$className.'.php';
 			if (is_file($classPath)) {
 				$classPath = 'PWForms\\'.$className;
-				$obfld = new $classPath($formdata,$params);
+				$obfld = new $classPath($formdata, $params);
 				if (isset($params['in'])) {
 					switch ($params['in']) {
 						case 'disposition':
@@ -73,7 +73,7 @@ class FieldOperations
 							if ($obfld->GetProperty('IsDisposition')) {
 								$obfld = FALSE;
 							} else {
-								$obfld->SetProperty('DisplayInForm',TRUE);
+								$obfld->SetProperty('DisplayInForm', TRUE);
 							}
 							break;
 					}
@@ -91,37 +91,40 @@ class FieldOperations
 	Copy an existing field from and to the database
 	Returns: boolean T/F indicating success
 	*/
-	public static function CopyField($field_id, $form_id=FALSE, $neworder=FALSE)
+	public static function CopyField($field_id, $form_id= FALSE, $neworder= FALSE)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
 		$db = \cmsms()->GetDb();
-		$row = $db->GetRow($sql,array($field_id));
-		if (!$row)
+		$row = $db->GetRow($sql, array($field_id));
+		if (!$row) {
 			return FALSE;
+		}
 
 		$fid = $db->GenID($pre.'module_pwf_field_seq');
 		$row['field_id'] = $fid;
-		if ($form_id === FALSE)
+		if ($form_id === FALSE) {
 			$form_id = $row['form_id'];
-		else
+		} else {
 			$row['form_id'] = $form_id;
+		}
 //		$row['name'] .= ' '.$mod->Lang('copy');
 
 		if ($neworder === FALSE) {
 			$sql = 'SELECT MAX(order_by) AS last FROM '.$pre.'module_pwf_field WHERE form_id=?';
-			$neworder = $db->GetOne($sql,array($form_id));
-			if (!$neworder)
+			$neworder = $db->GetOne($sql, array($form_id));
+			if (!$neworder) {
 				$neworder = 0;
+			}
 			$neworder++;
 		}
 		$row['order_by'] = $neworder;
 		$sql = 'INSERT INTO '.$pre.'module_pwf_field
 (field_id,form_id,name,alias,type,order_by) VALUES (?,?,?,?,?,?)';
-		$db->Execute($sql,$row);
+		$db->Execute($sql, $row);
 
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_fieldprops WHERE field_id=?';
-		$rs = $db->Execute($sql,array($field_id));
+		$rs = $db->Execute($sql, array($field_id));
 		if ($rs) {
 			$sql = 'INSERT INTO '.$pre.'module_pwf_fieldprops
 (prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
@@ -129,7 +132,7 @@ class FieldOperations
 				$row['prop_id'] = $db->GenID($pre.'module_pwf_fieldprops_seq');
 				$row['field_id'] = $fid;
 				$row['form_id'] = $form_id;
-				$db->Execute($sql,$row);
+				$db->Execute($sql, $row);
 			}
 			$rs->Close();
 		}
@@ -164,7 +167,7 @@ class FieldOperations
 	Sets @obfld->Id to real value if it was -1 i.e. a new field
 	Returns: boolean T/F per success of executed db commands
 	*/
-	public static function StoreField(&$obfld, $allprops=FALSE)
+	public static function StoreField(&$obfld, $allprops= FALSE)
 	{
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
@@ -172,7 +175,7 @@ class FieldOperations
 			$obfld->Id = $db->GenID($pre.'module_pwf_field_seq');
 			$sql = 'INSERT INTO '.$pre.'module_pwf_field
 (field_id,form_id,name,alias,type,order_by) VALUES (?,?,?,?,?,?)';
-			$res = $db->Execute($sql,array(
+			$res = $db->Execute($sql, array(
 				$obfld->Id,
 				$obfld->FormId,
 				$obfld->Name,
@@ -181,7 +184,7 @@ class FieldOperations
 				$obfld->OrderBy));
 		} else {
 			$sql = 'UPDATE '.$pre.'module_pwf_field SET name=?,alias=?,order_by=? WHERE field_id=?';
-			$res = $db->Execute($sql,array(
+			$res = $db->Execute($sql, array(
 				$obfld->Name,
 				$obfld->Alias,
 				$obfld->OrderBy,
@@ -191,7 +194,7 @@ class FieldOperations
 		if ($allprops) {
 			// drop all current properties
 			$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops where field_id=?';
-			$res = $db->Execute($sql,array($obfld->Id)) && $res;
+			$res = $db->Execute($sql, array($obfld->Id)) && $res;
 			// add back current ones
 			$sql = 'INSERT INTO '.$pre.'module_pwf_fieldprops
 (prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
@@ -208,7 +211,7 @@ class FieldOperations
 					$lval = $value;
 				}
 				$res = $db->Execute($sql,
-					array($newid,$obfld->Id,$obfld->FormId,$name,$sval,$lval)) && $res;
+					array($newid, $obfld->Id, $obfld->FormId, $name, $sval, $lval)) && $res;
 			}
 		}
 		return $res;
@@ -226,21 +229,24 @@ class FieldOperations
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
 		$db = \cmsms()->GetDb();
-		if ($row = $db->GetRow($sql,array($obfld->Id))) {
+		if ($row = $db->GetRow($sql, array($obfld->Id))) {
 			$obfld->FormId = (int)$row['form_id'];
-			if (!$obfld->Name)
+			if (!$obfld->Name) {
 				$obfld->Name = $row['name'];
-			if (!$obfld->Alias)
+			}
+			if (!$obfld->Alias) {
 				$obfld->Alias = $row['alias'];
+			}
 			$obfld->Type = $row['type'];
 			$obfld->OrderBy = (int)$row['order_by'];
-		} else
+		} else {
 			return FALSE;
+		}
 
 		$obfld->loaded = TRUE;
 
 		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE field_id=? ORDER BY prop_id';
-		$defaults = $db->GetArray($sql,array($obfld->Id));
+		$defaults = $db->GetArray($sql, array($obfld->Id));
 		if ($defaults) {
 			$merged = array();
 			$rc = count($defaults);
@@ -248,12 +254,14 @@ class FieldOperations
 				$row = $defaults[$r];
 				$nm = $row['name'];
 				$val = $row['value'];
-				if ($val === NULL)
+				if ($val === NULL) {
 					$val = $row['longvalue']; //maybe still FALSE
+				}
 				//accumulate properties with the same name into array
 				if (isset($merged[$nm])) {
-					if (!is_array($merged[$nm]))
+					if (!is_array($merged[$nm])) {
 						$merged[$nm] = array($merged[$nm]);
+					}
 					$merged[$nm][] = $val;
 				} else {
 					$merged[$nm] = $val;
@@ -266,7 +274,7 @@ class FieldOperations
 						$val = is_array($ar) ? $ar : (array)$ar;
 					}
 				}
-				if (property_exists($obfld,$nm)) {
+				if (property_exists($obfld, $nm)) {
 					$obfld->$nm = $val;
 				} else {
 					$obfld->XtraProps[$nm] = $val;
@@ -286,9 +294,9 @@ class FieldOperations
 		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field where field_id=?';
 		$db = \cmsms()->GetDb();
-		$res = $db->Execute($sql,array($obfld->Id));
+		$res = $db->Execute($sql, array($obfld->Id));
 		$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops where field_id=?';
-		$res = $db->Execute($sql,array($obfld->Id)) && $res;
+		$res = $db->Execute($sql, array($obfld->Id)) && $res;
 		return $res;
 	}
 
@@ -343,6 +351,6 @@ class FieldOperations
 	*/
 	public static function GetFieldIndexFromId(&$formdata, $field_id)
 	{
-		return array_search($field_id,array_keys($formdata->Fields));
+		return array_search($field_id, array_keys($formdata->Fields));
 	}
 }

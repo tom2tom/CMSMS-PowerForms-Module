@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2011 Robert Campbell <calguy1000@cmsmadesimple.org>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -18,9 +18,9 @@ class EmailFEUProperty extends EmailBase
 	public $MenuKey = 'field_label'; //owner-module lang key for this field's menu label, used by PWForms
 	public $mymodule; //used also by PWForms, do not rename
 
-	public function __construct(&$formdata,&$params)
+	public function __construct(&$formdata, &$params)
 	{
-		parent::__construct($formdata,$params);
+		parent::__construct($formdata, $params);
 		$this->ChangeRequirement = FALSE;
 		$this->IsDisposition = TRUE;
 		$this->IsInput = TRUE;
@@ -33,11 +33,12 @@ class EmailFEUProperty extends EmailBase
 		if ($this->mymodule) {
 			$ret = $this->formdata->formsmodule->Lang('title_feu_property').': '.$this->GetProperty('feu_property');
 			$status = $this->TemplateStatus();
-			if ($status)
+			if ($status) {
 				$ret .= '<br />'.$status;
+			}
 			return $ret;
 		}
-		return $this->formdata->formsmodule->Lang('missing_module',self::MODNAME);
+		return $this->formdata->formsmodule->Lang('missing_module', self::MODNAME);
 	}
 
 	public function DisplayableValue($as_string = TRUE)
@@ -48,17 +49,20 @@ class EmailFEUProperty extends EmailBase
 		if ($prop) {
 			$feu = \cms_utils::get_module('FrontEndUsers');
 			$opts = $feu->GetSelectOptions($prop);
-			if (array_key_exists($this->Value,$opts)) //TODO check logic
-				$ret = $opts[$this->Value]; //TODO if FALSE
-			else
-				$ret = $this->GetProperty('unspecified',$mod->Lang('unspecified'));
-		} else
-			$ret = $this->GetProperty('unspecified',$mod->Lang('unspecified'));
+			if (array_key_exists($this->Value, $opts)) { //TODO check logic
+				$ret = $opts[$this->Value];  //TODO if FALSE
+			} else {
+				$ret = $this->GetProperty('unspecified', $mod->Lang('unspecified'));
+			}
+		} else {
+			$ret = $this->GetProperty('unspecified', $mod->Lang('unspecified'));
+		}
 
-		if ($as_string)
+		if ($as_string) {
 			return $ret;
-		else
+		} else {
 			return array($ret);
+		}
 	}
 
 	public function GetDisplayType()
@@ -70,11 +74,12 @@ class EmailFEUProperty extends EmailBase
 	{
 		$feu = $this->mymodule;
 		if (!$feu) {
-			return array('main'=>array($this->GetErrorMessage('err_module',self::MODNAME)));
+			return array('main'=>array($this->GetErrorMessage('err_module', self::MODNAME)));
 		}
 		$defns = $feu->GetPropertyDefns();
-		if (!is_array($defns))
+		if (!is_array($defns)) {
 			return array('main'=>array($this->GetErrorMessage('err_feudefns')));
+		}
 		// check for dropdown or multiselect fields
 		$opts = array();
 		foreach ($defns as $key => $data) {
@@ -89,32 +94,38 @@ class EmailFEUProperty extends EmailBase
 				break;
 			}
 		}
-		if (!$opts)
+		if (!$opts) {
 			return array('main'=>array($this->GetErrorMessage('err_feudefns')));
-		list($main,$adv,$extra) = $this->AdminPopulateCommonEmail($id,FALSE,TRUE);
+		}
+		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, FALSE, TRUE);
 		$waslast = array_pop($ret['main']); //keep the email to-type selector for last
 		$keys = array_keys($opts);
 		$mod = $this->formdata->formsmodule;
 		$main[] = array($mod->Lang('title_feu_property'),
-				$mod->CreateInputDropdown($id,'fp_feu_property',array_flip($opts),-1,
-					$this->GetProperty('feu_property',$keys[0])),
+				$mod->CreateInputDropdown($id, 'fp_feu_property', array_flip($opts), -1,
+					$this->GetProperty('feu_property', $keys[0])),
 				$mod->Lang('help_feu_property'));
 		$main[] = $waslast;
 		return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
 	}
 
-	public function Populate($id,&$params)
+	public function Populate($id, &$params)
 	{
 		$mod = $this->formdata->formsmodule;
 		$feu = $this->mymodule;
-		if (!$feu)
-			return $mod->Lang('err_module',self::MODNAME);
+		if (!$feu) {
+			return $mod->Lang('err_module', self::MODNAME);
+		}
 
 		// get the property name and data
 		$prop = $this->GetProperty('feu_property');
-		if (!$prop) return '';
+		if (!$prop) {
+			return '';
+		}
 		$defn = $feu->GetPropertyDefn($prop);
-		if (!$defn) return '';
+		if (!$defn) {
+			return '';
+		}
 
 		switch ($defn['type']) {
 		 case 4: // dropdown
@@ -124,7 +135,7 @@ class EmailFEUProperty extends EmailBase
 			$choices = $feu->GetSelectOptions($prop);
 			// rendered all as a dropdown field.
 			$tmp = $mod->CreateInputDropdown(
-				$id,$this->formdata->current_prefix.$this->Id,$choices,-1,$this->Value,
+				$id, $this->formdata->current_prefix.$this->Id, $choices, -1, $this->Value,
 				'id="'.$this->GetInputId().'"'.$this->GetScript());
 			$res = $this->SetClass($tmp);
 			break;
@@ -134,17 +145,18 @@ class EmailFEUProperty extends EmailBase
 		return $res;
 	}
 
-	public function Dispose($id,$returnid)
+	public function Dispose($id, $returnid)
 	{
 		$feu = $this->mymodule;
-		if (!$feu)
-			return array(FALSE,$this->formdata->formsmodule->Lang('err_module',self::MODNAME));
+		if (!$feu) {
+			return array(FALSE,$this->formdata->formsmodule->Lang('err_module', self::MODNAME));
+		}
 
 		// get the property name
 		$prop = $this->GetProperty('feu_property');
 
 		// get the list of emails that match this value.
-		$users = $feu->GetUsersInGroup(-1,'','','',$prop,$this->Value);
+		$users = $feu->GetUsersInGroup(-1, '', '', '', $prop, $this->Value);
 		if (!is_array($users) || count($users) == 0) {
 			// no matching users is not an error.
 			return array(TRUE,'');
@@ -154,8 +166,7 @@ class EmailFEUProperty extends EmailBase
 		$smarty_users = array();
 		$destinations = array();
 		$ucount = count($users);
-		for ($i = 0; $i < $ucount; $i++)
-		{
+		for ($i = 0; $i < $ucount; $i++) {
 			$rec =& $users[$i];
 			unset($rec['password']);
 			if ($feu->GetPreference('username_is_email')) {
@@ -173,6 +184,6 @@ class EmailFEUProperty extends EmailBase
 			}
 		}
 		// send email(s)
-		return $this->SendForm($destinations,$this->GetProperty('email_subject'),$tplvars);
+		return $this->SendForm($destinations, $this->GetProperty('email_subject'), $tplvars);
 	}
 }
