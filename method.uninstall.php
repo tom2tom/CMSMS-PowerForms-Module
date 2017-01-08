@@ -52,7 +52,7 @@ $sqlarray = $dict->DropTableSQL($pre.'module_pwf_cache');
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_ip_log');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropTableSQL($pre.'module_pwf_record');
+$sqlarray = $dict->DropTableSQL($pre.'module_pwf_session');
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_trans');
 $dict->ExecuteSQLArray($sqlarray);
@@ -61,7 +61,7 @@ $db->DropSequence($pre.'module_pwf_field_seq');
 $db->DropSequence($pre.'module_pwf_fieldprops_seq');
 $db->DropSequence($pre.'module_pwf_form_seq');
 $db->DropSequence($pre.'module_pwf_formprops_seq');
-$db->DropSequence($pre.'module_pwf_record_seq');
+$db->DropSequence($pre.'module_pwf_session_seq');
 $db->DropSequence($pre.'module_pwf_uniquefield_seq');
 
 $this->DeleteTemplate(); //old-style templates can be for any version
