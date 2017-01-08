@@ -5,7 +5,7 @@
  */
 namespace MultiCache;
 
-class Cache_redis extends CacheBase implements CacheInterface
+class redis extends CacheBase implements CacheInterface
 {
 	protected $client;
 
@@ -45,7 +45,7 @@ class Cache_redis extends CacheBase implements CacheInterface
 			), $this->config);
 
 		$this->client = new \Redis();
-		if (!$this->client->connect($params['host'],(int)$params['port'],(float)$params['timeout'])) {
+		if (!$this->client->connect($params['host'], (int)$params['port'], (float)$params['timeout'])) {
 			return FALSE;
 		} elseif ($params['password'] && !$this->client->auth($params['password'])) {
 			return FALSE;
@@ -56,7 +56,7 @@ class Cache_redis extends CacheBase implements CacheInterface
 		return TRUE;
 	}
 
-	public function _newsert($keyword, $value, $lifetime=FALSE)
+	public function _newsert($keyword, $value, $lifetime= FALSE)
 	{
 		if (!$this->_has($keyword)) {
 			$ret = $this->client->set($keyword, $value, array('xx', 'ex' => $lifetime));
@@ -65,7 +65,7 @@ class Cache_redis extends CacheBase implements CacheInterface
 		return FALSE;
 	}
 
-	public function _upsert($keyword, $value, $lifetime=FALSE)
+	public function _upsert($keyword, $value, $lifetime= FALSE)
 	{
 		$ret = $this->client->set($keyword, $value, array('xx', 'ex' => $lifetime));
 		if ($ret === FALSE) {
@@ -85,7 +85,7 @@ class Cache_redis extends CacheBase implements CacheInterface
 
 	public function _getall($filter)
 	{
-//TODO filtering
+		//TODO filtering
 		return NULL; //TODO allitems;
 	}
 
@@ -102,8 +102,7 @@ class Cache_redis extends CacheBase implements CacheInterface
 
 	public function _clean($filter)
 	{
-//TODO filtering
+		//TODO filtering
 		$this->client->flushDB();
 	}
-
 }

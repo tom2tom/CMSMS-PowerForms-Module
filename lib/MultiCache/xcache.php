@@ -2,7 +2,7 @@
 
 namespace MultiCache;
 
-class Cache_xcache extends CacheBase implements CacheInterface
+class xcache extends CacheBase implements CacheInterface
 {
 	public function __construct($config=array())
 	{
@@ -30,25 +30,25 @@ class Cache_xcache extends CacheBase implements CacheInterface
 		return TRUE;  //TODO connect
 	}
 
-	public function _newsert($keyword, $value, $lifetime=FALSE)
+	public function _newsert($keyword, $value, $lifetime= FALSE)
 	{
 		if (xcache_isset($keyword)) {
 			return FALSE;
 		}
 		if ($lifetime) {
-			$ret = xcache_set($keyword,serialize($value),(int)$lifetime);
+			$ret = xcache_set($keyword, serialize($value), (int)$lifetime);
 		} else {
-			$ret = xcache_set($keyword,serialize($value));
+			$ret = xcache_set($keyword, serialize($value));
 		}
 		return $ret;
 	}
 
-	public function _upsert($keyword, $value, $lifetime=FALSE)
+	public function _upsert($keyword, $value, $lifetime= FALSE)
 	{
 		if ($lifetime) {
-			$ret = xcache_set($keyword,serialize($value),(int)$lifetime);
+			$ret = xcache_set($keyword, serialize($value), (int)$lifetime);
 		} else {
-			$ret = xcache_set($keyword,serialize($value));
+			$ret = xcache_set($keyword, serialize($value));
 		}
 		return $ret;
 	}
@@ -70,7 +70,7 @@ class Cache_xcache extends CacheBase implements CacheInterface
 			$keyword = $TODO;
 			$value = $this->_get($keyword);
 			$again = is_object($value); //get it again, in case the filter played with it!
-			if ($this->filterItem($filter,$keyword,$value)) {
+			if ($this->filterItem($filter, $keyword, $value)) {
 				if ($again) {
 					$value = $this->_get($keyword);
 				}
@@ -99,7 +99,7 @@ class Cache_xcache extends CacheBase implements CacheInterface
 		for ($i=0; $i<$count; $i++) {
 			$keyword = $TODO;
 			$value = $this->_get($keyword);
-			if ($this->filterItem($filter,$keyword,$value)) {
+			if ($this->filterItem($filter, $keyword, $value)) {
 				$ret = $ret && xcache_unset($keyword);
 			}
 		}

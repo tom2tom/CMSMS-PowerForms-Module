@@ -2,7 +2,7 @@
 
 namespace MultiCache;
 
-class Cache_memcache extends CacheBase implements CacheInterface
+class memcache extends CacheBase implements CacheInterface
 {
 	protected $client;
 
@@ -26,25 +26,26 @@ class Cache_memcache extends CacheBase implements CacheInterface
 	public function connectServer()
 	{
 		$this->client = new \Memcache(); //CHECKME data persistence ??
-	
+
 		$params = array_merge($this->config,
-			array(array('host'=>'127.0.0.1','port'=>11211))
+			array(array('host'=>'127.0.0.1', 'port'=>11211))
 		);
-		foreach($params as $server) {
+		foreach ($params as $server) {
 			$name = $server['host'].'_'.$server['port'];
 			if (!isset($this->checked[$name])) {
 				try {
-					if ($this->client->addserver($server['host'],(int)$server['port'])) {
+					if ($this->client->addserver($server['host'], (int)$server['port'])) {
 						$this->checked[$name] = 1;
 						return TRUE;
 					}
-				} catch(\Exception $e) {}
+				} catch (\Exception $e) {
+				}
 			}
 		}
 		return FALSE;
 	}
 
-	public function _newsert($keyword, $value, $lifetime=FALSE)
+	public function _newsert($keyword, $value, $lifetime= FALSE)
 	{
 		if ($this->_has($keyword)) {
 			return FALSE;
@@ -57,7 +58,7 @@ class Cache_memcache extends CacheBase implements CacheInterface
 		return $ret;
 	}
 
-	public function _upsert($keyword, $value, $lifetime=FALSE)
+	public function _upsert($keyword, $value, $lifetime= FALSE)
 	{
 		if ($lifetime) {
 			$expire = time() + (int)$lifetime;
@@ -89,9 +90,9 @@ class Cache_memcache extends CacheBase implements CacheInterface
 		$items = array();
 		$info = $this->client->getStats('items');
 		if ($info) {
-			foreach($info as $keyword=>$value) {
+			foreach ($info as $keyword=>$value) {
 				$again = is_object($value); //get it again, in case the filter played with it!
-				if ($this->filterItem($filter,$keyword,$value)) {
+				if ($this->filterItem($filter, $keyword, $value)) {
 					if ($again) {
 						$value = $this->_get($keyword);
 					}
@@ -109,7 +110,8 @@ class Cache_memcache extends CacheBase implements CacheInterface
 		return ($this->_get($keyword) != NULL);
 	}
 
-	public function _delete($keyword) {
+	public function _delete($keyword)
+	{
 		return $this->client->delete($keyword);
 	}
 
@@ -118,8 +120,8 @@ class Cache_memcache extends CacheBase implements CacheInterface
 		$info = $this->client->getStats('items');
 		if ($info) {
 			$ret = TRUE;
-			foreach($info as $keyword=>$value) {
-				if ($this->filterItem($filter,$keyword,$value)) {
+			foreach ($info as $keyword=>$value) {
+				if ($this->filterItem($filter, $keyword, $value)) {
 					$ret = $ret && $this->client->delete($keyword);
 				}
 			}
@@ -127,5 +129,4 @@ class Cache_memcache extends CacheBase implements CacheInterface
 		}
 		return TRUE;
 	}
-
 }

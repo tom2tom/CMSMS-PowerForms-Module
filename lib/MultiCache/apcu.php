@@ -2,7 +2,7 @@
 
 namespace MultiCache;
 
-class Cache_apcu extends CacheBase implements CacheInterface
+class apcu extends CacheBase implements CacheInterface
 {
 	protected $nativeiter; //which iter-API applies
 
@@ -30,7 +30,7 @@ class Cache_apcu extends CacheBase implements CacheInterface
 	{
 		if (class_exists('APCUIterator')) {
 			$this->nativeiter = TRUE;
-		}	elseif (class_exists('APCIterator')) {
+		} elseif (class_exists('APCIterator')) {
 			$this->nativeiter = FALSE;
 		} else {
 			return FALSE;
@@ -38,28 +38,28 @@ class Cache_apcu extends CacheBase implements CacheInterface
 		return TRUE;  //TODO connect
 	}
 
-	public function _newsert($keyword, $value, $lifetime=FALSE)
+	public function _newsert($keyword, $value, $lifetime= FALSE)
 	{
 		if ($this->_has($keyword)) {
 			return FALSE;
 		}
-		$ret = apcu_add($keyword,$value,(int)$lifetime);
+		$ret = apcu_add($keyword, $value, (int)$lifetime);
 		return $ret;
 	}
 
-	public function _upsert($keyword, $value, $lifetime=FALSE)
+	public function _upsert($keyword, $value, $lifetime= FALSE)
 	{
 		$lifetime = (int)$lifetime;
-		$ret = apcu_add($keyword,$value,$lifetime);
+		$ret = apcu_add($keyword, $value, $lifetime);
 		if (!$ret) {
-			$ret = apcu_store($keyword,$value,$lifetime);
+			$ret = apcu_store($keyword, $value, $lifetime);
 		}
 		return $ret;
 	}
 
 	public function _get($keyword)
 	{
-		$value = apcu_fetch($keyword,$suxs);
+		$value = apcu_fetch($keyword, $suxs);
 		if ($suxs !== FALSE) {
 			return $value;
 		}
@@ -77,7 +77,7 @@ class Cache_apcu extends CacheBase implements CacheInterface
 		if ($iter) {
 			foreach ($iter as $keyword=>$value) {
 				$again = is_object($value); //get it again, in case the filter played with it!
-				if ($this->filterItem($filter,$keyword,$value)) {
+				if ($this->filterItem($filter, $keyword, $value)) {
 					if ($again) {
 						$value = $this->_get($keyword);
 					}
@@ -110,7 +110,7 @@ class Cache_apcu extends CacheBase implements CacheInterface
 		if ($iter) {
 			$items = array();
 			foreach ($iter as $keyword=>$value) {
-				if ($this->filterItem($filter,$keyword,$value)) {
+				if ($this->filterItem($filter, $keyword, $value)) {
 					$items[] = $keyword;
 				}
 			}

@@ -4,7 +4,7 @@
  */
 namespace MultiCache;
 
-class Cache_yac extends CacheBase implements CacheInterface
+class yac extends CacheBase implements CacheInterface
 {
 	protected $client;
 
@@ -35,7 +35,7 @@ class Cache_yac extends CacheBase implements CacheInterface
 		return TRUE;
 	}
 
-	public function _newsert($keyword, $value, $lifetime=FALSE)
+	public function _newsert($keyword, $value, $lifetime= FALSE)
 	{
 		if ($this->_has($keyword)) {
 			return FALSE;
@@ -43,7 +43,7 @@ class Cache_yac extends CacheBase implements CacheInterface
 		return $this->client->set($keyword, serialize($value), (int)$lifetime);
 	}
 
-	public function _upsert($keyword, $value, $lifetime=FALSE)
+	public function _upsert($keyword, $value, $lifetime= FALSE)
 	{
 		return $this->client->set($keyword, serialize($value), (int)$lifetime);
 	}
@@ -70,7 +70,7 @@ class Cache_yac extends CacheBase implements CacheInterface
 					$keyword = $one['key'];
 					$value = $this->_get($keyword);
 					$again = is_object($value); //get it again, in case the filter played with it!
-					if ($this->filterItem($filter,$keyword,$value)) {
+					if ($this->filterItem($filter, $keyword, $value)) {
 						if ($again) {
 							$value = $this->_get($keyword);
 						}
@@ -105,7 +105,7 @@ class Cache_yac extends CacheBase implements CacheInterface
 				foreach ($info as $one) {
 					$keyword = $one['key'];
 					$value = $this->_get($keyword);
-					if ($this->filterItem($filter,$keyword,$value)) {
+					if ($this->filterItem($filter, $keyword, $value)) {
 						$ret = $ret && $this->client->delete($keyword);
 					}
 				}

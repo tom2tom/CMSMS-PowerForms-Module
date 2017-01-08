@@ -5,7 +5,7 @@
  */
 namespace MultiCache;
 
-class Cache_predis extends CacheBase implements CacheInterface
+class predis extends CacheBase implements CacheInterface
 {
 	protected $client;
 
@@ -35,7 +35,7 @@ class Cache_predis extends CacheBase implements CacheInterface
 		if (extension_loaded('Redis')) {
 			return FALSE; //native Redis extension is installed, prefer Redis to increase performance
 		}
-        return class_exists('Predis\Client');
+		return class_exists('Predis\Client');
 	}
 
 	public function connectServer()
@@ -75,7 +75,7 @@ class Cache_predis extends CacheBase implements CacheInterface
 		return $this->client !== NULL;
 	}
 
-	public function _newsert($keyword, $value, $lifetime=FALSE)
+	public function _newsert($keyword, $value, $lifetime= FALSE)
 	{
 		if (!$this->_has($keyword)) {
 			$ret = $this->client->set($keyword, $value, array('xx', 'ex' => $lifetime));
@@ -84,7 +84,7 @@ class Cache_predis extends CacheBase implements CacheInterface
 		return FALSE;
 	}
 
-	public function _upsert($keyword, $value, $lifetime=FALSE)
+	public function _upsert($keyword, $value, $lifetime= FALSE)
 	{
 		$ret = $this->client->set($keyword, $value, array('xx', 'ex' => $lifetime));
 		if ($ret === FALSE) {
@@ -104,7 +104,7 @@ class Cache_predis extends CacheBase implements CacheInterface
 
 	public function _getall($filter)
 	{
-//TODO filtering
+		//TODO filtering
 		return NULL; //TODO allitems;
 	}
 
@@ -120,8 +120,7 @@ class Cache_predis extends CacheBase implements CacheInterface
 
 	public function _clean($filter)
 	{
-//TODO filtering
+		//TODO filtering
 		$this->client->flushDB();
 	}
-
 }

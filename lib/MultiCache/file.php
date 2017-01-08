@@ -2,7 +2,7 @@
 
 namespace MultiCache;
 
-class Cache_file extends CacheBase implements CacheInterface
+class file extends CacheBase implements CacheInterface
 {
 	protected $basepath; //has trailing separator
 
@@ -24,11 +24,11 @@ class Cache_file extends CacheBase implements CacheInterface
 
 	public function connectServer()
 	{
-		$dir = trim(rtrim($this->config['path'],'/\\ \t'));
+		$dir = trim(rtrim($this->config['path'], '/\\ \t'));
 		if (!$dir) {
 			return FALSE;
 		}
-		$dir = str_replace(array('/','\\'),array(DIRECTORY_SEPARATOR,DIRECTORY_SEPARATOR),$dir);
+		$dir = str_replace(array('/', '\\'), array(DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR), $dir);
 		 //hacky check for relative-path
 		$real = realpath(__DIR__); // gets /path/to/here or X:\path\to\here
 		if (($dir[0] != DIRECTORY_SEPARATOR && $real[0] == DIRECTORY_SEPARATOR)
@@ -37,26 +37,27 @@ class Cache_file extends CacheBase implements CacheInterface
 		}
 		$dir .= DIRECTORY_SEPARATOR.'file_cache';
 		if (!is_dir($dir)) {
-			if (!(@mkdir($dir,0755) && file_exists($dir)))
+			if (!(@mkdir($dir, 0755) && file_exists($dir))) {
 				return FALSE;
+			}
 		}
 		$this->basepath = $dir.DIRECTORY_SEPARATOR;
 		return TRUE;
 	}
 
-	public function _newsert($keyword, $value, $lifetime=FALSE)
+	public function _newsert($keyword, $value, $lifetime= FALSE)
 	{
 		$fp = $this->basepath.$this->filename($keyword);
 		if (!file_exists($fp)) {
-			return $this->writefile($fp,$value);
+			return $this->writefile($fp, $value);
 		}
 		return FALSE;
 	}
 
-	public function _upsert($keyword, $value, $lifetime=FALSE)
+	public function _upsert($keyword, $value, $lifetime= FALSE)
 	{
 		$fp = $this->basepath.$this->filename($keyword);
-		return $this->writefile($fp,$value);
+		return $this->writefile($fp, $value);
 	}
 
 	public function _get($keyword)
@@ -74,13 +75,13 @@ class Cache_file extends CacheBase implements CacheInterface
 	public function _getall($filter)
 	{
 		$items = array();
-		$files = glob($this->basepath.'*',GLOB_NOSORT);
-		foreach($files as $fp) {
+		$files = glob($this->basepath.'*', GLOB_NOSORT);
+		foreach ($files as $fp) {
 			if (is_file($fp)) {
 				$keyword = $this->keyword($fp);
 				$value = $this->_get($keyword);
 				$again = is_object($value); //get it again, in case the filter played with it!
-				if ($this->filterItem($filter,$keyword,$value)) {
+				if ($this->filterItem($filter, $keyword, $value)) {
 					if ($again) {
 						$value = $this->_get($keyword);
 					}
@@ -111,12 +112,12 @@ class Cache_file extends CacheBase implements CacheInterface
 	public function _clean($filter)
 	{
 		$ret = TRUE;
-		$files = glob($this->basepath.'*',GLOB_NOSORT);
-		foreach($files as $fp) {
+		$files = glob($this->basepath.'*', GLOB_NOSORT);
+		foreach ($files as $fp) {
 			if (is_file($fp)) {
 				$keyword = $this->keyword($fp);
 				$value = $this->_get($keyword);
-				if ($this->filterItem($filter,$keyword,$value)) {
+				if ($this->filterItem($filter, $keyword, $value)) {
 					$ret = $ret && @unlink($fp);
 				}
 			}
@@ -129,20 +130,20 @@ class Cache_file extends CacheBase implements CacheInterface
 	*/
 	private function filename($keyword)
 	{
-		return str_replace('\\','|%|',$keyword);
+		return str_replace('\\', '|%|', $keyword);
 	}
 
 	private function keyword($filepath)
 	{
-		return str_replace('|%|','\\',basename($filepath));
+		return str_replace('|%|', '\\', basename($filepath));
 	}
 
 	private function readfile($filepath)
 	{
-		$h = @fopen($filepath,'rb');
+		$h = @fopen($filepath, 'rb');
 		if ($h) {
-			clearstatcache(TRUE,$filepath);
-			$content = @fread($h,filesize($filepath));
+			clearstatcache(TRUE, $filepath);
+			$content = @fread($h, filesize($filepath));
 			@fclose($h);
 			return unserialize($content);
 		}
@@ -151,13 +152,12 @@ class Cache_file extends CacheBase implements CacheInterface
 
 	private function writefile($filepath, $content)
 	{
-		$h = @fopen($filepath,'wb');
+		$h = @fopen($filepath, 'wb');
 		if ($h) {
-			$ret = @fwrite($h,serialize($content));
+			$ret = @fwrite($h, serialize($content));
 			$ret = $ret && @fclose($h);
 			return $ret;
 		}
 		return FALSE;
 	}
-
 }

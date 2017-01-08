@@ -2,7 +2,7 @@
 
 namespace MultiCache;
 
-class Cache_wincache extends CacheBase implements CacheInterface
+class wincache extends CacheBase implements CacheInterface
 {
 	public function __construct($config=array())
 	{
@@ -29,12 +29,12 @@ class Cache_wincache extends CacheBase implements CacheInterface
 		return TRUE; //TODO connect
 	}
 
-	public function _newsert($keyword, $value, $lifetime=FALSE)
+	public function _newsert($keyword, $value, $lifetime= FALSE)
 	{
 		return wincache_ucache_add($keyword, $value, (int)$lifetime);
 	}
 
-	public function _upsert($keyword, $value, $lifetime=FALSE)
+	public function _upsert($keyword, $value, $lifetime= FALSE)
 	{
 		$ret = wincache_ucache_add($keyword, $value, (int)$lifetime);
 		if (!$ret) {
@@ -45,7 +45,7 @@ class Cache_wincache extends CacheBase implements CacheInterface
 
 	public function _get($keyword)
 	{
-		$value = wincache_ucache_get($keyword,$suxs);
+		$value = wincache_ucache_get($keyword, $suxs);
 		if ($suxs) {
 			return $value;
 		}
@@ -60,7 +60,7 @@ class Cache_wincache extends CacheBase implements CacheInterface
 			$keyword = $one['key_name'];
 			$value = $this->_get($keyword);
 			$again = is_object($value); //get it again, in case the filter played with it!
-			if ($this->filterItem($filter,$keyword,$value)) {
+			if ($this->filterItem($filter, $keyword, $value)) {
 				if ($again) {
 					$value = $this->_get($keyword);
 				}
@@ -89,11 +89,10 @@ class Cache_wincache extends CacheBase implements CacheInterface
 		foreach ($info['ucache_entries'] as $one) {
 			$keyword = $one['key_name'];
 			$value = $this->_get($keyword);
-			if ($this->filterItem($filter,$keyword,$value)) {
+			if ($this->filterItem($filter, $keyword, $value)) {
 				$ret = $ret && wincache_ucache_delete($keyword);
 			}
 		}
 		return $ret;
 	}
-
 }
