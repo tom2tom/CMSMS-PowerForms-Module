@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
@@ -12,7 +12,7 @@ and the second field will contain the result of $db->Timestamp() (T)
 
 namespace MultiMutex;
 
-class Mutex_database implements iMutex
+class database implements iMutex
 {
 	private $field1;
 	private $field2;
@@ -26,15 +26,17 @@ class Mutex_database implements iMutex
 			$db = \cmsms()->GetDb();
 			$tbl = $config['table'];
 			$rs = $db->Execute('SELECT * FROM '.$tbl);
-			if (!$rs || $rs->FieldCount() < 2)
+			if (!$rs || $rs->FieldCount() < 2) {
 				throw new \Exception('no database mutex');
+			}
 			$rs->Close();
 			$all = $db->GetCol('SELECT column_name FROM information_schema.columns WHERE table_name=\''.$tbl.'\'');
 			$this->field1 = $all[0];
 			$this->field2 = $all[1];
 			$this->table = $tbl;
-		} else
+		} else {
 			throw new \Exception('no database mutex');
+		}
 		$this->pause = (!empty($config['timeout'])) ? $config['timeout'] : 500;
 		$this->maxtries = (!empty($config['tries'])) ? $config['tries'] : 200;
 	}
@@ -50,8 +52,9 @@ class Mutex_database implements iMutex
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
 			$db->StartTrans();
 			$db->Execute($sql);
-			if ($db->CompleteTrans())
-				return TRUE; //success
+			if ($db->CompleteTrans()) {
+				return TRUE;
+			} //success
 /*TODO		$sql = 'SELECT '.$this->field1'. FROM '.$this->table.' WHERE '.$this->field2.' < '.$stamp + 15;
 			if ($db->GetOne($sql))
 				$db->Execute('DELETE FROM '.$this->table);
@@ -69,8 +72,9 @@ class Mutex_database implements iMutex
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
 			$db->StartTrans();
 			$db->Execute($sql);
-			if ($db->CompleteTrans())
+			if ($db->CompleteTrans()) {
 				return;
+			}
 		}
 	}
 
@@ -82,8 +86,9 @@ class Mutex_database implements iMutex
 			$db->Execute('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
 			$db->StartTrans();
 			$db->Execute($sql);
-			if ($db->CompleteTrans())
+			if ($db->CompleteTrans()) {
 				return;
+			}
 		}
 	}
 }
