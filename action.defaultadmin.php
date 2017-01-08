@@ -50,9 +50,9 @@ if ($padm) {
 		if ($old != $t) {
 			//re-encrypt all stored records
 			$pre = cms_db_prefix();
-			$rs = $db->Execute('SELECT record_id,content FROM '.$pre.'module_pwf_record');
+			$rs = $db->Execute('SELECT sess_id,content FROM '.$pre.'module_pwf_session');
 			if ($rs) {
-				$sql = 'UPDATE '.$pre.'module_pwf_record SET content=? WHERE record_id=?';
+				$sql = 'UPDATE '.$pre.'module_pwf_session SET content=? WHERE sess_id=?';
 				while (!$rs->EOF) {
 					$val = PWForms\Utils::Decrypt($this, $rs->fields[1], $old);
 					$val = PWForms\Utils::Encrypt($this, $val, $t);

@@ -18,21 +18,21 @@ if (count($matched) != 3) {
 }
 $key = reset($matched);
 $key = substr($key, 0, 9); //prefix
-$record_id = $params[$key.'r'];
+$sid = $params[$key.'s'];
 
 $pre = cms_db_prefix();
-$sql = 'SELECT pubkey,content FROM '.$pre.'module_pwf_record WHERE record_id=?';
-$row = $db->GetRow($sql, array($record_id));
-$sql = 'DELETE FROM '.$pre.'module_pwf_record WHERE record_id=?';
+$sql = 'SELECT pubkey,content FROM '.$pre.'module_pwf_session WHERE sess_id=?';
+$row = $db->GetRow($sql, array($sid));
+$sql = 'DELETE FROM '.$pre.'module_pwf_session WHERE sess_id=?';
 if (!$row || $row['pubkey'] != $params[$key.'c']) {
 	if ($row) {
-		$db->Execute($sql, array($record_id));
+		$db->Execute($sql, array($sid));
 	}
 	echo $this->Lang('validation_response_error');
 	return;
 }
 
-$db->Execute($sql, array($record_id));
+$db->Execute($sql, array($sid));
 
 $pw = $row['pubkey'].PWForms\Utils::Unfusc($this->GetPreference('masterpass'));
 $formdata = unserialize(PWForms\Utils::Decrypt($row['content'], $pw));
@@ -43,7 +43,7 @@ if ($formdata === FALSE) {
 
 $field_id = $params[$key.'d'];
 $obfld = $formdata->Fields[$field_id];
-$obfld->ApproveToGo($record_id); //setup to 'really' dispose the form
+$obfld->ApproveToGo($sid); //setup to 'really' dispose the form
 
 //cache data for next action
 if (!empty($_SERVER['SERVER_ADDR'])) {
