@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
@@ -27,22 +27,23 @@ class FormData implements \Serializable
 	public $jsfuncs = array(); //funcs and/or instructions
 	public $jsloads = array(); //document-ready funcs and/or instructions
 
-	public function __set($name,$value)
+	public function __set($name, $value)
 	{
 		$this->XtraProps[$name] = $value;
 	}
 
 	public function __get($name)
 	{
-		if (array_key_exists($name,$this->XtraProps))
-            return $this->XtraProps[$name];
-        $trace = debug_backtrace();
-        trigger_error(
-            'Undefined property via __get(): '.$name.
-            ' in '.$trace[0]['file'] .
-            ' on line '.$trace[0]['line'],
-            E_USER_NOTICE);
-        return NULL;
+		if (array_key_exists($name, $this->XtraProps)) {
+			return $this->XtraProps[$name];
+		}
+		$trace = debug_backtrace();
+		trigger_error(
+			'Undefined property via __get(): '.$name.
+			' in '.$trace[0]['file'] .
+			' on line '.$trace[0]['line'],
+			E_USER_NOTICE);
+		return NULL;
 	}
 
 	public function __isset($name)
@@ -67,7 +68,7 @@ class FormData implements \Serializable
 		$this->Fields = '||~||';
 		$ret = json_encode(get_object_vars($this)); //include private properties
 		$jf = json_encode($afields);
-		$ret = str_replace('"||~||"',$jf,$ret);
+		$ret = str_replace('"||~||"', $jf, $ret);
 		//reinstate
 		$this->formsmodule = $mod;
 		$this->Fields = $saved;
@@ -97,8 +98,9 @@ class FormData implements \Serializable
 						foreach ($one as $i=>$mdata) {
 							$i = (int)$i;
 							$members[$i] = unserialize($mdata);
-							if ($members[$i]) //not marked for delete
+							if ($members[$i]) { //not marked for delete
 								$members[$i]->formdata =& $this;
+							}
 						}
 						$this->$key = $members;
 						break;
@@ -110,7 +112,7 @@ class FormData implements \Serializable
 						$this->$key = ($one) ? (array)$one : array();
 						break;
 					 case 'XtraProps':
- 						$one = (array)$one;
+						$one = (array)$one;
 						$members = array();
 						foreach ($one as $subkey=>$mdata) {
 							if (is_object($mdata)) {
