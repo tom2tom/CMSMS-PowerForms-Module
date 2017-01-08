@@ -1,15 +1,16 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright(C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright(C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
-if (!empty($message))
+if (!empty($message)) {
 	$tplvars['message'] = $message;
+}
 
-$tplvars['backtomod_nav'] = $this->CreateLink($id,'defaultadmin','','&#171; '.$this->Lang('back_top'));
-$tplvars['backtoform_nav'] = $this->CreateLink($id,'open_form',$returnid,'&#171; '.$this->Lang('back_form'),
-	array('form_id'=>$params['form_id'],'datakey'=>$params['datakey']));
+$tplvars['backtomod_nav'] = $this->CreateLink($id, 'defaultadmin', '', '&#171; '.$this->Lang('back_top'));
+$tplvars['backtoform_nav'] = $this->CreateLink($id, 'open_form', $returnid, '&#171; '.$this->Lang('back_form'),
+	array('form_id'=>$params['form_id'], 'datakey'=>$params['datakey']));
 
 if ($obfld) { //field data are loaded
 	$fid = $obfld->GetId(); //maybe <= 0, if adding
@@ -26,25 +27,29 @@ if ($obfld) { //field data are loaded
 
 	$tab = $this->_GetActiveTab($params);
 	$t = $this->StartTabHeaders();
-	if ($hasmain)
-		$t .= $this->SetTabHeader('maintab',$this->Lang('tab_field'),($tab == 'maintab'));
-	if ($hasadv)
-		$t .= $this->SetTabHeader('advancedtab',$this->Lang('tab_advanced'),($tab == 'advancedtab'));
+	if ($hasmain) {
+		$t .= $this->SetTabHeader('maintab', $this->Lang('tab_field'), ($tab == 'maintab'));
+	}
+	if ($hasadv) {
+		$t .= $this->SetTabHeader('advancedtab', $this->Lang('tab_advanced'), ($tab == 'advancedtab'));
+	}
 	$t .= $this->EndTabHeaders().$this->StartTabContent();
 	$tplvars['tabs_start'] = $t;
 
 	$tplvars['tabs_end'] = $this->EndTabContent();
-	if ($hasmain)
+	if ($hasmain) {
 		$tplvars['maintab_start'] = $this->StartTab('maintab');
-	if ($hasadv)
+	}
+	if ($hasadv) {
 		$tplvars['advancedtab_start'] = $this->StartTab('advancedtab');
+	}
 	$tplvars['tab_end'] = $this->EndTab();
 
 	$tplvars['add'] = ($obfld->HasComponentAdd())?
-		$this->CreateInputSubmit($id,'compadd',$obfld->ComponentAddLabel()):NULL;
+		$this->CreateInputSubmit($id, 'compadd', $obfld->ComponentAddLabel()):NULL;
 
 	if ($obfld->HasComponentDelete()) {
-		$tplvars['del'] = $this->CreateInputSubmit($id,'compdel',$obfld->ComponentDeleteLabel(),
+		$tplvars['del'] = $this->CreateInputSubmit($id, 'compdel', $obfld->ComponentDeleteLabel(),
 			'onclick="return confirm_selected(this)"');
 		$prompt = $this->Lang('confirm');
 		$obfld->jsfuncs['optiondel'] = <<<EOS
@@ -68,8 +73,12 @@ EOS;
 		foreach ($populators['main'] as $item) {
 			$oneset = new stdClass();
 			$oneset->title = (isset($item[0]))?$item[0]:'';
-			if (!empty($item[1])) $oneset->input = $item[1]; //optional
-			if (!empty($item[2])) $oneset->help = $item[2];
+			if (!empty($item[1])) {
+				$oneset->input = $item[1];
+			} //optional
+			if (!empty($item[2])) {
+				$oneset->help = $item[2];
+			}
 			$mainList[] = $oneset;
 		}
 	}
@@ -80,8 +89,12 @@ EOS;
 		foreach ($populators['adv'] as $item) {
 			$oneset = new stdClass();
 			$oneset->title = (isset($item[0]))?$item[0]:'';
-			if (!empty($item[1])) $oneset->input = $item[1]; //optional
-			if (!empty($item[2])) $oneset->help = $item[2];
+			if (!empty($item[1])) {
+				$oneset->input = $item[1];
+			} //optional
+			if (!empty($item[2])) {
+				$oneset->help = $item[2];
+			}
 			$advList[] = $oneset;
 		}
 	}
@@ -100,16 +113,16 @@ EOS;
   dragClass: 'row1hover',
   onDrop: function(table,droprows) {
    var $tbl = $(table),
-    odd = true,
-    oddclass = 'row1',
-    evenclass = 'row2';
+	odd = true,
+	oddclass = 'row1',
+	evenclass = 'row2';
    $tbl.find('tbody tr').each(function() {
-    var name = odd ? oddclass : evenclass;
-    if (this === droprows[0]) {
-     name = name+'hover';
-    }
-    $(this).removeClass().addClass(name);
-    odd = !odd;
+	var name = odd ? oddclass : evenclass;
+	if (this === droprows[0]) {
+	 name = name+'hover';
+	}
+	$(this).removeClass().addClass(name);
+	odd = !odd;
    });
   }
  }).find('tbody tr').removeAttr('onmouseover').removeAttr('onmouseout').mouseover(function() {
@@ -127,21 +140,23 @@ EOS;
 	if (isset($populators['extra'])) {
 		switch ($populators['extra']) {
 		 case 'varshelpmain':
-			if ($hasmain)
+			if ($hasmain) {
 				$tplvars['mainvarhelp'] = 1;
+			}
 			break;
 		 case 'varshelpadv':
 			if ($hasadv) {
 				$tplvars['advvarhelp'] = 1;
-				PWForms\Utils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
+				PWForms\Utils::SetupSubTemplateVarsHelp($formdata, $this, $tplvars);
 			}
 			break;
 		 case 'varshelpboth':
-			if ($hasmain)
+			if ($hasmain) {
 				$tplvars['mainvarhelp'] = 1;
+			}
 			if ($hasadv) {
 				$tplvars['advvarhelp'] = 1;
-				PWForms\Utils::SetupSubTemplateVarsHelp($formdata,$this,$tplvars);
+				PWForms\Utils::SetupSubTemplateVarsHelp($formdata, $this, $tplvars);
 			}
 			break;
 		}
@@ -153,14 +168,14 @@ EOS;
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_add_new_field');
 	PWForms\Utils::Collect_Fields($this);
-	$oneset->input = $this->CreateInputDropdown($id,'field_type',
-		array_merge(array($this->Lang('select_type')=>''),$this->field_types),-1,'');
+	$oneset->input = $this->CreateInputDropdown($id, 'field_type',
+		array_merge(array($this->Lang('select_type')=>''), $this->field_types), -1, '');
 //	$oneset->help = ;
 	$tplvars['mainitem'] = $oneset;
 }
 
-$tplvars['form_start'] = $this->CreateFormStart($id,'open_field',$returnid,
-	'POST','',FALSE,'',array(
+$tplvars['form_start'] = $this->CreateFormStart($id, 'open_field', $returnid,
+	'POST', '', FALSE, '', array(
 	'form_id'=>$params['form_id'],
 	'datakey'=>$params['datakey'],
 	'field_id'=>$fid,
@@ -170,5 +185,5 @@ $tplvars['form_start'] = $this->CreateFormStart($id,'open_field',$returnid,
 $tplvars['form_end'] = $this->CreateFormEnd();
 
 $t = ($fid != 0) ? 'close':'add'; //field use or add
-$tplvars['submit'] = $this->CreateInputSubmit($id,$nm,$this->Lang($t),'onclick="alert(\''.$this->Lang('save_form').'\')"');
-$tplvars['cancel'] = $this->CreateInputSubmit($id,'cancel',$this->Lang('cancel'));
+$tplvars['submit'] = $this->CreateInputSubmit($id, $nm, $this->Lang($t), 'onclick="alert(\''.$this->Lang('save_form').'\')"');
+$tplvars['cancel'] = $this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'));

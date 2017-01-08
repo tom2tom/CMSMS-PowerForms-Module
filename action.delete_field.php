@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -22,21 +22,22 @@ if (isset($params['active_tab'])) {
 		exit;
 	}
 	//mark field(s) for deletion during Store
-	if (strpos($params['field_id'],',') !== FALSE) {
-		$all = explode(',',$params['field_id']);
+	if (strpos($params['field_id'], ',') !== FALSE) {
+		$all = explode(',', $params['field_id']);
 	} else {
 		$all = array($params['field_id']);
 	}
-	foreach($all as $one) {
+	foreach ($all as $one) {
 		$fid = (int)$one;
 		$formdata->Fields[$fid] = NULL;
 		if ($formdata->FieldOrders) {
-			$key = array_search($fid,$formdata->FieldOrders);
-			if ($key !== FALSE)
+			$key = array_search($fid, $formdata->FieldOrders);
+			if ($key !== FALSE) {
 				unset($formdata->FieldOrders[$key]);
+			}
 		}
 	}
-	$cache->set($params['datakey'],$formdata,84600);
+	$cache->set($params['datakey'], $formdata, 84600);
 
 	echo '1';
 	exit;

@@ -1,6 +1,6 @@
 <?php
 # This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2016 Tom Phane <tpgww@onepost.net>
+# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -8,15 +8,17 @@
 //NB caller must be very careful that top-level dir is valid!
 function delTree($dir)
 {
-	$files = array_diff(scandir($dir),array('.','..'));
+	$files = array_diff(scandir($dir), array('.', '..'));
 	if ($files) {
 		foreach ($files as $file) {
-			$fp = cms_join_path($dir,$file);
+			$fp = cms_join_path($dir, $file);
 			if (is_dir($fp)) {
-			 	if (!delTree($fp))
+				if (!delTree($fp)) {
 					return FALSE;
-			} else
+				}
+			} else {
 				unlink($fp);
+			}
 		}
 		unset($files);
 	}
@@ -26,11 +28,11 @@ function delTree($dir)
 $pre = cms_db_prefix();
 $dict = NewDataDictionary($db);
 
-$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_field_idx',$pre.'module_pwf_field');
+$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_field_idx', $pre.'module_pwf_field');
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_field');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_fieldprops_idx',$pre.'module_pwf_fieldprops');
+$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_fieldprops_idx', $pre.'module_pwf_fieldprops');
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_fieldprops');
 $dict->ExecuteSQLArray($sqlarray);
@@ -38,11 +40,11 @@ $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_flock');
 $dict->ExecuteSQLArray($sqlarray);
 */
-$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_form_idx',$pre.'module_pwf_form');
+$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_form_idx', $pre.'module_pwf_form');
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_form');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_formprops_idx',$pre.'module_pwf_formprops');
+$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_formprops_idx', $pre.'module_pwf_formprops');
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_formprops');
 $dict->ExecuteSQLArray($sqlarray);
@@ -69,8 +71,9 @@ if (!$this->before20) {
 		foreach ($types as $type) {
 			$templates = $type->get_template_list();
 			if ($templates) {
-				foreach ($templates as $tpl)
+				foreach ($templates as $tpl) {
 					$tpl->delete();
+				}
 			}
 			$type->delete();
 		}
@@ -82,8 +85,9 @@ if ($fp && is_dir($fp)) {
 	$ud = $this->GetPreference('uploads_dir');
 	if ($ud) {
 		$ud = $fp.DIRECTORY_SEPARATOR.$ud;
-		if (is_dir($ud))
+		if (is_dir($ud)) {
 			delTree($ud);
+		}
 	}
 }
 
