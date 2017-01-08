@@ -338,7 +338,7 @@ EOS;
 }
 if ($count > 1 || $dcount > 1) {
 	$tplvars['selectall'] = $this->CreateInputCheckbox($id, 'selectall', 1, -1, 'onclick="select_all(this);"');
-	$jsfuncs[] = <<<EOS
+	$jsfuncs[] = <<<'EOS'
 function select_all(cb) {
  var st = cb.checked;
  $(cb).closest('table').find('tbody input[type="checkbox"]').attr('checked',st);
