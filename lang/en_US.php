@@ -1252,7 +1252,7 @@ and may include whatever else is appropriate, including Fieldbase properties and
 </ul>
 <h3>Requirements</h3>
 <ul>
-<li>PHP 5.3+</li>
+<li>PHP 5.4+</li>
 <li>PHP curl extension is needed if a 'SubmitForm' field is used</li>
 </ul>
 <h3>Desirables</h3>
