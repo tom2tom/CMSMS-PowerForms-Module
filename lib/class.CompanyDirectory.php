@@ -54,7 +54,7 @@ class CompanyDirectory extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -66,11 +66,11 @@ class CompanyDirectory extends FieldBase
 	public function AdminPopulate($id)
 	{
 		if (!$this->mymodule) {
-			return array('main'=>array($this->GetErrorMessage('err_module', self::MODNAME)));
+			return ['main'=>[$this->GetErrorMessage('err_module', self::MODNAME)]];
 		}
 
 		$mod = $this->formdata->formsmodule;
-		$Categories = array('All'=>$mod->Lang('all'));
+		$Categories = ['All'=>$mod->Lang('all')];
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT name FROM '.$pre.'module_compdir_categories';
 		$db = \cmsms()->GetDb();
@@ -84,7 +84,7 @@ class CompanyDirectory extends FieldBase
 			$CategorySelected = explode(',', $CategorySelected);
 		}
 
-		$FieldDefs = array('none'=>$this->Lang('none'));
+		$FieldDefs = ['none'=>$this->Lang('none')];
 		$sql = 'SELECT name FROM '.$pre.'module_compdir_fielddefs ORDER BY item_order';
 		$all = $db->GetCol($sql);
 		if ($all) {
@@ -95,25 +95,25 @@ class CompanyDirectory extends FieldBase
 			$FieldDefsSelected = explode(',', $FieldDefsSelected);
 		}
 
-		$choices = array(
+		$choices = [
 			$mod->Lang('option_dropdown')=>'Dropdown',
 			$mod->Lang('option_selectlist_single')=>'Select List-single',
 			$mod->Lang('option_selectlist_multiple')=>'Select List-multiple',
 			$mod->Lang('option_radiogroup')=>'Radio Group'
-		);
+		];
 
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
-		$main[] = array('','',$mod->Lang('help_company_field'));
-		$main[] = array($mod->Lang('title_pick_categories'),
+		$main[] = ['','',$mod->Lang('help_company_field')];
+		$main[] = [$mod->Lang('title_pick_categories'),
 						$mod->CreateInputSelectList($id, 'fp_Category', $Categories, $CategorySelected,
-						5, '', TRUE));
-		$main[] = array($mod->Lang('title_pick_fielddef'),
+						5, '', TRUE)];
+		$main[] = [$mod->Lang('title_pick_fielddef'),
 						$mod->CreateInputSelectList($id, 'fp_FieldDefs', $FieldDefs, $FieldDefsSelected,
-						5, '', FALSE));
-		$adv[] = array($mod->Lang('title_choose_user_input'),
+						5, '', FALSE)];
+		$adv[] = [$mod->Lang('title_choose_user_input'),
 						$mod->CreateInputDropdown($id, 'fp_UserInput', $choices, '-1',
-							$this->GetProperty('UserInput')));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('UserInput'))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
@@ -124,7 +124,7 @@ class CompanyDirectory extends FieldBase
 			return $mod->Lang('err_module', self::MODNAME);
 		}
 
-		$results = array();
+		$results = [];
 
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
@@ -147,16 +147,16 @@ LEFT JOIN {$pre}module_compdir_fielddefs AS fdd ON fdd.id=comfv.fielddef_id
 LEFT JOIN {$pre}module_compdir_companies AS com ON comfv.company_id=com.id
 WHERE com.company_name=? AND fdd.name=?
 EOS;
-		$val = array();
-		$companies = array();
+		$val = [];
+		$companies = [];
 		$field = $this->GetProperty('FieldDefs');
 		if ($Like=='' || $Like=='%' || $Like=='All') {
-			$rs = $db->Execute($sql, array());
+			$rs = $db->Execute($sql, []);
 			if ($rs) {
 				while ($row = $rs->FetchRow()) {
 					$company = $row['company_name'];
 					$FDval = '';
-					$rs2 = $db->Execute($sql2, array($company, $field));
+					$rs2 = $db->Execute($sql2, [$company, $field]);
 					if ($rs2) {
 						while ($row = $rs2->FetchRow()) {
 							$FDval = $row['value'];
@@ -171,12 +171,12 @@ EOS;
 		} else {
 			if (is_array($Like)) {
 				foreach ($Like as $key => $value) {
-					$rs = $db->Execute($sql, array($value));
+					$rs = $db->Execute($sql, [$value]);
 					if ($rs) {
 						while ($row = $rs->FetchRow()) {
 							$company = $row['company_name'];
 							$FDval = '';
-							$rs2 = $db->Execute($sql2, array($company, $field));
+							$rs2 = $db->Execute($sql2, [$company, $field]);
 							if ($rs2) {
 								while ($row = $rs2->FetchRow()) {
 									$FDval = $row['value'];
@@ -189,12 +189,12 @@ EOS;
 					}
 				}
 			} else {
-				$rs = $db->Execute($sql, array($Like));
+				$rs = $db->Execute($sql, [$Like]);
 				if ($rs) {
 					while ($row = $rs->FetchRow()) {
 						$company=$row['company_name'];
 						$FDval='';
-						$rs2 = $db->Execute($sql2, array($company, $field));
+						$rs2 = $db->Execute($sql2, [$company, $field]);
 						if ($rs2) {
 							while ($row = $rs2->FetchRow()) {
 								$FDval = $row['value'];
@@ -217,11 +217,11 @@ EOS;
 		if ($companies) {
 			$size = min(50, count($companies)); // maximum 50 lines,though this is probably big
 
-			$val = array();
+			$val = [];
 			if ($this->Value || is_numeric($this->Value)) {
 				$val = $this->Value;
 				if (!is_array($this->Value)) {
-					$val = array($this->Value);
+					$val = [$this->Value];
 				}
 			}
 

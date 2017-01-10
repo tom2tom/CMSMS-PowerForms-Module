@@ -20,10 +20,10 @@ class UserEmail extends EmailBase
 		$this->Type = 'UserEmail';
 		$this->ValidationType = 'email';
 		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = array(
+		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_email_address')=>'email'
-		);
+		];
 	}
 
 	public function HasValue($deny_blank_responses= FALSE)
@@ -42,7 +42,7 @@ class UserEmail extends EmailBase
 		if (is_array($newvalue)) {
 			$this->Value = $newvalue;
 		} else {
-			$this->Value = array($newvalue);
+			$this->Value = [$newvalue];
 		}
 	}
 
@@ -65,7 +65,7 @@ class UserEmail extends EmailBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -79,24 +79,24 @@ class UserEmail extends EmailBase
 		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, 'title_email_from_address');
 		$mod = $this->formdata->formsmodule;
 
-		$choices = array(
+		$choices = [
 			$mod->Lang('option_never')=>'n',
 			$mod->Lang('option_user_choice')=>'c',
-			$mod->Lang('option_always')=>'a');
-		$main[] = array($mod->Lang('title_send_user_copy'),
+			$mod->Lang('option_always')=>'a'];
+		$main[] = [$mod->Lang('title_send_user_copy'),
 						$mod->CreateInputDropdown($id, 'fp_send_user_copy', $choices, -1,
-						$this->GetProperty('send_user_copy', 'n')));
-		$main[] = array($mod->Lang('title_send_user_label'),
+						$this->GetProperty('send_user_copy', 'n'))];
+		$main[] = [$mod->Lang('title_send_user_label'),
 						$mod->CreateInputText($id, 'fp_send_user_label',
-						$this->GetProperty('send_user_label', $mod->Lang('title_send_me_a_copy')), 25, 125));
-		$choices = array(
+						$this->GetProperty('send_user_label', $mod->Lang('title_send_me_a_copy')), 25, 125)];
+		$choices = [
 			$mod->Lang('option_from')=>'f',
 			$mod->Lang('option_reply')=>'r',
-			$mod->Lang('option_both')=>'b');
-		$main[] = array($mod->Lang('title_headers_to_modify'),
+			$mod->Lang('option_both')=>'b'];
+		$main[] = [$mod->Lang('title_headers_to_modify'),
 						$mod->CreateInputDropdown($id, 'fp_headers_to_modify', $choices, -1,
-						$this->GetProperty('headers_to_modify', 'f')));
-		return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
+						$this->GetProperty('headers_to_modify', 'f'))];
+		return ['main'=>$main,'adv'=>$adv,'extra'=>$extra];
 	}
 
 	public function Populate($id, &$params)
@@ -143,7 +143,7 @@ class UserEmail extends EmailBase
 				$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_an_email', $this->Name);
 			}
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 
 	public function PreDisposeAction()
@@ -172,7 +172,7 @@ class UserEmail extends EmailBase
 		) {
 			return $this->SendForm($this->Value[0], $this->GetProperty('email_subject'));
 		} else {
-			return array(TRUE,'');
+			return [TRUE,''];
 		}
 	}
 }

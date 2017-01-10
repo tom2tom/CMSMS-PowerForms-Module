@@ -30,7 +30,7 @@ class FieldOperations
 				$pre = \cms_db_prefix();
 				$sql = 'SELECT type FROM '.$pre.'module_pwf_field WHERE field_id=?';
 				$db = \cmsms()->GetDb();
-				$type = $db->GetOne($sql, array($params['field_id']));
+				$type = $db->GetOne($sql, [$params['field_id']]);
 			} else {
 				$type = $params['type'];
 			}
@@ -96,7 +96,7 @@ class FieldOperations
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
 		$db = \cmsms()->GetDb();
-		$row = $db->GetRow($sql, array($field_id));
+		$row = $db->GetRow($sql, [$field_id]);
 		if (!$row) {
 			return FALSE;
 		}
@@ -112,7 +112,7 @@ class FieldOperations
 
 		if ($neworder === FALSE) {
 			$sql = 'SELECT MAX(order_by) AS last FROM '.$pre.'module_pwf_field WHERE form_id=?';
-			$neworder = $db->GetOne($sql, array($form_id));
+			$neworder = $db->GetOne($sql, [$form_id]);
 			if (!$neworder) {
 				$neworder = 0;
 			}
@@ -124,7 +124,7 @@ class FieldOperations
 		$db->Execute($sql, $row);
 
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_fieldprops WHERE field_id=?';
-		$rs = $db->Execute($sql, array($field_id));
+		$rs = $db->Execute($sql, [$field_id]);
 		if ($rs) {
 			$sql = 'INSERT INTO '.$pre.'module_pwf_fieldprops
 (prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
@@ -175,26 +175,26 @@ class FieldOperations
 			$obfld->Id = $db->GenID($pre.'module_pwf_field_seq');
 			$sql = 'INSERT INTO '.$pre.'module_pwf_field
 (field_id,form_id,name,alias,type,order_by) VALUES (?,?,?,?,?,?)';
-			$res = $db->Execute($sql, array(
+			$res = $db->Execute($sql, [
 				$obfld->Id,
 				$obfld->FormId,
 				$obfld->Name,
 				$obfld->Alias,
 				$obfld->Type,
-				$obfld->OrderBy));
+				$obfld->OrderBy]);
 		} else {
 			$sql = 'UPDATE '.$pre.'module_pwf_field SET name=?,alias=?,order_by=? WHERE field_id=?';
-			$res = $db->Execute($sql, array(
+			$res = $db->Execute($sql, [
 				$obfld->Name,
 				$obfld->Alias,
 				$obfld->OrderBy,
-				$obfld->Id));
+				$obfld->Id]);
 		}
 
 		if ($allprops) {
 			// drop all current properties
 			$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops where field_id=?';
-			$res = $db->Execute($sql, array($obfld->Id)) && $res;
+			$res = $db->Execute($sql, [$obfld->Id]) && $res;
 			// add back current ones
 			$sql = 'INSERT INTO '.$pre.'module_pwf_fieldprops
 (prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
@@ -211,7 +211,7 @@ class FieldOperations
 					$lval = $value;
 				}
 				$res = $db->Execute($sql,
-					array($newid, $obfld->Id, $obfld->FormId, $name, $sval, $lval)) && $res;
+					[$newid, $obfld->Id, $obfld->FormId, $name, $sval, $lval]) && $res;
 			}
 		}
 		return $res;
@@ -229,7 +229,7 @@ class FieldOperations
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
 		$db = \cmsms()->GetDb();
-		if ($row = $db->GetRow($sql, array($obfld->Id))) {
+		if ($row = $db->GetRow($sql, [$obfld->Id])) {
 			$obfld->FormId = (int)$row['form_id'];
 			if (!$obfld->Name) {
 				$obfld->Name = $row['name'];
@@ -246,9 +246,9 @@ class FieldOperations
 		$obfld->loaded = TRUE;
 
 		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE field_id=? ORDER BY prop_id';
-		$defaults = $db->GetArray($sql, array($obfld->Id));
+		$defaults = $db->GetArray($sql, [$obfld->Id]);
 		if ($defaults) {
-			$merged = array();
+			$merged = [];
 			$rc = count($defaults);
 			for ($r=0; $r<$rc; $r++) {
 				$row = $defaults[$r];
@@ -260,7 +260,7 @@ class FieldOperations
 				//accumulate properties with the same name into array
 				if (isset($merged[$nm])) {
 					if (!is_array($merged[$nm])) {
-						$merged[$nm] = array($merged[$nm]);
+						$merged[$nm] = [$merged[$nm]];
 					}
 					$merged[$nm][] = $val;
 				} else {
@@ -294,9 +294,9 @@ class FieldOperations
 		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field where field_id=?';
 		$db = \cmsms()->GetDb();
-		$res = $db->Execute($sql, array($obfld->Id));
+		$res = $db->Execute($sql, [$obfld->Id]);
 		$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops where field_id=?';
-		$res = $db->Execute($sql, array($obfld->Id)) && $res;
+		$res = $db->Execute($sql, [$obfld->Id]) && $res;
 		return $res;
 	}
 

@@ -25,14 +25,14 @@ class FieldsetEnd extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
 	public function AdminPopulate($id)
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE, FALSE);
-		return array('main'=>$main,'adv'=>$adv);
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)

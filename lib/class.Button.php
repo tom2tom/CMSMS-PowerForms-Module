@@ -21,10 +21,10 @@ class Button extends FieldBase
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_button_text'),
+		$main[] = [$mod->Lang('title_button_text'),
 						$mod->CreateInputText($id, 'fp_text',
-							$this->GetProperty('text'), 40));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('text'), 40)];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)

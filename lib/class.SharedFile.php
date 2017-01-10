@@ -23,7 +23,7 @@ class SharedFile extends FieldBase
 
 	public function CreateSampleHeader()
 	{
-		$fields = array();
+		$fields = [];
 		foreach ($this->formdata->Fields as &$one) {
 			if ($one->DisplayInSubmission()) {
 				$fields[] = $one->GetName();
@@ -35,7 +35,7 @@ class SharedFile extends FieldBase
 
 	public function CreateDefaultTemplate()
 	{
-		$fields = array();
+		$fields = [];
 		foreach ($this->formdata->Fields as &$one) {
 			if ($one->DisplayInSubmission()) {
 				$fields[] = '{$'.$one->GetVariableName().'}';
@@ -58,14 +58,14 @@ class SharedFile extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		if (!Utils::GetUploadsPath($mod)) {
-			return array('main'=>array($this->GetErrorMessage('err_uploads_dir')));
+			return ['main'=>[$this->GetErrorMessage('err_uploads_dir')]];
 		}
 
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE, FALSE);
 
-		$main[] = array($mod->Lang('title_file_name'),
+		$main[] = [$mod->Lang('title_file_name'),
 			$mod->CreateInputText($id, 'fp_filespec',
-				$this->GetProperty('filespec', 'form_submissions.txt'), 50, 128));
+				$this->GetProperty('filespec', 'form_submissions.txt'), 50, 128)];
 
 /*		$main[] = array($mod->Lang('title_newline_replacement'),
 				$mod->CreateInputText($id,'fp_newlinechar',
@@ -73,7 +73,7 @@ class SharedFile extends FieldBase
 				$mod->Lang('help_newline_replacement'));
 */
 		//setup sample-template buttons and scripts
-		$ctldata = array();
+		$ctldata = [];
 		$ctldata['fp_file_template']['is_oneline'] = TRUE;
 		$ctldata['fp_file_header']['is_oneline'] = TRUE;
 		$ctldata['fp_file_header']['is_header'] = TRUE;
@@ -82,25 +82,25 @@ class SharedFile extends FieldBase
 		list($buttons, $jsfuncs) = Utils::TemplateActions($this->formdata, $id, $ctldata);
 		$this->jsfuncs = array_merge($this->jsfuncs, $jsfuncs);
 
-		$adv[] = array($mod->Lang('title_file_template'),
+		$adv[] = [$mod->Lang('title_file_template'),
 						$mod->CreateTextArea(FALSE, $id,
 							htmlspecialchars($this->GetProperty('file_template')),
 							'fp_file_template', 'pwf_tallarea', '', '', '', 50, 15),
-						'<br /><br />'.$buttons[0]);
+						'<br /><br />'.$buttons[0]];
 
-		$adv[] = array($mod->Lang('title_file_header'),
+		$adv[] = [$mod->Lang('title_file_header'),
 						$mod->CreateTextArea(FALSE, $id,
 							htmlspecialchars($this->GetProperty('file_header')),
 							'fp_file_header', 'pwf_shortarea', '', '', '', 50, 8),
-						'<br /><br />'.$buttons[1]);
+						'<br /><br />'.$buttons[1]];
 
-		$adv[] = array($mod->Lang('title_file_footer'),
+		$adv[] = [$mod->Lang('title_file_footer'),
 						$mod->CreateTextArea(FALSE, $id,
 							htmlspecialchars($this->GetProperty('file_footer')),
 							'fp_file_footer', 'pwf_shortarea', '', '', '', 50, 8),
-						'<br /><br />'.$buttons[2]);
+						'<br /><br />'.$buttons[2]];
 		//show variables-help on advanced tab
-		return array('main'=>$main,'adv'=>$adv,'extra'=>'varshelpadv');
+		return ['main'=>$main,'adv'=>$adv,'extra'=>'varshelpadv'];
 	}
 
 	public function Dispose($id, $returnid)
@@ -108,7 +108,7 @@ class SharedFile extends FieldBase
 		$mod = $formdata->formsmodule;
 		$ud = $Utils::GetUploadsPath($mod);
 		if (!$ud) {
-			return array(FALSE,$mod->Lang('err_uploads_dir'));
+			return [FALSE,$mod->Lang('err_uploads_dir')];
 		}
 /*MUTEX
 		try {
@@ -117,7 +117,7 @@ class SharedFile extends FieldBase
 			return array(FALSE,$this->Lang('err_system'));
 		}
 */
-		$tplvars = array();
+		$tplvars = [];
 		Utils::SetupFormVars($this->formdata, $tplvars);
 
 		$filespec = $this->GetProperty('filespec');
@@ -188,6 +188,6 @@ class SharedFile extends FieldBase
 /*MUTEX
 		$mx->unlock($token);
 */
-		return array(TRUE,'');
+		return [TRUE,''];
 	}
 }

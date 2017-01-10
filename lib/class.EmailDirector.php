@@ -79,7 +79,7 @@ class EmailDirector extends EmailBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -89,14 +89,14 @@ class EmailDirector extends EmailBase
 		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, 'title_email_subject');
 		$mod = $this->formdata->formsmodule;
 		// remove the "email subject" field
-		$main[] = array($mod->Lang('title_select_one_message'),
+		$main[] = [$mod->Lang('title_select_one_message'),
 			$mod->CreateInputText($id, 'fp_select_one',
-			$this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128));
-		$main[] = array($mod->Lang('title_allow_subject_override'),
+			$this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128)];
+		$main[] = [$mod->Lang('title_allow_subject_override'),
 			$mod->CreateInputHidden($id, 'fp_subject_override', 0).
 			$mod->CreateInputCheckbox($id, 'fp_subject_override', 1,
 				$this->GetProperty('subject_override', 0)),
-			$mod->Lang('help_allow_subject_override'));
+			$mod->Lang('help_allow_subject_override')];
 		if ($this->addressAdd) {
 			$this->AddPropIndexed('destination_subject', '');
 			$this->AddPropIndexed('destination_address', '');
@@ -104,28 +104,28 @@ class EmailDirector extends EmailBase
 		}
 		$opt = $this->GetPropArray('destination_address');
 		if ($opt) {
-			$dests = array();
-			$dests[] = array(
+			$dests = [];
+			$dests[] = [
 				$mod->Lang('title_selection_subject'),
 				$mod->Lang('title_destination_address'),
 				$mod->Lang('title_select')
-				);
+				];
 			foreach ($opt as $i=>&$one) {
 				$arf = '['.$i.']';
-				$dests[] = array(
+				$dests[] = [
 				$mod->CreateInputText($id, 'fp_destination_subject'.$arf,
 					$this->GetPropIndexed('destination_subject', $i), 40, 128),
 				$mod->CreateInputText($id, 'fp_destination_address'.$arf, $one, 50, 128),
 				$mod->CreateInputCheckbox($id, 'selected'.$arf, 1, -1, 'style="display:block;margin:auto;"')
-				);
+				];
 			}
 			unset($one);
 			$this->MultiComponent = TRUE;
-			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'extra'=>$extra);
+			return ['main'=>$main,'adv'=>$adv,'table'=>$dests,'extra'=>$extra];
 		} else {
 			$this->MultiComponent = FALSE;
-			$main[] = array('','',$mod->Lang('missing_type', $mod->Lang('destination')));
-			return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
+			$main[] = ['','',$mod->Lang('missing_type', $mod->Lang('destination'))];
+			return ['main'=>$main,'adv'=>$adv,'extra'=>$extra];
 		}
 	}
 
@@ -146,7 +146,7 @@ class EmailDirector extends EmailBase
 
 	public function AdminValidate($id)
 	{
-		$messages = array();
+		$messages = [];
 		list($ret, $msg) = parent::AdminValidate($id);
 		if (!$ret) {
 			$messages[] = $msg;
@@ -173,7 +173,7 @@ class EmailDirector extends EmailBase
 			$messages[] = $mod->Lang('missing_type', $mod->Lang('destination'));
 		}
 		$msg = ($ret)?'':implode('<br />', $messages);
-		return array($ret,$msg);
+		return [$ret,$msg];
 	}
 
 	public function Populate($id, &$params)
@@ -181,7 +181,7 @@ class EmailDirector extends EmailBase
 		$subjects = $this->GetPropArray('destination_subject');
 		if ($subjects) {
 			$mod = $this->formdata->formsmodule;
-			$choices = array(' '.$this->GetProperty('select_one', $mod->Lang('select_one'))=>-1)
+			$choices = [' '.$this->GetProperty('select_one', $mod->Lang('select_one'))=>-1]
 				+ array_flip($subjects);
 			$tmp = $mod->CreateInputDropdown(
 				$id, $this->formdata->current_prefix.$this->Id, $choices, -1, $this->Value,
@@ -201,7 +201,7 @@ class EmailDirector extends EmailBase
 			$mod = $this->formdata->formsmodule;
 			$this->ValidationMessage = $mod->Lang('missing_type', $mod->Lang('destination'));
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 
 	public function Dispose($id, $returnid)

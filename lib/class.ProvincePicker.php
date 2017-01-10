@@ -16,12 +16,12 @@ class ProvincePicker extends FieldBase
 		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->Type = 'ProvincePicker';
-		$this->Provinces = array(
+		$this->Provinces = [
 		 'Alberta'=>'AB','British Columbia'=>'BC','Manitoba'=>'MB',
 		 'New Brunswick'=>'NB','Newfoundland and Labrador'=>'NL',
 		 'Northwest Territories'=>'NT','Nova Scotia'=>'NS','Nunavut'=>'NU',
 		 'Ontario'=>'ON','Prince Edward Island'=>'PE','Quebec'=>'QC',
-		 'Saskatchewan'=>'SK','Yukon'=>'YT');
+		 'Saskatchewan'=>'SK','Yukon'=>'YT'];
 //		ksort($this->Provinces);
 	}
 
@@ -31,7 +31,7 @@ class ProvincePicker extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -40,21 +40,21 @@ class ProvincePicker extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
 
-		$choices = array_merge(array('No Default'=>''), $this->Provinces);
-		$main[] = array($mod->Lang('title_select_default_province'),
+		$choices = array_merge(['No Default'=>''], $this->Provinces);
+		$main[] = [$mod->Lang('title_select_default_province'),
 						$mod->CreateInputDropdown($id, 'fp_default_province', $choices, -1,
-							$this->GetProperty('default_province')));
-		$main[] = array($mod->Lang('title_select_one_message'),
+							$this->GetProperty('default_province'))];
+		$main[] = [$mod->Lang('title_select_one_message'),
 						$mod->CreateInputText($id, 'fp_select_one',
-							$this->GetProperty('select_one', $mod->Lang('select_one'))));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('select_one', $mod->Lang('select_one')))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
 	{
 		$mod = $this->formdata->formsmodule;
 
-		$choices = array_merge(array($this->GetProperty('select_one', $mod->Lang('select_one'))=>-1), $this->Provinces);
+		$choices = array_merge([$this->GetProperty('select_one', $mod->Lang('select_one'))=>-1], $this->Provinces);
 
 		if (!$this->HasValue() && $this->GetProperty('default_province')) {
 			$this->SetValue($this->GetProperty('default_province'));

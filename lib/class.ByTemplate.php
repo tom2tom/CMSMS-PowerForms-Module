@@ -45,7 +45,7 @@ class ByTemplate extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -53,15 +53,15 @@ class ByTemplate extends FieldBase
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_tag'),
+		$main[] = [$mod->Lang('title_tag'),
 						$mod->CreateInputText($id, 'fp_value', $this->GetProperty('value'), 100, 1024),
-						$mod->Lang('help_tag'));
-		return array('main'=>$main,'adv'=>$adv);
+						$mod->Lang('help_tag')];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
 	{
-		$tplvars = array();
+		$tplvars = [];
 		$tplvars['FBid'] = $id.$this->formdata->current_prefix.$this->Id;
 		// for selected... what to do here TODO
 		// for things like checked="checked" on the back page

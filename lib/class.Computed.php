@@ -27,7 +27,7 @@ class Computed extends FieldBase
 
 	public function Compute()
 	{
-		$fids = array();
+		$fids = [];
 		$procstr = $this->GetProperty('value');
 		//TODO if fields not named like '$fld_N' in the string ?
 		preg_match_all('/\$fld_(\d+)/', $procstr, $fids);
@@ -91,28 +91,28 @@ class Computed extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$help = Utils::FormFieldsHelp($this->formdata). //TODO Compute() expects $fld_N, not field alias
 			'<br /><br />'.$mod->Lang('help_operators');
-		$choices = array(
+		$choices = [
 			$mod->Lang('title_numeric')=>'numeric',
 			$mod->Lang('title_string')=>'string',
 			$mod->Lang('title_string_unspaced')=>'unstring',
-			$mod->Lang('title_compute')=>'compute');
+			$mod->Lang('title_compute')=>'compute'];
 
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
-		$main[] = array($mod->Lang('title_compute_value'),
+		$main[] = [$mod->Lang('title_compute_value'),
 						$mod->CreateInputText($id, 'fp_value', $this->GetProperty('value'), 35, 1024),
-						$help);
-		$main[] = array($mod->Lang('title_string_or_number_eval'),
+						$help];
+		$main[] = [$mod->Lang('title_string_or_number_eval'),
 						$mod->CreateInputRadioGroup($id, 'fp_string_or_number_eval', $choices,
-						$this->GetProperty('string_or_number_eval', 'numeric'), '&nbsp;&nbsp;'));
-		$main[] = array($mod->Lang('title_compute_order'),
+						$this->GetProperty('string_or_number_eval', 'numeric'), '&nbsp;&nbsp;')];
+		$main[] = [$mod->Lang('title_compute_order'),
 						$mod->CreateInputText($id, 'fp_order', $this->GetProperty('order', 1), 3),
-						$mod->Lang('help_compute_order'));
-		return array('main'=>$main,'adv'=>$adv);
+						$mod->Lang('help_compute_order')];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function AdminValidate($id)
 	{
-		$messages = array();
+		$messages = [];
 		list($ret, $msg) = parent::AdminValidate($id);
 		if (!$ret) {
 			$messages[] = $msg;
@@ -143,6 +143,6 @@ class Computed extends FieldBase
 			$messages[] = $mod->Lang('err_typed', $mod->Lang('TODO_order'));
 		}
 		$msg = ($ret)?'':implode('<br />', $messages);
-		return array($ret,$msg);
+		return [$ret,$msg];
 	}
 }

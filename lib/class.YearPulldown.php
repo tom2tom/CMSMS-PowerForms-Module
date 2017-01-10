@@ -28,7 +28,7 @@ class YearPulldown extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -37,17 +37,17 @@ class YearPulldown extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
 
-		$main[] = array($mod->Lang('title_select_one_message'),
+		$main[] = [$mod->Lang('title_select_one_message'),
 						$mod->CreateInputText($id, 'fp_select_one',
-						  $this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128));
-		$main[] = array($mod->Lang('title_year_end_message'),
+						  $this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128)];
+		$main[] = [$mod->Lang('title_year_end_message'),
 						$mod->CreateInputText($id, 'fp_year_start',
-						  $this->GetProperty('year_start', 1900), 25, 128));
-		$main[] = array($mod->Lang('sort_options'),
+						  $this->GetProperty('year_start', 1900), 25, 128)];
+		$main[] = [$mod->Lang('sort_options'),
 						$mod->CreateInputDropdown($id, 'fp_sort',
-						  array($mod->Lang('yes')=>1, $mod->Lang('no')=>0), -1,
-						  $this->GetProperty('sort', 0)));
-		return array('main'=>$main,'adv'=>$adv);
+						  [$mod->Lang('yes')=>1, $mod->Lang('no')=>0], -1,
+						  $this->GetProperty('sort', 0))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
@@ -58,7 +58,7 @@ class YearPulldown extends FieldBase
 			$count_from = 1900;
 		}
 
-		$choices = array();
+		$choices = [];
 		for ($i=date('Y'); $i>=$count_from; $i--) {
 			$choices[$i] = $i;
 		}
@@ -68,7 +68,7 @@ class YearPulldown extends FieldBase
 		}
 
 		$mod = $this->formdata->formsmodule;
-		$choices = array($this->GetProperty('select_one', $mod->Lang('select_one'))=>-1) + $choices;
+		$choices = [$this->GetProperty('select_one', $mod->Lang('select_one'))=>-1] + $choices;
 		$tmp = $mod->CreateInputDropdown(
 			$id, $this->formdata->current_prefix.$this->Id, $choices, -1, $this->Value,
 			'id="'.$this->GetInputId().'"'.$this->GetScript());

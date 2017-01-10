@@ -26,7 +26,7 @@ class Utils
 	  default empty
 	  Returns: cache-object (after creating it if not already done) or NULL
 	 */
-	public static function GetCache(&$mod, $storage='auto', $settings=array())
+	public static function GetCache(&$mod, $storage='auto', $settings=[])
 	{
 		//		if (self::$cache == NULL && isset($_SESSION['pwfcache']))
 //			self::$cache = $_SESSION['pwfcache'];
@@ -45,27 +45,27 @@ class Utils
 		$pre = \cms_db_prefix();
 
 		$settings = array_merge(
-			array(
-			'memcache'=>array(
-			  array('host'=>$url, 'port'=>11211)
-			),
+			[
+			'memcache'=>[
+			  ['host'=>$url, 'port'=>11211]
+			],
 /*			  'memcached'=>array(
 			  array('host'=>$url,'port'=>11211,'persist'=>1)
 			  ),
 */
-			'redis'=>array(
+			'redis'=>[
 				'host'=>$url //TODO CHECKME
-			),
-			'predis'=>array(
+			],
+			'predis'=>[
 				'host'=>$url
-			),
-			'file'=>array(
+			],
+			'file'=>[
 				'path'=>$basedir
-			),
-			'database' => array(
+			],
+			'database' => [
 				'table'=>$pre.'module_pwf_cache'
-			)
-			), $settings);
+			]
+			], $settings);
 
 		if ($storage) {
 			$storage = strtolower($storage);
@@ -73,14 +73,15 @@ class Utils
 			$storage = 'auto';
 		}
 		if (strpos($storage, 'auto') !== FALSE) {
-			$storage = 'yac,apc,apcu,wincache,xcache,memcache,redis,predis,file,database';
+//			$storage = 'yac,apc,apcu,wincache,xcache,memcache,redis,predis,file,database';
+			$storage = 'file,database';
 		}
 
 		$types = explode(',', $storage);
 		foreach ($types as $one) {
 			$one = trim($one);
 			if (!isset($settings[$one])) {
-				$settings[$one] = array();
+				$settings[$one] = [];
 			}
 			if (empty($settings[$one]['namespace'])) {
 				$settings[$one]['namespace'] = $mod->GetName();
@@ -333,8 +334,8 @@ class Utils
 			return;
 		} //already done
 
-		$menu = array();
-		foreach (array(
+		$menu = [];
+		foreach ([
 			'Checkbox',
 			'Pulldown',
 			'RadioGroup',
@@ -342,12 +343,12 @@ class Utils
 			'TextArea',
 			'Text',
 			'SystemEmail',
-			'SharedFile') as $classname) {
+			'SharedFile'] as $classname) {
 			$menukey = 'fieldlabel_'.$classname;
 			//TODO dynamically add prefix '*' for dispositions, '-' for non-inputs??
 			$menu[$classname] = $mod->Lang($menukey);
 		}
-		uasort($menu, array('self', 'labelcmp'));
+		uasort($menu, ['self', 'labelcmp']);
 		$mod->std_field_types = array_flip($menu);
 
 		$fp = __DIR__.DIRECTORY_SEPARATOR.'Fields.manifest';
@@ -364,7 +365,7 @@ class Utils
 			}
 			$feu = \cms_utils::get_module('FrontEndUsers');
 
-			$menu = array();
+			$menu = [];
 			$rows = file($fp, FILE_SKIP_EMPTY_LINES); //flag doesn't work!!
 			foreach ($rows as $oneline) {
 				if ($oneline[0] == '#' || ($oneline[0] == '/' && $oneline[1] == '/')) {
@@ -386,7 +387,7 @@ class Utils
 				$menu[$classname] = $mod->Lang($menukey);
 			}
 		} else {
-			$menu += array('_' => $mod->Lang('missing_type', $mod->Lang('TODO')));
+			$menu += ['_' => $mod->Lang('missing_type', $mod->Lang('TODO'))];
 		}
 
 		$imports = $mod->GetPreference('imported_fields');
@@ -394,7 +395,7 @@ class Utils
 			$imports = unserialize($imports);
 			foreach ($imports as $classname) {
 				$classpath = 'PWForms\\'.$classname;
-				$params = array();
+				$params = [];
 				$formdata = $mod->_GetFormData($params);
 				$obfld = new $classpath($formdata, $params);
 				if ($obfld) {
@@ -403,7 +404,7 @@ class Utils
 			}
 		}
 
-		uasort($menu, array('self', 'labelcmp'));
+		uasort($menu, ['self', 'labelcmp']);
 		$mod->field_types = array_flip($menu);
 	}
 
@@ -417,7 +418,7 @@ class Utils
 	public static function Show_Field(&$mod, $classname, $sort=TRUE)
 	{
 		if ($mod->field_types) {
-			$params = array();
+			$params = [];
 			$formdata = $mod->_GetFormData($params);
 			$classpath = 'PWForms\\'.$classname;
 			$obfld = new $classpath($formdata, $params);
@@ -432,7 +433,7 @@ class Utils
 				$menulabel = $p.$obfld->mymodule->Lang($obfld->MenuKey);
 				$mod->field_types[$menulabel] = $classname;
 				if ($sort) {
-					uksort($mod->field_types, array('self', 'labelcmp')); //TODO mb-compatible sort $coll = new Collator('fr_FR');
+					uksort($mod->field_types, ['self', 'labelcmp']); //TODO mb-compatible sort $coll = new Collator('fr_FR');
 				}
 			}
 		}
@@ -449,7 +450,7 @@ class Utils
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT field_id FROM '.$pre.'module_pwf_field WHERE alias = ?';
-		$fid = $db->GetOne($sql, array($alias));
+		$fid = $db->GetOne($sql, [$alias]);
 		if ($fid) {
 			return (int)$fid;
 		}
@@ -463,7 +464,7 @@ class Utils
 	*/
 	public static function FileClassName($filename)
 	{
-		$shortname = str_replace(array('class.', '.php'), array('', ''), $filename);
+		$shortname = str_replace(['class.', '.php'], ['', ''], $filename);
 		return self::MakeClassName($shortname);
 	}
 
@@ -515,7 +516,7 @@ class Utils
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT name FROM '.$pre.'module_pwf_form WHERE form_id=?';
-		$name = $db->GetOne($sql, array($form_id));
+		$name = $db->GetOne($sql, [$form_id]);
 		if ($name) {
 			return $name;
 		}
@@ -533,7 +534,7 @@ class Utils
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT alias FROM '.$pre.'module_pwf_form WHERE form_id=?';
-		$alias = $db->GetOne($sql, array($form_id));
+		$alias = $db->GetOne($sql, [$form_id]);
 		if ($alias) {
 			return $alias;
 		}
@@ -551,7 +552,7 @@ class Utils
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT form_id FROM '.$pre.'module_pwf_form WHERE alias = ?';
-		$fid = $db->GetOne($sql, array($form_alias));
+		$fid = $db->GetOne($sql, [$form_alias]);
 		if ($fid) {
 			return (int)$fid;
 		}
@@ -597,13 +598,13 @@ class Utils
 				$ret .= $mod->Lang('email_default_template').PHP_EOL;
 			}
 
-			foreach (array(
+			foreach ([
 			 'form_name' => 'title_form_name',
 			 'form_url' =>'help_form_url',
 			 'form_host' => 'help_server_name',
 			 'sub_date' => 'help_submission_date',
 			 'sub_source' => 'help_sub_source',
-			 'version' => 'help_module_version') as $key=>$val) {
+			 'version' => 'help_module_version'] as $key=>$val) {
 				if ($htmlish) {
 					$ret .= '<strong>'.$mod->Lang($val).'</strong>: {$'.$key.'}<br />';
 				} else {
@@ -689,7 +690,7 @@ function populate_{$funcName}(formname) {
  }
 }
 EOS;
-		return array($button,$func);
+		return [$button,$func];
 	}
 
 	/**
@@ -725,8 +726,8 @@ EOS;
 	public static function TemplateActions(&$formdata, $id, $ctlData)
 	{
 		$mod = $formdata->formsmodule;
-		$buttons = array();
-		$funcs = array();
+		$buttons = [];
+		$funcs = [];
 		foreach ($ctlData as $ctlname=>$tpopts) {
 			$gen_button = !empty($tpopts['general_button']);
 			$html_button = !empty($tpopts['html_button']);
@@ -747,7 +748,7 @@ EOS;
 				$tplstr = self::CreateDefaultTemplate($formdata, FALSE,
 					$is_email, $is_oneline, $is_header, $is_footer);
 				//adjust the string for js
-				$tplstr = str_replace(array("'", PHP_EOL), array("\\'", $breaker), $tplstr);
+				$tplstr = str_replace(["'", PHP_EOL], ["\\'", $breaker], $tplstr);
 				list($b, $f) = self::CreateTemplateAction($mod, $id, $ctlname,
 					$mod->Lang('title_create_sample_template'), $tplstr, $ctlname.'_1');
 				$buttons[] = $b;
@@ -767,12 +768,12 @@ EOS;
 			$tplstr = self::CreateDefaultTemplate($formdata, $html_button || $gen_button,
 				$is_email, $is_oneline, $is_header, $is_footer);
 			//adjust the string for js
-			$tplstr = str_replace(array("'", PHP_EOL), array("\\'", $breaker), $tplstr);
+			$tplstr = str_replace(["'", PHP_EOL], ["\\'", $breaker], $tplstr);
 			list($b, $f) = self::CreateTemplateAction($mod, $id, $ctlname, $button_text, $tplstr);
 			$buttons[] = $b;
 			$funcs[] = $f;
 		}
-		return array($buttons,$funcs);
+		return [$buttons,$funcs];
 	}
 
 	/**
@@ -796,9 +797,9 @@ EOS;
 		having key=id, value=name default = empty array
 	Returns: xhtml string which generates a tabular help description
 	*/
-	public static function FormFieldsHelp(&$formdata, &$extras=array())
+	public static function FormFieldsHelp(&$formdata, &$extras=[])
 	{
-		$rows = array();
+		$rows = [];
 		foreach ($formdata->Fields as &$one) {
 			$oneset = new \stdClass();
 			$oneset->id = $one->GetId();
@@ -816,12 +817,12 @@ EOS;
 		}
 
 		$mod = $formdata->formsmodule;
-		$tplvars = array(
+		$tplvars = [
 			'title_variables' => $mod->Lang('title_variables_available'),
 			'title_name' => $mod->Lang('title_php_variable'),
 			'title_field' => $mod->Lang('title_form_field'),
 			'rows' => $rows
-		);
+		];
 
 		return self::ProcessTemplate($mod, 'varshelp.tpl', $tplvars);
 	}
@@ -837,20 +838,20 @@ EOS;
 	*/
 	public static function SetupSubTemplateVarsHelp(&$formdata, &$mod, &$tplvars)
 	{
-		$tplvars = $tplvars + array(
+		$tplvars = $tplvars + [
 		 'template_vars_title' => $mod->Lang('title_template_variables'),
 		 'variable_title' => $mod->Lang('variable'),
 		 'property_title' => $mod->Lang('property')
-		);
+		];
 
-		$globalvars = array();
-		foreach (array(
+		$globalvars = [];
+		foreach ([
 		 'form_name' => 'title_form_name',
 		 'form_url' =>'help_form_url',
 		 'form_host' => 'help_server_name',
 		 'sub_date' => 'help_submission_date',
 		 'sub_source' => 'help_sub_source',
-		 'version' => 'help_module_version') as $name=>$langkey) {
+		 'version' => 'help_module_version'] as $name=>$langkey) {
 			$oneset = new \stdClass();
 			$oneset->name = '{$'.$name.'}';
 			$oneset->title = $mod->Lang($langkey);
@@ -865,7 +866,7 @@ EOS;
 		$tplvars['globalvars'] = $globalvars;
 
 		if ($formdata->Fields) {
-			$fieldvars = array();
+			$fieldvars = [];
 			foreach ($formdata->Fields as &$one) {
 				if ($one->DisplayInSubmission()) {
 					$oneset = new \stdClass();
@@ -910,26 +911,26 @@ EOS;
 	{
 		$mod = $formdata->formsmodule;
 		// general variables
-		$tplvars = $tplvars + array(
+		$tplvars = $tplvars + [
 			'form_name' => $formdata->Name,
 			'form_url' => (empty($_SERVER['HTTP_REFERER'])?$mod->Lang('no_referrer_info'):$_SERVER['HTTP_REFERER']),
 			'form_host' => $_SERVER['SERVER_NAME'],
 			'sub_date' => date('r'),
 			'sub_source' => $_SERVER['REMOTE_ADDR'],
 			'version' => $mod->GetVersion()
-		);
+		];
 
 		$unspec = self::GetFormProperty($formdata, 'unspecified', $mod->Lang('unspecified'));
 
 		foreach ($formdata->Fields as &$one) {
 			$replVal = $unspec;
-			$replVals = array();
+			$replVals = [];
 			if ($one->DisplayInSubmission()) {
 				$replVal = $one->DisplayableValue();
 				if ($htmlemail) {
 					// allow <BR> as delimiter or in content
 					$replVal = preg_replace(
-						array('/<br(\s)*(\/)*>/i', '/[\n\r]+/'), array('|BR|', '|BR|'),
+						['/<br(\s)*(\/)*>/i', '/[\n\r]+/'], ['|BR|', '|BR|'],
 						$replVal);
 					$replVal = htmlspecialchars($replVal);
 					$replVal = str_replace('|BR|', '<br />', $replVal);
@@ -1043,9 +1044,9 @@ EOS;
 		if (is_array($jsincs)) {
 			$all = $jsincs;
 		} elseif ($jsincs) {
-			$all = array($jsincs);
+			$all = [$jsincs];
 		} else {
-			$all = array();
+			$all = [];
 		}
 		if ($jsfuncs || $jsloads) {
 			$all[] =<<<'EOS'
@@ -1093,8 +1094,8 @@ EOS;
 
 		$val = html_entity_decode($val, ENT_COMPAT|ENT_XHTML);
 		$val = str_replace(
-		array('&amp;', '&#60;&#33;--', '--&#62;', '&gt;', '&lt;', '&quot;', '&#39;', '&#036;', '&#33;'),
-		array('&', '<!--', '-->', '>', '<', '"', "'", '$', '!'	),
+		['&amp;', '&#60;&#33;--', '--&#62;', '&gt;', '&lt;', '&quot;', '&#39;', '&#036;', '&#33;'],
+		['&', '<!--', '-->', '>', '<', '"', "'", '$', '!'	],
 		$val);
 		return $val;
 	}
@@ -1208,9 +1209,9 @@ EOS;
 		$name = $id.$name;
 		$sel = $contentops->CreateHierarchyDropdown('', $current, $name);
 		if ($sel) {
-			$srch = array('<select name="'.$name.'" id="'.$name.'">',
-						'<option value="-1">none</option>');
-			$repl = array($srch[0].'<option value="0">'.$mod->Lang('select_one').'</option>','');
+			$srch = ['<select name="'.$name.'" id="'.$name.'">',
+						'<option value="-1">none</option>'];
+			$repl = [$srch[0].'<option value="0">'.$mod->Lang('select_one').'</option>',''];
 			return str_replace($srch, $repl, $sel);
 		}
 		return '';
@@ -1283,7 +1284,7 @@ EOS;
 	{
 		if ($except) {
 			$sql = 'SELECT 1 FROM '.$pre.'module_pwf_formprops WHERE form_id!=? AND name=?';
-			$keep = $db->GetOne($sql, array($except, $file));
+			$keep = $db->GetOne($sql, [$except, $file]);
 			if ($keep) {
 				return;
 			}

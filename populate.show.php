@@ -7,11 +7,11 @@
 
 $in_browser = !empty($params['in_browser']); //TODO deprecated
 $inline = (!$in_browser && PWForms\Utils::GetFormProperty($formdata, 'inline', 0));
-$fmhidden = array(
+$fmhidden = [
 'form_id'=>$form_id,
 $formdata->current_prefix.'datakey'=>$cache_key,
 $formdata->current_prefix.'formpage'=>$formdata->Page,
-$formdata->current_prefix.'in_browser'=>$in_browser); //TODO deprecated
+$formdata->current_prefix.'in_browser'=>$in_browser]; //TODO deprecated
 if (isset($params['resume'])) {
 	$fmhidden[$formdata->current_prefix.'resume'] = $params['resume'];
 	if (isset($params['passthru'])) {
@@ -22,23 +22,23 @@ $form_start = $this->CreateFormStart($id, 'show_form', $returnid, 'POST',
 	'multipart/form-data', $inline, '', $fmhidden);
 $form_end = $this->CreateFormEnd();
 
-$tplvars = $tplvars + array(
+$tplvars = $tplvars + [
 	'actionid' => $id,
 	'css_class' => PWForms\Utils::GetFormProperty($formdata, 'css_class'),
 	'form_id' => $formdata->Id,
 	'form_name' => $formdata->Name
-);
+];
 
 //fresh start for js accumulators
-$formdata->jsincs = array();
-$formdata->jsfuncs = array();
-$formdata->jsloads = array();
+$formdata->jsincs = [];
+$formdata->jsfuncs = [];
+$formdata->jsloads = [];
 $togglehelp = FALSE;
 // Hidden-controls accumulator (see also the form hidden-parameters, above)
 $hidden = '';
 $reqSymbol = PWForms\Utils::GetFormProperty($formdata, 'required_field_symbol', '*');
 // Start building fields
-$fields = array();
+$fields = [];
 //$prev = array(); //make other-page field-values available to templates
 $formPage = 1; //'current' page for field-walk purposes
 
@@ -114,12 +114,12 @@ if ($formdata->Page > $formPage) {
 	$formdata->Page = $formPage;
 } //maybe page-redisplay goof
 
-$tplvars = $tplvars + array(
+$tplvars = $tplvars + [
 	'fields' => $fields,
 	'this_page' => $formdata->Page,
 	'total_pages' => $formdata->PagesCount,
-	'title_page_x_of_y' => $this->Lang('title_page_x_of_y', array($formdata->Page, $formdata->PagesCount)),
-);
+	'title_page_x_of_y' => $this->Lang('title_page_x_of_y', [$formdata->Page, $formdata->PagesCount]),
+];
 
 $baseurl = $this->GetModuleURLPath();
 

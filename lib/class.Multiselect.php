@@ -48,7 +48,7 @@ class Multiselect extends FieldBase
 	{
 		if ($this->HasValue()) {
 			if (is_array($this->Value)) {
-				$ret = array();
+				$ret = [];
 				$vals = $this->GetPropArray('indexed_value');
 				foreach ($this->Value as $one) {
 					$ret[] = $vals[$one];
@@ -67,7 +67,7 @@ class Multiselect extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -87,9 +87,9 @@ class Multiselect extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
 
-		$main[] = array($mod->Lang('title_lines_to_show'),
+		$main[] = [$mod->Lang('title_lines_to_show'),
 						$mod->CreateInputText($id, 'fp_lines',
-							$this->GetProperty('lines', '3'), 10, 10));
+							$this->GetProperty('lines', '3'), 10, 10)];
 		if ($this->optionAdd) {
 			$this->AddPropIndexed('indexed_name', '');
 			$this->AddPropIndexed('indexed_value', '');
@@ -97,27 +97,27 @@ class Multiselect extends FieldBase
 		}
 		$names = $this->GetPropArray('indexed_name');
 		if ($names) {
-			$dests = array();
-			$dests[] = array(
+			$dests = [];
+			$dests[] = [
 				$mod->Lang('title_indexed_name'),
 				$mod->Lang('title_indexed_value'),
 				$mod->Lang('title_select')
-				);
+				];
 			foreach ($names as $i=>&$one) {
 				$arf = '['.$i.']';
-				$dests[] = array(
+				$dests[] = [
 				$mod->CreateInputText($id, 'fp_indexed_name'.$arf, $one, 30, 128),
 				$mod->CreateInputText($id, 'fp_indexed_value'.$arf, $this->GetPropIndexed('indexed_value', $i), 30, 128),
 				$mod->CreateInputCheckbox($id, 'selected'.$arf, 1, -1, 'style="display:block;margin:auto;"')
-				);
+				];
 			}
 			unset($one);
 			$this->MultiComponent = TRUE;
-			return array('main'=>$main,'adv'=>$adv,'table'=>$dests);
+			return ['main'=>$main,'adv'=>$adv,'table'=>$dests];
 		} else {
 			$this->MultiComponent = FALSE;
-			$main[] = array('','',$mod->Lang('missing_type', $mod->Lang('member')));
-			return array('main'=>$main,'adv'=>$adv);
+			$main[] = ['','',$mod->Lang('missing_type', $mod->Lang('member'))];
+			return ['main'=>$main,'adv'=>$adv];
 		}
 	}
 
@@ -144,11 +144,11 @@ class Multiselect extends FieldBase
 				$id, $this->formdata->current_prefix.$this->Id, 0);
 			$choices = array_flip($choices);
 			if (!($this->Value || is_numeric($this->Value))) {
-				$val = array();
+				$val = [];
 			} elseif (is_array($this->Value)) {
 				$val = $this->Value;
 			} else {
-				$val = array($this->Value);
+				$val = [$this->Value];
 			}
 
 			$tmp = $this->formdata->formsmodule->CreateInputSelectList(

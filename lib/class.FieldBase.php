@@ -30,7 +30,7 @@ class FieldBase implements \Serializable
 	public function __construct(&$formdata, &$params)
 	{
 		$this->formdata = $formdata;
-		$this->XtraProps = array(
+		$this->XtraProps = [
 		'ChangeRequirement' => TRUE, //whether admin user may change 'Required' state
 		'DisplayInForm' => TRUE,
 		'DisplayInSubmission' => TRUE, //whether field value is shown in submission template (if used) (effectively ~ self::IsInput)
@@ -52,8 +52,8 @@ class FieldBase implements \Serializable
 		'SmartyEval' => FALSE, //whether to process Populate() output as a smarty-template (i.e. treat that output as a sub-template)
 		'ValidationMessage' => '', //post-validation error message, or ''
 		'ValidationType' => 'none', //chosen member of ValidationTypes
-		'ValidationTypes' => array() //array of label=>val suitable for populating a pulldown
-		);
+		'ValidationTypes' => [] //array of label=>val suitable for populating a pulldown
+		];
 
 		if (isset($params['form_id'])) {
 			$this->FormId = $params['form_id'];
@@ -141,7 +141,7 @@ class FieldBase implements \Serializable
 	public function GetPropArray($propName)
 	{
 		$len = strlen($propName);
-		$matches = array();
+		$matches = [];
 		foreach ($this->XtraProps as $key => &$val) {
 			if (strncmp($key, $propName, $len) == 0) {
 				$o = (int)substr($key, $len);
@@ -242,9 +242,9 @@ class FieldBase implements \Serializable
 	{
 		$mod = $this->formdata->formsmodule;
 		if ($this->Name || !$mod->GetPreference('require_fieldnames')) {
-			return array(TRUE,'');
+			return [TRUE,''];
 		}
-		return array(FALSE,$mod->Lang('field_no_name'));
+		return [FALSE,$mod->Lang('field_no_name')];
 	}
 
 	// Confirm this field's name is the not same as another field's name
@@ -254,11 +254,11 @@ class FieldBase implements \Serializable
 		foreach ($this->formdata->Fields as &$one) {
 			if ($one->Name == $this->Name && $one->Id != $this->Id) {
 				unset($one);
-				return array(FALSE,$this->formdata->formsmodule->Lang('field_name_in_use', $this->Name));
+				return [FALSE,$this->formdata->formsmodule->Lang('field_name_in_use', $this->Name)];
 			}
 		}
 		unset($one);
-		return array(TRUE,'');
+		return [TRUE,''];
 	}
 
 	// Caches a new field-alias
@@ -467,7 +467,7 @@ class FieldBase implements \Serializable
 		$mod = $this->formdata->formsmodule;
 		$ret = '<span style="color:red">'.$mod->Lang('error').'</span> ';
 		$args = func_get_args();
-		$ret .= call_user_func_array(array($mod, 'Lang'), $args);
+		$ret .= call_user_func_array([$mod, 'Lang'], $args);
 		return $ret;
 	}
 
@@ -527,16 +527,16 @@ class FieldBase implements \Serializable
 		$cls = trim($cls);
 		if ($cls) {
 			$html = preg_replace(
-			array(
+			[
 			'/<input +type *= *"(\w+)"/U',
 			'/<label/',
 			'/<option/',
-			),
-			array(
+			],
+			[
 			'<input type="$1" class="'.$cls.'"',
 			'<label class="'.$cls.'"',
 			'<option class="'.$cls.'"',
-			), $html);
+			], $html);
 		}
 		return $html;
 	}
@@ -563,7 +563,7 @@ class FieldBase implements \Serializable
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -581,7 +581,7 @@ class FieldBase implements \Serializable
 	public function SetValue($newvalue)
 	{
 		if (is_array($newvalue)) {
-			$this->Value = array();
+			$this->Value = [];
 			foreach ($newvalue as &$one) {
 				$this->Value[] = Utils::html_myentities_decode($one);
 			}
@@ -678,7 +678,7 @@ class FieldBase implements \Serializable
 	{
 		if (!empty($this->XtraProps['field_logic'])) {
 			$code = $this->XtraProps['field_logic'];
-			return Utils::ProcessTemplateFromData($this->formdata->formsmodule, $code, array());
+			return Utils::ProcessTemplateFromData($this->formdata->formsmodule, $code, []);
 		}
 		return '';
 	}
@@ -789,33 +789,33 @@ class FieldBase implements \Serializable
 			$except = is_array($except);
 		}
 		//init main tab content
-		$main = array();
+		$main = [];
 		$key = 'title_field_name';
 		if (!$except || !in_array($key, $except)) {
-			$main[] = array($mod->Lang($key),
-							$mod->CreateInputText($id, 'field_Name', $this->GetName(), 50));
+			$main[] = [$mod->Lang($key),
+							$mod->CreateInputText($id, 'field_Name', $this->GetName(), 50)];
 		}
 		$key = 'title_field_alias';
 		if (!$except || !in_array($key, $except)) {
 			$alias = $this->ForceAlias();
-			$main[] = array($mod->Lang($key),
-							$mod->CreateInputText($id, 'field_Alias', $alias, 30)); //no 'fp_' prefix for maintable properties
+			$main[] = [$mod->Lang($key),
+							$mod->CreateInputText($id, 'field_Alias', $alias, 30)]; //no 'fp_' prefix for maintable properties
 		}
 		$key = 'title_field_type';
 		if (!$except || !in_array($key, $except)) {
-			$main[] = array($mod->Lang($key),
+			$main[] = [$mod->Lang($key),
 						$mod->CreateInputHidden($id, 'field_Type', $this->Type).
-						$this->GetDisplayType());
+						$this->GetDisplayType()];
 		}
 
 		if (!$boolean && $visible && !empty($this->XtraProps['ChangeRequirement'])) {
 			$key = 'title_field_required';
 			if (!$except || !in_array($key, $except)) {
-				$main[] = array($mod->Lang($key),
+				$main[] = [$mod->Lang($key),
 							$mod->CreateInputHidden($id, 'fp_Required', 0). //was field_required
 							$mod->CreateInputCheckbox($id, 'fp_Required', 1,
 								$this->IsRequired()),
-							$mod->Lang('help_field_required'));
+							$mod->Lang('help_field_required')];
 			}
 		}
 
@@ -833,7 +833,7 @@ class FieldBase implements \Serializable
 				} else {
 					$validInput = $mod->Lang('none');
 				}
-				$main[] = array($mod->Lang($key),$validInput);
+				$main[] = [$mod->Lang($key),$validInput];
 			}
 		}
 
@@ -841,31 +841,31 @@ class FieldBase implements \Serializable
 		if ($visible && $displayable) {
 			$key = 'title_field_helptext';
 			if (!$except || !in_array($key, $except)) {
-				$main[] = array($mod->Lang($key),
+				$main[] = [$mod->Lang($key),
 							$mod->CreateTextArea(FALSE, $id, $this->helptext,
-							'fp_helptext', 'pwf_shortarea', '', '', '', 50, 8));
+							'fp_helptext', 'pwf_shortarea', '', '', '', 50, 8)];
 				$helper = TRUE;
 			}
 		}
 
 		//init advanced tab content
-		$adv = array();
+		$adv = [];
 		if ($visible && !empty($this->XtraProps['HasLabel'])) {
 			$key = 'title_hide_label';
 			if (!$except || !in_array($key, $except)) {
-				$adv[] = array($mod->Lang($key),
+				$adv[] = [$mod->Lang($key),
 							$mod->CreateInputHidden($id, 'fp_HideLabel', 0).
 							$mod->CreateInputCheckbox($id, 'fp_HideLabel', 1, $this->HideLabel),
-							$mod->Lang('help_hide_label'));
+							$mod->Lang('help_hide_label')];
 			}
 		}
 		if ($helper) {
 			$key = 'title_field_helptoggle';
 			if (!$except || !in_array($key, $except)) {
-				$adv[] = array($mod->Lang($key),
+				$adv[] = [$mod->Lang($key),
 							$mod->CreateInputHidden($id, 'fp_helptoggle', 0).
 							$mod->CreateInputCheckbox($id, 'fp_helptoggle', 1, $this->helptoggle),
-							$mod->Lang('help_field_helptoggle'));
+							$mod->Lang('help_field_helptoggle')];
 			}
 		}
 
@@ -873,35 +873,35 @@ class FieldBase implements \Serializable
 			if ($visible) {
 				$key = 'title_field_css_class';
 				if (!$except || !in_array($key, $except)) {
-					$adv[] = array($mod->Lang($key),
-								$mod->CreateInputText($id, 'fp_css_class', $this->css_class, 30));
+					$adv[] = [$mod->Lang($key),
+								$mod->CreateInputText($id, 'fp_css_class', $this->css_class, 30)];
 				}
 				$key = 'title_field_javascript';
 				if (!$except || !in_array($key, $except)) {
-					$adv[] = array($mod->Lang($key),
+					$adv[] = [$mod->Lang($key),
 								$mod->CreateTextArea(FALSE, $id, $this->javascript,
 								'fp_javascript', 'pwf_shortarea', '', '', '', 50, 8, '', 'js'),
-								$mod->Lang('help_field_javascript'));
+								$mod->Lang('help_field_javascript')];
 				}
 			}
 			$key = 'title_field_resources';
 			if (!$except || !in_array($key, $except)) {
-				$adv[] = array($mod->Lang($key),
+				$adv[] = [$mod->Lang($key),
 							$mod->CreateTextArea(FALSE, $id, $this->resources, //was field_logic
 							'fp_resources', 'pwf_shortarea', '', '', '', 50, 8),
-							$mod->Lang('help_field_resources'));
+							$mod->Lang('help_field_resources')];
 			}
 		}
 
 		$key = 'title_smarty_eval';
 		if (!$except || !in_array($key, $except)) {
-			$adv[] = array($mod->Lang($key),
+			$adv[] = [$mod->Lang($key),
 					$mod->CreateInputHidden($id, 'fp_SmartyEval', 0).
 					$mod->CreateInputCheckbox($id, 'fp_SmartyEval', 1, $this->SmartyEval),
-					$mod->Lang('help_smarty_eval'));
+					$mod->Lang('help_smarty_eval')];
 		}
 
-		return array($main,$adv);
+		return [$main,$adv];
 	}
 
 	/**
@@ -933,7 +933,7 @@ class FieldBase implements \Serializable
 	*/
 	public function AdminValidate($id)
 	{
-		$messages = array();
+		$messages = [];
 		list($ret, $msg) = $this->FieldIsNamed();
 		if ($ret) {
 			list($ret, $msg) = $this->FieldNameUnique();
@@ -944,7 +944,7 @@ class FieldBase implements \Serializable
 			$messages[] = $msg;
 		}
 		$msg = ($ret)?'':implode('<br />', $messages);
-		return array($ret,$msg);
+		return [$ret,$msg];
 	}
 
 	/*Subclass this to generate content for the frontend form, either:
@@ -974,7 +974,7 @@ class FieldBase implements \Serializable
 	{
 		$this->valid = TRUE;
 		$this->XtraProps['ValidationMessage'] = '';
-		return array(TRUE,'');
+		return [TRUE,''];
 	}
 
 	// Subclass this to do stuff (e.g. modify other fields) after validation
@@ -992,7 +992,7 @@ class FieldBase implements \Serializable
 	*/
 	public function Dispose($id, $returnid)
 	{
-		return array(TRUE,'');
+		return [TRUE,''];
 	}
 
 	// Subclass this to do stuff after the form has been disposed

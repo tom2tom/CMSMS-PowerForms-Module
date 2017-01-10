@@ -41,14 +41,14 @@ class CustomEmail extends EmailBase
 
 	public function AdminPopulate($id)
 	{
-		$displayfields = array();
+		$displayfields = [];
 		foreach ($this->formdata->Fields as &$one) {
 			if ($one->DisplayInForm) {
 				$displayfields[$one->GetName()] = $one->GetId();
 			}
 		}
 		unset($one);
-		$destfields = array();
+		$destfields = [];
 		$opt = $this->GetPropArray('destination_address');
 		if ($opt) {
 			foreach ($displayfields as $k=>$v) {
@@ -58,30 +58,30 @@ class CustomEmail extends EmailBase
 			}
 		}
 		$mod = $this->formdata->formsmodule;
-		$choices = array($mod->Lang('select_one') => '') + $displayfields;
+		$choices = [$mod->Lang('select_one') => ''] + $displayfields;
 
 		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, FALSE, TRUE, FALSE);
 		$waslast = array_pop($main); //keep only the default to-type selector
-		$main[] = array($mod->Lang('title_subject_field'),
+		$main[] = [$mod->Lang('title_subject_field'),
 						$mod->CreateInputDropdown($id, 'fp_email_subject', $choices, -1,
-						$this->GetProperty('email_subject')));
-		$main[] = array($mod->Lang('title_from_field'),
+						$this->GetProperty('email_subject'))];
+		$main[] = [$mod->Lang('title_from_field'),
 						$mod->CreateInputDropdown($id, 'fp_email_from_name', $choices, -1,
-						$this->GetProperty('email_from_name', $mod->Lang('friendly_name'))));
-		$main[] = array($mod->Lang('title_from_address_field'),
+						$this->GetProperty('email_from_name', $mod->Lang('friendly_name')))];
+		$main[] = [$mod->Lang('title_from_address_field'),
 						$mod->CreateInputDropdown($id, 'fp_email_from_address', $choices, -1,
-						$this->GetProperty('email_from_address')));
+						$this->GetProperty('email_from_address'))];
 //TODO what is $i ?
-		$main[] = array($mod->Lang('title_destination_field'),
+		$main[] = [$mod->Lang('title_destination_field'),
 						$mod->CreateInputSelectList($id, 'fp_destination_address'.$i, $displayfields,
-						$destfields, 5));
+						$destfields, 5)];
 		$main[] = $waslast;
-		return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
+		return ['main'=>$main,'adv'=>$adv,'extra'=>$extra];
 	}
 
 	public function AdminValidate($id)
 	{
-		$messages = array();
+		$messages = [];
 		list($ret, $msg) = parent::AdminValidate($id);
 		if (!$ret) {
 			$messages[] = $msg;
@@ -124,7 +124,7 @@ class CustomEmail extends EmailBase
 			$messages[] = $msg;
 		}
 		$msg = ($ret)?'':implode('<br />', $messages);
-		return array($ret,$msg);
+		return [$ret,$msg];
 	}
 
 	public function Dispose($id, $returnid)
@@ -141,7 +141,7 @@ class CustomEmail extends EmailBase
 			$fld = $formdata->Fields[$fromfld];
 			$this->SetProperty('email_from_address', $fld->DisplayableValue());
 
-			$addrs = array();
+			$addrs = [];
 			foreach ($dests as $field_id) {
 				$fld = $formdata->Fields[$field_id];
 				$value = $fld->DisplayableValue();
@@ -168,6 +168,6 @@ class CustomEmail extends EmailBase
 
 			return $ret;
 		}
-		return array(FALSE,$this->formdata->formsmodule->Lang('err_address', ''));
+		return [FALSE,$this->formdata->formsmodule->Lang('err_address', '')];
 	}
 }

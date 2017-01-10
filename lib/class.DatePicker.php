@@ -31,8 +31,8 @@ class DatePicker extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$today = getdate();
-		return $mod->Lang('date_range', array($this->GetProperty('start_year', ($today['year']-10)),
-		 $this->GetProperty('end_year', ($today['year']+10)))).
+		return $mod->Lang('date_range', [$this->GetProperty('start_year', ($today['year']-10)),
+		 $this->GetProperty('end_year', ($today['year']+10))]).
 		 ($this->GetProperty('default_year', '-1')!=='-1'?' ('.$this->GetProperty('default_year', '-1').')':'');
 	}
 
@@ -70,7 +70,7 @@ class DatePicker extends FieldBase
 				$this->GetArrayValue(array_search('y', $arrUserOrder)));
 			$ret = date($this->GetProperty('date_format', 'j F Y'), $theDate);
 
-			$ret = str_replace(array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'),
+			$ret = str_replace(['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
 					explode(',', $mod->Lang('all_months')), $ret);
 			$ret = html_entity_decode($ret, ENT_QUOTES, 'UTF-8');
 		} else {
@@ -80,7 +80,7 @@ class DatePicker extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -90,42 +90,42 @@ class DatePicker extends FieldBase
 
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_default_blank'),
+		$main[] = [$mod->Lang('title_default_blank'),
 						$mod->CreateInputHidden($id, 'fp_default_blank', 0).
 						$mod->CreateInputCheckbox($id, 'fp_default_blank', 1,
 							$this->GetProperty('default_blank', 0)),
-						$mod->Lang('help_default_today'));
-		$main[] = array($mod->Lang('title_start_year'),
+						$mod->Lang('help_default_today')];
+		$main[] = [$mod->Lang('title_start_year'),
 						$mod->CreateInputText($id, 'fp_start_year',
-							$this->GetProperty('start_year', ($today['year']-10)), 10, 10));
-		$main[] = array($mod->Lang('title_end_year'),
+							$this->GetProperty('start_year', ($today['year']-10)), 10, 10)];
+		$main[] = [$mod->Lang('title_end_year'),
 						$mod->CreateInputText($id, 'fp_end_year',
-							$this->GetProperty('end_year', ($today['year']+10)), 10, 10));
-		$main[] = array($mod->Lang('title_default_year'),
+							$this->GetProperty('end_year', ($today['year']+10)), 10, 10)];
+		$main[] = [$mod->Lang('title_default_year'),
 						$mod->CreateInputText($id, 'fp_default_year',
 							$this->GetProperty('default_year', '-1'), 10, 10),
-						$mod->Lang('help_default_year'));
-		$adv[] = array($mod->Lang('title_date_format'),
+						$mod->Lang('help_default_year')];
+		$adv[] = [$mod->Lang('title_date_format'),
 						$mod->CreateInputText($id, 'fp_date_format',
 							$this->GetProperty('date_format', 'j F Y'), 25, 25),
-						$mod->Lang('help_date_format'));
-		$adv[] = array($mod->Lang('title_date_order'),
+						$mod->Lang('help_date_format')];
+		$adv[] = [$mod->Lang('title_date_order'),
 						$mod->CreateInputText($id, 'fp_date_order',
 							$this->GetProperty('date_order', 'd-m-y'), 5, 5),
-						$mod->Lang('help_date_order'));
-		return array('main'=>$main,'adv'=>$adv);
+						$mod->Lang('help_date_order')];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
 	{
 		$today = getdate();
 
-		$Days = array(''=>'');
+		$Days = [''=>''];
 		for ($i=1; $i<32; $i++) {
 			$Days[$i] = $i;
 		}
 
-		$Years = array(''=>'');
+		$Years = [''=>''];
 		$sty = $this->GetProperty('start_year', ($today['year']-10));
 		if ($sty <= 0) {
 			$sty = $today['year'];
@@ -183,11 +183,11 @@ class DatePicker extends FieldBase
 			$today['year'], 'id="'.$tid.'"'.$js);
 		$yr->input = $this->SetClass($tmp);
 
-		$order = array('d' => $day,'m' => $mon,'y' => $yr);
+		$order = ['d' => $day,'m' => $mon,'y' => $yr];
 		$user_order = $this->GetProperty('date_order', 'd-m-y');
 		$arrUserOrder = explode("-", $user_order);
 
-		$ret = array();
+		$ret = [];
 		foreach ($arrUserOrder as $key) {
 			$ret[] = $order[$key];
 		}

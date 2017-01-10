@@ -42,12 +42,12 @@ if (!function_exists('BlockSource')) {
 			$src = $_SERVER['REMOTE_ADDR'];
 			global $db;
 			$pre = cms_db_prefix();
-			$sql = array('UPDATE '.$pre.'module_pwf_ip_log SET howmany=255,basetime=? WHERE src=?');
-			$args = array(array($t2,$src));
+			$sql = ['UPDATE '.$pre.'module_pwf_ip_log SET howmany=255,basetime=? WHERE src=?'];
+			$args = [[$t2,$src]];
 			$sql[] = 'INSERT INTO '.$pre.'module_pwf_ip_log
 (src,howmany,basetime) SELECT ?,255,? FROM (SELECT 1 AS dmy) Z
 WHERE NOT EXISTS (SELECT 1 FROM '.$pre.'module_pwf_ip_log T WHERE T.src=?)';
-			$args[] = array($src,$t2,$src);
+			$args[] = [$src,$t2,$src];
 			PWForms\Utils::SafeExec($sql, $args);
 		}
 	}
@@ -66,20 +66,20 @@ if (!isset($params['form_id']) && isset($params['form'])) { // got the form by a
 	$params['form_id'] = PWForms\Utils::GetFormIDFromAlias($params['form']);
 }
 if (empty($params['form_id']) || $params['form_id'] == -1) {
-	echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', array(
+	echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 		'title'=>$this->Lang('title_aborted'),
 		'message'=>$this->Lang('err_data'),
-		'error'=>1));
+		'error'=>1]);
 	return;
 }
 
 try {
 	$cache = PWForms\Utils::GetCache($this);
 } catch (Exception $e) {
-	echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', array(
+	echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 		'title'=>$this->Lang('title_aborted'),
 		'message'=>$this->Lang('err_system').' NO CACHE MECHANISM',
-		'error'=>1));
+		'error'=>1]);
 	return;
 }
 
@@ -96,18 +96,18 @@ if ($matched) {
 	} else {
 		BlockSource();
 		ClearFormCache($cache, $params);
-		echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', array(
+		echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 			'title'=>$this->Lang('title_aborted'),
-			'message'=>$this->Lang('comeback_expired')));
+			'message'=>$this->Lang('comeback_expired')]);
 		return;
 	}
 	while ($key = next($matched)) {
 		if (strpos($key, $prefix) !== 0) {
 			BlockSource();
 			ClearFormCache($cache, $params);
-			echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', array(
+			echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 				'title'=>$this->Lang('title_aborted'),
-				'message'=>$this->Lang('comeback_expired')));
+				'message'=>$this->Lang('comeback_expired')]);
 			return;
 		}
 	}
@@ -118,9 +118,9 @@ if ($matched) {
 if (isset($params[$prefix.'cancel'])) {
 	ClearFormCache($cache, $params);
 	if (isset($params[$prefix.'passthru'])) {
-		$newparms = array('passthru'=>$params[$prefix.'passthru']);
+		$newparms = ['passthru'=>$params[$prefix.'passthru']];
 	} else {
-		$newparms = array();
+		$newparms = [];
 	}
 	if (strpos($params[$prefix.'resume'], ',') === FALSE) {
 		$this->Redirect($id, $params[$prefix.'resume'], $returnid, $newparms);
@@ -150,15 +150,15 @@ $validerr = 0; //default no validation error
 
 if (isset($params[$prefix.'datakey'])) {
 	$firsttime = FALSE; //this is a return-visit
-	$tplvars = array(); //TODO members to preserve c.f. 1st-pass
+	$tplvars = []; //TODO members to preserve c.f. 1st-pass
 
 	$cache_key = $params[$prefix.'datakey'];
 	$formdata = $cache->get($cache_key);
 	if (is_null($formdata)) {
-		echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', array(
+		echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 			'title'=>$this->Lang('title_aborted'),
 			'message'=>$this->Lang('err_data'),
-			'error'=>1));
+			'error'=>1]);
 		return;
 	}
 	$formdata->formsmodule = &$this;
@@ -194,9 +194,9 @@ if (isset($params[$prefix.'datakey'])) {
 				$num = 0;
 				$pre = cms_db_prefix();
 				$sql = 'DELETE FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<?';
-				$args = array($src,$t2);
+				$args = [$src,$t2];
 				$sql2 = 'SELECT COUNT(*) AS num FROM '.$pre.'module_pwf_ip_log WHERE src=? AND basetime<=?';
-				$args2 = array(array($src,$t));
+				$args2 = [[$src,$t]];
 
 				$nt = 10;
 				while ($nt > 0) {
@@ -213,39 +213,39 @@ if (isset($params[$prefix.'datakey'])) {
 				}
 				if ($nt == 0) {
 					$cache->delete($cache_key);
-					echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', array(
+					echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 						'title'=>$this->Lang('title_aborted'),
 						'message'=>$this->Lang('system_data'),
-						'error'=>1));
+						'error'=>1]);
 					return;
 				}
 				if ($num) {
 					if ($num == 255) { //blocked due to expiry
 						BlockSource(); //again!
 						$cache->delete($cache_key);
-						echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', array(
+						echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 							'title'=>$this->Lang('title_aborted'),
-							'message'=>$this->Lang('comeback_expired')));
+							'message'=>$this->Lang('comeback_expired')]);
 						return;
 					}
 					if ($num <= $limit) {
-						$sql = array();
+						$sql = [];
 						$sql[] = <<<EOS
 UPDATE {$pre}module_pwf_ip_log SET howmany=howmany+1 WHERE src=? AND howmany<?
 EOS;
-						$args = array(array($src,$num+1));
+						$args = [[$src,$num+1]];
 						$sql[] = <<<EOS
 INSERT INTO {$pre}module_pwf_ip_log (src,howmany,basetime)
 SELECT ?,1,? FROM (SELECT 1 AS dmy) Z
 WHERE NOT EXISTS (SELECT 1 FROM {$pre}module_pwf_ip_log T WHERE T.src=?)
 EOS;
-						$args[] = array($src,$t,$src);
+						$args[] = [$src,$t,$src];
 						PWForms\Utils::SafeExec($sql, $args);
 					} else {
 						$cache->delete($cache_key);
-						echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', array(
+						echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 							'title'=>$this->Lang('title_aborted'),
-							'message'=>$this->Lang('comeback_toomany')));
+							'message'=>$this->Lang('comeback_toomany')]);
 						return;
 					}
 				}
@@ -256,7 +256,7 @@ EOS;
 		$allvalid = TRUE;
 		$notempty = PWForms\Utils::GetFormProperty($formdata, 'blank_invalid',
 			$this->GetPreference('blank_invalid'));
-		$message = array();
+		$message = [];
 //			$formPage = 1;
 //			$valPage = $formdata->Page - 1; //TODO off by 1 ?
 
@@ -375,7 +375,7 @@ EOS;
 			}
 */
 			// run all field methods that modify other fields
-			$computes = array();
+			$computes = [];
 			foreach ($formdata->FieldOrders as $field_id) {
 				$obfld = $formdata->Fields[$field_id];
 				$obfld->PreDisposeAction();
@@ -392,7 +392,7 @@ EOS;
 			}
 
 			$alldisposed = TRUE;
-			$message = array();
+			$message = [];
 			// dispose TODO handle 'blocked' notices
 			foreach ($formdata->FieldOrders as $field_id) {
 				$obfld = $formdata->Fields[$field_id];
@@ -410,7 +410,7 @@ EOS;
 				$obfld->PostDisposeAction();
 			}
 
-			$parms = array();
+			$parms = [];
 			$parms['form_id'] = $form_id;
 			$parms['form_name'] = PWForms\Utils::GetFormNameFromID($form_id);
 
@@ -431,29 +431,29 @@ EOS;
 					if ($ret > 0) {
 						$this->RedirectContent($ret);
 					} else {
-						echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', array(
+						echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 							'title'=>$this->Lang('missing_type', $this->Lang('page')),
 							'message'=>$this->Lang('cannot_show_TODO'),
-							'error'=>1));
+							'error'=>1]);
 						return;
 					}
 				 case 'confirm':
 					//'external' confirmation needed before acceptance
 					//after confirmation, formdata will be different
-					echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', array(
+					echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 						'title'=>$this->Lang('title_confirm'),
-						'message'=>$this->Lang('help_confirm')));
+						'message'=>$this->Lang('help_confirm')]);
 					return;
 				 default:
 					exit;
 				}
 			} else {
 				$this->SendEvent('OnFormSubmitError', $parms);
-				$tplvars = $tplvars + array(
+				$tplvars = $tplvars + [
 					'submission_error' => $this->Lang('err_submission'),
 					'submission_error_list' => $message,
 					'show_submission_errors' => !$this->GetPreference('hide_errors')
-				);
+				];
 			}
 			unset($parms);
 // end of synchronous processing
@@ -523,10 +523,10 @@ EOS;
 	$formdata = $funcs->Load($this, $form_id, $id, $params);
 	if (!$formdata) {
 		unset($funcs);
-		echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', array(
+		echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 			'title'=>$this->Lang('title_aborted'),
 			'message'=>$this->Lang('err_data'),
-			'error'=>1));
+			'error'=>1]);
 		return;
 	}
 
@@ -537,7 +537,7 @@ EOS;
 		if (is_array($params['excludetype'])) {
 			$extypes = $params['excludetype'];
 		} else {
-			$extypes = array($params['excludetype']);
+			$extypes = [$params['excludetype']];
 		}
 	} else {
 		$extypes = FALSE;
@@ -546,7 +546,7 @@ EOS;
 		if (is_array($params['exclude'])) {
 			$exfields = $params['exclude'];
 		} else {
-			$exfields = array($params['exclude']);
+			$exfields = [$params['exclude']];
 		}
 	} else {
 		$exfields = FALSE;
@@ -577,7 +577,7 @@ EOS;
 	}
 
 	//make initiator-supplied parameters available TODO may also be needed for later pass(es)
-	$tplvars = array_diff_key($params, array(
+	$tplvars = array_diff_key($params, [
 	'action' => 1,
 	'cancel' => 1,
 	'exclude' => 1,
@@ -587,7 +587,7 @@ EOS;
 	'passthru' => 1,
 	'preload' => 1,
 	'resume' => 1
-	));
+	]);
 
 	if (isset($params['preload'])) {
 		//set fields' value from externally-supplied values
@@ -643,9 +643,9 @@ if ($udtonce || $udtevery) {
 	unset($usertagops);
 }
 
-$this->SendEvent('OnFormDisplay', array(
+$this->SendEvent('OnFormDisplay', [
  'form_id'=>$form_id,
- 'form_name'=>PWForms\Utils::GetFormNameFromID($form_id)));
+ 'form_name'=>PWForms\Utils::GetFormNameFromID($form_id)]);
 
 $tplvars['form_done'] = 0;
 
@@ -679,7 +679,7 @@ if (\$linklast.length) {
 }
 EOS;
 $jsall = NULL;
-PWForms\Utils::MergeJS(FALSE, array($t), FALSE, $jsall);
+PWForms\Utils::MergeJS(FALSE, [$t], FALSE, $jsall);
 echo $jsall;
 
 echo $form_start.$hidden;

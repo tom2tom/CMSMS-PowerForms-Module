@@ -14,18 +14,18 @@ class FormData implements \Serializable
 	public $prior_prefix = FALSE; //for prior-period
 	//known form-properties
 	public $Alias = '';
-	public $Fields = array(); //merged array of display and/or disposition field objects, each key = field->Id
+	public $Fields = []; //merged array of display and/or disposition field objects, each key = field->Id
 	public $FieldOrders = FALSE; //when needed, set to ordered array representing field->Orderby
 	public $Id = 0;
 	public $Name = '';
 	public $Page = 0; //current page in the form
 	public $PagesCount = 0; //no. of pages in the form
-	public $XtraProps = array(); //extra form-properties
+	public $XtraProps = []; //extra form-properties
 //	public $sampleTemplateCode = '';
-	public $templateVariables = array(); //extra 'global' items for template-help, each like 'var_name'=>'help_lang_key'
-	public $jsincs = array(); //'include' directives
-	public $jsfuncs = array(); //funcs and/or instructions
-	public $jsloads = array(); //document-ready funcs and/or instructions
+	public $templateVariables = []; //extra 'global' items for template-help, each like 'var_name'=>'help_lang_key'
+	public $jsincs = []; //'include' directives
+	public $jsfuncs = []; //funcs and/or instructions
+	public $jsloads = []; //document-ready funcs and/or instructions
 
 	public function __set($name, $value)
 	{
@@ -61,7 +61,7 @@ class FormData implements \Serializable
 		$mod = $this->formsmodule;
 		$this->formsmodule = ($mod) ? $mod->GetName():'PWForms'; //no need to log all 'public' data
 		$saved = $this->Fields;
-		$afields = array();
+		$afields = [];
 		foreach ($saved as $i=>$one) {
 			$afields[$i] = serialize($one);
 		}
@@ -94,7 +94,7 @@ class FormData implements \Serializable
 						$this->$key =& \cms_utils::get_module($one);
 						break;
 					 case 'Fields':
-						$members = array();
+						$members = [];
 						foreach ($one as $i=>$mdata) {
 							$i = (int)$i;
 							$members[$i] = unserialize($mdata);
@@ -109,14 +109,14 @@ class FormData implements \Serializable
 					 case 'jsincs':
 					 case 'jsfuncs':
 					 case 'jsloads':
-						$this->$key = ($one) ? (array)$one : array();
+						$this->$key = ($one) ? (array)$one : [];
 						break;
 					 case 'XtraProps':
 						$one = (array)$one;
-						$members = array();
+						$members = [];
 						foreach ($one as $subkey=>$mdata) {
 							if (is_object($mdata)) {
-								$mdata = array($mdata);
+								$mdata = [$mdata];
 							}
 							$members[$subkey] = $mdata;
 						}

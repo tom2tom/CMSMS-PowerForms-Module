@@ -25,7 +25,7 @@ class FieldsetStart extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -33,10 +33,10 @@ class FieldsetStart extends FieldBase
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE, FALSE);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_legend'),
+		$main[] = [$mod->Lang('title_legend'),
 						$mod->CreateInputText($id, 'fp_legend',
-							$this->GetProperty('legend'), 50));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('legend'), 50)];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)

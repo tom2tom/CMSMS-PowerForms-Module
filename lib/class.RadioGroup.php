@@ -77,7 +77,7 @@ class RadioGroup extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -105,10 +105,10 @@ class RadioGroup extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
 
-		$main[] = array($mod->Lang('title_radio_separator'),
+		$main[] = [$mod->Lang('title_radio_separator'),
 						$mod->CreateInputText($id, 'fp_radio_separator',
 							$this->GetProperty('radio_separator', '&nbsp;&nbsp;'), 15, 25),
-						$mod->Lang('help_radio_separator'));
+						$mod->Lang('help_radio_separator')];
 		if ($this->optionAdd) {
 			$this->AddPropIndexed('button_name', '');
 			$this->AddPropIndexed('button_checked', '');
@@ -117,25 +117,25 @@ class RadioGroup extends FieldBase
 		}
 		$names = $this->GetPropArray('button_name');
 		if ($names) {
-			$boxes = array();
-			$boxes[] = array(
+			$boxes = [];
+			$boxes[] = [
 				$mod->Lang('title_default_sel'),
 				$mod->Lang('title_radio_label'),
 				$mod->Lang('title_selected_value'),
 				$mod->Lang('title_select')
-				);
+				];
 			$fieldclass = 'field'.$this->Id;
 			foreach ($names as $i=>$one) {
 				$arf = '['.$i.']';
 				$tmp = $mod->CreateInputCheckbox($id, 'fp_button_is_set'.$arf, 'y', $this->GetPropIndexed('button_is_set', $i),
 					'style="display:block;margin:auto;"');
-				$boxes[] = array(
+				$boxes[] = [
 					$mod->CreateInputHidden($id, 'fp_button_is_set'.$arf, 'n').
 						str_replace('class="', 'class="'.$fieldclass.' ', $tmp),
 					$mod->CreateInputText($id, 'fp_button_name'.$arf, $one, 25, 128),
 					$mod->CreateInputText($id, 'fp_button_checked'.$arf, $this->GetPropIndexed('button_checked', $i), 25, 128),
 					$mod->CreateInputCheckbox($id, 'selected'.$arf, 1, -1, 'style="display:block;margin:auto;"')
-				 );
+				 ];
 			}
 			$this->jsfuncs['checkone'] = <<<'EOS'
 function select_only(cb,fclass) {
@@ -151,17 +151,17 @@ EOS;
  });
 EOS;
 			$this->MultiComponent = TRUE;
-			return array('main'=>$main,'adv'=>$adv,'table'=>$boxes);
+			return ['main'=>$main,'adv'=>$adv,'table'=>$boxes];
 		} else {
 			$this->MultiComponent = FALSE;
-			$main[] = array('','',$mod->Lang('missing_type', $mod->Lang('member')));
-			return array('main'=>$main,'adv'=>$adv);
+			$main[] = ['','',$mod->Lang('missing_type', $mod->Lang('member'))];
+			return ['main'=>$main,'adv'=>$adv];
 		}
 	}
 
 	public function AdminValidate($id)
 	{
-		$messages = array();
+		$messages = [];
 		list($ret, $msg) = parent::AdminValidate($id);
 		if (!$ret) {
 			$messages[] = $msg;
@@ -181,9 +181,9 @@ EOS;
 			$messages[] = $mod->Lang('missing_type', $mod->Lang('member'));
 		}
 		if ($messages) {
-			return array(FALSE,implode('<br />', $messages));
+			return [FALSE,implode('<br />', $messages)];
 		} else {
-			return array(TRUE,'');
+			return [TRUE,''];
 		}
 	}
 
@@ -207,7 +207,7 @@ EOS;
 	{
 		$names = $this->GetPropArray('button_name');
 		if ($names) {
-			$ret = array();
+			$ret = [];
 			$mod = $this->formdata->formsmodule;
 			$sep = $this->GetProperty('radio_separator', '&nbsp;&nbsp;');
 			$cnt = count($names);

@@ -61,7 +61,7 @@ class EmailFEUProperty extends EmailBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -74,14 +74,14 @@ class EmailFEUProperty extends EmailBase
 	{
 		$feu = $this->mymodule;
 		if (!$feu) {
-			return array('main'=>array($this->GetErrorMessage('err_module', self::MODNAME)));
+			return ['main'=>[$this->GetErrorMessage('err_module', self::MODNAME)]];
 		}
 		$defns = $feu->GetPropertyDefns();
 		if (!is_array($defns)) {
-			return array('main'=>array($this->GetErrorMessage('err_feudefns')));
+			return ['main'=>[$this->GetErrorMessage('err_feudefns')]];
 		}
 		// check for dropdown or multiselect fields
-		$opts = array();
+		$opts = [];
 		foreach ($defns as $key => $data) {
 			switch ($data['type']) {
 			 case 4: //dropdown
@@ -95,18 +95,18 @@ class EmailFEUProperty extends EmailBase
 			}
 		}
 		if (!$opts) {
-			return array('main'=>array($this->GetErrorMessage('err_feudefns')));
+			return ['main'=>[$this->GetErrorMessage('err_feudefns')]];
 		}
 		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, FALSE, TRUE);
 		$waslast = array_pop($ret['main']); //keep the email to-type selector for last
 		$keys = array_keys($opts);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_feu_property'),
+		$main[] = [$mod->Lang('title_feu_property'),
 				$mod->CreateInputDropdown($id, 'fp_feu_property', array_flip($opts), -1,
 					$this->GetProperty('feu_property', $keys[0])),
-				$mod->Lang('help_feu_property'));
+				$mod->Lang('help_feu_property')];
 		$main[] = $waslast;
-		return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
+		return ['main'=>$main,'adv'=>$adv,'extra'=>$extra];
 	}
 
 	public function Populate($id, &$params)
@@ -149,7 +149,7 @@ class EmailFEUProperty extends EmailBase
 	{
 		$feu = $this->mymodule;
 		if (!$feu) {
-			return array(FALSE,$this->formdata->formsmodule->Lang('err_module', self::MODNAME));
+			return [FALSE,$this->formdata->formsmodule->Lang('err_module', self::MODNAME)];
 		}
 
 		// get the property name
@@ -159,12 +159,12 @@ class EmailFEUProperty extends EmailBase
 		$users = $feu->GetUsersInGroup(-1, '', '', '', $prop, $this->Value);
 		if (!is_array($users) || count($users) == 0) {
 			// no matching users is not an error.
-			return array(TRUE,'');
+			return [TRUE,''];
 		}
 
-		$tplvars = array();
-		$smarty_users = array();
-		$destinations = array();
+		$tplvars = [];
+		$smarty_users = [];
+		$destinations = [];
 		$ucount = count($users);
 		for ($i = 0; $i < $ucount; $i++) {
 			$rec =& $users[$i];

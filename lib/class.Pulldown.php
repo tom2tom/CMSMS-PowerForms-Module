@@ -56,7 +56,7 @@ class Pulldown extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -78,13 +78,13 @@ class Pulldown extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
 
-		$main[] = array($mod->Lang('title_select_one_message'),
+		$main[] = [$mod->Lang('title_select_one_message'),
 			$mod->CreateInputText($id, 'fp_select_one',
-			  $this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128));
-		$main[] = array($mod->Lang('sort_options'),
+			  $this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128)];
+		$main[] = [$mod->Lang('sort_options'),
 			$mod->CreateInputDropdown($id, 'fp_sort',
-			  array($mod->Lang('yes')=>1, $mod->Lang('no')=>0), -1,
-			  $this->GetProperty('sort', 0)));
+			  [$mod->Lang('yes')=>1, $mod->Lang('no')=>0], -1,
+			  $this->GetProperty('sort', 0))];
 		if ($this->optionAdd) {
 			$this->AddPropIndexed('indexed_name', '');
 			$this->AddPropIndexed('indexed_value', '');
@@ -92,27 +92,27 @@ class Pulldown extends FieldBase
 		}
 		$opt = $this->GetPropArray('indexed_name');
 		if ($opt) {
-			$dests = array();
-			$dests[] = array(
+			$dests = [];
+			$dests[] = [
 				$mod->Lang('title_indexed_name'),
 				$mod->Lang('title_indexed_value'),
 				$mod->Lang('title_select')
-				);
+				];
 			foreach ($opt as $i=>&$one) {
 				$arf = '['.$i.']';
-				$dests[] = array(
+				$dests[] = [
 				$mod->CreateInputText($id, 'fp_indexed_name'.$arf, $one, 30, 128),
 				$mod->CreateInputText($id, 'fp_indexed_value'.$arf, $this->GetPropIndexed('indexed_value', $i), 30, 128),
 				$mod->CreateInputCheckbox($id, 'selected'.$arf, 1, -1, 'style="display:block;margin:auto;"')
-				);
+				];
 			}
 			unset($one);
 			$this->MultiComponent = TRUE;
-			return array('main'=>$main,'adv'=>$adv,'table'=>$dests);
+			return ['main'=>$main,'adv'=>$adv,'table'=>$dests];
 		} else {
 			$this->MultiComponent = FALSE;
-			$main[] = array('','',$mod->Lang('missing_type', $mod->Lang('member')));
-			return array('main'=>$main,'adv'=>$adv);
+			$main[] = ['','',$mod->Lang('missing_type', $mod->Lang('member'))];
+			return ['main'=>$main,'adv'=>$adv];
 		}
 	}
 
@@ -140,7 +140,7 @@ class Pulldown extends FieldBase
 				ksort($choices);
 			}
 			$mod = $this->formdata->formsmodule;
-			$choices = array(' '.$this->GetProperty('select_one', $mod->Lang('select_one'))=>-1) + $choices;
+			$choices = [' '.$this->GetProperty('select_one', $mod->Lang('select_one'))=>-1] + $choices;
 
 			$tmp = $mod->CreateInputDropdown(
 				$id, $this->formdata->current_prefix.$this->Id, $choices, -1, $this->Value,

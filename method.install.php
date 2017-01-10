@@ -13,8 +13,8 @@ TODO mutex check
 //TODO cache check
 
 $pre = cms_db_prefix();
-$taboptarray = array('mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
-'mysqli' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci');
+$taboptarray = ['mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
+'mysqli' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci'];
 $dict = NewDataDictionary($db);
 
 $flds = '
@@ -151,12 +151,12 @@ $this->CreateEvent('OnFormSubmitError');
 $css = @file_get_contents(cms_join_path(__DIR__, 'css', 'default.css'));
 $css_id = $db->GenID($pre.'css_seq');
 $db->Execute('INSERT INTO '.$pre.'css (css_id,css_name,css_text,media_type,create_date) VALUES (?,?,?,?,?)',
-	array($css_id, 'PWForms Default Style', $css, 'screen', date('Y-m-d')));
+	[$css_id, 'PWForms Default Style', $css, 'screen', date('Y-m-d')]);
 
 if (!$this->before20) {
 	$myname = $this->GetName();
 //	$me = get_userid(FALSE);
-	foreach (array('form', 'submission') as $name) {
+	foreach (['form', 'submission'] as $name) {
 		$ttype = new CmsLayoutTemplateType();
 		$ttype->set_originator($myname);
 		$ttype->set_name($name);

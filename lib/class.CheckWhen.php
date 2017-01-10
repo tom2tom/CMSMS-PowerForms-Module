@@ -53,20 +53,20 @@ class CheckWhen extends Checkbox
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_checkbox_label'),
+		$main[] = [$mod->Lang('title_checkbox_label'),
 						$mod->CreateInputText($id, 'fp_label',
-							$this->GetProperty('label'), 25, 255));
+							$this->GetProperty('label'), 25, 255)];
 
-		$main[] = array($mod->Lang('title_unchecked_value'),
+		$main[] = [$mod->Lang('title_unchecked_value'),
 						$mod->CreateInputText($id, 'fp_unchecked_value',
-							$this->GetProperty('unchecked_value', $mod->Lang('value_unchecked')), 25, 255));
+							$this->GetProperty('unchecked_value', $mod->Lang('value_unchecked')), 25, 255)];
 
-		$adv[] = array($mod->Lang('title_dateformat'),
+		$adv[] = [$mod->Lang('title_dateformat'),
 						$mod->CreateInputText($id, 'fp_dtfmt',
 							$this->GetProperty('dtfmt', $this->defaultfmt), 25, 255),
-						$this->Lang('help_date'));
+						$this->Lang('help_date')];
 
-		return array('main'=>$main,'adv'=>$adv);
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)

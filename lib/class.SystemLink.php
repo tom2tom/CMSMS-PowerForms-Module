@@ -32,7 +32,7 @@ class SystemLink extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -40,15 +40,15 @@ class SystemLink extends FieldBase
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_auto_link'),
+		$main[] = [$mod->Lang('title_auto_link'),
 						$mod->CreateInputHidden($id, 'fp_auto_link', 0).
 						$mod->CreateInputCheckbox($id, 'fp_auto_link', 1,
 							$this->GetProperty('auto_link', 0)),
-						$mod->Lang('help_auto_link'));
-		$main[] = array($mod->Lang('title_target_page'),
+						$mod->Lang('help_auto_link')];
+		$main[] = [$mod->Lang('title_target_page'),
 						Utils::CreateHierarchyPulldown($mod, $id, 'fp_target_page',
-							$this->GetProperty('target_page', 0)));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('target_page', 0))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
@@ -61,7 +61,7 @@ class SystemLink extends FieldBase
 			$tmp = $this->formdata->formsmodule->CreateContentLink($pageinfo->content_id, $oneset->name);
 			$oneset->input = $this->SetClass($tmp);
 			$this->MultiPopulate = TRUE;
-			return array($oneset);
+			return [$oneset];
 		} else {
 			$page = $this->GetProperty('target_page', 0);
 			if ($page > 0) {
@@ -73,7 +73,7 @@ class SystemLink extends FieldBase
 				$tmp = $this->formdata->formsmodule->CreateContentLink($cobj->Id(), $oneset->name);
 				$oneset->input = $this->SetClass($tmp);
 				$this->MultiPopulate = TRUE;
-				return array($oneset);
+				return [$oneset];
 			}
 		}
 		$this->MultiPopulate = FALSE;

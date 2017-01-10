@@ -30,7 +30,7 @@ class Link extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -39,13 +39,13 @@ class Link extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
 
-		$main[] = array($mod->Lang('title_default_link'),
+		$main[] = [$mod->Lang('title_default_link'),
 						$mod->CreateInputText($id, 'fp_default_link',
-							$this->GetProperty('default_link'), 25, 128));
-		$main[] = array($mod->Lang('title_default_link_title'),
+							$this->GetProperty('default_link'), 25, 128)];
+		$main[] = [$mod->Lang('title_default_link_title'),
 						$mod->CreateInputText($id, 'fp_default_link_title',
-							$this->GetProperty('default_link_title'), 25, 128));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('default_link_title'), 25, 128)];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
@@ -56,10 +56,10 @@ class Link extends FieldBase
 		if (is_array($this->Value)) {
 			$val = $this->Value;
 		} else {
-			$val = array($this->GetProperty('default_link'),$this->GetProperty('default_link_title'));
+			$val = [$this->GetProperty('default_link'),$this->GetProperty('default_link_title')];
 		}
 
-		$ret = array();
+		$ret = [];
 		$oneset = new \stdClass();
 		$tid = $this->GetInputId('_1');
 		$oneset->title = $mod->Lang('link_destination');

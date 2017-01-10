@@ -29,7 +29,7 @@ class StaticText extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -38,10 +38,10 @@ class StaticText extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE, FALSE);
 		$mod = $this->formdata->formsmodule;
 
-		$main[] = array($mod->Lang('title_text'),
+		$main[] = [$mod->Lang('title_text'),
 						$mod->CreateTextArea((get_preference(get_userid(), 'use_wysiwyg')), $id,
-							$this->GetProperty('text'), 'fp_text', 'pageheadtags'));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('text'), 'fp_text', 'pageheadtags')];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)

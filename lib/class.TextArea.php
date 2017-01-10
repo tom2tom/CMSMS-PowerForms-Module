@@ -15,10 +15,10 @@ class TextArea extends FieldBase
 		$this->IsInput = TRUE;
 		$this->Type = 'TextArea';
 		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = array(
+		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_length')=>'length'
-		);
+		];
 	}
 
 	public function GetSynopsis()
@@ -52,28 +52,28 @@ class TextArea extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id, 'title_field_javascript');
 		$mod = $this->formdata->formsmodule;
 
-		$main[] = array($mod->Lang('title_use_wysiwyg'),
+		$main[] = [$mod->Lang('title_use_wysiwyg'),
 						$mod->CreateInputHidden($id, 'fp_wysiwyg', 0).
-						$mod->CreateInputCheckbox($id, 'fp_wysiwyg', 1, $this->GetProperty('wysiwyg', 0)));
-		$main[] = array($mod->Lang('title_textarea_rows'),
-						$mod->CreateInputText($id, 'fp_rows', $this->GetProperty('rows', 15), 2, 2));
+						$mod->CreateInputCheckbox($id, 'fp_wysiwyg', 1, $this->GetProperty('wysiwyg', 0))];
+		$main[] = [$mod->Lang('title_textarea_rows'),
+						$mod->CreateInputText($id, 'fp_rows', $this->GetProperty('rows', 15), 2, 2)];
 //TODO this is stupid - prefer 100%
 //		$main[] = array($mod->Lang('title_textarea_cols'),
 //						$mod->CreateInputText($id,'fp_cols',$this->GetProperty('cols',80),5,5));
-		$main[] = array($mod->Lang('title_textarea_length'),
-						$mod->CreateInputText($id, 'fp_length', $this->GetProperty('length'), 5, 5));
+		$main[] = [$mod->Lang('title_textarea_length'),
+						$mod->CreateInputText($id, 'fp_length', $this->GetProperty('length'), 5, 5)];
 
-		$adv[] = array($mod->Lang('title_field_default_value'),
+		$adv[] = [$mod->Lang('title_field_default_value'),
 						$mod->CreateTextArea(FALSE, $id, $this->GetProperty('default'), 'fp_default',
-						'pwf_tallarea', '', '', '', 50, 15));
-		$adv[] = array($mod->Lang('title_clear_default'),
+						'pwf_tallarea', '', '', '', 50, 15)];
+		$adv[] = [$mod->Lang('title_clear_default'),
 						$mod->CreateInputHidden($id, 'fp_clear_default', 0).
 						$mod->CreateInputCheckbox($id, 'fp_clear_default', 1, $this->GetProperty('clear_default', 0)),
-						$mod->Lang('help_clear_default'));
-		$adv[] = array($mod->Lang('title_html5'),
+						$mod->Lang('help_clear_default')];
+		$adv[] = [$mod->Lang('title_html5'),
 						$mod->CreateInputHidden($id, 'fp_html5', 0).
-						$mod->CreateInputCheckbox($id, 'fp_html5', 1, $this->GetProperty('html5', 0)));
-		return array('main'=>$main,'adv'=>$adv);
+						$mod->CreateInputCheckbox($id, 'fp_html5', 1, $this->GetProperty('html5', 0))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
@@ -134,6 +134,6 @@ EOS;
 			}
 			$this->Value = substr($this->Value, 0, $length+1);
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 }

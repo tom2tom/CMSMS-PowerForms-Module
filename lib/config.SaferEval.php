@@ -8,17 +8,17 @@
 *
 */
 
-$allowedVariables = array(
+$allowedVariables = [
 	'$v',
 	'$i',
-);
+];
 
-$globalVariables = array(
+$globalVariables = [
 	'v',
 	'x',
-);
+];
 
-$allowedCalls = array(
+$allowedCalls = [
 	// Function Handling Functions
 //	'func_get_arg',		// Return an item from the argument list
 //	'func_get_args',	// Returns an array comprising a function's argument list
@@ -170,9 +170,9 @@ $allowedCalls = array(
 	'ucwords',		// Uppercase the first character of each word in a string
 	'wordwrap',		// Wraps a string to a given number of characters
 
-);
+];
 
-$allowedTokens = array(
+$allowedTokens = [
 	'T_AND_EQUAL',			// assignment operators
 	'T_ARRAY',			// array(), array syntax
 	'T_ARRAY_CAST',			// type-casting
@@ -244,9 +244,9 @@ $allowedTokens = array(
 	'T_WHILE',			// while, do..while
 	'T_WHITESPACE',			//
 	'T_XOR_EQUAL',			// assignment operators
-);
+];
 
-$disallowedExpressions = array(	// Probably unsafe to change these
+$disallowedExpressions = [	// Probably unsafe to change these
 
 	'/`/',				// Shell execution operator: "`"
 	'/\$\W/',			// Variable variables: any "$" which is not "$_" or "$alphanumeric"
@@ -255,4 +255,4 @@ $disallowedExpressions = array(	// Probably unsafe to change these
 //	'/\$\w\w*\s*(\/\/|\/\*)/',	// Comment after variable: "$alphanumeric //" or "$alphanumeric /*"
 //	'/(\]|\})\s*\//',		// Comment after parentheses: "] /" or "} /"
 
-);
+];

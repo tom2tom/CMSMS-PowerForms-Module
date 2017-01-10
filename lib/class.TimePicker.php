@@ -19,9 +19,9 @@ class TimePicker extends FieldBase
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'TimePicker';
 		$mod = $formdata->formsmodule;
-		$this->flag12hour = array(
+		$this->flag12hour = [
 			$mod->Lang('title_before_noon')=>$mod->Lang('title_before_noon'),
-			$mod->Lang('title_after_noon')=>$mod->Lang('title_after_noon'));
+			$mod->Lang('title_after_noon')=>$mod->Lang('title_after_noon')];
 	}
 
 	public function GetSynopsis()
@@ -49,7 +49,7 @@ class TimePicker extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -57,11 +57,11 @@ class TimePicker extends FieldBase
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_24_hour'),
+		$main[] = [$mod->Lang('title_24_hour'),
 						$mod->CreateInputHidden($id, 'fp_24_hour', 0).
 						$mod->CreateInputCheckbox($id, 'fp_24_hour', 1,
-							$this->GetProperty('24_hour', 0)));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('24_hour', 0))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
@@ -70,9 +70,9 @@ class TimePicker extends FieldBase
 		$js = $this->GetScript();
 
 		$now = localtime(time(), TRUE);
-		$Mins = array();
-		$Hours = array();
-		$ret = array();
+		$Mins = [];
+		$Hours = [];
+		$ret = [];
 		for ($i=0; $i<60; $i++) {
 			$mo = sprintf("%02d", $i);
 			$Mins[$mo] = $mo;

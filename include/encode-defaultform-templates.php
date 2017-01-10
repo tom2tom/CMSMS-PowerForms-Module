@@ -7,7 +7,7 @@
 Temporarily include this somewhere, to generate encoded templates for default forms
 After running, the results will need to be manually transcribed into the relevant template .xml files
 */
-$templates = array();
+$templates = [];
 
 $templates['Sample_form'] =<<<EOS
 {if \$form_done}

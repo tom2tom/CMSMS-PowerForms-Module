@@ -25,7 +25,7 @@ if (isset($params['active_tab'])) {
 	if (strpos($params['field_id'], ',') !== FALSE) {
 		$all = explode(',', $params['field_id']);
 	} else {
-		$all = array($params['field_id']);
+		$all = [$params['field_id']];
 	}
 	foreach ($all as $one) {
 		$fid = (int)$one;

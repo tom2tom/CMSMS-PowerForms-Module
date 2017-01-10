@@ -56,7 +56,7 @@ if ($padm) {
 				while (!$rs->EOF) {
 					$val = PWForms\Utils::Decrypt($this, $rs->fields[1], $old);
 					$val = PWForms\Utils::Encrypt($this, $val, $t);
-					if (!PWForms\Utils::SafeExec($sql, array($val, $rs->fields[0]))) {
+					if (!PWForms\Utils::SafeExec($sql, [$val, $rs->fields[0]])) {
 						//TODO handle error
 					}
 					if (!$rs->MoveNext()) {
@@ -78,7 +78,7 @@ if ($padm) {
 	}
 }
 
-$tplvars = array();
+$tplvars = [];
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.defaultadmin.php';
 

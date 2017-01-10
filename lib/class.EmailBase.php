@@ -44,50 +44,50 @@ class EmailBase extends FieldBase
 		$message = $this->GetProperty('email_template');
 
 		//additional main-tab items
-		$main[] = array($mod->Lang('title_email_subject'),
+		$main[] = [$mod->Lang('title_email_subject'),
 						$mod->CreateInputText($id, 'fp_email_subject',
-							$this->GetProperty('email_subject'), 50),$mod->Lang('canuse_smarty'));
-		$main[] = array($mod->Lang('title_email_from_name'),
+							$this->GetProperty('email_subject'), 50),$mod->Lang('canuse_smarty')];
+		$main[] = [$mod->Lang('title_email_from_name'),
 						$mod->CreateInputText($id, 'fp_email_from_name',
-							$this->GetProperty('email_from_name', $mod->Lang('friendly_name')), 40, 128));
-		$main[] = array($mod->Lang('title_email_from_address'),
+							$this->GetProperty('email_from_name', $mod->Lang('friendly_name')), 40, 128)];
+		$main[] = [$mod->Lang('title_email_from_address'),
 						$mod->CreateInputText($id, 'fp_email_from_address',
 							$this->GetProperty('email_from_address'), 50, 128),
-						$mod->Lang('email_from_addr_help', $_SERVER['SERVER_NAME']));
+						$mod->Lang('email_from_addr_help', $_SERVER['SERVER_NAME'])];
 		//abandoned here: 'fp_email_cc_address','fp_use_bcc'
 		//code elsewhere assumes this is last in $main[]
 		if ($totype) {
-			$main[] = array(
+			$main[] = [
 				$mod->Lang('title_send_using'),
 				$mod->CreateInputRadioGroup($id, 'fp_send_using',
-					array($mod->Lang('to')=>'to', $mod->Lang('cc')=>'cc', $mod->Lang('bcc')=>'bc'),
+					[$mod->Lang('to')=>'to', $mod->Lang('cc')=>'cc', $mod->Lang('bcc')=>'bc'],
 					$this->GetProperty('send_using', 'to'), '', '&nbsp;&nbsp;'),
-					$mod->Lang('email_to_help'));
+					$mod->Lang('email_to_help')];
 		}
 
 		//additional advanced-tab items
-		$adv[] = array($mod->Lang('title_html_email'),
+		$adv[] = [$mod->Lang('title_html_email'),
 					$mod->CreateInputHidden($id, 'fp_html_email', 0).
 					$mod->CreateInputCheckbox($id, 'fp_html_email', 1,
-						$this->GetProperty('html_email', 0)));
-		$adv[] = array($mod->Lang('title_email_encoding'),
+						$this->GetProperty('html_email', 0))];
+		$adv[] = [$mod->Lang('title_email_encoding'),
 					$mod->CreateInputText($id, 'fp_email_encoding',
-						$this->GetProperty('email_encoding', 'utf-8'), 15, 128));
+						$this->GetProperty('email_encoding', 'utf-8'), 15, 128)];
 		//setup sample-template buttons and scripts
-		$ctldata = array();
+		$ctldata = [];
 		$ctldata['fp_email_template']['html_button'] = TRUE;
 		$ctldata['fp_email_template']['text_button'] = TRUE;
 		$ctldata['fp_email_template']['is_email'] = TRUE;
 		list($buttons, $jsfuncs) = Utils::TemplateActions($this->formdata, $id, $ctldata);
 		$this->jsfuncs = array_merge($this->jsfuncs, $jsfuncs);
 
-		$adv[] = array($mod->Lang('title_email_template'),
+		$adv[] = [$mod->Lang('title_email_template'),
 						$mod->CreateTextArea(FALSE, $id,
 						//($this->GetProperty('html_email',0)?$message:htmlspecialchars($message))
 						$message, 'fp_email_template', 'pwf_tallarea', '', '', '', 50, 15, '', 'html'),
-						'<br /><br />'.$buttons[0].'&nbsp;'.$buttons[1]);
+						'<br /><br />'.$buttons[0].'&nbsp;'.$buttons[1]];
 		//show variables-help on advanced tab
-		return array($main,$adv,'varshelpadv');
+		return [$main,$adv,'varshelpadv'];
 	}
 
 	// override as necessary, return TRUE to include sender-address header in email
@@ -119,7 +119,7 @@ class EmailBase extends FieldBase
 		if (!$pref) {
 			return '""';
 		}
-		$v3 = array();
+		$v3 = [];
 		$v2 = explode(',', $pref);
 		foreach ($v2 as $one) {
 			$v3[] = '\''.trim($one).'\'';
@@ -190,11 +190,11 @@ EOS;
 	{
 		$mod = $this->formdata->formsmodule;
 		$ret = TRUE;
-		$messages = array();
+		$messages = [];
 		if (strpos($email, ',') !== FALSE) {
 			$ta = explode(',', $email);
 		} else {
-			$ta = array($email);
+			$ta = [$email];
 		}
 		foreach ($ta as $to) {
 			$to = trim($to);
@@ -210,7 +210,7 @@ EOS;
 			//TODO c.f. mailcheck.js for frontend addresses
 		}
 		$msg = ($ret) ? '':implode('<br />', $messages);
-		return array($ret,$msg);
+		return [$ret,$msg];
 	}
 
 	/*
@@ -218,20 +218,20 @@ EOS;
 	$subject is processed via smarty
 	message body is generated from field-option 'email_template' (or a default template)
 	*/
-	public function SendForm($destination_array, $subject, $tplvars=array())
+	public function SendForm($destination_array, $subject, $tplvars=[])
 	{
 		$mod = $this->formdata->formsmodule;
 		if (!$subject) {
-			return array(FALSE,$mod->Lang('missing_type', $mod->Lang('TODO')));
+			return [FALSE,$mod->Lang('missing_type', $mod->Lang('TODO'))];
 		}
 		if (!$destination_array) {
-			return array(FALSE,$mod->Lang('missing_type', $mod->Lang('destination')));
+			return [FALSE,$mod->Lang('missing_type', $mod->Lang('destination'))];
 		}
 
 		if ($mod->before20) {
 			$mail = \cms_utils::get_module('CMSMailer');
 			if (!$mail) {
-				return array(FALSE,$mod->Lang('err_module', 'CMSMailer'));
+				return [FALSE,$mod->Lang('err_module', 'CMSMailer')];
 			}
 			$mail->reset();
 		} else {
@@ -240,7 +240,7 @@ EOS;
 
 		$defto = $this->GetProperty('send_using', 'to');
 		if (!is_array($destination_array)) {
-			$destination_array = array($destination_array);
+			$destination_array = [$destination_array];
 		}
 		foreach ($destination_array as $thisDest) {
 			if (strpos($thisDest, ',') !== FALSE) {
@@ -278,7 +278,7 @@ EOS;
 				}
 				if (!$res) {
 					$mail->reset();
-					return array(FALSE,$mod->Lang('err_address', $this_ad));
+					return [FALSE,$mod->Lang('err_address', $this_ad)];
 				}
 			} else {
 				$bare = trim($thisDest);
@@ -309,7 +309,7 @@ EOS;
 					}
 				} else {
 					$mail->reset();
-					return array(FALSE,$mod->Lang('err_address', $thisDest));
+					return [FALSE,$mod->Lang('err_address', $thisDest)];
 				}
 			}
 		}
@@ -373,7 +373,7 @@ EOS;
 				$ud = Utils::GetUploadsPath($mod);
 				if (!$ud) {
 					$mail->reset();
-					return array(FALSE,$mod->Lang('err_uploads_dir'));
+					return [FALSE,$mod->Lang('err_uploads_dir')];
 				}
 
 				$thisAtt = $one->DisplayableValue(FALSE);
@@ -395,8 +395,8 @@ EOS;
 						$thisName = array_pop($thisNames);
 						if (!$mail->AddAttachment($filepath, $thisName, 'base64', $thisType)) {
 							$mail->reset();
-							return array(FALSE,$mod->Lang('err_attach',
-									array($filepath, $filepath, $onefile)));
+							return [FALSE,$mod->Lang('err_attach',
+									[$filepath, $filepath, $onefile])];
 						}
 					}
 				} elseif ($thisAtt) {
@@ -416,8 +416,8 @@ EOS;
 
 					if (!$mail->AddAttachment($filepath, $thisName, 'base64', $thisType)) {
 						$mail->reset();
-						return array(FALSE,$mod->Lang('err_attach',
-							array($filepath, $filepath, $thisType)));
+						return [FALSE,$mod->Lang('err_attach',
+							[$filepath, $filepath, $thisType])];
 					}
 				}
 			}
@@ -426,9 +426,9 @@ EOS;
 
 		// send the message
 		if ($mail->Send() !== FALSE) {
-			$toReturn = array(TRUE,'');
+			$toReturn = [TRUE,''];
 		} else {
-			$toReturn = array(FALSE,$mail->GetErrorInfo());
+			$toReturn = [FALSE,$mail->GetErrorInfo()];
 		}
 
 		$mail->reset();

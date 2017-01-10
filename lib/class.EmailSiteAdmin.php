@@ -19,7 +19,7 @@ class EmailSiteAdmin extends EmailBase
 		$this->Required = TRUE;
 		$this->Type = 'EmailSiteAdmin';
 		$this->ValidationType = 'email';
-		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_email_address')=>'email');
+		$this->ValidationTypes = [$formdata->formsmodule->Lang('validation_email_address')=>'email'];
 	}
 
 	public function GetSynopsis()
@@ -62,13 +62,13 @@ class EmailSiteAdmin extends EmailBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
 	public function AdminPopulate($id)
 	{
-		$choices = array();
+		$choices = [];
 		$groups = \cmsms()->GetGroupOperations()->LoadGroups();
 		foreach ($groups as $one) {
 			$choices[$one->name] = $one->id;
@@ -78,33 +78,33 @@ class EmailSiteAdmin extends EmailBase
 
 		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, FALSE, TRUE);
 		$waslast = array_pop($main); //keep the email to-type selector for later
-		$main[] = array($mod->Lang('title_select_one_message'),
+		$main[] = [$mod->Lang('title_select_one_message'),
 				$mod->CreateInputText($id, 'fp_select_one',
-				$this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128));
-		$main[] = array($mod->Lang('title_show_userfirstname'),
+				$this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128)];
+		$main[] = [$mod->Lang('title_show_userfirstname'),
 				$mod->CreateInputHidden($id, 'fp_show_userfirstname', 0).
 				$mod->CreateInputCheckbox($id, 'fp_show_userfirstname', 1,
-					$this->GetProperty('show_userfirstname', 1)));
-		$main[] = array($mod->Lang('title_show_userlastname'),
+					$this->GetProperty('show_userfirstname', 1))];
+		$main[] = [$mod->Lang('title_show_userlastname'),
 				$mod->CreateInputHidden($id, 'fp_show_userlastname', 0).
 				$mod->CreateInputCheckbox($id, 'fp_show_userlastname', 1,
-					$this->GetProperty('show_userlastname', 1)));
-		$main[] = array($mod->Lang('title_show_username'),
+					$this->GetProperty('show_userlastname', 1))];
+		$main[] = [$mod->Lang('title_show_username'),
 				$mod->CreateInputHidden($id, 'fp_show_username', 0).
 				$mod->CreateInputCheckbox($id, 'fp_show_username', 1,
-					$this->GetProperty('show_username', 0)));
+					$this->GetProperty('show_username', 0))];
 		$main[] = $waslast;
-		$main[] = array($mod->Lang('title_restrict_to_group'),
+		$main[] = [$mod->Lang('title_restrict_to_group'),
 				$mod->CreateInputHidden($id, 'fp_restrict_to_group', 0).
 				$mod->CreateInputCheckbox($id, 'fp_restrict_to_group', 1,
 					$this->GetProperty('restrict_to_group', 0)).
-				$mod->CreateInputDropdown($id, 'fp_group', $choices, -1, $this->GetProperty('group')));
-		return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
+				$mod->CreateInputDropdown($id, 'fp_group', $choices, -1, $this->GetProperty('group'))];
+		return ['main'=>$main,'adv'=>$adv,'extra'=>$extra];
 	}
 
 	public function AdminValidate($id)
 	{
-		$messages = array();
+		$messages = [];
 		list($ret, $msg) = parent::AdminValidate($id);
 		if (!$ret) {
 			$messages[] = $msg;
@@ -123,7 +123,7 @@ class EmailSiteAdmin extends EmailBase
 			$messages[] = $mod->Lang('missing_type', $mod->Lang('source'));
 		}
 		$msg = ($ret)?'':implode('<br />', $messages);
-		return array($ret,$msg);
+		return [$ret,$msg];
 	}
 
 	public function Populate($id, &$params)
@@ -140,10 +140,10 @@ class EmailSiteAdmin extends EmailBase
 			$f = $this->GetProperty('show_userfirstname', 0);
 			$l = $this->GetProperty('show_userlastname', 0);
 			$u = $this->GetProperty('show_username', 0);
-			$choices = array();
+			$choices = [];
 			$choices[' '.$this->GetProperty('select_one', $mod->Lang('select_one'))]=-1;
 			for ($i=0; $i<$c; $i++) {
-				$parts = array();
+				$parts = [];
 				$v = $userlist[$i];
 				if ($f) {
 					$parts[] = $v->firstname;
@@ -176,7 +176,7 @@ class EmailSiteAdmin extends EmailBase
 			$mod = $this->formdata->formsmodule;
 			$this->ValidationMessage = $mod->Lang('missing_type', $mod->Lang('admin'));
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 
 	public function Dispose($id, $returnid)
@@ -190,10 +190,10 @@ class EmailSiteAdmin extends EmailBase
 				$userlist = $userops->LoadUsers();
 			}
 
-			$dest = array($userlist[$this->Value - 1]->email);
+			$dest = [$userlist[$this->Value - 1]->email];
 			return $this->SendForm($dest, $this->GetProperty('email_subject'));
 		} else {
-			return array(TRUE,'');
+			return [TRUE,''];
 		}
 	}
 }

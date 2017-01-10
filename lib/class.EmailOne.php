@@ -17,7 +17,7 @@ class EmailOne extends EmailBase
 		$this->Required = TRUE;
 		$this->Type = 'EmailOne';
 		$this->ValidationType = 'email';
-		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_email_address')=>'email');
+		$this->ValidationTypes = [$formdata->formsmodule->Lang('validation_email_address')=>'email'];
 	}
 
 	public function GetSynopsis()
@@ -28,7 +28,7 @@ class EmailOne extends EmailBase
 	public function AdminPopulate($id)
 	{
 		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id);
-		return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
+		return ['main'=>$main,'adv'=>$adv,'extra'=>$extra];
 	}
 
 	public function Populate($id, &$params)
@@ -56,7 +56,7 @@ class EmailOne extends EmailBase
 			$this->valid = FALSE;
 			$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_an_email', $this->Name);
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 
 	public function Dispose($id, $returnid)
@@ -64,7 +64,7 @@ class EmailOne extends EmailBase
 		if ($this->HasValue()) {
 			return $this->SendForm($this->Value, $this->GetProperty('email_subject'));
 		} else {
-			return array(TRUE,'');
+			return [TRUE,''];
 		}
 	}
 }

@@ -54,7 +54,7 @@ class CatalogerItems extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -66,30 +66,30 @@ class CatalogerItems extends FieldBase
 	public function AdminPopulate($id)
 	{
 		if (!$this->mymodule) {
-			return array('main'=>array($this->GetErrorMessage('err_module', self::MODNAME)));
+			return ['main'=>[$this->GetErrorMessage('err_module', self::MODNAME)]];
 		}
 
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_field_height'),
+		$main[] = [$mod->Lang('title_field_height'),
 						$mod->CreateInputText($id, 'fp_lines', $this->GetProperty('lines', '5'), 3, 3),
-						$mod->Lang('help_field_height'));
-		$main[] = array($mod->Lang('title_name_regex'),
+						$mod->Lang('help_field_height')];
+		$main[] = [$mod->Lang('title_name_regex'),
 						$mod->CreateInputText($id, 'fp_nameregex', $this->GetProperty('nameregex'), 25, 25),
-						$mod->Lang('help_name_regex'));
-		$main[] = array('','',$mod->Lang('help_cataloger_attribute_fields'));
+						$mod->Lang('help_name_regex')];
+		$main[] = ['','',$mod->Lang('help_cataloger_attribute_fields')];
 
 		$attrs = \cmsms()->variables['catalog_attrs']; //TODO bad module behaviour
 		foreach ($attrs as &$one) {
 			if (!$one->is_text) {
 				$safeattr = strtolower(preg_replace('/\W/', '', $one->attr));
-				$main[] = array($one->attr,
+				$main[] = [$one->attr,
 								$mod->CreateInputText($id, 'fp_attr_'.$safeattr,
-								$this->GetProperty('attr_'.$safeattr), 30, 80));
+								$this->GetProperty('attr_'.$safeattr), 30, 80)];
 			}
 		}
 		unset($one);
-		return array('main'=>$main,'adv'=>$adv);
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
@@ -106,7 +106,7 @@ class CatalogerItems extends FieldBase
 		$lines = (int)$this->GetProperty('lines', 5);
 		$nameregex = trim($this->GetProperty('nameregex'));
 
-		$attrs = array();
+		$attrs = [];
 		foreach ($tmp_attrs as $one) {
 			$safeattr = strtolower(preg_replace('/\W/', '', $one->attr));
 			$val = trim($this->GetProperty('attr_'.$safeattr));
@@ -116,7 +116,7 @@ class CatalogerItems extends FieldBase
 			}
 		}
 
-		$tplvars = array(); //TODO need global vars?
+		$tplvars = []; //TODO need global vars?
 		// put the hidden fields into smarty
 		if (!isset($gCms->variables['pwf_smarty_vars_set'])) { //FIXME
 			foreach ($this->formdata->Fields as &$one) {
@@ -133,7 +133,7 @@ class CatalogerItems extends FieldBase
 		// for each hierarchy item (from the root down)
 		$hm = $gCms->GetHierarchyManager();
 		$allcontent = $hm->getFlatList();
-		$choices = array();
+		$choices = [];
 		foreach ($allcontent as $onepage) {
 			$content = $onepage->GetContent();
 
@@ -223,10 +223,10 @@ class CatalogerItems extends FieldBase
 				if (is_array($this->Value)) {
 					$val = $this->Value;
 				} else {
-					$val = array($this->Value);
+					$val = [$this->Value];
 				}
 			} else {
-				$val = array();
+				$val = [];
 			}
 			$tmp = $mod->CreateInputSelectList(
 				$id, $this->formdata->current_prefix.$this->Id.'[]',

@@ -29,7 +29,7 @@ class EmailConfirmation extends EmailBase
 		$this->Type = 'EmailConfirmation';
 		$this->ValidationType = 'email';
 		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = array($mod->Lang('validation_email_address')=>'email');
+		$this->ValidationTypes = [$mod->Lang('validation_email_address')=>'email'];
 	}
 
 	public function GetSynopsis()
@@ -48,7 +48,7 @@ class EmailConfirmation extends EmailBase
 		Utils::AddTemplateVariable($this->formdata, 'confirm_url', 'title_confirmation_url');
 
 		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id);
-		return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
+		return ['main'=>$main,'adv'=>$adv,'extra'=>$extra];
 	}
 
 	public function Populate($id, &$params)
@@ -83,7 +83,7 @@ class EmailConfirmation extends EmailBase
 			}
 			break;
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 
 	//assumes this field is first disposition on the form (sorted at runtime)
@@ -98,7 +98,7 @@ class EmailConfirmation extends EmailBase
 			}
 		} else {
 			//block relevant dispositions (some may already be blocked for other reasons)
-			$this->blocked = array();
+			$this->blocked = [];
 			foreach ($this->formdata->Fields as &$one) {
 				if ($one->IsDisposition() && $one->IsDisposable()) {
 					$this->blocked[] = $one->Id;
@@ -120,28 +120,27 @@ class EmailConfirmation extends EmailBase
 		$sid = $db->GenID($pre.'module_pwf_session_seq');
 
 		$chars = 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6';
-		$cl = strlen($chars) - 1;
-		$pref = '';
+		$pref = str_repeat('0', 20);
 		for ($i = 0; $i < 20; $i++) {
-			$pref .= $chars[mt_rand(0,$cl)];
+			$pref[$i] = $chars[mt_rand(0,103)];
 		}
 		$pub = sha1(uniqid($pref, TRUE)); //easy 40-byte hash
 		$pw = $pub.Utils::Unfusc($mod->GetPreference('masterpass'));
 		$when = time();
 		$cont = Utils::Encrypt(serialize($this->formdata), $pw);
 		$db->Execute('INSERT INTO '.$pre.'module_pwf_session
-(sess_id,pubkey,submitted,contents) VALUES (?,?,?,?)', array($sid, $pub, $when, $cont));
+(sess_id,pubkey,submitted,contents) VALUES (?,?,?,?)', [$sid, $pub, $when, $cont]);
 		$this->formdata->formsmodule = $mod; //reinstate
 		//set url variable for email template
-		$tplvars = array();
+		$tplvars = [];
 		$pref = $this->formdata->current_prefix;
 		$tplvars['confirm_url'] =
 			$this->formdata->formsmodule->CreateFrontendLink('', $returnid, 'validate', '',
-			array(
+			[
 				$pref.'c'=>$pub,
 				$pref.'d'=>$this->Id,
 //				$pref.'f'=>$this->formdata->Id,
-				$pref.'s'=>$sid),
+				$pref.'s'=>$sid],
 			'', TRUE, FALSE, '', TRUE);
 		return $this->SendForm($this->GetValue(), $this->GetProperty('email_subject'), $tplvars);
 	}

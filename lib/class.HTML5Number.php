@@ -20,21 +20,21 @@ class HTML5Number extends FieldBase
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_min_number'),
+		$main[] = [$mod->Lang('title_min_number'),
 						$mod->CreateInputText($id, 'fp_min_number',
-							$this->GetProperty('min_number', 0)));
-		$main[] = array($mod->Lang('title_max_number'),
+							$this->GetProperty('min_number', 0))];
+		$main[] = [$mod->Lang('title_max_number'),
 						$mod->CreateInputText($id, 'fp_max_number',
-							$this->GetProperty('max_number', 500)));
-		$main[] = array($mod->Lang('title_step_number'),
+							$this->GetProperty('max_number', 500))];
+		$main[] = [$mod->Lang('title_step_number'),
 						$mod->CreateInputText($id, 'fp_step_number',
-							$this->GetProperty('step_number', 50)));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('step_number', 50))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function AdminValidate($id)
 	{
-		$messages = array();
+		$messages = [];
 		list($ret, $msg) = parent::AdminValidate($id);
 		if (!$ret) {
 			$messages[] = $msg;
@@ -57,7 +57,7 @@ class HTML5Number extends FieldBase
 			$messages[] = $mod->Lang('err_typed', $mod->Lang('increment'));
 		}
 		$msg = ($ret)?'':implode('<br />', $messages);
-		return array($ret,$msg);
+		return [$ret,$msg];
 	}
 
 	public function Populate($id, &$params)

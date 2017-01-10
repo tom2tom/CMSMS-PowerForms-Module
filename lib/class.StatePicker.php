@@ -16,7 +16,7 @@ class StatePicker extends FieldBase
 		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->Type = 'StatePicker';
-		$this->States = array(
+		$this->States = [
 		'Alabama'=>'AL','Alaska'=>'AK','Arizona'=>'AZ','Arkansas'=>'AR',
 		'California'=>'CA','Colorado'=>'CO','Connecticut'=>'CT','Delaware'=>'DE',
 		'Florida'=>'FL','Georgia'=>'GA','Hawaii'=>'HI','Idaho'=>'ID',
@@ -33,7 +33,7 @@ class StatePicker extends FieldBase
 		'South Dakota'=>'SD','Tennessee'=>'TN','Texas'=>'TX','Utah'=>'UT',
 		'Vermont'=>'VT','Virginia'=>'VA','Washington'=>'WA',
 		'District of Columbia'=>'DC','West Virginia'=>'WV','Wisconsin'=>'WI',
-		'Wyoming'=>'WY');
+		'Wyoming'=>'WY'];
 //		ksort($this->States);
 	}
 
@@ -43,7 +43,7 @@ class StatePicker extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -52,21 +52,21 @@ class StatePicker extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
 
-		$choices = array_merge(array('No Default'=>''), $this->States);
-		$main[] = array($mod->Lang('title_select_default_state'),
+		$choices = array_merge(['No Default'=>''], $this->States);
+		$main[] = [$mod->Lang('title_select_default_state'),
 						$mod->CreateInputDropdown($id, 'fp_default_state', $choices, -1,
-							$this->GetProperty('default_state')));
-		$main[] = array($mod->Lang('title_select_one_message'),
+							$this->GetProperty('default_state'))];
+		$main[] = [$mod->Lang('title_select_one_message'),
 						$mod->CreateInputText($id, 'fp_select_one',
-							$this->GetProperty('select_one', $mod->Lang('select_one'))));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('select_one', $mod->Lang('select_one')))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
 	{
 		$mod = $this->formdata->formsmodule;
 
-		$choices = array_merge(array($this->GetProperty('select_one', $mod->Lang('select_one'))=>-1), $this->States);
+		$choices = array_merge([$this->GetProperty('select_one', $mod->Lang('select_one'))=>-1], $this->States);
 		if (!$this->HasValue() && $this->GetProperty('default_state')) {
 			$this->SetValue($this->GetProperty('default_state'));
 		}

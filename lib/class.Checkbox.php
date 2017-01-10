@@ -35,7 +35,7 @@ class Checkbox extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -43,20 +43,20 @@ class Checkbox extends FieldBase
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_checkbox_label'),
+		$main[] = [$mod->Lang('title_checkbox_label'),
 						$mod->CreateInputText($id, 'fp_label',
-							$this->GetProperty('label'), 25, 255));
-		$main[] = array($mod->Lang('title_checked_value'),
+							$this->GetProperty('label'), 25, 255)];
+		$main[] = [$mod->Lang('title_checked_value'),
 						$mod->CreateInputText($id, 'fp_checked_value',
-							$this->GetProperty('checked_value', $mod->Lang('value_checked')), 25, 255));
-		$main[] = array($mod->Lang('title_unchecked_value'),
+							$this->GetProperty('checked_value', $mod->Lang('value_checked')), 25, 255)];
+		$main[] = [$mod->Lang('title_unchecked_value'),
 						$mod->CreateInputText($id, 'fp_unchecked_value',
-							$this->GetProperty('unchecked_value', $mod->Lang('value_unchecked')), 25, 255));
-		$main[] = array($mod->Lang('title_default_set'),
+							$this->GetProperty('unchecked_value', $mod->Lang('value_unchecked')), 25, 255)];
+		$main[] = [$mod->Lang('title_default_set'),
 						$mod->CreateInputHidden($id, 'fp_is_checked', 0).
 						$mod->CreateInputCheckbox($id, 'fp_is_checked', 1,
-							$this->GetProperty('is_checked', 0)));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('is_checked', 0))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)

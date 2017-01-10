@@ -23,10 +23,10 @@ class Hidden extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE, FALSE); //TODO hidden field may use logic?
 
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_value'),
+		$main[] = [$mod->Lang('title_value'),
 						$mod->CreateInputText($id, 'fp_value',
-							$this->GetProperty('value'), 25, 1024));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('value'), 25, 1024)];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
@@ -35,7 +35,7 @@ class Hidden extends FieldBase
 
 		if ($this->Value || is_numeric($this->Value)) {
 			if (!is_numeric($this->Value) && $this->GetProperty('smarty_eval', 0)) {
-				$tplvars = array();
+				$tplvars = [];
 				$val = Utils::ProcessTemplateFromData($mod, $this->Value, $tplvars);
 			} else {
 				$val = $this->Value;

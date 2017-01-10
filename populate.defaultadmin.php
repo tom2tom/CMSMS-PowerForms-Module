@@ -24,20 +24,20 @@ if ($padm) {
 	$tplvars['settingstab_start'] = $this->StartTab('settings');
 }
 
-$tplvars = $tplvars + array(
+$tplvars = $tplvars + [
 	'formstab_start' => $this->StartTab('maintab'),
 	'form_end' => $this->CreateFormEnd(),
 	'tabs_end' => $this->EndTabContent(),
 	'tab_end' => $this->EndTab(), //CMSMS 2+ can't cope if this is before EndTabContent() !!
-);
+];
 $tplvars['message'] = (isset($params['message']))?$params['message']:'';
 
 $theme = ($this->before20) ? cmsms()->variables['admintheme']:
 	cms_utils::get_theme_object();
 //script accumulators
-$jsincs = array();
-$jsfuncs = array();
-$jsloads = array();
+$jsincs = [];
+$jsfuncs = [];
+$jsloads = [];
 $baseurl = $this->GetModuleURLPath();
 
 //list all the extant forms
@@ -56,19 +56,19 @@ if ($allforms) {
 	if ($pdev) {
 		$modname = $this->GetName();
 	}
-	$data = array();
+	$data = [];
 	foreach ($allforms as $one) {
 		$fid = (int)$one['form_id'];
 		$oneset = new stdClass();
 		if ($pmod) {
 			$oneset->name = $this->CreateLink($id, 'open_form', '',
-				$one['name'], array('form_id'=>$fid)); //no datakey
+				$one['name'], ['form_id'=>$fid]); //no datakey
 			$oneset->edit = $this->CreateLink($id, 'open_form', '',
-				$iconedit, array('form_id'=>$fid));
+				$iconedit, ['form_id'=>$fid]);
 			$oneset->copy = $this->CreateLink($id, 'add_form', '',
-				$iconcopy, array('form_id'=>$fid));
+				$iconcopy, ['form_id'=>$fid]);
 			$oneset->delete = $this->CreateLink($id, 'delete_form', '',
-				$icondelete, array('form_id'=>$fid),
+				$icondelete, ['form_id'=>$fid],
 				$this->Lang('confirm_delete_form', $one['name']));
 		} else {
 			$oneset->name = $one['name'];
@@ -76,7 +76,7 @@ if ($allforms) {
 		$oneset->alias = ($pdev) ?
 			'{'.$modname.' form=\''.$one['alias'].'\'}' : $one['alias'];
 		$oneset->exportlink = $this->CreateLink($id, 'export_form', '',
-			$iconexport, array('form_id'=>$fid));
+			$iconexport, ['form_id'=>$fid]);
 		$oneset->select = $this->CreateInputCheckbox($id, 'selected[]', $fid, -1);
 		$data[] = $oneset;
 	}
@@ -108,7 +108,7 @@ if ($pmod) {
 	$tplvars['addform'] = $this->CreateLink($id, 'add_form', '',
 		$this->Lang('title_add_new_form'));
 
-	$xmls = array();
+	$xmls = [];
 
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_xml_to_upload');
@@ -127,12 +127,12 @@ if ($pmod) {
 	$oneset->help = $this->Lang('help_import_alias');
 	$xmls[] = $oneset;
 
-	$tplvars = $tplvars + array(
+	$tplvars = $tplvars + [
 		'legend_xmlimport' => $this->Lang('title_importxml_legend'),
 		'start_importxmlform' => $this->CreateFormStart($id, 'import_formfile', $returnid, 'POST', 'multipart/form-data'),
 		'xmls' => $xmls,
 		'submitxml' => $this->CreateInputSubmit($id, 'submitxml', $this->Lang('upload'))
-	);
+	];
 
 	$ob = cms_utils::get_module('FormBuilder');
 	if ($ob) {
@@ -167,7 +167,7 @@ if ($pmod) {
 }
 
 if ($padm) {
-	$cfgs = array();
+	$cfgs = [];
 
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_require_fieldnames');
@@ -229,13 +229,13 @@ if ($padm) {
  });
 EOS;
 
-	$tplvars = $tplvars + array(
+	$tplvars = $tplvars + [
 		'configs' => $cfgs,
 		'start_configform' => $this->CreateFormStart($id, 'defaultadmin', $returnid),
 		'submitcfg' => $this->CreateInputSubmit($id, 'submit', $this->Lang('save')),
 		'cancel' => $this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel')),
 		'padm' => 1
-	);
+	];
 } else {
 	$tplvars['padm'] = 0;
 }

@@ -17,9 +17,9 @@ class CheckboxExtended extends FieldBase
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'CheckboxExtended';
 		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = array(
+		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
-			$mod->Lang('validation_empty')=>'empty');
+			$mod->Lang('validation_empty')=>'empty'];
 	}
 
 	public function GetSynopsis()
@@ -54,7 +54,7 @@ class CheckboxExtended extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -63,27 +63,27 @@ class CheckboxExtended extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id, 'title_field_required');
 		$mod = $this->formdata->formsmodule;
 
-		$main[] = array($mod->Lang('title_checkbox_label'),
+		$main[] = [$mod->Lang('title_checkbox_label'),
 						$mod->CreateInputText($id, 'fp_box_label',
-							$this->GetProperty('box_label'), 25, 255));
-		$main[] = array($mod->Lang('title_checked_value'),
+							$this->GetProperty('box_label'), 25, 255)];
+		$main[] = [$mod->Lang('title_checked_value'),
 						$mod->CreateInputText($id, 'fp_checked_value',
-							$this->GetProperty('checked_value', $mod->Lang('yes')), 25, 255));
-		$main[] = array($mod->Lang('title_unchecked_value'),
+							$this->GetProperty('checked_value', $mod->Lang('yes')), 25, 255)];
+		$main[] = [$mod->Lang('title_unchecked_value'),
 						$mod->CreateInputText($id, 'fp_unchecked_value',
-							$this->GetProperty('unchecked_value', $mod->Lang('no')), 25, 255));
-		$main[] = array($mod->Lang('title_default_set'),
+							$this->GetProperty('unchecked_value', $mod->Lang('no')), 25, 255)];
+		$main[] = [$mod->Lang('title_default_set'),
 						$mod->CreateInputHidden($id, 'fp_is_checked', 0).
 						$mod->CreateInputCheckbox($id, 'fp_is_checked', 1,
-							$this->GetProperty('is_checked', 0)));
-		$main[] = array($mod->Lang('title_textfield_label'),
+							$this->GetProperty('is_checked', 0))];
+		$main[] = [$mod->Lang('title_textfield_label'),
 						$mod->CreateInputText($id, 'fp_text_label',
-							$this->GetProperty('text_label'), 25, 255));
-		$main[] = array($mod->Lang('title_show_textfield'),
+							$this->GetProperty('text_label'), 25, 255)];
+		$main[] = [$mod->Lang('title_show_textfield'),
 						$mod->CreateInputHidden($id, 'fp_show_textfield', 0).
 						$mod->CreateInputCheckbox($id, 'fp_show_textfield', 1,
-							$this->GetProperty('show_textfield', 0)));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('show_textfield', 0))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
@@ -94,7 +94,7 @@ class CheckboxExtended extends FieldBase
 
 		$mod = $this->formdata->formsmodule;
 		$js = $this->GetScript();
-		$ret = array();
+		$ret = [];
 
 		$hidden = $this->formdata->formsmodule->CreateInputHidden(
 			$id, $this->formdata->current_prefix.$this->Id, 0);
@@ -172,6 +172,6 @@ class CheckboxExtended extends FieldBase
 			}
 			break;
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 }

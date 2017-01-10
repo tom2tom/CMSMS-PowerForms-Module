@@ -42,7 +42,7 @@ class SaferEval
 		$this->execute = $execute;
 		$this->code = $code;
 		$this->tokens = token_get_all('<?php '.$this->code.' ?>');
-		$this->errors = array();
+		$this->errors = [];
 		$this->braces = 0;
 
 		// STEP 1: SYNTAX - Check if braces are balanced

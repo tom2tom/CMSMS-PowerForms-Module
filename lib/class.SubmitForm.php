@@ -33,38 +33,38 @@ class SubmitForm extends FieldBase
 		
 		if (function_exists('curl_init')) {
 			$formdata = $this->formdata;
-			$methods = array('POST'=>'POST','GET'=>'GET');
-			$main[] = array($mod->Lang('title_method'),
+			$methods = ['POST'=>'POST','GET'=>'GET'];
+			$main[] = [$mod->Lang('title_method'),
 				$mod->CreateInputDropdown($id, 'fp_method', $methods, -1,
-					$this->GetProperty('method')));
-			$main[] = array($mod->Lang('title_url'),
+					$this->GetProperty('method'))];
+			$main[] = [$mod->Lang('title_url'),
 				$mod->CreateInputText($id, 'fp_url', $this->GetProperty('url'), 40, 255),
-				$mod->Lang('help_url'));
+				$mod->Lang('help_url')];
 			foreach ($formdata->Fields as &$one) {
 				$alias = $one->ForceAlias();
 				$fid = $one->GetId();
-				$adv[] = array($mod->Lang('title_maps_to', $one->GetName()),
+				$adv[] = [$mod->Lang('title_maps_to', $one->GetName()),
 					$mod->CreateInputText($id, 'fp_fld_'.$fid,
 						 $this->GetProperty('fld_'.$fid, $alias), 40, 255).
 					$mod->CreateInputHidden($id, 'fp_sub_'.$fid, 0).
 					$mod->CreateInputCheckbox($id, 'fp_sub_'.$fid, 1,
 						$this->GetProperty('sub_'.$fid, ($one->DisplayInSubmission()?1:0))),
-					$mod->Lang('title_include_in_submission'));
+					$mod->Lang('title_include_in_submission')];
 			}
 			unset($one);
-			$adv[] = array($mod->Lang('title_additional'),
+			$adv[] = [$mod->Lang('title_additional'),
 				$mod->CreateInputText($id, 'fp_additional',
 					$this->GetProperty('additional'), 40, 255),
-				$mod->Lang('help_additional_payload'));
+				$mod->Lang('help_additional_payload')];
 		} else {
-			$main[] = array('','',$mod->Lang('title_install_curl'));
+			$main[] = ['','',$mod->Lang('title_install_curl')];
 		}
-		return array('main'=>$main,'adv'=>$adv);
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Dispose($id, $returnid)
 	{
-		$payload = array();
+		$payload = [];
 		foreach ($this->formdata->Fields as &$one) {
 			if ($this->GetProperty('sub_'.$one->GetId(), 0)) {
 				$payload[] = urlencode($this->GetProperty('fld_'.$one->GetId())).'='.
@@ -107,6 +107,6 @@ class SubmitForm extends FieldBase
 			}
 			curl_close($ch);
 		}
-		return array($res,$msg);
+		return [$res,$msg];
 	}
 }

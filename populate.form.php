@@ -12,9 +12,9 @@ $tplvars['backtomod_nav'] = $this->CreateLink($id, 'defaultadmin', '', '&#171; '
 
 //multipart form needed for file uploads
 $tplvars['form_start'] = $this->CreateFormStart($id, 'open_form', $returnid,
-	'POST', 'multipart/form-data', FALSE, '', array(
+	'POST', 'multipart/form-data', FALSE, '', [
 	'form_id'=>$form_id,
-	'datakey'=>$params['datakey']));
+	'datakey'=>$params['datakey']]);
 
 $tab = $this->_GetActiveTab($params);
 $t = $this->StartTabHeaders().
@@ -32,7 +32,7 @@ $tplvars['tabs_start'] = $t;
 if ($form_id > 0) {
 	$tplvars['fieldstab_start'] = $this->StartTab('fieldstab');
 }
-$tplvars = $tplvars + array(
+$tplvars = $tplvars + [
 	'tabs_end' => $this->EndTabContent(),
 	'maintab_start' => $this->StartTab('maintab'),
 	'displaytab_start' => $this->StartTab('displaytab'),
@@ -62,17 +62,17 @@ $tplvars = $tplvars + array(
 	'title_form_main' => $this->Lang('title_form_main'),
 	'title_form_name' => $this->Lang('title_form_name'),
 	'title_form_status' => $this->Lang('title_form_status')
-);
+];
 
 $theme = ($this->before20) ? cmsms()->variables['admintheme']:
 	cms_utils::get_theme_object();
 //script accumulators
-$jsincs = array();
-$jsfuncs = array();
-$jsloads = array();
+$jsincs = [];
+$jsfuncs = [];
+$jsloads = [];
 $baseurl = $this->GetModuleURLPath();
 
-$hidden = array();
+$hidden = [];
 
 $tplvars['icon_info'] =
 	$theme->DisplayImage('icons/system/info.gif', $this->Lang('help_help'), '', '', 'systemicon tipper');
@@ -85,8 +85,8 @@ $icondelete = $theme->DisplayImage('icons/system/delete.gif', $this->Lang('delet
 $iconup = $theme->DisplayImage('icons/system/arrow-u.gif', $this->Lang('moveup'), '', '', 'systemicon');
 $icondown = $theme->DisplayImage('icons/system/arrow-d.gif', $this->Lang('movedn'), '', '', 'systemicon');
 
-$fields = array(); //ordinary fields
-$dispositions = array(); //disposition fields
+$fields = []; //ordinary fields
+$dispositions = []; //disposition fields
 $count = 1; //move-icon counters
 $dcount = 1;
 $total = count($formdata->Fields);
@@ -112,14 +112,14 @@ if (!isset($params['selectfields'])) { //first time
 $hidden[] = $this->CreateInputHidden($id, 'selectfields', $selfield);
 $hidden[] = $this->CreateInputHidden($id, 'selectdispos', $seldisp);
 
-$linkargs = array(
+$linkargs = [
 'field_id'=>0,
 'form_id'=>$form_id,
 'datakey'=>$params['datakey'],
 'active_tab'=>'fieldstab',
 'selectfields'=>$selfield,
 'selectdispos'=>$seldisp
-);
+];
 
 foreach ($formdata->FieldOrders as $one) {
 	$obfld = $formdata->Fields[$one];
@@ -139,9 +139,9 @@ foreach ($formdata->FieldOrders as $one) {
 	$oneset->edit = $this->CreateLink($id, 'open_field', '', $iconedit,
 		$linkargs);
 	$oneset->copy = $this->CreateLink($id, 'open_form', '', $iconcopy,
-		$linkargs + array('fieldcopy'=>1));
+		$linkargs + ['fieldcopy'=>1]);
 	$oneset->delete = $this->CreateLink($id, 'delete_field', '', $icondelete,
-		$linkargs + array('fielddelete'=>1),
+		$linkargs + ['fielddelete'=>1],
 		'', '', '', 'onclick="delete_field(this,'.$fid.',\''.htmlspecialchars($obfld->GetName()).'\');return FALSE;"');
 	$oneset->select = $this->CreateInputCheckbox($id, 'selected[]', $fid, -1);
 
@@ -149,14 +149,14 @@ foreach ($formdata->FieldOrders as $one) {
 		if ($dcount > 1) {
 			$oneset->up = $this->CreateLink($id, 'open_form', '',
 			$iconup,
-			array('form_id'=>$form_id, 'datakey'=>$params['datakey'], 'field_id'=>$fid, 'dir'=>'up'));
+			['form_id'=>$form_id, 'datakey'=>$params['datakey'], 'field_id'=>$fid, 'dir'=>'up']);
 		} else {
 			$oneset->up = '';
 		}
 		if ($dcount < $dtotal) {
 			$oneset->down = $this->CreateLink($id, 'open_form', '',
 			$icondown,
-			array('form_id'=>$form_id, 'datakey'=>$params['datakey'], 'field_id'=>$fid, 'dir'=>'down'));
+			['form_id'=>$form_id, 'datakey'=>$params['datakey'], 'field_id'=>$fid, 'dir'=>'down']);
 		} else {
 			$oneset->down = '';
 		}
@@ -169,26 +169,26 @@ foreach ($formdata->FieldOrders as $one) {
 		} elseif ($obfld->IsRequired()) {
 			$oneset->required = $this->CreateLink($id, 'require_field', '',
 				$icontrue,
-				array('form_id'=>$form_id, 'datakey'=>$params['datakey'], 'field_id'=>$fid, 'reqd'=>'off'),
+				['form_id'=>$form_id, 'datakey'=>$params['datakey'], 'field_id'=>$fid, 'reqd'=>'off'],
 				'', '', '', 'class="true" onclick="require_field(this,'.$fid.',false);return false;"');
 		} else {
 			$oneset->required = $this->CreateLink($id, 'require_field', '',
 				$iconfalse,
-				array('form_id'=>$form_id, 'datakey'=>$params['datakey'], 'field_id'=>$fid, 'reqd'=>'on'),
+				['form_id'=>$form_id, 'datakey'=>$params['datakey'], 'field_id'=>$fid, 'reqd'=>'on'],
 				'', '', '', 'class="false" onclick="require_field(this,'.$fid.',true);return false;"');
 		}
 
 		if ($count > 1) {
 			$oneset->up = $this->CreateLink($id, 'open_form', '',
 			$iconup,
-			array('form_id'=>$form_id, 'datakey'=>$params['datakey'], 'field_id'=>$fid, 'dir'=>'up'));
+			['form_id'=>$form_id, 'datakey'=>$params['datakey'], 'field_id'=>$fid, 'dir'=>'up']);
 		} else {
 			$oneset->up = '';
 		}
 		if ($count < $total) {
 			$oneset->down = $this->CreateLink($id, 'open_form', '',
 			$icondown,
-			array('form_id'=>$form_id, 'datakey'=>$params['datakey'], 'field_id'=>$fid, 'dir'=>'down'));
+			['form_id'=>$form_id, 'datakey'=>$params['datakey'], 'field_id'=>$fid, 'dir'=>'down']);
 		} else {
 			$oneset->down = '';
 		}
@@ -200,7 +200,7 @@ foreach ($formdata->FieldOrders as $one) {
 
 $tplvars['fields'] = $fields;
 if ($fields) {
-	$u = $this->create_url($id, 'require_field', '', array('datakey'=>$params['datakey'], 'reqd'=>'off', 'field_id'=>''));
+	$u = $this->create_url($id, 'require_field', '', ['datakey'=>$params['datakey'], 'reqd'=>'off', 'field_id'=>'']);
 	$offs = strpos($u, '?mact=');
 	$u = str_replace('&amp;', '&', substr($u, $offs+1)); //field identifier will be appended at runtime
 	$errmsg = $this->Lang('err_server');
@@ -230,24 +230,24 @@ function require_field(link,fid,newstate) {
 }
 EOS;
 } else { //no field
-	$tplvars = $tplvars + array(
+	$tplvars = $tplvars + [
 		'nofields' => $this->Lang('no_fields'),
 		'text_ready' => '',
 		'text_notready' => $this->Lang('title_not_ready'),
 		'help_notready' => $this->Lang('no_fields')
-	);
+	];
 }
 
 $tplvars['dispositions'] = $dispositions;
 if ($dispositions) {
 	$tplvars['text_ready'] = $this->Lang('title_ready');
 } else {
-	$tplvars = $tplvars + array(
+	$tplvars = $tplvars + [
 		'nodispositions' => $this->Lang('no_dispositions'),
 		'text_ready' => '',
 		'text_notready' => $this->Lang('title_not_ready'),
 		'help_notready' => $this->Lang('help_not_ready')
-	);
+	];
 }
 
 if ($count || $dcount) {
@@ -255,7 +255,7 @@ if ($count || $dcount) {
 		'title="'.$this->Lang('tip_delselfield').
 		'" onclick="delete_selected(this,\''.$this->Lang('confirm').'\');return false;"');
 	$prompt = $this->Lang('confirm_delete_field', '%s');
-	$u = $this->create_url($id, 'delete_field', '', array('datakey'=>$params['datakey'], 'field_id'=>''));
+	$u = $this->create_url($id, 'delete_field', '', ['datakey'=>$params['datakey'], 'field_id'=>'']);
 	$offs = strpos($u, '?mact=');
 	$u = str_replace('&amp;', '&', substr($u, $offs+1)); //field identifier will be appended at runtime
 	$errmsg = $this->Lang('err_server');
@@ -348,7 +348,7 @@ EOS;
 	$tplvars['selectall'] = NULL;
 }
 
-$basicfields = array($this->Lang('select_type')=>''); //non-disposition fields accumulator
+$basicfields = [$this->Lang('select_type')=>'']; //non-disposition fields accumulator
 $basicdispos = $basicfields; //disposition fields accumulator
 $extendedfields = $basicfields; //extended non-disposition fields accumulator
 $extendeddispos = $basicfields; //extended disposition fields accumulator
@@ -400,13 +400,13 @@ if ($selfield == 'basic') {
 		$basicfields, -1, '', 'onchange="add_field(this,\'form\');"');
 	$tplvars['help_fieldpick'] = $this->CreateLink($id, 'open_form', $returnid,
 		$this->Lang('title_switch_advanced_link'),
-		array('selectfields'=>'advanced') + $linkargs);
+		['selectfields'=>'advanced'] + $linkargs);
 } else { //advanced
 	$tplvars['input_fieldpick'] = $this->CreateInputDropdown($id, 'field_type',
 		$extendedfields, -1, '', 'onchange="add_field(this,\'form\');"');
 	$tplvars['help_fieldpick'] = $this->CreateLink($id, 'open_form', $returnid,
 		$this->Lang('title_switch_basic_link'),
-		array('selectfields'=>'basic') + $linkargs);
+		['selectfields'=>'basic'] + $linkargs);
 }
 
 //dispositions
@@ -425,13 +425,13 @@ if ($seldisp == 'basic') {
 		$basicdispos, -1, '', 'onchange="add_field(this,\'disposition\');"');
 	$tplvars['help_fieldpick2'] = $this->CreateLink($id, 'open_form', $returnid,
 		$this->Lang('title_switch_advanced_link'),
-		array('selectdispos'=>'advanced') + $linkargs);
+		['selectdispos'=>'advanced'] + $linkargs);
 } else { //advanced
 	$tplvars['input_fieldpick2'] = $this->CreateInputDropdown($id, 'disposition_type',
 		$extendeddispos, -1, '', 'onchange="add_field(this,\'disposition\');"');
 	$tplvars['help_fieldpick2'] = $this->CreateLink($id, 'open_form', $returnid,
 		$this->Lang('title_switch_basic_link'),
-		array('selectdispos'=>'basic') + $linkargs);
+		['selectdispos'=>'basic'] + $linkargs);
 }
 
 //js to add selected field
@@ -446,7 +446,7 @@ function add_field(sel,scope) {
 EOS;
 
 //====== DISPLAY TAB
-$displays = array();
+$displays = [];
 
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_form_required_symbol');
@@ -524,10 +524,10 @@ EOS;
 
 //====== TEMPLATE TAB
 
-$templateList = array($this->Lang('select_one')=>'',
+$templateList = [$this->Lang('select_one')=>'',
 	$this->Lang('default_template')=>'defaultform.tpl',
 	$this->Lang('table_left_template')=>'tableform_lefttitles.tpl',
-	$this->Lang('table_top_template')=>'tableform_toptitles.tpl');
+	$this->Lang('table_top_template')=>'tableform_toptitles.tpl'];
 
 $allForms = PWForms\Utils::GetForms();
 foreach ($allForms as $one) {
@@ -542,7 +542,7 @@ $tplvars['input_load_template'] = $this->CreateInputDropdown($id, 'template_load
 
 $prompt = $this->Lang('confirm_template');
 $msg = $this->Lang('err_server');
-$u = $this->create_url($id, 'get_template', '', array('tid'=>''));
+$u = $this->create_url($id, 'get_template', '', ['tid'=>'']);
 $offs = strpos($u, '?mact=');
 $u = str_replace('&amp;', '&', substr($u, $offs+1)); //template identifier will be appended at runtime
 
@@ -582,7 +582,7 @@ if ($this->before20) {
 	$tpl = $ob->get_content();
 }
 
-$tplvars = $tplvars + array(
+$tplvars = $tplvars + [
 	'title_variable' => $this->Lang('variable'),
 	'title_property' => $this->Lang('property'),
 	'title_description' => $this->Lang('description'),
@@ -590,7 +590,7 @@ $tplvars = $tplvars + array(
 	'help_tplvars' => $this->Lang('help_tpl_vars'),
 	'help_fieldvars1' => $this->Lang('help_fieldvars1'),
 	'help_fieldvars2' => $this->Lang('help_fieldvars2')
-);
+];
 
 $tplvars['title_form_template'] = $this->Lang('title_form_template');
 //note WYSIWYG is no good, the MCE editor stuffs around with the template contents
@@ -598,8 +598,8 @@ $tplvars['input_form_template'] = $this->CreateSyntaxArea($id, $tpl, 'fp_form_te
 	'pwf_tallarea', 'form_template', '', '', 50, 24, 'style="height:30em;"'); //xtra-tall!
 
 //help for form-template
-$formvars = array();
-foreach (array(
+$formvars = [];
+foreach ([
 	'total_pages',
 	'this_page',
 	'title_page_x_of_y',
@@ -617,7 +617,7 @@ foreach (array(
 	'submission_error_list',
 	'form_has_validation_errors',
 	'form_validation_errors'
-	) as $name) {
+	] as $name) {
 	$oneset = new stdClass();
 	$oneset->name = $name;
 	$oneset->description = $this->Lang('desc_'.$name);
@@ -635,8 +635,8 @@ if ($formdata->Fields) {
 	}
 	unset($one);
 
-	$fieldprops = array();
-	foreach (array(
+	$fieldprops = [];
+	foreach ([
 		'alias',
 		'css_class',
 		'display',
@@ -659,7 +659,7 @@ if ($formdata->Fields) {
 		'type',
 		'valid',
 		'values'
-		) as $name) {
+		] as $name) {
 		$oneset = new stdClass();
 		$oneset->name = $name;
 		if ($name != 'css_class') {
@@ -677,7 +677,7 @@ $tplvars['formvars'] = $formvars;
 
 $usertagops = cmsms()->GetUserTagOperations();
 $usertags = $usertagops->ListUserTags();
-$usertaglist = array();
+$usertaglist = [];
 $usertaglist[$this->Lang('none2')] = '';
 foreach ($usertags as $key => $value) {
 	$usertaglist[$value] = $key;
@@ -702,7 +702,7 @@ $tplvars['help_udt'] = $this->Lang('help_udt');
 
 //====== PROCESSING TAB
 
-$submits = array();
+$submits = [];
 
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_list_delimiter');
@@ -750,7 +750,7 @@ $submits[] = $oneset;
 
 $tplvars['presubmits'] = $submits;
 
-$submits = array();
+$submits = [];
 
 $oneset = new stdClass();
 $oneset->title = $this->Lang('title_inline_form');
@@ -762,7 +762,7 @@ $submits[] = $oneset;
 
 $tplvars['postsubmits'] = $submits;
 
-$choices = array($this->Lang('redirect_to_page')=>'redir',$this->Lang('display_text')=>'text');
+$choices = [$this->Lang('redirect_to_page')=>'redir',$this->Lang('display_text')=>'text'];
 $tplvars['title_submit_action'] = $this->Lang('title_submit_action');
 $tplvars['input_submit_action'] =
 	$this->CreateInputRadioGroup($id, 'fp_submit_action', $choices,
@@ -787,14 +787,14 @@ $tplvars['title_submit_template'] = $this->Lang('title_submit_response');
 $tplvars['input_submit_template'] = $this->CreateSyntaxArea($id, $tpl, 'fp_submission_template',
 	'pwf_tallarea', 'submission_template', '', '', 50, 15);
 //setup to revert to 'sample' submission-template
-$ctlData = array();
+$ctlData = [];
 $ctlData['fp_submission_template']['general_button'] = TRUE;
 list($buttons, $revertscripts) = PWForms\Utils::TemplateActions($formdata, $id, $ctlData);
 $jsfuncs[] = $revertscripts[0];
-$tplvars = $tplvars + array(
+$tplvars = $tplvars + [
 	'sample_submit_template' => $buttons[0],
 	'help_submit_template' => $this->Lang('help_submit_template'),
-);
+];
 
 $tplvars['cancel'] = $this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'));
 $tplvars['save'] = $this->CreateInputSubmit($id, 'submit', $this->Lang('save'));

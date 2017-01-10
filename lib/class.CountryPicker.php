@@ -22,7 +22,7 @@ class CountryPicker extends FieldBase
 	protected function InitCountries()
 	{
 		$mod = $this->formdata->formsmodule;
-		$this->Countries = array(
+		$this->Countries = [
 			$mod->Lang('AF') =>'AF',$mod->Lang('AX') =>'AX',$mod->Lang('AL') =>'AL',
 			$mod->Lang('DZ') =>'DZ',$mod->Lang('AS') =>'AS',$mod->Lang('AD') =>'AD',
 			$mod->Lang('AO') =>'AO',$mod->Lang('AI') =>'AI',$mod->Lang('AQ') =>'AQ',
@@ -105,7 +105,7 @@ class CountryPicker extends FieldBase
 			$mod->Lang('VN') =>'VN',$mod->Lang('VG') =>'VG',$mod->Lang('VI') =>'VI',
 			$mod->Lang('WF') =>'WF',$mod->Lang('EH') =>'EH',$mod->Lang('YE') =>'YE',
 			$mod->Lang('YU') =>'YU',$mod->Lang('ZM') =>'ZM',$mod->Lang('ZW') =>'ZW'
-			);
+			];
 		ksort($this->Countries); //TODO mb_ compatible sort
 	}
 
@@ -118,7 +118,7 @@ class CountryPicker extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -129,20 +129,20 @@ class CountryPicker extends FieldBase
 		}
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
-		$choices = array_merge(array($mod->Lang('no_default')=>''), $this->Countries);
-		$main[] = array($mod->Lang('title_select_default_country'),
+		$choices = array_merge([$mod->Lang('no_default')=>''], $this->Countries);
+		$main[] = [$mod->Lang('title_select_default_country'),
 						$mod->CreateInputDropdown($id, 'fp_default_country', $choices, -1,
-							$this->GetProperty('default_country')));
-		$main[] = array($mod->Lang('title_select_one_message'),
+							$this->GetProperty('default_country'))];
+		$main[] = [$mod->Lang('title_select_one_message'),
 						$mod->CreateInputText($id, 'fp_select_one',
-							$this->GetProperty('select_one', $mod->Lang('select_one'))));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('select_one', $mod->Lang('select_one')))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
 	{
 		$mod = $this->formdata->formsmodule;
-		$choices = array_merge(array($this->GetProperty('select_one', $mod->Lang('select_one'))=>-1),
+		$choices = array_merge([$this->GetProperty('select_one', $mod->Lang('select_one'))=>-1],
 			$this->Countries);
 
 		if (!$this->HasValue() && $this->GetProperty('default_country')) {

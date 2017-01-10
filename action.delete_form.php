@@ -11,5 +11,5 @@ if (!$this->_CheckAccess('ModifyPFForms')) {
 $funcs = new PWForms\FormOperations();
 $funcs->Delete($this, $params['form_id']);
 
-$this->Redirect($id, 'defaultadmin', $returnid, array(
-	'message' => $this->_PrettyMessage('form_deleted')));
+$this->Redirect($id, 'defaultadmin', $returnid, [
+	'message' => $this->_PrettyMessage('form_deleted')]);

@@ -63,7 +63,7 @@ class ClearcacheTask implements \CmsRegularTask
 		}
 		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_cache WHERE savetime+lifetime <?';
-		$mod->dbHandle->Execute($sql, array($time));
+		$mod->dbHandle->Execute($sql, [$time]);
 		return TRUE;
 	}
 

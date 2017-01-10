@@ -19,5 +19,5 @@ if ($funcs->NewID($params['import_formname'], $params['import_formalias'])) {
 	$key = 'duplicate_identifier';
 }
 
-$this->Redirect($id, 'defaultadmin', '', array(
-	'message' => $this->_PrettyMessage($key, $state)));
+$this->Redirect($id, 'defaultadmin', '', [
+	'message' => $this->_PrettyMessage($key, $state)]);

@@ -22,17 +22,17 @@ $sid = $params[$key.'s'];
 
 $pre = cms_db_prefix();
 $sql = 'SELECT pubkey,content FROM '.$pre.'module_pwf_session WHERE sess_id=?';
-$row = $db->GetRow($sql, array($sid));
+$row = $db->GetRow($sql, [$sid]);
 $sql = 'DELETE FROM '.$pre.'module_pwf_session WHERE sess_id=?';
 if (!$row || $row['pubkey'] != $params[$key.'c']) {
 	if ($row) {
-		$db->Execute($sql, array($sid));
+		$db->Execute($sql, [$sid]);
 	}
 	echo $this->Lang('validation_response_error');
 	return;
 }
 
-$db->Execute($sql, array($sid));
+$db->Execute($sql, [$sid]);
 
 $pw = $row['pubkey'].PWForms\Utils::Unfusc($this->GetPreference('masterpass'));
 $formdata = unserialize(PWForms\Utils::Decrypt($row['content'], $pw));
@@ -56,8 +56,8 @@ $cache_key = md5($token);
 $cache->set($cache_key, $formdata, 84600); //expiry ?
 
 $prefix = $formdata->current_prefix;
-$this->Redirect($id, 'default', $returnid, array(
+$this->Redirect($id, 'default', $returnid, [
 	'form_id'=>$formdata->Id,
 	$prefix.'datakey'=>$cache_key,
 	$prefix.'done'=>1
-	));
+	]);

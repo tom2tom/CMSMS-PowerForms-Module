@@ -90,20 +90,20 @@ class SystemEmail extends EmailBase
 		}
 		$opt = $this->GetPropArray('destination_address');
 		if ($opt) {
-			$totypes = array('to', 'cc', 'bc');
-			$dests = array();
-			$dests[] = array(
+			$totypes = ['to', 'cc', 'bc'];
+			$dests = [];
+			$dests[] = [
 				$mod->Lang('title_destination_address'),
 				$mod->Lang('to'),
 				$mod->Lang('cc'),
 				$mod->Lang('bcc'),
 				$mod->Lang('title_select')
-				);
+				];
 			foreach ($opt as $i=>&$one) {
 				$arf = '['.$i.']';
 
 				$totype = $this->GetPropIndexed('address_type', $i, 'to');
-				$btns = array();
+				$btns = [];
 				for ($c=0; $c<3; $c++) {
 					$t = '<input type="radio" class="cms_radio" name="'.$id.'fp_address_type'.$arf.
 					'" id="'.$id.'address_type'.$i.$c.'" value="'.$totypes[$c].'"';
@@ -113,21 +113,21 @@ class SystemEmail extends EmailBase
 					$t .= ' style="margin-left:5px;" />';
 					$btns[] = $t;
 				}
-				$dests[] = array(
+				$dests[] = [
 					$mod->CreateInputText($id, 'fp_destination_address'.$arf, $one, 50, 128),
 					$btns[0],
 					$btns[1],
 					$btns[2],
 					$mod->CreateInputCheckbox($id, 'selected'.$arf, 1, -1, 'style="display:block;margin:auto;"')
-				);
+				];
 			}
 			unset($one);
 			$this->MultiComponent = TRUE;
-			return array('main'=>$main,'adv'=>$adv,'table'=>$dests,'extra'=>$extra);
+			return ['main'=>$main,'adv'=>$adv,'table'=>$dests,'extra'=>$extra];
 		} else {
 			$this->MultiComponent = FALSE;
-			$main[] = array('','',$mod->Lang('missing_type', $mod->Lang('destination')));
-			return array('main'=>$main,'adv'=>$adv,'extra'=>$extra);
+			$main[] = ['','',$mod->Lang('missing_type', $mod->Lang('destination'))];
+			return ['main'=>$main,'adv'=>$adv,'extra'=>$extra];
 		}
 	}
 
@@ -148,7 +148,7 @@ class SystemEmail extends EmailBase
 
 	public function AdminValidate($id)
 	{
-		$messages = array();
+		$messages = [];
 		list($ret, $msg) = parent::AdminValidate($id);
 		if (!$ret) {
 			$messages[] = $msg;
@@ -183,7 +183,7 @@ class SystemEmail extends EmailBase
 		}
 
 		$msg = ($ret)? '' : implode('<br />', $messages);
-		return array($ret,$msg);
+		return [$ret,$msg];
 	}
 
 	public function SetFromAddress()

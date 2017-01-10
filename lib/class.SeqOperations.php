@@ -14,7 +14,7 @@ class SeqOperations
 	{
 		$nm = $actor->GetProperty('privatename'); //sequence identifier
 		$fdata = $actor->formdata;
-		$log = array();
+		$log = [];
 		foreach ($fdata->FieldOrders as $o=>$fid) {
 			$obfld = $fdata->Fields[$fid];
 			$t = $obfld->GetFieldType();
@@ -67,9 +67,9 @@ class SeqOperations
 		$o = $ao + 1;
 		//members offset
 		$x = $mo + 1;
-		$xfields = array();
-		$xords = array();
-		$xmembers = array();
+		$xfields = [];
+		$xords = [];
+		$xmembers = [];
 
 		while ($times > 0) {
 			foreach ($batch as $fid) {
@@ -88,7 +88,7 @@ class SeqOperations
 		$pos = ($after) ? $ao+1:$ao;
 		$fdata->Fields = array_slice($fdata->Fields, 0, $pos, TRUE) + $xfields + array_slice($fdata->Fields, $pos, NULL, TRUE);
 
-		$tail = array();
+		$tail = [];
 		$c = count($xords);
 		$rest = array_slice($fdata->FieldOrders, $pos, NULL, TRUE);
 		foreach ($rest as $i=>$fid) {
@@ -100,7 +100,7 @@ class SeqOperations
 			$xmembers[$i] = array_search($fid, $fdata->FieldOrders);
 		}
 		$pos = ($after) ? $mo+1:$mo;
-		$tail = array();
+		$tail = [];
 		$x = count($xmembers);
 		$rest = array_slice($members, $pos, NULL, TRUE);
 		foreach ($rest as $i=>$o) {

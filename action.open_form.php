@@ -43,7 +43,7 @@ if (isset($params['submit']) || isset($params['apply'])) {
 		$message = $this->_PrettyMessage($message, TRUE, FALSE);
 		if (isset($params['submit'])) {
 			$cache->delete($params['datakey']);
-			$this->Redirect($id, 'defaultadmin', '', array('message'=> $message));
+			$this->Redirect($id, 'defaultadmin', '', ['message'=> $message]);
 		}
 	} else {
 		$message = $this->_PrettyMessage($message, FALSE, FALSE);
@@ -57,12 +57,12 @@ if (isset($params['submit']) || isset($params['apply'])) {
 		//update cache ready for next use
 		$cache->set($params['datakey'], $formdata, 84600);
 		$this->Redirect($id, 'open_field', $returnid,
-			array('form_id'=>$fid,
+			['form_id'=>$fid,
 				'datakey'=>$params['datakey'],
 				'field_id'=>$params['field_id'],
 				'selectfields'=>$params['selectfields'],
 				'selectdispos'=>$params['selectdispos']
-				));
+				]);
 	} else {
 		$message = $this->_PrettyMessage('err_copy', FALSE);
 	}
@@ -178,7 +178,7 @@ if (isset($_FILES) && isset($_FILES[$t])) {
 	}
 }
 
-$orders = array();
+$orders = [];
 foreach ($formdata->Fields as $fid=>&$one) {
 	$orders[] = $fid;
 }
@@ -186,7 +186,7 @@ unset($one);
 $formdata->FieldOrders = $orders;
 $funcs->Arrange($formdata->Fields, $formdata->FieldOrders);
 
-$tplvars = array();
+$tplvars = [];
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.form.php';
 

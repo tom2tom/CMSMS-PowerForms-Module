@@ -18,20 +18,20 @@ class TextExpandable extends FieldBase
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'TextExpandable';
 		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = array(
+		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_numeric')=>'numeric',
 			$mod->Lang('validation_integer')=>'integer',
 			$mod->Lang('validation_email_address')=>'email',
 			$mod->Lang('validation_regex_match')=>'regex_match',
 			$mod->Lang('validation_regex_nomatch')=>'regex_nomatch'
-		);
+		];
 	}
 
 	// Gets all other 'TextExpandable' fields in the form
 	public function GetFieldSiblings()
 	{
-		$siblings = array();
+		$siblings = [];
 		$siblings[$this->formdata->formsmodule->Lang('select_one')] = '';
 		$tid = $this->Id;
 		foreach ($this->formdata->Fields as &$one) {
@@ -65,7 +65,7 @@ class TextExpandable extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -88,25 +88,25 @@ class TextExpandable extends FieldBase
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_maximum_length'),
-						$mod->CreateInputText($id, 'fp_length', $this->GetProperty('length', 80), 3, 3));
-		$main[] = array($mod->Lang('title_add_button_text'),
-						$mod->CreateInputText($id, 'fp_add_button', $this->GetProperty('add_button', '+'), 15, 25));
-		$main[] = array($mod->Lang('title_del_button_text'),
-						$mod->CreateInputText($id, 'fp_del_button', $this->GetProperty('del_button', 'X'), 15, 25));
-		$adv[] = array($mod->Lang('title_field_regex'),
+		$main[] = [$mod->Lang('title_maximum_length'),
+						$mod->CreateInputText($id, 'fp_length', $this->GetProperty('length', 80), 3, 3)];
+		$main[] = [$mod->Lang('title_add_button_text'),
+						$mod->CreateInputText($id, 'fp_add_button', $this->GetProperty('add_button', '+'), 15, 25)];
+		$main[] = [$mod->Lang('title_del_button_text'),
+						$mod->CreateInputText($id, 'fp_del_button', $this->GetProperty('del_button', 'X'), 15, 25)];
+		$adv[] = [$mod->Lang('title_field_regex'),
 						$mod->CreateInputText($id, 'fp_regex', $this->GetProperty('regex'), 25, 255),
-						$mod->Lang('help_regex_use'));
-		$adv[] = array($mod->Lang('title_field_siblings'),
+						$mod->Lang('help_regex_use')];
+		$adv[] = [$mod->Lang('title_field_siblings'),
 						$mod->CreateInputDropdown($id, 'fp_siblings', $this->GetFieldSiblings(), -1,
 							$this->GetProperty('siblings')),
-						$mod->Lang('help_field_siblings'));
+						$mod->Lang('help_field_siblings')];
 		//TODO c.f. $this->HasUserAddOp, $this->HasUserDeleteOp
-		$adv[] = array($mod->Lang('title_field_hidebuttons'),
+		$adv[] = [$mod->Lang('title_field_hidebuttons'),
 						$mod->CreateInputHidden($id, 'fp_hidebuttons', 0).
 						$mod->CreateInputCheckbox($id, 'fp_hidebuttons', 1, $this->GetProperty('hidebuttons', 0)),
-						$mod->Lang('help_field_hidebuttons'));
-		return array('main'=>$main,'adv'=>$adv);
+						$mod->Lang('help_field_hidebuttons')];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function LabelSubComponents()
@@ -146,7 +146,7 @@ class TextExpandable extends FieldBase
 		}
 
 		// Input fields
-		$ret = array();
+		$ret = [];
 		for ($i=0; $i<$vals; $i++) {
 			$oneset = new \stdClass();
 
@@ -192,11 +192,11 @@ class TextExpandable extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$res = TRUE;
-		$messages = array();
+		$messages = [];
 		$l = $this->GetProperty('length', 0);
 
 		if (!is_array($this->Value)) {
-			$this->Value = array($this->Value);
+			$this->Value = [$this->Value];
 		}
 		foreach ($this->Value as $one) {
 			switch ($this->ValidationType) {
@@ -247,6 +247,6 @@ class TextExpandable extends FieldBase
 			$this->ValidationMessage = implode('<br />', $messages);
 		}
 
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 }

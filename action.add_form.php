@@ -29,20 +29,20 @@ if (isset($params['cancel'])) {
 	if (isset($params['form_id'])) {
 		$newid = $funcs->Copy($this, $id, $params, $params['form_id']);
 		if (!$newid) {
-			$this->Redirect($id, 'defaultadmin', '', array(
-				'message'=>$this->_PrettyMessage('err_copy2', FALSE)));
+			$this->Redirect($id, 'defaultadmin', '', [
+				'message'=>$this->_PrettyMessage('err_copy2', FALSE)]);
 		}
 		$seetab = 'maintab'; //name/alias will be different
 	} else {
 		$newid = $funcs->Add($this, $params);
 		if (!$newid) {
-			$this->Redirect($id, 'defaultadmin', '', array(
-				'message'=>$this->_PrettyMessage('err_name', FALSE)));
+			$this->Redirect($id, 'defaultadmin', '', [
+				'message'=>$this->_PrettyMessage('err_name', FALSE)]);
 		}
 	}
 	unset($funcs);
-	$this->Redirect($id, 'open_form', '', array(
-		'form_id'=>$newid, 'active_tab'=>$seetab)); //no datakey parameter
+	$this->Redirect($id, 'open_form', '', [
+		'form_id'=>$newid, 'active_tab'=>$seetab]); //no datakey parameter
 }
 
 if (isset($params['form_id'])) {
@@ -62,7 +62,7 @@ if (isset($params['form_id'])) {
 	$alias = '';
 }
 
-$tplvars = array(
+$tplvars = [
 	'form_start' => $this->CreateFormStart($id, 'add_form', $returnid),
 	'form_end' => $this->CreateFormEnd(),
 	'hidden' => $h,
@@ -74,6 +74,6 @@ $tplvars = array(
 	'help_form_alias' => $this->Lang('help_form_alias'),
 	'save' => $this->CreateInputSubmit($id, 'save', $this->Lang('save')),
 	'cancel' => $this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'))
-);
+];
 
 echo PWForms\Utils::ProcessTemplate($this, 'addform.tpl', $tplvars);

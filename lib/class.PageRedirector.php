@@ -57,7 +57,7 @@ class PageRedirector extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -79,9 +79,9 @@ class PageRedirector extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE, FALSE);
 		$mod = $this->formdata->formsmodule;
 
-		$main[] = array($mod->Lang('title_select_one_message'),
+		$main[] = [$mod->Lang('title_select_one_message'),
 						$mod->CreateInputText($id, 'fp_select_one',
-							$this->GetProperty('select_one', $mod->Lang('select_one')), 30, 128));
+							$this->GetProperty('select_one', $mod->Lang('select_one')), 30, 128)];
 		if ($this->addressAdd) {
 			$this->AddPropIndexed('destination_page', '');
 			$this->AddPropIndexed('destination_subject', '');
@@ -89,28 +89,28 @@ class PageRedirector extends FieldBase
 		}
 		$opt = $this->GetPropArray('destination_page');
 		if ($opt) {
-			$dests = array();
-			$dests[] = array(
+			$dests = [];
+			$dests[] = [
 				$mod->Lang('title_selection_subject'),
 				$mod->Lang('title_destination_page'),
 				$mod->Lang('title_select')
-				);
+				];
 			foreach ($opt as $i=>&$one) {
 				$arf = '['.$i.']';
-				$dests[] = array(
+				$dests[] = [
 					$mod->CreateInputText($id, 'fp_destination_subject'.$arf,
 						$this->GetPropIndexed('destination_subject', $i), 30, 128),
 					Utils::CreateHierarchyPulldown($mod, $id, 'fp_destination_page'.$arf, $one),
 					$mod->CreateInputCheckbox($id, 'selected'.$arf, 1, -1, 'style="display:block;margin:auto;"')
-				);
+				];
 			}
 			unset($one);
 			$this->MultiComponent = TRUE;
-			return array('main'=>$main,'adv'=>$adv,'table'=>$dests);
+			return ['main'=>$main,'adv'=>$adv,'table'=>$dests];
 		} else {
 			$this->MultiComponent = FALSE;
-			$main[] = array('','',$mod->Lang('missing_type', $mod->Lang('page')));
-			return array('main'=>$main,'adv'=>$adv);
+			$main[] = ['','',$mod->Lang('missing_type', $mod->Lang('page'))];
+			return ['main'=>$main,'adv'=>$adv];
 		}
 	}
 
@@ -131,7 +131,7 @@ class PageRedirector extends FieldBase
 
 	public function AdminValidate($id)
 	{
-		$messages = array();
+		$messages = [];
 		list($ret, $msg) = parent::AdminValidate($id);
 		if (!$ret) {
 			$messages[] = $msg;
@@ -143,7 +143,7 @@ class PageRedirector extends FieldBase
 			$messages[] = $mod->Lang('missing_type', $mod->Lang('page'));
 		}
 		$msg = ($ret)?'':implode('<br />', $messages);
-		return array($ret,$msg);
+		return [$ret,$msg];
 	}
 
 	public function Populate($id, &$params)
@@ -151,7 +151,7 @@ class PageRedirector extends FieldBase
 		$pages = $this->GetPropArray('destination_subject');
 		if ($pages) {
 			$mod = $this->formdata->formsmodule;
-			$choices = array(' '.$this->GetProperty('select_one', $mod->Lang('select_one')) => -1)
+			$choices = [' '.$this->GetProperty('select_one', $mod->Lang('select_one')) => -1]
 				+ array_flip($pages);
 			$tmp = $mod->CreateInputDropdown(
 				$id, $this->formdata->current_prefix.$this->Id, $choices, -1, $this->Value,
@@ -169,9 +169,9 @@ class PageRedirector extends FieldBase
 		if ($page >= 0) {
 			$this->formdata->XtraProps['redirect_page'] = $page;
 			$this->formdata->XtraProps['submit_action'] = 'redir';
-			return array(TRUE,'');
+			return [TRUE,''];
 		}
 		$mod = $this->formdata->formsmodule;
-		return array(FALSE,$mod->Lang('missing_type', $mod->Lang('page')));
+		return [FALSE,$mod->Lang('missing_type', $mod->Lang('page'))];
 	}
 }

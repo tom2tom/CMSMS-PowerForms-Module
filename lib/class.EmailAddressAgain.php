@@ -14,7 +14,7 @@ class EmailAddressAgain extends EmailBase
 		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->Type = 'EmailAddressAgain';
-		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_email_address')=>'email');
+		$this->ValidationTypes = [$formdata->formsmodule->Lang('validation_email_address')=>'email'];
 	}
 
 	public function GetSynopsis()
@@ -25,7 +25,7 @@ class EmailAddressAgain extends EmailBase
 
 	public function AdminPopulate($id)
 	{
-		$choices = array();
+		$choices = [];
 		foreach ($this->formdata->Fields as &$one) {
 			if ($one->IsInput && $one->Id != $this->Id) {
 				$tn = $one->GetName();
@@ -36,22 +36,22 @@ class EmailAddressAgain extends EmailBase
 
 		list($main, $adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_field_to_validate'),
+		$main[] = [$mod->Lang('title_field_to_validate'),
 						$mod->CreateInputDropdown($id, 'fp_field_to_validate', $choices, -1,
-							$this->GetProperty('field_to_validate')));
-		$adv[] = array($mod->Lang('title_field_default_value'),
+							$this->GetProperty('field_to_validate'))];
+		$adv[] = [$mod->Lang('title_field_default_value'),
 						$mod->CreateInputText($id, 'fp_default',
-							$this->GetProperty('default'), 25, 1024));
-		$adv[] = array($mod->Lang('title_clear_default'),
+							$this->GetProperty('default'), 25, 1024)];
+		$adv[] = [$mod->Lang('title_clear_default'),
 						$mod->CreateInputHidden($id, 'fp_clear_default', 0).
 						$mod->CreateInputCheckbox($id, 'fp_clear_default', 1,
 							$this->GetProperty('clear_default', 0)),
-						$mod->Lang('help_clear_default'));
-		$adv[] = array($mod->Lang('title_html5'),
+						$mod->Lang('help_clear_default')];
+		$adv[] = [$mod->Lang('title_html5'),
 						$mod->CreateInputHidden($id, 'fp_html5', 0).
 						$mod->CreateInputCheckbox($id, 'fp_html5', 1,
-							$this->GetProperty('html5', 0)));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('html5', 0))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
@@ -91,6 +91,6 @@ class EmailAddressAgain extends EmailBase
 			}
 			unset($one);
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 }

@@ -20,24 +20,24 @@ class EmailSender extends EmailBase
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
-		$choices = array($mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b');
+		$choices = [$mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b'];
 		
-		$main[] = array($mod->Lang('title_headers_to_modify'),
+		$main[] = [$mod->Lang('title_headers_to_modify'),
 						$mod->CreateInputDropdown($id, 'fp_headers_to_modify', $choices, -1,
-							$this->GetProperty('headers_to_modify', 'b')));
-		$adv[] = array($mod->Lang('title_field_default_value'),
+							$this->GetProperty('headers_to_modify', 'b'))];
+		$adv[] = [$mod->Lang('title_field_default_value'),
 						$mod->CreateInputText($id, 'fp_default',
-							$this->GetProperty('default'), 25, 1024));
-		$adv[] = array($mod->Lang('title_clear_default'),
+							$this->GetProperty('default'), 25, 1024)];
+		$adv[] = [$mod->Lang('title_clear_default'),
 						$mod->CreateInputHidden($id, 'fp_clear_default', 0).
 						$mod->CreateInputCheckbox($id, 'fp_clear_default', 1,
 							$this->GetProperty('clear_default', 0)),
-						$mod->Lang('help_clear_default'));
-		$adv[] = array($mod->Lang('title_html5'),
+						$mod->Lang('help_clear_default')];
+		$adv[] = [$mod->Lang('title_html5'),
 						$mod->CreateInputHidden($id, 'fp_html5', 0).
 						$mod->CreateInputCheckbox($id, 'fp_html5', 1,
-							$this->GetProperty('html5', 0)));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('html5', 0))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)

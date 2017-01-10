@@ -31,7 +31,7 @@ class SiteAdmin extends FieldBase
 			$f = $this->GetProperty('show_userfirstname', 0);
 			$l = $this->GetProperty('show_userlastname', 0);
 			$u = $this->GetProperty('show_username', 0);
-			$choices = array();
+			$choices = [];
 			if ($select) {
 				$choices[' '.$this->GetProperty('select_one', $mod->Lang('select_one'))] = -1;
 			}
@@ -39,7 +39,7 @@ class SiteAdmin extends FieldBase
 			for ($i=0; $i<$c; $i++) {
 				$v = $userlist[$i];
 				if ($v->active || !$this->GetProperty('active_only', 1)) {
-					$parts = array();
+					$parts = [];
 					if ($f) {
 						$parts[] = $v->firstname;
 					}
@@ -75,7 +75,7 @@ class SiteAdmin extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -95,7 +95,7 @@ class SiteAdmin extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		$choices = array();
+		$choices = [];
 		$groups = \cmsms()->GetGroupOperations()->LoadGroups();
 		foreach ($groups as $one) {
 			$choices[$one->name] = $one->id;
@@ -103,32 +103,32 @@ class SiteAdmin extends FieldBase
 
 		list($main, $adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_select_one_message'),
+		$main[] = [$mod->Lang('title_select_one_message'),
 					$mod->CreateInputText($id, 'fp_select_one',
-					$this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128));
-		$main[] = array($mod->Lang('title_show_userfirstname'),
+					$this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128)];
+		$main[] = [$mod->Lang('title_show_userfirstname'),
 					$mod->CreateInputHidden($id, 'fp_show_userfirstname', 0).
 					$mod->CreateInputCheckbox($id, 'fp_show_userfirstname', 1,
-						$this->GetProperty('show_userfirstname', 1)));
-		$main[] = array($mod->Lang('title_show_userlastname'),
+						$this->GetProperty('show_userfirstname', 1))];
+		$main[] = [$mod->Lang('title_show_userlastname'),
 					$mod->CreateInputHidden($id, 'fp_show_userlastname', 0).
 					$mod->CreateInputCheckbox($id, 'fp_show_userlastname', 1,
-						$this->GetProperty('show_userlastname', 1)));
-		$main[] = array($mod->Lang('title_show_username'),
+						$this->GetProperty('show_userlastname', 1))];
+		$main[] = [$mod->Lang('title_show_username'),
 					$mod->CreateInputHidden($id, 'fp_show_username', 0).
 					$mod->CreateInputCheckbox($id, 'fp_show_username', 1,
-						$this->GetProperty('show_username', 0)));
-		$main[] = array($mod->Lang('title_active_only'),
+						$this->GetProperty('show_username', 0))];
+		$main[] = [$mod->Lang('title_active_only'),
 					$mod->CreateInputHidden($id, 'fp_active_only', 0).
 					$mod->CreateInputCheckbox($id, 'fp_active_only', 1,
-						$this->GetProperty('active_only', 1)));
-		$main[] = array($mod->Lang('title_restrict_to_group'),
+						$this->GetProperty('active_only', 1))];
+		$main[] = [$mod->Lang('title_restrict_to_group'),
 					$mod->CreateInputHidden($id, 'fp_restrict_to_group', 0).
 					$mod->CreateInputCheckbox($id, 'fp_restrict_to_group', 1,
 						$this->GetProperty('restrict_to_group', 0)).
 					$mod->CreateInputDropdown($id, 'fp_group', $choices, -1,
-						$this->GetProperty('group')));
-		return array('main'=>$main,'adv'=>$adv);
+						$this->GetProperty('group'))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
@@ -154,6 +154,6 @@ class SiteAdmin extends FieldBase
 			$mod = $this->formdata->formsmodule;
 			$this->ValidationMessage = $mod->Lang('missing_type', $mod->Lang('admin'));
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 }

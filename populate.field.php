@@ -10,15 +10,15 @@ if (!empty($message)) {
 
 $tplvars['backtomod_nav'] = $this->CreateLink($id, 'defaultadmin', '', '&#171; '.$this->Lang('back_top'));
 $tplvars['backtoform_nav'] = $this->CreateLink($id, 'open_form', $returnid, '&#171; '.$this->Lang('back_form'),
-	array('form_id'=>$params['form_id'], 'datakey'=>$params['datakey']));
+	['form_id'=>$params['form_id'], 'datakey'=>$params['datakey']]);
 
 if ($obfld) { //field data are loaded
 	$fid = $obfld->GetId(); //maybe <= 0, if adding
 	$nm = 'submit'; //submit-control name
 
-	$obfld->jsincs = array();
-	$obfld->jsfuncs = array();
-	$obfld->jsloads = array();
+	$obfld->jsincs = [];
+	$obfld->jsfuncs = [];
+	$obfld->jsloads = [];
 	$baseurl = $this->GetModuleURLPath();
 
 	$populators = $obfld->AdminPopulate($id);
@@ -68,7 +68,7 @@ EOS;
 
 	$tplvars['requirable'] = (/*!$obfld->IsDisposition() && */!$obfld->GetChangeRequirement())?1:0;
 
-	$mainList = array();
+	$mainList = [];
 	if ($hasmain) {
 		foreach ($populators['main'] as $item) {
 			$oneset = new stdClass();
@@ -84,7 +84,7 @@ EOS;
 	}
 	$tplvars['mainList'] = $mainList;
 
-	$advList = array();
+	$advList = [];
 	if ($hasadv) {
 		foreach ($populators['adv'] as $item) {
 			$oneset = new stdClass();
@@ -169,19 +169,19 @@ EOS;
 	$oneset->title = $this->Lang('title_add_new_field');
 	PWForms\Utils::Collect_Fields($this);
 	$oneset->input = $this->CreateInputDropdown($id, 'field_type',
-		array_merge(array($this->Lang('select_type')=>''), $this->field_types), -1, '');
+		array_merge([$this->Lang('select_type')=>''], $this->field_types), -1, '');
 //	$oneset->help = ;
 	$tplvars['mainitem'] = $oneset;
 }
 
 $tplvars['form_start'] = $this->CreateFormStart($id, 'open_field', $returnid,
-	'POST', '', FALSE, '', array(
+	'POST', '', FALSE, '', [
 	'form_id'=>$params['form_id'],
 	'datakey'=>$params['datakey'],
 	'field_id'=>$fid,
 	'selectfields'=>$params['selectfields'],
 	'selectdispos'=>$params['selectdispos']
-	));
+	]);
 $tplvars['form_end'] = $this->CreateFormEnd();
 
 $t = ($fid != 0) ? 'close':'add'; //field use or add

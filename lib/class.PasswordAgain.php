@@ -25,7 +25,7 @@ class PasswordAgain extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		$choices = array();
+		$choices = [];
 		foreach ($this->formdata->Fields as &$one) {
 			if ($one->GetFieldType() == 'Password') {
 				$tn = $one->GetName();
@@ -35,22 +35,22 @@ class PasswordAgain extends FieldBase
 		unset($one);
 		list($main, $adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array(
+		$main[] = [
 					$mod->Lang('title_field_to_validate'),
 					$mod->CreateInputDropdown($id, 'fp_field_to_validate', $choices, -1,
-						$this->GetProperty('field_to_validate')));
-		$main[] = array($mod->Lang('title_display_length'),
+						$this->GetProperty('field_to_validate'))];
+		$main[] = [$mod->Lang('title_display_length'),
 					$mod->CreateInputText($id, 'fp_length',
-						$this->GetProperty('length', '12'), 3, 3));
-		$main[] = array($mod->Lang('title_minimum_length'),
+						$this->GetProperty('length', '12'), 3, 3)];
+		$main[] = [$mod->Lang('title_minimum_length'),
 					$mod->CreateInputText($id, 'fp_min_length',
-						$this->GetProperty('min_length', '8'), 3, 3));
-		$main[] = array($mod->Lang('title_hide'),
+						$this->GetProperty('min_length', '8'), 3, 3)];
+		$main[] = [$mod->Lang('title_hide'),
 					$mod->CreateInputHidden($id, 'fp_hide', 0).
 					$mod->CreateInputCheckbox($id, 'fp_hide', 1,
 						$this->GetProperty('hide', 1)),
-					$mod->Lang('title_hide_help'));
-		return array('main'=>$main,'adv'=>$adv);
+					$mod->Lang('title_hide_help')];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
@@ -87,6 +87,6 @@ class PasswordAgain extends FieldBase
 			}
 			unset($one);
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 }

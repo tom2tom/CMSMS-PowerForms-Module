@@ -17,7 +17,7 @@ class EmailBCCAddress extends EmailBase
 		$this->IsInput = TRUE;
 		$this->Type = 'EmailBCCAddress';
 		$this->ValidationType = 'email';
-		$this->ValidationTypes = array($formdata->formsmodule->Lang('validation_email_address')=>'email');
+		$this->ValidationTypes = [$formdata->formsmodule->Lang('validation_email_address')=>'email'];
 	}
 
 	public function GetSynopsis()
@@ -37,7 +37,7 @@ class EmailBCCAddress extends EmailBase
 
 	public function AdminPopulate($id)
 	{
-		$choices = array();
+		$choices = [];
 		foreach ($this->formdata->Fields as &$one) {
 			if ($one->IsDisposition() && is_subclass_of($one, 'EmailBase')) {
 				$txt = $one->GetName().': '.$one->GetDisplayType().
@@ -49,10 +49,10 @@ class EmailBCCAddress extends EmailBase
 
 		list($main, $adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_field_to_modify2'),
+		$main[] = [$mod->Lang('title_field_to_modify2'),
 						$mod->CreateInputDropdown($id, 'fp_field_to_modify', $choices, -1,
-							$this->GetProperty('field_to_modify')));
-		return array('main'=>$main,'adv'=>$adv);
+							$this->GetProperty('field_to_modify'))];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
@@ -80,7 +80,7 @@ class EmailBCCAddress extends EmailBase
 			}
 			break;
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 
 	public function PreDisposeAction()

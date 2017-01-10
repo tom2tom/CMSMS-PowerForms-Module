@@ -58,39 +58,39 @@ class SequenceEnd extends SequenceStart
 		if ($nm && (strncmp($nm, $pre, $p)) == 0) {
 			$this->Name = substr($nm, $p);
 		}
-		$except = array(
+		$except = [
 		'title_field_alias',
 		'title_field_javascript',
 		'title_field_resources',
-		'title_smarty_eval');
+		'title_smarty_eval'];
 		list($main, $adv) = $this->AdminPopulateCommon($id, $except, TRUE);
 		$mod = $this->formdata->formsmodule;
 		//name-help
 		$main[0][] = $mod->Lang('help_sequence_name2', '&#171;&#171;');
 
 		//TODO MAYBE a picklist of available names
-		$main[] = array($mod->Lang('title_privatename'),
+		$main[] = [$mod->Lang('title_privatename'),
 						$mod->CreateInputText($id, 'fp_privatename',
 							$this->GetProperty('privatename', ''), 25, 50),
-						$mod->Lang('help_privatename'));
-		$main[] = array($mod->Lang('title_change_count'),
+						$mod->Lang('help_privatename')];
+		$main[] = [$mod->Lang('title_change_count'),
 						$mod->CreateInputHidden($id, 'fp_change_count', 0).
 						$mod->CreateInputCheckbox($id, 'fp_change_count', 1,
-							$this->GetProperty('change_count', 1)));
-		$main[] = array($mod->Lang('title_add_button_seqpre'),
+							$this->GetProperty('change_count', 1))];
+		$main[] = [$mod->Lang('title_add_button_seqpre'),
 						$mod->CreateInputText($id, 'fp_insertpre_label',
-							$this->GetProperty('insertpre_label', $mod->Lang('insert')), 25, 30));
-		$main[] = array($mod->Lang('title_del_button_seqpre'),
+							$this->GetProperty('insertpre_label', $mod->Lang('insert')), 25, 30)];
+		$main[] = [$mod->Lang('title_del_button_seqpre'),
 						$mod->CreateInputText($id, 'fp_deletepre_label',
-							$this->GetProperty('deletepre_label', $mod->Lang('delete')), 25, 30));
-		$main[] = array($mod->Lang('title_add_button_seq'),
+							$this->GetProperty('deletepre_label', $mod->Lang('delete')), 25, 30)];
+		$main[] = [$mod->Lang('title_add_button_seq'),
 						$mod->CreateInputText($id, 'fp_insert_label',
-							$this->GetProperty('insert_label', $mod->Lang('insert')), 25, 30));
-		$main[] = array($mod->Lang('title_del_button_seq'),
+							$this->GetProperty('insert_label', $mod->Lang('insert')), 25, 30)];
+		$main[] = [$mod->Lang('title_del_button_seq'),
 						$mod->CreateInputText($id, 'fp_delete_label',
-							$this->GetProperty('delete_label', $mod->Lang('delete')), 25, 30));
+							$this->GetProperty('delete_label', $mod->Lang('delete')), 25, 30)];
 
-		return array('main'=>$main,'adv'=>$adv);
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function PostAdminAction(&$params)
@@ -132,7 +132,7 @@ class SequenceEnd extends SequenceStart
 			$msg = $mod->Lang('missing_type', $mod->Lang('sequenceid')); //not fatal, warn user
 		}
 		//TODO conform 'change_count' property with SequenceStart, if any
-		return array($ret,$msg);
+		return [$ret,$msg];
 	}
 
 	public function Populate($id, &$params)
@@ -143,13 +143,13 @@ class SequenceEnd extends SequenceStart
 		}
 		//at this stage, don't know whether all buttons are relevant, can't tailor them
 		if ($this->LastBreak) {
-			$propkeys = array('insertpre_label','deletepre_label','insert_label');
-			$nm = array('SeI_','SeD_','SeX_');
+			$propkeys = ['insertpre_label','deletepre_label','insert_label'];
+			$nm = ['SeI_','SeD_','SeX_'];
 		} else {
-			$propkeys = array('insertpre_label','deletepre_label','insert_label','delete_label');
-			$nm = array('SeI_','SeD_','SeX_','SeW_');
+			$propkeys = ['insertpre_label','deletepre_label','insert_label','delete_label'];
+			$nm = ['SeI_','SeD_','SeX_','SeW_'];
 		}
-		$ret = array();
+		$ret = [];
 		$bnm = $id.$this->formdata->current_prefix;
 		$bid = $this->GetInputId();
 		if ($this->LastBreak) {

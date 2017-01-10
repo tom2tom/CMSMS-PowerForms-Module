@@ -23,12 +23,12 @@ class DateTime extends FieldBase
 		$this->Type = 'DateTime';
 		$this->ValidationType = 'none';
 		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = array(
+		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_before')=>'before',
 			$mod->Lang('validation_after')=>'after',
 			$mod->Lang('validation_between')=>'between'
-		);
+		];
 	}
 
 	private function CurrentFormat()
@@ -69,7 +69,7 @@ class DateTime extends FieldBase
 		if ($as_string) {
 			return $ret;
 		} else {
-			return array($ret);
+			return [$ret];
 		}
 	}
 
@@ -110,25 +110,25 @@ class DateTime extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id);
 		$mod = $this->formdata->formsmodule;
 
-		$main[] = array($mod->Lang('title_date_only'),
+		$main[] = [$mod->Lang('title_date_only'),
 				$mod->CreateInputHidden($id, 'fp_date_only', 0).
 				$mod->CreateInputCheckbox($id, 'fp_date_only', 1,
-					$this->GetProperty('date_only', 0)));
-		$main[] = array($mod->Lang('title_time_only'),
+					$this->GetProperty('date_only', 0))];
+		$main[] = [$mod->Lang('title_time_only'),
 				$mod->CreateInputHidden($id, 'fp_time_only', 0).
 				$mod->CreateInputCheckbox($id, 'fp_time_only', 1,
-					$this->GetProperty('time_only', 0)));
+					$this->GetProperty('time_only', 0))];
 
-		$adv[] = array($mod->Lang('title_dateformat'),
+		$adv[] = [$mod->Lang('title_dateformat'),
 				$mod->CreateInputText($id, 'fp_date_format',
 					$this->GetProperty('date_format',
 						$mod->GetPreference('date_format')), 10, 12),
-					$mod->Lang('help_dateformat'));
-		$adv[] = array($mod->Lang('title_timeformat'),
+					$mod->Lang('help_dateformat')];
+		$adv[] = [$mod->Lang('title_timeformat'),
 				$mod->CreateInputText($id, 'fp_time_format',
 				$this->GetProperty('time_format',
 					$mod->GetPreference('time_format')), 10, 12),
-				$mod->Lang('help_timeformat'));
+				$mod->Lang('help_timeformat')];
 		$v = $this->GetProperty('low_limit', 0);
 		if ($v) {
 			$vs = $this->GetProperty('low_value', '');
@@ -140,11 +140,11 @@ class DateTime extends FieldBase
 		} else {
 			$vs = '';
 		}
-		$adv[] = array($mod->Lang('title_low_limit'),
+		$adv[] = [$mod->Lang('title_low_limit'),
 				$mod->CreateInputHidden($id, 'fp_low_limit', 0).
 				$mod->CreateInputCheckbox($id, 'fp_low_limit', 1, $v)
 				.'&nbsp;'.
-				$mod->CreateInputText($id, 'fp_low_value', $vs, 20));
+				$mod->CreateInputText($id, 'fp_low_value', $vs, 20)];
 		$v = $this->GetProperty('high_limit', 0);
 		if ($v) {
 			$vs = $this->GetProperty('high_value', '');
@@ -160,18 +160,18 @@ class DateTime extends FieldBase
 		} else {
 			$vs = '';
 		}
-		$adv[] = array($mod->Lang('title_high_limit'),
+		$adv[] = [$mod->Lang('title_high_limit'),
 				$mod->CreateInputHidden($id, 'fp_high_limit', 0).
 				$mod->CreateInputCheckbox($id, 'fp_high_limit', 1, $v)
 				.'&nbsp;'.
-				$mod->CreateInputText($id, 'fp_high_value', $vs, 20));
-		return array('main'=>$main,'adv'=>$adv);
+				$mod->CreateInputText($id, 'fp_high_value', $vs, 20)];
+		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function AdminValidate($id)
 	{
 		$ret = TRUE;
-		$messages = array();
+		$messages = [];
 		$dt = new \DateTime('@'.time(), NULL);
 
 		if (!$this->GetProperty('time_only')) {
@@ -217,7 +217,7 @@ class DateTime extends FieldBase
 			$this->ValidationType = 'before';
 		}
 		$msg = ($ret)?'':implode('<br />', $messages);
-		return array($ret,$msg);
+		return [$ret,$msg];
 	}
 
 	public function Populate($id, &$params)
@@ -300,6 +300,6 @@ EOS;
 				$this->ValidationMessage = $msg;
 			}
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 }

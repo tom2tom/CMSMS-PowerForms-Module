@@ -23,10 +23,10 @@ if (!function_exists('Match_Browses')) {
 			$sql3 = 'UPDATE '.$pre.'module_pwbr_field SET form_field=? WHERE form_field=?';
 			foreach ($data as &$row) {
 				if ($row['isform']) {
-					$db->Execute($sql, array($row['new_id'], -$row['old_id']));
-					$db->Execute($sql2, array($row['new_id'], -$row['old_id']));
+					$db->Execute($sql, [$row['new_id'], -$row['old_id']]);
+					$db->Execute($sql2, [$row['new_id'], -$row['old_id']]);
 				} else {
-					$db->Execute($sql3, array($row['new_id'], -$row['old_id']));
+					$db->Execute($sql3, [$row['new_id'], -$row['old_id']]);
 				}
 			}
 			unset($row);
@@ -38,7 +38,7 @@ if (!function_exists('Match_Browses')) {
 	{
 		static $editors = NULL;
 		if ($editors === NULL) {
-			$editors = array();
+			$editors = [];
 			global $db;
 			$pre = cms_db_prefix();
 			$sql = <<<EOS
@@ -124,7 +124,7 @@ EOS;
 */
  function Update_Templates(&$mod, &$db, $pre, $oldfid, $newfid)
  {
-	 $finds = array(
+	 $finds = [
 		'FormBuilder',
 		'$one->css_class',
 		'$one->required',
@@ -152,8 +152,8 @@ EOS;
 		'class="error"',
 		'class="fbr_helptext"',
 		'class="submit"'
-	);
-	 $repls = array(
+	];
+	 $repls = [
 		'PWForms',
 		'0',
 		'0',
@@ -181,7 +181,7 @@ EOS;
 		'class="error_list"',
 		'class="help_display"',
 		'class="submit_actions"'
-	);
+	];
 
 	 $sql = 'SELECT * FROM '.$pre.'module_pwf_trans WHERE NOT isform ORDER BY old_id';
 	 $data = $db->GetAssoc($sql);
@@ -226,7 +226,7 @@ EOS;
 	 }
 
 	 $sql = 'SELECT prop_id,value,longvalue FROM '.$pre.'module_pwf_formprops WHERE form_id=? AND name=\'submission_template\'';
-	 $row = $db->GetRow($sql, array($newfid));
+	 $row = $db->GetRow($sql, [$newfid]);
 	 if ($row) {
 		 $sval = $row['value'];
 		 $lval = $row['longvalue'];
@@ -238,14 +238,14 @@ EOS;
 		 if ($sval || $lval) {
 			 $sql = 'UPDATE '.$pre.'module_pwf_formprops SET value=?,longvalue=? WHERE prop_id=?';
 			 $args = (strlen($tpl) <= PWForms::LENSHORTVAL) ?
-				array($tpl,NULL,$row['prop_id']):
-				array(NULL,$tpl,$row['prop_id']);
+				[$tpl,NULL,$row['prop_id']]:
+				[NULL,$tpl,$row['prop_id']];
 			 $db->Execute($sql, $args);
 		 }
 	 }
 
 	 $sql = 'SELECT prop_id,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE form_id=? AND name LIKE\'%template%\'';
-	 $rows = $db->GetArray($sql, array($newfid));
+	 $rows = $db->GetArray($sql, [$newfid]);
 	 if ($rows) {
 		 $sql = 'UPDATE '.$pre.'module_pwf_fieldprops SET value=?,longvalue=? WHERE prop_id=?';
 		 foreach ($rows as &$row) {
@@ -258,8 +258,8 @@ EOS;
 			 }
 			 if ($sval || $lval) {
 				 $args = (strlen($tpl) <= PWForms::LENSHORTVAL) ?
-					array($tpl,NULL,$row['prop_id']):
-					array(NULL,$tpl,$row['prop_id']);
+					[$tpl,NULL,$row['prop_id']]:
+					[NULL,$tpl,$row['prop_id']];
 				 $db->Execute($sql, $args);
 			 }
 		 }
@@ -270,11 +270,11 @@ EOS;
 	function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, $oldtype, &$passdowns, &$passbacks)
 	{
 		$sql = 'SELECT * FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY option_id';
-		$data = $db->GetArray($sql, array($oldfid, $oldf));
+		$data = $db->GetArray($sql, [$oldfid, $oldf]);
 		if ($data) {
 			$fbfields = array_keys($data[0]);
 		//exclude some properties
-		foreach (array(
+		foreach ([
 		'crypt',
 		'modifiesOtherFields',
 		'searchable',
@@ -287,7 +287,7 @@ EOS;
 		'HasDeleteOp',
 		'HasUserAddOp',
 		'HasUserDeleteOp',
-		) as $one) {
+		] as $one) {
 			$p = array_search($one, $fbfields);
 			if ($p !== FALSE) {
 				unset($fbfields[$p]);
@@ -313,7 +313,7 @@ EOS;
 
 		//some field-types simply repeat the same option-name (relying on save-order for any reconciliation!)
 		//we are more careful!
-		$sequence = in_array($oldtype, array(
+		$sequence = in_array($oldtype, [
 		 'CheckboxGroupField',
 		 'DispositionDirector',
 		 'DispositionEmail',
@@ -324,12 +324,19 @@ EOS;
 		 'MultiselectField',
 		 'PulldownField',
 		 'RadioGroupField',
-		));
+		]);
 			if ($sequence) {
 				$desc = '';
 				$uses = array_count_values(array_column($data, 'name'));
 			}
-
+/* TODO
+	$obfld = new PWForms\XXX();
+	$populators = $obfld->AdminPopulate('FAKE');
+	$hasmain = (isset($populators['main']) && count($populators['main']) > 0);
+	$hasadv = (isset($populators['adv']) && count($populators['adv']) > 0);
+	$hastbl = (isset($populators['table']) && count($populators['table']) > 0);
+	//TODO get object names from xml, omit others in $data
+*/
 		foreach ($data as $fbrow) {
 			extract($pfrow); //NULL default values
 			extract($fbrow);
@@ -365,7 +372,7 @@ EOS;
 			$form_id = $newfid;
 
 			$pid = $db->GenID($pre.'module_pwf_fieldprops_seq');
-			$args = array($pid);
+			$args = [$pid];
 			foreach ($pwfields as $one) {
 				if ($one != 'prop_id') {
 					$args[] = $$one;
@@ -389,7 +396,7 @@ EOS;
 			$field_id = $newf;
 			$form_id = $newfid;
 			$pid = $db->GenID($pre.'module_pwf_fieldprops_seq');
-			$args = array($pid);
+			$args = [$pid];
 			foreach ($pwfields as $one) {
 				if ($one != 'prop_id') {
 					$args[] = $$one;
@@ -404,7 +411,7 @@ EOS;
 	function Get_Fields(&$db, $pre, $oldfid, $newfid)
 	{
 		$sql = 'SELECT * FROM '.$pre.'module_fb_field WHERE form_id=? ORDER BY order_by,field_id';
-		$data = $db->GetArray($sql, array($oldfid));
+		$data = $db->GetArray($sql, [$oldfid]);
 		if ($data) {
 			$fbfields = array_keys($data[0]);
 			$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_field');
@@ -421,7 +428,7 @@ EOS;
 			$sql = 'INSERT INTO '.$pre.'module_pwf_field ('.$namers.') VALUES ('.$fillers.'?)';
 			$sql2 = 'INSERT INTO '.$pre.'module_pwf_trans (old_id,new_id,isform) VALUES (?,?,0)';
 		//these are used after type has been cleaned up and some duplicates done
-		$renames = array(
+		$renames = [
 		 'DeliverToEmailAddress'=>'EmailOne',
 		 'Director'=>'EmailDirector',
 		 'Email'=>'SystemEmail',
@@ -438,7 +445,7 @@ EOS;
 		 'setStart'=>'FieldsetStart',
 		 'SiteAdmin'=>'EmailSiteAdmin',
 		 'UserTag'=>'SubmissionTag',
-		);
+		];
 
 			foreach ($data as $fbrow) {
 				extract($pfrow); //default values
@@ -447,14 +454,14 @@ EOS;
 				$oldf = (int)$field_id;
 				$oldtype = $type;
 				$type = str_replace(
-				array('Field', 'DispositionFromEmailAddress', DispositionUserTag, 'Disposition'),
-				array('', 'UserEmail', 'SubmissionTag', ''), $type);
+				['Field', 'DispositionFromEmailAddress', DispositionUserTag, 'Disposition'],
+				['', 'UserEmail', 'SubmissionTag', ''], $type);
 				if (array_key_exists($type, $renames)) {
 					$type = $renames[$type];
 				}
-				$done = array();
+				$done = [];
 				$newf = $db->GenID($pre.'module_pwf_field_seq');
-				$args = array($newf);
+				$args = [$newf];
 				foreach ($pwfields as $one) {
 					$done[] = $one;
 					if ($one != 'field_id') {
@@ -462,16 +469,16 @@ EOS;
 					}
 				}
 				$ares = $db->Execute($sql, $args);
-				$db->Execute($sql2, array($oldf, $newf));
+				$db->Execute($sql2, [$oldf, $newf]);
 
-				$more = array();
+				$more = [];
 				$xopts = array_diff($fbfields, $done);
 				if ($xopts) {
 					foreach ($xopts as $one) {
 						$more[$one] = $$one;
 					}
 				}
-				$back = array(); //TODO missing keys to get from options
+				$back = []; //TODO missing keys to get from options
 			Get_FieldOpts($db, $pre, $oldfid, $newfid, $oldf, $newf, $oldtype, $more, $back);
 			//TODO handle passbacks
 			}
@@ -481,7 +488,7 @@ EOS;
 	function Get_FormOpts(&$mod, &$db, $pre, $oldfid, $newfid, &$passdowns, &$passbacks)
 	{
 		$sql = 'SELECT * FROM '.$pre.'module_fb_form_attr WHERE form_id=? ORDER BY form_attr_id';
-		$data = $db->GetArray($sql, array($oldfid));
+		$data = $db->GetArray($sql, [$oldfid]);
 		if ($data) {
 			//TODO support insert into $pre.'module_pwf_form' if relevant
 		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops
@@ -524,7 +531,7 @@ EOS;
 				break;
 			}
 				$newid = $db->GenID($pre.'module_pwf_formprops_seq');
-				$ares = $db->Execute($sql, array($newid, $newfid, $name, $val, $longval));
+				$ares = $db->Execute($sql, [$newid, $newfid, $name, $val, $longval]);
 			}
 		}
 	//TODO handle $passbacks
@@ -597,9 +604,9 @@ if (isset($params['import'])) {
 			}
 			$alias = $ta;
 
-			$done = array();
+			$done = [];
 			$fid = $db->GenID($pre.'module_pwf_form_seq');
-			$args = array($fid);
+			$args = [$fid];
 			foreach ($pwfields as $one) {
 				$done[] = $one;
 				if ($one != 'form_id') {
@@ -608,16 +615,16 @@ if (isset($params['import'])) {
 			}
 			$db->Execute($sql, $args);
 //			$renums[$form_id] = $fid;
-			$db->Execute($sql2, array($form_id, $fid));
+			$db->Execute($sql2, [$form_id, $fid]);
 
-			$more = array();
+			$more = [];
 			$xopts = array_diff($fbfields, $done);
 			if ($xopts) {
 				foreach ($xopts as $one) {
 					$more[$one] = $$one;
 				}
 			}
-			$back = array(); //TODO missing keys to get from options
+			$back = []; //TODO missing keys to get from options
 			Get_FormOpts($this, $db, $pre, $form_id, $fid, $more, $back);
 			//TODO handle passbacks
 			Get_Fields($db, $pre, $form_id, $fid);
@@ -644,5 +651,5 @@ if (isset($params['import'])) {
 	$message = $this->_PrettyMessage('error', FALSE);
 }
 
-$this->Redirect($id, 'defaultadmin', '', array(
-	'message'=>$message, 'active_tab'=>'import'));
+$this->Redirect($id, 'defaultadmin', '', [
+	'message'=>$message, 'active_tab'=>'import']);

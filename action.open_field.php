@@ -25,7 +25,7 @@ if (isset($params['datakey'])) {
 $this->Crash();
 //		$formdata = $funcs->Load($this,$params['form_id'],$id,$params);
 //		$params['datakey'] = 'pwf'.md5($formdata->Id.session_id()); //must persist across requests
-		$this->Redirect($id, 'defaultadmin', '', array('message'=>$this->_PrettyMessage('err_data', FALSE)));
+		$this->Redirect($id, 'defaultadmin', '', ['message'=>$this->_PrettyMessage('err_data', FALSE)]);
 	}
 	$formdata->formsmodule = &$this;
 
@@ -46,10 +46,10 @@ $this->Crash();
 if (isset($params['cancel'])) {
 	$obfld = $formdata->Fields[$params['field_id']];
 	$t = ($obfld->IsDisposition()) ? 'submittab':'fieldstab';
-	$this->Redirect($id, 'open_form', $returnid, array(
+	$this->Redirect($id, 'open_form', $returnid, [
 		'form_id'=>$params['form_id'],
 		'datakey'=>$params['datakey'],
-		'active_tab'=>$t));
+		'active_tab'=>$t]);
 }
 
 $message = '';
@@ -59,10 +59,10 @@ if (isset($params['submit'])) {
 		$obfld = PWForms\FieldOperations::NewField($formdata, $params);
 	}
 	//migrate $params to field data
-	foreach (array(
+	foreach ([
 		'field_Name'=>'SetName',
 		'field_Alias'=>'SetAlias',
-	) as $key=>$val) {
+	] as $key=>$val) {
 		if (array_key_exists($key, $params)) {
 			$obfld->$val($params[$key]);
 		}
@@ -101,13 +101,13 @@ if (isset($params['submit'])) {
 			$message = $msg.'<br />'.$message;
 		}
 		$t = ($obfld->IsDisposition()) ? 'submittab':'fieldstab';
-		$this->Redirect($id, 'open_form', $returnid, array(
+		$this->Redirect($id, 'open_form', $returnid, [
 			'form_id'=>$params['form_id'],
 			'datakey'=>$params['datakey'],
 			'active_tab'=>$t,
 			'selectfields'=>$params['selectfields'],
 			'selectdispos'=>$params['selectdispos'],
-			'message'=>$this->_PrettyMessage($message, TRUE, FALSE)));
+			'message'=>$this->_PrettyMessage($message, TRUE, FALSE)]);
 	} else {
 		//start again //TODO if imported field with no tabled data
 		if ($newfield) {
@@ -147,7 +147,7 @@ if ($refresh) {
 	}
 }
 
-$tplvars = array();
+$tplvars = [];
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.field.php';
 

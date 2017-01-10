@@ -35,7 +35,7 @@ class EmailSubject extends FieldBase
 			$this->valid = FALSE;
 			$this->ValidationMessage = $mod->Lang('missing_type', $mod->Lang('subject'));
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 
 	public function PreDisposeAction()

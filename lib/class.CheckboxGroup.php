@@ -19,9 +19,9 @@ class CheckboxGroup extends FieldBase
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'CheckboxGroup';
 		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = array(
+		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
-			$mod->Lang('validation_empty')=>'empty');
+			$mod->Lang('validation_empty')=>'empty'];
 	}
 
 	// Get add-button label
@@ -71,7 +71,7 @@ class CheckboxGroup extends FieldBase
 	{
 		$names = $this->GetPropArray('box_name');
 		if ($names) {
-			$ret = array();
+			$ret = [];
 			foreach ($names as $i=>&$one) {
 				if ($this->InArrayValue($i) === FALSE) { //TODO OR sequence GetArrayValue($index)
 					if (!$this->GetProperty('no_empty', 0)) {
@@ -123,21 +123,21 @@ class CheckboxGroup extends FieldBase
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
 		$mod = $this->formdata->formsmodule;
-		$main[] = array($mod->Lang('title_no_empty'),
+		$main[] = [$mod->Lang('title_no_empty'),
 						$mod->CreateInputHidden($id, 'fp_no_empty', 0).
 						$mod->CreateInputCheckbox($id, 'fp_no_empty', 1,
 							$this->GetProperty('no_empty', 0)),
-						$mod->Lang('help_no_empty'));
-		$adv[] = array($mod->Lang('title_single_check'),
+						$mod->Lang('help_no_empty')];
+		$adv[] = [$mod->Lang('title_single_check'),
 						$mod->CreateInputHidden($id, 'fp_single_check', 0).
 						$mod->CreateInputCheckbox($id, 'fp_single_check', 1,
 							$this->GetProperty('single_check', 0)),
-						$mod->Lang('help_single_check'));
-		$adv[] = array($mod->Lang('title_field_includelabels'),
+						$mod->Lang('help_single_check')];
+		$adv[] = [$mod->Lang('title_field_includelabels'),
 						$mod->CreateInputHidden($id, 'fp_include_labels', 0).
 						$mod->CreateInputCheckbox($id, 'fp_include_labels', 1,
 							$this->GetProperty('include_labels', 0)),
-						$mod->Lang('help_field_includelabels'));
+						$mod->Lang('help_field_includelabels')];
 
 		if ($this->boxAdd) {
 			$this->AddPropIndexed('box_name', '');
@@ -147,27 +147,27 @@ class CheckboxGroup extends FieldBase
 		}
 		$names = $this->GetPropArray('box_name');
 		if ($names) {
-			$boxes = array();
-			$boxes[] = array(
+			$boxes = [];
+			$boxes[] = [
 				$mod->Lang('title_default_check'),
 				$mod->Lang('title_checkbox_label'),
 				$mod->Lang('title_checked_value'),
 				$mod->Lang('title_unchecked_value'),
 				$mod->Lang('title_select')
-			);
+			];
 			$fieldclass = 'field'.$this->Id;
 			foreach ($names as $i=>$one) {
 				$arf = '['.$i.']';
 				$tmp = $mod->CreateInputCheckbox($id, 'fp_box_is_set'.$arf, 'y', $this->GetPropIndexed('box_is_set', $i),
 					'style="display:block;margin:auto;"');
-				$boxes[] = array(
+				$boxes[] = [
 					$mod->CreateInputHidden($id, 'fp_box_is_set'.$arf, 'n').
 						str_replace('class="', 'class="'.$fieldclass.' ', $tmp),
 					$mod->CreateInputText($id, 'fp_box_name'.$arf, $one, 30, 128),
 					$mod->CreateInputText($id, 'fp_box_checked'.$arf, $this->GetPropIndexed('box_checked', $i), 20, 128),
 					$mod->CreateInputText($id, 'fp_box_unchecked'.$arf, $this->GetPropIndexed('box_unchecked', $i), 20, 128),
 					$mod->CreateInputCheckbox($id, 'selected'.$arf, 1, -1, 'style="display:block;margin:auto;"')
-				);
+				];
 			}
 /*			//TODO js for field e.g.
 			$this->jsfuncs['X'] = <<<'EOS'
@@ -185,11 +185,11 @@ EOS;
 EOS;
 */
 			$this->MultiComponent = TRUE;
-			return array('main'=>$main,'adv'=>$adv,'table'=>$boxes);
+			return ['main'=>$main,'adv'=>$adv,'table'=>$boxes];
 		} else {
 			$this->MultiComponent = FALSE;
-			$main[] = array('','',$mod->Lang('missing_type', $mod->Lang('member')));
-			return array('main'=>$main,'adv'=>$adv);
+			$main[] = ['','',$mod->Lang('missing_type', $mod->Lang('member'))];
+			return ['main'=>$main,'adv'=>$adv];
 		}
 	}
 
@@ -236,7 +236,7 @@ EOS;
 				$jsl = '';
 			}
 			$js = $this->GetScript();
-			$ret = array();
+			$ret = [];
 			foreach ($names as $i=>&$one) { //$i is 1-based
 				$oneset = new \stdClass();
 				$tid = $this->GetInputId('_'.$i);
@@ -296,6 +296,6 @@ EOS;
 			}
 			break;
 		}
-		return array($this->valid,$this->ValidationMessage);
+		return [$this->valid,$this->ValidationMessage];
 	}
 }

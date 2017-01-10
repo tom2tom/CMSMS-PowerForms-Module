@@ -15,7 +15,7 @@ class FormOperations
 	private function SetTemplate($type, $id, $val)
 	{
 		if (self::$editors === NULL) {
-			$editors = array();
+			$editors = [];
 
 			$db = \cmsms()->GetDb();
 			$pre = \cms_db_prefix();
@@ -93,7 +93,7 @@ EOS;
 (form_id,name,alias) VALUES (?,?,?)';
 		$db = \cmsms()->GetDb();
 		$newid = $db->GenID($pre.'module_pwf_form_seq');
-		$db->Execute($sql, array($newid, $name, $alias));
+		$db->Execute($sql, [$newid, $name, $alias]);
 		return $newid;
 	}
 
@@ -131,11 +131,11 @@ EOS;
 		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_trans WHERE new_id=? AND isform=1';
 		$db = \cmsms()->GetDb();
-		$db->Execute($sql, array($form_id));
+		$db->Execute($sql, [$form_id]);
 		$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops WHERE form_id=?';
-		$res = $db->Execute($sql, array($form_id));
+		$res = $db->Execute($sql, [$form_id]);
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field WHERE form_id=?';
-		if (!$db->Execute($sql, array($form_id))) {
+		if (!$db->Execute($sql, [$form_id])) {
 			$res = FALSE;
 		}
 		//no need for longvalue check
@@ -144,11 +144,11 @@ EOS;
 			Utils::DeleteUploadFile($mod, $file, $form_id);
 		}
 		$sql = 'DELETE FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
-		if (!$db->Execute($sql, array($form_id))) {
+		if (!$db->Execute($sql, [$form_id])) {
 			$res = FALSE;
 		}
 		$sql = 'DELETE FROM '.$pre.'module_pwf_form WHERE form_id=?';
-		if (!$db->Execute($sql, array($form_id))) {
+		if (!$db->Execute($sql, [$form_id])) {
 			$res = FALSE;
 		}
 		return ($res != FALSE);
@@ -166,7 +166,7 @@ EOS;
 	*/
 	public function Copy(&$mod, $id, &$params, $form_id)
 	{
-		$noparms = array();
+		$noparms = [];
 		$formdata = self::Load($mod, $form_id, $id, $noparms);
 		if (!$formdata) {
 			return FALSE;
@@ -206,7 +206,7 @@ EOS;
 (form_id,name,alias) VALUES (?,?,?)';
 		$db = \cmsms()->GetDb();
 		$newid = $db->GenID($pre.'module_pwf_form_seq');
-		$db->Execute($sql, array($newid, $name, $alias));
+		$db->Execute($sql, [$newid, $name, $alias]);
 
 		$res = TRUE;
 		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops
@@ -234,7 +234,7 @@ EOS;
 					$val = NULL;
 				}
 			}
-			if (!$db->Execute($sql, array($newid, $form_id, $key, $val, $longval))) {
+			if (!$db->Execute($sql, [$newid, $form_id, $key, $val, $longval])) {
 				$params['message'] = $mod->Lang('database_error');
 				$res = FALSE;
 			}
@@ -269,7 +269,7 @@ EOS;
 		$newform = ($form_id <= 0);
 		// if it's a new form, check for duplicate name and/or alias
 		if ($newform && !self::NewID($formdata->Name, $formdata->Alias)) {
-			return array(FALSE,$mod->Lang('duplicate_identifier'));
+			return [FALSE,$mod->Lang('duplicate_identifier')];
 		}
 
 		$db = \cmsms()->GetDb();
@@ -278,14 +278,14 @@ EOS;
 			$form_id = $db->GenID($pre.'module_pwf_form_seq');
 			$sql = 'INSERT INTO '.$pre.'module_pwf_form
 (form_id,name,alias) VALUES (?,?,?)';
-			$res = $db->Execute($sql, array($form_id, $params['form_Name'], $params['form_Alias']));
+			$res = $db->Execute($sql, [$form_id, $params['form_Name'], $params['form_Alias']]);
 		} else {
 			$sql = 'UPDATE '.$pre.'module_pwf_form SET name=?,alias=? WHERE form_id=?';
-			$res = $db->Execute($sql, array($params['form_Name'], $params['form_Alias'], $form_id));
-			$done = array();
+			$res = $db->Execute($sql, [$params['form_Name'], $params['form_Alias'], $form_id]);
+			$done = [];
 		}
 		if (!$res) {
-			return array(FALSE,$mod->Lang('database_error'));
+			return [FALSE,$mod->Lang('database_error')];
 		}
 
 		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
@@ -326,12 +326,12 @@ EOS;
 				}
 				if ($newform) {
 					$newid = $db->GenID($pre.'module_pwf_formprops_seq');
-					if (!$db->Execute($sql, array($newid, $form_id, $key, $val, $longval))) {
-						return array(FALSE,$mod->Lang('database_error'));
+					if (!$db->Execute($sql, [$newid, $form_id, $key, $val, $longval])) {
+						return [FALSE,$mod->Lang('database_error')];
 					}
 				} else {
-					if (!$db->Execute($sql2, array($val, $longval, $form_id, $key))) {
-						return array(FALSE,$mod->Lang('database_error'));
+					if (!$db->Execute($sql2, [$val, $longval, $form_id, $key])) {
+						return [FALSE,$mod->Lang('database_error')];
 					}
 					$done[] = $key;
 				}
@@ -340,7 +340,7 @@ EOS;
 
 		if (!$newform) {
 			$sql = 'DELETE FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
-			$args = array(-1=>$form_id);
+			$args = [-1=>$form_id];
 			if ($done) {
 				$fillers = str_repeat('?,', count($done)-1);
 				$sql .= ' AND name NOT IN ('.$fillers.'?)';
@@ -352,7 +352,7 @@ EOS;
 		self::Arrange($formdata->Fields, $params['form_FieldOrders']);
 
 		// store fields
-		$newfields = array();
+		$newfields = [];
 		foreach ($formdata->Fields as $key=>&$obfld) {
 			if ($obfld) {
 				$obfld->Store(TRUE);
@@ -371,7 +371,7 @@ EOS;
 			$formdata->Fields[$newkey] = $formdata->Fields[$key];
 			unset($formdata->Fields[$key]);
 		}
-		return array(TRUE,'');
+		return [TRUE,''];
 	}
 
 	/**
@@ -394,7 +394,7 @@ EOS;
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT name,alias FROM '.$pre.'module_pwf_form WHERE form_id=?';
-		$row = Utils::SafeGet($sql, array($form_id), 'row');
+		$row = Utils::SafeGet($sql, [$form_id], 'row');
 		if (!$row) {
 			return FALSE;
 		}
@@ -410,7 +410,7 @@ EOS;
 
 		//no form data value is an array, so no records with same name
 		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
-		$data = Utils::SafeGet($sql, array($form_id));
+		$data = Utils::SafeGet($sql, [$form_id]);
 		foreach ($data as $one) {
 			$nm = $one['name'];
 /*			TODO support arrays when 'name' field like A[B...
@@ -457,7 +457,7 @@ EOS;
 		}
 
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
-		$fields = Utils::SafeGet($sql, array($form_id));
+		$fields = Utils::SafeGet($sql, [$form_id]);
 		if ($fields) {
 			//TODO if (!$admin) { populate sequences }
 			foreach ($fields as &$row) {
@@ -502,12 +502,12 @@ EOS;
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_form WHERE form_id=?';
 		$db = \cmsms()->GetDb();
 		if (!is_array($form_id)) {
-			$properties = $db->GetRow($sql, array($form_id));
-			$form_id = array($form_id);
+			$properties = $db->GetRow($sql, [$form_id]);
+			$form_id = [$form_id];
 		} else {
 			//use form-properties data from first-found
 			foreach ($form_id as $one) {
-				$properties = $db->GetRow($sql, array($one));
+				$properties = $db->GetRow($sql, [$one]);
 				if ($properties) {
 					break;
 				}
@@ -517,7 +517,7 @@ EOS;
 			return FALSE;
 		}
 
-		$outxml = array();
+		$outxml = [];
 		$t = '<?xml version="1.0" standalone="yes"';
 		if ($charset) {
 			$t .= ' encoding="'.strtoupper($charset).'"';
@@ -550,11 +550,11 @@ EOS;
 		$formpropkeys = array_keys($properties);
 
 		foreach ($form_id as $one) {
-			$formopts = $db->GetAssoc($sql, array($one));
-			$formfields = $db->GetArray($sql2, array($one));
-			$fieldkeys = ($formfields) ? array_keys($formfields[0]) : array();
-			$fieldopts = $db->GetArray($sql3, array($one));
-			$xml = array();
+			$formopts = $db->GetAssoc($sql, [$one]);
+			$formfields = $db->GetArray($sql2, [$one]);
+			$fieldkeys = ($formfields) ? array_keys($formfields[0]) : [];
+			$fieldopts = $db->GetArray($sql3, [$one]);
+			$xml = [];
 			$xml[] =<<<EOS
 \t<form>
 \t\t<properties>
@@ -685,7 +685,7 @@ EOS;
 		array_shift($xmlarray); //ignore 'powerforms' tag
 		$arrsize = count($xmlarray);
 		//migrate $xmlarray to condensed format
-		$opened = array();
+		$opened = [];
 		$opened[1] = 0;
 		for ($j = 0; $j < $arrsize; $j++) {
 			$val = $xmlarray[$j];
@@ -735,14 +735,14 @@ EOS;
 			}
 		}
 		unset($value);
-		foreach (array('version', 'date', 'count', 'form1') as $expected) {
+		foreach (['version', 'date', 'count', 'form1'] as $expected) {
 			if (!array_key_exists($expected, $array)) {
 				return FALSE;
 			}
 		}
 		//and lower-level tags
 		self::ClearTags($array);
-		$expected = array('properties','fields');
+		$expected = ['properties','fields'];
 		foreach ($array['form1'] as $indx=>&$check) {
 			if (!in_array($indx, $expected)) {
 				unset($check);
@@ -772,9 +772,9 @@ EOS;
 			$sql = 'INSERT INTO '.$pre.'module_pwf_form
 (form_id,name,alias) VALUES (?,?,?)';
 			$form_id = $db->GenID($pre.'module_pwf_form_seq');
-			$db->Execute($sql, array($form_id,
+			$db->Execute($sql, [$form_id,
 				$fdata['properties']['name'],
-				$fdata['properties']['alias']));
+				$fdata['properties']['alias']]);
 			unset($fdata['properties']['name']);
 			unset($fdata['properties']['alias']);
 
@@ -803,8 +803,8 @@ EOS;
 					}
 				}
 				$args = (strlen($val) <= \PWForms::LENSHORTVAL) ?
-					array($prop_id,$form_id,$name,$val,NULL):
-					array($prop_id,$form_id,$name,NULL,$val);
+					[$prop_id,$form_id,$name,$val,NULL]:
+					[$prop_id,$form_id,$name,NULL,$val];
 				$db->Execute($sql, $args);
 			}
 			unset($one);
@@ -815,7 +815,7 @@ EOS;
 			foreach ($fdata['fields'] as &$fld) {
 				$field_id = $db->GenID($pre.'module_pwf_field_seq');
 				unset($fld['properties']['field_id']);
-				foreach (array('name', 'alias', 'type', 'order_by') as $key) {
+				foreach (['name', 'alias', 'type', 'order_by'] as $key) {
 					if (isset($fld['properties'][$key])) {
 						$$key = $fld['properties'][$key];
 						unset($fld['properties'][$key]);
@@ -823,7 +823,7 @@ EOS;
 						$$key = '';
 					}
 				}
-				$db->Execute($sql, array($field_id, $form_id, $name, $alias, $type, $order_by));
+				$db->Execute($sql, [$field_id, $form_id, $name, $alias, $type, $order_by]);
 
 				foreach ($fld['properties'] as $name=>&$one) {
 					$prop_id = $db->GenID($pre.'module_pwf_fieldprops_seq');
@@ -833,8 +833,8 @@ EOS;
 						$val = urldecode(substr($one, 4));
 					} //TODO translate numbered fields in templates
 					$args = (strlen($val) <= \PWForms::LENSHORTVAL) ?
-						array($prop_id,$field_id,$form_id,$name,$val,NULL):
-						array($prop_id,$field_id,$form_id,$name,NULL,$val);
+						[$prop_id,$field_id,$form_id,$name,$val,NULL]:
+						[$prop_id,$field_id,$form_id,$name,NULL,$val];
 					$db->Execute($sql2, $args);
 				}
 				unset($one);
@@ -887,7 +887,7 @@ EOS;
 			return $a - $b; //stet current order
 		});
 		// update source-arrays accordingly
-		$neworder = array();
+		$neworder = [];
 		foreach ($keys as $val) {
 			$neworder[] = (int)$orders[$val];
 		}
@@ -905,8 +905,8 @@ EOS;
 	*/
 	public function NewID($name= FALSE, $alias= FALSE)
 	{
-		$where = array();
-		$vars = array();
+		$where = [];
+		$vars = [];
 
 		if ($name) {
 			$where[] = 'name=?';

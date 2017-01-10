@@ -50,7 +50,7 @@ class PWForms extends CMSModule
 		$sep = strpos($url,'&amp;');
 		$this->Qurl = substr($url,0,$sep);
 */
-		spl_autoload_register(array($this, 'cmsms_spacedload'));
+		spl_autoload_register([$this, 'cmsms_spacedload']);
 
 		require_once cms_join_path(__DIR__, 'lib', 'class.FormData.php');
 
@@ -66,7 +66,7 @@ class PWForms extends CMSModule
 		if ($this->mh)
 			curl_multi_close($this->mh);
 */
-		spl_autoload_unregister(array($this, 'cmsms_spacedload'));
+		spl_autoload_unregister([$this, 'cmsms_spacedload']);
 		if (function_exists('parent::__destruct')) {
 			parent::__destruct();
 		}
@@ -164,7 +164,7 @@ class PWForms extends CMSModule
 
 	public function GetDependencies()
 	{
-		return array();
+		return [];
 	}
 
 	public function GetEventDescription($eventname)
@@ -179,10 +179,10 @@ class PWForms extends CMSModule
 
 	public function get_tasks()
 	{
-		return array(
+		return [
 			new PWForms\ClearcacheTask(),
 			new PWForms\ClearTablesTask()
-		);
+		];
 	}
 
 	public function MinimumCMSVersion()
@@ -390,10 +390,10 @@ class PWForms extends CMSModule
 		$now = time();
 		$base = floor($now / (84600 * 1800)) * 1800; //start of current 30-mins
 		$day = date('j', $now);
-		return array(
+		return [
 			'pwfp_'.$this->_Hash($base+$day).'_',
 			'pwfp_'.$this->_Hash($base-1800+$day-1).'_'
-		);
+		];
 	}
 
 	private function _Hash($num)
@@ -441,7 +441,7 @@ class PWForms extends CMSModule
 			$imports = unserialize($imports);
 			$imports[] = $classname;
 		} else {
-			$imports = array($classname);
+			$imports = [$classname];
 		}
 		$this->SetPreference('imported_fields', serialize($imports));
 		if ($this->field_types) {
@@ -482,7 +482,7 @@ class PWForms extends CMSModule
 		$pre = cms_db_prefix();
 		$sql = 'SELECT field_id FROM '.$pre.'module_pwf_field WHERE type=?';
 		$classname = substr($classname, 3); //strip 'pwf' namespace
-		$ids = $db->GetCol($sql, array($classname));
+		$ids = $db->GetCol($sql, [$classname]);
 		if ($ids) {
 			$join = implode(',', $ids);
 			$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops WHERE field_id IN('.$join.')';
