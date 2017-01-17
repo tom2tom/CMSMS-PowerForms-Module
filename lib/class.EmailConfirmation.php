@@ -119,10 +119,10 @@ class EmailConfirmation extends EmailBase
 		$db = \cmsms()->GetDb();
 		$sid = $db->GenID($pre.'module_pwf_session_seq');
 
-		$chars = 'A1B2C3D4E5F6G7H8I9J0K1L2M3N4O5P6Q7R8S9T0U1V2W3X4Y5Z6a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6';
+		$chars = '01234567890123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		$pref = str_repeat('0', 20);
 		for ($i = 0; $i < 20; $i++) {
-			$pref[$i] = $chars[mt_rand(0,103)];
+			$pref[$i] = $chars[mt_rand(0, 81)];
 		}
 		$pub = sha1(uniqid($pref, TRUE)); //easy 40-byte hash
 		$pw = $pub.Utils::Unfusc($mod->GetPreference('masterpass'));
