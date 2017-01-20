@@ -138,7 +138,7 @@ class PWForms extends CMSModule
 
 	public function GetHelp()
 	{
-		return $this->Lang('help_module');
+		return ''.@file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.'modhelp.inc');
 	}
 
 	public function GetVersion()
@@ -158,8 +158,7 @@ class PWForms extends CMSModule
 
 	public function GetChangeLog()
 	{
-		$fn = cms_join_path(__DIR__, 'include', 'changelog.inc');
-		return ''.@file_get_contents($fn);
+		return ''.@file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.'changelog.inc');
 	}
 
 	public function GetDependencies()
