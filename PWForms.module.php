@@ -397,12 +397,12 @@ class PWForms extends CMSModule
 
 	private function _Hash($num)
 	{
-		//djb2 hash : see http://www.cse.yorku.ca/~oz/hash.html
+		//djb2a hash : see http://www.cse.yorku.ca/~oz/hash.html
 		$n = ''.$num;
 		$l = strlen($n);
 		$hash = 5381;
 		for ($i = 0; $i < $l; $i++) {
-			$hash += $hash + ($hash << 5) + $n[$i]; //aka $hash = $hash*33 + $n[$i]
+			$hash = ($hash + ($hash << 5)) ^ $n[$i]; //aka $hash = $hash*33 ^ $n[$i]
 		}
 		return substr($hash, -3);
 	}

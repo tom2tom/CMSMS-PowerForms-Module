@@ -32,11 +32,11 @@ class semaphore implements iMutex
 
 	public function hash($token)
 	{
-		//djb2 hash : see http://www.cse.yorku.ca/~oz/hash.html
+		//djb2a hash : see http://www.cse.yorku.ca/~oz/hash.html
 		$l = strlen($token);
 		$hash = 5381;
 		for ($i = 0; $i < $l; $i++) {
-			$hash = $hash * 33 + $token[$i] + $i;
+			$hash = ($hash + ($hash << 5)) ^ $n[$i]; //aka $hash = $hash*33 ^ $n[$i]
 		}
 		return $hash % 1011011; //limit the offset
 	}
