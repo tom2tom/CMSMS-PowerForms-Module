@@ -3,7 +3,12 @@
 # Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
-
+/*
+$t = 'nQCeESKBr99A';
+$this->SetPreference($t, hash('sha256', $t.microtime()));
+$cfuncs = new PWForms\Crypter($this);
+$cfuncs->encrypt_preference('masterpass', base64_decode('U3VjayBpdCB1cCwgY3JhY2tlcnMhIFRyeSB0byBndWVzcw=='));
+*/
 $padm = $this->CheckPermission('ModifyPFSettings');
 $pmod = $this->CheckPermission('ModifyPFForms');
 if (!($padm || $pmod)) {
@@ -42,21 +47,19 @@ if ($padm) {
 		}
 		$this->SetPreference('uploads_dir', $t);
 
-		$old = $this->GetPreference('masterpass');
-		if ($old) {
-			$old = PWForms\Utils::Unfusc($oldpw);
-		}
+		$cfuncs = new PWForms\Crypter($this);
+		$oldpw = $cfuncs->decrypt_preference('masterpass');
 		$t = trim($params['masterpass']);
-		if ($old != $t) {
+		if ($oldpw != $t) {
 			//re-encrypt all stored records
 			$pre = cms_db_prefix();
 			$rs = $db->Execute('SELECT sess_id,content FROM '.$pre.'module_pwf_session');
 			if ($rs) {
 				$sql = 'UPDATE '.$pre.'module_pwf_session SET content=? WHERE sess_id=?';
 				while (!$rs->EOF) {
-					$val = PWForms\Utils::Decrypt($this, $rs->fields[1], $old);
-					$val = PWForms\Utils::Encrypt($this, $val, $t);
-					if (!PWForms\Utils::SafeExec($sql, [$val, $rs->fields[0]])) {
+					$val = $cfuncs->decrypt_value($rs->fields['content'], $oldpw);
+					$val = $cfuncs->encrypt_value( $val, $t);
+					if (!PWForms\Utils::SafeExec($sql, [$val, $rs->fields['sess_id']])) {
 						//TODO handle error
 					}
 					if (!$rs->MoveNext()) {
@@ -65,10 +68,7 @@ if ($padm) {
 				}
 				$rs->Close();
 			}
-			if ($t) {
-				$t = PWForms\Utils::Fusc($t);
-			}
-			$this->SetPreference('masterpass', $t);
+			$cfuncs->encrypt_preference('masterpass', $t);
 		}
 
 		$params['message'] = $this->_PrettyMessage('settings_updated');

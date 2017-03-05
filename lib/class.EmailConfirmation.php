@@ -119,15 +119,16 @@ class EmailConfirmation extends EmailBase
 		$db = \cmsms()->GetDb();
 		$sid = $db->GenID($pre.'module_pwf_session_seq');
 
-		$chars = '01234567890123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		$chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		$pref = str_repeat('0', 20);
 		for ($i = 0; $i < 20; $i++) {
-			$pref[$i] = $chars[mt_rand(0, 81)];
+			$pref[$i] = $chars[mt_rand(0, 71)];
 		}
 		$pub = sha1(uniqid($pref, TRUE)); //easy 40-byte hash
-		$pw = $pub.Utils::Unfusc($mod->GetPreference('masterpass'));
+		$cfuncs = new Crypter($mod);
+		$pw = $pub.$cfuncs->decrypt_preference('masterpass');
 		$when = time();
-		$cont = Utils::Encrypt(serialize($this->formdata), $pw);
+		$cont = $cfuncs->encrypt_value(serialize($this->formdata), $pw);
 		$db->Execute('INSERT INTO '.$pre.'module_pwf_session
 (sess_id,pubkey,submitted,contents) VALUES (?,?,?,?)', [$sid, $pub, $when, $cont]);
 		$this->formdata->formsmodule = $mod; //reinstate

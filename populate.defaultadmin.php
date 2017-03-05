@@ -211,10 +211,8 @@ if ($padm) {
 	$oneset->help = $this->Lang('help_uploads_dir');
 	$cfgs[] = $oneset;
 
-	$t = $this->GetPreference('masterpass');
-	if ($t) {
-		$t = PWForms\Utils::Unfusc($t);
-	}
+	$cfuncs = new PWForms\Crypter($this);
+	$t = $cfuncs->decrypt_preference('masterpass');
 	$oneset = new stdClass();
 	$oneset->title = $this->Lang('title_password');
 	$oneset->input = $this->CreateTextArea(FALSE, $id, $t, 'masterpass', 'cloaked',
