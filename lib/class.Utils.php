@@ -1023,8 +1023,8 @@ EOS;
 	public static function ProcessTemplateFromData(&$mod, $data, $tplvars)
 	{
 		global $smarty;
+		$smarty->assign($tplvars);
 		if ($mod->before20) {
-			$smarty->assign($tplvars);
 			return $mod->ProcessTemplateFromData($data);
 		} else {
 			$tpl = $smarty->CreateTemplate('eval:'.$data, NULL, NULL, $smarty, $tplvars);
