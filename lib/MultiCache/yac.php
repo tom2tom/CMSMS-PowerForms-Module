@@ -2,7 +2,7 @@
 /*
  * Refer to https://github.com/laruence/yac#yac---yet-another-cache
  */
-namespace MultiCache;
+namespace PWForms\MultiCache;
 
 class yac extends CacheBase implements CacheInterface
 {
@@ -93,7 +93,7 @@ class yac extends CacheBase implements CacheInterface
 	{
 		return $this->client->delete($keyword);
 	}
-	
+
 	public function _clean($filter)
 	{
 		$info = $this->client->info();

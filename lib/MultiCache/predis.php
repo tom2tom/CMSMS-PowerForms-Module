@@ -3,7 +3,7 @@
  * Predis extension:
  * https://github.com/nrk/predis
  */
-namespace MultiCache;
+namespace PWForms\MultiCache;
 
 class predis extends CacheBase implements CacheInterface
 {

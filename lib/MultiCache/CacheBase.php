@@ -1,6 +1,6 @@
 <?php
 
-namespace MultiCache;
+namespace PWForms\MultiCache;
 
 abstract class CacheBase
 {
@@ -66,7 +66,7 @@ abstract class CacheBase
 	{
 		return $this->_getall($filter);
 	}
-	
+
 	/**
 	has:
 	@keyword: string

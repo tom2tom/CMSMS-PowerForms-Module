@@ -3,7 +3,7 @@
  * Redis extension:
  * https://github.com/phpredis/phpredis
  */
-namespace MultiCache;
+namespace PWForms\MultiCache;
 
 class redis extends CacheBase implements CacheInterface
 {

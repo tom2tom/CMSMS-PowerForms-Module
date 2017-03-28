@@ -1,6 +1,7 @@
 <?php
 
-namespace MultiCache;
+
+namespace PWForms\MultiCache;
 
 class database extends CacheBase implements CacheInterface
 {

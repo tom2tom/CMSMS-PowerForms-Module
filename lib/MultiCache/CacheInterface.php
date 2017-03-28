@@ -1,6 +1,6 @@
 <?php
 
-namespace MultiCache;
+namespace PWForms\MultiCache;
 
 interface CacheInterface
 {

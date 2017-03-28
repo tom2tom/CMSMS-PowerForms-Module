@@ -1,6 +1,6 @@
 <?php
 
-namespace MultiCache;
+namespace PWForms\MultiCache;
 
 class apcu extends CacheBase implements CacheInterface
 {
