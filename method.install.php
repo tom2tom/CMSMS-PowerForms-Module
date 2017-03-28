@@ -156,18 +156,24 @@ $css_id = $db->GenID($pre.'css_seq');
 $db->Execute('INSERT INTO '.$pre.'css (css_id,css_name,css_text,media_type,create_date) VALUES (?,?,?,?,?)',
 	[$css_id, 'PWForms Default Style', $css, 'screen', date('Y-m-d')]);
 
+/* NO DESIGN-MANAGER TEMPLATES UNTIL GRANULAR MODULE-SPECIFIC PERMISSIONS THERE
 if (!$this->before20) {
 	$myname = $this->GetName();
 //	$me = get_userid(FALSE);
 	foreach (['form', 'submission'] as $name) {
 		$ttype = new CmsLayoutTemplateType();
 		$ttype->set_originator($myname);
-		$ttype->set_name($name);
+		$ttype->set_name($myname.$name);
 //		$ttype->set_owner($me);
-		$ttype->save();
-	}
+//		$ttype->set_dflt_flag(TRUE);
+		try {
+			$ttype->save();
+//			$tid = $ttype->get_id();
+		} catch (Exception $e) {
+//			$tid = FALSE;
+		}
 }
-
+*/
 $funcs = new PWForms\FormOperations();
 $path = cms_join_path(__DIR__, 'include');
 $dir = opendir($path);
