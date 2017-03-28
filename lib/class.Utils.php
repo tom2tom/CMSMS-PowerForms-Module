@@ -961,14 +961,14 @@ EOS;
 	public static function ProcessTemplate(&$mod, $tplname, $tplvars, $cache=TRUE)
 	{
 		global $smarty;
-		if ($mod->before20) {
-			//			$smarty->clearAllAssign();
+//		if ($mod->before20) {
+			//$smarty->clearAllAssign();
 			$smarty->assign($tplvars);
 			return $mod->ProcessTemplate($tplname);
-		} else {
+/*		} else {
 			if ($cache) {
 				$cache_id = md5('pwf'.$tplname.serialize(array_keys($tplvars)));
-				$lang = CmsNlsOperations::get_current_language();
+				$lang = \CmsNlsOperations::get_current_language();
 				$compile_id = md5('pwf'.$tplname.$lang);
 				$tpl = $smarty->CreateTemplate($mod->GetFileResource($tplname), $cache_id, $compile_id, $smarty);
 				if (!$tpl->isCached()) {
@@ -979,6 +979,7 @@ EOS;
 			}
 			return $tpl->fetch();
 		}
+*/
 	}
 
 	/**
@@ -992,14 +993,14 @@ EOS;
 	public static function ProcessTemplateFromDatabase(&$mod, $tplname, $tplvars, $cache=TRUE)
 	{
 		global $smarty;
-		if ($mod->before20) {
+//		if ($mod->before20) {
 			$smarty->assign($tplvars);
 			echo $mod->ProcessTemplateFromDatabase($tplname);
-		} else {
+/*		} else {
 			//TODO handle old template if new one N/A
 			if ($cache) {
 				$cache_id = md5('pwf'.$tplname.serialize(array_keys($tplvars)));
-				$lang = CmsNlsOperations::get_current_language();
+				$lang = \CmsNlsOperations::get_current_language();
 				$compile_id = md5('pwf'.$tplname.$lang);
 				$tpl = $smarty->CreateTemplate($mod->GetTemplateResource($tplname), $cache_id, $compile_id, $smarty);
 				if (!$tpl->isCached()) {
@@ -1010,6 +1011,7 @@ EOS;
 			}
 			$tpl->display();
 		}
+*/
 	}
 
 	/**
@@ -1024,12 +1026,13 @@ EOS;
 	{
 		global $smarty;
 		$smarty->assign($tplvars);
-		if ($mod->before20) {
+//		if ($mod->before20) {
 			return $mod->ProcessTemplateFromData($data);
-		} else {
+/*		} else {
 			$tpl = $smarty->CreateTemplate('eval:'.$data, NULL, NULL, $smarty, $tplvars);
 			return $tpl->fetch();
 		}
+*/
 	}
 
 	/**

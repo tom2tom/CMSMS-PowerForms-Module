@@ -118,6 +118,7 @@ class CatalogerItems extends FieldBase
 
 		$tplvars = []; //TODO need global vars?
 		// put the hidden fields into smarty
+		// TODO BAD for CMSMS2+
 		if (!isset($gCms->variables['pwf_smarty_vars_set'])) { //FIXME
 			foreach ($this->formdata->Fields as &$one) {
 				if ($one->GetFieldType() != 'Hidden') {

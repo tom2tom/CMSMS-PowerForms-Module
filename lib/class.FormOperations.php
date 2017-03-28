@@ -12,6 +12,7 @@ class FormOperations
 	//for CMSMS 2+
 	private static $editors = NULL;
 
+/* disabled pending better template management process in CMSMS2
 	private function SetTemplate($type, $id, $val)
 	{
 		if (self::$editors === NULL) {
@@ -59,7 +60,7 @@ EOS;
 		$tpl->set_content($val);
 		$tpl->save();
 	}
-
+*/
 	/**
 	Add:
 	@mod: reference to the current PWForms module object
@@ -113,21 +114,22 @@ EOS;
 			$one->Delete();
 		unset($one);
 */
-		if ($mod->before20) {
+//		if ($mod->before20) {
 			$mod->DeleteTemplate('pwf_'.$form_id);
 			$mod->DeleteTemplate('pwf_sub_'.$form_id);
-		} else {
+/*		} else {
 			try {
-				$tpl = CmsLayoutTemplateType::load('pwf_'.$form_id);
+				$tpl = \CmsLayoutTemplateType::load('pwf_'.$form_id);
 				$tpl->delete();
 			} catch (Exception $e) {
 			}
 			try {
-				$tpl = CmsLayoutTemplateType::load('pwf_sub_'.$form_id);
+				$tpl = \CmsLayoutTemplateType::load('pwf_sub_'.$form_id);
 				$tpl->delete();
 			} catch (Exception $e) {
 			}
 		}
+*/
 		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_trans WHERE new_id=? AND isform=1';
 		$db = \cmsms()->GetDb();
@@ -215,18 +217,20 @@ EOS;
 			$newid = $db->GenID($pre.'module_pwf_formprops_seq');
 			$longval = NULL;
 			if ($key == 'form_template') {
-				if ($mod->before20) {
+//				if ($mod->before20) {
 					$mod->SetTemplate('pwf_'.$form_id, $val);
-				} else {
+/*				} else {
 					self::SetTemplate('form', $form_id, $val);
 				}
+*/
 				$val = 'pwf_'.$form_id;
 			} elseif ($key == 'submission_template') {
-				if ($mod->before20) {
+//				if ($mod->before20) {
 					$mod->SetTemplate('pwf_sub_'.$form_id, $val);
-				} else {
+/*				} else {
 					self::SetTemplate('submission', $form_id, $val);
 				}
+*/
 				$val = 'pwf_sub_'.$form_id;
 			} else {
 				if (strlen($val) > \PWForms::LENSHORTVAL) {
@@ -308,17 +312,18 @@ EOS;
 						default:
 							break 2;
 					}
-					if ($mod->before20) {
+//					if ($mod->before20) {
 						$mod->SetTemplate($name, $val);
-					} else {
+/*					} else {
 						if ($newform) {
 							self::SetTemplate($type, $form_id, $val);
 						} else {
-							$ob = CmsLayoutTemplate::load($name);
+							$ob = \CmsLayoutTemplate::load($name);
 							$ob->set_content($val);
 							$ob->save();
 						}
 					}
+*/
 					$val = $name; //record a pointer
 				} elseif (strlen($val > \PWForms::LENSHORTVAL)) {
 					$longval = $val;
@@ -437,21 +442,23 @@ EOS;
 
 		if ($admin) {
 			$val = $formdata->XtraProps['form_template'];
-			if ($mod->before20) {
+//			if ($mod->before20) {
 				$tpl = $mod->GetTemplate($val);
-			} else {
-				$ob = CmsLayoutTemplate::load($val);
+/*			} else {
+				$ob = \CmsLayoutTemplate::load($val);
 				$tpl = $ob->get_content();
 			}
+*/
 			$formdata->XtraProps['form_template'] = $tpl;
 			$val = $formdata->XtraProps['submission_template'];
 			if ($val) {
-				if ($mod->before20) {
+//				if ($mod->before20) {
 					$tpl = $mod->GetTemplate($val);
-				} else {
-					$ob = CmsLayoutTemplate::load($val);
+/*				} else {
+					$ob = \CmsLayoutTemplate::load($val);
 					$tpl = $ob->get_content();
 				}
+*/
 				$formdata->XtraProps['submission_template'] = $tpl;
 			}
 		}
@@ -575,18 +582,19 @@ EOS;
 					$xml[] = "\t\t\t<$name>".trim($value)."</$name>";
 				} else { //smarty syntax can abort the xml-decoder - so mask it
 					if ($name == 'form_template') {
-						if ($mod->before20) {
+//						if ($mod->before20) {
 							$value = $mod->GetTemplate($value);
-						} else {
-							$ob = CmsLayoutTemplate::load($value);
+/*						} else {
+							$ob = \CmsLayoutTemplate::load($value);
 							$value = $ob->get_content();
 						}
+*/
 					}
 /*					elseif ($name == 'submission_template') {
 						if ($mod->before20)
 							$value = $mod->GetTemplate($value);
 						else {
-							$ob = CmsLayoutTemplate::load($value);
+							$ob = \CmsLayoutTemplate::load($value);
 							$value = $ob->get_content();
 						}
 					}
@@ -787,18 +795,20 @@ EOS;
 				} else { //encoded value
 					$val = urldecode(substr($one, 4)); //TODO translate numbered fields in templates
 					if ($name == 'form_template') {
-						if ($mod->before20) {
+//						if ($mod->before20) {
 							$mod->SetTemplate('pwf_'.$form_id, $val);
-						} else {
+/*						} else {
 							self::SetTemplate('form', $form_id, $val);
 						}
+*/
 						$val = 'pwf_'.$form_id;
 					} elseif ($name == 'submission_template') {
-						if ($mod->before20) {
+//						if ($mod->before20) {
 							$mod->SetTemplate('pwf_sub_'.$form_id, $val);
-						} else {
+/*						} else {
 							self::SetTemplate('submission', $form_id, $val);
 						}
+*/
 						$val = 'pwf_sub_'.$form_id;
 					}
 				}
