@@ -28,7 +28,7 @@ class Utils
 	 */
 	public static function GetCache(&$mod, $storage='auto', $settings=[])
 	{
-		//		if (self::$cache == NULL && isset($_SESSION['pwfcache']))
+//		if (self::$cache == NULL && isset($_SESSION['pwfcache']))
 //			self::$cache = $_SESSION['pwfcache'];
 		if (self::$cache) {
 			return self::$cache;
@@ -86,9 +86,9 @@ class Utils
 			if (empty($settings[$one]['namespace'])) {
 				$settings[$one]['namespace'] = $mod->GetName();
 			}
-			$class = 'MultiCache\Cache_' . $one;
 			try {
 				require($path.$one.'.php');
+				$class = 'PWForms\\MultiCache\\' . $one;
 				$cache = new $class($settings[$one]);
 			} catch (\Exception $e) {
 				continue;
@@ -102,7 +102,7 @@ class Utils
 
 	public static function ClearCache()
 	{
-		//		unset($_SESSION['bkrcache']);
+//		unset($_SESSION['bkrcache']);
 		unset(self::$cache);
 		self::$cache = NULL;
 	}
