@@ -35,15 +35,16 @@ if ($obfld) { //field data are loaded
 	}
 	$t .= $this->EndTabHeaders().$this->StartTabContent();
 	$tplvars['tabs_start'] = $t;
-
+	//workaround CMSMS2 crap 'auto-end', EndTab() & EndTabContent() before [1st] StartTab()
+	$tplvars['tab_end'] = $this->EndTab();
 	$tplvars['tabs_end'] = $this->EndTabContent();
+
 	if ($hasmain) {
 		$tplvars['maintab_start'] = $this->StartTab('maintab');
 	}
 	if ($hasadv) {
 		$tplvars['advancedtab_start'] = $this->StartTab('advancedtab');
 	}
-	$tplvars['tab_end'] = $this->EndTab();
 
 	$tplvars['add'] = ($obfld->HasComponentAdd())?
 		$this->CreateInputSubmit($id, 'compadd', $obfld->ComponentAddLabel()):NULL;

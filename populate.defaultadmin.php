@@ -5,34 +5,32 @@
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 $tab = $this->_GetActiveTab($params);
-
-$starts = $this->StartTabHeaders().
+$t = $this->StartTabHeaders().
 	$this->SetTabHeader('maintab', $this->Lang('forms'), ($tab == 'maintab'));
 if ($pmod) {
-	$starts .= $this->SetTabHeader('import', $this->Lang('import'), ($tab == 'import'));
+	$t .= $this->SetTabHeader('import', $this->Lang('import'), ($tab == 'import'));
 }
 if ($padm) {
-	$starts .= $this->SetTabHeader('settings', $this->Lang('settings'), ($tab == 'settings'));
+	$t .= $this->SetTabHeader('settings', $this->Lang('settings'), ($tab == 'settings'));
 }
-$starts .= $this->EndTabHeaders().$this->StartTabContent();
-
-$tplvars['tabs_start'] = $starts;
+$t .= $this->EndTabHeaders().$this->StartTabContent();
+//workaround CMSMS2 crap 'auto-end', EndTab() & EndTabContent() before [1st] StartTab()
+$tplvars += [
+	'tabs_start' => $t,
+	'tab_end' => $this->EndTab(),
+	'tabs_end' => $this->EndTabContent(),
+	'form_end' => $this->CreateFormEnd(),
+	'formstab_start' => $this->StartTab('maintab')
+];
 if ($pmod) {
 	$tplvars['importstab_start'] = $this->StartTab('import');
 }
 if ($padm) {
 	$tplvars['settingstab_start'] = $this->StartTab('settings');
 }
-
-$tplvars = $tplvars + [
-	'formstab_start' => $this->StartTab('maintab'),
-	'form_end' => $this->CreateFormEnd(),
-	'tabs_end' => $this->EndTabContent(),
-	'tab_end' => $this->EndTab(), //CMSMS 2+ can't cope if this is before EndTabContent() !!
-];
 $tplvars['message'] = (isset($params['message']))?$params['message']:'';
 
-$theme = ($this->before20) ? cmsms()->variables['admintheme']:
+$theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 	cms_utils::get_theme_object();
 //script accumulators
 $jsincs = [];
@@ -127,7 +125,7 @@ if ($pmod) {
 	$oneset->help = $this->Lang('help_import_alias');
 	$xmls[] = $oneset;
 
-	$tplvars = $tplvars + [
+	$tplvars += [
 		'legend_xmlimport' => $this->Lang('title_importxml_legend'),
 		'start_importxmlform' => $this->CreateFormStart($id, 'import_formfile', $returnid, 'POST', 'multipart/form-data'),
 		'xmls' => $xmls,
@@ -227,7 +225,7 @@ if ($padm) {
  });
 EOS;
 
-	$tplvars = $tplvars + [
+	$tplvars += [
 		'configs' => $cfgs,
 		'start_configform' => $this->CreateFormStart($id, 'defaultadmin', $returnid),
 		'submitcfg' => $this->CreateInputSubmit($id, 'submit', $this->Lang('save')),

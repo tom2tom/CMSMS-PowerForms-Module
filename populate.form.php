@@ -28,19 +28,17 @@ $t .=
 	$this->SetTabHeader('udttab', $this->Lang('tab_udt'), ($tab == 'udttab')).
 	$this->SetTabHeader('submittab', $this->Lang('tab_submit'), ($tab == 'submittab')).
 	$this->EndTabHeaders().$this->StartTabContent();
-$tplvars['tabs_start'] = $t;
-if ($form_id > 0) {
-	$tplvars['fieldstab_start'] = $this->StartTab('fieldstab');
-}
-$tplvars = $tplvars + [
+//workaround CMSMS2 crap 'auto-end', EndTab() & EndTabContent() before [1st] StartTab()
+$tplvars += [
+	'tabs_start' => $t,
+	'tab_end' => $this->EndTab(),
 	'tabs_end' => $this->EndTabContent(),
+	'form_end' => $this->CreateFormEnd(),
 	'maintab_start' => $this->StartTab('maintab'),
 	'displaytab_start' => $this->StartTab('displaytab'),
 	'templatetab_start' => $this->StartTab('templatetab'),
 	'udttab_start' => $this->StartTab('udttab'),
 	'submittab_start' => $this->StartTab('submittab'),
-	'tab_end' => $this->EndTab(),
-	'form_end' => $this->CreateFormEnd(),
 
 	'help_can_drag' => $this->Lang('help_can_drag'),
 	'help_form_alias' => $this->Lang('help_form_alias'),
@@ -63,8 +61,11 @@ $tplvars = $tplvars + [
 	'title_form_name' => $this->Lang('title_form_name'),
 	'title_form_status' => $this->Lang('title_form_status')
 ];
+if ($form_id > 0) {
+	$tplvars['fieldstab_start'] = $this->StartTab('fieldstab');
+}
 
-$theme = ($this->before20) ? cmsms()->variables['admintheme']:
+$theme = ($this->before20) ? cmsms()->get_variable('admintheme'):
 	cms_utils::get_theme_object();
 //script accumulators
 $jsincs = [];
@@ -230,7 +231,7 @@ function require_field(link,fid,newstate) {
 }
 EOS;
 } else { //no field
-	$tplvars = $tplvars + [
+	$tplvars += [
 		'nofields' => $this->Lang('no_fields'),
 		'text_ready' => '',
 		'text_notready' => $this->Lang('title_not_ready'),
@@ -242,7 +243,7 @@ $tplvars['dispositions'] = $dispositions;
 if ($dispositions) {
 	$tplvars['text_ready'] = $this->Lang('title_ready');
 } else {
-	$tplvars = $tplvars + [
+	$tplvars += [
 		'nodispositions' => $this->Lang('no_dispositions'),
 		'text_ready' => '',
 		'text_notready' => $this->Lang('title_not_ready'),
@@ -573,16 +574,16 @@ function get_template (sel) {
 }
 EOS;
 
-if ($this->before20) {
+if ($this->oldtemplates) {
 	$tpl = $this->GetTemplate('pwf_'.$form_id);
 } else {
-	//	CmsLayoutTemplate::get_designs() TODO
+//	CmsLayoutTemplate::get_designs() TODO
 //	CmsLayoutTemplate::set_designs()
 	$ob = CmsLayoutTemplate::load('pwf_'.$form_id);
 	$tpl = $ob->get_content();
 }
 
-$tplvars = $tplvars + [
+$tplvars += [
 	'title_variable' => $this->Lang('variable'),
 	'title_property' => $this->Lang('property'),
 	'title_description' => $this->Lang('description'),
@@ -773,7 +774,7 @@ $tplvars['input_redirect_page'] =
 	PWForms\Utils::CreateHierarchyPulldown($this, $id, 'fp_redirect_page',
 		PWForms\Utils::GetFormProperty($formdata, 'redirect_page', 0));
 
-if ($this->before20) {
+if ($this->oldtemplates) {
 	$tpl = $this->GetTemplate('pwf_sub_'.$form_id);
 } else {
 	$ob = CmsLayoutTemplate::load('pwf_sub_'.$form_id);
@@ -791,7 +792,7 @@ $ctlData = [];
 $ctlData['fp_submission_template']['general_button'] = TRUE;
 list($buttons, $revertscripts) = PWForms\Utils::TemplateActions($formdata, $id, $ctlData);
 $jsfuncs[] = $revertscripts[0];
-$tplvars = $tplvars + [
+$tplvars += [
 	'sample_submit_template' => $buttons[0],
 	'help_submit_template' => $this->Lang('help_submit_template'),
 ];

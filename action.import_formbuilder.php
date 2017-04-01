@@ -193,7 +193,7 @@ EOS;
 		 unset($row);
 	 }
 
-	 if ($mod->before20) {
+	 if ($mod->oldtemplates) {
 		 $tpl = $mod->GetTemplate('pwf_'.$newfid);
 	 } else {
 		 //CHECKME try/catch?
@@ -202,14 +202,14 @@ EOS;
 	 }
 	 if ($tpl) {
 		 $tpl = str_replace($finds, $repls, $tpl);
-		 if ($mod->before20) {
+		 if ($mod->oldtemplates) {
 			 $mod->SetTemplate('pwf_'.$newfid, $tpl);
 		 } else {
 			 $ob->set_content($tpl);
 			 $ob->save();
 		 }
 	 }
-	 if ($mod->before20) {
+	 if ($mod->oldtemplates) {
 		 $tpl = $mod->GetTemplate('pwf_sub_'.$newfid);
 	 } else {
 		 $ob = CmsLayoutTemplate::load('pwf_sub_'.$newfid);
@@ -217,7 +217,7 @@ EOS;
 	 }
 	 if ($tpl) {
 		 $tpl = str_replace($finds, $repls, $tpl);
-		 if ($mod->before20) {
+		 if ($mod->oldtemplates) {
 			 $mod->SetTemplate('pwf_sub_'.$newfid, $tpl);
 		 } else {
 			 $ob->set_content($tpl);
@@ -505,7 +505,7 @@ EOS;
 			//CHECKME template arrangements used by newer FormBuilder
 			switch ($row['name']) {
 			 case 'form_template':
-				if ($mod->before20) {
+				if ($mod->oldtemplates) {
 					$mod->SetTemplate('pwf_'.$newfid, $val);
 				} else {
 					MySetTemplate('form', $newfid, $val);
@@ -514,7 +514,7 @@ EOS;
 				$val = 'pwf_'.$newfid;
 				break;
 			 case 'submission_template':
-				if ($mod->before20) {
+				if ($mod->oldtemplates) {
 					$mod->SetTemplate('pwf_sub_'.$newfid, $val);
 				} else {
 					MySetTemplate('submission', $newfid, $val);
@@ -534,10 +534,10 @@ EOS;
 				$ares = $db->Execute($sql, [$newid, $newfid, $name, $val, $longval]);
 			}
 		}
-	//TODO handle $passbacks
-	if ($passdowns) {
-		$this->Crash(); //TODO
-	}
+		//TODO handle $passbacks
+		if ($passdowns) {
+			$this->Crash(); //TODO
+		}
 	}
 } // !function_exists
 
@@ -547,7 +547,7 @@ if (isset($params['import'])) {
 	$sql = 'SELECT * FROM '.$pre.'module_fb_form ORDER BY form_id';
 	$oldforms = $db->GetArray($sql);
 	if ($oldforms) {
-		if (!$this->before20) {
+		if (!$this->oldtemplates) {
 			$types = CmsLayoutTemplateType::load_all_by_originator('FormBuilder');
 			if ($types) {
 				foreach ($types as $type) {

@@ -17,7 +17,7 @@ if (preg_match('/\.tpl$/', $params['tid'])) {
 		$tplstr = $data['value'];
 	}
 	if ($tplstr && strncmp($tplstr, 'pwf_', 4) == 0) {
-		if ($this->before20) {
+		if ($this->oldtemplates) {
 			$tplstr = $this->GetTemplate($tplstr);
 		} else {
 			$ob = CmsLayoutTemplate::load($tplstr);

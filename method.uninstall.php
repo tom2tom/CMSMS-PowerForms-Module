@@ -64,8 +64,9 @@ $db->DropSequence($pre.'module_pwf_formprops_seq');
 $db->DropSequence($pre.'module_pwf_session_seq');
 $db->DropSequence($pre.'module_pwf_uniquefield_seq');
 
-$this->DeleteTemplate(); //old-style templates can be for any version
-if (!$this->before20) {
+if ($this->oldtemplates) {
+	$this->DeleteTemplate();
+} else {
 	$types = CmsLayoutTemplateType::load_all_by_originator($this->GetName());
 	if ($types) {
 		foreach ($types as $type) {

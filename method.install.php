@@ -156,8 +156,7 @@ $css_id = $db->GenID($pre.'css_seq');
 $db->Execute('INSERT INTO '.$pre.'css (css_id,css_name,css_text,media_type,create_date) VALUES (?,?,?,?,?)',
 	[$css_id, 'PWForms Default Style', $css, 'screen', date('Y-m-d')]);
 
-/* NO DESIGN-MANAGER TEMPLATES UNTIL GRANULAR MODULE-SPECIFIC PERMISSIONS THERE
-if (!$this->before20) {
+if (!$this->oldtemplates) {
 	$myname = $this->GetName();
 //	$me = get_userid(FALSE);
 	foreach (['form', 'submission'] as $name) {
@@ -172,8 +171,9 @@ if (!$this->before20) {
 		} catch (Exception $e) {
 //			$tid = FALSE;
 		}
+	}
 }
-*/
+
 $funcs = new PWForms\FormOperations();
 $path = cms_join_path(__DIR__, 'include');
 $dir = opendir($path);

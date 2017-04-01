@@ -838,7 +838,7 @@ EOS;
 	*/
 	public static function SetupSubTemplateVarsHelp(&$formdata, &$mod, &$tplvars)
 	{
-		$tplvars = $tplvars + [
+		$tplvars += [
 		 'template_vars_title' => $mod->Lang('title_template_variables'),
 		 'variable_title' => $mod->Lang('variable'),
 		 'property_title' => $mod->Lang('property')
@@ -911,7 +911,7 @@ EOS;
 	{
 		$mod = $formdata->formsmodule;
 		// general variables
-		$tplvars = $tplvars + [
+		$tplvars += [
 			'form_name' => $formdata->Name,
 			'form_url' => (empty($_SERVER['HTTP_REFERER'])?$mod->Lang('no_referrer_info'):$_SERVER['HTTP_REFERER']),
 			'form_host' => $_SERVER['SERVER_NAME'],
@@ -960,12 +960,16 @@ EOS;
 	*/
 	public static function ProcessTemplate(&$mod, $tplname, $tplvars, $cache=TRUE)
 	{
-		global $smarty;
-//		if ($mod->before20) {
-			//$smarty->clearAllAssign();
+		if ($mod->before20) {
+			global $smarty;
+		} else {
+			$smarty = $mod->GetActionTemplateObject();
+		}
+		$smarty->assign($tplvars);
+		if ($mod->oldtemplates) {
 			$smarty->assign($tplvars);
 			return $mod->ProcessTemplate($tplname);
-/*		} else {
+		} else {
 			if ($cache) {
 				$cache_id = md5('pwf'.$tplname.serialize(array_keys($tplvars)));
 				$lang = \CmsNlsOperations::get_current_language();
@@ -979,7 +983,6 @@ EOS;
 			}
 			return $tpl->fetch();
 		}
-*/
 	}
 
 	/**
@@ -992,12 +995,15 @@ EOS;
 	*/
 	public static function ProcessTemplateFromDatabase(&$mod, $tplname, $tplvars, $cache=TRUE)
 	{
-		global $smarty;
-//		if ($mod->before20) {
-			$smarty->assign($tplvars);
+		if ($mod->before20) {
+			global $smarty;
+		} else {
+			$smarty = $mod->GetActionTemplateObject();
+		}
+		$smarty->assign($tplvars);
+		if ($mod->oldtemplates) {
 			echo $mod->ProcessTemplateFromDatabase($tplname);
-/*		} else {
-			//TODO handle old template if new one N/A
+		} else {
 			if ($cache) {
 				$cache_id = md5('pwf'.$tplname.serialize(array_keys($tplvars)));
 				$lang = \CmsNlsOperations::get_current_language();
@@ -1011,7 +1017,6 @@ EOS;
 			}
 			$tpl->display();
 		}
-*/
 	}
 
 	/**
@@ -1024,15 +1029,18 @@ EOS;
 	*/
 	public static function ProcessTemplateFromData(&$mod, $data, $tplvars)
 	{
-		global $smarty;
+		if ($mod->before20) {
+			global $smarty;
+		} else {
+			$smarty = $mod->GetActionTemplateObject();
+		}
 		$smarty->assign($tplvars);
-//		if ($mod->before20) {
+		if ($mod->oldtemplates) {
 			return $mod->ProcessTemplateFromData($data);
-/*		} else {
+		} else {
 			$tpl = $smarty->CreateTemplate('eval:'.$data, NULL, NULL, $smarty, $tplvars);
 			return $tpl->fetch();
 		}
-*/
 	}
 
 	/**
