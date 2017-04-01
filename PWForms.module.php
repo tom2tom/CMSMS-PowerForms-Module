@@ -22,7 +22,7 @@ class PWForms extends CMSModule
 	const LENSHORTVAL = 64;
 
 	public $before20;
-	public $havemcrypt;
+	public $oldtemplates;
 /*QUEUE
 	private $mh = NULL; //curl_multi handle for async queue processing
 	private $ch = FALSE; //cached curl handle for unfinished process
@@ -41,7 +41,7 @@ class PWForms extends CMSModule
 		parent::__construct();
 		global $CMS_VERSION;
 		$this->before20 = (version_compare($CMS_VERSION, '2.0') < 0);
-		$this->havemcrypt = function_exists('mcrypt_encrypt');
+		$this->oldtemplates = $this->before20 || TRUE; //TODO
 /*QUEUE
 		$this->mh = curl_multi_init();
 		//bogus frontend link (i.e. no admin login needed)
