@@ -449,7 +449,7 @@ EOS;
 				}
 			} else {
 				$this->SendEvent('OnFormSubmitError', $parms);
-				$tplvars = $tplvars + [
+				$tplvars += [
 					'submission_error' => $this->Lang('err_submission'),
 					'submission_error_list' => $message,
 					'show_submission_errors' => !$this->GetPreference('hide_errors')

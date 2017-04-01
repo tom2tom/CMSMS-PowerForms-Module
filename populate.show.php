@@ -22,7 +22,7 @@ $form_start = $this->CreateFormStart($id, 'show_form', $returnid, 'POST',
 	'multipart/form-data', $inline, '', $fmhidden);
 $form_end = $this->CreateFormEnd();
 
-$tplvars = $tplvars + [
+$tplvars += [
 	'actionid' => $id,
 	'css_class' => PWForms\Utils::GetFormProperty($formdata, 'css_class'),
 	'form_id' => $formdata->Id,
@@ -114,7 +114,7 @@ if ($formdata->Page > $formPage) {
 	$formdata->Page = $formPage;
 } //maybe page-redisplay goof
 
-$tplvars = $tplvars + [
+$tplvars += [
 	'fields' => $fields,
 	'this_page' => $formdata->Page,
 	'total_pages' => $formdata->PagesCount,
