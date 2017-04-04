@@ -31,22 +31,22 @@
 		{strip}
 		{if $one->display}
 			{if $one->needs_div}<div
-			{if $one->required || !empty($one->css_class)} class="{if $one->required}required{/if}{if !empty($one->css_class)} {$one->css_class}{/if}"
-			{/if}>
+				{if $one->required || !empty($one->css_class)} class="{if $one->required}required{/if}{if !empty($one->css_class)} {$one->css_class}{/if}"{/if}
+			>{/if}
 			{if !$one->hide_name}
 				<label{if $one->multiple_parts != 1} for="{$one->input_id}"{/if}>{$one->name}
 				{if $one->required && $one->required_symbol}{$one->required_symbol}{/if}
 				</label>
 			{/if}
 			{if $one->multiple_parts}
-				{section name=numloop loop=$one->input}
+				{foreach from=$one->input item=part}
 					{if $one->label_parts}
-						<div>{$one->input[numloop]->input}&nbsp;{$one->input[numloop]->name}</div>
+						<div>{$part->input}&nbsp;{$part->name}</div>
 					{else}
-						{$one->input[numloop]->input}
+						{$part->input}
 					{/if}
-					{if !empty($one->input[numloop]->op)}{$one->input[numloop]->op}{/if}
-				{/section}
+					{if !empty($part->op)}{$part->op}{/if}
+				{/foreach}
 			{else}
 				{if $one->smarty_eval}{eval var=$one->input}{else}{$one->input}{/if}
 			{/if}
