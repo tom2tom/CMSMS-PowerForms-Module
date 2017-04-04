@@ -49,14 +49,14 @@ $templates['Sample_form'] =<<<EOS
 				</label>
 			{/if}
 			{if \$one->multiple_parts}
-				{section name=numloop loop=\$one->input}
+				{foreach \$one->input as \$part}
 				{if \$one->label_parts}
-					<div>{\$one->input[numloop]->input}&nbsp;{\$one->input[numloop]->name}</div>
+					<div>{\$part->input}&nbsp;{\$part->name}</div>
 				{else}
-					{\$one->input[numloop]->input}
+					{\$part->input}
 				{/if}
-				{if !empty(\$one->input[numloop]->op)}{\$one->input[numloop]->op}{/if}
-				{/section}
+				{if !empty(\$part->op)}{\$part->op}{/if}
+				{/foreach}
 			{else}
 				{if \$one->smarty_eval}{eval var=\$one->input}{else}{\$one->input}{/if}
 			{/if}
@@ -133,14 +133,14 @@ $templates['Contact_form'] =<<<EOS
 				</label>
 			{/if}
 			{if \$one->multiple_parts}
-				{section name=numloop loop=\$one->input}
-					{if \$one->label_parts}
-						<div>{\$one->input[numloop]->input}&nbsp;{\$one->input[numloop]->name}</div>
-					{else}
-						{\$one->input[numloop]->input}
-					{/if}
-					{if !empty(\$one->input[numloop]->op)}{\$one->input[numloop]->op}{/if}
-				{/section}
+				{foreach \$one->input as \$part}
+				{if \$one->label_parts}
+					<div>{\$part->input}&nbsp;{\$part->name}</div>
+				{else}
+					{\$part->input}
+				{/if}
+				{if !empty(\$part->op)}{\$part->op}{/if}
+				{/foreach}
 			{else}
 				{if \$one->smarty_eval}{eval var=\$one->input}{else}{\$one->input}{/if}
 			{/if}
@@ -167,7 +167,7 @@ $templates['Contact_submission'] =<<<EOS
 <strong>Subject</strong>: {\$subject}<br />
 <strong>Comments</strong>:<br />
 {\$message}
-</p> 
+</p>
 <h4>Other information</h4>
 <p>
 <strong>Date submitted</strong>: {\$sub_date}<br />
@@ -238,14 +238,14 @@ $templates['Advanced_form'] =<<<EOS
 				</label>
 			{/if}
 			{if \$one->multiple_parts}
-				{section name=numloop loop=\$one->input}
-					{if \$one->label_parts}
-						<div>{\$one->input[numloop]->input}&nbsp;{\$one->input[numloop]->name}</div>
-					{else}
-						{\$one->input[numloop]->input}
-					{/if}
-					{if !empty(\$one->input[numloop]->op)}{\$one->input[numloop]->op}{/if}
-				{/section}
+				{foreach \$one->input as \$part}
+				{if \$one->label_parts}
+					<div>{\$part->input}&nbsp;{\$part->name}</div>
+				{else}
+					{\$part->input}
+				{/if}
+				{if !empty(\$part->op)}{\$part->op}{/if}
+				{/foreach}
 			{else}
 				{if \$one->smarty_eval}{eval var=\$one->input}{else}{\$one->input}{/if}
 			{/if}

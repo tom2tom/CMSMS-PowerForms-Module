@@ -42,23 +42,28 @@
 			{if $one->multiple_parts}
 			<table>
 				<tr>
-				{section name=numloop loop=$one->input}
-					<td>{$one->input[numloop]->input}&nbsp;{$one->input[numloop]->name}{if !empty($one->input[numloop]->op)}&nbsp;{$one->input[numloop]->op}{/if}</td>
-					{if not ($smarty.section.numloop.rownum mod $cols)}
-						{if not $smarty.section.numloop.last}
+				{*section name=numloop loop=$one->input*}
+				{foreach $one->input as $part}
+					<td>{$part->input}&nbsp;{$part->name}{if !empty($part->op)}&nbsp;{$part->op}{/if}</td>
+					{*if not ($smarty.section.numloop.rownum mod $cols)}
+						{if not $smarty.section.numloop.last*}
+					{if !($part@last || ($part@iteration % $cols))}
 				</tr><tr>
-						{/if}
+						{*/if*}
 					{/if}
-					{if $smarty.section.numloop.last}
-						{math equation = "n - a % n" n=$cols a=$one->input|@count assign="cells"}
+					{*if $smarty.section.numloop.last*}
+					{if $part@last}
+						{*math equation = "n - a % n" n=$cols a=$one->input|@count assign="cells"*}
+						{$cells = ($cols-$one->input|@count) % $cols}
 						{if $cells ne $cols}
-							{section name=pad loop=$cells}
+							{*section name=pad loop=$cells*}{for $pad=0 to $cells}
 					<td>&nbsp;</td>
-							{/section}
+							{*/section*}{/for}
 						{/if}
 				</tr>
 					{/if}
-				{/section}
+				{*/section*}
+				{/foreach}
 				</table>
 			{else}
 				{if $one->smarty_eval}{eval var=$one->input}{else}{$one->input}{/if}
