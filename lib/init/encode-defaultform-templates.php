@@ -4,8 +4,9 @@
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
 /*
-Temporarily include this somewhere, to generate encoded templates for default forms
-After running, the results will need to be manually transcribed into the relevant template .xml files
+To generate encoded templates for default forms, run this file from the command line.
+After that, the results will need to be manually transcribed into the relevant
+template .xml files, at the respective <*_template>....</*_template>
 */
 $templates = [];
 
