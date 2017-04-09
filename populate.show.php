@@ -129,10 +129,10 @@ if ($t) {
 	if (is_file($fp)) {
 		$url = PWForms\Utils::GetUploadURL($this, $t);
 	} else {
-		$url = $baseurl.'/images/info-small.gif';
+		$url = $baseurl.'/images/info-small.png';
 	}
 } else {
-	$url = $baseurl.'/images/info-small.gif';
+	$url = $baseurl.'/images/info-small.png';
 }
 $tplvars['help_icon'] = '<img src="'.$url.'" alt="'.$this->Lang('help').
 	'" title="'.$this->Lang('help_help').'" />';

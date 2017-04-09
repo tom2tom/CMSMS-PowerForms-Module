@@ -50,7 +50,7 @@ if ($allforms) {
 		$iconcopy = $theme->DisplayImage('icons/system/copy.gif', $this->Lang('copy'), '', '', 'systemicon');
 		$icondelete = $theme->DisplayImage('icons/system/delete.gif', $this->Lang('delete'), '', '', 'systemicon');
 	}
-	$iconexport = '<img src="'.$this->GetModuleURLPath().'/images/xml.gif" class="systemicon" title="'.$this->Lang('export').'" alt="'.$this->Lang('export_tip').'" />';
+	$iconexport = '<img src="'.$this->GetModuleURLPath().'/images/xml.png" class="systemicon" title="'.$this->Lang('export').'" alt="'.$this->Lang('export_tip').'" />';
 	if ($pdev) {
 		$modname = $this->GetName();
 	}
@@ -217,7 +217,7 @@ if ($padm) {
 		$id.'passwd', '', '', 50, 3);
 	$cfgs[] = $oneset;
 
-	$jsincs[] = '<script type="text/javascript" src="'.$baseurl.'/include/jquery-inputCloak.min.js"></script>';
+	$jsincs[] = '<script type="text/javascript" src="'.$baseurl.'/lib/js/jquery-inputCloak.min.js"></script>';
 	$jsloads[] = <<<EOS
  $('#{$id}passwd').inputCloak({
   type:'see4',
