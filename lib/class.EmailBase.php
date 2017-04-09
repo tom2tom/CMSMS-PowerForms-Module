@@ -135,8 +135,8 @@ class EmailBase extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$baseurl = $mod->GetModuleURLPath();
 		$this->formdata->jsincs['mailcheck'] = <<<EOS
-<script type="text/javascript" src="{$baseurl}/include/mailcheck.min.js"></script>
-<script type="text/javascript" src="{$baseurl}/include/levenshtein.min.js"></script>
+<script type="text/javascript" src="{$baseurl}/lib/js/mailcheck.min.js"></script>
+<script type="text/javascript" src="{$baseurl}/lib/js/levenshtein.min.js"></script>
 EOS;
 
 		$pref = $mod->GetPreference('email_topdomains');

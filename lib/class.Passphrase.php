@@ -72,7 +72,7 @@ class Passphrase extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$baseurl = $mod->GetModuleURLPath();
 		$this->formdata->jsincs['cloak'] = <<<EOS
-<script type="text/javascript" src="{$baseurl}/include/jquery-inputCloak.min.js"></script>
+<script type="text/javascript" src="{$baseurl}/lib/js/jquery-inputCloak.min.js"></script>
 EOS;
 		$htmlid = $id.$this->GetInputId(); //html may get id="$id.$htmlid", or maybe not ...
 		$style = $this->GetProperty('style', 'all');

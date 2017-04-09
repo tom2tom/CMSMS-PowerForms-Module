@@ -106,7 +106,7 @@ EOS;
 		if (count($populators['table']) > 2) { //titles + >1 options-row
 			$tplvars['dndhelp'] = $this->Lang('help_can_drag');
 			$obfld->jsincs[] = <<<EOS
-<script type="text/javascript" src="{$baseurl}/include/jquery.tablednd.min.js"></script>
+<script type="text/javascript" src="{$baseurl}/lib/js/jquery.tablednd.min.js"></script>
 EOS;
 			$obfld->jsloads[] = <<<'EOS'
  $('#helpdnd').show();

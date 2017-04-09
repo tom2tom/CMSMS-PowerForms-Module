@@ -175,7 +175,7 @@ if (!$this->oldtemplates) {
 }
 
 $funcs = new PWForms\FormOperations();
-$path = cms_join_path(__DIR__, 'include');
+$path = cms_join_path(__DIR__, 'lib', 'init');
 $dir = opendir($path);
 while ($filespec = readdir($dir)) {
 	if (preg_match('/.xml$/', $filespec) > 0) {

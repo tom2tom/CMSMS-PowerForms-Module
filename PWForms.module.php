@@ -140,7 +140,7 @@ class PWForms extends CMSModule
 
 	public function GetHelp()
 	{
-		return ''.@file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.'modhelp.inc');
+		return ''.@file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'modhelp.htm');
 	}
 
 	public function GetVersion()
@@ -160,7 +160,7 @@ class PWForms extends CMSModule
 
 	public function GetChangeLog()
 	{
-		return ''.@file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'include'.DIRECTORY_SEPARATOR.'changelog.inc');
+		return ''.@file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'doc'.DIRECTORY_SEPARATOR.'changelog.htm');
 	}
 
 	public function GetDependencies()

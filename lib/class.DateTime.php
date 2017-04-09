@@ -225,7 +225,7 @@ class DateTime extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$baseurl = $mod->GetModuleURLPath();
 		$this->formdata->jsincs[] = <<<EOS
-<script type="text/javascript" src="{$baseurl}/include/jquery.watermark.min.js"></script>
+<script type="text/javascript" src="{$baseurl}/lib/js/jquery.watermark.min.js"></script>
 EOS;
 		$dt = new \DateTime('@'.time(), NULL);
 		$fmt = $this->CurrentFormat();

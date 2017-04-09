@@ -815,9 +815,9 @@ $tplvars['hidden'] = implode(PHP_EOL, $hidden);
 //help for submission-template
 PWForms\Utils::SetupSubTemplateVarsHelp($formdata, $this, $tplvars);
 
-//<script type="text/javascript" src="{$baseurl}/include/module.js"></script>
+//<script type="text/javascript" src="{$baseurl}/lib/js/module.js"></script>
 $jsincs[] = <<<EOS
-<script type="text/javascript" src="{$baseurl}/include/jquery.tablednd.min.js"></script>
+<script type="text/javascript" src="{$baseurl}/lib/js/jquery.tablednd.min.js"></script>
 EOS;
 
 $jsloads[] = <<<EOS
