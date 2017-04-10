@@ -393,13 +393,18 @@ class Utils
 		$imports = $mod->GetPreference('imported_fields');
 		if ($imports) {
 			$imports = unserialize($imports);
+			$bp = __DIR__.DIRECTORY_SEPARATOR.'class.';
 			foreach ($imports as $classname) {
-				$classpath = 'PWForms\\'.$classname;
-				$params = [];
-				$formdata = $mod->_GetFormData($params);
-				$obfld = new $classpath($formdata, $params);
-				if ($obfld) {
-					$menu[$classname] = $obfld->GetDisplayType();
+				$fp = $bp.$classname.'.php';
+				if (is_file($fp)) {
+					include_once $fp;
+					$classpath = 'PWForms\\'.$classname;
+					$params = [];
+					$formdata = $mod->_GetFormData($params);
+					$obfld = new $classpath($formdata, $params);
+					if ($obfld) {
+						$menu[$classname] = $obfld->GetDisplayType();
+					}
 				}
 			}
 		}
@@ -964,6 +969,9 @@ EOS;
 			global $smarty;
 		} else {
 			$smarty = $mod->GetActionTemplateObject();
+			if (!$smarty) {
+				global $smarty;
+			}
 		}
 		$smarty->assign($tplvars);
 		if ($mod->oldtemplates) {
@@ -999,6 +1007,9 @@ EOS;
 			global $smarty;
 		} else {
 			$smarty = $mod->GetActionTemplateObject();
+			if (!$smarty) {
+				global $smarty;
+			}
 		}
 		$smarty->assign($tplvars);
 		if ($mod->oldtemplates) {
@@ -1033,6 +1044,9 @@ EOS;
 			global $smarty;
 		} else {
 			$smarty = $mod->GetActionTemplateObject();
+			if (!$smarty) {
+				global $smarty;
+			}
 		}
 		$smarty->assign($tplvars);
 		if ($mod->oldtemplates) {
