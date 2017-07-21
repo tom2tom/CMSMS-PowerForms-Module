@@ -126,7 +126,7 @@ class EmailConfirmation extends EmailBase
 		}
 		$pub = sha1(uniqid($pref, TRUE)); //easy 40-byte hash
 		$cfuncs = new Crypter($mod);
-		$pw = $pub.$cfuncs->decrypt_preference('masterpass');
+		$pw = $pub.$cfuncs->decrypt_preference(Crypter::MKEY);
 		$when = time();
 		$cont = $cfuncs->encrypt_value(serialize($this->formdata), $pw);
 		$db->Execute('INSERT INTO '.$pre.'module_pwf_session

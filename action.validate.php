@@ -35,7 +35,7 @@ if (!$row || $row['pubkey'] != $params[$key.'c']) {
 $db->Execute($sql, [$sid]);
 
 $cfuncs = new PWForms\Crypter($this);
-$pw = $row['pubkey'].$cfuncs->decrypt_preference('masterpass');
+$pw = $row['pubkey'].$cfuncs->decrypt_preference(PWForms\Crypter::MKEY);
 $formdata = unserialize($cfuncs->decrypt_value($row['content'], $pw));
 if ($formdata === FALSE) {
 	echo $this->Lang('validation_response_error');
