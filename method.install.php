@@ -121,7 +121,7 @@ $db->CreateSequence($pre.'module_pwf_uniquefield_seq');
 
 $cfuncs = new PWForms\Crypter($this);
 $cfuncs->init_crypt();
-$cfuncs->encrypt_preference(PWForms\Crypter::MKEY, base64_decode('U3VjayBpdCB1cCwgY3JhY2tlcnMhIFRyeSB0byBndWVzcw=='));
+$cfuncs->encrypt_preference(PWForms\Crypter::MKEY, base64_decode('U3VjayBpdCB1cCwgY3JhY2tlcnMhIFlvdSBjYW4ndCBndWVzcw=='));
 
 $this->SetPreference('adder_fields', 'basic'); //or 'advanced'
 $this->SetPreference('blank_invalid', 0);
