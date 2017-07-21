@@ -119,16 +119,16 @@ $dict->ExecuteSQLArray($sqlarray);
 
 $db->CreateSequence($pre.'module_pwf_uniquefield_seq');
 
-$t = 'nQCeESKBr99A';
-$this->SetPreference($t, hash('sha256', $t.microtime()));
+$cfuncs = new PWForms\Crypter($this);
+$cfuncs->init_crypt();
+$cfuncs->encrypt_preference(PWForms\Crypter::MKEY, base64_decode('U3VjayBpdCB1cCwgY3JhY2tlcnMhIFRyeSB0byBndWVzcw=='));
+
 $this->SetPreference('adder_fields', 'basic'); //or 'advanced'
 $this->SetPreference('blank_invalid', 0);
 //for email address checking by mailcheck.js
 $this->SetPreference('email_domains', ''); //specific/complete domains for initial check
 $this->SetPreference('email_subdomains', ''); //partial domains for secondary check
 $this->SetPreference('email_topdomains', 'biz,co,com,edu,gov,info,mil,name,net,org'); //for final check
-$cfuncs = new PWForms\Crypter($this);
-$cfuncs->encrypt_preference('masterpass', base64_decode('U3VjayBpdCB1cCwgY3JhY2tlcnMhIFRyeSB0byBndWVzcw=='));
 $this->SetPreference('require_fieldnames', 1);
 $this->SetPreference('submit_limit', 0);
 
