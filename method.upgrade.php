@@ -14,4 +14,19 @@ $taboptarray = ['mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_genera
 $pre = cms_db_prefix();
 */
 switch ($oldversion) {
+/* case '0.7':
+	$cfuncs = new PWForms\Crypter($this);
+	$key = 'masterpass';
+	$s = base64_decode($this->GetPreference($key));
+	$t = $config['ssl_url'].$this->GetModulePath();
+	$val = hash('crc32b',$this->GetPreference('nQCeESKBr99A').$t);
+	$pw = $cfuncs->decrypt($s,$val);
+	if (!$pw) {
+		$pw = base64_decode('U3VjayBpdCB1cCwgY3JhY2tlcnMhIFlvdSBjYW4ndCBndWVzcw==');
+	}
+	$this->RemovePreference($key);
+	$this->RemovePreference('nQCeESKBr99A');
+	$cfuncs->init_crypt();
+	$cfuncs->encrypt_preference(PWForms\Crypter::MKEY,$pw);
+*/
 }
