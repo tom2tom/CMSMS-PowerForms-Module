@@ -641,7 +641,7 @@ class Utils
 		foreach ($formdata->Fields as &$one) {
 			if ($one->DisplayInSubmission()) {
 				$fldref = $one->ForceAlias();
-				$ret .= '{if $'.$fldref.' != "" && $'.$fldref.' != "'.self::GetFormProperty($formdata, 'unspecified', $mod->Lang('unspecified')).'"}';
+				$ret .= '{if $'.$fldref.' && $'.$fldref.' != "'.self::GetFormProperty($formdata, 'unspecified', $mod->Lang('unspecified')).'"}';
 				$fldref = '{$'.$fldref.'}';
 
 				if ($htmlish) {
