@@ -15,25 +15,20 @@
 {if isset($multiControls)}
   <div class="pageoverflow">
    <table id="controls" class="pagetable leftwards">
- {*section name=r loop=$multiControls*}
  {foreach $multiControls as $r}
  {cycle name=multiControls values='row2,row1' assign=rowclass}
-  {*if $smarty.section.r.first*}
   {if $r@first}
    <thead>
    <tr class="pagetext">
-   {*section name=c loop=$multiControls[r]}<th>{$multiControls[r][c]}</th>{/section*}
-   {foreach $multiControls[$r] as $c}<th>{$multiControls[$r][$c]}</th>{/foreach}
+   {foreach $r as $c}<th>{$c}</th>{/foreach}
    </tr>
    </thead>
    <tbody>
   {else}
    <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
-   {*section name=c loop=$multiControls[r]}<td>{$multiControls[r][c]}</td>{/section*}
-   {foreach $multiControls[$r] as $c}<td>{$multiControls[$r][$c]}</td>{/foreach}
+   {foreach $r as $c}<td>{$c}</td>{/foreach}
    </tr>
   {/if}
- {*/section*}
  {/foreach}
    </tbody>
    </table>
