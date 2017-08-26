@@ -914,9 +914,8 @@ $lang['title_field_required'] = 'Required';
 $lang['title_field_required_abbrev'] = 'Req\'d';
 $lang['title_field_resources'] = 'Extra content to accompany field';
 $lang['title_field_siblings'] = 'Link this field to its sibling';
-//TODO next 2 are stupid
-$lang['title_field_to_modify'] = 'Email field to add CC address';
-$lang['title_field_to_modify2'] = 'Email field to add BCC address';
+$lang['title_field_to_modify'] = 'Email field to add CC address'; //TODO stupid
+$lang['title_field_to_modify2'] = 'Email field to add BCC address';//TODO stupid
 $lang['title_field_to_validate'] = 'Field to validate';
 $lang['title_field_type'] = 'Type';
 $lang['title_field_validation'] = 'Validation';
