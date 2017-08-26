@@ -156,7 +156,8 @@ class SystemEmail extends EmailBase
 
 		$mod = $this->formdata->formsmodule;
 		$opt = $this->GetProperty('email_from_address');
-		if ($opt) {
+		if ($opt !== '') {
+			$opt = filter_var(trim($opt), FILTER_SANITIZE_EMAIL);
 			list($rv, $msg) = $this->validateEmailAddr($opt);
 			if (!$rv) {
 				$ret = FALSE;
@@ -170,6 +171,9 @@ class SystemEmail extends EmailBase
 		$dests = $this->GetPropArray('destination_address');
 		if ($dests) {
 			foreach ($dests as &$one) {
+				if ($one !== '') {
+					$one = filter_var(trim($one), FILTER_SANITIZE_EMAIL);
+				}
 				list($rv, $msg) = $this->validateEmailAddr($one);
 				if (!$rv) {
 					$ret = FALSE;

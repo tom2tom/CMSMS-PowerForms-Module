@@ -158,17 +158,20 @@ class CheckboxExtended extends FieldBase
 
 	public function Validate($id)
 	{
-		$mod = $this->formdata->formsmodule;
+		if ($this->Value['text'] !== '') {
+			$this->Value['text'] = filter_var(trim($this->Value['text']), FILTER_SANITIZE_STRING);
+		}
+
 		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 
 		switch ($this->ValidationType) {
 		 case 'none':
 			break;
-			case 'empty':
+		 case 'empty':
 			if (empty($this->Value['text'])) {
 				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('enter_a_value', $this->GetProperty('text_label'));
+				$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_a_value', $this->GetProperty('text_label'));
 			}
 			break;
 		}

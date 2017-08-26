@@ -72,6 +72,9 @@ class PasswordAgain extends FieldBase
 
 	public function Validate($id)
 	{
+		if ($this->Value !== '') {
+			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_STRING);
+		}
 		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 

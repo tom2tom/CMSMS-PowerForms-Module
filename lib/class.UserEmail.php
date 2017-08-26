@@ -39,11 +39,14 @@ class UserEmail extends EmailBase
 	//c.f. parent::SetValue() which calls html_myentities_decode()
 	public function SetValue($newvalue)
 	{
-		if (is_array($newvalue)) {
-			$this->Value = $newvalue;
-		} else {
-			$this->Value = [$newvalue];
+		if (!is_array($newvalue)) {
+			$newvalue = [$newvalue];
 		}
+		foreach ($newvalue as &$tmp) {
+			$tmp = filter_var($tmp, FILTER_SANITIZE_EMAIL);
+		}
+		unset($tmp);
+		$this->Value = $newvalue;
 	}
 
 	public function DisplayableValue($as_string=TRUE)
@@ -129,20 +132,11 @@ class UserEmail extends EmailBase
 
 	public function Validate($id)
 	{
+		if ($this->ValidationType != 'none') {
+			return parent::Validate($id);
+		}
 		$this->valid = TRUE;
 		$this->ValidationMessage = '';
-		if ($this->ValidationType != 'none') {
-			if ($this->Value) {
-				list($rv, $msg) = $this->validateEmailAddr($this->Value);
-				if (!$rv) {
-					$this->valid = FALSE;
-					$this->ValidationMessage = $msg;
-				}
-			} else {
-				$this->valid = FALSE;
-				$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_an_email', $this->Name);
-			}
-		}
 		return [$this->valid,$this->ValidationMessage];
 	}
 

@@ -90,6 +90,33 @@ class EmailBase extends FieldBase
 		return [$main,$adv,'varshelpadv'];
 	}
 
+	/* Subclass this for fields that need validation
+	Sets field properties valid & ValidationMessage
+	Returns: 2-member array:
+	 [0] = boolean T/F indicating whether the field value is valid
+	 [1] = '' or error message
+	*/
+	public function Validate($id)
+	{
+		if ($this->Value !== '') {
+			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_EMAIL);
+		}
+		if ($this->Value) {
+			list($rv, $msg) = $this->validateEmailAddr($this->Value);
+			if ($rv) {
+				$this->valid = TRUE;
+				$this->ValidationMessage = '';
+			} else {
+				$this->valid = FALSE;
+				$this->ValidationMessage = $msg;
+			}
+		} else {
+			$this->valid = FALSE;
+			$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_an_email', $this->Name);
+		}
+		return [$this->valid,$this->ValidationMessage];
+	}
+
 	// override as necessary, return TRUE to include sender-address header in email
 	public function SetFromAddress()
 	{

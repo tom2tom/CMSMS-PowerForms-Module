@@ -123,17 +123,19 @@ EOS;
 
 	public function Validate($id)
 	{
+		if ($this->Value !== '') {
+			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_STRING);
+		}
 		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 		$length = $this->GetProperty('length');
 		if (is_numeric($length) && $length > 0) {
 			if ((strlen($this->Value)-1) > $length) {
 				$this->valid = FALSE;
-				$mod = $this->formdata->formsmodule;
-				$this->ValidationMessage = $mod->Lang('enter_no_longer', $length);
+				$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_no_longer', $length);
 			}
 			$this->Value = substr($this->Value, 0, $length+1);
 		}
-		return [$this->valid,$this->ValidationMessage];
+		return [$this->valid, $this->ValidationMessage];
 	}
 }

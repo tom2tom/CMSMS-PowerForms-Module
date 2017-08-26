@@ -23,9 +23,18 @@ class HTML5URL extends FieldBase
 		return $this->SetClass($tmp);
 	}
 
-/*	public function Validate($id)
+	public function Validate($id)
 	{
-		//TODO
+		if ($this->Value !== '') {
+			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_URL);
+		}
+		if ($this->Value !== '') {
+			$this->valid = TRUE;
+			$this->ValidationMessage = '';
+		} else {
+			$this->valid = FALSE;
+			$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_valid','URL');
+		}
+		return [$this->valid,$this->ValidationMessage];
 	}
-*/
 }

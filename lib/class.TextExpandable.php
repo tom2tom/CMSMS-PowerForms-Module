@@ -198,41 +198,60 @@ class TextExpandable extends FieldBase
 		if (!is_array($this->Value)) {
 			$this->Value = [$this->Value];
 		}
-		foreach ($this->Value as $one) {
+		foreach ($this->Value as &$one) {
 			switch ($this->ValidationType) {
 			 case 'none':
+				if ($one !== '') {
+					$one = filter_var(trim($one), FILTER_SANITIZE_STRING);
+				}
 				break;
 			 case 'numeric':
-				if ($one && !preg_match('/^[\d\.\,]+$/', $one)) {
+				if ($one !== '') {
+					$one = filter_var(trim($one), FILTER_SANITIZE_NUMBER_FLOAT);
+				}
+				if ($one === '') {
 					$res = FALSE;
 					$messages[] = $mod->Lang('enter_a_number', $this->Name);
 				}
 				break;
 			 case 'integer':
-				if ($one && !preg_match('/^\d+$/', $one) || (int)$one != $one) {
+				if ($one !== '') {
+					$one = filter_var(trim($one), FILTER_SANITIZE_NUMBER_INT);
+				}
+				if ($one === '') {
 					$res = FALSE;
 					$messages[] = $mod->Lang('enter_an_integer', $this->Name);
 				}
 				break;
 			 case 'email':
+				if ($one !== '') {
+					$one = filter_var(trim($one), FILTER_SANITIZE_EMAIL);
+				}
 				if ($one && !preg_match($mod->email_regex, $one)) {
 					$res = FALSE;
 					$messages[] = $mod->Lang('enter_an_email', $this->Name);
 				}
 				break;
 			 case 'regex_match':
+				if ($one !== '') {
+					$one = filter_var(trim($one), FILTER_SANITIZE_STRING);
+				}
 				if ($one && !preg_match($this->GetProperty('regex', '/.*/'), $one)) {
 					$res = FALSE;
 					$messages[] = $mod->Lang('enter_valid', $this->Name);
 				}
 				break;
 			 case 'regex_nomatch':
+				if ($one !== '') {
+					$one = filter_var(trim($one), FILTER_SANITIZE_STRING);
+				}
 				if ($one && preg_match($this->GetProperty('regex', '/.*/'), $one)) {
 					$res = FALSE;
 					$messages[] = $mod->Lang('enter_valid', $this->Name);
 				}
 				break;
 			}
+			unset($one);
 
 			if ($l > 0 && strlen($one) > $l) {
 				$res = FALSE;

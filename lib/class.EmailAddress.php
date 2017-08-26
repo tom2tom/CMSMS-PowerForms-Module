@@ -64,6 +64,9 @@ class EmailAddress extends EmailBase
 
 	public function Validate($id)
 	{
+		if ($this->Value !== '') {
+			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_EMAIL);
+		}
 		$this->valid = TRUE;
 		$this->ValidationMessage = '';
 		switch ($this->ValidationType) {

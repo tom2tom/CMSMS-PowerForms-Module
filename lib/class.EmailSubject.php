@@ -28,12 +28,21 @@ class EmailSubject extends FieldBase
 
 	public function Validate($id)
 	{
-		if ($this->Value) {
-			$this->valid = TRUE;
-			$this->ValidationMessage = '';
+		if ($this->Value !== '') {
+			$this->Value = trim($this->Value);
+		}
+		if ($this->Value !== '') {
+			$this->Value = filter_var($this->Value, FILTER_SANITIZE_STRING);
+			if ($this->Value !== '') {
+				$this->valid = TRUE;
+				$this->ValidationMessage = '';
+			} else {
+				$this->valid = FALSE;
+				$this->ValidationMessage = $this->formdata->formsmodule->Lang('err_typed', $mod->Lang('subject'));
+			}
 		} else {
 			$this->valid = FALSE;
-			$this->ValidationMessage = $mod->Lang('missing_type', $mod->Lang('subject'));
+			$this->ValidationMessage = $this->formdata->formsmodule->Lang('missing_type', $mod->Lang('subject'));
 		}
 		return [$this->valid,$this->ValidationMessage];
 	}

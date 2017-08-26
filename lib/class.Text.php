@@ -113,29 +113,31 @@ class Text extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		switch ($this->ValidationType) {
 		 case 'none':
+			if ($this->Value !== '') {
+				$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_STRING);
+			}
 			break;
 		 case 'numeric':
-			if ($this->Value) {
-				$this->Value = trim($this->Value);
+			if ($this->Value !== '') {
+				$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_NUMBER_FLOAT);
 			}
-			if ($this->Value && !preg_match('/^[\d\.\,]+$', $this->Value)) {
+			if ($this->Value === '') {
 				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('enter_a_number', $this->Name);
 			}
 			break;
 		 case 'integer':
-			if ($this->Value) {
-				$this->Value = trim($this->Value);
+			if ($this->Value !== '') {
+				$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_NUMBER_INT);
 			}
-			if ($this->Value && !preg_match('/^\d+$/', $this->Value) ||
-				(int)$this->Value != $this->Value) {
+			if ($this->Value === '') {
 				$this->valid = FALSE;
 				$this->ValidationMessage = $mod->Lang('enter_an_integer', $this->Name);
 			}
 			break;
 		 case 'email':
-			if ($this->Value) {
-				$this->Value = trim($this->Value);
+			if ($this->Value !== '') {
+				$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_EMAIL);
 			}
 			if ($this->Value && !preg_match($mod->email_regex, $this->Value)) {
 				$this->valid = FALSE;
@@ -143,8 +145,8 @@ class Text extends FieldBase
 			}
 			break;
 		 case 'usphone':
-			if ($this->Value) {
-				$this->Value = trim($this->Value);
+			if ($this->Value !== '') {
+				$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_STRING);
 			}
 			if ($this->Value &&
 				!preg_match('/^([0-9][\s\.-]?)?(\(?[0-9]{3}\)?|[0-9]{3})[\s\.-]?([0-9]{3}[\s\.-]?[0-9]{4}|[a-zA-Z0-9]{7})(\s?(x|ext|ext.)\s?[a-zA-Z0-9]+)?$/',
@@ -154,6 +156,9 @@ class Text extends FieldBase
 			}
 			break;
 		 case 'regex_match':
+			if ($this->Value !== '') {
+				$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_STRING);
+			}
 			if ($this->Value &&
 				!preg_match($this->GetProperty('regex', '/.*/'), $this->Value)) {
 				$this->valid = FALSE;
@@ -161,6 +166,9 @@ class Text extends FieldBase
 			}
 			break;
 		 case 'regex_nomatch':
+			if ($this->Value !== '') {
+				$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_STRING);
+			}
 			if ($this->Value &&
 				preg_match($this->GetProperty('regex', '/.*/'), $this->Value)) {
 				$this->valid = FALSE;
