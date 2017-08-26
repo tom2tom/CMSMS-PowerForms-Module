@@ -33,7 +33,7 @@ prop_id I(8) KEY,
 form_id I(8),
 name C(64),
 value C('.PWForms::LENSHORTVAL.'),
-longvalue B
+longvalue X(16384)
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_formprops', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
@@ -61,7 +61,7 @@ field_id I(8),
 form_id I(8),
 name C(256),
 value C('.PWForms::LENSHORTVAL.'),
-longvalue B
+longvalue X(16384)
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_fieldprops', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
@@ -73,7 +73,7 @@ $flds = '
 sess_id I(4) KEY,
 pubkey C(40),
 submitted I,
-content B
+content B(16384)
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_session', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
@@ -92,7 +92,7 @@ $dict->ExecuteSQLArray($sqlarray);
 $flds = '
 cache_id I(2) AUTO KEY,
 keyword C(48),
-value B,
+value B(16384),
 savetime I(8),
 lifetime I(4)
 ';
@@ -119,9 +119,11 @@ $dict->ExecuteSQLArray($sqlarray);
 
 $db->CreateSequence($pre.'module_pwf_uniquefield_seq');
 
-$cfuncs = new PWForms\Crypter($this);
+$cfuncs = new PWForms\CryptInit($this);
 $cfuncs->init_crypt();
-$cfuncs->encrypt_preference(PWForms\Crypter::MKEY, base64_decode('U3VjayBpdCB1cCwgY3JhY2tlcnMhIFlvdSBjYW4ndCBndWVzcw=='));
+$t = substr(str_shuffle(base64_encode(time().$config['root_url'].rand(10000000, 99999999))), 0, 10);
+$t = sprintf(base64_decode('U29tZSByYW5kb21uZXNzICglcykgaXMgaW5jbHVkZWQ='), $t);
+$cfuncs->encrypt_preference(PWForms\Crypter::MKEY, $t);
 
 $this->SetPreference('adder_fields', 'basic'); //or 'advanced'
 $this->SetPreference('blank_invalid', 0);

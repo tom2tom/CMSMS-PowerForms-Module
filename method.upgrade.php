@@ -15,7 +15,7 @@ $pre = cms_db_prefix();
 */
 switch ($oldversion) {
 /* case '0.7':
-	$cfuncs = new PWForms\Crypter($this);
+	$cfuncs = new PWForms\CryptInit($this);
 	$key = 'masterpass';
 	$s = base64_decode($this->GetPreference($key));
 	$t = $config['ssl_url'].$this->GetModulePath();
