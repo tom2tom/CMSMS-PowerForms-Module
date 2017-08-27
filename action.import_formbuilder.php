@@ -88,6 +88,9 @@ EOS;
 	{$fb_form_start}		gone
 	{$fb_form_end}			gone
 	{$fb_hidden}			gone
+	{$title_captcha}		gone
+	{$graphic_captcha}		gone
+	{$input_captcha}		gone
 	$one->css_class			0
 	$one->required			0
 	$one->valid				0
@@ -136,6 +139,9 @@ EOS;
 		'{$fb_form_start}',
 		'{$fb_form_end}',
 		'{$fb_hidden}',
+		'{$title_captcha}',
+		'{$graphic_captcha}',
+		'{$input_captcha}'
 		'{$TAB}',
 		'$fb_version',
 		'fb_invalid',
@@ -160,6 +166,9 @@ EOS;
 		'0',
 		'0',
 		'0',
+		'',
+		'',
+		'',
 		'',
 		'',
 		'',
