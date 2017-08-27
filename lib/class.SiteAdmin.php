@@ -151,8 +151,7 @@ class SiteAdmin extends FieldBase
 			$this->ValidationMessage = '';
 		} else {
 			$this->valid = FALSE;
-			$mod = $this->formdata->formsmodule;
-			$this->ValidationMessage = $mod->Lang('missing_type', $mod->Lang('admin'));
+			$this->ValidationMessage = $this->formdata->formsmodule->Lang('missing_type', $mod->Lang('admin'));
 		}
 		return [$this->valid,$this->ValidationMessage];
 	}

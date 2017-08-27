@@ -583,7 +583,7 @@ class FieldBase implements \Serializable
 		if (is_array($newvalue)) {
 			$this->Value = [];
 			foreach ($newvalue as &$one) {
-				$this->Value[] = Utils::html_myentities_decode($one);
+				$this->Value[] = Utils::html_myentities_decode($one); //OR filter_var() ?
 			}
 			unset($one);
 		} else {
@@ -603,9 +603,9 @@ class FieldBase implements \Serializable
 			} else
 				$this->Value[] = Utils::html_myentities_decode($newvalue);
 		} elseif (is_array($newvalue)) {
-			$this->Value = array();
+			$this->Value = [];
 			foreach ($newvalue as &$one)
-				$this->Value[] = Utils::html_myentities_decode($one);
+				$this->Value[] = Utils::html_myentities_decode($one); OR filter_var()
 			unset($one);
 		} else
 			 $this->Value = Utils::html_myentities_decode($newvalue);
