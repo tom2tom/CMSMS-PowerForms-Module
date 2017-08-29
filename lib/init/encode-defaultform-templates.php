@@ -18,7 +18,7 @@ $templates['Sample_form'] =<<<EOS
 		{if \$show_submission_errors}
 			<div class="error_list">
 			<ul>
-			{foreach from=\$submission_error_list item=one}
+			{foreach \$submission_error_list as \$one}
 				<li>{\$one}</li>
 			{/foreach}
 			</ul>
@@ -31,7 +31,7 @@ $templates['Sample_form'] =<<<EOS
 	{if \$form_has_validation_errors}
 		<div class="error_message">
 		<ul>
-		{foreach from=\$form_validation_errors item=one}
+		{foreach \$form_validation_errors as \$one}
 			<li>{\$one}</li>
 		{/foreach}
 		</ul>
@@ -40,7 +40,7 @@ $templates['Sample_form'] =<<<EOS
 	{* and now the form itself *}
 	<div{if \$css_class} class="{\$css_class}"{/if}>
 	{if \$total_pages gt 1}<span>{\$title_page_x_of_y}</span>{/if}
-	{foreach from=\$fields item=one}
+	{foreach \$fields as \$one}
 		{strip}
 		{if \$one->display}
 			{if \$one->needs_div}<div>{/if}
@@ -102,7 +102,7 @@ $templates['Contact_form'] =<<<EOS
 		{if !empty(\$show_submission_errors)}
 			<div class="error_list">
 			<ul>
-			{foreach from=\$submission_error_list item=one}
+			{foreach \$submission_error_list as \$one}
 				<li>{\$one}</li>
 			{/foreach}
 			</ul>
@@ -115,7 +115,7 @@ $templates['Contact_form'] =<<<EOS
 	{if !empty(\$form_has_validation_errors)}
 		<div class="error_message">
 		<ul>
-		{foreach from=\$form_validation_errors item=one}
+		{foreach \$form_validation_errors as \$one}
 			<li>{\$one}</li>
 		{/foreach}
 		</ul>
@@ -124,7 +124,7 @@ $templates['Contact_form'] =<<<EOS
 	{* and now the form itself *}
 	<div{if \$css_class} class="{\$css_class}"{/if}>
 	{if \$total_pages gt 1}<span>{\$title_page_x_of_y}</span>{/if}
-	{foreach from=\$fields item=one}
+	{foreach \$fields as \$one}
 	{strip}
 		{if \$one->display}
 			{if \$one->needs_div}<div>{/if}
@@ -206,7 +206,7 @@ $templates['Advanced_form'] =<<<EOS
 		{if !empty(\$show_submission_errors)}
 			<div class="error_list">
 			<ul>
-			{foreach from=\$submission_error_list item=one}
+			{foreach \$submission_error_list as \$one}
 				<li>{\$one}</li>
 			{/foreach}
 			</ul>
@@ -219,7 +219,7 @@ $templates['Advanced_form'] =<<<EOS
 	{if !empty(\$form_has_validation_errors)}
 		<div class="error_message">
 		<ul>
-		{foreach from=\$form_validation_errors item=one}
+		{foreach \$form_validation_errors as \$one}
 			<li>{\$one}</li>
 		{/foreach}
 		</ul>
@@ -229,7 +229,7 @@ $templates['Advanced_form'] =<<<EOS
 	<h4 style="text-align:center;">Order</h4>
 	<div{if \$css_class} class="{\$css_class}"{/if}>
 	{if \$total_pages gt 1}<span>{\$title_page_x_of_y}</span>{/if}
-	{foreach from=\$fields item=one}
+	{foreach \$fields as \$one}
 		{strip}
 		{if \$one->display}
 			{if \$one->needs_div}<div>{/if}
