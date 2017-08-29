@@ -46,6 +46,22 @@ textarea.cloaked {
 	font-size:1.2em;
 }
 
+/* for multi-item fields like Radiogroup */
+table.multipart {
+	margin:0;
+	padding:0;
+	border-width:0;
+}
+
+table.multipart tr {
+	margin:0;
+}
+
+table.multipart td {
+	margin:0;
+	padding:0;
+}
+
 /* Apply this class to text/select input fields with shorter labelsto help alignment */
 .short-label label {
 	float: left;
