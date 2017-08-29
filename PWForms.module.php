@@ -188,7 +188,7 @@ class PWForms extends CMSModule
 
 	public function MinimumCMSVersion()
 	{
-		return '1.10'; //need class autoloading
+		return '1.11'; //need smarty 3
 	}
 
 /*	public function MaximumCMSVersion()
