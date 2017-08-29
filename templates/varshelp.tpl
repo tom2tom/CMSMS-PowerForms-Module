@@ -4,13 +4,13 @@
 <th>{$variable_title}</th><th>{$property_title}</th>
 </tr></thead>
 <tbody>
-{foreach from=$globalvars item=entry}
+{foreach $globalvars as $entry}
 {cycle name=globalvars values='row1,row2' assign=rowclass}
 <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
 <td>{$entry->name}</td><td>{$entry->title}</td></tr>
 {/foreach}
 {if !empty($fieldvars)}
- {foreach from=$fieldvars item=entry}
+ {foreach $fieldvars as $entry}
  {if $rowclass == 'row2'}
   {cycle name=fieldvars values='row1,row2' assign=rowclass}
  {else}

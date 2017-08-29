@@ -566,13 +566,13 @@ A template associated with another module may be used to generate content for th
 Such template must include a <code>{$FBid}</code> tag to tie it back to PWForms.
 For example, to include form options based on the Products module, create the following template in Products:<br />
 <pre>
-{foreach from=$items item=entry}
- {assign var=MData value=''}
- {assign var=Cd value=''}
- {foreach from=$FBvalue item=MData}
-  {assign var=MData value='::'|explode:$MData}
+{foreach $items as $entry}
+ {$MData=''}
+ {$Cd=''}
+ {foreach $FBvalue as $MData}
+  {$MData='::'|explode:$MData}
   {if $MData[1]==$entry->id}
-   {assign var=Cd value=' checked="checked"'}
+   {$Cd=' checked="checked"'}
   {/if}
  {/foreach}
  &lt;div class="ProductDirectoryItem">

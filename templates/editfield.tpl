@@ -6,7 +6,7 @@
 {if isset($maintab_start)}
 {$maintab_start}
  <div class="pageinput pageoverflow">
-{foreach from=$mainList item=entry}
+{foreach $mainList as $entry}
 {if !empty($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
 {if isset($entry->input)}<div>{$entry->input}</div>{/if}
 {if !empty($entry->help)}<p>{$entry->help}</p>{/if}
@@ -45,7 +45,7 @@
 {if isset($advancedtab_start)}
 {$advancedtab_start}
  <div class="pageinput pageoverflow">
-{foreach from=$advList item=entry}
+{foreach $advList as $entry}
 {if !empty($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
 {if isset($entry->input)}<div>{$entry->input}</div>{/if}
 {if !empty($entry->help)}<p>{$entry->help}</p>{/if}

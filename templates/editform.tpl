@@ -13,7 +13,7 @@
  </div>
 {$tab_end}{$displaytab_start}
  <div class="pageinput pageoverflow">
- {foreach from=$displays item=entry}
+ {foreach $displays as $entry}
   <p class="pagetext">{$entry->title}:</p>
   <div>{$entry->input}</div>
   {if !empty($entry->help)}<p>{$entry->help}</p>{/if}
@@ -43,7 +43,7 @@
     <th{if count($fields)>1} class="checkbox">{$selectall}{else}>{/if}</th>
    </tr></thead>
    <tbody>
-  {foreach from=$fields item=entry}
+  {foreach $fields as $entry}
    {cycle name=fields values='row1,row2' assign=rowclass}
   	<tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
    {if isset($text_id)}<td>{$entry->id}</td>{/if}
@@ -78,7 +78,7 @@
   <p style="font-weight:bold;">{$title_tplvars}:</p>
 <table class="varshelp">
 <tr><th>{$title_variable}</th><th>{$title_description}</th></tr>
-{foreach from=$formvars item=entry}
+{foreach $formvars as $entry}
 {cycle name=globals values='row1,row2' assign=rowclass}
  <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
  <td>{ldelim}${$entry->name}{rdelim}</td><td>{$entry->description}</td></tr>
@@ -89,7 +89,7 @@
   <p>{$help_fieldvars1}</p>
 <table class="varshelp">
 <tr><th>{$title_property}</th><th>{$title_description}</th></tr>
-{foreach from=$fieldprops item=entry}
+{foreach $fieldprops as $entry}
 {cycle name=fieldprops values='row1,row2' assign=rowclass}
 <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
 <td>field->{$entry->name}</td><td>{$entry->description}</td></tr>
@@ -116,7 +116,7 @@
  </div>
 {$tab_end}{$submittab_start}
  <div class="pageinput pageoverflow">
- {foreach from=$presubmits item=entry}
+ {foreach $presubmits as $entry}
   <p class="pagetext">{$entry->title}:</p>
   <div>{$entry->input}</div>
   {if !empty($entry->help)}<p>{$entry->help}</p>{/if}
@@ -141,7 +141,7 @@
     <th{if count($dispositions)>1} class="checkbox">{$selectall}{else}>{/if}</th>
    </tr></thead>
    <tbody>
-  {foreach from=$dispositions item=entry}
+  {foreach $dispositions as $entry}
    {cycle name=fields values='row1,row2' assign=rowclass}
   	<tr id="pwfp_{$entry->id}" class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
      <td>{$entry->order}{$entry->name}</td>
@@ -177,7 +177,7 @@
   <p>{$help_submit_template}<br /><br />{$sample_submit_template}</p>
   <div class="showhelp"><br />{$help_subtplvars}</div>
   </div>
- {foreach from=$postsubmits item=entry}
+ {foreach $postsubmits as $entry}
   <p class="pagetext">{$entry->title}:</p>
   <div>{$entry->input}</div>
   {if !empty($entry->help)}<p>{$entry->help}</p>{/if}

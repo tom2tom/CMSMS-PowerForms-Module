@@ -5,7 +5,7 @@
 		{if $show_submission_errors}
 			<div class="error_list">
 			<ul>
-			{foreach from=$submission_error_list item=one}
+			{foreach $submission_error_list as $one}
 				<li>{$one}</li>
 			{/foreach}
 			</ul>
@@ -18,7 +18,7 @@
 	{if !empty($form_has_validation_errors)}
 		<div class="error_message">
 		<ul>
-		{foreach from=$form_validation_errors item=one}
+		{foreach $form_validation_errors as $one}
 			<li>{$one}</li>
 		{/foreach}
 		</ul>
@@ -26,20 +26,20 @@
 	{/if}
 	{* and now the form itself *}
 	<div{if $css_class} class="{$css_class}"{/if}>
-	{if $total_pages gt 1}<span>{$title_page_x_of_y}</span>{/if}
-	{foreach from=$fields item=one}
+	{if $total_pages > 1}<span>{$title_page_x_of_y}</span>{/if}
+	{foreach $fields as $one}
 		{strip}
 		{if $one->display}
 			{if $one->needs_div}<div
 				{if $one->required || !empty($one->css_class)} class="{if $one->required}required{/if}{if !empty($one->css_class)} {$one->css_class}{/if}"{/if}
 			>{/if}
 			{if !$one->hide_name}
-				<label{if $one->multiple_parts != 1} for="{$one->input_id}"{/if}>{$one->name}
+				<label{if !$one->multiple_parts} for="{$one->input_id}"{/if}>{$one->name}
 				{if $one->required && $one->required_symbol}{$one->required_symbol}{/if}
 				</label>
 			{/if}
 			{if $one->multiple_parts}
-				{foreach from=$one->input item=part}
+				{foreach $one->input as $part}
 					{if $one->label_parts}
 						<div>{$part->input}&nbsp;{$part->name}</div>
 					{else}

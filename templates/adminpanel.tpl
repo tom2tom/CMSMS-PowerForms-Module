@@ -17,7 +17,7 @@
   <th class="checkbox">{$selectall_forms}</th>
  </tr></thead>
  <tbody>
-{foreach from=$forms item=entry}{cycle values='row1,row2' assign=rowclass}
+{foreach $forms as $entry}{cycle values='row1,row2' assign=rowclass}
  <tr class="{$rowclass}" onmouseover="this.className='{$rowclass}hover';" onmouseout="this.className='{$rowclass}';">
   <td>{$entry->name}</td>
   <td>{$entry->alias}</td>
@@ -50,7 +50,7 @@
  <legend>{$legend_xmlimport}</legend>
 {/if}
  {$start_importxmlform}
- {foreach from=$xmls item=entry}
+ {foreach $xmls as $entry}
  {if !empty($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
   <div>{$entry->input}{if !empty($entry->help)}<br />{$entry->help}{/if}</div>
  {/foreach}
@@ -73,7 +73,7 @@
 {$settingstab_start}
 {$start_configform}
 <div class="pageinput pageoverflow">
-{foreach from=$configs item=entry}
+{foreach $configs as $entry}
 {if !empty($entry->title)}<p class="pagetext">{$entry->title}:</p>{/if}
 <div>{$entry->input}{if isset($entry->help)}<br />{$entry->help}{/if}</div>
 {/foreach}
