@@ -651,12 +651,25 @@ $tplvars['form_done'] = 0;
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.show.php';
 
-$jsincs = $formdata->jsincs;
-$formdata->jsincs = NULL;
-$jsfuncs = $formdata->jsfuncs;
-$formdata->jsfuncs = NULL;
-$jsloads = $formdata->jsloads;
-$formdata->jsloads = NULL;
+if ($formdata->jsincs) {
+	$jsincs = array_values($formdata->jsincs);
+	$formdata->jsincs = NULL;
+} else {
+	$jsincs = NULL;
+}
+if ($formdata->jsfuncs) {
+	$jsfuncs = array_values($formdata->jsfuncs);
+	$formdata->jsfuncs = NULL;
+} else {
+	$jsfuncs = NULL;
+}
+if ($formdata->jsloads) {
+	$jsloads = array_values($formdata->jsloads);
+	$formdata->jsloads = NULL;
+} else {
+	$jsloads = NULL;
+}
+
 $cache->set($cache_key, $formdata, 84600);
 
 $styler = '<link rel="stylesheet" type="text/css" href="'.$baseurl.'/css/showform.css" />';
