@@ -81,7 +81,7 @@ class TextArea extends FieldBase
 		$cols = $this->GetProperty('cols', 80);
 		$rows = $this->GetProperty('rows', 15);
 		$wysiwyg = $this->GetProperty('wysiwyg', 0);
-		$add = ($wysiwyg) ? ' style="width:100%;"':' style="overflow:auto;height:'.$rows.'em;width:100%;"';
+		$add = ($wysiwyg) ? '':' style="overflow:auto;height:'.$rows.'em;"';
 		$htmlid = $id.$this->GetInputId(); //html may get id="$id.$htmlid", or maybe not ...
 		$clear = $this->GetProperty('clear_default', 0);
 //TODO make this auto-grow see http://www.impressivewebs.com/textarea-auto-resize
