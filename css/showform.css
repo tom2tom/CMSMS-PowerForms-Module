@@ -18,21 +18,22 @@ fieldset div div {
 }
 fieldset {
 	margin-bottom: 1em;
-	border: 1px solid #F60;
+/*	border: 1px solid #F60; */
 	padding: 0.5em
 }
 fieldset label {
 	width: auto;
 }
 legend {
-	color: #FFF;
+/*	color: #FFF;
 	background: #F60;
+*/
 	font-style: italic;
 	font-size: 1.2em;
 	margin-bottom: 0.5em;
 	padding: 0.2em;
 	width: auto;
-	border: 1px solid #CCC
+/*	border: 1px solid #CCC */
 }
 textarea {
 	margin: 0.5em 0;
@@ -60,16 +61,18 @@ textarea.cloaked {
 	text-align: center
 }
 .captcha img {
-	border: 1px solid #F60;
+/*	border: 1px solid #F60; */
 	margin-bottom: 0.5em
 }
 .captcha input {
 	width: 196px;
 	margin-top: 0.5em
 }
+/*
 .contactform input {
 	border: 1px solid #F60;
 }
+*/
 .contactform input.checkbox {
 	border: none;
 }
@@ -84,18 +87,23 @@ textarea.cloaked {
 	width: 10em;
 	font-size: 0.8em;
 }
+/*
 .contactform textarea {
 	background-color: #FFC;
 	border: 1px solid #F60;
 }
+*/
 .powerform .message {
 	line-height: 1.3em;
 	padding: 0 0 8px 0;
 }
+/*
 .invalid_field {
 	color: #F33;
 }
+*/
 /* Alternate table rows */
+/*
 .row1 {
 	background-color:#FFF;
 }
@@ -108,14 +116,17 @@ textarea.cloaked {
 .row2hover {
 	background-color:#CDCDCD;
 }
+*/
 /* More room for submit buttons */
 .submit_actions {
 	margin-top: 0.5em
 }
 /* Multi-page submit buttons */
+/*
 .submit_current {
 }
 .submit_next {
 }
 .submit_prev {
 }
+*/

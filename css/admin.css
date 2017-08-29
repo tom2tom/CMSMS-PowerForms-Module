@@ -64,7 +64,7 @@ table.varshelp
 {
  font-size:11px;
  margin:6px 0;
- border:1px solid black;
+/* border:1px solid black; */
  border-collapse:collapse;
 }
 table.varshelp th {background-color:#AAA;}
