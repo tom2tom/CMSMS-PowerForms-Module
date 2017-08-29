@@ -141,7 +141,7 @@ EOS;
 		'{$fb_hidden}',
 		'{$title_captcha}',
 		'{$graphic_captcha}',
-		'{$input_captcha}'
+		'{$input_captcha}',
 		'{$TAB}',
 		'$fb_version',
 		'fb_invalid',
@@ -458,12 +458,12 @@ EOS;
 
 			foreach ($data as $fbrow) {
 				extract($pfrow); //default values
-			extract($fbrow);
+				extract($fbrow);
 				$form_id = $newfid;
 				$oldf = (int)$field_id;
 				$oldtype = $type;
 				$type = str_replace(
-				['Field', 'DispositionFromEmailAddress', DispositionUserTag, 'Disposition'],
+				['Field', 'DispositionFromEmailAddress', 'DispositionUserTag', 'Disposition'],
 				['', 'UserEmail', 'SubmissionTag', ''], $type);
 				if (array_key_exists($type, $renames)) {
 					$type = $renames[$type];
