@@ -194,19 +194,19 @@ EOS;
   $(this).mailcheck({
 {$domains}{$l2domains}{$topdomains}
    distanceFunction: function(string1,string2) {
-	var lv = Levenshtein;
-	return lv.get(string1,string2);
+    var lv = Levenshtein;
+    return lv.get(string1,string2);
    },
    suggested: function(element,suggestion) {
-	if (confirm('{$intro} <strong><em>' + suggestion.full + '</em></strong>?')) {
-	 element.innerHTML = suggestion.full;
-	} else {
-	 element.focus();
-	}
+    if (confirm('{$intro} <strong><em>' + suggestion.full + '</em></strong>?')) {
+     element.innerHTML = suggestion.full;
+    } else {
+     element.focus();
+    }
    },
    empty: function(element) {
-	alert('{$empty}');
-	element.focus();
+    alert('{$empty}');
+    element.focus();
    }
   });
  });
