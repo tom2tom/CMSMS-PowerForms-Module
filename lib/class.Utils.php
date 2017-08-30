@@ -637,20 +637,22 @@ class Utils
 			}
 			return $ret;
 		}
+
+		$unspec = self::GetFormProperty($formdata, 'unspecified', $mod->Lang('unspecified'));
 //TODO support field-sequences
 		foreach ($formdata->Fields as &$one) {
 			if ($one->DisplayInSubmission()) {
 				$fldref = $one->ForceAlias();
-				$ret .= '{if $'.$fldref.' && $'.$fldref.' != "'.self::GetFormProperty($formdata, 'unspecified', $mod->Lang('unspecified')).'"}';
+				$ret .= '{if $'.$fldref.' && $'.$fldref.' != "'.$unspec.'"}';
 				$fldref = '{$'.$fldref.'}';
 
 				if ($htmlish) {
 					$ret .= '<strong>'.$one->GetName().'</strong>: '.$fldref.'<br />';
 				} elseif ($oneline) {
 					if ($header) {
-						$ret .= $one->GetName();
+						$ret .= $one->GetName().PHP_EOL;
 					} else {
-						$ret .= $fldref;
+						$ret .= $fldref.PHP_EOL;
 					}
 				} else {
 					$ret .= $one->GetName().':'.PHP_EOL.$fldref.PHP_EOL;
