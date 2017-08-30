@@ -46,6 +46,9 @@ textarea.cloaked {
 	font-size:1.2em;
 }
 
+table.formtable label {
+	margin: 0;
+}
 /* for multi-item fields like Radiogroup */
 table.multipart {
 	margin:0;
@@ -59,7 +62,19 @@ table.multipart tr {
 
 table.multipart td {
 	margin:0;
-	padding:0;
+	padding:0 10px;
+}
+
+/* cells in tabular layout*/
+td.topleft {
+	vertical-align:top;
+	text-align:left;
+}
+
+td.topright {
+	vertical-align:top;
+	text-align:right;
+	width:30%;
 }
 
 /* Apply this class to text/select input fields with shorter labelsto help alignment */
