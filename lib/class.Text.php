@@ -53,6 +53,9 @@ class Text extends FieldBase
 		$main[] = [$mod->Lang('title_maximum_length'),
 						$mod->CreateInputText($id, 'fp_length',
 							$this->GetProperty('length', 80), 3, 3)];
+		$main[] = [$mod->Lang('title_display_length'),
+						$mod->CreateInputText($id, 'fp_size',
+							$this->GetProperty('size', 50), 3, 3)];
 		$main[] = [$mod->Lang('title_read_only'),
 						$mod->CreateInputHidden($id, 'fp_readonly', 0).
 						$mod->CreateInputCheckbox($id, 'fp_readonly', 1,
@@ -86,10 +89,12 @@ class Text extends FieldBase
 			$ro = '';
 		}
 
+		$len = $this->GetProperty('length');
+		$size = $this->GetProperty('size');
 		if ($this->GetProperty('html5', 0)) {
 			$tmp = $mod->CreateInputText(
 				$id, $this->formdata->current_prefix.$this->Id, $this->Value,
-				$this->GetProperty('length')<25?$this->GetProperty('length'):25, $this->GetProperty('length'),
+				$size, $len,
 				' placeholder="'.$this->GetProperty('default').'"'.$ro.$this->GetScript());
 		} else {
 			$js = $this->GetScript();
@@ -99,7 +104,7 @@ class Text extends FieldBase
 			$tmp = $mod->CreateInputText(
 				$id, $this->formdata->current_prefix.$this->Id,
 				($this->HasValue()?$this->Value:$this->GetProperty('default')),
-				$this->GetProperty('length')<25?$this->GetProperty('length'):25, $this->GetProperty('length'),
+				$size, $len,
 				$ro.$js);
 		}
 		$tmp = preg_replace('/id="\S+"/', 'id="'.$this->GetInputId().'"', $tmp);
