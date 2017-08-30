@@ -32,7 +32,7 @@ class Text extends FieldBase
 		$ret = $mod->Lang('abbreviation_length', $this->GetProperty('length', 80));
 
 		if ($this->ValidationType) {
-			//			$this->EnsureArray($this->ValidationTypes);
+//			$this->EnsureArray($this->ValidationTypes);
 			if (is_object($this->ValidationTypes)) {
 				$this->ValidationTypes = (array)$this->ValidationTypes;
 			}
@@ -55,7 +55,8 @@ class Text extends FieldBase
 							$this->GetProperty('length', 80), 3, 3)];
 		$main[] = [$mod->Lang('title_display_length'),
 						$mod->CreateInputText($id, 'fp_size',
-							$this->GetProperty('size', 50), 3, 3)];
+							$this->GetProperty('size'), 3, 3),
+						$mod->Lang('help_display_length')];
 		$main[] = [$mod->Lang('title_read_only'),
 						$mod->CreateInputHidden($id, 'fp_readonly', 0).
 						$mod->CreateInputCheckbox($id, 'fp_readonly', 1,
@@ -90,7 +91,7 @@ class Text extends FieldBase
 		}
 
 		$len = $this->GetProperty('length');
-		$size = $this->GetProperty('size');
+		$size = $this->GetProperty('size', $len);
 		if ($this->GetProperty('html5', 0)) {
 			$tmp = $mod->CreateInputText(
 				$id, $this->formdata->current_prefix.$this->Id, $this->Value,

@@ -74,7 +74,7 @@ class TextExpandable extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$ret = $mod->Lang('abbreviation_length', $this->GetProperty('length', 80));
 		if ($this->ValidationType) {
-			//			$this->EnsureArray($this->ValidationTypes);
+//			$this->EnsureArray($this->ValidationTypes);
 			if (is_object($this->ValidationTypes)) {
 				$this->ValidationTypes = (array)$this->ValidationTypes;
 			}
@@ -90,6 +90,9 @@ class TextExpandable extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$main[] = [$mod->Lang('title_maximum_length'),
 						$mod->CreateInputText($id, 'fp_length', $this->GetProperty('length', 80), 3, 3)];
+		$main[] = [$mod->Lang('title_display_length'),
+						$mod->CreateInputText($id, 'fp_size', $this->GetProperty('size'), 3, 3),
+						$mod->Lang('help_display_length')];
 		$main[] = [$mod->Lang('title_add_button_text'),
 						$mod->CreateInputText($id, 'fp_add_button', $this->GetProperty('add_button', '+'), 15, 25)];
 		$main[] = [$mod->Lang('title_del_button_text'),
@@ -101,7 +104,7 @@ class TextExpandable extends FieldBase
 						$mod->CreateInputDropdown($id, 'fp_siblings', $this->GetFieldSiblings(), -1,
 							$this->GetProperty('siblings')),
 						$mod->Lang('help_field_siblings')];
-		//TODO c.f. $this->HasUserAddOp, $this->HasUserDeleteOp
+//TODO c.f. $this->HasUserAddOp, $this->HasUserDeleteOp
 		$adv[] = [$mod->Lang('title_field_hidebuttons'),
 						$mod->CreateInputHidden($id, 'fp_hidebuttons', 0).
 						$mod->CreateInputCheckbox($id, 'fp_hidebuttons', 1, $this->GetProperty('hidebuttons', 0)),
@@ -118,7 +121,7 @@ class TextExpandable extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$sibling_id = $this->GetProperty('siblings');
-		//TODO c.f. $this->HasUserAddOp, $this->HasUserDeleteOp
+//TODO c.f. $this->HasUserAddOp, $this->HasUserDeleteOp
 		$hidebuttons = $this->GetProperty('hidebuttons');
 
 		if (!is_array($this->Value)) {
@@ -146,6 +149,8 @@ class TextExpandable extends FieldBase
 		}
 
 		// Input fields
+		$len = $this->GetProperty('length');
+		$size = $this->GetProperty('size', $len);
 		$ret = [];
 		for ($i=0; $i<$vals; $i++) {
 			$oneset = new \stdClass();
@@ -154,9 +159,7 @@ class TextExpandable extends FieldBase
 			$oneset->title = '';
 			$tmp = $mod->CreateInputText(
 				$id, $this->formdata->current_prefix.$this->Id.'[]',
-				$this->Value[$i], $this->GetProperty('length')<25?$this->GetProperty('length'):25,
-				$this->GetProperty('length'),
-				$this->GetScript());
+				$this->Value[$i], $size, $len, $this->GetScript());
 			$tmp = preg_replace('/id="\S+"/', 'id="'.$this->GetInputId('_'.$i).'"', $tmp);
 			$oneset->input = $this->SetClass($tmp);
 			if (!$hidebuttons) {
