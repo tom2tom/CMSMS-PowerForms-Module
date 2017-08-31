@@ -44,8 +44,12 @@ $this->Crash();
 }
 
 if (isset($params['cancel'])) {
-	$obfld = $formdata->Fields[$params['field_id']];
-	$t = ($obfld->IsDisposition()) ? 'submittab':'fieldstab';
+	if ($params['field_id']) {
+		$obfld = $formdata->Fields[$params['field_id']];
+		$t = ($obfld->IsDisposition()) ? 'submittab':'fieldstab';
+	} else {
+		$t = 'fieldstab';
+	}
 	$this->Redirect($id, 'open_form', $returnid, [
 		'form_id'=>$params['form_id'],
 		'datakey'=>$params['datakey'],
