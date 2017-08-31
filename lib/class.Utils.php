@@ -641,7 +641,7 @@ class Utils
 		$unspec = self::GetFormProperty($formdata, 'unspecified', $mod->Lang('unspecified'));
 //TODO support field-sequences
 		foreach ($formdata->Fields as &$one) {
-			if ($one->DisplayInSubmission()) {
+			if ($one && $one->DisplayInSubmission()) {
 				$fldref = $one->ForceAlias();
 				$ret .= '{if $'.$fldref.' && $'.$fldref.' != "'.$unspec.'"}';
 				$fldref = '{$'.$fldref.'}';
@@ -875,7 +875,7 @@ EOS;
 		if ($formdata->Fields) {
 			$fieldvars = [];
 			foreach ($formdata->Fields as &$one) {
-				if ($one->DisplayInSubmission()) {
+				if ($one && $one->DisplayInSubmission()) {
 					$oneset = new \stdClass();
 					$oneset->title = $one->GetName();
 					$oneset->alias = $one->ForceAlias();

@@ -90,15 +90,16 @@ $fields = []; //ordinary fields
 $dispositions = []; //disposition fields
 $count = 1; //move-icon counters
 $dcount = 1;
-$total = count($formdata->Fields);
+$total = count($formdata->Fields); //may include deleted (null'd) field(s) 
 $dtotal = 0;
 $etotal = 0;
 if ($total > 0) {
-	foreach ($formdata->Fields as $obfld) {
-		if ($obfld->IsDisposition() && !$obfld->IsDisplayed()) {
+	foreach ($formdata->Fields as &$obfld) {
+		if ($obfld && $obfld->IsDisposition() && !$obfld->IsDisplayed()) {
 			$dtotal++;
 		}
 	}
+	unset($obfld);
 	$total -= $dtotal;
 }
 
@@ -626,15 +627,15 @@ foreach ([
 }
 
 if ($formdata->Fields) {
-	foreach ($formdata->Fields as &$one) {
-		if ($one->DisplayInSubmission()) {
-			$oneset = new stdClass();
-			$oneset->name = $one->GetVariableName().'} / {$fld_'.$one->GetId();
-			$oneset->description = $this->Lang('field_named', $one->GetName());
-			$formvars[] = $oneset;
+	foreach ($formdata->Fields as &$obfld) {
+		if ($obfld && $obfld->DisplayInSubmission()) {
+			$one = new stdClass();
+			$one->name = $obfld->GetVariableName().'} / {$fld_'.$one->GetId();
+			$one->description = $this->Lang('field_named', $obfld->GetName());
+			$formvars[] = $one;
 		}
 	}
-	unset($one);
+	unset($obfld);
 
 	$fieldprops = [];
 	foreach ([
