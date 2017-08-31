@@ -57,12 +57,12 @@ if (isset($params['submit']) || isset($params['apply'])) {
 		//update cache ready for next use
 		$cache->set($params['datakey'], $formdata, 84600);
 		$this->Redirect($id, 'open_field', $returnid,
-			['form_id'=>$fid,
-				'datakey'=>$params['datakey'],
-				'field_id'=>$params['field_id'],
-				'selectfields'=>$params['selectfields'],
-				'selectdispos'=>$params['selectdispos']
-				]);
+			['form_id'=>$form_id,
+			'datakey'=>$params['datakey'],
+			'field_id'=>$params['field_id'],
+			'selectfields'=>$params['selectfields'],
+			'selectdispos'=>$params['selectdispos']
+			]);
 	} else {
 		$message = $this->_PrettyMessage('err_copy', FALSE);
 	}
