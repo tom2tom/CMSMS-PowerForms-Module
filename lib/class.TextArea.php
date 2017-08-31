@@ -53,35 +53,43 @@ class TextArea extends FieldBase
 		$mod = $this->formdata->formsmodule;
 
 		$main[] = [$mod->Lang('title_use_wysiwyg'),
-						$mod->CreateInputHidden($id, 'fp_wysiwyg', 0).
-						$mod->CreateInputCheckbox($id, 'fp_wysiwyg', 1, $this->GetProperty('wysiwyg', 0))];
+					$mod->CreateInputHidden($id, 'fp_wysiwyg', 0).
+					$mod->CreateInputCheckbox($id, 'fp_wysiwyg', 1, $this->GetProperty('wysiwyg', 0))];
 		$main[] = [$mod->Lang('title_textarea_rows'),
-						$mod->CreateInputText($id, 'fp_rows', $this->GetProperty('rows', 15), 2, 2)];
-//TODO this is stupid - prefer 100%
-//		$main[] = array($mod->Lang('title_textarea_cols'),
-//						$mod->CreateInputText($id,'fp_cols',$this->GetProperty('cols',80),5,5));
+					$mod->CreateInputText($id, 'fp_rows', $this->GetProperty('rows', 15), 2, 2)];
+		$main[] = array($mod->Lang('title_textarea_cols'),
+					$mod->CreateInputText($id, 'fp_cols', $this->GetProperty('cols'), 5, 5),
+					$mod->Lang('help_textarea_cols')];
 		$main[] = [$mod->Lang('title_textarea_length'),
-						$mod->CreateInputText($id, 'fp_length', $this->GetProperty('length'), 5, 5)];
+					$mod->CreateInputText($id, 'fp_length', $this->GetProperty('length'), 5, 5)];
 
 		$adv[] = [$mod->Lang('title_field_default_value'),
-						$mod->CreateTextArea(FALSE, $id, $this->GetProperty('default'), 'fp_default',
-						'pwf_tallarea', '', '', '', 50, 15)];
+					$mod->CreateTextArea(FALSE, $id, $this->GetProperty('default'), 'fp_default',
+					'pwf_tallarea', '', '', '', 50, 15)];
 		$adv[] = [$mod->Lang('title_clear_default'),
-						$mod->CreateInputHidden($id, 'fp_clear_default', 0).
-						$mod->CreateInputCheckbox($id, 'fp_clear_default', 1, $this->GetProperty('clear_default', 0)),
-						$mod->Lang('help_clear_default')];
+					$mod->CreateInputHidden($id, 'fp_clear_default', 0).
+					$mod->CreateInputCheckbox($id, 'fp_clear_default', 1, $this->GetProperty('clear_default', 0)),
+					$mod->Lang('help_clear_default')];
 		$adv[] = [$mod->Lang('title_html5'),
-						$mod->CreateInputHidden($id, 'fp_html5', 0).
-						$mod->CreateInputCheckbox($id, 'fp_html5', 1, $this->GetProperty('html5', 0))];
+					$mod->CreateInputHidden($id, 'fp_html5', 0).
+					$mod->CreateInputCheckbox($id, 'fp_html5', 1, $this->GetProperty('html5', 0))];
 		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
 	{
-		$cols = $this->GetProperty('cols', 80);
 		$rows = $this->GetProperty('rows', 15);
+		$cols = $this->GetProperty('cols');
 		$wysiwyg = $this->GetProperty('wysiwyg', 0);
-		$add = ($wysiwyg) ? '':' style="overflow:auto;height:'.$rows.'em;"';
+		if ($wysiwyg) {
+			$add = '';
+		} else {
+			$add = ' style="overflow:auto;height:'.$rows.'em;';
+			if ($cols) {
+				$add .= 'width:'.$cols.'em;';
+			}
+			$add .= '"';
+		}
 		$htmlid = $id.$this->GetInputId(); //html may get id="$id.$htmlid", or maybe not ...
 		$clear = $this->GetProperty('clear_default', 0);
 //TODO make this auto-grow see http://www.impressivewebs.com/textarea-auto-resize
