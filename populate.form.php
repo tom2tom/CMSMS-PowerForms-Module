@@ -630,7 +630,7 @@ if ($formdata->Fields) {
 	foreach ($formdata->Fields as &$obfld) {
 		if ($obfld && $obfld->DisplayInSubmission()) {
 			$one = new stdClass();
-			$one->name = $obfld->GetVariableName().'} / {$fld_'.$one->GetId();
+			$one->name = $obfld->GetVariableName().'} / {$fld_'.$obfld->GetId();
 			$one->description = $this->Lang('field_named', $obfld->GetName());
 			$formvars[] = $one;
 		}
