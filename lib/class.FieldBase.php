@@ -708,7 +708,7 @@ class FieldBase implements \Serializable
 	//Whether to generate a submit-button labelled 'delete', along with the field
 	public function HasComponentDelete()
 	{
-		return !empty($this->XtraProps['>MultiComponent']);
+		return !empty($this->XtraProps['MultiComponent']);
 	}
 
 	// Subclass this to generate appropriate delete-button label
