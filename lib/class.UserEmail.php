@@ -18,12 +18,6 @@ class UserEmail extends EmailBase
 		$this->IsDisposition = TRUE;
 		$this->IsInput = TRUE;
 		$this->Type = 'UserEmail';
-		$this->ValidationType = 'email';
-		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = [
-			$mod->Lang('validation_none')=>'none',
-			$mod->Lang('validation_email_address')=>'email'
-		];
 	}
 
 	public function HasValue($deny_blank_responses= FALSE)

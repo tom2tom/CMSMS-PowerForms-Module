@@ -16,8 +16,6 @@ class EmailAddress extends EmailBase
 		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->Type = 'EmailAddress';
-		$this->ValidationType = 'email';
-		$this->ValidationTypes = [$formdata->formsmodule->Lang('validation_email_address')=>'email'];
 	}
 
 	public function AdminPopulate($id)

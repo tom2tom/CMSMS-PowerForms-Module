@@ -14,6 +14,7 @@ class Text extends FieldBase
 		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->Type = 'Text';
+		$this->ValidationType = 'none';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',

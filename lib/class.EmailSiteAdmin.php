@@ -18,8 +18,6 @@ class EmailSiteAdmin extends EmailBase
 //		$this->IsInput = TRUE; no need to preserve input value
 		$this->Required = TRUE;
 		$this->Type = 'EmailSiteAdmin';
-		$this->ValidationType = 'email';
-		$this->ValidationTypes = [$formdata->formsmodule->Lang('validation_email_address')=>'email'];
 	}
 
 	public function GetSynopsis()

@@ -18,6 +18,7 @@ class CheckboxGroup extends FieldBase
 		$this->IsInput = TRUE;
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'CheckboxGroup';
+		$this->ValidationType = 'none';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',

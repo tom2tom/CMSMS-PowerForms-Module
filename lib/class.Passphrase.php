@@ -15,6 +15,7 @@ class Passphrase extends FieldBase
 		$this->IsInput = TRUE;
 		$this->Required = TRUE;
 		$this->Type = 'Passphrase';
+		$this->ValidationType = 'none';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',

@@ -27,9 +27,6 @@ class EmailConfirmation extends EmailBase
 		$this->IsDisposition = TRUE;
 //		$this->IsInput = TRUE; no preservation of input value
 		$this->Type = 'EmailConfirmation';
-		$this->ValidationType = 'email';
-		$mod = $formdata->formsmodule;
-		$this->ValidationTypes = [$mod->Lang('validation_email_address')=>'email'];
 	}
 
 	public function GetSynopsis()

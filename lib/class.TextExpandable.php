@@ -17,6 +17,7 @@ class TextExpandable extends FieldBase
 		$this->IsInput = TRUE;
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'TextExpandable';
+		$this->ValidationType = 'none';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',

@@ -15,6 +15,7 @@ class Password extends FieldBase
 		$this->IsInput = TRUE;
 		$this->Required = TRUE;
 		$this->Type = 'Password';
+		$this->ValidationType = 'none';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
@@ -29,7 +30,7 @@ class Password extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$ret = $mod->Lang('abbreviation_length', $this->GetProperty('length', '80'));
 		if ($this->ValidationType) {
-			//			$this->EnsureArray($this->ValidationTypes);
+//			$this->EnsureArray($this->ValidationTypes);
 			if (is_object($this->ValidationTypes)) {
 				$this->ValidationTypes = (array)$this->ValidationTypes;
 			}

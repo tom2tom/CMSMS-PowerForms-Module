@@ -16,8 +16,6 @@ class EmailCCAddress extends EmailBase
 		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->Type = 'EmailCCAddress';
-		$this->ValidationType = 'email';
-		$this->ValidationTypes = [$formdata->formsmodule->Lang('validation_email_address')=>'email'];
 	}
 
 	public function GetSynopsis()

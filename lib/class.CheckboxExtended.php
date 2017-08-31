@@ -16,6 +16,7 @@ class CheckboxExtended extends FieldBase
 		$this->IsInput = TRUE;
 		$this->MultiPopulate = TRUE;
 		$this->Type = 'CheckboxExtended';
+		$this->ValidationType = 'none';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
@@ -27,7 +28,7 @@ class CheckboxExtended extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$ret = ($this->GetProperty('is_checked', 0)?$mod->Lang('checked_by_default'):$mod->Lang('unchecked_by_default'));
 		if ($this->ValidationType) {
-			//			$this->EnsureArray($this->ValidationTypes);
+//			$this->EnsureArray($this->ValidationTypes);
 			if (is_object($this->ValidationTypes)) {
 				$this->ValidationTypes = (array)$this->ValidationTypes;
 			}

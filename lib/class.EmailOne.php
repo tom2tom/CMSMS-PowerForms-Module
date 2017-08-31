@@ -16,8 +16,6 @@ class EmailOne extends EmailBase
 		$this->IsInput = TRUE;
 		$this->Required = TRUE;
 		$this->Type = 'EmailOne';
-		$this->ValidationType = 'email';
-		$this->ValidationTypes = [$formdata->formsmodule->Lang('validation_email_address')=>'email'];
 	}
 
 	public function GetSynopsis()
