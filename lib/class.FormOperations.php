@@ -90,8 +90,7 @@ EOS;
 		$params['form_name'] = $name;
 		$params['form_alias'] = $alias;
 		$pre = \cms_db_prefix();
-		$sql = 'INSERT INTO '.$pre.'module_pwf_form
-(form_id,name,alias) VALUES (?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
 		$db = \cmsms()->GetDb();
 		$newid = $db->GenID($pre.'module_pwf_form_seq');
 		$db->Execute($sql, [$newid, $name, $alias]);
@@ -204,15 +203,13 @@ EOS;
 		$params['form_alias'] = $alias;
 
 		$pre = \cms_db_prefix();
-		$sql = 'INSERT INTO '.$pre.'module_pwf_form
-(form_id,name,alias) VALUES (?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
 		$db = \cmsms()->GetDb();
 		$newid = $db->GenID($pre.'module_pwf_form_seq');
 		$db->Execute($sql, [$newid, $name, $alias]);
 
 		$res = TRUE;
-		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops
-(prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
 		foreach ($formdata->XtraProps as $key=>&$val) {
 			$newid = $db->GenID($pre.'module_pwf_formprops_seq');
 			$longval = NULL;
@@ -278,8 +275,7 @@ EOS;
 		$pre = \cms_db_prefix();
 		if ($newform) {
 			$form_id = $db->GenID($pre.'module_pwf_form_seq');
-			$sql = 'INSERT INTO '.$pre.'module_pwf_form
-(form_id,name,alias) VALUES (?,?,?)';
+			$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
 			$res = $db->Execute($sql, [$form_id, $params['form_Name'], $params['form_Alias']]);
 		} else {
 			$sql = 'UPDATE '.$pre.'module_pwf_form SET name=?,alias=? WHERE form_id=?';
@@ -598,7 +594,7 @@ EOS;
 \t\t\t\t<properties>
 EOS;
 				foreach ($fieldkeys as $onekey) {
-					$xml[] = "\t\t\t\t\t<$onekey>".$thisfield[$onekey]."</$onekey>";
+					$xml[] = "\t\t\t\t\t<$onekey>".urlencode($thisfield[$onekey])."</$onekey>";
 				}
 				//get $fieldopts[] for this field
 //				$myopts = array_filter($fieldopts,array(new IsFieldOption($thisfield['field_id']),'isMine'));
