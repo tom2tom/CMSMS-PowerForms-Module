@@ -491,7 +491,7 @@ EOS;
 	/**
 	CreateXML:
 	@mod: reference to PWForms module
-	@form_id: single form identifier,or array of them
+	@formid: single form identifier,or array of them
 	@date: date string for inclusion in the content
 	@charset: optional,name of content encoding,default = FALSE
 	@dtd: optional boolean,whether to consruct DTD in file,default TRUE
@@ -499,17 +499,17 @@ EOS;
 		<![CDATA[...]]> cuz that mechanism is not nestable. This means that
 		values which include javascript may be unbrowsable in a XML-viewer.
 	*/
-	public function CreateXML(&$mod, $form_id, $date, $charset= FALSE, $dtd=TRUE)
+	public function CreateXML(&$mod, $formid, $date, $charset= FALSE, $dtd=TRUE)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_form WHERE form_id=?';
 		$db = \cmsms()->GetDb();
-		if (!is_array($form_id)) {
-			$properties = $db->GetRow($sql, [$form_id]);
-			$form_id = [$form_id];
+		if (!is_array($formid)) {
+			$properties = $db->GetRow($sql, [$formid]);
+			$formid = [$formid];
 		} else {
 			//use form-properties data from first-found
-			foreach ($form_id as $one) {
+			foreach ($formid as $one) {
 				$properties = $db->GetRow($sql, [$one]);
 				if ($properties) {
 					break;
@@ -520,12 +520,12 @@ EOS;
 			return FALSE;
 		}
 
-		$outxml = [];
+		$count = count($formid);
 		$t = '<?xml version="1.0" standalone="yes"';
 		if ($charset) {
 			$t .= ' encoding="'.strtoupper($charset).'"';
 		}
-		$outxml[] = $t.'?>';
+		$outxml = [$t.'?>'];
 		if ($dtd) {
 			$xml[] = <<<'EOS'
 <!DOCTYPE powerforms [
@@ -540,7 +540,6 @@ EOS;
 ]>
 EOS;
 		}
-		$count = (is_array($form_id))?count($form_id):1;
 		$outxml[] = <<<EOS
 <powerforms>
 \t<version>{$mod->GetVersion()}</version>
@@ -548,11 +547,11 @@ EOS;
 \t<count>{$count}</count>
 EOS;
 		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_formprops WHERE form_id=? ORDER BY name';
-		$sql2 = 'SELECT field_id,name,type,order_by FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
+		$sql2 = 'SELECT field_id,name,alias,type,order_by FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
 		$sql3 = 'SELECT prop_id,field_id,name,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE form_id=? ORDER BY prop_id,name';
 		$formpropkeys = array_keys($properties);
 
-		foreach ($form_id as $one) {
+		foreach ($formid as $one) {
 			$formopts = $db->GetAssoc($sql, [$one]);
 			$formfields = $db->GetArray($sql2, [$one]);
 			$fieldkeys = ($formfields) ? array_keys($formfields[0]) : [];
@@ -562,40 +561,32 @@ EOS;
 \t<form>
 \t\t<properties>
 EOS;
-//TODO <alias> <template>
 			foreach ($formpropkeys as $onekey) {
-				$xml[] = "\t\t\t<$onekey>".$properties[$onekey]."</$onekey>";
+				$xml[] = "\t\t\t<$onekey>".urlencode($properties[$onekey])."</$onekey>";
 			}
 			foreach ($formopts as $name=>$row) {
 				$value = $row['value'];
-				if ($value === '') {
+				if ($value === null || $value === '') {
 					$value = $row['longvalue'];
+					if ($value === null || $value === '') {
+						continue;
+					}
 				}
-				if ($value === '') {
-					continue;
-				}
-				if (strpos($name, 'template') === FALSE) {
-					$xml[] = "\t\t\t<$name>".trim($value)."</$name>";
-				} else { //smarty syntax can abort the xml-decoder - so mask it
-					if ($name == 'form_template') {
+				if (strpos($name, 'template') !== FALSE) {
+					switch ($name) {
+					 case 'form_template':
+					 case 'submission_template':
 						if ($mod->oldtemplates) {
 							$value = $mod->GetTemplate($value);
 						} else {
 							$ob = \CmsLayoutTemplate::load($value);
 							$value = $ob->get_content();
 						}
+//					 default:
+						break;
 					}
-/*					elseif ($name == 'submission_template') {
-						if ($mod->oldtemplates)
-							$value = $mod->GetTemplate($value);
-						else {
-							$ob = \CmsLayoutTemplate::load($value);
-							$value = $ob->get_content();
-						}
-					}
-*/
-					$xml[] = "\t\t\t<$name>]][[".urlencode(trim($value))."</$name>";
 				}
+				$xml[] = "\t\t\t<$name>".urlencode(trim($value))."</$name>";
 			}
 			$xml[] =<<<EOS
 \t\t</properties>
@@ -617,15 +608,15 @@ EOS;
 				});
 				if ($myopts) {
 					foreach ($myopts as &$oneopt) {
-						if ($oneopt['value'] === '') {
-							continue;
+						$value = $oneopt['value'];
+						if ($value === null || $value === '') {
+							$value = $oneopt['longvalue'];
+							if ($value === null || $value === '') {
+								continue;
+							}
 						}
 						$name = $oneopt['name'];
-						if (strpos($name, 'template') === FALSE) {
-							$xml[] = "\t\t\t\t\t<$name>".trim($oneopt['value'])."</$name>";
-						} else { //as above,mask potentially-bad content
-							$xml[] = "\t\t\t\t\t<$name>]][[".urlencode(trim($oneopt['value']))."</$name>";
-						}
+						$xml[] = "\t\t\t\t\t<$name>".urlencode(trim($value))."</$name>";
 					}
 					unset($oneopt);
 				}
@@ -785,25 +776,21 @@ EOS;
 (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
 			foreach ($fdata['properties'] as $name=>&$one) {
 				$prop_id = $db->GenID($pre.'module_pwf_formprops_seq');
-				if (strncmp($one, ']][[', 4) != 0) {
-					$val = $one;
-				} else { //encoded value
-					$val = urldecode(substr($one, 4)); //TODO translate numbered fields in templates
-					if ($name == 'form_template') {
-						if ($mod->oldtemplates) {
-							$mod->SetTemplate('pwf_'.$form_id, $val);
-						} else {
-							self::SetTemplate('form', $form_id, $val);
-						}
-						$val = 'pwf_'.$form_id;
-					} elseif ($name == 'submission_template') {
-						if ($mod->oldtemplates) {
-							$mod->SetTemplate('pwf_sub_'.$form_id, $val);
-						} else {
-							self::SetTemplate('submission', $form_id, $val);
-						}
-						$val = 'pwf_sub_'.$form_id;
+				$val = urldecode($one); //TODO translate numbered fields in templates
+				if ($name == 'form_template') {
+					if ($mod->oldtemplates) {
+						$mod->SetTemplate('pwf_'.$form_id, $val);
+					} else {
+						self::SetTemplate('form', $form_id, $val);
 					}
+					$val = 'pwf_'.$form_id;
+				} elseif ($name == 'submission_template') {
+					if ($mod->oldtemplates) {
+						$mod->SetTemplate('pwf_sub_'.$form_id, $val);
+					} else {
+						self::SetTemplate('submission', $form_id, $val);
+					}
+					$val = 'pwf_sub_'.$form_id;
 				}
 				$args = (strlen($val) <= \PWForms::LENSHORTVAL) ?
 					[$prop_id,$form_id,$name,$val,NULL]:
@@ -830,11 +817,7 @@ EOS;
 
 				foreach ($fld['properties'] as $name=>&$one) {
 					$prop_id = $db->GenID($pre.'module_pwf_fieldprops_seq');
-					if (strncmp($one, ']][[', 4) !== 0) {
-						$val = $one;
-					} else { //encoded
-						$val = urldecode(substr($one, 4));
-					} //TODO translate numbered fields in templates
+					$val = urldecode($one); //TODO translate numbered fields in templates
 					$args = (strlen($val) <= \PWForms::LENSHORTVAL) ?
 						[$prop_id,$field_id,$form_id,$name,$val,NULL]:
 						[$prop_id,$field_id,$form_id,$name,NULL,$val];
@@ -866,28 +849,34 @@ EOS;
 		usort($keys, function ($a, $b) use ($fields, $orders) {
 			$fa = $fields[$orders[$a]];
 			$fb = $fields[$orders[$b]];
-			if ($fa->IsDisposition) {
-				if ($fb->IsDisposition) {
-					if ($fb->Type == 'PageRedirector') { //page redirect last
-						return -1;
-					} elseif ($fb->DisplayInForm) { //email confirmation first
+			if ($fa && $fb) { //neither field is deleted
+				if ($fa->IsDisposition) {
+					if ($fb->IsDisposition) {
+						if ($fb->Type == 'PageRedirector') { //page redirect last
+							return -1;
+						} elseif ($fb->DisplayInForm) { //email confirmation first
+							return 1;
+						} elseif ($fa->Type == 'PageRedirector') {
+							return 1;
+						} elseif ($fa->DisplayInForm) {
+							return -1;
+						}
+					} elseif (!$fa->DisplayInForm) {
+						//includes $fa->Type == 'PageRedirector'
 						return 1;
-					} elseif ($fa->Type == 'PageRedirector') {
-						return 1;
-					} elseif ($fa->DisplayInForm) {
-						return -1;
 					}
-				} elseif (!$fa->DisplayInForm) {
-					//includes $fa->Type == 'PageRedirector'
-					return 1;
+				} elseif ($fb->IsDisposition) {
+					if (!$fb->DisplayInForm) {
+						return 1;
+					}
 				}
-			} elseif ($fb->IsDisposition) {
-				if (!$fb->DisplayInForm) {
-					return 1;
-				}
+				//TODO field type '...start' before corresponding type '...end'
+				return $a - $b; //stet current order
+			} elseif ($fa) { //$fb is gone
+				return -1;
+			} else {
+				return 1;
 			}
-			//TODO field type '...start' before corresponding type '...end'
-			return $a - $b; //stet current order
 		});
 		// update source-arrays accordingly
 		$neworder = [];
@@ -895,8 +884,10 @@ EOS;
 			$neworder[] = (int)$orders[$val];
 		}
 		foreach ($neworder as $i=>$val) {
-			$fields[$val]->SetOrder($i+1);
-			$orders[$i] = $val;
+			if ($fields[$val]) {
+				$fields[$val]->SetOrder($i+1);
+				$orders[$i] = $val;
+			}
 		}
 	}
 
