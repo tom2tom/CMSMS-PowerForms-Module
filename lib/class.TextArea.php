@@ -14,6 +14,7 @@ class TextArea extends FieldBase
 		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->Type = 'TextArea';
+		$this->ValidationType = 'none';
 		$mod = $formdata->formsmodule;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
@@ -57,12 +58,12 @@ class TextArea extends FieldBase
 					$mod->CreateInputCheckbox($id, 'fp_wysiwyg', 1, $this->GetProperty('wysiwyg', 0))];
 		$main[] = [$mod->Lang('title_textarea_rows'),
 					$mod->CreateInputText($id, 'fp_rows', $this->GetProperty('rows', 15), 2, 2)];
-		$main[] = array($mod->Lang('title_textarea_cols'),
+		$main[] = [$mod->Lang('title_textarea_cols'),
 					$mod->CreateInputText($id, 'fp_cols', $this->GetProperty('cols'), 5, 5),
 					$mod->Lang('help_textarea_cols')];
 		$main[] = [$mod->Lang('title_textarea_length'),
-					$mod->CreateInputText($id, 'fp_length', $this->GetProperty('length'), 5, 5)];
-
+					$mod->CreateInputText($id, 'fp_length', $this->GetProperty('length'), 5, 5),
+					$mod->Lang('help_limit_count')];
 		$adv[] = [$mod->Lang('title_field_default_value'),
 					$mod->CreateTextArea(FALSE, $id, $this->GetProperty('default'), 'fp_default',
 					'pwf_tallarea', '', '', '', 50, 15)];
@@ -81,15 +82,11 @@ class TextArea extends FieldBase
 		$rows = $this->GetProperty('rows', 15);
 		$cols = $this->GetProperty('cols');
 		$wysiwyg = $this->GetProperty('wysiwyg', 0);
-		if ($wysiwyg) {
-			$add = '';
-		} else {
-			$add = ' style="overflow:auto;height:'.$rows.'em;';
-			if ($cols) {
-				$add .= 'width:'.$cols.'em;';
-			}
-			$add .= '"';
+		$add = ' style="overflow:auto;height:'.$rows.'em;';
+		if ($cols) {
+			$add .= 'width:'.$cols.'em;';
 		}
+		$add .= '"';
 		$htmlid = $id.$this->GetInputId(); //html may get id="$id.$htmlid", or maybe not ...
 		$clear = $this->GetProperty('clear_default', 0);
 //TODO make this auto-grow see http://www.impressivewebs.com/textarea-auto-resize
