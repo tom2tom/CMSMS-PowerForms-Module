@@ -626,6 +626,7 @@ $lang['help_compute_order'] = 'If the form has more than one Computed Field, the
 $lang['help_dateformat'] = 'A string including format characters recognised by PHP\'s date() function. For reference, please check the <a href="http://www.php.net/manual/function.date.php">php manual</a>.<br />Remember to escape any characters you don\'t want interpreted as format codes!';
 $lang['help_default_today'] = 'If un-checked, default to today\'s date';
 $lang['help_default_year'] = 'Use -1 for the current year';
+$lang['help_display_length'] = 'Blank or 0 means use the maximum length';
 $lang['help_email_domains'] = 'Comma-separated series of complete email domains, e.g. \'msn.com,gmail.com\' which will override the default values used by the mailcheck script for initial address-validation';
 $lang['help_email_subdomains'] = 'Comma-separated series of partial domains, e.g. \'yahoo,hotmail\' which will override the default values used by the mailcheck script for secondary address-validation';
 $lang['help_email_topdomains'] = 'Comma-separated series of top-level domains, e.g. \'com,com.tw,de,net,net.au\' which will override the default values used by the mailcheck script for final address-validation';
@@ -671,6 +672,7 @@ The template is not relevant to form-field disposition.<br />Disposition-specifi
 set in the "advanced" tab displayed when editing a disposition field, as listed above.
 EOS;
 $lang['help_timeformat'] = 'See advice for date format.';
+$lang['help_textarea_cols'] = 'Blank or 0 means set the maximum available width';
 $lang['help_tpl_vars'] = <<<'EOS'
 At minimum, a <code>{$submit}</code> tag must be included in the template, or else the form cannot work.
 EOS;
