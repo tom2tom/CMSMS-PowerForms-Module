@@ -469,15 +469,15 @@ EOS;
 					$type = $renames[$type];
 				}
 				$done = [];
-				$newf = $db->GenID($pre.'module_pwf_field_seq');
-				$args = [$newf];
+				$args = [];
 				foreach ($pwfields as $one) {
 					$done[] = $one;
 					if ($one != 'field_id') {
 						$args[] = $$one;
 					}
 				}
-				$ares = $db->Execute($sql, $args);
+				$db->Execute($sql, $args);
+				$newf = $db->Insert_ID();
 				$db->Execute($sql2, [$oldf, $newf]);
 
 				$more = [];

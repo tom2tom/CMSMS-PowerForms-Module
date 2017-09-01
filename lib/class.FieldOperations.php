@@ -94,15 +94,13 @@ class FieldOperations
 	public static function CopyField($field_id, $form_id= FALSE, $neworder= FALSE)
 	{
 		$pre = \cms_db_prefix();
-		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
+		$sql = 'SELECT form_id,name,alias,type,order_by FROM '.$pre.'module_pwf_field WHERE field_id=?';
 		$db = \cmsms()->GetDb();
 		$row = $db->GetRow($sql, [$field_id]);
 		if (!$row) {
 			return FALSE;
 		}
 
-		$fid = $db->GenID($pre.'module_pwf_field_seq');
-		$row['field_id'] = $fid;
 		if ($form_id === FALSE) {
 			$form_id = $row['form_id'];
 		} else {
@@ -113,15 +111,16 @@ class FieldOperations
 		if ($neworder === FALSE) {
 			$sql = 'SELECT MAX(order_by) AS last FROM '.$pre.'module_pwf_field WHERE form_id=?';
 			$neworder = $db->GetOne($sql, [$form_id]);
-			if (!$neworder) {
-				$neworder = 0;
+			if ($neworder) {
+				$neworder++;
+			} else {
+				$neworder = 1;
 			}
-			$neworder++;
 		}
 		$row['order_by'] = $neworder;
-		$sql = 'INSERT INTO '.$pre.'module_pwf_field
-(field_id,form_id,name,alias,type,order_by) VALUES (?,?,?,?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_field (form_id,name,alias,type,order_by) VALUES (?,?,?,?,?)';
 		$db->Execute($sql, $row);
+		$fid = $db->Insert_ID();
 
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_fieldprops WHERE field_id=?';
 		$rs = $db->Execute($sql, [$field_id]);
@@ -172,16 +171,14 @@ class FieldOperations
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		if ($obfld->Id <= 0) {
-			$obfld->Id = $db->GenID($pre.'module_pwf_field_seq');
-			$sql = 'INSERT INTO '.$pre.'module_pwf_field
-(field_id,form_id,name,alias,type,order_by) VALUES (?,?,?,?,?,?)';
-			$res = $db->Execute($sql, [
-				$obfld->Id,
+			$sql = 'INSERT INTO '.$pre.'module_pwf_field (form_id,name,alias,type,order_by) VALUES (?,?,?,?,?)';
+			$db->Execute($sql, [
 				$obfld->FormId,
 				$obfld->Name,
 				$obfld->Alias,
 				$obfld->Type,
 				$obfld->OrderBy]);
+			$obfld->Id = $db->Insert_ID();
 		} else {
 			$sql = 'UPDATE '.$pre.'module_pwf_field SET name=?,alias=?,order_by=? WHERE field_id=?';
 			$res = $db->Execute($sql, [

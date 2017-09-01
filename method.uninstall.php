@@ -57,7 +57,6 @@ $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_trans');
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->DropSequence($pre.'module_pwf_field_seq');
 $db->DropSequence($pre.'module_pwf_fieldprops_seq');
 $db->DropSequence($pre.'module_pwf_uniquefield_seq');
 

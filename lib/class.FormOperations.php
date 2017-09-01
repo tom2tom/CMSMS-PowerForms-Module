@@ -798,11 +798,10 @@ EOS;
 			}
 			unset($one);
 			$sql = 'INSERT INTO '.$pre.'module_pwf_field
-(field_id,form_id,name,alias,type,order_by) VALUES (?,?,?,?,?,?)';
+(form_id,name,alias,type,order_by) VALUES (?,?,?,?,?)';
 			$sql2 = 'INSERT INTO '.$pre.'module_pwf_fieldprops
 (prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
 			foreach ($fdata['fields'] as &$fld) {
-				$field_id = $db->GenID($pre.'module_pwf_field_seq');
 				unset($fld['properties']['field_id']);
 				foreach (['name', 'alias', 'type', 'order_by'] as $key) {
 					if (isset($fld['properties'][$key])) {
@@ -812,7 +811,8 @@ EOS;
 						$$key = '';
 					}
 				}
-				$db->Execute($sql, [$field_id, $form_id, $name, $alias, $type, $order_by]);
+				$db->Execute($sql, [$form_id, $name, $alias, $type, $order_by]);
+				$field_id = $db->Insert_ID();
 
 				foreach ($fld['properties'] as $name=>&$one) {
 					$prop_id = $db->GenID($pre.'module_pwf_fieldprops_seq');

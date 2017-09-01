@@ -40,7 +40,7 @@ $dict->ExecuteSQLArray($sqlarray);
 $db->Execute('CREATE INDEX '.$pre.'module_pwf_formprops_idx ON '.$pre.'module_pwf_formprops (form_id)');
 
 $flds = '
-field_id I(8) KEY,
+field_id I(8) AUTO KEY,
 form_id I(8),
 name C(96),
 alias C(32),
@@ -50,7 +50,6 @@ order_by I(2)
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_field', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pre.'module_pwf_field_seq');
 $db->Execute('CREATE INDEX '.$pre.'module_pwf_field_idx ON '.$pre.'module_pwf_field (form_id)');
 
 $flds = '
