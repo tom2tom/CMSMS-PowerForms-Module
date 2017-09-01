@@ -46,8 +46,11 @@ if ($obfld) { //field data are loaded
 		$tplvars['advancedtab_start'] = $this->StartTab('advancedtab');
 	}
 
-	$tplvars['add'] = ($obfld->HasComponentAdd())?
-		$this->CreateInputSubmit($id, 'compadd', $obfld->ComponentAddLabel()):NULL;
+	if ($obfld->HasComponentAdd()) {
+		$tplvars['add'] = $this->CreateInputSubmit($id, 'compadd', $obfld->ComponentAddLabel());
+	} else {
+		$tplvars['add'] = NULL;
+	}
 
 	if ($obfld->HasComponentDelete()) {
 		$tplvars['del'] = $this->CreateInputSubmit($id, 'compdel', $obfld->ComponentDeleteLabel(),
