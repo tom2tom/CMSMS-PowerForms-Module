@@ -16,7 +16,7 @@ class EmailDirector extends EmailBase
 	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata, $params);
-		$this->HasAddOp = TRUE;
+		$this->MultiChoice = TRUE;
 		$this->IsDisposition = TRUE;
 //		$this->IsInput = TRUE; no preservation of input data
 		$this->Type = 'EmailDirector';
@@ -85,7 +85,7 @@ class EmailDirector extends EmailBase
 
 	public function AdminPopulate($id)
 	{
-		//		$this->SetEmailJS(); TODO
+//		$this->SetEmailJS(); TODO
 		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, 'title_email_subject');
 		$mod = $this->formdata->formsmodule;
 		// remove the "email subject" field
@@ -120,10 +120,8 @@ class EmailDirector extends EmailBase
 				];
 			}
 			unset($one);
-			$this->MultiComponent = TRUE;
 			return ['main'=>$main,'adv'=>$adv,'table'=>$dests,'extra'=>$extra];
 		} else {
-			$this->MultiComponent = FALSE;
 			$main[] = ['','',$mod->Lang('missing_type', $mod->Lang('destination'))];
 			return ['main'=>$main,'adv'=>$adv,'extra'=>$extra];
 		}

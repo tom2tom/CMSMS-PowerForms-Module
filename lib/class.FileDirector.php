@@ -15,9 +15,9 @@ class FileDirector extends FieldBase
 	{
 		parent::__construct($formdata, $params);
 		$this->DisplayInSubmission = FALSE;
-		$this->HasAddOp = TRUE;
 		$this->IsDisposition = TRUE;
 		$this->IsInput = TRUE;
+		$this->MultiChoice = TRUE;
 		$this->Type = 'FileDirector';
 	}
 

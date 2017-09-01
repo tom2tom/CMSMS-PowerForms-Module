@@ -14,9 +14,8 @@ class CheckboxGroup extends FieldBase
 	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata, $params);
-		$this->HasAddOp = TRUE;
 		$this->IsInput = TRUE;
-		$this->MultiPopulate = TRUE;
+		$this->MultiComponent = TRUE;
 		$this->Type = 'CheckboxGroup';
 		$this->ValidationType = 'none';
 		$mod = $formdata->formsmodule;
@@ -185,10 +184,8 @@ EOS;
  });
 EOS;
 */
-			$this->MultiComponent = TRUE;
 			return ['main'=>$main,'adv'=>$adv,'table'=>$boxes];
 		} else {
-			$this->MultiComponent = FALSE;
 			$main[] = ['','',$mod->Lang('missing_type', $mod->Lang('member'))];
 			return ['main'=>$main,'adv'=>$adv];
 		}

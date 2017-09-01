@@ -35,8 +35,7 @@ class FieldBase implements \Serializable
 		'DisplayInForm' => TRUE,
 		'DisplayInSubmission' => TRUE, //whether field value is shown in submission template (if used) (effectively ~ self::IsInput)
 		'Disposable' => TRUE, //a field-status, not so much a continuing property
-		'HasAddOp' => FALSE, //whether AdminPopulate() supports component-addition
-		'HasLabel' => TRUE,
+//		'HasLabel' => TRUE,
 //		'HasUserAddOp' => FALSE, //whether Populate() supports component-addition
 //		'HasUserDeleteOp' => FALSE,//whether Populate() supports component-deletion
 		'HideLabel' => FALSE,
@@ -44,9 +43,10 @@ class FieldBase implements \Serializable
 		'IsDisposition' => FALSE,
 		'IsEmailDisposition' => FALSE,
 		'IsInput' => FALSE, //whether Populate() generates user-input control(s) AND their values are to be preserved e.g. for browsing
-		'LabelSubComponents' => TRUE, //if MultiPopulate = TRUE, give each component its own label
-		'MultiPopulate' => FALSE, //whether Populate() generates array of objects (i.e. not necessarily relevant for admin)
-		'MultiComponent' => FALSE, //whether AdminPopulate() currently generates array of components for tabular editing
+		'LabelSubComponents' => TRUE, //if MultiComponent = TRUE, give each component its own label
+		'MultiChoice' => FALSE, //whether the field comprises >1 value (some variant of Pulldown or Multiselect)
+		'MultiComponent' => FALSE, //whether the field generates (or can do so) an array of components for tabular editing
+		'MultiPopulate' => FALSE, //a form-display status, whether Populate() generated object(s) instead of xhtml
 		'NeedsDiv' => TRUE,
 		'Required' => FALSE,
 		'SmartyEval' => FALSE, //whether to process Populate() output as a smarty-template (i.e. treat that output as a sub-template)
@@ -689,10 +689,11 @@ class FieldBase implements \Serializable
 		return '';
 	}
 
-	//Whether to generate a submit-button labelled 'add', along with the field
+	//Whether to generate a submit-button labelled 'add', along with the field (admin only)
 	public function HasComponentAdd()
 	{
-		return !empty($this->XtraProps['HasAddOp']);
+		return !empty($this->XtraProps['MultiComponent']) ||
+			!empty($this->XtraProps['MultiChoice']);
 	}
 
 	// Subclass this to generate appropriate add-button label
@@ -705,10 +706,10 @@ class FieldBase implements \Serializable
 	public function ComponentAdd(&$params)
 	{
 	}
-	//Whether to generate a submit-button labelled 'delete', along with the field
+	//Whether to generate a submit-button labelled 'delete', along with the field (admin only)
 	public function HasComponentDelete()
 	{
-		return !empty($this->XtraProps['MultiComponent']);
+		return !empty($this->XtraProps['MultiComponent']); //TODO && field-options-count > 0
 	}
 
 	// Subclass this to generate appropriate delete-button label
@@ -920,7 +921,7 @@ class FieldBase implements \Serializable
 	{
 	}
 
-	// Subclass this if needed (especially for cleanup of classes with HasAddOp=TRUE)
+	// Subclass this if needed (especially for cleanup of classes with MultiComponent=TRUE or MultiChoice=TRUE)
 	// called before AdminValidate()
 	public function PostAdminAction(&$params)
 	{
@@ -951,7 +952,7 @@ class FieldBase implements \Serializable
 	* an xhtml string which constitutes the field-input(s) to be displayed in the
 	(frontend or backend) form. Only the input portion itself, any title and/or
 	container(s) will be provided by the form renderer
-	OR if the field->MultiPopulate, then
+	OR if the field->MultiComponent, then
 	* an array of stdClass objects, each with properties:
 	->name, ->title and ->input (and for a couple of field-types, also ->op)
 	Object-names must begin with $this->formdata->current_prefix, so as to not be

@@ -16,7 +16,6 @@ class DatePicker extends FieldBase
 		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->LabelSubComponents = FALSE;
-		$this->MultiPopulate = TRUE;
 		$this->Type = 'DatePicker';
 		$mod = $formdata->formsmodule;
 		$months = explode(',', $mod->Lang('all_months'));
@@ -192,6 +191,7 @@ class DatePicker extends FieldBase
 			$ret[] = $order[$key];
 		}
 
+		$this->MultiPopulate = TRUE;
 		return $ret;
 	}
 }

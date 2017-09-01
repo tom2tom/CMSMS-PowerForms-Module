@@ -14,7 +14,6 @@ class CheckboxExtended extends FieldBase
 		parent::__construct($formdata, $params);
 		$this->ChangeRequirement = FALSE;
 		$this->IsInput = TRUE;
-		$this->MultiPopulate = TRUE;
 		$this->Type = 'CheckboxExtended';
 		$this->ValidationType = 'none';
 		$mod = $formdata->formsmodule;
@@ -153,7 +152,7 @@ class CheckboxExtended extends FieldBase
 
 			$ret[] = $oneset;
 		}
-
+		$this->MultiPopulate = TRUE;
 		return $ret;
 	}
 
