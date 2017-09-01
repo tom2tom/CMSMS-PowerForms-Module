@@ -324,14 +324,14 @@ EOS;
 					$val = NULL;
 				}
 				if ($newform) {
-					$db->Execute($sql, [$form_id, $key, $val, $longval])
+					$db->Execute($sql, [$form_id, $key, $val, $longval]);
 					if ($db->Affected_Rows() > 0) {
 						$newid = $db->Insert_ID();
 					} else {
 						return [FALSE,$mod->Lang('database_error')];
 					}
 				} else {
-					$db->Execute($sql2, [$val, $longval, $form_id, $key])
+					$db->Execute($sql2, [$val, $longval, $form_id, $key]);
 					if ($db->Affected_Rows() > 0) {
 						$done[] = $key;
 					} else {

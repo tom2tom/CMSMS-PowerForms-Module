@@ -15,11 +15,10 @@ class MultiselectFileDirector extends FieldBase
 	{
 		parent::__construct($formdata, $params);
 		$this->DisplayInSubmission = FALSE;
-		$this->HasAddOp = TRUE;
 		$this->IsDisposition = TRUE;
 		$this->IsInput = TRUE;
-		$this->MultiPopulate = TRUE;
-		$this->Type = 'MultiselectFileDirector';
+		$this->MultiComponent = TRUE;
+	$this->Type = 'MultiselectFileDirector';
 	}
 
 	public function ComponentAddLabel()
@@ -146,10 +145,9 @@ class MultiselectFileDirector extends FieldBase
 				];
 			}
 			unset($one);
-			$this->MultiComponent = TRUE;
 		} else {
 			$dests = FALSE;
-			$this->MultiComponent = FALSE;
+			//TODO no delete button now
 			$main[] = ['','',$mod->Lang('missing_type', $mod->Lang('file'))];
 		}
 
