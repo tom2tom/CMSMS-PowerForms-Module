@@ -20,8 +20,8 @@ class SystemEmail extends EmailBase
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
-		$this->HasAddOp = TRUE;
 		$this->IsDisposition = TRUE;
+		$this->MultiComponent = TRUE;
 		$this->Type = 'SystemEmail';
 	}
 

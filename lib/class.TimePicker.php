@@ -16,7 +16,6 @@ class TimePicker extends FieldBase
 		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->LabelSubComponents = FALSE;
-		$this->MultiPopulate = TRUE;
 		$this->Type = 'TimePicker';
 		$mod = $formdata->formsmodule;
 		$this->flag12hour = [
@@ -106,7 +105,7 @@ class TimePicker extends FieldBase
 				$Mins, -1, $now['tm_min'], 'id="'.$tid.'"'.$js);
 			$oneset->input = $this->SetClass($tmp);
 			$ret[] = $oneset;
-
+			$this->MultiPopulate = TRUE;
 			return $ret;
 		} else {
 			for ($i=1; $i<13; $i++) {
@@ -156,6 +155,7 @@ class TimePicker extends FieldBase
 				$this->flag12hour, -1, $now['merid'], 'id="'.$tid.'"'.$js);
 			$oneset->input = $this->SetClass($tmp);
 			$ret[] = $oneset;
+			$this->MultiPopulate = TRUE;
 			return $ret;
 		}
 	}

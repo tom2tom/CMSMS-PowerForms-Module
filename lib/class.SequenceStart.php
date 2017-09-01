@@ -17,7 +17,6 @@ class SequenceStart extends FieldBase
 		$this->Alias = uniqid('start_'.$this->formdata->Id); //not user editable
 		$this->HasLabel = TRUE;
 		$this->LabelSubComponents = FALSE;
-		$this->MultiPopulate = TRUE;
 		$this->NeedsDiv = FALSE;
 		$this->Type = 'SequenceStart';
 	}
@@ -166,6 +165,7 @@ class SequenceStart extends FieldBase
 			}
 			$ret[] = $oneset;
 		}
+		$this->MultiPopulate = TRUE;
 		return $ret;
 	}
 }

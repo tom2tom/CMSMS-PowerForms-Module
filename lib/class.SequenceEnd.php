@@ -185,6 +185,7 @@ class SequenceEnd extends SequenceStart
 			}
 			$ret[] = $oneset;
 		}
+		$this->MultiPopulate = TRUE;
 		return $ret;
 	}
 }
