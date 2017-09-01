@@ -14,7 +14,6 @@ class Link extends FieldBase
 		parent::__construct($formdata, $params);
 		$this->ChangeRequirement = FALSE;
 		$this->IsInput = TRUE;
-		$this->MultiPopulate = TRUE;
 		$this->Required = FALSE;
 		$this->Type = 'Link';
 	}
@@ -87,6 +86,7 @@ class Link extends FieldBase
 		$tmp = preg_replace('/id="\S+"/', 'id="'.$tid.'"', $tmp);
 		$oneset->input = $this->SetClass($tmp);
 		$ret[] = $oneset;
+		$this->MultiPopulate = TRUE;
 		return $ret;
 	}
 }

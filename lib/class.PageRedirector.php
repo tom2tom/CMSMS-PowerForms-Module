@@ -14,9 +14,9 @@ class PageRedirector extends FieldBase
 	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata, $params);
-		$this->HasAddOp = TRUE;
 		$this->IsDisposition = TRUE;
 		$this->IsInput = TRUE;
+		$this->MultiChoice = TRUE;
 		$this->Type = 'PageRedirector';
 	}
 

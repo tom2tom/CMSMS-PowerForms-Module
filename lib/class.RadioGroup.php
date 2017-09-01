@@ -14,9 +14,10 @@ class RadioGroup extends FieldBase
 	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata, $params);
-		$this->HasAddOp = TRUE;
+//		$this->HasAddOp = TRUE;
 		$this->IsInput = TRUE;
-		$this->MultiPopulate = TRUE;
+		$this->MultiChoice = TRUE;
+//		$this->MultiComponent = TRUE;
 		$this->Type = 'RadioGroup';
 	}
 

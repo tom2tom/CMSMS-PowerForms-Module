@@ -12,10 +12,8 @@ class TextExpandable extends FieldBase
 	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata, $params);
-//		$this->HasUserAddOp = TRUE;
-//		$this->HasUserDeleteOp = TRUE;
 		$this->IsInput = TRUE;
-		$this->MultiPopulate = TRUE;
+		$this->MultiComponent = TRUE; //CHECKME
 		$this->Type = 'TextExpandable';
 		$this->ValidationType = 'none';
 		$mod = $formdata->formsmodule;
@@ -189,7 +187,12 @@ class TextExpandable extends FieldBase
 			$ret[] = $oneset;
 		}
 
-		return $ret;
+		if ($ret) {
+			$this->MultiPopulate = TRUE;
+			return $ret;
+		}
+		$this->MultiPopulate = FALSE;
+		return '';
 	}
 
 	public function Validate($id)
