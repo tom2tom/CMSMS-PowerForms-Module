@@ -90,11 +90,10 @@ EOS;
 		$params['form_name'] = $name;
 		$params['form_alias'] = $alias;
 		$pre = \cms_db_prefix();
-		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form (name,alias) VALUES (?,?)';
 		$db = \cmsms()->GetDb();
-		$newid = $db->GenID($pre.'module_pwf_form_seq');
-		$db->Execute($sql, [$newid, $name, $alias]);
-		return $newid;
+		$db->Execute($sql, [$name, $alias]);
+		return $db->Insert_ID();
 	}
 
 	/**
@@ -203,10 +202,10 @@ EOS;
 		$params['form_alias'] = $alias;
 
 		$pre = \cms_db_prefix();
-		$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_form (name,alias) VALUES (?,?)';
 		$db = \cmsms()->GetDb();
-		$newid = $db->GenID($pre.'module_pwf_form_seq');
-		$db->Execute($sql, [$newid, $name, $alias]);
+		$db->Execute($sql, [$name, $alias]);
+		$newfid = $db->Insert_ID();
 
 		$res = TRUE;
 		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
@@ -215,25 +214,25 @@ EOS;
 			$longval = NULL;
 			if ($key == 'form_template') {
 				if ($mod->oldtemplates) {
-					$mod->SetTemplate('pwf_'.$form_id, $val);
+					$mod->SetTemplate('pwf_'.$newfid, $val);
 				} else {
-					self::SetTemplate('form', $form_id, $val);
+					self::SetTemplate('form', $newfid, $val);
 				}
-				$val = 'pwf_'.$form_id;
+				$val = 'pwf_'.$newfid;
 			} elseif ($key == 'submission_template') {
 				if ($mod->oldtemplates) {
-					$mod->SetTemplate('pwf_sub_'.$form_id, $val);
+					$mod->SetTemplate('pwf_sub_'.$newfid, $val);
 				} else {
-					self::SetTemplate('submission', $form_id, $val);
+					self::SetTemplate('submission', $newfid, $val);
 				}
-				$val = 'pwf_sub_'.$form_id;
+				$val = 'pwf_sub_'.$newfid;
 			} else {
 				if (strlen($val) > \PWForms::LENSHORTVAL) {
 					$longval = $val;
 					$val = NULL;
 				}
 			}
-			if (!$db->Execute($sql, [$newid, $form_id, $key, $val, $longval])) {
+			if (!$db->Execute($sql, [$newid, $newfid, $key, $val, $longval])) {
 				$params['message'] = $mod->Lang('database_error');
 				$res = FALSE;
 			}
@@ -274,9 +273,9 @@ EOS;
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		if ($newform) {
-			$form_id = $db->GenID($pre.'module_pwf_form_seq');
-			$sql = 'INSERT INTO '.$pre.'module_pwf_form (form_id,name,alias) VALUES (?,?,?)';
-			$res = $db->Execute($sql, [$form_id, $params['form_Name'], $params['form_Alias']]);
+			$sql = 'INSERT INTO '.$pre.'module_pwf_form (name,alias) VALUES (?,?)';
+			$res = $db->Execute($sql, [$params['form_Name'], $params['form_Alias']]);
+			$form_id = $db->Insert_ID();
 		} else {
 			$sql = 'UPDATE '.$pre.'module_pwf_form SET name=?,alias=? WHERE form_id=?';
 			$res = $db->Execute($sql, [$params['form_Name'], $params['form_Alias'], $form_id]);
@@ -759,17 +758,15 @@ EOS;
 		$pre = \cms_db_prefix();
 		for ($i=1; $i<=$data['count']; $i++) {
 			$fdata = $data['form'.$i];
-			$sql = 'INSERT INTO '.$pre.'module_pwf_form
-(form_id,name,alias) VALUES (?,?,?)';
-			$form_id = $db->GenID($pre.'module_pwf_form_seq');
-			$db->Execute($sql, [$form_id,
+			$sql = 'INSERT INTO '.$pre.'module_pwf_form (name,alias) VALUES (?,?)';
+			$db->Execute($sql, [
 				$fdata['properties']['name'],
 				$fdata['properties']['alias']]);
+			$form_id = $db->Insert_ID();
 			unset($fdata['properties']['name']);
 			unset($fdata['properties']['alias']);
 
-			$sql = 'INSERT INTO '.$pre.'module_pwf_formprops
-(prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
+			$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (prop_id,name,value,longvalue) VALUES (?,?,?,?)';
 			foreach ($fdata['properties'] as $name=>&$one) {
 				$prop_id = $db->GenID($pre.'module_pwf_formprops_seq');
 				$val = urldecode($one); //TODO translate numbered fields in templates

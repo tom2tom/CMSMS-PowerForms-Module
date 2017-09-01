@@ -18,14 +18,13 @@ $taboptarray = ['mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_genera
 $dict = NewDataDictionary($db);
 
 $flds = '
-form_id I(8) KEY,
+form_id I(8) AUTO KEY,
 name C(256),
 alias C(32)
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_form', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pre.'module_pwf_form_seq');
 $db->Execute('CREATE INDEX '.$pre.'module_pwf_form_idx ON '.$pre.'module_pwf_form (alias)');
 
 $flds = '

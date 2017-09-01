@@ -614,8 +614,7 @@ if (isset($params['import'])) {
 			$alias = $ta;
 
 			$done = [];
-			$fid = $db->GenID($pre.'module_pwf_form_seq');
-			$args = [$fid];
+			$args = [];
 			foreach ($pwfields as $one) {
 				$done[] = $one;
 				if ($one != 'form_id') {
@@ -623,8 +622,9 @@ if (isset($params['import'])) {
 				}
 			}
 			$db->Execute($sql, $args);
-//			$renums[$form_id] = $fid;
-			$db->Execute($sql2, [$form_id, $fid]);
+			$newfid = $db->Insert_ID();
+//			$renums[$form_id] = $newfid;
+			$db->Execute($sql2, [$form_id, $newfid]);
 
 			$more = [];
 			$xopts = array_diff($fbfields, $done);
@@ -634,10 +634,10 @@ if (isset($params['import'])) {
 				}
 			}
 			$back = []; //TODO missing keys to get from options
-			Get_FormOpts($this, $db, $pre, $form_id, $fid, $more, $back);
+			Get_FormOpts($this, $db, $pre, $form_id, $newfid, $more, $back);
 			//TODO handle passbacks
-			Get_Fields($db, $pre, $form_id, $fid);
-			Update_Templates($this, $db, $pre, $form_id, $fid);
+			Get_Fields($db, $pre, $form_id, $newfid);
+			Update_Templates($this, $db, $pre, $form_id, $newfid);
 			//data may've already been imported by the browser module
 			$rs = $db->SelectLimit('SELECT * FROM '.$pre.'module_pwbr_browser', 1);
 			if ($rs) {
