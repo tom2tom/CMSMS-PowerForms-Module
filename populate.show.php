@@ -170,9 +170,9 @@ if (PWForms\Utils::GetFormProperty($formdata, 'input_button_safety')) {
 	$safejs = <<<EOS
 
    setTimeout(function() {
-	$('input[id^="submit_"]').each(function() {
-	 this.disabled = true;
-	});
+    $('input[id^="submit_"]').each(function() {
+     this.disabled = true;
+    });
    },10);
 EOS;
 } else {
