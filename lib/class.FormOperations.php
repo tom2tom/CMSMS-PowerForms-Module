@@ -800,7 +800,7 @@ EOS;
 			$sql = 'INSERT INTO '.$pre.'module_pwf_field
 (form_id,name,alias,type,order_by) VALUES (?,?,?,?,?)';
 			$sql2 = 'INSERT INTO '.$pre.'module_pwf_fieldprops
-(prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
+(field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
 			foreach ($fdata['fields'] as &$fld) {
 				unset($fld['properties']['field_id']);
 				foreach (['name', 'alias', 'type', 'order_by'] as $key) {
@@ -815,12 +815,12 @@ EOS;
 				$field_id = $db->Insert_ID();
 
 				foreach ($fld['properties'] as $name=>&$one) {
-					$prop_id = $db->GenID($pre.'module_pwf_fieldprops_seq');
 					$val = urldecode($one); //TODO translate numbered fields in templates
 					$args = (strlen($val) <= \PWForms::LENSHORTVAL) ?
-						[$prop_id,$field_id,$form_id,$name,$val,NULL]:
-						[$prop_id,$field_id,$form_id,$name,NULL,$val];
+						[$field_id,$form_id,$name,$val,NULL]:
+						[$field_id,$form_id,$name,NULL,$val];
 					$db->Execute($sql2, $args);
+//					$prop_id = $db->Insert_ID();
 				}
 				unset($one);
 			}

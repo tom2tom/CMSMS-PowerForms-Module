@@ -122,13 +122,12 @@ class FieldOperations
 		$db->Execute($sql, $row);
 		$fid = $db->Insert_ID();
 
-		$sql = 'SELECT * FROM '.$pre.'module_pwf_fieldprops WHERE field_id=?';
+		$sql = 'SELECT field_id,form_id,name,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE field_id=?';
 		$rs = $db->Execute($sql, [$field_id]);
 		if ($rs) {
 			$sql = 'INSERT INTO '.$pre.'module_pwf_fieldprops
-(prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
+(field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
 			while ($row = $rs->FetchRow()) {
-				$row['prop_id'] = $db->GenID($pre.'module_pwf_fieldprops_seq');
 				$row['field_id'] = $fid;
 				$row['form_id'] = $form_id;
 				$db->Execute($sql, $row);
@@ -191,15 +190,15 @@ class FieldOperations
 		if ($allprops) {
 			// drop all current properties
 			$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops where field_id=?';
-			$res = $db->Execute($sql, [$obfld->Id]) && $res;
+			$db->Execute($sql, [$obfld->Id]);
+			$res = ($db->Affected_Rows() > 0) && $res;
 			// add back current ones
 			$sql = 'INSERT INTO '.$pre.'module_pwf_fieldprops
-(prop_id,field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?,?)';
+(field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
 			foreach ($obfld->XtraProps as $name=>$value) {
 				if (!is_scalar($value)) {
-					$value = json_encode($value);
+					$value = json_encode($value, JSON_FORCE_OBJECT);
 				}
-				$newid = $db->GenID($pre.'module_pwf_fieldprops_seq');
 				if (strlen($value) <= \PWForms::LENSHORTVAL) {
 					$sval = $value;
 					$lval = NULL;
@@ -207,8 +206,9 @@ class FieldOperations
 					$sval = NULL;
 					$lval = $value;
 				}
-				$res = $db->Execute($sql,
-					[$newid, $obfld->Id, $obfld->FormId, $name, $sval, $lval]) && $res;
+				$db->Execute($sql, [$obfld->Id, $obfld->FormId, $name, $sval, $lval]);
+				$res = ($db->Affected_Rows() > 0) && $res;
+//				$newid = $db->Insert_ID();
 			}
 		}
 		return $res;
@@ -265,7 +265,7 @@ class FieldOperations
 				}
 			}
 			foreach ($merged as $nm=>$val) {
-				if ($val && is_string($val) && ($val[0] == '[' || $val[0] == '{')) {
+				if ($val && is_string($val) && $val[0] == '{') {
 					$ar = json_decode($val);
 					if (json_last_error() == JSON_ERROR_NONE) {
 						$val = is_array($ar) ? $ar : (array)$ar;

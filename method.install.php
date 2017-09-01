@@ -53,7 +53,7 @@ $dict->ExecuteSQLArray($sqlarray);
 $db->Execute('CREATE INDEX '.$pre.'module_pwf_field_idx ON '.$pre.'module_pwf_field (form_id)');
 
 $flds = '
-prop_id I(8) KEY,
+prop_id I(8) AUTO KEY,
 field_id I(8),
 form_id I(8),
 name C(256),
@@ -63,7 +63,6 @@ longvalue X(16384)
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_fieldprops', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
-$db->CreateSequence($pre.'module_pwf_fieldprops_seq');
 $db->Execute('CREATE INDEX '.$pre.'module_pwf_fieldprops_idx ON '.$pre.'module_pwf_fieldprops (field_id,form_id)');
 
 $flds = '
