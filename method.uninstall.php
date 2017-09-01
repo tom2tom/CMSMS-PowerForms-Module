@@ -61,7 +61,6 @@ $db->DropSequence($pre.'module_pwf_field_seq');
 $db->DropSequence($pre.'module_pwf_fieldprops_seq');
 $db->DropSequence($pre.'module_pwf_form_seq');
 $db->DropSequence($pre.'module_pwf_formprops_seq');
-$db->DropSequence($pre.'module_pwf_session_seq');
 $db->DropSequence($pre.'module_pwf_uniquefield_seq');
 
 if ($this->oldtemplates) {

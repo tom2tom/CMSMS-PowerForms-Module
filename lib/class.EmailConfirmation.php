@@ -114,7 +114,6 @@ class EmailConfirmation extends EmailBase
 		//cache form data, pending confirmation
 		$pre = \cms_db_prefix();
 		$db = \cmsms()->GetDb();
-		$sid = $db->GenID($pre.'module_pwf_session_seq');
 
 		$chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 		$pref = str_repeat('0', 20);
@@ -126,19 +125,18 @@ class EmailConfirmation extends EmailBase
 		$pw = $pub.$cfuncs->decrypt_preference(Crypter::MKEY);
 		$when = time();
 		$cont = $cfuncs->encrypt_value(serialize($this->formdata), $pw);
-		$db->Execute('INSERT INTO '.$pre.'module_pwf_session
-(sess_id,pubkey,submitted,contents) VALUES (?,?,?,?)', [$sid, $pub, $when, $cont]);
+		$db->Execute('INSERT INTO '.$pre.'module_pwf_session (pubkey,submitted,contents) VALUES (?,?,?)', [$pub, $when, $cont]);
+		$sid = $db->Insert_Id();
 		$this->formdata->formsmodule = $mod; //reinstate
 		//set url variable for email template
 		$tplvars = [];
 		$pref = $this->formdata->current_prefix;
 		$tplvars['confirm_url'] =
 			$this->formdata->formsmodule->CreateFrontendLink('', $returnid, 'validate', '',
-			[
-				$pref.'c'=>$pub,
-				$pref.'d'=>$this->Id,
-//				$pref.'f'=>$this->formdata->Id,
-				$pref.'s'=>$sid],
+			[$pref.'c'=>$pub,
+			 $pref.'d'=>$this->Id,
+//			 $pref.'f'=>$this->formdata->Id,
+			 $pref.'s'=>$sid],
 			'', TRUE, FALSE, '', TRUE);
 		return $this->SendForm($this->GetValue(), $this->GetProperty('email_subject'), $tplvars);
 	}

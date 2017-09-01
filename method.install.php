@@ -70,15 +70,13 @@ $db->CreateSequence($pre.'module_pwf_fieldprops_seq');
 $db->Execute('CREATE INDEX '.$pre.'module_pwf_fieldprops_idx ON '.$pre.'module_pwf_fieldprops (field_id,form_id)');
 
 $flds = '
-sess_id I(4) KEY,
+sess_id I(4) AUTO KEY,
 pubkey C(40),
 submitted I,
 content B(16384)
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_session', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
-
-$db->CreateSequence($pre.'module_pwf_session_seq');
 
 /*MUTEX
 $flds = '
