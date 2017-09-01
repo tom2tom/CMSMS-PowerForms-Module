@@ -208,9 +208,8 @@ EOS;
 		$newfid = $db->Insert_ID();
 
 		$res = TRUE;
-		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (form_id,name,value,longvalue) VALUES (?,?,?,?)';
 		foreach ($formdata->XtraProps as $key=>&$val) {
-			$newid = $db->GenID($pre.'module_pwf_formprops_seq');
 			$longval = NULL;
 			if ($key == 'form_template') {
 				if ($mod->oldtemplates) {
@@ -232,7 +231,10 @@ EOS;
 					$val = NULL;
 				}
 			}
-			if (!$db->Execute($sql, [$newid, $newfid, $key, $val, $longval])) {
+			$db->Execute($sql, [$newfid, $key, $val, $longval]);
+			if ($db->Affected_Rows() > 0) {
+				$newid = $db->Insert_ID();
+			} else {
 				$params['message'] = $mod->Lang('database_error');
 				$res = FALSE;
 			}
@@ -285,7 +287,7 @@ EOS;
 			return [FALSE,$mod->Lang('database_error')];
 		}
 
-		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
+		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (form_id,name,value,longvalue) VALUES (?,?,?,?)';
 		$sql2 = 'UPDATE '.$pre.'module_pwf_formprops SET value=?,longvalue=? WHERE form_id=? AND name=?';
 
 		//store form options
@@ -322,15 +324,19 @@ EOS;
 					$val = NULL;
 				}
 				if ($newform) {
-					$newid = $db->GenID($pre.'module_pwf_formprops_seq');
-					if (!$db->Execute($sql, [$newid, $form_id, $key, $val, $longval])) {
+					$db->Execute($sql, [$form_id, $key, $val, $longval])
+					if ($db->Affected_Rows() > 0) {
+						$newid = $db->Insert_ID();
+					} else {
 						return [FALSE,$mod->Lang('database_error')];
 					}
 				} else {
-					if (!$db->Execute($sql2, [$val, $longval, $form_id, $key])) {
+					$db->Execute($sql2, [$val, $longval, $form_id, $key])
+					if ($db->Affected_Rows() > 0) {
+						$done[] = $key;
+					} else {
 						return [FALSE,$mod->Lang('database_error')];
 					}
-					$done[] = $key;
 				}
 			}
 		}
@@ -766,9 +772,8 @@ EOS;
 			unset($fdata['properties']['name']);
 			unset($fdata['properties']['alias']);
 
-			$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (prop_id,name,value,longvalue) VALUES (?,?,?,?)';
+			$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (name,value,longvalue) VALUES (?,?,?)';
 			foreach ($fdata['properties'] as $name=>&$one) {
-				$prop_id = $db->GenID($pre.'module_pwf_formprops_seq');
 				$val = urldecode($one); //TODO translate numbered fields in templates
 				if ($name == 'form_template') {
 					if ($mod->oldtemplates) {
@@ -786,9 +791,10 @@ EOS;
 					$val = 'pwf_sub_'.$form_id;
 				}
 				$args = (strlen($val) <= \PWForms::LENSHORTVAL) ?
-					[$prop_id,$form_id,$name,$val,NULL]:
-					[$prop_id,$form_id,$name,NULL,$val];
+					[$form_id,$name,$val,NULL]:
+					[$form_id,$name,NULL,$val];
 				$db->Execute($sql, $args);
+//				$prop_id = $db->Insert_ID();
 			}
 			unset($one);
 			$sql = 'INSERT INTO '.$pre.'module_pwf_field

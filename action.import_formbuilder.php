@@ -499,9 +499,8 @@ EOS;
 		$sql = 'SELECT * FROM '.$pre.'module_fb_form_attr WHERE form_id=? ORDER BY form_attr_id';
 		$data = $db->GetArray($sql, [$oldfid]);
 		if ($data) {
-			//TODO support insert into $pre.'module_pwf_form' if relevant
-		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops
-(prop_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
+			//TODO support INSERT INTO $pre.'module_pwf_form' if relevant
+			$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (form_id,name,value,longvalue) VALUES (?,?,?,?)';
 			foreach ($data as $row) {
 				if (strpos($row['name'], 'captcha') !== FALSE) { //ignore redundant options
 					continue;
@@ -511,36 +510,37 @@ EOS;
 				}
 				$val = $row['value'];
 				$longval = NULL;
-			//CHECKME template arrangements used by newer FormBuilder
-			switch ($row['name']) {
-			 case 'form_template':
-				if ($mod->oldtemplates) {
-					$mod->SetTemplate('pwf_'.$newfid, $val);
-				} else {
-					MySetTemplate('form', $newfid, $val);
+				//CHECKME template arrangements used by newer FormBuilder
+				switch ($row['name']) {
+				 case 'form_template':
+					if ($mod->oldtemplates) {
+						$mod->SetTemplate('pwf_'.$newfid, $val);
+					} else {
+						MySetTemplate('form', $newfid, $val);
+					}
+					$name = $row['name'];
+					$val = 'pwf_'.$newfid;
+					break;
+				 case 'submission_template':
+					if ($mod->oldtemplates) {
+						$mod->SetTemplate('pwf_sub_'.$newfid, $val);
+					} else {
+						MySetTemplate('submission', $newfid, $val);
+					}
+					$name = $row['name'];
+					$val = 'pwf_sub_'.$newfid;
+					break;
+				 default:
+					$name = $row['name'];
+					if (strlen($val) > PWForms::LENSHORTVAL) {
+						$longval = $val;
+						$val = NULL;
+					}
+					break;
 				}
-				$name = $row['name'];
-				$val = 'pwf_'.$newfid;
-				break;
-			 case 'submission_template':
-				if ($mod->oldtemplates) {
-					$mod->SetTemplate('pwf_sub_'.$newfid, $val);
-				} else {
-					MySetTemplate('submission', $newfid, $val);
-				}
-				$name = $row['name'];
-				$val = 'pwf_sub_'.$newfid;
-				break;
-			 default:
-				$name = $row['name'];
-				if (strlen($val) > PWForms::LENSHORTVAL) {
-					$longval = $val;
-					$val = NULL;
-				}
-				break;
-			}
-				$newid = $db->GenID($pre.'module_pwf_formprops_seq');
-				$ares = $db->Execute($sql, [$newid, $newfid, $name, $val, $longval]);
+				$db->Execute($sql, [$newfid, $name, $val, $longval]);
+//				$ares = $db->Affected_Rows();
+//				$newid = $db->Insert_ID();
 			}
 		}
 		//TODO handle $passbacks
