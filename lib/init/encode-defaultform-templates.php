@@ -303,9 +303,25 @@ $templates['Advanced_captcha'] =<<<EOS
 {\$prompt}<br />{\$captcha_input}<br />{\$captcha}
 EOS;
 
+//replicates method in FormOperations class
+function xml_entities ($str)
+{
+	$nl = urlencode(PHP_EOL);
+	return strtr($str, [
+	'<' => '%3C',
+	'>' => '%3E',
+	'"' => '%22',
+	"'" => '%27',
+	'&' => '%26',
+	"\r\n" => $nl,
+	"\n" => $nl,
+	"\r" => $nl,
+	]);
+}
+
 $fh = fopen(__DIR__.DIRECTORY_SEPARATOR.'encoded-templates.xml', 'w');
 foreach ($templates as $key=>&$value) {
-	fwrite($fh, '<'.$key.'_template>'.urlencode($value).'</'.$key.'_template>'.PHP_EOL.PHP_EOL);
+	fwrite($fh, '<'.$key.'_template>'.xml_entities($value).'</'.$key.'_template>'.PHP_EOL.PHP_EOL);
 }
 
 unset($value);
