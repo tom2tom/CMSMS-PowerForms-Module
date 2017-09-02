@@ -490,6 +490,46 @@ EOS;
 	}
 
 	/**
+	xml_entities:
+	Escape chars in @str which are a problem for the PHP xml parser
+	@str: string to be encoded
+	Returns: encoded string
+	*/
+	public function xml_entities($str)
+	{
+		$nl = urlencode(PHP_EOL);
+		return strtr($str, [
+		'<' => '%3C',
+		'>' => '%3E',
+		'"' => '%22',
+		"'" => '%27',
+		'&' => '%26',
+		"\r\n" => $nl,
+		"\n" => $nl,
+		"\r" => $nl,
+		]);
+	}
+
+	/**
+	xml_entity_decode:
+	@str: string to be decoded
+	Returns: decoded string
+	*/
+	public function xml_entity_decode($str)
+	{
+		return strtr($str, [
+		'%3C' => '<',
+		'%3E' => '>',
+		'%22' => '"',
+		'%27' => "'",
+		'%26' => '&',
+		'%0D%0A' => PHP_EOL,
+		'%0A' => PHP_EOL,
+		'%0D' => PHP_EOL,
+		]);
+	}
+
+	/**
 	CreateXML:
 	@mod: reference to PWForms module
 	@formid: single form identifier,or array of them
@@ -562,8 +602,16 @@ EOS;
 \t<form>
 \t\t<properties>
 EOS;
-			foreach ($formpropkeys as $onekey) {
-				$xml[] = "\t\t\t<$onekey>".urlencode($properties[$onekey])."</$onekey>";
+			foreach ($formpropkeys as $name) {
+				$value = $properties[$name];
+				if ($value) {
+					$value = trim($value);
+					if ($value) {
+						$value = $this->xml_entities($value);
+					}
+				}
+				$name = $this->xml_entities($name);
+				$xml[] = "\t\t\t<$name>".$value."</$name>";
 			}
 			foreach ($formopts as $name=>$row) {
 				$value = $row['value'];
@@ -587,7 +635,14 @@ EOS;
 						break;
 					}
 				}
-				$xml[] = "\t\t\t<$name>".urlencode(trim($value))."</$name>";
+				if ($value) {
+					$value = trim($value);
+					if ($value) {
+						$value = $this->xml_entities($value);
+					}
+				}
+				$name = $this->xml_entities($name);
+				$xml[] = "\t\t\t<$name>".$value."</$name>";
 			}
 			$xml[] =<<<EOS
 \t\t</properties>
@@ -598,8 +653,16 @@ EOS;
 \t\t\t<field>
 \t\t\t\t<properties>
 EOS;
-				foreach ($fieldkeys as $onekey) {
-					$xml[] = "\t\t\t\t\t<$onekey>".urlencode($thisfield[$onekey])."</$onekey>";
+				foreach ($fieldkeys as $name) {
+					$value = $thisfield[$name];
+					if ($value) {
+						$value = trim($value);
+						if ($value) {
+							$value = $this->xml_entities($value);
+						}
+					}
+					$name = $this->xml_entities($name);
+					$xml[] = "\t\t\t\t\t<$name>".$value."</$name>";
 				}
 				//get $fieldopts[] for this field
 //				$myopts = array_filter($fieldopts,array(new IsFieldOption($thisfield['field_id']),'isMine'));
@@ -616,8 +679,14 @@ EOS;
 								continue;
 							}
 						}
-						$name = $oneopt['name'];
-						$xml[] = "\t\t\t\t\t<$name>".urlencode(trim($value))."</$name>";
+						$name = $this->xml_entities($oneopt['name']);
+						if ($value) {
+							$value = trim($value);
+							if ($value) {
+								$value = $this->xml_entities($value);
+							}
+						}
+						$xml[] = "\t\t\t\t\t<$name>".$value."</$name>";
 					}
 					unset($oneopt);
 				}
@@ -716,6 +785,7 @@ EOS;
 			}
 		}
 		unset($value);
+		unset($xmlarray);
 		//clear top-level numeric keys and related tags
 		$suff = 1;
 		foreach ($array as $indx=>&$value) {
@@ -751,10 +821,12 @@ EOS;
 	/**
 	ImportXML:
 	@mod: reference to the current PWForms module object
-	@xmlfile:
+	@xmlfile: filesystem path of uploaded temp file to be processed
+	@formname: optional name for the imported form
+	@formalias: optional alias for the imported form
 	Returns boolean T/F indicating success
 	*/
-	public function ImportXML(&$mod, $xmlfile)
+	public function ImportXML(&$mod, $xmlfile, $formname = '', $formalias = '')
 	{
 		$data = self::ParseXML($xmlfile);
 		if (!$data) {
@@ -764,17 +836,20 @@ EOS;
 		$pre = \cms_db_prefix();
 		for ($i=1; $i<=$data['count']; $i++) {
 			$fdata = $data['form'.$i];
+			$fprops = &$fdata['properties'];
 			$sql = 'INSERT INTO '.$pre.'module_pwf_form (name,alias) VALUES (?,?)';
-			$db->Execute($sql, [
-				$fdata['properties']['name'],
-				$fdata['properties']['alias']]);
+			$name = ($formname) ? $formname : $this->xml_entity_decode($fprops['name']);
+			$val = ($formalias) ? $formalias : $fprops['alias'];
+			$db->Execute($sql, [$name, $val]);
 			$form_id = $db->Insert_ID();
-			unset($fdata['properties']['name']);
-			unset($fdata['properties']['alias']);
+			unset($fprops['form_id']);
+			unset($fprops['name']);
+			unset($fprops['alias']);
 
-			$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (name,value,longvalue) VALUES (?,?,?)';
-			foreach ($fdata['properties'] as $name=>&$one) {
-				$val = urldecode($one); //TODO translate numbered fields in templates
+			$sql = 'INSERT INTO '.$pre.'module_pwf_formprops
+(form_id,name,value,longvalue) VALUES (?,?,?,?)';
+			foreach ($fprops as $name=>&$one) {
+				$val = $this->xml_entity_decode($one); //TODO translate numbered fields in templates
 				if ($name == 'form_template') {
 					if ($mod->oldtemplates) {
 						$mod->SetTemplate('pwf_'.$form_id, $val);
@@ -797,13 +872,20 @@ EOS;
 //				$prop_id = $db->Insert_ID();
 			}
 			unset($one);
+			unset($fprops);
 			$sql = 'INSERT INTO '.$pre.'module_pwf_field
 (form_id,name,alias,type,order_by) VALUES (?,?,?,?,?)';
 			$sql2 = 'INSERT INTO '.$pre.'module_pwf_fieldprops
 (field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
 			foreach ($fdata['fields'] as &$fld) {
 				unset($fld['properties']['field_id']);
-				foreach (['name', 'alias', 'type', 'order_by'] as $key) {
+				if (isset($fld['properties']['name'])) {
+					$name = $this->xml_entity_decode($fld['properties']['name']);
+					unset($fld['properties']['name']);
+				} else {
+					$name = '';
+				}
+				foreach (['alias', 'type', 'order_by'] as $key) {
 					if (isset($fld['properties'][$key])) {
 						$$key = $fld['properties'][$key];
 						unset($fld['properties'][$key]);
@@ -815,7 +897,7 @@ EOS;
 				$field_id = $db->Insert_ID();
 
 				foreach ($fld['properties'] as $name=>&$one) {
-					$val = urldecode($one); //TODO translate numbered fields in templates
+					$val = $this->xml_entity_decode($one); //TODO translate numbered fields in templates
 					$args = (strlen($val) <= \PWForms::LENSHORTVAL) ?
 						[$field_id,$form_id,$name,$val,NULL]:
 						[$field_id,$form_id,$name,NULL,$val];
