@@ -276,14 +276,16 @@ EOS;
 		$pre = \cms_db_prefix();
 		if ($newform) {
 			$sql = 'INSERT INTO '.$pre.'module_pwf_form (name,alias) VALUES (?,?)';
-			$res = $db->Execute($sql, [$params['form_Name'], $params['form_Alias']]);
+			$db->Execute($sql, [$params['form_Name'], $params['form_Alias']]);
 			$form_id = $db->Insert_ID();
 		} else {
+			$sql = 'SELECT prop_id,name FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
+			$oldfields = $db->GetAssoc($sql,[$form_id ]);
+
 			$sql = 'UPDATE '.$pre.'module_pwf_form SET name=?,alias=? WHERE form_id=?';
-			$res = $db->Execute($sql, [$params['form_Name'], $params['form_Alias'], $form_id]);
-			$done = [];
+			$db->Execute($sql, [$params['form_Name'], $params['form_Alias'], $form_id]);
 		}
-		if (!$res) {
+		if ($db->Affected_Rows() < 1) {
 			return [FALSE,$mod->Lang('database_error')];
 		}
 
@@ -331,10 +333,15 @@ EOS;
 						return [FALSE,$mod->Lang('database_error')];
 					}
 				} else {
-					$db->Execute($sql2, [$val, $longval, $form_id, $key]);
-					if ($db->Affected_Rows() > 0) {
-						$done[] = $key;
+					$idx = array_search($key, $oldfields);
+					if ($idx !== FALSE) {
+						$db->Execute($sql2, [$val, $longval, $form_id, $key]);
+						unset($oldfields[$idx]);
 					} else {
+						$db->Execute($sql, [$form_id, $key, $val, $longval]);
+					}
+
+					if ($db->Affected_Rows() < 1) {
 						return [FALSE,$mod->Lang('database_error')];
 					}
 				}
@@ -342,14 +349,12 @@ EOS;
 		}
 
 		if (!$newform) {
-			$sql = 'DELETE FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
-			$args = [-1=>$form_id];
-			if ($done) {
-				$fillers = str_repeat('?,', count($done)-1);
-				$sql .= ' AND name NOT IN ('.$fillers.'?)';
-				$args += $done;
+			if ($oldfields) {
+				$sql = 'DELETE FROM '.$pre.'module_pwf_formprops WHERE prop_id IN('.implode(',',array_keys($old)).')';
+				$db->Execute($sql);
 			}
-			$db->Execute($sql, $args);
+			$sql = 'SELECT field_id FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY field_id';
+			$oldfields = $db->GetCol($sql,[$form_id ]);
 		}
 
 		self::Arrange($formdata->Fields, $params['form_FieldOrders']);
@@ -359,16 +364,38 @@ EOS;
 		foreach ($formdata->Fields as $key=>&$obfld) {
 			if ($obfld) {
 				$obfld->Store(TRUE);
-				if ($key <= 0) { //new field, after save it will include an actual id
+				if ($key > 0)
+					if (!$newform) {
+						$idx = array_search($key, $oldfields);
+						if ($idx !== FALSE) {
+							unset($oldfields[$idx]);
+						}
+					}
+				} else { //new field, after save it will include an actual id
 					$newfields[$key] = $obfld->GetId();
 				}
 			} else { //marked for deletion
+				$idx = array_search($key, $oldfields);
+				if ($idx !== FALSE) {
+					unset($oldfields[$idx]);
+				}
 				$obfld = new \stdClass();
 				$obfld->Id = $key;
 				FieldOperations::RealDeleteField($obfld);
 			}
 		}
 		unset($obfld);
+
+		foreach ($oldfields as $key) {
+			if (isset($formdata->Fields[$key])) { //should never happen
+				FieldOperations::RealDeleteField($formdata->Fields[$key]);
+				unset($formdata->Fields[$key]);
+			} else {
+				$obfld = new \stdClass();
+				$obfld->Id = $key;
+				FieldOperations::RealDeleteField($obfld);
+			}
+		}
 		// conform array-keys of new fields
 		foreach ($newfields as $key=>$newkey) {
 			$formdata->Fields[$newkey] = $formdata->Fields[$key];
