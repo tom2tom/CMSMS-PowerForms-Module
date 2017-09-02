@@ -555,20 +555,20 @@ function get_template (sel) {
   if (value) {
    var msg = '{$msg}';
    $.ajax({
-	type: 'POST',
-	url: 'moduleinterface.php',
-	data: '{$u}'+value,
-	dataType: 'text',
-	success: function(data,status) {
-	 if (status=='success') {
-	  $('#form_template').val(data);
-	 } else {
-	  alert(msg);
-	 }
-	},
-	error: function() {
-	 alert(msg);
-	}
+    type: 'POST',
+    url: 'moduleinterface.php',
+    data: '{$u}'+value,
+    dataType: 'text',
+    success: function(data,status) {
+     if (status=='success') {
+      $('#form_template').val(data);
+     } else {
+      alert(msg);
+     }
+    },
+    error: function() {
+     alert(msg);
+    }
    });
   }
  }
