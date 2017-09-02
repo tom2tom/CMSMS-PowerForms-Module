@@ -10,74 +10,110 @@
 <!ELEMENT field (properties?)>
 ]>
 <powerforms>
-	<version>0.8</version>
+	<version>0.7</version>
 	<date></date>
 	<count>1</count>
 	<form>
 		<properties>
-			<form_id>1</form_id>
+			<form_id>2</form_id>
 			<name>Sample Form</name>
 			<alias>sample_form</alias>
 			<css_class>powerform</css_class>
-			<form_displaytype>tab</form_displaytype>
-			<form_template>]][[%7Bif+%24form_done%7D%0A%09%7B%2A+This+section+is+for+displaying+submission-errors+%2A%7D%0A%09%7Bif+%24submission_error%7D%0A%09%09%3Cdiv+class%3D%22error_message%22%3E%7B%24submission_error%7D%3C%2Fdiv%3E%0A%09%09%7Bif+%24show_submission_errors%7D%0A%09%09%09%3Cdiv+class%3D%22error_list%22%3E%0A%09%09%09%3Cul%3E%0A%09%09%09%7Bforeach+%24submission_error_list+as+%24one%7D%0A%09%09%09%09%3Cli%3E%7B%24one%7D%3C%2Fli%3E%0A%09%09%09%7B%2Fforeach%7D%0A%09%09%09%3C%2Ful%3E%0A%09%09%09%3C%2Fdiv%3E%0A%09%09%7B%2Fif%7D%0A%09%7B%2Fif%7D%0A%7Belse%7D%0A%09%7B%2A+This+section+is+for+displaying+the+form+%2A%7D%0A%09%7B%2A+we+start+with+validation+errors+%2A%7D%0A%09%7Bif+%24form_has_validation_errors%7D%0A%09%09%3Cdiv+class%3D%22error_message%22%3E%0A%09%09%3Cul%3E%0A%09%09%7Bforeach+%24form_validation_errors+as+%24one%7D%0A%09%09%09%3Cli%3E%7B%24one%7D%3C%2Fli%3E%0A%09%09%7B%2Fforeach%7D%0A%09%09%3C%2Ful%3E%0A%09%09%3C%2Fdiv%3E%0A%09%7B%2Fif%7D%0A%09%7B%2A+and+now+the+form+itself+%2A%7D%0A%09%3Cdiv%7Bif+%24css_class%7D+class%3D%22%7B%24css_class%7D%22%7B%2Fif%7D%3E%0A%09%7Bif+%24total_pages+gt+1%7D%3Cspan%3E%7B%24title_page_x_of_y%7D%3C%2Fspan%3E%7B%2Fif%7D%0A%09%7Bforeach+%24fields+as+%24one%7D%0A%09%09%7Bstrip%7D%0A%09%09%7Bif+%24one-%3Edisplay%7D%0A%09%09%09%7Bif+%24one-%3Eneeds_div%7D%3Cdiv%3E%7B%2Fif%7D%0A%09%09%09%7Bif+%21%24one-%3Ehide_name%7D%0A%09%09%09%09%3Clabel%7Bif+%21%24one-%3Emultiple_parts%7D+for%3D%22%7B%24one-%3Einput_id%7D%22%7B%2Fif%7D%3E%7B%24one-%3Ename%7D%0A%09%09%09%09%09%7Bif+%24one-%3Erequired_symbol%7D%7B%24one-%3Erequired_symbol%7D%7B%2Fif%7D%0A%09%09%09%09%3C%2Flabel%3E%0A%09%09%09%7B%2Fif%7D%0A%09%09%09%7Bif+%24one-%3Emultiple_parts%7D%0A%09%09%09%09%7Bforeach+%24one-%3Einput+as+%24part%7D%0A%09%09%09%09%7Bif+%24one-%3Elabel_parts%7D%0A%09%09%09%09%09%3Cdiv%3E%7B%24part-%3Einput%7D%26nbsp%3B%7B%24part-%3Ename%7D%3C%2Fdiv%3E%0A%09%09%09%09%7Belse%7D%0A%09%09%09%09%09%7B%24part-%3Einput%7D%0A%09%09%09%09%7B%2Fif%7D%0A%09%09%09%09%7Bif+%21empty%28%24part-%3Eop%29%7D%7B%24part-%3Eop%7D%7B%2Fif%7D%0A%09%09%09%09%7B%2Fforeach%7D%0A%09%09%09%7Belse%7D%0A%09%09%09%09%7Bif+%24one-%3Esmarty_eval%7D%7Beval+var%3D%24one-%3Einput%7D%7Belse%7D%7B%24one-%3Einput%7D%7B%2Fif%7D%0A%09%09%09%7B%2Fif%7D%0A%09%09%09%7Bif+%21%24one-%3Evalid%7D+%26lt%3B---+%7B%24one-%3Eerror%7D%7B%2Fif%7D%0A%09%09%09%7Bif+%24one-%3Eneeds_div%7D%3C%2Fdiv%3E%7B%2Fif%7D%0A%09%09%7B%2Fif%7D%0A%09%09%7B%2Fstrip%7D%0A%09%7B%2Fforeach%7D%0A%09%3Cdiv+class%3D%22submit_actions%22%3E%7B%24prev%7D+%7B%24submit%7D%3C%2Fdiv%3E%0A%09%3C%2Fdiv%3E%0A%7B%2Fif%7D</form_template>
+			<form_template>{if $form_done}%0A	{* section for displaying submission-errors *}%0A	{if !empty($submission_error)}%0A		%3Cdiv class=%22error_message%22%3E{$submission_error}%3C/div%3E%0A		{if !empty($show_submission_errors)}%0A			%3Cdiv class=%22error_list%22%3E%3Cul%3E%0A	{foreach $submission_error_list as $one}%3Cli%3E{$one}%3C/li%3E{/foreach}%0A			%3C/ul%3E%3C/div%3E%0A		{/if}%0A	{/if}%0A{else}%0A	{* section for displaying the form, starting with validation errors *}%0A	{if !empty($form_has_validation_errors)}%0A		%3Cdiv class=%22error_message%22%3E%3Cul%3E%0A	{foreach $form_validation_errors as $one}%3Cli%3E{$one}%3C/li%3E{/foreach}%0A		%3C/ul%3E%3C/div%3E%0A	{/if}%0A	{* and now the form itself *}%0A	{if $css_class}%3Cdiv class=%22{$css_class}%22%3E{/if}%0A	{if $total_pages %3E 1}%3Cspan%3E{$title_page_x_of_y}%3C/span%3E{/if}%0A	{foreach $fields as $one}%0A		{strip}%0A		{if $one-%3Edisplay}%0A			{if $one-%3Eneeds_div}%3Cdiv%3E{/if}%0A			{if !$one-%3Ehide_name}%0A				%3Clabel{if !$one-%3Emultiple_parts} for=%22{$one-%3Einput_id}%22{/if}%3E{$one-%3Ename}%0A					{if $one-%3Erequired_symbol}{$one-%3Erequired_symbol}{/if}%0A				%3C/label%3E%0A			{/if}%0A			{if $one-%3Emultiple_parts}%0A				{foreach $one-%3Einput as $part}%0A				{if $one-%3Elabel_parts}%0A					%3Cdiv%3E{$part-%3Einput}%26nbsp;{$part-%3Ename}%3C/div%3E%0A				{else}%0A					{$part-%3Einput}%0A				{/if}%0A				{if !empty($part-%3Eop)}{$part-%3Eop}{/if}%0A				{/foreach}%0A			{else}%0A				{if $one-%3Esmarty_eval}{eval var=$one-%3Einput}{else}{$one-%3Einput}{/if}%0A			{/if}%0A			{if !$one-%3Evalid} %26lt;--- {$one-%3Eerror}{/if}%0A			{if $one-%3Eneeds_div}%3C/div%3E{/if}%0A		{/if}%0A		{/strip}%0A	{/foreach}%0A	%3Cdiv class=%22submit_actions%22%3E{$prev} {$submit}%3C/div%3E%0A	{if $css_class}%3C/div%3E{/if}%0A{/if}</form_template>
 			<inline>1</inline>
 			<list_delimiter>-</list_delimiter>
 			<next_button_text>Continue...</next_button_text>
 			<prev_button_text>Back...</prev_button_text>
 			<redirect_page>-1</redirect_page>
 			<required_field_symbol>*</required_field_symbol>
-			<submission_template>]][[%3Ch1%3EThanks%21%3C%2Fh1%3E%0A%3Cp%3EYour+feedback+helps+make+the+PWForms+module+better.%3C%2Fp%3E</submission_template>
+			<submission_template>%3Ch1%3EThanks!%3C/h1%3E%0A%3Cp%3EYour feedback helps make the PowerForms module better.%3C/p%3E</submission_template>
 			<submit_action>text</submit_action>
 			<submit_button_text>Send Feedback</submit_button_text>
-			<title_position>left</title_position>
 			<unspecified>[unspecified]</unspecified>
 		</properties>
 		<fields>
 			<field>
 				<properties>
-					<field_id>1</field_id>
+					<field_id>10</field_id>
 					<name>Fieldset Start</name>
 					<alias>fieldset_sta</alias>
 					<type>FieldsetStart</type>
 					<order_by>1</order_by>
+					<ChangeRequirement>0</ChangeRequirement>
+					<DisplayInForm>1</DisplayInForm>
+					<DisplayInSubmission>0</DisplayInSubmission>
+					<Disposable>1</Disposable>
+					<MultiChoice>0</MultiChoice>
+					<HasLabel>0</HasLabel>
+					<HideLabel>0</HideLabel>
+					<IsComputedOnSubmission>0</IsComputedOnSubmission>
+					<IsDisposition>0</IsDisposition>
+					<IsEmailDisposition>0</IsEmailDisposition>
+					<IsInput>0</IsInput>
+					<LabelSubComponents>1</LabelSubComponents>
+					<MultiComponent>0</MultiComponent>
+					<NeedsDiv>0</NeedsDiv>
+					<Required>0</Required>
+					<SmartyEval>0</SmartyEval>
+					<ValidationType>none</ValidationType>
+					<ValidationTypes>{}</ValidationTypes>
 					<legend>Help Improve Power Forms</legend>
 				</properties>
 			</field>
 			<field>
 				<properties>
-					<field_id>2</field_id>
-					<name>Send It</name>
-					<alias>send_it</alias>
-					<type>SystemEmail</type>
-					<order_by>2</order_by>
-					<email_subject>PowerForms Sample Form Submission</email_subject>
-					<email_from_name>Power Forms Installation</email_from_name>
-					<email_from_address>me@overhere.com</email_from_address>
-					<destination_address>you@overthere.net</destination_address>
-					<email_template>]][[%3Ch1%3ESomeone%27s+Testing+a+PWForms+Submission%21%3C%2Fh1%3E%0A%3Cstrong%3EDate+submitted%3C%2Fstrong%3E%3A+%7B%24sub_date%7D%3Cbr+%2F%3E%0A%3Cstrong%3EIP+address+from+which+form+was+submitted%3C%2Fstrong%3E%3A+%7B%24sub_source%7D%3Cbr+%2F%3E%0A%3Cstrong%3EForm+server%3C%2Fstrong%3E%3A+%7B%24form_host%7D%3Cbr+%2F%3E%0A%3Cstrong%3EURL+of+page+containing+form%3C%2Fstrong%3E%3A+%7B%24form_url%7D%3Cbr+%2F%3E%0A%3Cstrong%3EForm+name%3C%2Fstrong%3E%3A+%7B%24form_name%7D%3Cbr+%2F%3E%0A%3Chr+%2F%3E%0A%3Cstrong%3EModules+you%27ll+be+using+together%3C%2Fstrong%3E%3A+%7B%24modules_you%7D%3Cbr+%2F%3E%0A%3Cstrong%3EWhat+will+you+personally+be+doing+on+your+CMS+MS+site%3F%3C%2Fstrong%3E%3A+%7B%24what_will_yo%7D%3Cbr+%2F%3E%0A%3Cstrong%3EWhere+are+you+from%3F%3C%2Fstrong%3E%3A+%7B%24where_are_yo%7D%3Cbr+%2F%3E%0A%3Cstrong%3EDo+you+have+any+comments+%2F+feedback+for+me%3F%3C%2Fstrong%3E%3A+%7B%24do_you_have%7D</email_template>
-					<email_encoding>utf-8</email_encoding>
-					<html_email>1</html_email>
-				</properties>
-			</field>
-			<field>
-				<properties>
-					<field_id>3</field_id>
+					<field_id>12</field_id>
 					<name>Welcome!</name>
 					<alias>welcome</alias>
 					<type>StaticText</type>
-					<order_by>3</order_by>
-					<text>Thanks for trying out PowerForms. You can use this form to provide feedback about how you will be using this module.</text>
+					<order_by>2</order_by>
+					<ChangeRequirement>0</ChangeRequirement>
+					<DisplayInForm>1</DisplayInForm>
+					<DisplayInSubmission>0</DisplayInSubmission>
+					<Disposable>1</Disposable>
+					<MultiChoice>0</MultiChoice>
+					<HasLabel>0</HasLabel>
+					<HideLabel>0</HideLabel>
+					<IsComputedOnSubmission>0</IsComputedOnSubmission>
+					<IsDisposition>0</IsDisposition>
+					<IsEmailDisposition>0</IsEmailDisposition>
+					<IsInput>0</IsInput>
+					<LabelSubComponents>1</LabelSubComponents>
+					<MultiComponent>0</MultiComponent>
+					<NeedsDiv>1</NeedsDiv>
+					<Required>0</Required>
+					<SmartyEval>0</SmartyEval>
+					<ValidationType>none</ValidationType>
+					<ValidationTypes>{}</ValidationTypes>
+					<text>%3Cp%3EThanks for trying out PowerForms. You can use this form to provide feedback about how you will be using this module.%3C/p%3E</text>
 					<css_class>message</css_class>
 				</properties>
 			</field>
 			<field>
 				<properties>
-					<field_id>4</field_id>
-					<name>Modules you'll be using together</name>
+					<field_id>13</field_id>
+					<name>Modules you%27ll be using together</name>
 					<alias>modules_you</alias>
 					<type>CheckboxGroup</type>
-					<order_by>4</order_by>
+					<order_by>3</order_by>
+					<ChangeRequirement>1</ChangeRequirement>
+					<DisplayInForm>1</DisplayInForm>
+					<DisplayInSubmission>1</DisplayInSubmission>
+					<Disposable>1</Disposable>
+					<MultiChoice>1</MultiChoice>
+					<HasLabel>1</HasLabel>
+					<HideLabel>0</HideLabel>
+					<IsComputedOnSubmission>0</IsComputedOnSubmission>
+					<IsDisposition>0</IsDisposition>
+					<IsEmailDisposition>0</IsEmailDisposition>
+					<IsInput>1</IsInput>
+					<LabelSubComponents>1</LabelSubComponents>
+					<MultiComponent>1</MultiComponent>
+					<NeedsDiv>1</NeedsDiv>
+					<Required>0</Required>
+					<SmartyEval>0</SmartyEval>
+					<ValidationType>none</ValidationType>
+					<ValidationTypes>{%22No validation%22:%22none%22,%22Can%27t be empty%22:%22empty%22}</ValidationTypes>
 					<box_name1>PowerForms</box_name1>
 					<box_name2>PowerBrowse</box_name2>
 					<box_name3>Front End Users</box_name3>
@@ -106,11 +142,29 @@
 			</field>
 			<field>
 				<properties>
-					<field_id>5</field_id>
+					<field_id>14</field_id>
 					<name>What will you personally be doing on your CMS MS site?</name>
 					<alias>what_will_yo</alias>
 					<type>CheckboxGroup</type>
-					<order_by>5</order_by>
+					<order_by>4</order_by>
+					<ChangeRequirement>1</ChangeRequirement>
+					<DisplayInForm>1</DisplayInForm>
+					<DisplayInSubmission>1</DisplayInSubmission>
+					<Disposable>1</Disposable>
+					<MultiChoice>1</MultiChoice>
+					<HasLabel>1</HasLabel>
+					<HideLabel>0</HideLabel>
+					<IsComputedOnSubmission>0</IsComputedOnSubmission>
+					<IsDisposition>0</IsDisposition>
+					<IsEmailDisposition>0</IsEmailDisposition>
+					<IsInput>1</IsInput>
+					<LabelSubComponents>1</LabelSubComponents>
+					<MultiComponent>0</MultiComponent>
+					<NeedsDiv>1</NeedsDiv>
+					<Required>0</Required>
+					<SmartyEval>0</SmartyEval>
+					<ValidationType>none</ValidationType>
+					<ValidationTypes>{%22No validation%22:%22none%22,%22Can%27t be empty%22:%22empty%22}</ValidationTypes>
 					<no_empty1>1</no_empty1>
 					<box_name1>Graphical Design</box_name1>
 					<box_name2>HTML and CSS</box_name2>
@@ -134,45 +188,122 @@
 			</field>
 			<field>
 				<properties>
-					<field_id>6</field_id>
+					<field_id>15</field_id>
 					<name>Where are you from?</name>
 					<alias>where_are_yo</alias>
 					<type>CountryPicker</type>
-					<order_by>6</order_by>
+					<order_by>5</order_by>
+					<ChangeRequirement>1</ChangeRequirement>
+					<DisplayInForm>1</DisplayInForm>
+					<DisplayInSubmission>1</DisplayInSubmission>
+					<Disposable>1</Disposable>
+					<MultiChoice>0</MultiChoice>
+					<HasLabel>1</HasLabel>
+					<HideLabel>0</HideLabel>
+					<IsComputedOnSubmission>0</IsComputedOnSubmission>
+					<IsDisposition>0</IsDisposition>
+					<IsEmailDisposition>0</IsEmailDisposition>
+					<IsInput>1</IsInput>
+					<LabelSubComponents>1</LabelSubComponents>
+					<MultiComponent>0</MultiComponent>
+					<NeedsDiv>1</NeedsDiv>
+					<Required>0</Required>
+					<SmartyEval>0</SmartyEval>
+					<ValidationType>none</ValidationType>
+					<ValidationTypes>{}</ValidationTypes>
 					<select_one>Select One</select_one>
 				</properties>
 			</field>
 			<field>
 				<properties>
-					<field_id>7</field_id>
-					<name>Enter here any comments that might be helpful</name>
-					<alias>enter_here_a</alias>
-					<type>TextArea</type>
-					<order_by>7</order_by>
-					<rows>10</rows>
-					<cols>60</cols>
-				</properties>
-			</field>
-			<field>
-				<properties>
-					<field_id>8</field_id>
+					<field_id>17</field_id>
 					<name>Fieldset End</name>
 					<alias>fieldset_end</alias>
 					<type>FieldsetEnd</type>
-					<order_by>8</order_by>
+					<order_by>7</order_by>
+					<ChangeRequirement>0</ChangeRequirement>
+					<DisplayInForm>1</DisplayInForm>
+					<DisplayInSubmission>0</DisplayInSubmission>
+					<Disposable>1</Disposable>
+					<MultiChoice>0</MultiChoice>
+					<HasLabel>0</HasLabel>
+					<HideLabel>0</HideLabel>
+					<IsComputedOnSubmission>0</IsComputedOnSubmission>
+					<IsDisposition>0</IsDisposition>
+					<IsEmailDisposition>0</IsEmailDisposition>
+					<IsInput>0</IsInput>
+					<LabelSubComponents>1</LabelSubComponents>
+					<MultiComponent>0</MultiComponent>
+					<NeedsDiv>0</NeedsDiv>
+					<Required>0</Required>
+					<SmartyEval>0</SmartyEval>
+					<ValidationType>none</ValidationType>
+					<ValidationTypes>{}</ValidationTypes>
 				</properties>
 			</field>
 			<field>
 				<properties>
-					<field_id>9</field_id>
+					<field_id>18</field_id>
 					<name>Captcha</name>
 					<alias>captcha</alias>
 					<type>Captcha</type>
-					<order_by>9</order_by>
+					<order_by>8</order_by>
+					<ChangeRequirement>0</ChangeRequirement>
+					<DisplayInForm>1</DisplayInForm>
+					<DisplayInSubmission>0</DisplayInSubmission>
+					<Disposable>1</Disposable>
+					<MultiChoice>0</MultiChoice>
+					<HasLabel>1</HasLabel>
+					<HideLabel>0</HideLabel>
+					<IsComputedOnSubmission>0</IsComputedOnSubmission>
+					<IsDisposition>0</IsDisposition>
+					<IsEmailDisposition>0</IsEmailDisposition>
+					<IsInput>0</IsInput>
+					<LabelSubComponents>1</LabelSubComponents>
+					<MultiComponent>0</MultiComponent>
+					<NeedsDiv>1</NeedsDiv>
+					<Required>1</Required>
+					<SmartyEval>0</SmartyEval>
+					<ValidationType>none</ValidationType>
+					<ValidationTypes>{}</ValidationTypes>
 					<aslabel>1</aslabel>
 					<prompt>Please enter the text from the image</prompt>
 					<wrongtext>The entered text was not correct</wrongtext>
-					<captcha_template>]][[%7B%24prompt%7D%3Cbr+%2F%3E%7B%24captcha_input%7D%3Cbr+%2F%3E%7B%24captcha%7D</captcha_template>
+					<captcha_template>{$prompt}%3Cbr /%3E{$captcha_input}%3Cbr /%3E{$captcha}</captcha_template>
+				</properties>
+			</field>
+			<field>
+				<properties>
+					<field_id>11</field_id>
+					<name>Send It</name>
+					<alias>send_it</alias>
+					<type>SystemEmail</type>
+					<order_by>9</order_by>
+					<ChangeRequirement>0</ChangeRequirement>
+					<DisplayInForm>0</DisplayInForm>
+					<DisplayInSubmission>0</DisplayInSubmission>
+					<Disposable>1</Disposable>
+					<MultiChoice>1</MultiChoice>
+					<HasLabel>1</HasLabel>
+					<HideLabel>0</HideLabel>
+					<IsComputedOnSubmission>0</IsComputedOnSubmission>
+					<IsDisposition>1</IsDisposition>
+					<IsEmailDisposition>1</IsEmailDisposition>
+					<IsInput>0</IsInput>
+					<LabelSubComponents>1</LabelSubComponents>
+					<MultiComponent>0</MultiComponent>
+					<NeedsDiv>1</NeedsDiv>
+					<Required>0</Required>
+					<SmartyEval>0</SmartyEval>
+					<ValidationType>none</ValidationType>
+					<ValidationTypes>{}</ValidationTypes>
+					<email_subject>PowerForms Sample Form Submission</email_subject>
+					<email_from_name>Power Forms Installation</email_from_name>
+					<email_from_address>me@overhere.com</email_from_address>
+					<email_template>%3Ch1%3ESomeone%27s Testing a PowerForms Submission!%3C/h1%3E%0A%3Cstrong%3EDate submitted%3C/strong%3E: {$sub_date}%3Cbr /%3E%0A%3Cstrong%3EIP address from which form was submitted%3C/strong%3E: {$sub_source}%3Cbr /%3E%0A%3Cstrong%3EForm server%3C/strong%3E: {$form_host}%3Cbr /%3E%0A%3Cstrong%3EURL of page containing form%3C/strong%3E: {$form_url}%3Cbr /%3E%0A%3Cstrong%3EForm name%3C/strong%3E: {$form_name}%3Cbr /%3E%0A%3Chr /%3E%0A%3Cstrong%3EModules you%27ll be using together%3C/strong%3E: {$modules_you}%3Cbr /%3E%0A%3Cstrong%3EWhat will you personally be doing on your CMS MS site?%3C/strong%3E: {$what_will_yo}%3Cbr /%3E%0A%3Cstrong%3EWhere are you from?%3C/strong%3E: {$where_are_yo}%3Cbr /%3E%0A%3Cstrong%3EDo you have any comments / feedback for me?%3C/strong%3E: {$do_you_have}</email_template>
+					<email_encoding>utf-8</email_encoding>
+					<html_email>1</html_email>
+					<destination_address1>you@overthere.net</destination_address1>
 				</properties>
 			</field>
 		</fields>
