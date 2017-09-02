@@ -493,6 +493,7 @@ EOS;
 	xml_entities:
 	Escape chars in @str which are a problem for the PHP xml parser
 	@str: string to be encoded
+	See also: replicated function in init/encode-defaultform-templates.php
 	Returns: encoded string
 	*/
 	public function xml_entities($str)
