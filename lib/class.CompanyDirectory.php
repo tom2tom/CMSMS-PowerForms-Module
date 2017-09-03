@@ -151,59 +151,59 @@ EOS;
 		$companies = [];
 		$field = $this->GetProperty('FieldDefs');
 		if ($Like=='' || $Like=='%' || $Like=='All') {
-			$rs = $db->Execute($sql, []);
-			if ($rs) {
-				while ($row = $rs->FetchRow()) {
+			$rst = $db->Execute($sql, []);
+			if ($rst) {
+				while ($row = $rst->FetchRow()) {
 					$company = $row['company_name'];
 					$FDval = '';
-					$rs2 = $db->Execute($sql2, [$company, $field]);
-					if ($rs2) {
-						while ($row = $rs2->FetchRow()) {
+					$rst2 = $db->Execute($sql2, [$company, $field]);
+					if ($rst2) {
+						while ($row = $rst2->FetchRow()) {
 							$FDval = $row['value'];
 						}
-						$rs2->Close();
+						$rst2->Close();
 					}
 
 					$companies[$company] = $FDval;
 				}
-				$rs->Close();
+				$rst->Close();
 			}
 		} else {
 			if (is_array($Like)) {
 				foreach ($Like as $key => $value) {
-					$rs = $db->Execute($sql, [$value]);
-					if ($rs) {
-						while ($row = $rs->FetchRow()) {
+					$rst = $db->Execute($sql, [$value]);
+					if ($rst) {
+						while ($row = $rst->FetchRow()) {
 							$company = $row['company_name'];
 							$FDval = '';
-							$rs2 = $db->Execute($sql2, [$company, $field]);
-							if ($rs2) {
-								while ($row = $rs2->FetchRow()) {
+							$rst2 = $db->Execute($sql2, [$company, $field]);
+							if ($rst2) {
+								while ($row = $rst2->FetchRow()) {
 									$FDval = $row['value'];
 								}
-								$rs2->Close();
+								$rst2->Close();
 							}
 							$companies[$company] = $FDval;
 						}
-						$rs->Close();
+						$rst->Close();
 					}
 				}
 			} else {
-				$rs = $db->Execute($sql, [$Like]);
-				if ($rs) {
-					while ($row = $rs->FetchRow()) {
+				$rst = $db->Execute($sql, [$Like]);
+				if ($rst) {
+					while ($row = $rst->FetchRow()) {
 						$company=$row['company_name'];
 						$FDval='';
-						$rs2 = $db->Execute($sql2, [$company, $field]);
-						if ($rs2) {
-							while ($row = $rs2->FetchRow()) {
+						$rst2 = $db->Execute($sql2, [$company, $field]);
+						if ($rst2) {
+							while ($row = $rst2->FetchRow()) {
 								$FDval = $row['value'];
 							}
-							$rs2->Close();
+							$rst2->Close();
 						}
 						$companies[$company] = $FDval;
 					}
-					$rs->Close();
+					$rst->Close();
 				}
 			}
 		}
