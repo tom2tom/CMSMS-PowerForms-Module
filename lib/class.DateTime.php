@@ -224,7 +224,7 @@ class DateTime extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$baseurl = $mod->GetModuleURLPath();
-		$this->formdata->jsincs[] = <<<EOS
+		$this->formdata->Jscript->jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/lib/js/jquery.watermark.min.js"></script>
 EOS;
 		$dt = new \DateTime('@'.time(), NULL);
@@ -242,7 +242,7 @@ EOS;
 		}
 
 		$t = $this->GetInputId();
-		$this->formdata->jsloads[] = <<<EOS
+		$this->formdata->Jscript->jsloads[] = <<<EOS
  setTimeout(function() {
   $('#{$t}').watermark();
  },10);
@@ -258,7 +258,7 @@ EOS;
 		if ($this->Value !== '') {
 			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_STRING);
 		}
-		$this->valid = TRUE;
+		$val = TRUE;
 		$this->ValidationMessage = '';
 		if ($this->ValidationType != 'none') {
 			$msg = FALSE;
@@ -299,10 +299,11 @@ EOS;
 				$msg = $this->formdata->formsmodule->Lang('err_format');
 			}
 			if ($msg) {
-				$this->valid = FALSE;
+				$val = FALSE;
 				$this->ValidationMessage = $msg;
 			}
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 }

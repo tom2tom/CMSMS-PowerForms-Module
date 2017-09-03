@@ -198,7 +198,7 @@ class TextExpandable extends FieldBase
 	public function Validate($id)
 	{
 		$mod = $this->formdata->formsmodule;
-		$res = TRUE;
+		$val = TRUE;
 		$messages = [];
 		$l = $this->GetProperty('length', 0);
 
@@ -217,7 +217,7 @@ class TextExpandable extends FieldBase
 					$one = filter_var(trim($one), FILTER_SANITIZE_NUMBER_FLOAT);
 				}
 				if ($one === '') {
-					$res = FALSE;
+					$val = FALSE;
 					$messages[] = $mod->Lang('enter_a_number', $this->Name);
 				}
 				break;
@@ -226,7 +226,7 @@ class TextExpandable extends FieldBase
 					$one = filter_var(trim($one), FILTER_SANITIZE_NUMBER_INT);
 				}
 				if ($one === '') {
-					$res = FALSE;
+					$val = FALSE;
 					$messages[] = $mod->Lang('enter_an_integer', $this->Name);
 				}
 				break;
@@ -235,7 +235,7 @@ class TextExpandable extends FieldBase
 					$one = filter_var(trim($one), FILTER_SANITIZE_EMAIL);
 				}
 				if ($one && !preg_match($mod->email_regex, $one)) {
-					$res = FALSE;
+					$val = FALSE;
 					$messages[] = $mod->Lang('enter_an_email', $this->Name);
 				}
 				break;
@@ -244,7 +244,7 @@ class TextExpandable extends FieldBase
 					$one = filter_var(trim($one), FILTER_SANITIZE_STRING);
 				}
 				if ($one && !preg_match($this->GetProperty('regex', '/.*/'), $one)) {
-					$res = FALSE;
+					$val = FALSE;
 					$messages[] = $mod->Lang('enter_valid', $this->Name);
 				}
 				break;
@@ -253,7 +253,7 @@ class TextExpandable extends FieldBase
 					$one = filter_var(trim($one), FILTER_SANITIZE_STRING);
 				}
 				if ($one && preg_match($this->GetProperty('regex', '/.*/'), $one)) {
-					$res = FALSE;
+					$val = FALSE;
 					$messages[] = $mod->Lang('enter_valid', $this->Name);
 				}
 				break;
@@ -261,18 +261,16 @@ class TextExpandable extends FieldBase
 			unset($one);
 
 			if ($l > 0 && strlen($one) > $l) {
-				$res = FALSE;
+				$val = FALSE;
 				$messages[] = $mod->Lang('enter_no_longer', $l);
 			}
 		}
-		if ($res) {
-			$this->valid = TRUE;
+		$this->SetStatus('valid', $val);
+		if ($val) {
 			$this->ValidationMessage = '';
 		} else {
-			$this->valid = FALSE;
 			$this->ValidationMessage = implode('<br />', $messages);
 		}
-
-		return [$this->valid,$this->ValidationMessage];
+		return [$val, $this->ValidationMessage];
 	}
 }

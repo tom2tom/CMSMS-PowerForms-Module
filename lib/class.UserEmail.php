@@ -129,9 +129,9 @@ class UserEmail extends EmailBase
 		if ($this->ValidationType != 'none') {
 			return parent::Validate($id);
 		}
-		$this->valid = TRUE;
+		$this->SetStatus('valid', TRUE);
 		$this->ValidationMessage = '';
-		return [$this->valid,$this->ValidationMessage];
+		return [TRUE,$this->ValidationMessage];
 	}
 
 	public function PreDisposeAction()

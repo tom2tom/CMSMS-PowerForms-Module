@@ -192,14 +192,15 @@ class EmailDirector extends EmailBase
 	public function Validate($id)
 	{
 		if ($this->Value) {
-			$this->valid = TRUE;
+			$val = TRUE;
 			$this->ValidationMessage = '';
 		} else {
-			$this->valid = FALSE;
+			$val = FALSE;
 			$mod = $this->formdata->formsmodule;
 			$this->ValidationMessage = $mod->Lang('missing_type', $mod->Lang('destination'));
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 
 	public function Dispose($id, $returnid)

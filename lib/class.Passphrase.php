@@ -72,14 +72,14 @@ class Passphrase extends FieldBase
 	{
 		$mod = $this->formdata->formsmodule;
 		$baseurl = $mod->GetModuleURLPath();
-		$this->formdata->jsincs['cloak'] = <<<EOS
+		$this->formdata->Jscript->jsincs['cloak'] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/lib/js/jquery-inputCloak.min.js"></script>
 EOS;
 		$htmlid = $id.$this->GetInputId(); //html may get id="$id.$htmlid", or maybe not ...
 		$style = $this->GetProperty('style', 'all');
 		$char = $this->GetProperty('masker', '*');
 		$ms = $this->GetProperty('delay', 0);
-		$this->formdata->jsloads[] = <<<EOS
+		$this->formdata->Jscript->jsloads[] = <<<EOS
  $('#{$htmlid}').inputCloak({
   type: '{$style}',
   symbol: '{$char}',
@@ -104,7 +104,7 @@ EOS;
 			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_STRING);
 		}
 
-		$this->valid = TRUE;
+		$val = TRUE;
 		$this->ValidationMessage = '';
 		$mod = $this->formdata->formsmodule;
 		switch ($this->ValidationType) {
@@ -114,24 +114,25 @@ EOS;
 			$length = $this->GetProperty('length');
 			if (is_numeric($length) && $length > 0) {
 				if (strlen($this->Value) < $length) {
-					$this->valid = FALSE;
+					$val = FALSE;
 					$this->ValidationMessage = $mod->Lang('enter_no_shorter', $length);
 				}
 			}
 			break;
 		 case 'regex_match':
 			if (!preg_match($this->GetProperty('regex', '/.*/'), $this->Value)) {
-				$this->valid = FALSE;
+				$val = FALSE;
 				$this->ValidationMessage = $mod->Lang('enter_valid', $this->Name);
 			}
 			break;
 		 case 'regex_nomatch':
 			if (preg_match($this->GetProperty('regex', '/.*/'), $this->Value)) {
-				$this->valid = FALSE;
+				$val = FALSE;
 				$this->ValidationMessage = $mod->Lang('enter_valid', $this->Name);
 			}
 			break;
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 }

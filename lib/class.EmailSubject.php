@@ -34,17 +34,18 @@ class EmailSubject extends FieldBase
 		if ($this->Value !== '') {
 			$this->Value = filter_var($this->Value, FILTER_SANITIZE_STRING);
 			if ($this->Value !== '') {
-				$this->valid = TRUE;
+				$val = TRUE;
 				$this->ValidationMessage = '';
 			} else {
-				$this->valid = FALSE;
+				$val = FALSE;
 				$this->ValidationMessage = $this->formdata->formsmodule->Lang('err_typed', $mod->Lang('subject'));
 			}
 		} else {
-			$this->valid = FALSE;
+			$val = FALSE;
 			$this->ValidationMessage = $this->formdata->formsmodule->Lang('missing_type', $mod->Lang('subject'));
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 
 	public function PreDisposeAction()

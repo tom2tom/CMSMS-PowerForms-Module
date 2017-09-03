@@ -107,8 +107,8 @@ class TextArea extends FieldBase
 		if ($this->GetProperty('clear_default', 0)) {
 			$xclass = 'formarea';
 			//arrange for all such fields to be cleared
-			if (!isset($this->formdata->jsloads['cleararea'])) {
-				$this->formdata->jsloads['cleararea'] = <<<'EOS'
+			if (!isset($this->formdata->Jscript->jsloads['cleararea'])) {
+				$this->formdata->Jscript->jsloads['cleararea'] = <<<'EOS'
  $('.formarea').focus(function() {
   if (this.value == this.defaultValue) {
    this.value = '';
@@ -131,16 +131,17 @@ EOS;
 		if ($this->Value !== '') {
 			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_STRING);
 		}
-		$this->valid = TRUE;
+		$val = TRUE;
 		$this->ValidationMessage = '';
 		$length = $this->GetProperty('length');
 		if (is_numeric($length) && $length > 0) {
 			if ((strlen($this->Value)-1) > $length) {
-				$this->valid = FALSE;
+				$val = FALSE;
 				$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_no_longer', $length);
 			}
 			$this->Value = substr($this->Value, 0, $length+1);
 		}
-		return [$this->valid, $this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 }

@@ -64,23 +64,24 @@ class EmailConfirmation extends EmailBase
 		//sneak this in, ahead of PreDisposeAction()
 		$this->approvedToGo = FALSE;
 
-		$this->valid = TRUE;
+		$val = TRUE;
 		$this->ValidationMessage = '';
 		switch ($this->ValidationType) {
 		 case 'email':
 			if ($this->Value) {
 				list($rv, $msg) = $this->validateEmailAddr($this->Value);
 				if (!$rv) {
-					$this->valid = FALSE;
+					$val = FALSE;
 					$this->ValidationMessage = $msg;
 				}
 			} else {
-				$this->valid = FALSE;
+				$val = FALSE;
 				$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_an_email', $this->Name);
 			}
 			break;
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 
 	//assumes this field is first disposition on the form (sorted at runtime)

@@ -75,7 +75,7 @@ class PasswordAgain extends FieldBase
 		if ($this->Value !== '') {
 			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_STRING);
 		}
-		$this->valid = TRUE;
+		$val = TRUE;
 		$this->ValidationMessage = '';
 
 		$field_to_validate = $this->GetProperty('field_to_validate');
@@ -83,13 +83,14 @@ class PasswordAgain extends FieldBase
 			foreach ($this->formdata->Fields as &$one) {
 				if ($one->Name == $field_to_validate) {
 					if ($one->GetValue() != $this->Value) {
-						$this->valid = FALSE;
+						$val = FALSE;
 						$this->ValidationMessage = $this->formdata->formsmodule->Lang('password_does_not_match', $field_to_validate);
 					}
 				}
 			}
 			unset($one);
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 }

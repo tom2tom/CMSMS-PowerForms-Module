@@ -68,19 +68,20 @@ class EmailCCAddress extends EmailBase
 		if ($this->Value !== '') {
 			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_EMAIL);
 		}
-		$this->valid = TRUE;
+		$val = TRUE;
 		$this->ValidationMessage = '';
 		switch ($this->ValidationType) {
 		 case 'email':
 			$mod = $this->formdata->formsmodule;
 			//no ','-separator support
 			if ($this->Value && !preg_match($mod->email_regex, $this->Value)) {
-				$this->valid = FALSE;
+				$val = FALSE;
 				$this->ValidationMessage = $mod->Lang('enter_an_email', $this->Name);
 			}
 			break;
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 
 	public function PreDisposeAction()

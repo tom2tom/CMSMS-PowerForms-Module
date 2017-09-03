@@ -29,12 +29,13 @@ class HTML5URL extends FieldBase
 			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_URL);
 		}
 		if ($this->Value !== '') {
-			$this->valid = TRUE;
+			$val = TRUE;
 			$this->ValidationMessage = '';
 		} else {
-			$this->valid = FALSE;
+			$val = FALSE;
 			$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_valid','URL');
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 }

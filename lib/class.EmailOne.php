@@ -45,19 +45,20 @@ class EmailOne extends EmailBase
 		if ($this->Value !== '') {
 			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_EMAIL);
 		}
-		$this->valid = TRUE;
+		$val = TRUE;
 		$this->ValidationMessage = '';
 		if ($this->Value) {
 			list($rv, $msg) = $this->validateEmailAddr($this->Value);
 			if (!$rv) {
-				$this->valid = FALSE;
+				$val = FALSE;
 				$this->ValidationMessage = $msg;
 			}
 		} else {
-			$this->valid = FALSE;
+			$val = FALSE;
 			$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_an_email', $this->Name);
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 
 	public function Dispose($id, $returnid)

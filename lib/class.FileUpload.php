@@ -220,7 +220,7 @@ class FileUpload extends FieldBase
 		if ($this->Value !== '') {
 			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_STRING);
 		}
-		$this->valid = TRUE;
+		$val = TRUE;
 		$this->ValidationMessage = '';
 		$mod = $this->formdata->formsmodule;
 		$_id = $id.$this->formdata->current_prefix.$this->Id;
@@ -228,22 +228,24 @@ class FileUpload extends FieldBase
 			$_id = $id.$this->formdata->prior_prefix.$this->Id;
 		}
 		if (empty($_FILES[$_id])) {
-			$this->valid = FALSE;
+			$this->SetStatus('valid', FALSE);
 			$this->ValidationMessage = $mod->Lang('missing_type', $mod->Lang('file'));
-			return [$this->valid,$this->ValidationMessage];
+			return [FALSE, $this->ValidationMessage];
 		}
 		if ($_FILES[$_id]['size'] < 1 && ! $this->Required) {
-			return [TRUE,''];
+			$this->SetStatus('valid', TRUE);
+			$this->ValidationMessage = '';
+			return [TRUE, $this->ValidationMessage];
 		}
 
 		$ms = $this->GetProperty('max_size');
 		$exts = $this->GetProperty('permitted_extensions');
 		if ($_FILES[$_id]['size'] < 1 && $this->Required) {
-			$this->valid = FALSE;
+			$val = FALSE;
 			$this->ValidationMessage = $mod->Lang('required_field_missing');
 		} elseif ($ms && $_FILES[$_id]['size'] > ($ms * 1024)) {
 			$this->ValidationMessage = $mod->Lang('err_large_file'). ' '.$ms.'kb';//($ms * 1024).'kb'; // Stikki mods
-			$this->valid = FALSE;
+			$val = FALSE;
 		} elseif ($exts) {
 			$match = FALSE;
 			$legalExts = explode(',', $exts);
@@ -256,10 +258,11 @@ class FileUpload extends FieldBase
 			}
 			if (!$match) {
 				$this->ValidationMessage = $mod->Lang('illegal_file_type');
-				$this->valid = FALSE;
+				$val = FALSE;
 			}
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 
 	/*

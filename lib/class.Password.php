@@ -96,7 +96,7 @@ class Password extends FieldBase
 		if ($this->Value !== '') {
 			$this->Value = filter_var(trim($this->Value), FILTER_SANITIZE_STRING);
 		}
-		$this->valid = TRUE;
+		$val = TRUE;
 		$this->ValidationMessage = '';
 		$mod = $this->formdata->formsmodule;
 		switch ($this->ValidationType) {
@@ -105,23 +105,24 @@ class Password extends FieldBase
 		 case 'length':
 			$ln = $this->GetProperty('min_length', 0);
 			if ($ln > 0 && strlen($this->Value) < $ln) {
-				$this->valid = FALSE;
+				$val = FALSE;
 				$this->ValidationMessage = $mod->Lang('enter_at_least', $ln);
 			}
 			break;
 		 case 'regex_match':
 			if (!preg_match($this->GetProperty('regex', '/.*/'), $this->Value)) {
-				$this->valid = FALSE;
+				$val = FALSE;
 				$this->ValidationMessage = $mod->Lang('enter_valid', $this->Name);
 			}
 			break;
 		 case 'regex_nomatch':
 			if (preg_match($this->GetProperty('regex', '/.*/'), $this->Value)) {
-				$this->valid = FALSE;
+				$val = FALSE;
 				$this->ValidationMessage = $mod->Lang('enter_valid', $this->Name);
 			}
 			break;
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 }
