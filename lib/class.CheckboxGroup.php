@@ -170,7 +170,7 @@ class CheckboxGroup extends FieldBase
 				];
 			}
 /*			//TODO js for field e.g.
-			$this->jsfuncs['X'] = <<<'EOS'
+			$this->Jscript->jsfuncs['X'] = <<<'EOS'
 function select_only(cb,fclass) {
  if (cb.checked) {
   $('input.'+fclass).attr('checked',false);
@@ -178,7 +178,7 @@ function select_only(cb,fclass) {
  }
 }
 EOS;
-			$this->jsloads[] = <<<EOS
+			$this->Jscript->jsloads[] = <<<EOS
  $('input.{$fieldclass}').change(function(){
   select_only(this,'{$fieldclass}');
  });
@@ -218,9 +218,9 @@ EOS;
 
 			$limit = $this->GetProperty('single_check', 0);
 			if ($limit) {
-				if (!isset($this->formdata->jsfuncs['cbgroup'])) {
+				if (!isset($this->formdata->Jscript->jsfuncs['cbgroup'])) {
 					//TODO correct js for array of boxes
-					$this->formdata->jsfuncs['cbgroup'] = <<<'EOS'
+					$this->formdata->Jscript->jsfuncs['cbgroup'] = <<<'EOS'
 function select_only(cb) {
  if (cb.checked) {
   $('input:checkbox[name="'+cb.name+'"]').attr('checked',false);
@@ -280,20 +280,20 @@ EOS;
 
 	public function Validate($id)
 	{
-		$mod = $this->formdata->formsmodule;
-		$this->valid = TRUE;
+		$val = TRUE;
 		$this->ValidationMessage = '';
 
 		switch ($this->ValidationType) {
 		 case 'none':
 			break;
-			case 'empty':
+		 case 'empty':
 			if (0) { //TODO
-				$this->valid = FALSE;
-				$this->ValidationMessage = $mod->Lang('TODO', $this->GetProperty('text_label'));
+				$val = FALSE;
+				$this->ValidationMessage = $this->formdata->formsmodule->Lang('TODO', $this->GetProperty('text_label'));
 			}
 			break;
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 }

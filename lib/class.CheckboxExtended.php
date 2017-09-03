@@ -72,7 +72,7 @@ class CheckboxExtended extends FieldBase
 		$main[] = [$mod->Lang('title_unchecked_value'),
 						$mod->CreateInputText($id, 'fp_unchecked_value',
 							$this->GetProperty('unchecked_value', $mod->Lang('no')), 25, 255)];
-		$main[] = [$mod->Lang('title_default_set'),
+		$main[] = [$mod->Lang('checked_by_default'),
 						$mod->CreateInputHidden($id, 'fp_is_checked', 0).
 						$mod->CreateInputCheckbox($id, 'fp_is_checked', 1,
 							$this->GetProperty('is_checked', 0))];
@@ -162,7 +162,7 @@ class CheckboxExtended extends FieldBase
 			$this->Value['text'] = filter_var(trim($this->Value['text']), FILTER_SANITIZE_STRING);
 		}
 
-		$this->valid = TRUE;
+		$val = TRUE;
 		$this->ValidationMessage = '';
 
 		switch ($this->ValidationType) {
@@ -170,11 +170,12 @@ class CheckboxExtended extends FieldBase
 			break;
 		 case 'empty':
 			if (empty($this->Value['text'])) {
-				$this->valid = FALSE;
+				$val = FALSE;
 				$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_a_value', $this->GetProperty('text_label'));
 			}
 			break;
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 }

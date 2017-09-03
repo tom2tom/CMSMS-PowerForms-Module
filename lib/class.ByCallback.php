@@ -27,7 +27,7 @@ class ByCallback extends FieldBase
 		parent::__construct($formdata, $params);
 		$this->Type = 'ByCallback';
 		$this->AddOverride('ExternValidate', function ($obj, $id) {
-			$obj->valid = TRUE;
+			$obj->SetStatus('valid', TRUE);
 			$obj->ValidationMessage = '';
 		});
 	}
@@ -149,9 +149,10 @@ class ByCallback extends FieldBase
 
 	public function Validate($id)
 	{
-		$this->valid = TRUE;
+		$val = TRUE;
 		$this->ValidationMessage = '';
 		$this->ExternValidate(); //method to be populated by the callback
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 }
