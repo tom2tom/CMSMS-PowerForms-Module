@@ -16,9 +16,11 @@ if ($obfld) { //field data are loaded
 	$fid = $obfld->GetId(); //maybe <= 0, if adding
 	$nm = 'submit'; //submit-control name
 
-	$obfld->jsincs = [];
-	$obfld->jsfuncs = [];
-	$obfld->jsloads = [];
+	$ob = new stdClass();
+	$ob->jsincs = [];
+	$ob->jsfuncs = [];
+	$ob->jsloads = [];
+	$obfld->Jscript = &$ob;
 	$baseurl = $this->GetModuleURLPath();
 
 	$populators = $obfld->AdminPopulate($id);
@@ -56,7 +58,7 @@ if ($obfld) { //field data are loaded
 		$tplvars['del'] = $this->CreateInputSubmit($id, 'compdel', $obfld->ComponentDeleteLabel(),
 			'onclick="return confirm_selected(this)"');
 		$prompt = $this->Lang('confirm');
-		$obfld->jsfuncs['optiondel'] = <<<EOS
+		$ob->jsfuncs['optiondel'] = <<<EOS
 function confirm_selected(btn) {
  var sel = $(btn).closest('div').find('input[name^="{$id}selected"]:checked');
  if (sel.length > 0) {
@@ -108,10 +110,10 @@ EOS;
 		$tplvars['multiControls'] = $populators['table'];
 		if (count($populators['table']) > 2) { //titles + >1 options-row
 			$tplvars['dndhelp'] = $this->Lang('help_can_drag');
-			$obfld->jsincs[] = <<<EOS
+			$ob->jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/lib/js/jquery.tablednd.min.js"></script>
 EOS;
-			$obfld->jsloads[] = <<<'EOS'
+			$ob->jsloads[] = <<<'EOS'
  $('#helpdnd').show();
  $('#controls').addClass('table_drag').tableDnD({
   dragClass: 'row1hover',
@@ -169,13 +171,19 @@ EOS;
 	$fid = 0;
 	$nm = 'add';
 	//setup to select a type, then come back to edit it
-	$oneset = new stdClass();
-	$oneset->title = $this->Lang('title_add_new_field');
+	$ob = new stdClass();
+	$ob->title = $this->Lang('title_add_new_field');
 	PWForms\Utils::Collect_Fields($this);
-	$oneset->input = $this->CreateInputDropdown($id, 'field_type',
+	$ob->input = $this->CreateInputDropdown($id, 'field_type',
 		array_merge([$this->Lang('select_type')=>''], $this->field_types), -1, '');
-//	$oneset->help = ;
-	$tplvars['mainitem'] = $oneset;
+//	$ob->help = ;
+	$tplvars['mainitem'] = $ob;
+
+	$ob = new stdClass();
+	$ob->jsincs = NULL;
+	$ob->jsfuncs = NULL;
+	$ob->jsloads = NULL;
+	$obfld->Jscript = &$ob;
 }
 
 $tplvars['form_start'] = $this->CreateFormStart($id, 'open_field', $returnid,

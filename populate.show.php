@@ -29,10 +29,6 @@ $tplvars += [
 	'form_name' => $formdata->Name
 ];
 
-//fresh start for js accumulators
-$formdata->jsincs = [];
-$formdata->jsfuncs = [];
-$formdata->jsloads = [];
 $togglehelp = FALSE;
 // Hidden-controls accumulator (see also the form hidden-parameters, above)
 $hidden = '';
@@ -95,7 +91,7 @@ foreach ($formdata->FieldOrders as $field_id) {
 } //foreach FieldOrders[]
 
 if ($togglehelp) {
-	$formdata->jsfuncs[] = <<<'EOS'
+	$formdata->Jscript->jsfuncs[] = <<<'EOS'
 function help_toggle(htid) {
  var help_container=document.getElementById(htid);
  if (help_container) {
@@ -180,10 +176,10 @@ EOS;
 }
 
 if ($usersafejs || $safejs) {
-	$formdata->jsfuncs[] =<<<EOS
+	$formdata->Jscript->jsfuncs[] =<<<EOS
 var submitted = false;
 EOS;
-	$formdata->jsloads[] =<<<EOS
+	$formdata->Jscript->jsloads[] =<<<EOS
  $('input[class*=" submit_"]').click(function() {
   if (!submitted) {{$usersafejs}
    submitted = true;{$safejs}
