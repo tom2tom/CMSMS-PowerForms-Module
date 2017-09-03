@@ -20,10 +20,10 @@ class database extends CacheBase implements CacheInterface
 	public function use_driver()
 	{
 		$db = \cmsms()->GetDb();
-		$rs = $db->Execute("SHOW TABLES LIKE '".$this->table."'");
-		if ($rs) {
-			$ret = ($rs->RecordCount() == 1);
-			$rs->Close();
+		$rst = $db->Execute("SHOW TABLES LIKE '".$this->table."'");
+		if ($rst) {
+			$ret = ($rst->RecordCount() == 1);
+			$rst->Close();
 			return $ret;
 		}
 		return FALSE;
@@ -41,8 +41,8 @@ class database extends CacheBase implements CacheInterface
 				$lifetime = NULL;
 			}
 			$sql = 'INSERT INTO '.$this->table.' (keyword,value,savetime,lifetime) VALUES (?,?,?,?)';
-			$ret = $db->Execute($sql, array($keyword, $value, time(), $lifetime));
-			return $ret;
+			$db->Execute($sql, array($keyword, $value, time(), $lifetime));
+			return $db->Affected_Rows() > 0;
 		}
 		return FALSE;
 	}
@@ -60,12 +60,13 @@ class database extends CacheBase implements CacheInterface
 		//upsert, sort-of
 		if ($id) {
 			$sql = 'UPDATE '.$this->table.' SET value=?,savetime=?,lifetime=? WHERE cache_id=?';
-			$ret = $db->Execute($sql, array($value, time(), $lifetime, $id));
+			$db->Execute($sql, array($value, time(), $lifetime, $id));
+			return $db->Affected_Rows() != 0; //TODO CHECK MySQL reliable after update?
 		} else {
 			$sql = 'INSERT INTO '.$this->table.' (keyword,value,savetime,lifetime) VALUES (?,?,?,?)';
-			$ret = $db->Execute($sql, array($keyword, $value, time(), $lifetime));
+			$db->Execute($sql, array($keyword, $value, time(), $lifetime));
+			return $db->Affected_Rows() > 0;
 		}
-		return ($ret != FALSE);
 	}
 
 	public function _get($keyword)
@@ -123,11 +124,8 @@ class database extends CacheBase implements CacheInterface
 	public function _delete($keyword)
 	{
 		$db = \cmsms()->GetDb();
-		if ($db->Execute('DELETE FROM '.$this->table.' WHERE keyword=?', array($keyword))) {
-			return TRUE;
-		} else {
-			return FALSE;
-		}
+		$db->Execute('DELETE FROM '.$this->table.' WHERE keyword=?', array($keyword));
+		return ($db->Affected_Rows() > 0);
 	}
 
 	public function _clean($filter)
@@ -141,7 +139,8 @@ class database extends CacheBase implements CacheInterface
 				$keyword = $row['keyword'];
 				$value = (!is_null($row['value'])) ? unserialize($row['value']) : NULL;
 				if ($this->filterItem($filter, $keyword, $value)) {
-					$ret = $ret && $db->Execute($sql, array($row['cache_id']));
+					$db->Execute($sql, array($row['cache_id']));
+					$ret = $ret && ($db->Affected_Rows() > 0);
 				}
 			}
 		}
