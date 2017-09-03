@@ -252,17 +252,16 @@ class PWForms extends CMSModule
 	public function SuppressAdminOutput(&$request)
 	{
 		if (isset($_SERVER['QUERY_STRING'])) {
-			if (strpos($_SERVER['QUERY_STRING'], 'export_form') !== FALSE) {
-				return TRUE;
-			}
-			if (strpos($_SERVER['QUERY_STRING'], 'get_template') !== FALSE) {
-				return TRUE;
-			}
-			if (strpos($_SERVER['QUERY_STRING'], 'require_field') !== FALSE) {
-				return TRUE;
-			}
-			if (strpos($_SERVER['QUERY_STRING'], 'delete_field') !== FALSE) {
-				return TRUE;
+			foreach ([
+			'require_field',
+			'delete_field',
+			'get_template',
+			'populate_template',
+			'export_form',
+			] as $name) {
+				if (strpos($_SERVER['QUERY_STRING'], $name) !== FALSE) {
+					return TRUE;
+				}
 			}
 		}
 		return FALSE;
