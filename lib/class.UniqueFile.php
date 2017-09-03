@@ -80,8 +80,8 @@ class UniqueFile extends FieldBase
 		$ctldata['fp_file_header']['is_header'] = TRUE;
 		$ctldata['fp_file_footer']['is_oneline'] = TRUE;
 		$ctldata['fp_file_footer']['is_footer'] = TRUE;
-		list($buttons, $jsfuncs) = Utils::TemplateActions($this->formdata, $id, $ctldata);
-		$this->jsfuncs = array_merge($this->jsfuncs, $jsfuncs);
+		$buttons = Utils::TemplateReverters($this->formdata, $id, $ctldata);
+		//TODO CHECK custom js for template reversion? c.f. EmailBase
 
 		$adv[] = [ $mod->Lang('title_unique_file_template'),
 						$mod->CreateTextArea(FALSE, $id,

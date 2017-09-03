@@ -58,21 +58,33 @@ class Captcha extends FieldBase
 		list($main, $adv) = $this->AdminPopulateCommon($id, $except);
 		$mod = $this->formdata->formsmodule;
 		$main[] = [$mod->Lang('title_captcha_prompt'),
-						$mod->CreateInputText($id, 'fp_prompt',
-							$this->GetProperty('prompt', $mod->Lang('captcha_prompt')), 60, 120)];
+					$mod->CreateInputText($id, 'fp_prompt',
+						$this->GetProperty('prompt', $mod->Lang('captcha_prompt')), 60, 120)];
 		$main[] = [$mod->Lang('title_captcha_wrong'),
-						$mod->CreateInputText($id, 'fp_wrongtext',
-							$this->GetProperty('wrongtext', $mod->Lang('captcha_wrong')), 60, 120)];
+					$mod->CreateInputText($id, 'fp_wrongtext',
+						$this->GetProperty('wrongtext', $mod->Lang('captcha_wrong')), 60, 120)];
 		$adv[] = [$mod->Lang('title_captcha_label'),
-						$mod->CreateInputHidden($id, 'fp_aslabel', 0).
-						$mod->CreateInputCheckbox($id, 'fp_aslabel', 1,
-							$this->GetProperty('aslabel', 0)),
-						$mod->Lang('help_captcha_label')];
+					$mod->CreateInputHidden($id, 'fp_aslabel', 0).
+					$mod->CreateInputCheckbox($id, 'fp_aslabel', 1,
+						$this->GetProperty('aslabel', 0)),
+					$mod->Lang('help_captcha_label')];
+
 		//setup to revert to default (a.k.a. 'sample') template
-		list($button, $jsfunc) = Utils::CreateTemplateAction($mod, $id,
-			'fp_captcha_template', $mod->Lang('title_create_sample_template'),
-			$this->defaulttemplate);
-		$this->jsfuncs[] = $jsfunc;
+		$button = Utils::CreateTemplateButton($mod, $id, 'fp_captcha_template',
+			$mod->Lang('title_create_sample_template'));
+		$js = <<<EOS
+ $('#get_captcha_template').click(function () {
+  populate_template('{$id}fp_captcha_template');
+ });
+EOS;
+		$this->Jscript->jsloads[] = $js;
+
+		$js = <<<EOS
+function populate_template(elid) {
+//TODO ajax needed
+}
+EOS;
+		$this->Jscript->jsfuncs[] = $js;
 
 		$adv[] = [$mod->Lang('title_captcha_template'),
 						$mod->CreateTextArea(FALSE, $id, $this->GetProperty('captcha_template', $this->defaulttemplate),
@@ -156,16 +168,17 @@ class Captcha extends FieldBase
 		$mod = $this->formdata->formsmodule;
 		$captcha = \cms_utils::get_module('Captcha');
 		if (!$captcha) { //should never happen
-			$this->valid = FALSE;
+			$val = FALSE;
 			$this->ValidationMessage = $mod->Lang('err_module', 'Captcha');
 		} elseif ($captcha->CheckCaptcha($this->Value)) { //upstream migrated $params['captcha_input] to $this->Value
-			$this->valid = TRUE;
+			$val = TRUE;
 			$this->ValidationMessage = '';
 		} else {
-			$this->valid = FALSE;
+			$val = FALSE;
 			$this->ValidationMessage = $this->GetProperty('wrongtext',
 				$mod->Lang('captcha_wrong'));
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 }
