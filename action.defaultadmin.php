@@ -49,20 +49,20 @@ if ($padm) {
 		if ($oldpw != $t) {
 			//re-encrypt all stored records
 			$pre = cms_db_prefix();
-			$rs = $db->Execute('SELECT sess_id,content FROM '.$pre.'module_pwf_session');
-			if ($rs) {
+			$rst = $db->Execute('SELECT sess_id,content FROM '.$pre.'module_pwf_session');
+			if ($rst) {
 				$sql = 'UPDATE '.$pre.'module_pwf_session SET content=? WHERE sess_id=?';
-				while (!$rs->EOF) {
-					$val = $cfuncs->decrypt_value($rs->fields['content'], $oldpw);
+				while (!$rst->EOF) {
+					$val = $cfuncs->decrypt_value($rst->fields['content'], $oldpw);
 					$val = $cfuncs->encrypt_value( $val, $t);
-					if (!PWForms\Utils::SafeExec($sql, [$val, $rs->fields['sess_id']])) {
+					if (!PWForms\Utils::SafeExec($sql, [$val, $rst->fields['sess_id']])) {
 						//TODO handle error
 					}
-					if (!$rs->MoveNext()) {
+					if (!$rst->MoveNext()) {
 						break;
 					}
 				}
-				$rs->Close();
+				$rst->Close();
 			}
 			$cfuncs->encrypt_preference($key, $t);
 		}
