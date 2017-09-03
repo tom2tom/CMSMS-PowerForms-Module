@@ -316,8 +316,9 @@ SET value=?,longvalue=? WHERE field_id=? AND name=?';
 
 /*	public static function ResetFields(&$formdata)
 	{
-		foreach ($formdata->Fields as &$one)
+		foreach ($formdata->Fields as &$one) {
 			$one->ResetValue();
+		}
 
 		unset($one);
 	}
