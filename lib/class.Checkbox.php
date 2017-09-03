@@ -52,7 +52,7 @@ class Checkbox extends FieldBase
 		$main[] = [$mod->Lang('title_unchecked_value'),
 						$mod->CreateInputText($id, 'fp_unchecked_value',
 							$this->GetProperty('unchecked_value', $mod->Lang('value_unchecked')), 25, 255)];
-		$main[] = [$mod->Lang('title_default_set'),
+		$main[] = [$mod->Lang('checked_by_default'),
 						$mod->CreateInputHidden($id, 'fp_is_checked', 0).
 						$mod->CreateInputCheckbox($id, 'fp_is_checked', 1,
 							$this->GetProperty('is_checked', 0))];
