@@ -269,22 +269,20 @@ EOS;
 				continue;
 			}
 */
+			$val = TRUE;
 			if (// $obfld->GetChangeRequirement() &&
 				$obfld->IsRequired() && !$obfld->HasValue($notempty)) {
-				$allvalid = FALSE;
-				$obfld->valid = FALSE;
+				$allvalid = $val = FALSE;
 				$obfld->ValidationMessage = $this->Lang('enter_a_value', $obfld->GetName());
 				$message[] = $obfld->ValidationMessage;
 			} elseif ($obfld->GetValue()) {
 				$res = $obfld->Validate($id);
-				if ($res[0]) {
-					$obfld->valid = TRUE;
-				} else {
-					$allvalid = FALSE;
-					$obfld->valid = FALSE;
+				if (!$res[0]) {
+					$allvalid = $val = FALSE;
 					$message[] = $res[1];
 				}
 			}
+			$obfld->SetStatus('valid', $val);
 		}
 
 		if ($allvalid) {
@@ -649,26 +647,34 @@ $this->SendEvent('OnFormDisplay', [
 
 $tplvars['form_done'] = 0;
 
+//fresh start for js accumulators
+$ob = new \stdClass();
+$ob->jsincs = []; //'include' directives
+$ob->jsfuncs = []; //funcs and/or instructions
+$ob->jsloads = []; //document-ready funcs and/or instructions
+$formdata->Jscript = &$ob;
+
 require __DIR__.DIRECTORY_SEPARATOR.'populate.show.php';
 
-if ($formdata->jsincs) {
-	$jsincs = array_values($formdata->jsincs);
-	$formdata->jsincs = NULL;
+if ($ob->jsincs) {
+	$jsincs = array_values($ob->jsincs);
+	$ob->jsincs = NULL;
 } else {
 	$jsincs = NULL;
 }
-if ($formdata->jsfuncs) {
-	$jsfuncs = array_values($formdata->jsfuncs);
-	$formdata->jsfuncs = NULL;
+if ($ob->jsfuncs) {
+	$jsfuncs = array_values($ob->jsfuncs);
+	$ob->jsfuncs = NULL;
 } else {
 	$jsfuncs = NULL;
 }
-if ($formdata->jsloads) {
-	$jsloads = array_values($formdata->jsloads);
-	$formdata->jsloads = NULL;
+if ($ob->jsloads) {
+	$jsloads = array_values($ob->jsloads);
+	$ob->jsloads = NULL;
 } else {
 	$jsloads = NULL;
 }
+unset($formdata->Jscript);
 
 $cache->set($cache_key, $formdata, 84600);
 
