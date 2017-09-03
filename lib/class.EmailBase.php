@@ -84,14 +84,52 @@ class EmailBase extends FieldBase
 		$ctldata['fp_email_template']['html_button'] = TRUE;
 		$ctldata['fp_email_template']['text_button'] = TRUE;
 		$ctldata['fp_email_template']['is_email'] = TRUE;
-		list($buttons, $jsfuncs) = Utils::TemplateActions($this->formdata, $id, $ctldata);
-		$this->jsfuncs = array_merge($this->jsfuncs, $jsfuncs);
-
+		$buttons = Utils::TemplateReverters($this->formdata, $id, $ctldata);
+//TODO make this js generally available for all TemplateReverters() callers
+		$this->Jscript->jsloads[] = <<<EOS
+ $('#get_email_template').click(function() {
+  populate_template('{$id}fp_email_template',true);
+ });
+ $('#get_email_template_1').click(function() {
+  populate_template('{$id}fp_email_template',false);
+ });
+EOS;
+		$prompt = $mod->Lang('confirm_template');
+		$msg = $mod->Lang('err_server');
+		$u = $mod->create_url($id, 'populate_template', '', ['datakey'=>'__XX__', 'field_id'=>$this->Id, 'email'=>1, 'html'=>'']);
+		$offs = strpos($u, '?mact=');
+		$u = str_replace('&amp;', '&', substr($u, $offs+1)); //other parameters will be appended at runtime
+		$this->Jscript->jsfuncs[] = <<<EOS
+function populate_template(elid,html) {
+ if (confirm('{$prompt}')) {
+  var dkey = $('input[name={$id}datakey').val();
+  var type = (html) ? '1':'0';
+  var udata = '$u'.replace('__XX__',dkey)+type;
+  var msg = '$msg';
+  $.ajax({
+   type: 'POST',
+   url: 'moduleinterface.php',
+   data: udata,
+   dataType: 'text',
+   success: function(data,status) {
+    if (status=='success') {
+     $('#'+elid).val(data);
+    } else {
+     alert(msg);
+    }
+   },
+   error: function() {
+    alert(msg);
+   }
+  });
+ }
+}
+EOS;
 		$adv[] = [$mod->Lang('title_email_template'),
-						$mod->CreateTextArea(FALSE, $id,
-						//($this->GetProperty('html_email',0)?$message:htmlspecialchars($message))
-						$message, 'fp_email_template', 'pwf_tallarea', '', '', '', 50, 15, '', 'html'),
-						'<br /><br />'.$buttons[0].'&nbsp;'.$buttons[1]];
+					$mod->CreateTextArea(FALSE, $id,
+					//($this->GetProperty('html_email',0)?$message:htmlspecialchars($message))
+					$message, 'fp_email_template', 'pwf_tallarea', '', '', '', 50, 15, '', 'html'),
+					'<br /><br />'.$buttons[0].'&nbsp;'.$buttons[1]];
 		//show variables-help on advanced tab
 		return [$main,$adv,'varshelpadv'];
 	}
@@ -110,17 +148,18 @@ class EmailBase extends FieldBase
 		if ($this->Value) {
 			list($rv, $msg) = $this->validateEmailAddr($this->Value);
 			if ($rv) {
-				$this->valid = TRUE;
+				$val = TRUE;
 				$this->ValidationMessage = '';
 			} else {
-				$this->valid = FALSE;
+				$val = FALSE;
 				$this->ValidationMessage = $msg;
 			}
 		} else {
-			$this->valid = FALSE;
+			$val = FALSE;
 			$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_an_email', $this->Name);
 		}
-		return [$this->valid,$this->ValidationMessage];
+		$this->SetStatus('valid', $val);
+		return [$val, $this->ValidationMessage];
 	}
 
 	// override as necessary, return TRUE to include sender-address header in email
@@ -162,12 +201,12 @@ class EmailBase extends FieldBase
 
 	protected function SetEmailJS()
 	{
-		if (isset($this->formdata->jsincs['mailcheck'])) {
+		if (isset($this->formdata->Jscript->jsincs['mailcheck'])) {
 			return;
 		}
 		$mod = $this->formdata->formsmodule;
 		$baseurl = $mod->GetModuleURLPath();
-		$this->formdata->jsincs['mailcheck'] = <<<EOS
+		$this->formdata->Jscript->jsincs['mailcheck'] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/lib/js/mailcheck.min.js"></script>
 <script type="text/javascript" src="{$baseurl}/lib/js/levenshtein.min.js"></script>
 EOS;
@@ -195,7 +234,7 @@ EOS;
 		}
 		$intro = $mod->Lang('suggest');
 		$empty = $mod->Lang('missing_type', $mod->Lang('destination'));
-		$this->formdata->jsloads['mailcheck'] = <<<EOS
+		$this->formdata->Jscript->jsloads['mailcheck'] = <<<EOS
  $('.emailaddr').blur(function() {
   $(this).mailcheck({
 {$domains}{$l2domains}{$topdomains}
