@@ -138,7 +138,7 @@ class RadioGroup extends FieldBase
 					$mod->CreateInputCheckbox($id, 'selected'.$arf, 1, -1, 'style="display:block;margin:auto;"')
 				 ];
 			}
-			$this->jsfuncs['checkone'] = <<<'EOS'
+			$this->Jscript->jsfuncs['checkone'] = <<<'EOS'
 function select_only(cb,fclass) {
  if (cb.checked) {
   $('input.'+fclass).attr('checked',false);
@@ -146,7 +146,7 @@ function select_only(cb,fclass) {
  }
 }
 EOS;
-			$this->jsloads[] = <<<EOS
+			$this->Jscript->jsloads[] = <<<EOS
  $('input.{$fieldclass}').change(function(){
   select_only(this,'{$fieldclass}');
  });
