@@ -176,6 +176,7 @@ $dir = opendir($path);
 while ($filespec = readdir($dir)) {
 	if (preg_match('/.xml$/', $filespec) > 0) {
 		$fp = cms_join_path($path, $filespec);
+//		list($state, $msg) = 
 		$funcs->ImportXML($this, $fp);
 	}
 }
