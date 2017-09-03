@@ -323,8 +323,17 @@ class FieldBase implements \Serializable
 		$alias = preg_replace('/[^\w]+/', '_', $alias);
 		$parts = array_slice(explode('_', $alias), 0, 5);
 		$alias = substr(implode('_', $parts), 0, 12);
-		return trim($alias, '_');
-// TODO prevent a duplicate alias
+		$ta = $alias = trim($alias, '_');
+		// prevent duplicate
+		$have = [];
+		foreach ($this->formdata->Fields as &$one) {
+			$have[] = $one->Name;
+		}
+		unset($one);
+		while (in_array($alias, $have)) {
+			$alias = $ta.'_'.$i;
+		}
+		return $alias;
 	}
 
 /*	public function GetIdTag($suffix='')
