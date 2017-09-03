@@ -10,14 +10,8 @@ if (!$this->_CheckAccess('ModifyPFForms')) {
 }
 
 $funcs = new PWForms\FormOperations();
-if ($funcs->NewID($params['import_formname'], $params['import_formalias'])) {
-	$fp = $_FILES[$id.'xmlfile']['tmp_name'];
-	$state = $funcs->ImportXML($this, $fp, $params['import_formname'], $params['import_formalias']);
-	$key = ($state)?'form_imported':'err_form_import';
-} else {
-	$state = FALSE;
-	$key = 'duplicate_identifier';
-}
+$fp = $_FILES[$id.'xmlfile']['tmp_name'];
+list ($state, $msg) = $funcs->ImportXML($this, $fp, $params['import_formname'], $params['import_formalias']);
 
 $this->Redirect($id, 'defaultadmin', '', [
-	'message' => $this->_PrettyMessage($key, $state)]);
+	'message' => $this->_PrettyMessage($msg, $state, FALSE)]);
