@@ -10,9 +10,6 @@ namespace PWForms;
 class FieldBase implements \Serializable
 {
 	public $formdata; //reference to FormData object for the form to which this field belongs
-	//field status
-	public $loaded = FALSE;
-	public $valid = TRUE; //TRUE unless validation has failed
 	//field properties
 	public $Alias = '';
 	public $FormId = 0;
@@ -21,11 +18,10 @@ class FieldBase implements \Serializable
 	public $OrderBy = 0; //form display-order
 	public $Type = '';
 	public $Value; //when set, can be scalar or array, with all content processed by Utils::html_myentities_decode()
-	public $XtraProps; //container for other properties
-	//field-edit-script accumulators (won't work in XtraProps[])
-	public $jsincs;
-	public $jsfuncs;
-	public $jsloads;
+	public $XtraProps; //container-array for other properties
+
+	public $Jscript = NULL;  //container-object for AdminPopulate() script accumulators (see action.open_field for init)
+	public $Stati; //container-array for status flags & codes
 
 	public function __construct(&$formdata, &$params)
 	{
@@ -34,7 +30,6 @@ class FieldBase implements \Serializable
 		'ChangeRequirement' => TRUE, //whether admin user may change 'Required' state
 		'DisplayInForm' => TRUE,
 		'DisplayInSubmission' => TRUE, //whether field value is shown in submission template (if used) (effectively ~ self::IsInput)
-		'Disposable' => TRUE, //a field-status, not so much a continuing property
 //		'HasLabel' => TRUE,
 //		'HasUserAddOp' => FALSE, //whether Populate() supports component-addition
 //		'HasUserDeleteOp' => FALSE,//whether Populate() supports component-deletion
@@ -52,8 +47,14 @@ class FieldBase implements \Serializable
 		'SmartyEval' => FALSE, //whether to process Populate() output as a smarty-template (i.e. treat that output as a sub-template)
 		'ValidationMessage' => '', //post-validation error message, or ''
 		'ValidationType' => 'none', //chosen member of ValidationTypes
-		'ValidationTypes' => [] //array of label=>val suitable for populating a pulldown
+		'ValidationTypes' => [], //array of label=>val suitable for populating a pulldown
 		];
+		$this->Stati = [
+		'loaded' => FALSE,
+		'valid' => TRUE, //TRUE unless validation has failed
+		'Disposable' => TRUE,
+		];
+//		$this->Jscript = new \stdClass();
 
 		if (isset($params['form_id'])) {
 			$this->FormId = $params['form_id'];
@@ -98,7 +99,11 @@ class FieldBase implements \Serializable
 
 	public function __set($name, $value)
 	{
-		$this->XtraProps[$name] = $value;
+		if (0) { //TODO distinguish
+			$this->Stati[$name] = $value;
+		} else {
+			$this->XtraProps[$name] = $value;
+		}
 	}
 
 	public function __get($name)
@@ -106,17 +111,37 @@ class FieldBase implements \Serializable
 		if (array_key_exists($name, $this->XtraProps)) {
 			return $this->XtraProps[$name];
 		}
+		if (array_key_exists($name, $this->Stati)) {
+			return $this->Stati[$name];
+		}
 		return NULL;
 	}
 
 	public function __isset($name)
 	{
-		return isset($this->XtraProps[$name]);
+		return isset($this->XtraProps[$name]) || isset($this->Stati[$name]);
 	}
 
 	public function __unset($name)
 	{
-		unset($this->XtraProps[$name]);
+		if (array_key_exists($name, $this->XtraProps)) {
+			unset($this->XtraProps[$name]);
+		} elseif (array_key_exists($name, $this->Stati)) {
+			unset($this->Stati[$name]);
+		}
+	}
+
+	public function SetStatus($propName, $propValue)
+	{
+		$this->Stati[$propName] = $propValue;
+	}
+
+	public function GetStatus($propName)
+	{
+		if (isset($this->Stati[$propName])) {
+			return $this->Stati[$propName];
+		}
+		return NULL;
 	}
 
 	public function SetProperty($propName, $propValue)
@@ -299,6 +324,7 @@ class FieldBase implements \Serializable
 		$parts = array_slice(explode('_', $alias), 0, 5);
 		$alias = substr(implode('_', $parts), 0, 12);
 		return trim($alias, '_');
+// TODO prevent a duplicate alias
 	}
 
 /*	public function GetIdTag($suffix='')
@@ -333,7 +359,7 @@ class FieldBase implements \Serializable
 
 	public function IsValid()
 	{
-		return $this->valid;
+		return $this->Stati['valid'];
 	}
 
 	public function GetScript($prefix=' ')
@@ -367,13 +393,13 @@ class FieldBase implements \Serializable
 	// Set flag determining whether this disposition field is permitted to be disposed (i.e. not inhibited)
 	public function SetDisposable($state=TRUE)
 	{
-		$this->XtraProps['Disposable'] = $state;
+		$this->Stati['Disposable'] = $state;
 	}
 
 	// Get flag determining whether this disposition field is currently permitted to be disposed
 	public function IsDisposable()
 	{
-		return !empty($this->XtraProps['Disposable']);
+		return !empty($this->Stati['Disposable']);
 	}
 
 	public function IsInputField()
@@ -518,7 +544,7 @@ class FieldBase implements \Serializable
 		if ($this->Required) {
 			$cls .= ' required';
 		}
-		if (!$this->valid) {
+		if (!$this->Stati['valid']) {
 			$cls .= ' invalid_field';
 		}
 		if ($extra) {
@@ -624,7 +650,7 @@ class FieldBase implements \Serializable
 
 	// Subclass this if needed to support some unusual format for the value
 	// Returns boolean T/F indicating whether the field value is present and non-default
-	public function HasValue($empty_notaccepted= FALSE)
+	public function HasValue($empty_notaccepted=FALSE)
 	{
 		if ($this->Value || is_numeric($this->Value)) {
 			if (isset($this->XtraProps['default'])) { // field has default
@@ -734,7 +760,7 @@ class FieldBase implements \Serializable
 	*/
 	public function Load($id, &$params)
 	{
-		return FieldOperations::LoadField($this);
+		return FieldOperations::Load($this);
 	}
 
 	/**
@@ -745,9 +771,9 @@ class FieldBase implements \Serializable
 	Sets field->Id to real value if it was -1 i.e. a new field
 	Returns: boolean T/F per success of executed db commands
 	*/
-	public function Store($allprops= FALSE)
+	public function Store($allprops=FALSE)
 	{
-		return FieldOperations::StoreField($this, $allprops);
+		return FieldOperations::Store($this, $allprops);
 	}
 
 	// Subclass this if needed to do stuff after the field is stored
@@ -763,7 +789,7 @@ class FieldBase implements \Serializable
 	public function Delete()
 	{
 		if ($this->Id) {
-			return FieldOperations::RealDeleteField($this);
+			return FieldOperations::RealDelete($this);
 		}
 		return FALSE;
 	}
@@ -782,7 +808,7 @@ class FieldBase implements \Serializable
 	 [0] = array of things for 'main' tab
 	 [1] = (possibly empty) array of things for 'adv' tab
 	*/
-	public function AdminPopulateCommon($id, $except= FALSE, $boolean= FALSE, $visible=TRUE)
+	public function AdminPopulateCommon($id, $except=FALSE, $boolean=FALSE, $visible=TRUE)
 	{
 		$mod = $this->formdata->formsmodule;
 		$displayable = !empty($this->XtraProps['DisplayInForm']);
@@ -973,7 +999,7 @@ class FieldBase implements \Serializable
 	*/
 	public function Validate($id)
 	{
-		$this->valid = TRUE;
+		$this->Stati['valid'] = TRUE;
 		$this->XtraProps['ValidationMessage'] = '';
 		return [TRUE,''];
 	}
