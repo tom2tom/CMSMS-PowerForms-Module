@@ -591,7 +591,7 @@ class Utils
 	@footer: whether the template is to be the end (of another template), default FALSE
 	*/
 	public static function CreateDefaultTemplate(&$formdata,
-		$htmlish= FALSE, $email=TRUE, $oneline= FALSE, $header= FALSE, $footer= FALSE)
+		$htmlish=FALSE, $email=TRUE, $oneline=FALSE, $header=FALSE, $footer=FALSE)
 	{
 		$mod = $formdata->formsmodule;
 		$ret = '';
@@ -665,7 +665,7 @@ class Utils
 	}
 
 	/**
-	CreateTemplateAction:
+	CreateTemplateButton:
 	Setup to insert a defined (probably default) template into a html-control.
 	For use when editing a form or field containing a template.
 	@mod: reference to PWForms module object
@@ -673,35 +673,23 @@ class Utils
 	@ctlName: name of the control, by convention like 'fp_'.field-prop-name,
 		here, it may have appended suffix 'text'
 	@$button_label: text for button label
-	@template: template to be inserted into the control, upon button-click.
-		This becomes a single-quoted js string, so any embedded single-quote
-		must be escaped, and any js-unfriendly content must be resolved.
 	@funcName: identifier for use when multiple buttons populate the same control, default ''
-	Returns: 2-member array:
-	 [0] XHTML for a button, including 'onclick' js
-	 [1] js onclick handler for the button, sets object value
+	Returns: XHTML for a button, no js
 	*/
-	public static function CreateTemplateAction(&$mod, $id, $ctlName, $button_label, $template, $funcName= FALSE)
+	public static function CreateTemplateButton(&$mod, $id, $ctlName, $button_label, $funcName=FALSE)
 	{
 		if (!$funcName) {
-			$funcName = substr($ctlName, 3);
-		} //omit 'fp_' prefix
-		$button = <<<EOS
-<input type="button" class="cms_submit" value="{$button_label}" onclick="populate_{$funcName}(this.form)" />
+			$funcName = substr($ctlName, 3); //omit 'fp_' prefix
+		} else {
+			$funcName = substr($funcName, 3);
+		}
+		return <<<EOS
+<input type="button" class="cms_submit" id="get_{$funcName}" value="{$button_label}" />
 EOS;
-		$prompt = $mod->Lang('confirm');
-		$func = <<<EOS
-function populate_{$funcName}(formname) {
- if (confirm('{$prompt}')) {
-  formname['{$id}{$ctlName}'].value='{$template}';
- }
-}
-EOS;
-		return [$button,$func];
 	}
 
 	/**
-	TemplateActions:
+	TemplateReverters:
 	@formdata: reference to FormData formdata object
 	@id: The id given to the Powerforms module on execution
 	@ctlData: array of parameters in which key(s) are respective names of affected form-control(s),
@@ -716,71 +704,46 @@ EOS;
 		and their respective values being boolean
 		e.g. for 3 controls:
 		array
-		  'fp_file_template' => array
-			  'is_oneline' => TRUE
-		  'fp_file_header' => array
-			  'is_oneline' => TRUE
-			  'is_header' => TRUE
-		  'fp_file_footer' => array
-			  'is_oneline' => TRUE
-			  'is_footer' => TRUE
-	Returns: 2-member array
-	 [0] = array of XHTML button-strings, each including 'onclick=...' js
-	 [1] = corresponding array of onclick handler-funcs for buttons in [0]
-	 The scripts install a 'sample template' into the corresponding control.
-	 For some combinations of options, pairs of buttons & scripts are created.
+		 'fp_file_template' => array
+		 'is_oneline' => TRUE
+		 'fp_file_header' => array
+		 'is_oneline' => TRUE
+		 'is_header' => TRUE
+		 'fp_file_footer' => array
+		 'is_oneline' => TRUE
+		 'is_footer' => TRUE
+	Returns: array of XHTML button-strings (no js applied)
 	*/
-	public static function TemplateActions(&$formdata, $id, $ctlData)
+	public static function TemplateReverters(&$formdata, $id, $ctlData)
 	{
 		$mod = $formdata->formsmodule;
 		$buttons = [];
-		$funcs = [];
 		foreach ($ctlData as $ctlname=>$tpopts) {
 			$gen_button = !empty($tpopts['general_button']);
 			$html_button = !empty($tpopts['html_button']);
 			$text_button = !empty($tpopts['text_button']);
-			$is_email = !empty($vtpopts['is_email']);
-			$is_oneline = !empty($tpopts['is_oneline']);
+//			$is_email = !empty($vtpopts['is_email']);
+//			$is_oneline = !empty($tpopts['is_oneline']);
 			$is_footer = !empty($tpopts['is_footer']);
 			$is_header = !empty($tpopts['is_header']);
 
-			$nl = PHP_EOL;
-			$l = strlen($nl);
-			$breaker = '';
-			for ($i=0; $i<$l; $i++) {
-				$breaker .= (ord($nl[$i])==10) ? '\n':'\r';
-			}
-
-			if ($html_button && $text_button) {
-				$tplstr = self::CreateDefaultTemplate($formdata, FALSE,
-					$is_email, $is_oneline, $is_header, $is_footer);
-				//adjust the string for js
-				$tplstr = str_replace(["'", PHP_EOL], ["\\'", $breaker], $tplstr);
-				list($b, $f) = self::CreateTemplateAction($mod, $id, $ctlname,
-					$mod->Lang('title_create_sample_template'), $tplstr, $ctlname.'_1');
-				$buttons[] = $b;
-				$funcs[] = $f;
-			}
-
 			if ($html_button) {
+				if ($text_button) { //extra button
+					$button_text = $mod->Lang('title_create_sample_template');
+					$buttons[] = self::CreateTemplateButton($mod, $id, $ctlname, $button_text, $ctlname.'_1');
+				}
 				$button_text = $mod->Lang('title_create_sample_html_template');
 			} elseif ($is_header) {
 				$button_text = $mod->Lang('title_create_sample_header_template');
 			} elseif ($is_footer) {
 				$button_text = $mod->Lang('title_create_sample_footer_template');
-			} else {
+			} else { //$gen_button
 				$button_text = $mod->Lang('title_create_sample_template');
 			}
 
-			$tplstr = self::CreateDefaultTemplate($formdata, $html_button || $gen_button,
-				$is_email, $is_oneline, $is_header, $is_footer);
-			//adjust the string for js
-			$tplstr = str_replace(["'", PHP_EOL], ["\\'", $breaker], $tplstr);
-			list($b, $f) = self::CreateTemplateAction($mod, $id, $ctlname, $button_text, $tplstr);
-			$buttons[] = $b;
-			$funcs[] = $f;
+			$buttons[] = self::CreateTemplateButton($mod, $id, $ctlname, $button_text);
 		}
-		return [$buttons,$funcs];
+		return $buttons;
 	}
 
 	/**
