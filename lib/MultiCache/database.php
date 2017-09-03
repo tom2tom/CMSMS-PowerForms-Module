@@ -61,7 +61,7 @@ class database extends CacheBase implements CacheInterface
 		if ($id) {
 			$sql = 'UPDATE '.$this->table.' SET value=?,savetime=?,lifetime=? WHERE cache_id=?';
 			$db->Execute($sql, array($value, time(), $lifetime, $id));
-			return $db->Affected_Rows() != 0; //TODO CHECK MySQL reliable after update?
+			return $db->Affected_Rows() >= 0; //TODO CHECK MySQL reliable after update?
 		} else {
 			$sql = 'INSERT INTO '.$this->table.' (keyword,value,savetime,lifetime) VALUES (?,?,?,?)';
 			$db->Execute($sql, array($keyword, $value, time(), $lifetime));
