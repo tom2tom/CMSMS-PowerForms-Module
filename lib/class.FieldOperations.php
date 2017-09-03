@@ -10,7 +10,7 @@ namespace PWForms;
 class FieldOperations
 {
 	/**
-	NewField:
+	Get:
 	@formdata: reference to FormData-class object to be set in the field
 	@params: reference to array of table-row fields and/or request parameters,
 	 should include 'field_id' (in which case, maybe 'type' too) or 'field_pick'
@@ -21,7 +21,7 @@ class FieldOperations
 	Constructs new field-object per $params['field_id'] or $params['field_pick']
 	Returns: the object, or FALSE
 	*/
-	public static function NewField(&$formdata, &$params)
+	public static function Get(&$formdata, &$params)
 	{
 		$obfld = FALSE;
 		if (!empty($params['field_id'])) {
@@ -41,7 +41,7 @@ class FieldOperations
 				if (is_file($classPath)) {
 					$classPath = 'PWForms\\'.$className;
 					$obfld = new $classPath($formdata, $params);
-					if (self::LoadField($obfld)) {
+					if (self::Load($obfld)) {
 						//TODO rationalise value setting
 						if (!empty($params[$formdata->current_prefix.$obfld->Id])) {
 							$obfld->SetValue($params[$formdata->current_prefix.$obfld->Id]);
@@ -84,14 +84,14 @@ class FieldOperations
 	}
 
 	/**
-	CopyField:
+	Copy:
 	@field_id: field enumerator
 	@form_id: optional form enumerator, default FALSE to use the form for @field_id
 	@neworder: optional display-order for the field, default FALSE to place it last
 	Copy an existing field from and to the database
 	Returns: boolean T/F indicating success
 	*/
-	public static function CopyField($field_id, $form_id= FALSE, $neworder= FALSE)
+	public static function Copy($field_id, $form_id=FALSE, $neworder=FALSE)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT form_id,name,alias,type,order_by FROM '.$pre.'module_pwf_field WHERE field_id=?';
@@ -123,16 +123,16 @@ class FieldOperations
 		$fid = $db->Insert_ID();
 
 		$sql = 'SELECT field_id,form_id,name,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE field_id=?';
-		$rs = $db->Execute($sql, [$field_id]);
-		if ($rs) {
+		$rst = $db->Execute($sql, [$field_id]);
+		if ($rst) {
 			$sql = 'INSERT INTO '.$pre.'module_pwf_fieldprops
 (field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
-			while ($row = $rs->FetchRow()) {
+			while ($row = $rst->FetchRow()) {
 				$row['field_id'] = $fid;
 				$row['form_id'] = $form_id;
 				$db->Execute($sql, $row);
 			}
-			$rs->Close();
+			$rst->Close();
 		}
 		return TRUE;
 	}
@@ -157,7 +157,7 @@ class FieldOperations
 	}
 
 	/**
-	StoreField:
+	Store:
 	@obfld: reference to field-object
 	@allprops: optional boolean, whether to also save all field properties, default=FALSE
 	Stores (by insert or update) data for @obfld in database tables.
@@ -165,36 +165,36 @@ class FieldOperations
 	Sets @obfld->Id to real value if it was -1 i.e. a new field
 	Returns: boolean T/F per success of executed db commands
 	*/
-	public static function StoreField(&$obfld, $allprops= FALSE)
+	public static function Store(&$obfld, $allprops=FALSE)
 	{
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
-		if ($obfld->Id <= 0) {
-			$sql = 'INSERT INTO '.$pre.'module_pwf_field (form_id,name,alias,type,order_by) VALUES (?,?,?,?,?)';
+		//upsert, sort-of
+		$sql = 'UPDATE '.$pre.'module_pwf_field
+SET name=?,alias=?,order_by=? WHERE field_id=?';
+		$db->Execute($sql, [
+		$obfld->Name,
+		$obfld->Alias,
+		$obfld->OrderBy,
+		$obfld->Id]);
+		if ($db->Affected_Rows() == -1) { //failed
+			$sql = 'INSERT INTO '.$pre.'module_pwf_field
+(form_id,name,alias,type,order_by) VALUES (?,?,?,?,?)';
 			$db->Execute($sql, [
-				$obfld->FormId,
-				$obfld->Name,
-				$obfld->Alias,
-				$obfld->Type,
-				$obfld->OrderBy]);
+			$obfld->FormId,
+			$obfld->Name,
+			$obfld->Alias,
+			$obfld->Type,
+			$obfld->OrderBy]);
+
 			$obfld->Id = $db->Insert_ID();
-		} else {
-			$sql = 'UPDATE '.$pre.'module_pwf_field SET name=?,alias=?,order_by=? WHERE field_id=?';
-			$res = $db->Execute($sql, [
-				$obfld->Name,
-				$obfld->Alias,
-				$obfld->OrderBy,
-				$obfld->Id]);
 		}
 
 		if ($allprops) {
-			// drop all current properties
-			$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops where field_id=?';
-			$db->Execute($sql, [$obfld->Id]);
-			$res = ($db->Affected_Rows() > 0) && $res;
-			// add back current ones
-			$sql = 'INSERT INTO '.$pre.'module_pwf_fieldprops
-(field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
+			$sql = 'UPDATE '.$pre.'module_pwf_fieldprops
+SET value=?,longvalue=? WHERE field_id=? AND name=?';
+			$sql2 = 'INSERT INTO '.$pre.'module_pwf fieldprops
+(field_id,form_id,name,value,longvalue) VALUES(?,?,?,?,?)';
 			foreach ($obfld->XtraProps as $name=>$value) {
 				if (!is_scalar($value)) {
 					$value = json_encode($value, JSON_FORCE_OBJECT);
@@ -206,22 +206,24 @@ class FieldOperations
 					$sval = NULL;
 					$lval = $value;
 				}
-				$db->Execute($sql, [$obfld->Id, $obfld->FormId, $name, $sval, $lval]);
-				$res = ($db->Affected_Rows() > 0) && $res;
-//				$newid = $db->Insert_ID();
+				$db->Execute($sql, [$val, $lval, $obfld->Id, $name]);
+				if ($db->Affected_Rows() == -1) { //failed
+					$db->Execute($sql2, [$obfld->Id, $obfld->FormId, $name, $val, $lval]);
+//					$newid = $db->Insert_ID();
+				}
 			}
 		}
 		return $res;
 	}
 
 	/**
-	LoadField:
+	Load:
 	@obfld: reference to field-object, including (at least) the appropriate Id
 	Populates @obfld data from database tables.
 	Table data replace existing data TODO OK?
 	Returns: boolean T/F indicating successful operation
 	*/
-	public static function LoadField(&$obfld)
+	public static function Load(&$obfld)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_field WHERE field_id=?';
@@ -240,7 +242,7 @@ class FieldOperations
 			return FALSE;
 		}
 
-		$obfld->loaded = TRUE;
+		$obfld->SetStatus('loaded', TRUE);
 
 		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE field_id=? ORDER BY prop_id';
 		$defaults = $db->GetArray($sql, [$obfld->Id]);
@@ -282,29 +284,31 @@ class FieldOperations
 	}
 
 	/**
-	RealDeleteField:
+	RealDelete:
 	@obfld: reference to field-object, including (at least) the appropriate Id
 	Returns: boolean T/F indicating success
 	*/
-	public static function RealDeleteField(&$obfld)
+	public static function RealDelete(&$obfld)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field where field_id=?';
 		$db = \cmsms()->GetDb();
-		$res = $db->Execute($sql, [$obfld->Id]);
+		$db->Execute($sql, [$obfld->Id]);
+		$res = $db->Affected_Rows() > 0;
 		$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops where field_id=?';
-		$res = $db->Execute($sql, [$obfld->Id]) && $res;
+		$db->Execute($sql, [$obfld->Id]) && $res;
+		$res = $res && ($db->Affected_Rows() > 0);
 		return $res;
 	}
 
 	/**
-	DeleteField:
+	Delete:
 	@formdata: reference to FormData-class object
 	@field_id: field enumerator, key in @formdata->Fields[]
 	Clear table data
-	Unless the-field->Delete() is subclassed, it just calls self::RealDeleteField()
+	Unless the-field->Delete() is subclassed, it comes back to self::RealDelete()
 	*/
-	public static function DeleteField(&$formdata, $field_id)
+	public static function Delete(&$formdata, $field_id)
 	{
 		$formdata->Fields[$field_id]->Delete();
 		unset($formdata->Fields[$field_id]);
@@ -320,13 +324,13 @@ class FieldOperations
 */
 
 	/**
-	SwapFieldsByIndex:
+	SwapByIndex:
 	@field_index1:
 	@field_index2:
 	Swaps field display-orders
 	This is intended for swapping adjacent fields but works more generally
 	*/
-	public static function SwapFieldsByIndex($field_index1, $field_index2)
+	public static function SwapByIndex($field_index1, $field_index2)
 	{
 		$keys = array_keys($formdata->Fields);
 		if (isset($keys[$field_index1]) && isset($keys[$field_index2])) {
@@ -340,13 +344,13 @@ class FieldOperations
 	}
 
 	/**
-	GetFieldIndexFromId:
+	GetIndexFromId:
 	@formdata: reference to FormData-class object
 	@field_id: field enumerator, key in @formdata->Fields[]
 	Returns: 0-based index of a field in @formdata->Fields[] and with id matching @field_id
 	Check returned value with !== FALSE
 	*/
-	public static function GetFieldIndexFromId(&$formdata, $field_id)
+	public static function GetIndexFromId(&$formdata, $field_id)
 	{
 		return array_search($field_id, array_keys($formdata->Fields));
 	}
