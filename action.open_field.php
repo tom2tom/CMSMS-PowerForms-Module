@@ -33,7 +33,7 @@ $this->Crash();
 		$obfld = $formdata->Fields[$params['field_id']];
 	} elseif (isset($params['field_pick'])) { //we know what type of field to add
 		unset($params['field_id']); //-1 no use
-		$obfld = PWForms\FieldOperations::NewField($formdata, $params);
+		$obfld = PWForms\FieldOperations::Get($formdata, $params);
 	} else { //add field, whose type is to be selected
 		$obfld = FALSE;
 	}
@@ -60,7 +60,7 @@ $message = '';
 if (isset($params['submit'])) {
 	if ($newfield) {
 		$params['field_pick'] = $params['field_Type'];
-		$obfld = PWForms\FieldOperations::NewField($formdata, $params);
+		$obfld = PWForms\FieldOperations::Get($formdata, $params);
 	}
 	//migrate $params to field data
 	foreach ([
@@ -115,7 +115,7 @@ if (isset($params['submit'])) {
 	} else {
 		//start again //TODO if imported field with no tabled data
 		if ($newfield) {
-			$obfld = PWForms\FieldOperations::NewField($formdata, $params);
+			$obfld = PWForms\FieldOperations::Get($formdata, $params);
 		} else {
 			$obfld->Load($id, $params);
 		} //TODO check for failure
@@ -152,14 +152,21 @@ if ($refresh) {
 }
 
 $tplvars = [];
+$ob = new stdClass();
+$ob->jsincs = [];
+$ob->jsfuncs = [];
+$ob->jsloads = [];
+$obfld->Jscript = &$ob;
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.field.php';
 
 $jsall = NULL;
-PWForms\Utils::MergeJS($obfld->jsincs, $obfld->jsfuncs, $obfld->jsloads, $jsall);
-$obfld->jsincs = FALSE;
-$obfld->jsfuncs = FALSE;
-$obfld->jsloads = FALSE;
+PWForms\Utils::MergeJS($ob->jsincs, $ob->jsfuncs, $ob->jsloads, $jsall);
+
+$ob->jsincs = NULL;
+$ob->jsfuncs = NULL;
+$ob->jsloads = NULL;
+unset($obfld->Jscript);
 
 $cache->set($params['datakey'], $formdata, 84600);
 

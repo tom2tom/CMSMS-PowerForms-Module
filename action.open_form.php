@@ -67,9 +67,9 @@ if (isset($params['submit']) || isset($params['apply'])) {
 		$message = $this->_PrettyMessage('err_copy', FALSE);
 	}
 } elseif (isset($params['dir'])) {
-	$srcIndex = PWForms\FieldOperations::GetFieldIndexFromId($formdata, $params['field_id']);
+	$srcIndex = PWForms\FieldOperations::GetIndexFromId($formdata, $params['field_id']);
 	$destIndex = ($params['dir'] == 'up') ? $srcIndex - 1 : $srcIndex + 1;
-	PWForms\FieldOperations::SwapFieldsByIndex($srcIndex, $destIndex);
+	PWForms\FieldOperations::SwapByIndex($srcIndex, $destIndex);
 	$message = $this->_PrettyMessage('field_order_updated');
 }
 
