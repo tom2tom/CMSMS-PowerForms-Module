@@ -221,8 +221,8 @@ function require_field(link,fid,newstate) {
   },
   success: function() {
    var \$l = $(link),
-	url = \$l.attr('href'),
-	js = \$l.attr('onclick');
+    url = \$l.attr('href'),
+    js = \$l.attr('onclick');
    var newurl = (newstate) ? url.replace('reqd=on','reqd=off') : url.replace('reqd=off','reqd=on');
    var newjs = (newstate) ? js.replace(',true',',false') : js.replace(',false',',true');
    var img = (newstate) ? '{$icontrue}':'{$iconfalse}';
@@ -233,10 +233,10 @@ function require_field(link,fid,newstate) {
 EOS;
 } else { //no field
 	$tplvars += [
-		'nofields' => $this->Lang('no_fields'),
-		'text_ready' => '',
-		'text_notready' => $this->Lang('title_not_ready'),
-		'help_notready' => $this->Lang('no_fields')
+	'nofields' => $this->Lang('no_fields'),
+	'text_ready' => '',
+	'text_notready' => $this->Lang('title_not_ready'),
+	'help_notready' => $this->Lang('no_fields')
 	];
 }
 
@@ -270,28 +270,28 @@ function delete_field (link,fid,fname) {
    url: 'moduleinterface.php',
    data: '{$u}'+fid,
    error: function() {
-	alert('{$errmsg}');
+    alert('{$errmsg}');
    },
    success: function() {
-	var \$row = $(link).closest('tr');
-	\$row.fadeOut('500', function() {
-	 var odd = true,
-	  oddclass = 'row1',
-	  evenclass = 'row2',
-	  \$bod = \$row.closest('tbody');
-	 \$row.remove();
-	 \$bod.find('tr').each(function() {
-	  var \$r = $(this),
-		name = odd ? oddclass : evenclass;
-	  \$r.removeClass().addClass(name)
-	  .removeAttr('onmouseover').mouseover(function() {
-		\$r.attr('class',name+'hover');
-	  }).removeAttr('onmouseout').mouseout(function() {
-		\$r.attr('class',name);
-	  });
-	  odd = !odd;
-	 });
-	});
+    var \$row = $(link).closest('tr');
+    \$row.fadeOut('500', function() {
+     var odd = true,
+      oddclass = 'row1',
+      evenclass = 'row2',
+      \$bod = \$row.closest('tbody');
+     \$row.remove();
+     \$bod.find('tr').each(function() {
+      var \$r = $(this),
+       name = odd ? oddclass : evenclass;
+      \$r.removeClass().addClass(name)
+      .removeAttr('onmouseover').mouseover(function() {
+        \$r.attr('class',name+'hover');
+      }).removeAttr('onmouseout').mouseout(function() {
+        \$r.attr('class',name);
+      });
+      odd = !odd;
+     });
+    });
    }
   });
  }
@@ -301,35 +301,35 @@ function delete_selected(btn,prompt) {
  if (\$sel.length > 0) {
   if (confirm(prompt)) {
    var fids = \$sel.map(function() {
-	return this.value;
+    return this.value;
    }).get();
    $.ajax({
-	type: 'POST',
-	url: 'moduleinterface.php',
-	data: '{$u}'+fids,
-	error: function() {
-	 alert('{$errmsg}');
-	},
-	success: function() {
-	 \$sel.each(function() {
-	  $(this).closest('tr').remove();
-	 });
-	 var \$bod = $(btn).closest('div[class^="add"]').prev('table').find('tbody');
-	  odd = true,
-	  oddclass = 'row1',
-	  evenclass = 'row2';
-	 \$bod.find('tr').each(function() {
-	  var \$r = $(this),
-		name = odd ? oddclass : evenclass;
-	  \$r.removeClass().addClass(name)
-	  .removeAttr('onmouseover').mouseover(function() {
-		\$r.attr('class',name+'hover');
-	  }).removeAttr('onmouseout').mouseout(function() {
-		\$r.attr('class',name);
-	  });
-	  odd = !odd;
-	 });
-	}
+    type: 'POST',
+    url: 'moduleinterface.php',
+    data: '$u'+fids,
+    error: function() {
+     alert('{$errmsg}');
+    },
+    success: function() {
+     \$sel.each(function() {
+      $(this).closest('tr').remove();
+     });
+     var \$bod = $(btn).closest('div[class^="add"]').prev('table').find('tbody');
+      odd = true,
+      oddclass = 'row1',
+      evenclass = 'row2';
+     \$bod.find('tr').each(function() {
+      var \$r = $(this),
+        name = odd ? oddclass : evenclass;
+      \$r.removeClass().addClass(name)
+      .removeAttr('onmouseover').mouseover(function() {
+        \$r.attr('class',name+'hover');
+      }).removeAttr('onmouseout').mouseout(function() {
+        \$r.attr('class',name);
+      });
+      odd = !odd;
+     });
+    }
    });
   }
  }
@@ -540,7 +540,13 @@ foreach ($allForms as $one) {
 
 $tplvars['title_load_template'] = $this->Lang('title_load_template');
 $tplvars['input_load_template'] = $this->CreateInputDropdown($id, 'template_load',
-	$templateList, -1, '', 'id="template_load" onchange="get_template(this);"'); //overwrites downstream-generated id
+	$templateList, -1, '', 'id="template_load"'); //overwrites downstream-generated id
+
+$jsloads[] = <<<EOS
+ $('#template_load').change(function() {
+  get_template(this,'form_template');
+ });
+EOS;
 
 $prompt = $this->Lang('confirm_template');
 $msg = $this->Lang('err_server');
@@ -549,19 +555,19 @@ $offs = strpos($u, '?mact=');
 $u = str_replace('&amp;', '&', substr($u, $offs+1)); //template identifier will be appended at runtime
 
 $jsfuncs[] = <<<EOS
-function get_template (sel) {
+function get_template (sel, elid) {
  if (confirm('{$prompt}')) {
   var value = $(sel).val();
   if (value) {
-   var msg = '{$msg}';
+   var msg = '$msg';
    $.ajax({
     type: 'POST',
     url: 'moduleinterface.php',
-    data: '{$u}'+value,
+    data: '$u'+value,
     dataType: 'text',
     success: function(data,status) {
      if (status=='success') {
-      $('#form_template').val(data);
+      $('#'+elid).val(data);
      } else {
       alert(msg);
      }
@@ -791,12 +797,44 @@ $tplvars['input_submit_template'] = $this->CreateSyntaxArea($id, $tpl, 'fp_submi
 //setup to revert to 'sample' submission-template
 $ctlData = [];
 $ctlData['fp_submission_template']['general_button'] = TRUE;
-list($buttons, $revertscripts) = PWForms\Utils::TemplateActions($formdata, $id, $ctlData);
-$jsfuncs[] = $revertscripts[0];
+$buttons = PWForms\Utils::TemplateReverters($formdata, $id, $ctlData);
 $tplvars += [
 	'sample_submit_template' => $buttons[0],
 	'help_submit_template' => $this->Lang('help_submit_template'),
 ];
+$jsloads[] = <<<EOS
+ $('#get_submission_template').click(function() {
+  populate_template('submission_template');
+ });
+EOS;
+//$prompt = $this->Lang('confirm_template');
+//$msg = $this->Lang('err_server');
+$u = $this->create_url($id, 'populate_template', '', ['datakey'=>$params['datakey'], 'form_id'=>$form_id]);
+$offs = strpos($u, '?mact=');
+$u = str_replace('&amp;', '&', substr($u, $offs+1));
+$jsfuncs[] = <<<EOS
+function populate_template (elid) {
+ if (confirm('{$prompt}')) {
+  var msg = '$msg';
+  $.ajax({
+   type: 'POST',
+   url: 'moduleinterface.php',
+   data: '$u',
+   dataType: 'text',
+   success: function(data,status) {
+    if (status=='success') {
+     $('#'+elid).val(data);
+    } else {
+     alert(msg);
+    }
+   },
+   error: function() {
+    alert(msg);
+   }
+  });
+ }
+}
+EOS;
 
 $tplvars['cancel'] = $this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'));
 $tplvars['save'] = $this->CreateInputSubmit($id, 'submit', $this->Lang('save'));
