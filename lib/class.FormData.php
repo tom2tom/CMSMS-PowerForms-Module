@@ -9,23 +9,24 @@ namespace PWForms;
 class FormData implements \Serializable
 {
 	public $formsmodule = NULL; //reference to PWForms-module object
-	//time-specific object-name-prefixes (for bot-combat), must begin with 'pwfp_NNN_' where N = digit
-	public $current_prefix = FALSE; //for current 30-minute period
-	public $prior_prefix = FALSE; //for prior-period
 	//known form-properties
 	public $Alias = '';
 	public $Fields = []; //merged array of display and/or disposition field objects, each key = field->Id
 	public $FieldOrders = FALSE; //when needed, set to ordered array representing field->Orderby
 	public $Id = 0;
 	public $Name = '';
+	//extra form-properties
+	public $XtraProps = [];
+	//diplay-time properties
 	public $Page = 0; //current page in the form
 	public $PagesCount = 0; //no. of pages in the form
-	public $XtraProps = []; //extra form-properties
+	//time-specific object-name-prefixes (for bot-combat), must begin with 'pwfp_NNN_' where N = digit
+	public $current_prefix = FALSE; //for current 30-minute period
+	public $prior_prefix = FALSE; //for prior-period
+	//container for form-script accumulators (won't work in array e.g. XtraProps[] if array_merge() used directly)
+	public $Jscript = null; //init & use in & via populate.show
 //	public $sampleTemplateCode = '';
 	public $templateVariables = []; //extra 'global' items for template-help, each like 'var_name'=>'help_lang_key'
-	public $jsincs = []; //'include' directives
-	public $jsfuncs = []; //funcs and/or instructions
-	public $jsloads = []; //document-ready funcs and/or instructions
 
 	public function __set($name, $value)
 	{
