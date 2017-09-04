@@ -82,9 +82,9 @@ EOS;
 		$tn = $name;
 		$ta = $alias;
 		$i = 1;
-		while (!self::NewID($name, $alias)) {
-			$name = $tn."[$i]";
-			$alias = $ta."[$i]";
+		while (!$this->NewID($name, $alias)) {
+			$name = $tn.'('.$i.')';
+			$alias = $ta.'_'.$i;
 			$i++;
 		}
 		$params['form_name'] = $name;
@@ -104,7 +104,7 @@ EOS;
 	*/
 	public function Delete(&$mod, $form_id)
 	{
-		/*		$noparms = array();
+/*		$noparms = array();
 		$formdata = self::Load($mod,$form_id,$id,$noparms);
 		if (!$formdata)
 			return FALSE;
@@ -133,25 +133,24 @@ EOS;
 		$db = \cmsms()->GetDb();
 		$db->Execute($sql, [$form_id]);
 		$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops WHERE form_id=?';
-		$res = $db->Execute($sql, [$form_id]);
+		$db->Execute($sql, [$form_id]);
+		$res = $db->Affected_Rows() > 0;
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field WHERE form_id=?';
-		if (!$db->Execute($sql, [$form_id])) {
-			$res = FALSE;
-		}
+		$db->Execute($sql, [$form_id]);
+		$res = $res && ($db->Affected_Rows() > 0);
 		//no need for longvalue check
 		$file = $db->GetOne('SELECT value FROM '.$pre.'module_pwf_formprops WHERE form_id=? AND name=\'css_file\'');
 		if ($file) {
 			Utils::DeleteUploadFile($mod, $file, $form_id);
 		}
 		$sql = 'DELETE FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
-		if (!$db->Execute($sql, [$form_id])) {
-			$res = FALSE;
-		}
+		$db->Execute($sql, [$form_id]);
+		$res = $res && ($db->Affected_Rows() > 0);
 		$sql = 'DELETE FROM '.$pre.'module_pwf_form WHERE form_id=?';
-		if (!$db->Execute($sql, [$form_id])) {
-			$res = FALSE;
-		}
-		return ($res != FALSE);
+		$db->Execute($sql, [$form_id]);
+		$res = $res && ($db->Affected_Rows() > 0);
+
+		return $res;
 	}
 
 	/**
@@ -193,9 +192,9 @@ EOS;
 		$tn = $name;
 		$ta = $alias;
 		$i = 1;
-		while (!self::NewID($name, $alias)) {
-			$name = $tn."[$i]";
-			$alias = $ta."[$i]";
+		while (!$this->NewID($name, $alias)) {
+			$name = $tn.'('.$i.')';
+			$alias = $ta.'_'.$i;
 			$i++;
 		}
 		$params['form_name'] = $name;
@@ -210,7 +209,7 @@ EOS;
 		$res = TRUE;
 		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (form_id,name,value,longvalue) VALUES (?,?,?,?)';
 		foreach ($formdata->XtraProps as $key=>&$val) {
-			$longval = NULL;
+			$lval = NULL;
 			if ($key == 'form_template') {
 				if ($mod->oldtemplates) {
 					$mod->SetTemplate('pwf_'.$newfid, $val);
@@ -227,11 +226,11 @@ EOS;
 				$val = 'pwf_sub_'.$newfid;
 			} else {
 				if (strlen($val) > \PWForms::LENSHORTVAL) {
-					$longval = $val;
+					$lval = $val;
 					$val = NULL;
 				}
 			}
-			$db->Execute($sql, [$newfid, $key, $val, $longval]);
+			$db->Execute($sql, [$newfid, $key, $val, $lval]);
 			if ($db->Affected_Rows() > 0) {
 				$newid = $db->Insert_ID();
 			} else {
@@ -243,7 +242,7 @@ EOS;
 
 		$neworder = 1;
 		foreach ($formdata->Fields as &$one) {
-			if (!FieldOperations::CopyField((int)$one->GetId(), $newid, $neworder)) {
+			if (!FieldOperations::Copy((int)$one->GetId(), $newid, $neworder)) {
 				$params['message'] = $mod->Lang('database_error');
 				$res = FALSE;
 			}
@@ -261,14 +260,16 @@ EOS;
 	@mod: reference to the current PWForms module object
 	@formdata: reference to form data object
 	@params: reference to array of request-parameters including form/field property-values
-	Returns: boolean T/F indicating success, with $params['message'] set upon failure
+	Returns: 2-member array,
+	 [0] = boolean indicating success
+	 [1] = error message or ''
 	*/
 	public function Store(&$mod, &$formdata, &$params)
 	{
 		$form_id = $formdata->Id;
 		$newform = ($form_id <= 0);
-		// if it's a new form, check for duplicate name and/or alias
-		if ($newform && !self::NewID($formdata->Name, $formdata->Alias)) {
+		//for a new form, check for duplicate name and/or alias
+		if ($newform && !$this->NewID($formdata->Name, $formdata->Alias)) {
 			return [FALSE,$mod->Lang('duplicate_identifier')];
 		}
 
@@ -277,26 +278,27 @@ EOS;
 		if ($newform) {
 			$sql = 'INSERT INTO '.$pre.'module_pwf_form (name,alias) VALUES (?,?)';
 			$db->Execute($sql, [$params['form_Name'], $params['form_Alias']]);
+			if ($db->Affected_Rows() < 1) {
+				return [FALSE,$mod->Lang('database_error')];
+			}
 			$form_id = $db->Insert_ID();
 		} else {
-			$sql = 'SELECT prop_id,name FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
-			$oldfields = $db->GetAssoc($sql,[$form_id ]);
-
 			$sql = 'UPDATE '.$pre.'module_pwf_form SET name=?,alias=? WHERE form_id=?';
 			$db->Execute($sql, [$params['form_Name'], $params['form_Alias'], $form_id]);
+			if ($db->Affected_Rows() == -1) {
+				return [FALSE,$mod->Lang('database_error')];
+			}
 		}
-		if ($db->Affected_Rows() < 1) {
-			return [FALSE,$mod->Lang('database_error')];
-		}
-
-		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (form_id,name,value,longvalue) VALUES (?,?,?,?)';
-		$sql2 = 'UPDATE '.$pre.'module_pwf_formprops SET value=?,longvalue=? WHERE form_id=? AND name=?';
-
+		//upsert, sort-of
+		$sql = 'UPDATE '.$pre.'module_pwf_formprops
+SET value=?,longvalue=? WHERE form_id=? AND name=?';
+		$sql2 = 'INSERT INTO '.$pre.'module_pwf_formprops
+(form_id,name,value,longvalue) VALUES (?,?,?,?)';
 		//store form options
 		foreach ($params as $key=>$val) {
 			if (strncmp($key, 'fp_', 3) == 0) {
 				$key = substr($key, 3);
-				$longval = NULL;
+				$lval = NULL;
 				if (($p = strpos($key, '_template')) !== FALSE) {
 					$type = substr($key, 0, $p);
 					switch ($type) {
@@ -311,92 +313,46 @@ EOS;
 					}
 					if ($mod->oldtemplates) {
 						$mod->SetTemplate($name, $val);
+					} elseif ($newform) {
+						self::SetTemplate($type, $form_id, $val);
 					} else {
-						if ($newform) {
-							self::SetTemplate($type, $form_id, $val);
-						} else {
-							$ob = \CmsLayoutTemplate::load($name);
-							$ob->set_content($val);
-							$ob->save();
-						}
+						$ob = \CmsLayoutTemplate::load($name);
+						$ob->set_content($val);
+						$ob->save();
 					}
 					$val = $name; //record a pointer
 				} elseif (strlen($val > \PWForms::LENSHORTVAL)) {
-					$longval = $val;
+					$lval = $val;
 					$val = NULL;
 				}
-				if ($newform) {
-					$db->Execute($sql, [$form_id, $key, $val, $longval]);
-					if ($db->Affected_Rows() > 0) {
-						$newid = $db->Insert_ID();
-					} else {
-						return [FALSE,$mod->Lang('database_error')];
-					}
-				} else {
-					$idx = array_search($key, $oldfields);
-					if ($idx !== FALSE) {
-						$db->Execute($sql2, [$val, $longval, $form_id, $key]);
-						unset($oldfields[$idx]);
-					} else {
-						$db->Execute($sql, [$form_id, $key, $val, $longval]);
-					}
 
-					if ($db->Affected_Rows() < 1) {
-						return [FALSE,$mod->Lang('database_error')];
-					}
+				$db->Execute($sql, [$val, $lval, $form_id, $key]);
+				if ($db->Affected_Rows() == -1) {
+					$db->Execute($sql2, [$form_id, $key, $val, $lval]);
 				}
 			}
-		}
-
-		if (!$newform) {
-			if ($oldfields) {
-				$sql = 'DELETE FROM '.$pre.'module_pwf_formprops WHERE prop_id IN('.implode(',',array_keys($old)).')';
-				$db->Execute($sql);
-			}
-			$sql = 'SELECT field_id FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY field_id';
-			$oldfields = $db->GetCol($sql,[$form_id ]);
 		}
 
 		self::Arrange($formdata->Fields, $params['form_FieldOrders']);
 
-		// store fields
+		//store fields
 		$newfields = [];
 		foreach ($formdata->Fields as $key=>&$obfld) {
 			if ($obfld) {
 				$obfld->Store(TRUE);
-				if ($key > 0)
-					if (!$newform) {
-						$idx = array_search($key, $oldfields);
-						if ($idx !== FALSE) {
-							unset($oldfields[$idx]);
-						}
-					}
-				} else { //new field, after save it will include an actual id
+				if ($key < 0) {
+					//new field, after save it will include an actual id
 					$newfields[$key] = $obfld->GetId();
 				}
 			} else { //marked for deletion
-				$idx = array_search($key, $oldfields);
-				if ($idx !== FALSE) {
-					unset($oldfields[$idx]);
-				}
 				$obfld = new \stdClass();
 				$obfld->Id = $key;
-				FieldOperations::RealDeleteField($obfld);
+				FieldOperations::RealDelete($obfld);
 			}
 		}
 		unset($obfld);
 
-		foreach ($oldfields as $key) {
-			if (isset($formdata->Fields[$key])) { //should never happen
-				FieldOperations::RealDeleteField($formdata->Fields[$key]);
-				unset($formdata->Fields[$key]);
-			} else {
-				$obfld = new \stdClass();
-				$obfld->Id = $key;
-				FieldOperations::RealDeleteField($obfld);
-			}
-		}
-		// conform array-keys of new fields
+		//conform array-keys of new fields
 		foreach ($newfields as $key=>$newkey) {
 			$formdata->Fields[$newkey] = $formdata->Fields[$key];
 			unset($formdata->Fields[$key]);
@@ -420,7 +376,7 @@ EOS;
 	@admin: optional boolean whether to load for administration, default FALSE
 	Returns: a FormData object, or FALSE
 	*/
-	public function Load(&$mod, $form_id, $id, &$params, $admin= FALSE)
+	public function Load(&$mod, $form_id, $id, &$params, $admin=FALSE)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT name,alias FROM '.$pre.'module_pwf_form WHERE form_id=?';
@@ -435,10 +391,9 @@ EOS;
 			$formdata->Name = $row['name'];
 		}
 		if (empty($params['form_alias'])) {
-			$formdata->Alias = $row['alias'];
-		} //alias used only for admin
-
-		//no form data value is an array, so no records with same name
+			$formdata->Alias = $row['alias']; //alias used only for admin
+		}
+		//no form property value is an array, so no records with same name
 		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
 		$data = Utils::SafeGet($sql, [$form_id]);
 		foreach ($data as $one) {
@@ -503,7 +458,7 @@ EOS;
 					$row = array_merge($row, $params); //make field id/values available
 				}
 				// create the field object
-				$obfld = FieldOperations::NewField($formdata, $row);
+				$obfld = FieldOperations::Get($formdata, $row);
 				if ($obfld) {
 					$formdata->Fields[$obfld->Id] = $obfld;
 					if ($obfld->Type == 'PageBreak') {
@@ -568,7 +523,7 @@ EOS;
 		<![CDATA[...]]> cuz that mechanism is not nestable. This means that
 		values which include javascript may be unbrowsable in a XML-viewer.
 	*/
-	public function CreateXML(&$mod, $formid, $date, $charset= FALSE, $dtd=TRUE)
+	public function CreateXML(&$mod, $formid, $date, $charset=FALSE, $dtd=TRUE)
 	{
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_form WHERE form_id=?';
@@ -852,22 +807,47 @@ EOS;
 	@xmlfile: filesystem path of uploaded temp file to be processed
 	@formname: optional name for the imported form
 	@formalias: optional alias for the imported form
-	Returns boolean T/F indicating success
+	Returns 2-member array,
+	 [0] = boolean T/F indicating success
+	 [1] = message reflecting [0]
 	*/
-	public function ImportXML(&$mod, $xmlfile, $formname = '', $formalias = '')
+	public function ImportXML(&$mod, $xmlfile, $name='', $alias='')
 	{
 		$data = self::ParseXML($xmlfile);
 		if (!$data) {
-			return FALSE;
+			return [FALSE, $mod->Lang('err_form_import')];
 		}
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
-		for ($i=1; $i<=$data['count']; $i++) {
+		$c = $data['count'];
+		for ($i=1; $i<=$c; $i++) {
 			$fdata = $data['form'.$i];
 			$fprops = &$fdata['properties'];
+			if (!$name) {
+				if ($alias) {
+					$name = $alias;
+				} else {
+					$name = $this->xml_entity_decode($fprops['name']);
+				}
+			}
+			if ($alias) {
+				$val = $alias;
+			} elseif ($name) {
+				$val = Utils::MakeAlias($name);
+			} else {
+				$val = $fprops['alias'];
+			}
+
+			$tn = $name;
+			$ta = $val;
+			$i = 1;
+			while (!$this->NewID($name, $alias)) {
+				$name = $tn.'('.$i.')';
+				$val = $ta.'_'.$i;
+				$i++;
+			}
+
 			$sql = 'INSERT INTO '.$pre.'module_pwf_form (name,alias) VALUES (?,?)';
-			$name = ($formname) ? $formname : $this->xml_entity_decode($fprops['name']);
-			$val = ($formalias) ? $formalias : $fprops['alias'];
 			$db->Execute($sql, [$name, $val]);
 			$form_id = $db->Insert_ID();
 			unset($fprops['form_id']);
@@ -936,7 +916,7 @@ EOS;
 			}
 			unset($fld);
 		}
-		return TRUE;
+		return [TRUE, $mod->Lang('form_imported')];
 	}
 
 	/**
@@ -1006,7 +986,7 @@ EOS;
 	@alias: optional form-alias string, default = FALSE
 	Returns TRUE if there's no form with matching name OR alias
 	*/
-	public function NewID($name= FALSE, $alias= FALSE)
+	public function NewID($name='', $alias='')
 	{
 		$where = [];
 		$vars = [];
