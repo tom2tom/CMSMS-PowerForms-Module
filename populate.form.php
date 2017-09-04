@@ -90,7 +90,7 @@ $fields = []; //ordinary fields
 $dispositions = []; //disposition fields
 $count = 1; //move-icon counters
 $dcount = 1;
-$total = count($formdata->Fields); //may include deleted (null'd) field(s) 
+$total = count($formdata->Fields); //may include deleted (null'd) field(s)
 $dtotal = 0;
 $etotal = 0;
 if ($total > 0) {
@@ -795,11 +795,10 @@ $tplvars['title_submit_template'] = $this->Lang('title_submit_response');
 $tplvars['input_submit_template'] = $this->CreateSyntaxArea($id, $tpl, 'fp_submission_template',
 	'pwf_tallarea', 'submission_template', '', '', 50, 15);
 //setup to revert to 'sample' submission-template
-$ctlData = [];
-$ctlData['fp_submission_template']['general_button'] = TRUE;
-$buttons = PWForms\Utils::TemplateReverters($formdata, $id, $ctlData);
+$button = PWForms\Utils::SetTemplateButton('submission_template',
+	$this->Lang('title_create_sample_template'));
 $tplvars += [
-	'sample_submit_template' => $buttons[0],
+	'sample_submit_template' => $button,
 	'help_submit_template' => $this->Lang('help_submit_template'),
 ];
 $jsloads[] = <<<EOS

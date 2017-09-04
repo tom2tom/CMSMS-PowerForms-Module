@@ -141,31 +141,68 @@ class FileDirector extends FieldBase
 			$main[] = ['','',$mod->Lang('missing_type', $mod->Lang('file'))];
 		}
 
-		//setup sample-template buttons and scripts
-		$ctldata = [];
-		$ctldata['fp_file_template']['is_oneline'] = TRUE;
-		$ctldata['fp_file_header']['is_oneline'] = TRUE;
-		$ctldata['fp_file_header']['is_header'] = TRUE;
-		$ctldata['fp_file_footer']['is_oneline'] = TRUE;
-		$ctldata['fp_file_footer']['is_footer'] = TRUE;
-		$buttons = Utils::TemplateReverters($this->formdata, $id, $ctldata);
-		//TODO CHECK custom js for template reversion? c.f. EmailBase
-
+		$button = Utils::SetTemplateButton('file_template',
+			$mod->Lang('title_create_sample_template'));
 		$adv[] = [$mod->Lang('title_file_template'),
 			$mod->CreateTextArea(FALSE, $id,
 				htmlspecialchars($this->GetProperty('file_template')),
 				'fp_file_template', 'pwf_tallarea', '', '', '', 50, 15).
-				'<br /><br />'.$buttons[0]];
+				'<br /><br />'.$button];
+		$button = Utils::SetTemplateButton('file_header',
+			$mod->Lang('title_create_sample_header_template'));
 		$adv[] = [$mod->Lang('title_file_header'),
 			$mod->CreateTextArea(FALSE, $id,
 				htmlspecialchars($this->GetProperty('file_header')),
 				'fp_file_header', 'pwf_shortarea', '', '', '', 50, 8).
-				'<br /><br />'.$buttons[1]];
+				'<br /><br />'.$button];
+		$button = Utils::SetTemplateButton('file_footer',
+			$mod->Lang('title_create_sample_footer_template'));
 		$adv[] = [$mod->Lang('title_file_footer'),
 			$mod->CreateTextArea(FALSE, $id,
 				htmlspecialchars($this->GetProperty('file_footer')),
 				'fp_file_footer', 'pwf_shortarea', '', '', '', 50, 8).
-				'<br /><br />'.$buttons[2]];
+				'<br /><br />'.$button];
+		$this->Jscript->jsloads[] = <<<EOS
+ $('#get_file_template').click(function() {
+  populate_template('{$id}fp_file_template');
+ });
+ $('#get_file_header').click(function() {
+  populate_template('{$id}fp_file_header');
+ });
+ $('#get_file_footer').click(function() {
+  populate_template('{$id}fp_file_footer');
+ });
+EOS;
+		$prompt = $mod->Lang('confirm_template');
+		$msg = $mod->Lang('err_server');
+		$u = $mod->create_url($id, 'populate_template', '', ['datakey'=>'__XX__', 'field_id'=>$this->Id]);
+		$offs = strpos($u, '?mact=');
+		$u = str_replace('&amp;', '&', substr($u, $offs+1));
+		$this->Jscript->jsfuncs[] = <<<EOS
+function populate_template(elid) {
+ if (confirm('{$prompt}')) {
+  var dkey = $('input[name={$id}datakey').val();
+  var udata = '$u'.replace('__XX__',dkey);
+  var msg = '$msg';
+  $.ajax({
+   type: 'POST',
+   url: 'moduleinterface.php',
+   data: udata,
+   dataType: 'text',
+   success: function(data,status) {
+    if (status=='success') {
+     $('#'+elid).val(data);
+    } else {
+     alert(msg);
+    }
+   },
+   error: function() {
+    alert(msg);
+   }
+  });
+ }
+}
+EOS;
 		//show variables-help on advanced tab
 		if ($dests) {
 			return ['main'=>$main,'adv'=>$adv,'table'=>$dests,'extra'=>'varshelpadv'];

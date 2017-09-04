@@ -665,85 +665,18 @@ class Utils
 	}
 
 	/**
-	CreateTemplateButton:
+	SetTemplateButton:
 	Setup to insert a defined (probably default) template into a html-control.
 	For use when editing a form or field containing a template.
-	@mod: reference to PWForms module object
-	@id: id given to the Powerforms module on execution
-	@ctlName: name of the control, by convention like 'fp_'.field-prop-name,
-		here, it may have appended suffix 'text'
-	@$button_label: text for button label
-	@funcName: identifier for use when multiple buttons populate the same control, default ''
-	Returns: XHTML for a button, no js
+	@ctlName: 'raw' name of the control, by convention like field-prop-name
+	@label: text for button-label
+	Returns: string XHTML button (un-named, no applied js)
 	*/
-	public static function CreateTemplateButton(&$mod, $id, $ctlName, $button_label, $funcName=FALSE)
+	public static function SetTemplateButton($ctlName, $label)
 	{
-		if (!$funcName) {
-			$funcName = substr($ctlName, 3); //omit 'fp_' prefix
-		} else {
-			$funcName = substr($funcName, 3);
-		}
 		return <<<EOS
-<input type="button" class="cms_submit" id="get_{$funcName}" value="{$button_label}" />
+<input type="button" class="cms_submit" id="get_{$ctlName}" value="{$label}" />
 EOS;
-	}
-
-	/**
-	TemplateReverters:
-	@formdata: reference to FormData formdata object
-	@id: The id given to the Powerforms module on execution
-	@ctlData: array of parameters in which key(s) are respective names of affected form-control(s),
-		values are arrays of parameters, their key(s) being any one or more of
-		 'general_button'
-		 'html_button'
-		 'text_button'
-		 'is_email'
-		 'is_oneline'
-		 'is_footer' (last, if used)
-		 'is_header'
-		and their respective values being boolean
-		e.g. for 3 controls:
-		array
-		 'fp_file_template' => array
-		 'is_oneline' => TRUE
-		 'fp_file_header' => array
-		 'is_oneline' => TRUE
-		 'is_header' => TRUE
-		 'fp_file_footer' => array
-		 'is_oneline' => TRUE
-		 'is_footer' => TRUE
-	Returns: array of XHTML button-strings (no js applied)
-	*/
-	public static function TemplateReverters(&$formdata, $id, $ctlData)
-	{
-		$mod = $formdata->formsmodule;
-		$buttons = [];
-		foreach ($ctlData as $ctlname=>$tpopts) {
-			$gen_button = !empty($tpopts['general_button']);
-			$html_button = !empty($tpopts['html_button']);
-			$text_button = !empty($tpopts['text_button']);
-//			$is_email = !empty($vtpopts['is_email']);
-//			$is_oneline = !empty($tpopts['is_oneline']);
-			$is_footer = !empty($tpopts['is_footer']);
-			$is_header = !empty($tpopts['is_header']);
-
-			if ($html_button) {
-				if ($text_button) { //extra button
-					$button_text = $mod->Lang('title_create_sample_template');
-					$buttons[] = self::CreateTemplateButton($mod, $id, $ctlname, $button_text, $ctlname.'_1');
-				}
-				$button_text = $mod->Lang('title_create_sample_html_template');
-			} elseif ($is_header) {
-				$button_text = $mod->Lang('title_create_sample_header_template');
-			} elseif ($is_footer) {
-				$button_text = $mod->Lang('title_create_sample_footer_template');
-			} else { //$gen_button
-				$button_text = $mod->Lang('title_create_sample_template');
-			}
-
-			$buttons[] = self::CreateTemplateButton($mod, $id, $ctlname, $button_text);
-		}
-		return $buttons;
 	}
 
 	/**

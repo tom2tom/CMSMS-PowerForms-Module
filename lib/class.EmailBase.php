@@ -79,19 +79,23 @@ class EmailBase extends FieldBase
 		$adv[] = [$mod->Lang('title_email_encoding'),
 					$mod->CreateInputText($id, 'fp_email_encoding',
 						$this->GetProperty('email_encoding', 'utf-8'), 15, 128)];
-		//setup sample-template buttons and scripts
-		$ctldata = [];
-		$ctldata['fp_email_template']['html_button'] = TRUE;
-		$ctldata['fp_email_template']['text_button'] = TRUE;
-		$ctldata['fp_email_template']['is_email'] = TRUE;
-		$buttons = Utils::TemplateReverters($this->formdata, $id, $ctldata);
-//TODO make this js generally available for all TemplateReverters() callers
+
+		$button = Utils::SetTemplateButton('email_template',
+			$mod->Lang('title_create_sample_template'));
+		$button2 = Utils::SetTemplateButton('email_template_2',
+			$mod->Lang('title_create_sample_html_template'));
+		$adv[] = [$mod->Lang('title_email_template'),
+					$mod->CreateTextArea(FALSE, $id,
+					//($this->GetProperty('html_email',0)?$message:htmlspecialchars($message))
+					$message, 'fp_email_template', 'pwf_tallarea', '', '', '', 50, 15, '', 'html'),
+					'<br /><br />'.$button.'&nbsp;'.$button2];
+//TODO make this sort of js generally available for all SetTemplateButton() callers
 		$this->Jscript->jsloads[] = <<<EOS
  $('#get_email_template').click(function() {
-  populate_template('{$id}fp_email_template',true);
- });
- $('#get_email_template_1').click(function() {
   populate_template('{$id}fp_email_template',false);
+ });
+ $('#get_email_template_2').click(function() {
+  populate_template('{$id}fp_email_template',true);
  });
 EOS;
 		$prompt = $mod->Lang('confirm_template');
@@ -125,11 +129,6 @@ function populate_template(elid,html) {
  }
 }
 EOS;
-		$adv[] = [$mod->Lang('title_email_template'),
-					$mod->CreateTextArea(FALSE, $id,
-					//($this->GetProperty('html_email',0)?$message:htmlspecialchars($message))
-					$message, 'fp_email_template', 'pwf_tallarea', '', '', '', 50, 15, '', 'html'),
-					'<br /><br />'.$buttons[0].'&nbsp;'.$buttons[1]];
 		//show variables-help on advanced tab
 		return [$main,$adv,'varshelpadv'];
 	}

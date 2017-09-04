@@ -20,6 +20,11 @@ class Captcha extends FieldBase
 		$this->Type = 'Captcha';
 	}
 
+	public function GetDefaultTemplate()
+	{
+		return $this->defaulttemplate;
+	}
+
 	public function DisplayableValue($as_string=TRUE)
 	{
 		$ret = '[Captcha]';
@@ -69,27 +74,47 @@ class Captcha extends FieldBase
 						$this->GetProperty('aslabel', 0)),
 					$mod->Lang('help_captcha_label')];
 
-		//setup to revert to default (a.k.a. 'sample') template
-		$button = Utils::CreateTemplateButton($mod, $id, 'fp_captcha_template',
+		$button = Utils::SetTemplateButton('captcha_template',
 			$mod->Lang('title_create_sample_template'));
-		$js = <<<EOS
+		$adv[] = [$mod->Lang('title_captcha_template'),
+					$mod->CreateTextArea(FALSE, $id, $this->GetProperty('captcha_template', $this->defaulttemplate),
+						'fp_captcha_template', 'pwf_shortarea', '', '', '', 50, 5),
+					$mod->Lang('help_captcha_template').'<br /><br />'.$button];
+		$this->Jscript->jsloads[] = <<<EOS
  $('#get_captcha_template').click(function () {
   populate_template('{$id}fp_captcha_template');
  });
 EOS;
-		$this->Jscript->jsloads[] = $js;
-
-		$js = <<<EOS
+		$prompt = $mod->Lang('confirm_template');
+		$msg = $mod->Lang('err_server');
+		$u = $mod->create_url($id, 'populate_template', '', ['datakey'=>'__XX__', 'field_id'=>$this->Id, 'captcha'=>1]);
+		$offs = strpos($u, '?mact=');
+		$u = str_replace('&amp;', '&', substr($u, $offs+1));
+		$this->Jscript->jsfuncs[] = <<<EOS
 function populate_template(elid) {
-//TODO ajax needed
+ if (confirm('{$prompt}')) {
+  var dkey = $('input[name={$id}datakey').val();
+  var udata = '$u'.replace('__XX__',dkey);
+  var msg = '$msg';
+  $.ajax({
+   type: 'POST',
+   url: 'moduleinterface.php',
+   data: udata,
+   dataType: 'text',
+   success: function(data,status) {
+    if (status=='success') {
+     $('#'+elid).val(data);
+    } else {
+     alert(msg);
+    }
+   },
+   error: function() {
+    alert(msg);
+   }
+  });
+ }
 }
 EOS;
-		$this->Jscript->jsfuncs[] = $js;
-
-		$adv[] = [$mod->Lang('title_captcha_template'),
-						$mod->CreateTextArea(FALSE, $id, $this->GetProperty('captcha_template', $this->defaulttemplate),
-							'fp_captcha_template', 'pwf_shortarea', '', '', '', 50, 5),
-						$mod->Lang('help_captcha_template').'<br /><br />'.$button];
 		return ['main'=>$main,'adv'=>$adv];
 	}
 
