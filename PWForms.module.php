@@ -222,7 +222,7 @@ class PWForms extends CMSModule
 
 	public function LazyLoadAdmin()
 	{
-		return FALSE;
+		return TRUE;
 	}
 
 	public function GetAdminSection()
@@ -274,7 +274,7 @@ class PWForms extends CMSModule
 */
 	public function LazyLoadFrontend()
 	{
-		return FALSE;
+		return TRUE;
 	}
 
 	//setup for pre-1.10
