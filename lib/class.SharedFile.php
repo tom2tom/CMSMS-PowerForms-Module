@@ -72,16 +72,6 @@ class SharedFile extends FieldBase
 						$this->GetProperty('newlinechar'),5,15),
 				$mod->Lang('help_newline_replacement'));
 */
-		//setup sample-template buttons and scripts
-		$ctldata = [];
-		$ctldata['fp_file_template']['is_oneline'] = TRUE;
-		$ctldata['fp_file_header']['is_oneline'] = TRUE;
-		$ctldata['fp_file_header']['is_header'] = TRUE;
-		$ctldata['fp_file_footer']['is_oneline'] = TRUE;
-		$ctldata['fp_file_footer']['is_footer'] = TRUE;
-		$buttons = Utils::TemplateReverters($this->formdata, $id, $ctldata);
-		//TODO CHECK custom js for template reversion? c.f. EmailBase
-
 		$adv[] = [$mod->Lang('title_file_template'),
 						$mod->CreateTextArea(FALSE, $id,
 							htmlspecialchars($this->GetProperty('file_template')),
