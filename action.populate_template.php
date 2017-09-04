@@ -24,9 +24,19 @@ if (isset($params['form_id'])) {
 	$tplstr = PWForms\Utils::CreateDefaultTemplate($formdata, TRUE, FALSE);
 	echo $tplstr;
 } elseif (isset($params['field_id'])) {
-	$tplstr = PWForms\Utils::CreateDefaultTemplate($formdata,
-		!empty($params['html']),
-		!empty($params['email']));
+	if (!empty($params['captcha'])) {
+		$obfld = $formdata->Fields[$params['field_id']];
+		if ($obfld) {
+			$tplstr = $obfld->GetDefaultTemplate();
+		} else {
+			echo '0';
+			exit;
+		}
+	} else {
+		$tplstr = PWForms\Utils::CreateDefaultTemplate($formdata,
+			!empty($params['html']),
+			!empty($params['email']));
+	}
 	echo $tplstr;
 } else {
 	echo '0';
