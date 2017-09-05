@@ -31,9 +31,19 @@ class FileDirector extends FieldBase
 		return $this->formdata->formsmodule->Lang('delete_file');
 	}
 
+	public function HasComponentAdd()
+	{
+		return TRUE;
+	}
+
 	public function ComponentAdd(&$params)
 	{
 		$this->fileAdd = TRUE;
+	}
+
+	public function HasComponentDelete()
+	{
+		return !empty($this->Extraprops['destination_filename']);
 	}
 
 	public function ComponentDelete(&$params)
@@ -164,45 +174,17 @@ class FileDirector extends FieldBase
 				'<br /><br />'.$button];
 		$this->Jscript->jsloads[] = <<<EOS
  $('#get_file_template').click(function() {
-  populate_template('{$id}fp_file_template');
+  populate_template('{$id}fp_file_template',{main:1});
  });
  $('#get_file_header').click(function() {
-  populate_template('{$id}fp_file_header');
+  populate_template('{$id}fp_file_header',{header:1});
  });
  $('#get_file_footer').click(function() {
-  populate_template('{$id}fp_file_footer');
+  populate_template('{$id}fp_file_footer',{footer:1});
  });
 EOS;
-		$prompt = $mod->Lang('confirm_template');
-		$msg = $mod->Lang('err_server');
-		$u = $mod->create_url($id, 'populate_template', '', ['datakey'=>'__XX__', 'field_id'=>$this->Id]);
-		$offs = strpos($u, '?mact=');
-		$u = str_replace('&amp;', '&', substr($u, $offs+1));
-		$this->Jscript->jsfuncs[] = <<<EOS
-function populate_template(elid) {
- if (confirm('{$prompt}')) {
-  var dkey = $('input[name={$id}datakey').val();
-  var udata = '$u'.replace('__XX__',dkey);
-  var msg = '$msg';
-  $.ajax({
-   type: 'POST',
-   url: 'moduleinterface.php',
-   data: udata,
-   dataType: 'text',
-   success: function(data,status) {
-    if (status=='success') {
-     $('#'+elid).val(data);
-    } else {
-     alert(msg);
-    }
-   },
-   error: function() {
-    alert(msg);
-   }
-  });
- }
-}
-EOS;
+		$this->Jscript->jsfuncs[] = Utils::SetTemplateScript($mod, $id, ['type'=>'director', 'field_id'=>$this->Id]);
+
 		//show variables-help on advanced tab
 		if ($dests) {
 			return ['main'=>$main,'adv'=>$adv,'table'=>$dests,'extra'=>'varshelpadv'];

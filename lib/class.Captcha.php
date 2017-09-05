@@ -85,36 +85,8 @@ class Captcha extends FieldBase
   populate_template('{$id}fp_captcha_template');
  });
 EOS;
-		$prompt = $mod->Lang('confirm_template');
-		$msg = $mod->Lang('err_server');
-		$u = $mod->create_url($id, 'populate_template', '', ['datakey'=>'__XX__', 'field_id'=>$this->Id, 'captcha'=>1]);
-		$offs = strpos($u, '?mact=');
-		$u = str_replace('&amp;', '&', substr($u, $offs+1));
-		$this->Jscript->jsfuncs[] = <<<EOS
-function populate_template(elid) {
- if (confirm('{$prompt}')) {
-  var dkey = $('input[name={$id}datakey').val();
-  var udata = '$u'.replace('__XX__',dkey);
-  var msg = '$msg';
-  $.ajax({
-   type: 'POST',
-   url: 'moduleinterface.php',
-   data: udata,
-   dataType: 'text',
-   success: function(data,status) {
-    if (status=='success') {
-     $('#'+elid).val(data);
-    } else {
-     alert(msg);
-    }
-   },
-   error: function() {
-    alert(msg);
-   }
-  });
- }
-}
-EOS;
+		$this->Jscript->jsfuncs[] = Utils::SetTemplateScript($mod, $id, ['type'=>'captcha', 'field_id'=>$this->Id]);
+
 		return ['main'=>$main,'adv'=>$adv];
 	}
 

@@ -89,46 +89,16 @@ class EmailBase extends FieldBase
 					//($this->GetProperty('html_email',0)?$message:htmlspecialchars($message))
 					$message, 'fp_email_template', 'pwf_tallarea', '', '', '', 50, 15, '', 'html'),
 					'<br /><br />'.$button.'&nbsp;'.$button2];
-//TODO make this sort of js generally available for all SetTemplateButton() callers
 		$this->Jscript->jsloads[] = <<<EOS
  $('#get_email_template').click(function() {
-  populate_template('{$id}fp_email_template',false);
+  populate_template('{$id}fp_email_template');
  });
  $('#get_email_template_2').click(function() {
-  populate_template('{$id}fp_email_template',true);
+  populate_template('{$id}fp_email_template',{html:1});
  });
 EOS;
-		$prompt = $mod->Lang('confirm_template');
-		$msg = $mod->Lang('err_server');
-		$u = $mod->create_url($id, 'populate_template', '', ['datakey'=>'__XX__', 'field_id'=>$this->Id, 'email'=>1, 'html'=>'']);
-		$offs = strpos($u, '?mact=');
-		$u = str_replace('&amp;', '&', substr($u, $offs+1)); //other parameters will be appended at runtime
-		$this->Jscript->jsfuncs[] = <<<EOS
-function populate_template(elid,html) {
- if (confirm('{$prompt}')) {
-  var dkey = $('input[name={$id}datakey').val();
-  var type = (html) ? '1':'0';
-  var udata = '$u'.replace('__XX__',dkey)+type;
-  var msg = '$msg';
-  $.ajax({
-   type: 'POST',
-   url: 'moduleinterface.php',
-   data: udata,
-   dataType: 'text',
-   success: function(data,status) {
-    if (status=='success') {
-     $('#'+elid).val(data);
-    } else {
-     alert(msg);
-    }
-   },
-   error: function() {
-    alert(msg);
-   }
-  });
- }
-}
-EOS;
+		$this->Jscript->jsfuncs[] = Utils::SetTemplateScript($mod, $id, ['type'=>'email', 'field_id'=>$this->Id]);
+
 		//show variables-help on advanced tab
 		return [$main,$adv,'varshelpadv'];
 	}
