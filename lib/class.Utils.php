@@ -619,9 +619,9 @@ class Utils
 			}
 
 			if ($htmlish) {
-				$ret .= PHP_EOL.'<hr />'.PHP_EOL;
+				$ret .= '<hr />'.PHP_EOL;
 			} else {
-				$ret .= PHP_EOL.'-------------------------------------------------'.PHP_EOL;
+				$ret .= '-------------------------------------------------'.PHP_EOL;
 			}
 		} elseif (!$oneline) {
 			if ($htmlish) {
@@ -655,13 +655,64 @@ class Utils
 						$ret .= $fldref.PHP_EOL;
 					}
 				} else {
-					$ret .= $one->GetName().':'.PHP_EOL.$fldref.PHP_EOL;
+					$ret .= $one->GetName().':';
+					if ($email) {
+						$ret .= ' ';
+					} else {
+						$ret .= PHP_EOL;
+					}
+					$ret .= $fldref.PHP_EOL;
 				}
 				$ret .= '{/if}'.PHP_EOL;
 			}
 		}
 		unset($one);
 		return $ret;
+	}
+
+	/**
+	SetTemplateScript:
+	@mod: reference to PWForms module object
+	@id: module id
+	@params: associative array of URL parameters, including (at least) 'type'=>'whatever'
+	Returns: string js function
+	*/
+	public static function SetTemplateScript(&$mod, $id, $params)
+	{
+		$prompt = $mod->Lang('confirm_template');
+		$msg = $mod->Lang('err_server');
+		$u = $mod->create_url($id, 'populate_template', '', $params + ['datakey'=>'']);
+		$offs = strpos($u, '?mact=');
+		$u = str_replace('&amp;', '&', substr($u, $offs+1));
+		return <<<EOS
+function populate_template(elid,extra) {
+ if (confirm('$prompt')) {
+  var msg = '$msg',
+   append = $('input[name={$id}datakey').val();
+  if(typeof extra !== 'undefined') {
+   Object.keys(extra).forEach(function(key) {
+    append += '&$id'+key+'='+extra[key];
+   });
+  }
+  $.ajax({
+   type: 'POST',
+   url: 'moduleinterface.php',
+   data: '$u'+append,
+   dataType: 'text',
+   success: function(data,status) {
+    if (status=='success') {
+     $('#'+elid).val(data);
+    } else {
+     alert(msg);
+    }
+   },
+   error: function() {
+    alert(msg);
+   }
+  });
+ }
+}
+EOS;
 	}
 
 	/**
