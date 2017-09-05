@@ -34,6 +34,10 @@ $this->Crash();
 	} elseif (isset($params['field_pick'])) { //we know what type of field to add
 		unset($params['field_id']); //-1 no use
 		$obfld = PWForms\FieldOperations::Get($formdata, $params);
+	} elseif (isset($params['compadd'])) { //add component to new field
+		$obfld = PWForms\FieldOperations::Get($formdata, $params);
+	} elseif (isset($params['compdel'])) { //remove component from new field
+		$obfld = PWForms\FieldOperations::Get($formdata, $params);
 	} else { //add field, whose type is to be selected
 		$obfld = FALSE;
 	}
