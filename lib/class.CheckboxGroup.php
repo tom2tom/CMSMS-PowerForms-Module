@@ -36,10 +36,20 @@ class CheckboxGroup extends FieldBase
 		return $this->formdata->formsmodule->Lang('delete_checkboxes');
 	}
 
+	public function HasComponentAdd()
+	{
+		return TRUE;
+	}
+
 	// Add action
 	public function ComponentAdd(&$params)
 	{
 		$this->boxAdd = TRUE;
+	}
+
+	public function HasComponentDelete()
+	{
+		return $this->GetPropArray('box_name') != FALSE;
 	}
 
 	// Delete action

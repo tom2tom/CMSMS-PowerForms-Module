@@ -31,9 +31,19 @@ class RadioGroup extends FieldBase
 		return $this->formdata->formsmodule->Lang('delete_options');
 	}
 
+	public function HasComponentAdd()
+	{
+		return TRUE;
+	}
+
 	public function ComponentAdd(&$params)
 	{
 		$this->optionAdd = TRUE;
+	}
+
+	public function HasComponentDelete()
+	{
+		return $this->GetPropArray('button_name') != FALSE;;
 	}
 
 	public function ComponentDelete(&$params)

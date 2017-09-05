@@ -30,9 +30,19 @@ class PageRedirector extends FieldBase
 		return $this->formdata->formsmodule->Lang('delete_destination');
 	}
 
+	public function HasComponentAdd()
+	{
+		return TRUE;
+	}
+
 	public function ComponentAdd(&$params)
 	{
 		$this->addressAdd = TRUE;
+	}
+
+	public function HasComponentDelete()
+	{
+		return $this->GetPropArray('destination_page') != FALSE;
 	}
 
 	public function ComponentDelete(&$params)

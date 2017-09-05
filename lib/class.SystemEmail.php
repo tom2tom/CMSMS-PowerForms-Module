@@ -35,9 +35,19 @@ class SystemEmail extends EmailBase
 		return $this->formdata->formsmodule->Lang('delete_address');
 	}
 
+	public function HasComponentAdd()
+	{
+		return TRUE;
+	}
+
 	public function ComponentAdd(&$params)
 	{
 		$this->addressAdd = TRUE;
+	}
+
+	public function HasComponentDelete()
+	{
+		return $this->GetPropArray('destination_address') != FALSE;
 	}
 
 	public function ComponentDelete(&$params)

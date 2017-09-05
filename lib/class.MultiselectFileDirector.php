@@ -43,7 +43,7 @@ class MultiselectFileDirector extends FieldBase
 
 	public function HasComponentDelete()
 	{
-		return !empty($this->Extraprops['destination_filename']);
+		return $this->GetPropArray('destination_filename') != FALSE;
 	}
 
 	public function ComponentDelete(&$params)
