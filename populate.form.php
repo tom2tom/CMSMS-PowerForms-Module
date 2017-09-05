@@ -125,6 +125,9 @@ $linkargs = [
 
 foreach ($formdata->FieldOrders as $one) {
 	$obfld = $formdata->Fields[$one];
+	if (!$obfld) {
+		continue; //deleted field
+	}
 	$oneset = new stdClass();
 	$fid = (int)$obfld->GetId();
 	$oneset->id = $fid;
@@ -541,44 +544,17 @@ foreach ($allForms as $one) {
 $tplvars['title_load_template'] = $this->Lang('title_load_template');
 $tplvars['input_load_template'] = $this->CreateInputDropdown($id, 'template_load',
 	$templateList, -1, '', 'id="template_load"'); //overwrites downstream-generated id
-
+//use js shared with submission template
 $jsloads[] = <<<EOS
  $('#template_load').change(function() {
-  get_template(this,'form_template');
- });
-EOS;
-
-$prompt = $this->Lang('confirm_template');
-$msg = $this->Lang('err_server');
-$u = $this->create_url($id, 'get_template', '', ['tid'=>'']);
-$offs = strpos($u, '?mact=');
-$u = str_replace('&amp;', '&', substr($u, $offs+1)); //template identifier will be appended at runtime
-
-$jsfuncs[] = <<<EOS
-function get_template (sel, elid) {
- if (confirm('{$prompt}')) {
-  var value = $(sel).val();
-  if (value) {
-   var msg = '$msg';
-   $.ajax({
-    type: 'POST',
-    url: 'moduleinterface.php',
-    data: '$u'+value,
-    dataType: 'text',
-    success: function(data,status) {
-     if (status=='success') {
-      $('#'+elid).val(data);
-     } else {
-      alert(msg);
-     }
-    },
-    error: function() {
-     alert(msg);
-    }
-   });
+  var tid = this.value;
+  if (tid) {
+   if (!isNaN(parseFloat(tid))) {
+    tid = 'pwf_'+tid;
+   }
+   populate_template('form_template',{type:'form',name:tid});
   }
- }
-}
+ });
 EOS;
 
 if ($this->oldtemplates) {
@@ -806,34 +782,7 @@ $jsloads[] = <<<EOS
   populate_template('submission_template');
  });
 EOS;
-//$prompt = $this->Lang('confirm_template');
-//$msg = $this->Lang('err_server');
-$u = $this->create_url($id, 'populate_template', '', ['datakey'=>$params['datakey'], 'form_id'=>$form_id]);
-$offs = strpos($u, '?mact=');
-$u = str_replace('&amp;', '&', substr($u, $offs+1));
-$jsfuncs[] = <<<EOS
-function populate_template (elid) {
- if (confirm('{$prompt}')) {
-  var msg = '$msg';
-  $.ajax({
-   type: 'POST',
-   url: 'moduleinterface.php',
-   data: '$u',
-   dataType: 'text',
-   success: function(data,status) {
-    if (status=='success') {
-     $('#'+elid).val(data);
-    } else {
-     alert(msg);
-    }
-   },
-   error: function() {
-    alert(msg);
-   }
-  });
- }
-}
-EOS;
+$jsfuncs[] = PWForms\Utils::SetTemplateScript($this, $id, ['type'=>'submission', 'form_id'=>$form_id]);
 
 $tplvars['cancel'] = $this->CreateInputSubmit($id, 'cancel', $this->Lang('cancel'));
 $tplvars['save'] = $this->CreateInputSubmit($id, 'submit', $this->Lang('save'));
