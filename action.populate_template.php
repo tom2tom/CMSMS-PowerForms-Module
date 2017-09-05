@@ -3,8 +3,8 @@
 # Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 # Refer to licence and other details at the top of file PWForms.module.php
 # More info at http://dev.cmsmadesimple.org/projects/powerforms
-//get default template for form-submission or a field
-//this action processes ajax
+//get default template for a form (main or submission) or for a field
+//this action processes ajax-calls
 
 if (isset($params['datakey'])) {
 	try {
@@ -28,11 +28,17 @@ switch ($params['type']) {
 		} else {
 			$name = $params['name'];
 		}
-		if ($this->oldtemplates) {
-			$tplstr = $this->GetTemplate($name);
+		if (strncmp($name, 'pwf_', 4) == 0)
+			if ($this->oldtemplates) {
+				$tplstr = $this->GetTemplate($name);
+			} else {
+				$ob = CmsLayoutTemplate::load($name);
+				$tplstr = $ob->get_content();
+			}
+		} elseif (preg_match('/\.tpl$/', $name)) {
+			$tplstr = ''.@file_get_contents(cms_join_path(__DIR__, 'templates', $params['tid']));
 		} else {
-			$ob = CmsLayoutTemplate::load($name);
-			$tplstr = $ob->get_content();
+			$tplstr = '0';
 		}
 	} else {
 		$tplstr = $formdata['XtraProps']['form_template'];
@@ -46,18 +52,31 @@ switch ($params['type']) {
 	}
 	break;
  case 'email':
-	$tplstr = PWForms\Utils::CreateDefaultTemplate($formdata, !empty($params['html']), TRUE);
+	if (empty($params['revert'])) {
+		$tplstr = PWForms\Utils::CreateDefaultTemplate($formdata, !empty($params['html']), TRUE);
+	} else {
+		$obfld = $formdata->Fields[$params['field_id']];
+		if ($obfld) {
+			$tplstr = $obfld['XtraProps']['email_template'];
+		} else {
+			$tplstr = '0';
+		}
+	}
 	break;
  case 'captcha':
 	$obfld = $formdata->Fields[$params['field_id']];
 	if ($obfld) {
-		$tplstr = $obfld->GetDefaultTemplate();
+		if (empty($params['revert'])) {
+			$tplstr = $obfld->GetDefaultTemplate();
+		} else {
+			$tplstr = $obfld['XtraProps']['captcha_template'];
+		}
 	} else {
 		$tplstr = '0';
 	}
 	break;
  case 'director':
-	$tplstr = 'NOT YET SUPPORTED'; //TODO handle main or header or footer
+	$tplstr = 'NOT YET SUPPORTED'; //TODO handle main/header/footer
 	break;
 }
 
