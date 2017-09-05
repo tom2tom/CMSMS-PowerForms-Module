@@ -28,7 +28,7 @@ switch ($params['type']) {
 		} else {
 			$name = $params['name'];
 		}
-		if (strncmp($name, 'pwf_', 4) == 0)
+		if (strncmp($name, 'pwf_', 4) == 0) {
 			if ($this->oldtemplates) {
 				$tplstr = $this->GetTemplate($name);
 			} else {
