@@ -285,15 +285,19 @@ EOS;
 		} else {
 			$sql = 'UPDATE '.$pre.'module_pwf_form SET name=?,alias=? WHERE form_id=?';
 			$db->Execute($sql, [$params['form_Name'], $params['form_Alias'], $form_id]);
-			if ($db->Affected_Rows() == -1) {
+			//post-UPDATE $db->Affected_Rows() can't be relied on
+/*			if ($db->Affected_Rows() == -1) {
 				return [FALSE,$mod->Lang('database_error')];
 			}
+*/
 		}
 		//upsert, sort-of
 		$sql = 'UPDATE '.$pre.'module_pwf_formprops
 SET value=?,longvalue=? WHERE form_id=? AND name=?';
-		$sql2 = 'INSERT INTO '.$pre.'module_pwf_formprops
-(form_id,name,value,longvalue) VALUES (?,?,?,?)';
+		//post-UPDATE $db->Affected_Rows() can't be relied on
+		$sql2 = 'INSERT INTO '.$pre.'module_pwf_formprops (form_id,name,value,longvalue) SELECT ?,?,?,?
+FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS
+(SELECT 1 FROM '.$pre.'module_pwf_formprops P WHERE P.form_id=? AND P.name=?)';
 		//store form options
 		foreach ($params as $key=>$val) {
 			if (strncmp($key, 'fp_', 3) == 0) {
@@ -326,10 +330,8 @@ SET value=?,longvalue=? WHERE form_id=? AND name=?';
 					$val = NULL;
 				}
 
-				$db->Execute($sql, [$val, $lval, $form_id, $key]);
-				if ($db->Affected_Rows() == -1) {
-					$db->Execute($sql2, [$form_id, $key, $val, $lval]);
-				}
+				$db->Execute($sql, [$val, $lval, $form_id, $key]); //UPDATE attempt
+				$db->Execute($sql2, [$form_id, $key, $val, $lval, $form_id, $key]);
 			}
 		}
 
