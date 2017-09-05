@@ -24,15 +24,18 @@ class FieldOperations
 	public static function Get(&$formdata, &$params)
 	{
 		$obfld = FALSE;
-		if (!empty($params['field_id'])) {
-			// we're loading an extant field
-			if (empty($params['type'])) {
+		if (!empty($params['field_id']) ||
+			!empty($params['compadd']) || !empty($params['compdel'])) {
+			// we're loading an extant field, or adjusting a new one
+			if (!empty($params['type'])) {
+				$type = $params['type'];
+			} elseif (!empty($params['field_Type'])) {
+				$type = $params['field_Type'];
+			} else {
 				$pre = \cms_db_prefix();
 				$sql = 'SELECT type FROM '.$pre.'module_pwf_field WHERE field_id=?';
 				$db = \cmsms()->GetDb();
 				$type = $db->GetOne($sql, [$params['field_id']]);
-			} else {
-				$type = $params['type'];
 			}
 			if ($type) {
 				$className = Utils::MakeClassName($type);
@@ -169,32 +172,36 @@ class FieldOperations
 	{
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
-		//upsert, sort-of
-		$sql = 'UPDATE '.$pre.'module_pwf_field
-SET name=?,alias=?,order_by=? WHERE field_id=?';
-		$db->Execute($sql, [
-		$obfld->Name,
-		$obfld->Alias,
-		$obfld->OrderBy,
-		$obfld->Id]);
-		if ($db->Affected_Rows() == -1) { //failed
-			$sql = 'INSERT INTO '.$pre.'module_pwf_field
-(form_id,name,alias,type,order_by) VALUES (?,?,?,?,?)';
+		if ($obfld->Id <= 0) {
+			$sql = 'INSERT INTO '.$pre.'module_pwf_field (form_id,name,alias,type,order_by) VALUES (?,?,?,?,?)';
 			$db->Execute($sql, [
 			$obfld->FormId,
 			$obfld->Name,
 			$obfld->Alias,
 			$obfld->Type,
 			$obfld->OrderBy]);
-
-			$obfld->Id = $db->Insert_ID();
+			if ($db->Affected_Rows() > 0) {
+				$obfld->Id = $db->Insert_ID();
+			} else {
+				return FALSE;
+			}
+		} else {
+			$sql = 'UPDATE '.$pre.'module_pwf_field SET name=?,alias=?,order_by=? WHERE field_id=?';
+			$db->Execute($sql, [
+			$obfld->Name,
+			$obfld->Alias,
+			$obfld->OrderBy,
+			$obfld->Id]);
+			//post-UPDATE $db->Affected_Rows() can't be relied on
 		}
 
 		if ($allprops) {
+			//upsert, sort-of
 			$sql = 'UPDATE '.$pre.'module_pwf_fieldprops
 SET value=?,longvalue=? WHERE field_id=? AND name=?';
-			$sql2 = 'INSERT INTO '.$pre.'module_pwf fieldprops
-(field_id,form_id,name,value,longvalue) VALUES(?,?,?,?,?)';
+			$sql2 = 'INSERT INTO '.$pre.'module_pwf fieldprops (field_id,form_id,name,value,longvalue) SELECT ?,?,?,?,?
+FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS
+(SELECT 1 FROM '.$pre.'module_pwf_fieldprops P WHERE P.field_id=? AND P.name=?)';
 			foreach ($obfld->XtraProps as $name=>$value) {
 				if (!is_scalar($value)) {
 					$value = json_encode($value, JSON_FORCE_OBJECT);
@@ -206,14 +213,12 @@ SET value=?,longvalue=? WHERE field_id=? AND name=?';
 					$sval = NULL;
 					$lval = $value;
 				}
-				$db->Execute($sql, [$val, $lval, $obfld->Id, $name]);
-				if ($db->Affected_Rows() == -1) { //failed
-					$db->Execute($sql2, [$obfld->Id, $obfld->FormId, $name, $val, $lval]);
-//					$newid = $db->Insert_ID();
-				}
+				$db->Execute($sql, [$sval, $lval, $obfld->Id, $name]); //UPDATE attempt
+				$db->Execute($sql2, [$obfld->Id, $obfld->FormId, $name, $sval, $lval, $obfld->Id, $name]);
+//				$newid = $db->Insert_ID();
 			}
 		}
-		return $res;
+		return TRUE;
 	}
 
 	/**
