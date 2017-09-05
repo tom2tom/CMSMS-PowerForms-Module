@@ -85,8 +85,10 @@ class FieldBase implements \Serializable
 				$key = substr($key, 3);
 				if (property_exists($this, $key)) {
 					$this->$key = $val;
-				} else {
+				} elseif (!is_array($val) || !$this->HasComponentAdd()) {
 					$this->XtraProps[$key] = $val;
+				} else {
+					$this->SetPropArray($key, $val);
 				}
 			}
 		}
@@ -161,30 +163,40 @@ class FieldBase implements \Serializable
 		return $default;
 	}
 
+	public function SetPropArray($propName, $value)
+	{
+		foreach ($value as $key => &$val) {
+			$this->XtraProps[$propName.$key] = $val;
+		}
+		unset($val);
+	}
+
 	// Returns array of property-values (possibly just 0=>NULL), or FALSE
 	// Each array-key is the numeric-suffix to $propName, & array-value is the stored value
-	public function GetPropArray($propName)
+	public function GetPropArray($propName, $sorted=TRUE)
 	{
 		$len = strlen($propName);
-		$matches = [];
+		$have = [];
 		foreach ($this->XtraProps as $key => &$val) {
 			if (strncmp($key, $propName, $len) == 0) {
 				$o = (int)substr($key, $len);
-				$matches[$o] = $val;
+				$have[$o] = $val;
 			}
 		}
 		unset($val);
 
-		if ($matches) {
-			if (count($matches) > 1) {
-				ksort($matches);
-			} elseif (key($matches) == 0) {
-				$matches[1] = $matches[0];
-				unset($matches[0]);
-				$this->XtraProps[$propName.'1'] = $matches[1];
+		if ($have) {
+			if (count($have) > 1) {
+				if ($sorted) {
+					ksort($have);
+				}
+			} elseif (key($have) == 0) {
+				$have[1] = $have[0];
+				unset($have[0]);
+				$this->XtraProps[$propName.'1'] = $have[1];
 				unset($this->XtraProps[$propName]);
 			}
-			return $matches;
+			return $have;
 		}
 		return FALSE;
 	}
@@ -277,9 +289,11 @@ class FieldBase implements \Serializable
 	public function FieldNameUnique()
 	{
 		foreach ($this->formdata->Fields as &$one) {
-			if ($one->Name == $this->Name && $one->Id != $this->Id) {
-				unset($one);
-				return [FALSE,$this->formdata->formsmodule->Lang('field_name_in_use', $this->Name)];
+			if ($one) { //not deleted
+				if ($one->Name == $this->Name && $one->Id != $this->Id) {
+					unset($one);
+					return [FALSE,$this->formdata->formsmodule->Lang('field_name_in_use', $this->Name)];
+				}
 			}
 		}
 		unset($one);
@@ -724,11 +738,11 @@ class FieldBase implements \Serializable
 		return '';
 	}
 
-	//Whether to generate a submit-button labelled 'add', along with the field (admin only)
+	// Whether to generate a submit-button labelled 'add', along with the field (admin only)
+	// Subclass this for multicomponent fields
 	public function HasComponentAdd()
 	{
-		return !empty($this->XtraProps['MultiComponent']) ||
-			!empty($this->XtraProps['MultiChoice']);
+		return FALSE;
 	}
 
 	// Subclass this to generate appropriate add-button label
@@ -741,10 +755,12 @@ class FieldBase implements \Serializable
 	public function ComponentAdd(&$params)
 	{
 	}
-	//Whether to generate a submit-button labelled 'delete', along with the field (admin only)
+
+	// Whether to generate a submit-button labelled 'delete', along with the field (admin only)
+	// Subclass this for multicomponent fields
 	public function HasComponentDelete()
 	{
-		return !empty($this->XtraProps['MultiComponent']); //TODO && field-options-count > 0
+		return FALSE;
 	}
 
 	// Subclass this to generate appropriate delete-button label
