@@ -21,7 +21,8 @@ class Password extends FieldBase
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_minlength')=>'length',
 			$mod->Lang('validation_regex_match')=>'regex_match',
-			$mod->Lang('validation_regex_nomatch')=>'regex_nomatch'
+			$mod->Lang('validation_regex_nomatch')=>'regex_nomatch',
+			$mod->Lang('validation_strengh')=>'strength'
 		];
 	}
 
@@ -56,11 +57,16 @@ class Password extends FieldBase
 						$mod->CreateInputHidden($id, 'fp_hide', 0).
 						$mod->CreateInputCheckbox($id, 'fp_hide', 1,
 							$this->GetProperty('hide', 1)),
-					  $mod->Lang('title_hide_help')];
+						$mod->Lang('title_hide_help')];
 		$main[] = [$mod->Lang('title_read_only'),
 						$mod->CreateInputHidden($id, 'fp_readonly', 0).
 						$mod->CreateInputCheckbox($id, 'fp_readonly', 1,
 							$this->GetProperty('readonly', 0))];
+
+		$adv[] = [$mod->Lang('title_strength'),
+						$mod->CreateInputText($id, 'fp_min_strength',
+							$this->GetProperty('min_strength', 1), 1),
+						$mod->Lang('help_strength')];
 		$adv[] = [$mod->Lang('title_field_regex'),
 						$mod->CreateInputText($id, 'fp_regex',
 							$this->GetProperty('regex'), 25, 1024),
@@ -107,6 +113,15 @@ class Password extends FieldBase
 			if ($ln > 0 && strlen($this->Value) < $ln) {
 				$val = FALSE;
 				$this->ValidationMessage = $mod->Lang('enter_at_least', $ln);
+			}
+			break;
+		 case 'strength':
+			$sm = $this->GetProperty('min_strength', 1);
+			$funcs = new \PWForms\ZxcvbnPhp\Zxcvbn();
+			$check = $funcs->passwordStrength($this->Value);
+			if ($check['score'] + 1 < $sm) { //returned value 0..4, public uses 1..5
+				$val = FALSE;
+				$this->ValidationMessage = $mod->Lang('enter_stronger', $this->Name);
 			}
 			break;
 		 case 'regex_match':
