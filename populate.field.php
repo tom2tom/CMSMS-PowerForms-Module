@@ -48,30 +48,6 @@ if ($obfld) { //field data are loaded
 		$tplvars['advancedtab_start'] = $this->StartTab('advancedtab');
 	}
 
-	if ($obfld->HasComponentAdd()) {
-		$tplvars['add'] = $this->CreateInputSubmit($id, 'compadd', $obfld->ComponentAddLabel());
-	} else {
-		$tplvars['add'] = NULL;
-	}
-
-	if ($obfld->HasComponentDelete()) {
-		$tplvars['del'] = $this->CreateInputSubmit($id, 'compdel', $obfld->ComponentDeleteLabel(),
-			'onclick="return confirm_selected(this)"');
-		$prompt = $this->Lang('confirm');
-		$ob->jsfuncs['optiondel'] = <<<EOS
-function confirm_selected(btn) {
- var sel = $(btn).closest('div').find('input[name^="{$id}selected"]:checked');
- if (sel.length > 0) {
-   return confirm('{$prompt}');
- } else {
-  return false;
- }
-}
-EOS;
-	} else {
-		$tplvars['del'] = NULL;
-	}
-
 	$tplvars['requirable'] = (/*!$obfld->IsDisposition() && */!$obfld->GetChangeRequirement())?1:0;
 
 	$mainList = [];
@@ -166,6 +142,30 @@ EOS;
 			}
 			break;
 		}
+	}
+
+	if ($obfld->HasComponentAdd()) {
+		$tplvars['add'] = $this->CreateInputSubmit($id, 'compadd', $obfld->ComponentAddLabel());
+	} else {
+		$tplvars['add'] = NULL;
+	}
+
+	if ($obfld->HasComponentDelete()) {
+		$tplvars['del'] = $this->CreateInputSubmit($id, 'compdel', $obfld->ComponentDeleteLabel(),
+			'onclick="return confirm_selected(this)"');
+		$prompt = $this->Lang('confirm');
+		$ob->jsfuncs['optiondel'] = <<<EOS
+function confirm_selected(btn) {
+ var sel = $(btn).closest('div').find('input[name^="{$id}selected"]:checked');
+ if (sel.length > 0) {
+   return confirm('{$prompt}');
+ } else {
+  return false;
+ }
+}
+EOS;
+	} else {
+		$tplvars['del'] = NULL;
 	}
 } else { //no field
 	$fid = 0;
