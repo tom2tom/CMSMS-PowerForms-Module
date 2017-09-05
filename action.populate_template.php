@@ -20,25 +20,46 @@ if (isset($params['datakey'])) {
 	}
 }
 
-if (isset($params['form_id'])) {
-	$tplstr = PWForms\Utils::CreateDefaultTemplate($formdata, TRUE, FALSE);
-	echo $tplstr;
-} elseif (isset($params['field_id'])) {
-	if (!empty($params['captcha'])) {
-		$obfld = $formdata->Fields[$params['field_id']];
-		if ($obfld) {
-			$tplstr = $obfld->GetDefaultTemplate();
+switch ($params['type']) {
+ case 'form':
+	if (empty($params['revert'])) {
+		if (empty($params['name'])) {
+			$name = 'pwf_'.$formdata->Id;
 		} else {
-			echo '0';
-			exit;
+			$name = $params['name'];
+		}
+		if ($this->oldtemplates) {
+			$tplstr = $this->GetTemplate($name);
+		} else {
+			$ob = CmsLayoutTemplate::load($name);
+			$tplstr = $ob->get_content();
 		}
 	} else {
-		$tplstr = PWForms\Utils::CreateDefaultTemplate($formdata,
-			!empty($params['html']),
-			!empty($params['email']));
+		$tplstr = $formdata['XtraProps']['form_template'];
 	}
-	echo $tplstr;
-} else {
-	echo '0';
+	break;
+ case 'submission':
+	if (empty($params['revert'])) {
+		$tplstr = PWForms\Utils::CreateDefaultTemplate($formdata, TRUE, FALSE);
+	} else {
+		$tplstr = $formdata['XtraProps']['submission_template'];
+	}
+	break;
+ case 'email':
+	$tplstr = PWForms\Utils::CreateDefaultTemplate($formdata, !empty($params['html']), TRUE);
+	break;
+ case 'captcha':
+	$obfld = $formdata->Fields[$params['field_id']];
+	if ($obfld) {
+		$tplstr = $obfld->GetDefaultTemplate();
+	} else {
+		$tplstr = '0';
+	}
+	break;
+ case 'director':
+	$tplstr = 'NOT YET SUPPORTED'; //TODO handle main or header or footer
+	break;
 }
+
+echo $tplstr;
 exit;
