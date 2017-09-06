@@ -253,7 +253,7 @@ EOS;
 			}
 		}
 
-		$sql = 'SELECT prop_id,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE form_id=? AND name LIKE\'%template%\'';
+		$sql = 'SELECT prop_id,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE form_id=? AND name LIKE\'%template%\' ORDER BY field_id';
 		$rows = $db->GetArray($sql, [$newfid]);
 		if ($rows) {
 			$sql = 'UPDATE '.$pre.'module_pwf_fieldprops SET value=?,longvalue=? WHERE prop_id=?';
@@ -278,7 +278,7 @@ EOS;
 
 	function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, $oldtype, &$passdowns, &$passbacks)
 	{
-		$sql = 'SELECT * FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY option_id';
+		$sql = 'SELECT * FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY name';
 		$data = $db->GetArray($sql, [$oldfid, $oldf]);
 		if ($data) {
 			$fbfields = array_keys($data[0]);
@@ -421,7 +421,7 @@ EOS;
 
 	function Get_Fields(&$db, $pre, $oldfid, $newfid)
 	{
-		$sql = 'SELECT * FROM '.$pre.'module_fb_field WHERE form_id=? ORDER BY order_by,field_id';
+		$sql = 'SELECT * FROM '.$pre.'module_fb_field WHERE form_id=? ORDER BY field_id,order_by';
 		$data = $db->GetArray($sql, [$oldfid]);
 		if ($data) {
 			$fbfields = array_keys($data[0]);
@@ -431,6 +431,7 @@ EOS;
 				$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_field');
 				$db->Execute('DELETE FROM '.$pre.'module_pwf_field WHERE field_id=-1');
 			}
+			unset($pfrow['field_id']);  //ignore auto-inc field
 			$pwfields = array_keys($pfrow);
 			$pfrow = array_fill_keys($pwfields, NULL); //default values
 
@@ -470,7 +471,7 @@ EOS;
 				if (array_key_exists($type, $renames)) {
 					$type = $renames[$type];
 				}
-				$done = [];
+				$done = ['field_id'];
 				$args = [];
 				foreach ($pwfields as $one) {
 					$done[] = $one;
@@ -498,7 +499,7 @@ EOS;
 
 	function Get_FormOpts(&$mod, &$db, $pre, $oldfid, $newfid, &$passdowns, &$passbacks)
 	{
-		$sql = 'SELECT * FROM '.$pre.'module_fb_form_attr WHERE form_id=? ORDER BY form_attr_id';
+		$sql = 'SELECT * FROM '.$pre.'module_fb_form_attr WHERE form_id=? ORDER BY name';
 		$data = $db->GetArray($sql, [$oldfid]);
 		if ($data) {
 			//TODO support INSERT INTO $pre.'module_pwf_form' if relevant
@@ -547,7 +548,7 @@ EOS;
 		}
 		//TODO handle $passbacks
 		if ($passdowns) {
-			$this->Crash(); //TODO
+			$X = $CRASH; //TODO
 		}
 	}
 } // !function_exists
@@ -587,6 +588,7 @@ if (isset($params['import'])) {
 			$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_form');
 			$db->Execute('DELETE FROM '.$pre.'module_pwf_form WHERE form_id=-1');
 		}
+		unset($pfrow['form_id']); //ignore auto-inc field
 		$pwfields = array_keys($pfrow);
 		$pfrow = array_fill_keys($pwfields, NULL); //default values
 
@@ -615,7 +617,7 @@ if (isset($params['import'])) {
 			}
 			$alias = $ta;
 
-			$done = [];
+			$done = ['form_id'];
 			$args = [];
 			foreach ($pwfields as $one) {
 				$done[] = $one;
