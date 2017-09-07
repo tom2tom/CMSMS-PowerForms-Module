@@ -729,6 +729,7 @@ $lang['destination'] = 'destination address';
 $lang['file'] = 'file';
 $lang['item'] = 'item';
 $lang['member'] = 'member';
+$lang['name'] = 'name';
 $lang['page'] = 'website page';
 $lang['sequenceid'] = 'sequence identifier';
 $lang['source'] = 'source address';
