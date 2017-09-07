@@ -504,7 +504,7 @@ EOS;
 	//$matched && preg_grep('/_Fe[DX]_/',$matched);
 
 /*TODO make initiator-supplied parameters available as per 1st-pass
-	$tplvars = array_diff_key($params, array(
+	$tplvars = array_diff_key($params, [
 	'action' => 1,
 	'cancel' => 1,
 	'exclude' => 1,
@@ -514,7 +514,7 @@ EOS;
 	'passthru' => 1,
 	'preload' => 1,
 	'resume' => 1
-	));
+	]);
 */
 } else { //first time
 	$funcs = new PWForms\FormOperations();
