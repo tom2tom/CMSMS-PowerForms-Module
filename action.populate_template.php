@@ -41,14 +41,14 @@ switch ($params['type']) {
 			$tplstr = '0';
 		}
 	} else {
-		$tplstr = $formdata['XtraProps']['form_template'];
+		$tplstr = $formdata->XtraProps['form_template'];
 	}
 	break;
  case 'submission':
 	if (empty($params['revert'])) {
 		$tplstr = PWForms\Utils::CreateDefaultTemplate($formdata, TRUE, FALSE);
 	} else {
-		$tplstr = $formdata['XtraProps']['submission_template'];
+		$tplstr = $formdata->XtraProps['submission_template'];
 	}
 	break;
  case 'email':
@@ -57,7 +57,7 @@ switch ($params['type']) {
 	} else {
 		$obfld = $formdata->Fields[$params['field_id']];
 		if ($obfld) {
-			$tplstr = $obfld['XtraProps']['email_template'];
+			$tplstr = $obfld->XtraProps['email_template'];
 		} else {
 			$tplstr = '0';
 		}
@@ -69,13 +69,13 @@ switch ($params['type']) {
 		if (empty($params['revert'])) {
 			$tplstr = $obfld->GetDefaultTemplate();
 		} else {
-			$tplstr = $obfld['XtraProps']['captcha_template'];
+			$tplstr = $obfld->XtraProps['captcha_template'];
 		}
 	} else {
 		$tplstr = '0';
 	}
 	break;
- case 'director':
+ case 'file':
 	$tplstr = 'NOT YET SUPPORTED'; //TODO handle main/header/footer
 	break;
 }
