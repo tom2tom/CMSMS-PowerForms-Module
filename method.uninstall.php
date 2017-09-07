@@ -32,10 +32,6 @@ $sqlarray = $dict->DropIndexSQL($pre.'module_pwf_field_idx', $pre.'module_pwf_fi
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_field');
 $dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_fieldprops_idx', $pre.'module_pwf_fieldprops');
-$dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropTableSQL($pre.'module_pwf_fieldprops');
-$dict->ExecuteSQLArray($sqlarray);
 /*MUTEX
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_flock');
 $dict->ExecuteSQLArray($sqlarray);
@@ -43,10 +39,6 @@ $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropIndexSQL($pre.'module_pwf_form_idx', $pre.'module_pwf_form');
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_form');
-$dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropIndexSQL($pre.'module_pwf_formprops_idx', $pre.'module_pwf_formprops');
-$dict->ExecuteSQLArray($sqlarray);
-$sqlarray = $dict->DropTableSQL($pre.'module_pwf_formprops');
 $dict->ExecuteSQLArray($sqlarray);
 $sqlarray = $dict->DropTableSQL($pre.'module_pwf_cache');
 $dict->ExecuteSQLArray($sqlarray);
