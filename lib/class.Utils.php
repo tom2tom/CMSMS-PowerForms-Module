@@ -1108,8 +1108,8 @@ EOS;
 		if (!$time) {
 			$time = time();
 		}
-		$pre = \cms_db_prefix();
 		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
 		$limit = $time-1800;
 		$db->Execute('DELETE FROM '.$pre.'module_pwf_ip_log WHERE basetime<'.$limit);
 		$limit = $time-86400; //ignore DST
@@ -1163,12 +1163,22 @@ EOS;
 	public static function DeleteUploadFile(&$mod, $file, $except= FALSE)
 	{
 		if ($except) {
-			$sql = 'SELECT 1 FROM '.$pre.'module_pwf_formprops WHERE form_id!=? AND name=?';
-			$keep = $db->GetOne($sql, [$except, $file]);
-			if ($keep) {
-				return;
+			$db = \cmsms()->GetDb();
+			$pre = \cms_db_prefix();
+			$sql = 'SELECT props FROM '.$pre.'module_pwf_form WHERE form_id!=?';
+			$props = $db->GetCol($sql, [$except]);
+			if ($props) {
+				foreach ($props as &$one) {
+					$t = (array)json_decode($one);
+					if ($t && !empty($t['css_file']) && $t['css_file'] == $file) {
+						unset($one);
+						return;
+					}
+				}
+				unset($one);
 			}
 		}
+
 		$fp = self::GetUploadsPath($mod);
 		if ($fp) {
 			$fp = $fp.DIRECTORY_SEPARATOR.$file;
