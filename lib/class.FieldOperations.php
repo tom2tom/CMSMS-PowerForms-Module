@@ -97,7 +97,7 @@ class FieldOperations
 	public static function Copy($field_id, $form_id=FALSE, $neworder=FALSE)
 	{
 		$pre = \cms_db_prefix();
-		$sql = 'SELECT form_id,name,alias,type,order_by FROM '.$pre.'module_pwf_field WHERE field_id=?';
+		$sql = 'SELECT form_id,name,alias,type,order_by,props FROM '.$pre.'module_pwf_field WHERE field_id=?';
 		$db = \cmsms()->GetDb();
 		$row = $db->GetRow($sql, [$field_id]);
 		if (!$row) {
@@ -110,6 +110,9 @@ class FieldOperations
 			$row['form_id'] = $form_id;
 		}
 //		$row['name'] .= ' '.$mod->Lang('copy');
+
+		$props = $row['props'];
+		unset($row['props']);
 
 		if ($neworder === FALSE) {
 			$sql = 'SELECT MAX(order_by) AS last FROM '.$pre.'module_pwf_field WHERE form_id=?';
@@ -124,18 +127,16 @@ class FieldOperations
 		$sql = 'INSERT INTO '.$pre.'module_pwf_field (form_id,name,alias,type,order_by) VALUES (?,?,?,?,?)';
 		$db->Execute($sql, $row);
 		$fid = $db->Insert_ID();
+		if ($db->Affected_Rows() == 0) {
+			return FALSE;
+		}
 
-		$sql = 'SELECT field_id,form_id,name,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE field_id=?';
-		$rst = $db->Execute($sql, [$field_id]);
-		if ($rst) {
-			$sql = 'INSERT INTO '.$pre.'module_pwf_fieldprops
-(field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
-			while ($row = $rst->FetchRow()) {
-				$row['field_id'] = $fid;
-				$row['form_id'] = $form_id;
-				$db->Execute($sql, $row);
-			}
-			$rst->Close();
+		$t = (array)json_decode($props);
+		if ($t) {
+$X = $CRASH; //TODO revise props for new field
+			$val = json_encode($t, JSON_FORCE_OBJECT);
+			$sql = 'UPDATE '.$pre.'module_pwf_field SET props=? WHERE field_id='.$fid;
+			$db->Execute($sql, [$val]);
 		}
 		return TRUE;
 	}
@@ -196,27 +197,22 @@ class FieldOperations
 		}
 
 		if ($allprops) {
-			//upsert, sort-of
-			$sql = 'UPDATE '.$pre.'module_pwf_fieldprops
-SET value=?,longvalue=? WHERE field_id=? AND name=?';
-			$sql2 = 'INSERT INTO '.$pre.'module_pwf fieldprops (field_id,form_id,name,value,longvalue) SELECT ?,?,?,?,?
-FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS
-(SELECT 1 FROM '.$pre.'module_pwf_fieldprops P WHERE P.field_id=? AND P.name=?)';
-			foreach ($obfld->XtraProps as $name=>$value) {
-				if (!is_scalar($value)) {
-					$value = json_encode($value, JSON_FORCE_OBJECT);
-				}
-				if (strlen($value) <= \PWForms::LENSHORTVAL) {
-					$sval = $value;
-					$lval = NULL;
-				} else {
-					$sval = NULL;
-					$lval = $value;
-				}
-				$db->Execute($sql, [$sval, $lval, $obfld->Id, $name]); //UPDATE attempt
-				$db->Execute($sql2, [$obfld->Id, $obfld->FormId, $name, $sval, $lval, $obfld->Id, $name]);
-//				$newid = $db->Insert_ID();
-			}
+			//exclude 'constant' properties
+			$saves = array_diff_key($obfld->XtraProps,
+			['DisplayInForm',
+			'DisplayInSubmission',
+			'IsComputedOnSubmission',
+			'IsDisposition',
+			'IsEmailDisposition',
+			'IsInput',
+			'MultiChoice',
+			'MultiComponent',
+			'MultiPopulate',
+			'ValidationTypes',
+			]);
+			$props = json_encode($saves, JSON_FORCE_OBJECT);
+			$sql = 'UPDATE '.$pre.'module_pwf_field SET props=? WHERE field_id=?';
+			$db->Execute($sql, [$props, $obfld->Id]);
 		}
 		return TRUE;
 	}
@@ -243,48 +239,15 @@ FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS
 			}
 			$obfld->Type = $row['type'];
 			$obfld->OrderBy = (int)$row['order_by'];
+			$props = (array)json_decode($row['props']);
+			if ($props) {
+				$obfld->XtraProps = array_merge($obfld->XtraProps, $props);
+			}
 		} else {
 			return FALSE;
 		}
-
 		$obfld->SetStatus('loaded', TRUE);
 
-		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE field_id=? ORDER BY prop_id';
-		$defaults = $db->GetArray($sql, [$obfld->Id]);
-		if ($defaults) {
-			$merged = [];
-			$rc = count($defaults);
-			for ($r=0; $r<$rc; $r++) {
-				$row = $defaults[$r];
-				$nm = $row['name'];
-				$val = $row['value'];
-				if ($val === NULL) {
-					$val = $row['longvalue']; //maybe still FALSE
-				}
-				//accumulate properties with the same name into array
-				if (isset($merged[$nm])) {
-					if (!is_array($merged[$nm])) {
-						$merged[$nm] = [$merged[$nm]];
-					}
-					$merged[$nm][] = $val;
-				} else {
-					$merged[$nm] = $val;
-				}
-			}
-			foreach ($merged as $nm=>$val) {
-				if ($val && is_string($val) && $val[0] == '{') {
-					$ar = json_decode($val);
-					if (json_last_error() == JSON_ERROR_NONE) {
-						$val = is_array($ar) ? $ar : (array)$ar;
-					}
-				}
-				if (property_exists($obfld, $nm)) {
-					$obfld->$nm = $val;
-				} else {
-					$obfld->XtraProps[$nm] = $val;
-				}
-			}
-		}
 		return TRUE;
 	}
 
@@ -295,15 +258,11 @@ FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS
 	*/
 	public static function RealDelete(&$obfld)
 	{
+		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field where field_id=?';
-		$db = \cmsms()->GetDb();
 		$db->Execute($sql, [$obfld->Id]);
-		$res = $db->Affected_Rows() > 0;
-		$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops where field_id=?';
-		$db->Execute($sql, [$obfld->Id]) && $res;
-		$res = $res && ($db->Affected_Rows() > 0);
-		return $res;
+		return $db->Affected_Rows() > 0;
 	}
 
 	/**

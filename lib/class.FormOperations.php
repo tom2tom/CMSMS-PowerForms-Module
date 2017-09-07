@@ -132,20 +132,16 @@ EOS;
 		$sql = 'DELETE FROM '.$pre.'module_pwf_trans WHERE new_id=? AND isform=1';
 		$db = \cmsms()->GetDb();
 		$db->Execute($sql, [$form_id]);
-		$sql = 'DELETE FROM '.$pre.'module_pwf_fieldprops WHERE form_id=?';
-		$db->Execute($sql, [$form_id]);
-		$res = $db->Affected_Rows() > 0;
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field WHERE form_id=?';
 		$db->Execute($sql, [$form_id]);
 		$res = $res && ($db->Affected_Rows() > 0);
-		//no need for longvalue check
-		$file = $db->GetOne('SELECT value FROM '.$pre.'module_pwf_formprops WHERE form_id=? AND name=\'css_file\'');
-		if ($file) {
-			Utils::DeleteUploadFile($mod, $file, $form_id);
+		$t = $db->GetOne('SELECT props FROM '.$pre.'module_pwf_form WHERE form_id=?',[$form_id]);
+		if ($t) {
+			$props = (array)json_decode($t);
+			if ($props && !empty($props['css_file'])) {
+				Utils::DeleteUploadFile($mod, $props['css_file'], $form_id);
+			}
 		}
-		$sql = 'DELETE FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
-		$db->Execute($sql, [$form_id]);
-		$res = $res && ($db->Affected_Rows() > 0);
 		$sql = 'DELETE FROM '.$pre.'module_pwf_form WHERE form_id=?';
 		$db->Execute($sql, [$form_id]);
 		$res = $res && ($db->Affected_Rows() > 0);
@@ -206,39 +202,27 @@ EOS;
 		$db->Execute($sql, [$name, $alias]);
 		$newfid = $db->Insert_ID();
 
-		$res = TRUE;
-		$sql = 'INSERT INTO '.$pre.'module_pwf_formprops (form_id,name,value,longvalue) VALUES (?,?,?,?)';
-		foreach ($formdata->XtraProps as $key=>&$val) {
-			$lval = NULL;
-			if ($key == 'form_template') {
-				if ($mod->oldtemplates) {
-					$mod->SetTemplate('pwf_'.$newfid, $val);
-				} else {
-					self::SetTemplate('form', $newfid, $val);
-				}
-				$val = 'pwf_'.$newfid;
-			} elseif ($key == 'submission_template') {
-				if ($mod->oldtemplates) {
-					$mod->SetTemplate('pwf_sub_'.$newfid, $val);
-				} else {
-					self::SetTemplate('submission', $newfid, $val);
-				}
-				$val = 'pwf_sub_'.$newfid;
+		$props = $formdata->XtraProps;
+		if (!empty($props['form_template'])) {
+			if ($mod->oldtemplates) {
+				$mod->SetTemplate('pwf_'.$newfid, $props['form_template']);
 			} else {
-				if (strlen($val) > \PWForms::LENSHORTVAL) {
-					$lval = $val;
-					$val = NULL;
-				}
+				self::SetTemplate('form', $newfid, $props['form_template']);
 			}
-			$db->Execute($sql, [$newfid, $key, $val, $lval]);
-			if ($db->Affected_Rows() > 0) {
-				$newid = $db->Insert_ID();
-			} else {
-				$params['message'] = $mod->Lang('database_error');
-				$res = FALSE;
-			}
+			$props['form_template'] = 'pwf_'.$newfid;
 		}
-		unset($val);
+		if (!empty($props['submission_template'])) {
+			if ($mod->oldtemplates) {
+				$mod->SetTemplate('pwf_sub_'.$newfid, $props['submission_template']);
+			} else {
+				self::SetTemplate('submission', $newfid, $props['submission_template']);
+			}
+			$props['submission_template'] = 'pwf_sub_'.$newfid;
+		}
+		$props = json_encode($props, JSON_FORCE_OBJECT);
+
+		$sql = 'UPDATE '.$pre.'module_pwf_form SET props=? WHERE form_id='.$newfid;
+		$db->Execute($sql, [$props]);
 
 		$neworder = 1;
 		foreach ($formdata->Fields as &$one) {
@@ -273,36 +257,11 @@ EOS;
 			return [FALSE,$mod->Lang('duplicate_identifier')];
 		}
 
-		$db = \cmsms()->GetDb();
-		$pre = \cms_db_prefix();
-		if ($newform) {
-			$sql = 'INSERT INTO '.$pre.'module_pwf_form (name,alias) VALUES (?,?)';
-			$db->Execute($sql, [$params['form_Name'], $params['form_Alias']]);
-			if ($db->Affected_Rows() < 1) {
-				return [FALSE,$mod->Lang('database_error')];
-			}
-			$form_id = $db->Insert_ID();
-		} else {
-			$sql = 'UPDATE '.$pre.'module_pwf_form SET name=?,alias=? WHERE form_id=?';
-			$db->Execute($sql, [$params['form_Name'], $params['form_Alias'], $form_id]);
-			//post-UPDATE $db->Affected_Rows() can't be relied on
-/*			if ($db->Affected_Rows() == -1) {
-				return [FALSE,$mod->Lang('database_error')];
-			}
-*/
-		}
-		//upsert, sort-of
-		$sql = 'UPDATE '.$pre.'module_pwf_formprops
-SET value=?,longvalue=? WHERE form_id=? AND name=?';
-		//post-UPDATE $db->Affected_Rows() can't be relied on
-		$sql2 = 'INSERT INTO '.$pre.'module_pwf_formprops (form_id,name,value,longvalue) SELECT ?,?,?,?
-FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS
-(SELECT 1 FROM '.$pre.'module_pwf_formprops P WHERE P.form_id=? AND P.name=?)';
-		//store form options
+		//aggregate form properties
+		$props = [];
 		foreach ($params as $key=>$val) {
 			if (strncmp($key, 'fp_', 3) == 0) {
 				$key = substr($key, 3);
-				$lval = NULL;
 				if (($p = strpos($key, '_template')) !== FALSE) {
 					$type = substr($key, 0, $p);
 					switch ($type) {
@@ -325,14 +284,29 @@ FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS
 						$ob->save();
 					}
 					$val = $name; //record a pointer
-				} elseif (strlen($val > \PWForms::LENSHORTVAL)) {
-					$lval = $val;
-					$val = NULL;
 				}
-
-				$db->Execute($sql, [$val, $lval, $form_id, $key]); //UPDATE attempt
-				$db->Execute($sql2, [$form_id, $key, $val, $lval, $form_id, $key]);
+				$props[$key] = $val;
 			}
+		}
+		$val = json_encode($props, JSON_FORCE_OBJECT);
+
+		$db = \cmsms()->GetDb();
+		$pre = \cms_db_prefix();
+		if ($newform) {
+			$sql = 'INSERT INTO '.$pre.'module_pwf_form (name,alias,props) VALUES (?,?,?)';
+			$db->Execute($sql, [$params['form_Name'], $params['form_Alias'], $val]);
+			if ($db->Affected_Rows() < 1) {
+				return [FALSE,$mod->Lang('database_error')];
+			}
+			$form_id = $db->Insert_ID();
+		} else {
+			$sql = 'UPDATE '.$pre.'module_pwf_form SET name=?,alias=?,$props=? WHERE form_id=?';
+			$db->Execute($sql, [$params['form_Name'], $params['form_Alias'], $val, $form_id]);
+			//post-UPDATE $db->Affected_Rows() can't be relied on
+/*			if ($db->Affected_Rows() == -1) {
+				return [FALSE,$mod->Lang('database_error')];
+			}
+*/
 		}
 
 		self::Arrange($formdata->Fields, $params['form_FieldOrders']);
@@ -381,12 +355,11 @@ FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS
 	public function Load(&$mod, $form_id, $id, &$params, $admin=FALSE)
 	{
 		$pre = \cms_db_prefix();
-		$sql = 'SELECT name,alias FROM '.$pre.'module_pwf_form WHERE form_id=?';
+		$sql = 'SELECT name,alias,props FROM '.$pre.'module_pwf_form WHERE form_id=?';
 		$row = Utils::SafeGet($sql, [$form_id], 'row');
 		if (!$row) {
 			return FALSE;
 		}
-
 		$formdata = $mod->_GetFormData($params);
 		//some form properties (if absent from $params) default to stored values
 		if (empty($params['form_name'])) {
@@ -395,45 +368,23 @@ FROM (SELECT 1 AS dmy) Z WHERE NOT EXISTS
 		if (empty($params['form_alias'])) {
 			$formdata->Alias = $row['alias']; //alias used only for admin
 		}
-		//no form property value is an array, so no records with same name
-		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_formprops WHERE form_id=?';
-		$data = Utils::SafeGet($sql, [$form_id]);
-		foreach ($data as $one) {
-			$nm = $one['name'];
-/*			TODO support arrays when 'name' field like A[B...
-			if (strpos($nm,'[') !== FALSE) {
-				$parts = explode('[',$nm);
-				foreach ($parts as $a) {
-					if (!is_array(<pathto>$a)) {
-						create it in <pathto>
-					}
-					process rest of parts as members
-				}
-			}
-*/
-			$val = $one['value'];
-			if ($val === NULL) {
-				$val = $one['longvalue'];
-			} //maybe still FALSE
-			if (property_exists($formdata, $nm)) {
-				$formdata->$nm = $val;
-			} else {
-				$formdata->XtraProps[$nm] = $val;
-			}
-		}
+
+		$formdata->XtraProps = (array)json_decode($row['props']);
 
 		if ($admin) {
-			$val = $formdata->XtraProps['form_template'];
-			if ($mod->oldtemplates) {
-				$tpl = $mod->GetTemplate($val);
-			} else {
-				$ob = \CmsLayoutTemplate::load($val);
-				$tpl = $ob->get_content();
+			if (!empty($formdata->XtraProps['form_template'])) {
+				$val = $formdata->XtraProps['form_template'];
+				if ($mod->oldtemplates) {
+					$tpl = $mod->GetTemplate($val);
+				} else {
+					$ob = \CmsLayoutTemplate::load($val);
+					$tpl = $ob->get_content();
+				}
+				$formdata->XtraProps['form_template'] = $tpl;
 			}
 
-			$formdata->XtraProps['form_template'] = $tpl;
-			$val = $formdata->XtraProps['submission_template'];
-			if ($val) {
+			if (!empty($formdata->XtraProps['submission_template'])) {
+				$val = $formdata->XtraProps['submission_template'];
 				if ($mod->oldtemplates) {
 					$tpl = $mod->GetTemplate($val);
 				} else {
@@ -572,16 +523,22 @@ EOS;
 \t<date>{$date}</date>
 \t<count>{$count}</count>
 EOS;
-		$sql = 'SELECT name,value,longvalue FROM '.$pre.'module_pwf_formprops WHERE form_id=? ORDER BY name';
-		$sql2 = 'SELECT field_id,name,alias,type,order_by FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
-		$sql3 = 'SELECT prop_id,field_id,name,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE form_id=? ORDER BY prop_id,name';
+		$sql = 'SELECT props FROM '.$pre.'module_pwf_form WHERE form_id=?';
+		$sql2 = 'SELECT field_id,name,alias,type,order_by,props FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
 		$formpropkeys = array_keys($properties);
 
 		foreach ($formid as $one) {
-			$formopts = $db->GetAssoc($sql, [$one]);
+			$t = $db->GetOne($sql, [$one]);
+			$formopts = (array)json_decode($t);
 			$formfields = $db->GetArray($sql2, [$one]);
-			$fieldkeys = ($formfields) ? array_keys($formfields[0]) : [];
-			$fieldopts = $db->GetArray($sql3, [$one]);
+			if ($formfields) {
+				$fieldopts = (array)json_decode($formopts['props']);
+				$fieldkeys = array_keys($formfields[0]);
+				unset($fieldkeys['props']);
+			} else {
+				$fieldopts = [];
+				$fieldkeys = [];
+			}
 			$xml = [];
 			$xml[] =<<<EOS
 \t<form>
@@ -843,31 +800,32 @@ EOS;
 			$tn = $name;
 			$ta = $val;
 			$i = 1;
-			while (!$this->NewID($name, $alias)) {
+			while (!$this->NewID($name, $val)) {
 				$name = $tn.'('.$i.')';
 				$val = $ta.'_'.$i;
 				$i++;
 			}
+			$alias = $val;
 
-			$sql = 'INSERT INTO '.$pre.'module_pwf_form (name,alias) VALUES (?,?)';
-			$db->Execute($sql, [$name, $val]);
-			$form_id = $db->Insert_ID();
 			unset($fprops['form_id']);
 			unset($fprops['name']);
 			unset($fprops['alias']);
 
-			$sql = 'INSERT INTO '.$pre.'module_pwf_formprops
-(form_id,name,value,longvalue) VALUES (?,?,?,?)';
-			foreach ($fprops as $name=>&$one) {
+			$sql = 'INSERT INTO '.$pre.'module_pwf_form (name,alias) VALUES (?,?)';
+			$db->Execute($sql, [$name, $alias]);
+			$form_id = $db->Insert_ID();
+
+			$props = [];
+			foreach ($fprops as $key=>&$one) {
 				$val = $this->xml_entity_decode($one); //TODO translate numbered fields in templates
-				if ($name == 'form_template') {
+				if ($key == 'form_template') {
 					if ($mod->oldtemplates) {
 						$mod->SetTemplate('pwf_'.$form_id, $val);
 					} else {
 						self::SetTemplate('form', $form_id, $val);
 					}
 					$val = 'pwf_'.$form_id;
-				} elseif ($name == 'submission_template') {
+				} elseif ($key == 'submission_template') {
 					if ($mod->oldtemplates) {
 						$mod->SetTemplate('pwf_sub_'.$form_id, $val);
 					} else {
@@ -875,48 +833,47 @@ EOS;
 					}
 					$val = 'pwf_sub_'.$form_id;
 				}
-				$args = (strlen($val) <= \PWForms::LENSHORTVAL) ?
-					[$form_id,$name,$val,NULL]:
-					[$form_id,$name,NULL,$val];
-				$db->Execute($sql, $args);
-//				$prop_id = $db->Insert_ID();
+				$props[$key] = $val;
 			}
 			unset($one);
 			unset($fprops);
+			$val = json_encode($props, JSON_FORCE_OBJECT);
+
+			$sql = 'UPDATE '.$pre.'module_pwf_form SET props=? WHERE form_id='.$form_id;
+			$db->Execute($sql, [$val]);
+
 			$sql = 'INSERT INTO '.$pre.'module_pwf_field
-(form_id,name,alias,type,order_by) VALUES (?,?,?,?,?)';
-			$sql2 = 'INSERT INTO '.$pre.'module_pwf_fieldprops
-(field_id,form_id,name,value,longvalue) VALUES (?,?,?,?,?)';
+(form_id,name,alias,type,order_by,props) VALUES ('.$form_id.',?,?,?,?,?)';
+
 			foreach ($fdata['fields'] as &$fld) {
 				unset($fld['properties']['field_id']);
-				if (isset($fld['properties']['name'])) {
+				if (!empty($fld['properties']['name'])) {
 					$name = $this->xml_entity_decode($fld['properties']['name']);
-					unset($fld['properties']['name']);
+				} elseif (!empty($fld['properties']['alias'])) {
+					$name = '<'.$fld['properties']['alias'].'>';
 				} else {
-					$name = '';
+					$name = '<'.$mod->Lang('missing_type', $mod->Lang('name')).'>';
 				}
 				foreach (['alias', 'type', 'order_by'] as $key) {
 					if (isset($fld['properties'][$key])) {
 						$$key = $fld['properties'][$key];
 						unset($fld['properties'][$key]);
 					} else {
-						$$key = '';
+						$$key = NULL;
 					}
 				}
-				$db->Execute($sql, [$form_id, $name, $alias, $type, $order_by]);
-				$field_id = $db->Insert_ID();
-
-				foreach ($fld['properties'] as $name=>&$one) {
+				$props = [];
+				foreach ($fld['properties'] as $key=>&$one) {
 					$val = $this->xml_entity_decode($one); //TODO translate numbered fields in templates
-					$args = (strlen($val) <= \PWForms::LENSHORTVAL) ?
-						[$field_id,$form_id,$name,$val,NULL]:
-						[$field_id,$form_id,$name,NULL,$val];
-					$db->Execute($sql2, $args);
-//					$prop_id = $db->Insert_ID();
+					$props[$key] = $val;
 				}
 				unset($one);
+				$val = json_encode($props, JSON_FORCE_OBJECT);
+
+				$db->Execute($sql, [$name, $alias, $type, $order_by, $val]);
 			}
 			unset($fld);
+			unset($fdata);
 		}
 		return [TRUE, $mod->Lang('form_imported')];
 	}
