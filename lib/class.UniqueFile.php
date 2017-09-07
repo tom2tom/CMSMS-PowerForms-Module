@@ -73,23 +73,42 @@ class UniqueFile extends FieldBase
 				$this->GetProperty('newlinechar'),5,15),
 			$mod->Lang('help_newline_replacement'));
 */
-		$adv[] = [ $mod->Lang('title_unique_file_template'),
-						$mod->CreateTextArea(FALSE, $id,
-							htmlspecialchars($this->GetProperty('file_template')),
-							'fp_file_template', 'pwf_tallarea', '', '', '', 50, 15),
-						$mod->Lang('help_unique_file_template').'<br /><br />'.$buttons[0]];
+		$button = Utils::SetTemplateButton('file_template',
+			$mod->Lang('title_create_sample_template'));
+		$adv[] = [$mod->Lang('title_unique_file_template'),
+				$mod->CreateTextArea(FALSE, $id,
+					htmlspecialchars($this->GetProperty('file_template')),
+					'fp_file_template', 'pwf_shortarea', '', '', '', 45, 3),
+				$mod->Lang('help_unique_file_template').'<br />'.$button];
 
-		$adv[] = [ $mod->Lang('title_file_header'),
-						$mod->CreateTextArea(FALSE, $id,
-							htmlspecialchars($this->GetProperty('file_header')),
-							'fp_file_header', 'pwf_shortarea', '', '', '', 50, 8),
-						$mod->Lang('help_file_header_template').'<br /><br />'.$buttons[1]];
+		$button = Utils::SetTemplateButton('file_header',
+			$mod->Lang('title_create_sample_header_template'));
+		$adv[] = [$mod->Lang('title_file_header'),
+				$mod->CreateTextArea(FALSE, $id,
+					htmlspecialchars($this->GetProperty('file_header')),
+					'fp_file_header', 'pwf_shortarea', '', '', '', 45, 8),
+				$mod->Lang('help_file_header_template').'<br />'.$button];
 
-		$adv[] = [ $mod->Lang('title_file_footer'),
-						$mod->CreateTextArea(FALSE, $id,
-							htmlspecialchars($this->GetProperty('file_footer')),
-							'fp_file_footer', 'pwf_shortarea', '', '', '', 50, 8),
-						$mod->Lang('help_file_footer_template').'<br /><br />'.$buttons[2]];
+		$button = Utils::SetTemplateButton('file_footer',
+			$mod->Lang('title_create_sample_footer_template'));
+		$adv[] = [$mod->Lang('title_file_footer'),
+				$mod->CreateTextArea(FALSE, $id,
+					htmlspecialchars($this->GetProperty('file_footer')),
+					'fp_file_footer', 'pwf_shortarea', '', '', '', 45, 8),
+				$mod->Lang('help_file_footer_template').'<br />'.$button];
+		$this->Jscript->jsloads[] = <<<EOS
+ $('#get_file_template').click(function() {
+  populate_template('{$id}fp_file_template',{main:1});
+ });
+ $('#get_file_header').click(function() {
+  populate_template('{$id}fp_file_header',{header:1});
+ });
+ $('#get_file_footer').click(function() {
+  populate_template('{$id}fp_file_footer',{footer:1});
+ });
+EOS;
+		$this->Jscript->jsfuncs[] = Utils::SetTemplateScript($mod, $id, ['type'=>'file', 'field_id'=>$this->Id]);
+
 		//show variables-help on advanced tab
 		return ['main'=>$main,'adv'=>$adv,'extra'=>'varshelpadv'];
 	}
