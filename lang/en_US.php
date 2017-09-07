@@ -551,8 +551,8 @@ $lang['help_date_format'] = 'See <a href="http://www.php.net/manual/en/function.
 $lang['help_date_order'] = 'Use "m" for Month, "d" for Day, and "y" for Year. Separate the items by hyphens.';
 $lang['help_field_height'] = 'The height of the multiselect field';
 //$lang['help_field_values'] = 'Another way of accessing field values is via $fieldname_obj, $alias_obj, or $fld_#_obj, where each field is an object with attributes';
-$lang['help_file_footer_template'] = 'For TXT, this will be placed at the bottom of the file. For RTF, this will replace the %%FOOTER%% string in the template file.';
-$lang['help_file_header_template'] = 'For TXT, this will be placed at the top of the file. For RTF, this will replace the %%HEADER%% string in the template file.';
+$lang['help_file_footer_template'] = 'This will be placed at the bottom of the file';
+$lang['help_file_header_template'] = 'This will be placed at the top of the file';
 $lang['help_file_rename'] = 'To rename a file upon uploading, create the template here. Leave blank to preserve original filename';
 $lang['help_form_alias'] = 'If left blank, an alias will be derived from the form name';
 $lang['help_form_button'] = 'Used in multi-page forms';
@@ -607,11 +607,7 @@ $lang['help_submission_date'] = 'Date of submission';
 $lang['help_submit_limit'] = 'Primitive, secondary, spam management mechanism. This sets the default value for each form, 0 (no limit) or 1 to 250. Usually not needed, especially if the form includes a captcha field.';
 $lang['help_sub_source'] = 'IP address of form user';
 $lang['help_form_url'] = 'URL of page containing form';
-$lang['help_unique_file_template'] = <<<'EOS'
-For TXT, this will be immediately after the Header Template.<br />
-For RTF, this will replace the %FIELDS% string in the template file if RTF template type is set to "Basic".<br />
-This field will be ignored if using "RTF" as file type and "Advanced" as RTF template type.
-EOS;
+$lang['help_unique_file_template'] = 'This will be immediately after the header template';
 $lang['help_variable_name'] = 'Smarty variable';
 $lang['help_additional_payload'] = 'Anything to be appended to the submission payload, in URL-encoded form (.e.g, "user=steve+jobs&employee_number=1)';
 $lang['help_allow_overwrite'] = 'Should uploaded file overwrite previously uploaded file if it has the same name?';
@@ -926,8 +922,8 @@ $lang['title_field_type'] = 'Type';
 $lang['title_field_validation'] = 'Validation';
 $lang['title_field_value'] = 'Human-readable value';
 $lang['title_field_valuearray'] = 'Array of field value(s)';
-$lang['title_file_footer'] = 'Template for the footer of output file';
-$lang['title_file_header'] = 'Template for the header of output file';
+$lang['title_file_footer'] = 'Template for output file footer';
+$lang['title_file_header'] = 'Template for output file header';
 $lang['title_file_name'] = 'File name';
 $lang['title_file_path'] = 'Destination directory for output files';
 $lang['title_file_rename'] = 'Filename template';
