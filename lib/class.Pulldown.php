@@ -72,14 +72,8 @@ class Pulldown extends FieldBase
 
 	public function GetSynopsis()
 	{
-		$opt = $this->GetProperty('indexed_name');
-		if (is_array($opt)) {
-			$num = count($opt);
-		} elseif ($opt) {
-			$num = 1;
-		} else {
-			$num = 0;
-		}
+		$opt = $this->GetPropArray('indexed_name');
+		$num = ($opt) ? count($opt) : 0;
 		return $this->formdata->formsmodule->Lang('options', $num);
 	}
 

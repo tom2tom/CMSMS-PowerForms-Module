@@ -83,13 +83,9 @@ class Multiselect extends FieldBase
 
 	public function GetSynopsis()
 	{
-		$opt = $this->GetProperty('indexed_name');
-		if (is_array($opt)) {
-			$optionCount = count($opt);
-		} else {
-			$optionCount = 0;
-		}
-		return $this->formdata->formsmodule->Lang('options', $optionCount);
+		$opt = $this->GetPropArray('indexed_name');
+		$num = ($opt) ? count($opt) : 0;
+		return $this->formdata->formsmodule->Lang('options', $num);
 	}
 
 	public function AdminPopulate($id)

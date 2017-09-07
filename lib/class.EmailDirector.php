@@ -59,14 +59,8 @@ class EmailDirector extends EmailBase
 
 	public function GetSynopsis()
 	{
-		$opt = $this->GetProperty('destination_address');
-		if (is_array($opt)) {
-			$num = count($opt);
-		} elseif ($opt) {
-			$num = 1;
-		} else {
-			$num = 0;
-		}
+		$opt = $this->GetPropArray('destination_address');
+		$num = ($opt) ? count($opt) : 0;
 
 		$mod = $this->formdata->formsmodule;
 		$ret = $mod->Lang('destination_count', $num);

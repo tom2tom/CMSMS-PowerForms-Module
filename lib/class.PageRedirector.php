@@ -73,14 +73,8 @@ class PageRedirector extends FieldBase
 
 	public function GetSynopsis()
 	{
-		$opt = $this->GetProperty('destination_page');
-		if (is_array($opt)) {
-			$num = count($opt);
-		} elseif ($opt) {
-			$num = 1;
-		} else {
-			$num = 0;
-		}
+		$opt = $this->GetPropArray('destination_page');
+		$num = ($opt) ? count($opt) : 0;
 		return $this->formdata->formsmodule->Lang('destination_count', $num);
 	}
 

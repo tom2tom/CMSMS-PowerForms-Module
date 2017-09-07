@@ -120,13 +120,9 @@ class CheckboxGroup extends FieldBase
 
 	public function GetSynopsis()
 	{
-		$pt = $this->GetPropArray('box_name');
-		if ($pt) {
-			$boxCount = count($pt);
-		} else {
-			$boxCount = 0;
-		}
-		return $this->formdata->formsmodule->Lang('boxes', $boxCount);
+		$opt = $this->GetPropArray('box_name');
+		$num = ($opt) ? count($opt) : 0;
+		return $this->formdata->formsmodule->Lang('boxes', $num);
 	}
 
 	public function AdminPopulate($id)
