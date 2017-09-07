@@ -1056,10 +1056,7 @@ class FieldBase implements \Serializable
 	protected function EnsureArray(&$val)
 	{
 		if (is_string($val)) {
-			$val = json_decode($val);
-		}
-		if (is_object($val)) {
-			$val = (array)$val;
+			$val = json_decode($val, TRUE);
 		}
 	}
 */
@@ -1068,7 +1065,7 @@ class FieldBase implements \Serializable
 		//no need to fully-document our 'parent'
 		$ob = $this->formdata;
 		$this->formdata = NULL; //upstream must reinstate ref to relevant FormData-object when unserializing
-		$ret = json_encode(get_object_vars($this));
+		$ret = json_encode(get_object_vars($this), JSON_NUMERIC_CHECK);
 		$this->formdata = $ob;
 		return $ret;
 	}
@@ -1082,15 +1079,10 @@ class FieldBase implements \Serializable
 	public function unserialize($serialized)
 	{
 		if ($serialized) {
-			$props = json_decode($serialized);
+			$props = json_decode($serialized, TRUE);
 			if ($props !== NULL) {
-				$arr = (array)$props;
-				foreach ($arr as $key=>$one) {
-					if (is_object($one)) {
-						$this->$key = (array)$one; //no objects in field properties
-					} else {
-						$this->$key = $one;
-					}
+				foreach ($props as $key=>$one) {
+					$this->$key = $one;
 				}
 			}
 		}

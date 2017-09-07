@@ -131,10 +131,10 @@ class FieldOperations
 			return FALSE;
 		}
 
-		$t = (array)json_decode($props);
+		$t = json_decode($props, TRUE);
 		if ($t) {
 $X = $CRASH; //TODO revise props for new field
-			$val = json_encode($t, JSON_FORCE_OBJECT);
+			$val = json_encode($t, JSON_NUMERIC_CHECK);
 			$sql = 'UPDATE '.$pre.'module_pwf_field SET props=? WHERE field_id='.$fid;
 			$db->Execute($sql, [$val]);
 		}
@@ -199,18 +199,19 @@ $X = $CRASH; //TODO revise props for new field
 		if ($allprops) {
 			//exclude 'constant' properties
 			$saves = array_diff_key($obfld->XtraProps,
-			['DisplayInForm',
-			'DisplayInSubmission',
-			'IsComputedOnSubmission',
-			'IsDisposition',
-			'IsEmailDisposition',
-			'IsInput',
-			'MultiChoice',
-			'MultiComponent',
-			'MultiPopulate',
-			'ValidationTypes',
+			['DisplayInForm' => 1,
+			'DisplayInSubmission' => 1,
+			'IsComputedOnSubmission' => 1,
+			'IsDisposition' => 1,
+			'IsEmailDisposition' => 1,
+			'IsInput' => 1,
+			'MultiChoice' => 1,
+			'MultiComponent' => 1,
+			'MultiPopulate' => 1,
+			'NeedsDiv' => 1,
+			'ValidationTypes' => 1,
 			]);
-			$props = json_encode($saves, JSON_FORCE_OBJECT);
+			$props = json_encode($saves, JSON_NUMERIC_CHECK);
 			$sql = 'UPDATE '.$pre.'module_pwf_field SET props=? WHERE field_id=?';
 			$db->Execute($sql, [$props, $obfld->Id]);
 		}
@@ -239,7 +240,7 @@ $X = $CRASH; //TODO revise props for new field
 			}
 			$obfld->Type = $row['type'];
 			$obfld->OrderBy = (int)$row['order_by'];
-			$props = (array)json_decode($row['props']);
+			$props = json_decode($row['props'], TRUE);
 			if ($props) {
 				$obfld->XtraProps = array_merge($obfld->XtraProps, $props);
 			}

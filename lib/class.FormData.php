@@ -67,8 +67,8 @@ class FormData implements \Serializable
 			$afields[$i] = serialize($one);
 		}
 		$this->Fields = '||~||';
-		$ret = json_encode(get_object_vars($this)); //include private properties
-		$jf = json_encode($afields);
+		$ret = json_encode(get_object_vars($this), JSON_NUMERIC_CHECK); //include private properties
+		$jf = json_encode($afields, JSON_NUMERIC_CHECK);
 		$ret = str_replace('"||~||"', $jf, $ret);
 		//reinstate
 		$this->formsmodule = $mod;
@@ -86,10 +86,9 @@ class FormData implements \Serializable
 	public function unserialize($serialized)
 	{
 		if ($serialized) {
-			$props = json_decode($serialized);
+			$props = json_decode($serialized, TRUE);
 			if ($props !== NULL) {
-				$arr = (array)$props;
-				foreach ($arr as $key=>$one) {
+				foreach ($props as $key=>$one) {
 					switch ($key) {
 					 case 'formsmodule':
 						$this->$key =& \cms_utils::get_module($one);

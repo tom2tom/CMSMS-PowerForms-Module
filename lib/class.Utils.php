@@ -1169,8 +1169,8 @@ EOS;
 			$props = $db->GetCol($sql, [$except]);
 			if ($props) {
 				foreach ($props as &$one) {
-					$t = (array)json_decode($one);
-					if ($t && !empty($t['css_file']) && $t['css_file'] == $file) {
+					$t = json_decode($one, TRUE);
+					if ($t && isset($t['css_file']) && $t['css_file'] == $file) {
 						unset($one);
 						return;
 					}
