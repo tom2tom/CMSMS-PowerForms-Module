@@ -196,8 +196,8 @@ EOS;
 		$data = $db->GetAssoc($sql);
 		if ($data) {
 			foreach ($data as &$row) {
-				$finds[] = '\$fld_'.$row['old_id'];
-				$repls[] = '\$fld_'.$row['new_id'];
+				$finds[] = '$fld_'.$row['old_id'];
+				$repls[] = '$fld_'.$row['new_id'];
 			}
 			unset($row);
 		}
@@ -209,6 +209,7 @@ EOS;
 			$ob = CmsLayoutTemplate::load('pwf_'.$newfid);
 			$tpl = $ob->get_content();
 		}
+
 		if ($tpl) {
 			$tpl = str_replace($finds, $repls, $tpl);
 			if ($mod->oldtemplates) {
@@ -218,6 +219,7 @@ EOS;
 				$ob->save();
 			}
 		}
+
 		if ($mod->oldtemplates) {
 			$tpl = $mod->GetTemplate('pwf_sub_'.$newfid);
 		} else {
@@ -233,48 +235,6 @@ EOS;
 				$ob->save();
 			}
 		}
-
-/*		$sql = 'SELECT prop_id,value,longvalue FROM '.$pre.'module_pwf_formprops WHERE form_id=? AND name=\'submission_template\'';
-		$row = $db->GetRow($sql, [$newfid]);
-		if ($row) {
-			$sval = $row['value'];
-			$lval = $row['longvalue'];
-			if ($sval) {
-				$tpl = str_replace($finds, $repls, $sval);
-			} elseif ($lval) {
-				$tpl = str_replace($finds, $repls, $lval);
-			}
-			if ($sval || $lval) {
-				$sql = 'UPDATE '.$pre.'module_pwf_formprops SET value=?,longvalue=? WHERE prop_id=?';
-				$args = (strlen($tpl) <= PWForms::LENSHORTVAL) ?
-						[$tpl,NULL,$row['prop_id']]:
-						[NULL,$tpl,$row['prop_id']];
-				$db->Execute($sql, $args);
-			}
-		}
-
-		$sql = 'SELECT prop_id,value,longvalue FROM '.$pre.'module_pwf_fieldprops WHERE form_id=? AND name LIKE\'%template%\' ORDER BY field_id';
-		$rows = $db->GetArray($sql, [$newfid]);
-		if ($rows) {
-			$sql = 'UPDATE '.$pre.'module_pwf_fieldprops SET value=?,longvalue=? WHERE prop_id=?';
-			foreach ($rows as &$row) {
-				$sval = $row['value'];
-				$lval = $row['longvalue'];
-				if ($sval) {
-					$tpl = str_replace($finds, $repls, $sval);
-				} elseif ($lval) {
-					$tpl = str_replace($finds, $repls, $lval);
-				}
-				if ($sval || $lval) {
-					$args = (strlen($tpl) <= PWForms::LENSHORTVAL) ?
-							[$tpl,NULL,$row['prop_id']]:
-							[NULL,$tpl,$row['prop_id']];
-					$db->Execute($sql, $args);
-				}
-			}
-			unset($row);
-		}
-*/
 	}
 
 	function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, $oldtype, &$passdowns, &$passbacks)
@@ -315,7 +275,7 @@ EOS;
 			];
 			//some field-types simply repeat the same option-name (relying on save-order for any reconciliation!)
 			//we are more careful!
-			$sequence = in_array($oldtype, [
+			$multi = in_array($oldtype, [
 			'CheckboxGroupField',
 			'DispositionDirector',
 			'DispositionEmail',
@@ -327,7 +287,7 @@ EOS;
 			'PulldownField',
 			'RadioGroupField',
 			]);
-			if ($sequence) {
+			if ($multi) {
 				$desc = '';
 				$uses = array_count_values(array_column($data, 'name')); //TODO only for PHP 5.5+
 			}
@@ -342,10 +302,8 @@ EOS;
 			$hastbl = (isset($populators['table']) && count($populators['table']) > 0);
 			//TODO get object names from xml, omit others in $data
 */
-//			$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_fieldprops');
 			foreach ($data as $fbrow) {
 				extract($fbrow);
-//				extract($pfrow); //NULL default values
 				if (!$name) {
 					$name = $this->Lang('none2');
 				}
@@ -363,18 +321,15 @@ EOS;
 				if (isset($passdowns[$name])) {
 					unset($passdowns[$name]);
 				}
-				if ($sequence) {
+				if ($multi) {
 					if ($name != $desc) {
 						$desc = $name;
 						$indx = 1;
 					}
-					//not all field-properties are sequences (and some that are, are single-valued)
+					//not all field-properties are sequences (and some that are, are single-valued & handled in-field)
 					if ($uses[$name] > 1) {
 						$name .= $indx;
 						$indx++;
-//					} elseif (0) { //TODO identify single-valued sequences
-//						$name .= $indx;
-//						$indx++;
 					}
 				}
 				//rename some properties e.g. 'option_'* to 'indexed_'*
@@ -408,23 +363,22 @@ EOS;
 			}
 		}
 		if ($passdowns) {
-			foreach ($passdowns as $nm=>$value) {
-//				if ($val) {
-//				extract($pfrow); //NULL default values
-				$name = ($nm) ? $nm:$this->Lang('none2');
-				if (in_array($name, $excludes)) {
-					continue;
-				}
-				if ($name == 'alias') {
-//					$value = PWForms\Utils::MakeAlias($value, 24); //length conform to FieldBase::GetVariableName()
-					continue;
+			foreach ($passdowns as $name => $value) {
+				if ($name) {
+					if (in_array($name, $excludes)) {
+						continue;
+					}
+					if ($name == 'alias') {
+						continue;
+					}
+				} else {
+					$name = '<'.$this->Lang('none2').'>';
 				}
 				$props[$name] = $value;
-//				}
 			}
 		}
 
-		ksort($props, SORT_STRING);
+		ksort($props);
 		$value = json_encode($props, JSON_NUMERIC_CHECK);
 		$sql = 'UPDATE '.$pre.'module_pwf_field SET props=? WHERE field_id=?';
 		$db->Execute ($sql, [$value, $newf]);
@@ -502,8 +456,8 @@ EOS;
 					}
 				}
 				$back = []; //TODO missing keys to get from options
-			Get_FieldOpts($db, $pre, $oldfid, $newfid, $oldf, $newf, $oldtype, $more, $back);
-			//TODO handle passbacks
+				Get_FieldOpts($db, $pre, $oldfid, $newfid, $oldf, $newf, $oldtype, $more, $back);
+				//TODO handle passbacks
 			}
 		}
 	}
@@ -515,42 +469,55 @@ EOS;
 		$props = [];
 		if ($data) {
 			foreach ($data as $row) {
-				if (strpos($row['name'], 'captcha') !== FALSE) { //ignore redundant options
+				$name = $row['name'];
+				//ignore redundant properties
+				if (strpos($name, 'captcha') !== FALSE) {
 					continue;
 				}
-				if (strpos($row['name'], 'udt') !== FALSE && (!$row['value'] || $row['value'] == -1)) {
+				$value = $row['value'];
+				if (strpos($name, 'udt') !== FALSE && (!$value || $value == -1)) {
 					continue;
 				}
-				$val = $row['value'];
-				//CHECKME template arrangements used by newer FormBuilder
-				switch ($row['name']) {
+				switch ($name) {
+				 case 'inline':
+				 case 'input_button_safety':
+					$value = $value + 0;
+					break;
 				 case 'form_template':
+					//TODO CHECK template arrangements used by newer FormBuilder
 					if ($mod->oldtemplates) {
-						$mod->SetTemplate('pwf_'.$newfid, $val);
+						$mod->SetTemplate('pwf_'.$newfid, $value);
 					} else {
-						MySetTemplate('form', $newfid, $val);
+						MySetTemplate('form', $newfid, $value);
 					}
-					$val = 'pwf_'.$newfid;
+					$value = 'pwf_'.$newfid;
 					break;
 				 case 'submission_template':
 					if ($mod->oldtemplates) {
-						$mod->SetTemplate('pwf_sub_'.$newfid, $val);
+						$mod->SetTemplate('pwf_sub_'.$newfid, $value);
 					} else {
-						MySetTemplate('submission', $newfid, $val);
+						MySetTemplate('submission', $newfid, $value);
 					}
-					$val = 'pwf_sub_'.$newfid;
+					$value = 'pwf_sub_'.$newfid;
 					break;
 				}
-				$props[$row['name']] = $val;
+				$props[$name] = $value;
 			}
 		}
 		//TODO handle $passbacks
 		if ($passdowns) {
-			$X = $CRASH; //TODO
+			foreach ($passdowns as $name=>$value) {
+				if (!$name) {
+					$name = '<'.this->Lang('none2').'>';
+				}
+				$props[$name] = $value;
+			}
 		}
-		$val = json_encode($props, JSON_NUMERIC_CHECK);
+
+		ksort($props);
+		$value = json_encode($props, JSON_NUMERIC_CHECK);
 		$sql = 'UPDATE '.$pre.'module_pwf_form SET props=? WHERE form_id=?';
-		$db->Execute ($sql, [$val, $newfid]);
+		$db->Execute ($sql, [$value, $newfid]);
 	}
 } // !function_exists
 
