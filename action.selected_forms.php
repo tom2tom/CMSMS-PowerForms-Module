@@ -21,6 +21,11 @@ if (!empty($params['selected'])) {
 			$funcs->Delete($this, $fid);
 		}
 	} elseif (isset($params['export'])) {
+		sort($params['selected']);
+		$fn = $this->GetName().$this->Lang('export').'-Forms_'.
+			implode('_',$params['selected']).'-'.date('Y-m-d-H-i').'.xml';
+		$fn = preg_replace('/[^\w\-.]/', '_', $fn);
+
 		$xmlstr = $funcs->CreateXML($this, $params['selected'], date('Y-m-d H:i:s'));
 		if ($xmlstr) {
 			@ob_clean();
