@@ -279,17 +279,19 @@ EOS;
 
 	function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, $oldtype, &$passdowns, &$passbacks)
 	{
-		$sql = 'SELECT * FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY name';
+		$sql = 'SELECT name,value FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY name';
 		$data = $db->GetArray($sql, [$oldfid, $oldf]);
 		$props = [];
 		if ($data) {
-			$fbfields = array_keys($data[0]);
 			//exclude some properties
-			foreach ([
+			$excludes = [
 			'crypt',
-			'field_alias', //TODO passback
-			'modifiesOtherFields',
+			'crypt_lib',
+			'feu_bind',
+			'hash_sort',
+//			'modifiesOtherFields', ?
 			'searchable',
+			'sort',
 			'sortable',
 			'sortfield1',
 			'sortfield2',
@@ -299,15 +301,18 @@ EOS;
 			'HasDeleteOp',
 			'HasUserAddOp',
 			'HasUserDeleteOp',
-			] as $one) {
-				$p = array_search($one, $fbfields);
-				if ($p !== FALSE) {
-					unset($fbfields[$p]);
-				}
-				if (array_key_exists($one, $passdowns)) {
-					unset($passdowns[$one]);
-				}
-			}
+			];
+			$numbers = [
+			'clear_default',
+			'cols',
+			'html5',
+			'html_email',
+			'is_checked',
+			'length',
+			'readonly',
+			'rows',
+			'wysiwyg',
+			];
 			//some field-types simply repeat the same option-name (relying on save-order for any reconciliation!)
 			//we are more careful!
 			$sequence = in_array($oldtype, [
@@ -324,8 +329,11 @@ EOS;
 			]);
 			if ($sequence) {
 				$desc = '';
-				$uses = array_count_values(array_column($data, 'name'));
+				$uses = array_count_values(array_column($data, 'name')); //TODO only for PHP 5.5+
 			}
+
+			$finds = NULL; //populate if/when needed
+			$repls = [];
 /* TODO
 			$obfld = new PWForms\XXX();
 			$populators = $obfld->AdminPopulate('FAKE');
@@ -334,11 +342,22 @@ EOS;
 			$hastbl = (isset($populators['table']) && count($populators['table']) > 0);
 			//TODO get object names from xml, omit others in $data
 */
+//			$pfrow = $db->GetRow('SELECT * FROM '.$pre.'module_pwf_fieldprops');
 			foreach ($data as $fbrow) {
-				extract($pfrow); //NULL default values
 				extract($fbrow);
+//				extract($pfrow); //NULL default values
 				if (!$name) {
 					$name = $this->Lang('none2');
+				}
+				if (in_array($name, $excludes)) {
+					continue;
+				}
+				$value = $value; //for DEBUG
+				if ($name == 'field_alias') {
+					if ($value) {
+						$passbacks['Alias'] = $value;
+					}
+					continue;
 				}
 				//existing option-value prevails
 				if (isset($passdowns[$name])) {
@@ -349,38 +368,66 @@ EOS;
 						$desc = $name;
 						$indx = 1;
 					}
-					//not all field-properties are sequences (and some that are will be single-valued)
+					//not all field-properties are sequences (and some that are, are single-valued)
 					if ($uses[$name] > 1) {
 						$name .= $indx;
 						$indx++;
+//					} elseif (0) { //TODO identify single-valued sequences
+//						$name .= $indx;
+//						$indx++;
 					}
 				}
 				//rename some properties e.g. 'option_'* to 'indexed_'*
 				if (strncmp($name, 'option_', 7) == 0) {
 					$name = 'indexed_'.substr($name, 7);
 				}
-				$value = $value; //??
+				//revalue some properties
+				if (in_array($name, $numbers)) {
+					$value = $value + 0;
+				} elseif (strpos($name, 'template') !== FALSE) {
+					if ($finds === NULL) {
+						$sql = 'SELECT * FROM '.$pre.'module_pwf_trans WHERE NOT isform ORDER BY old_id';
+						$trans = $db->GetAssoc($sql);
+						if ($trans) {
+							foreach ($trans as &$row) {
+								$finds[] = '$fld_'.$row['old_id'];
+								$repls[] = '$fld_'.$row['new_id'];
+							}
+							unset($row);
+						} else {
+							$finds = [];
+						}
+					}
+					$value = str_replace($finds, $repls, $value);
+				}
 				$props[$name] = $value;
 			}
-			//TODO update $passbacks
+			//supplementary property
+			if ($oldtype == 'TextField') {
+				$props['size'] = min($props['length'], 50);
+			}
 		}
 		if ($passdowns) {
-			foreach ($passdowns as $nm=>$val) {
+			foreach ($passdowns as $nm=>$value) {
 //				if ($val) {
-				extract($pfrow); //NULL default values
+//				extract($pfrow); //NULL default values
 				$name = ($nm) ? $nm:$this->Lang('none2');
-				if ($name == 'alias') {
-					$val = PWForms\Utils::MakeAlias($val, 24); //length conform to FieldBase::GetVariableName()
+				if (in_array($name, $excludes)) {
+					continue;
 				}
-				$props[$name] = $val;
+				if ($name == 'alias') {
+//					$value = PWForms\Utils::MakeAlias($value, 24); //length conform to FieldBase::GetVariableName()
+					continue;
+				}
+				$props[$name] = $value;
 //				}
 			}
 		}
 
 		ksort($props, SORT_STRING);
-		$val = json_encode($props, JSON_FORCE_OBJECT);
+		$value = json_encode($props, JSON_NUMERIC_CHECK);
 		$sql = 'UPDATE '.$pre.'module_pwf_field SET props=? WHERE field_id=?';
-		$db->Execute ($sql, [$val, $newf]);
+		$db->Execute ($sql, [$value, $newf]);
 	}
 
 	function Get_Fields(&$db, $pre, $oldfid, $newfid)
@@ -501,7 +548,7 @@ EOS;
 		if ($passdowns) {
 			$X = $CRASH; //TODO
 		}
-		$val = json_encode($props, JSON_FORCE_OBJECT);
+		$val = json_encode($props, JSON_NUMERIC_CHECK);
 		$sql = 'UPDATE '.$pre.'module_pwf_form SET props=? WHERE form_id=?';
 		$db->Execute ($sql, [$val, $newfid]);
 	}
