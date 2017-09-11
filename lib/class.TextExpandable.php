@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -13,10 +14,11 @@ class TextExpandable extends FieldBase
 	{
 		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
+		$this->LabelSubComponents = FALSE;
 		$this->MultiComponent = TRUE; //CHECKME
 		$this->Type = 'TextExpandable';
 		$this->ValidationType = 'none';
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_numeric')=>'numeric',
@@ -27,11 +29,24 @@ class TextExpandable extends FieldBase
 		];
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'length' => 11,
+		'size' => 11,
+		'hidebuttons' => 10,
+		'add_button' => 12,
+		'del_button' => 12,
+		'regex' => 12,
+		'siblings' => 12,
+		];
+	}
+
 	// Gets all other 'TextExpandable' fields in the form
 	public function GetFieldSiblings()
 	{
 		$siblings = [];
-		$siblings[$this->formdata->formsmodule->Lang('select_one')] = '';
+		$siblings[$this->formdata->pwfmod->Lang('select_one')] = '';
 		$tid = $this->Id;
 		foreach ($this->formdata->Fields as &$one) {
 			if ($one->GetFieldType() == 'TextExpandable') {
@@ -58,7 +73,7 @@ class TextExpandable extends FieldBase
 			$ret = $this->Value;
 		} else {
 			$ret = $this->GetFormProperty('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
+				$this->formdata->pwfmod->Lang('unspecified'));
 		}
 
 		if ($as_string) {
@@ -70,7 +85,7 @@ class TextExpandable extends FieldBase
 
 	public function GetSynopsis()
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$ret = $mod->Lang('abbreviation_length', $this->GetProperty('length', 80));
 		if ($this->ValidationType) {
 //			$this->EnsureArray($this->ValidationTypes);
@@ -86,7 +101,7 @@ class TextExpandable extends FieldBase
 	public function AdminPopulate($id)
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id);
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_maximum_length'),
 						$mod->CreateInputText($id, 'fp_length', $this->GetProperty('length', 80), 3, 3)];
 		$main[] = [$mod->Lang('title_display_length'),
@@ -111,14 +126,9 @@ class TextExpandable extends FieldBase
 		return ['main'=>$main,'adv'=>$adv];
 	}
 
-	public function LabelSubComponents()
-	{
-		return FALSE;
-	}
-
 	public function Populate($id, &$params)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$sibling_id = $this->GetProperty('siblings');
 //TODO c.f. $this->HasUserAddOp, $this->HasUserDeleteOp
 		$hidebuttons = $this->GetProperty('hidebuttons');
@@ -197,7 +207,7 @@ class TextExpandable extends FieldBase
 
 	public function Validate($id)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$val = TRUE;
 		$messages = [];
 		$l = $this->GetProperty('length', 0);
@@ -265,7 +275,7 @@ class TextExpandable extends FieldBase
 				$messages[] = $mod->Lang('enter_no_longer', $l);
 			}
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		if ($val) {
 			$this->ValidationMessage = '';
 		} else {

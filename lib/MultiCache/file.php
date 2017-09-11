@@ -45,7 +45,7 @@ class file extends CacheBase implements CacheInterface
 		return TRUE;
 	}
 
-	public function _newsert($keyword, $value, $lifetime= FALSE)
+	public function _newsert($keyword, $value, $lifetime=FALSE)
 	{
 		$fp = $this->basepath.$this->filename($keyword);
 		if (!file_exists($fp)) {
@@ -54,7 +54,7 @@ class file extends CacheBase implements CacheInterface
 		return FALSE;
 	}
 
-	public function _upsert($keyword, $value, $lifetime= FALSE)
+	public function _upsert($keyword, $value, $lifetime=FALSE)
 	{
 		$fp = $this->basepath.$this->filename($keyword);
 		return $this->writefile($fp, $value);

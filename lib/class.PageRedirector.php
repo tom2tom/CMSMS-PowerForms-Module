@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -20,14 +21,48 @@ class PageRedirector extends FieldBase
 		$this->Type = 'PageRedirector';
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		$ret = parent::GetMutables($nobase) + [
+		'select_label' => 12,
+		];
+
+		$mkey1 = 'destination_page';
+		$mkey2 = 'destination_subject';
+		if ($actual) {
+			$opt = $this->GetPropArray($mkey1);
+			if ($opt) {
+				$suff = array_keys($opt);
+			} else {
+				return $ret;
+			}
+		} else {
+			$suff = range(1, 10);
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey1.$one] = 12;
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey2.$one] = 12;
+		}
+		return $ret;
+	}
+
+	public function GetSynopsis()
+	{
+		$opt = $this->GetPropArray('destination_page');
+		$num = ($opt) ? count($opt) : 0;
+		return $this->formdata->pwfmod->Lang('destination_count', $num);
+	}
+
 	public function ComponentAddLabel()
 	{
-		return $this->formdata->formsmodule->Lang('add_destination');
+		return $this->formdata->pwfmod->Lang('add_destination');
 	}
 
 	public function ComponentDeleteLabel()
 	{
-		return $this->formdata->formsmodule->Lang('delete_destination');
+		return $this->formdata->pwfmod->Lang('delete_destination');
 	}
 
 	public function HasComponentAdd()
@@ -61,7 +96,7 @@ class PageRedirector extends FieldBase
 			$ret = $this->GetPropIndexed('destination_page', $this->Value);
 		} else {
 			$ret = $this->GetFormProperty('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
+				$this->formdata->pwfmod->Lang('unspecified'));
 		}
 
 		if ($as_string) {
@@ -71,21 +106,14 @@ class PageRedirector extends FieldBase
 		}
 	}
 
-	public function GetSynopsis()
-	{
-		$opt = $this->GetPropArray('destination_page');
-		$num = ($opt) ? count($opt) : 0;
-		return $this->formdata->formsmodule->Lang('destination_count', $num);
-	}
-
 	public function AdminPopulate($id)
 	{
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE, FALSE);
-		$mod = $this->formdata->formsmodule;
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE, FALSE);
+		$mod = $this->formdata->pwfmod;
 
 		$main[] = [$mod->Lang('title_select_one_message'),
-						$mod->CreateInputText($id, 'fp_select_one',
-							$this->GetProperty('select_one', $mod->Lang('select_one')), 30, 128)];
+					$mod->CreateInputText($id, 'fp_select_label',
+						$this->GetProperty('select_label', $mod->Lang('select_one')), 30, 128)];
 		if ($this->addressAdd) {
 			$this->AddPropIndexed('destination_page', '');
 			$this->AddPropIndexed('destination_subject', '');
@@ -143,7 +171,7 @@ class PageRedirector extends FieldBase
 
 		if (!$this->GetProperty('destination_page')) {
 			$ret = FALSE;
-			$mod = $this->formdata->formsmodule;
+			$mod = $this->formdata->pwfmod;
 			$messages[] = $mod->Lang('missing_type', $mod->Lang('page'));
 		}
 		$msg = ($ret)?'':implode('<br />', $messages);
@@ -154,8 +182,8 @@ class PageRedirector extends FieldBase
 	{
 		$pages = $this->GetPropArray('destination_subject');
 		if ($pages) {
-			$mod = $this->formdata->formsmodule;
-			$choices = [' '.$this->GetProperty('select_one', $mod->Lang('select_one')) => -1]
+			$mod = $this->formdata->pwfmod;
+			$choices = [' '.$this->GetProperty('select_label', $mod->Lang('select_one')) => -1]
 				+ array_flip($pages);
 			$tmp = $mod->CreateInputDropdown(
 				$id, $this->formdata->current_prefix.$this->Id, $choices, -1, $this->Value,
@@ -168,14 +196,14 @@ class PageRedirector extends FieldBase
 	public function Dispose($id, $returnid)
 	{
 		//TODO ensure all other dispositions are run before this
-//		$this->formdata->formsmodule->RedirectContent($this->GetPropIndexed('destination_page',$this->Value));
+//		$this->formdata->pwfmod->RedirectContent($this->GetPropIndexed('destination_page',$this->Value));
 		$page = $this->GetPropIndexed('destination_page', $this->Value);
 		if ($page >= 0) {
 			$this->formdata->XtraProps['redirect_page'] = $page;
 			$this->formdata->XtraProps['submit_action'] = 'redir';
 			return [TRUE,''];
 		}
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		return [FALSE,$mod->Lang('missing_type', $mod->Lang('page'))];
 	}
 }

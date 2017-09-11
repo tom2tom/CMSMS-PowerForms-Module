@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -131,10 +132,10 @@ class FieldOperations
 			return FALSE;
 		}
 
-		$t = json_decode($props, TRUE);
+		$t = unserialize($props);
 		if ($t) {
 $X = $CRASH; //TODO revise props for new field
-			$val = json_encode($t, JSON_NUMERIC_CHECK);
+			$val = serialize($t);
 			$sql = 'UPDATE '.$pre.'module_pwf_field SET props=? WHERE field_id='.$fid;
 			$db->Execute($sql, [$val]);
 		}
@@ -154,7 +155,7 @@ $X = $CRASH; //TODO revise props for new field
 			$field = $formdata->Fields[$field_id];
 			$obfld = clone($field);
 			$obfld->Id = 0;
-			$obfld->SetName($field->GetName().' '.$formdata->formsmodule->Lang('copy'));
+			$obfld->SetName($field->GetName().' '.$formdata->pwfmod->Lang('copy'));
 			$obfld->SetOrder(count($formdata->Fields)+1); //bit racy!
 		}
 		return $obfld;
@@ -198,20 +199,33 @@ $X = $CRASH; //TODO revise props for new field
 
 		if ($allprops) {
 			//exclude 'constant' properties
-			$saves = array_diff_key($obfld->XtraProps,
-			['DisplayInForm' => 1,
-			'DisplayInSubmission' => 1,
-			'IsComputedOnSubmission' => 1,
-			'IsDisposition' => 1,
-			'IsEmailDisposition' => 1,
-			'IsInput' => 1,
-			'MultiChoice' => 1,
-			'MultiComponent' => 1,
-			'MultiPopulate' => 1,
-			'NeedsDiv' => 1,
-			'ValidationTypes' => 1,
-			]);
-			$props = json_encode($saves, JSON_NUMERIC_CHECK);
+			$includes = $obfld->GetMutables();
+			$saves = array_intersect_key($obfld->XtraProps, $includes);
+			foreach ($saves as $name => &$val) {
+				switch ($includes[$name]) {
+				 case 0:
+				 case 10:
+					$val = ($val) ? 1:0;
+					break;
+				 case 1:
+				 case 11:
+					$val += 0;
+					break;
+//				 case 3: no special case for templates ?
+//				 case 13:
+				 case 4:
+				 case 14:
+					if ($val === NULL || is_scalar($val)) {
+//TODO check mixed value & process accordingly
+					} else {
+						$val = serialize($val);
+					}
+					//no break here
+				 default:
+				}
+			}
+			unset($val);
+			$props = serialize($saves);
 			$sql = 'UPDATE '.$pre.'module_pwf_field SET props=? WHERE field_id=?';
 			$db->Execute($sql, [$props, $obfld->Id]);
 		}
@@ -240,14 +254,14 @@ $X = $CRASH; //TODO revise props for new field
 			}
 			$obfld->Type = $row['type'];
 			$obfld->OrderBy = (int)$row['order_by'];
-			$props = json_decode($row['props'], TRUE);
+			$props = unserialize($row['props']);
 			if ($props) {
 				$obfld->XtraProps = array_merge($obfld->XtraProps, $props);
 			}
 		} else {
 			return FALSE;
 		}
-		$obfld->SetStatus('loaded', TRUE);
+		$obfld->SetProperty('loaded', TRUE);
 
 		return TRUE;
 	}

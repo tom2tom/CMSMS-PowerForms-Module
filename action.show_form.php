@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 /*
 'form' => alias, first-time opened
 'form_id' => enum or -1
@@ -161,7 +162,7 @@ if (isset($params[$prefix.'datakey'])) {
 			'error'=>1]);
 		return;
 	}
-	$formdata->formsmodule = &$this;
+	$formdata->pwfmod = &$this;
 
 	//update cached field data from $params[]
 	foreach ($matched as $key) {
@@ -282,7 +283,7 @@ EOS;
 					$message[] = $res[1];
 				}
 			}
-			$obfld->SetStatus('valid', $val);
+			$obfld->SetProperty('valid', $val);
 		}
 
 		if ($allvalid) {
@@ -328,13 +329,13 @@ EOS;
 			$queue = $cache->get('pwfQarray');
 			if (!$queue)
 				$queue = array();
-			unset($formdata->formsmodule); //no need to cache this
+			unset($formdata->pwfmod); //no need to cache this
 			$queue[] = array(
 				'data' => $formdata, //CHECKME encrypted?
 				'submitted' => time(),
 				'pageid' => $id);
 			$cache->set('pwfQarray',$queue,0); //no expiry
-			$formdata->formsmodule = &$this;
+			$formdata->pwfmod = &$this;
 			$mx->unlock($token);
 			if (!$cache->get('pwfQrunning')) {
 				//initiate async queue processing
@@ -611,6 +612,8 @@ EOS;
 	$firsttime = TRUE;
 	$formdata->Page = 1;
 	$formdata->PagesCount = 1; //we will count
+
+	list($formdata->current_prefix, $formdata->prior_prefix) = $this->_GetTokens();
 
 	//construct cache key (more random than backend keys)
 	if (!empty($_SERVER['SERVER_ADDR'])) {

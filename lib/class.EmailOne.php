@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -18,6 +19,11 @@ class EmailOne extends EmailBase
 		$this->Type = 'EmailOne';
 	}
 
+/*	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [];
+	}
+*/
 	public function GetSynopsis()
 	{
 		return $this->TemplateStatus();
@@ -32,7 +38,7 @@ class EmailOne extends EmailBase
 	public function Populate($id, &$params)
 	{
 		$this->SetEmailJS();
-		$tmp = $this->formdata->formsmodule->CreateInputEmail(
+		$tmp = $this->formdata->pwfmod->CreateInputEmail(
 			$id, $this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($this->Value, ENT_QUOTES), 25, 128,
 			$this->GetScript());
@@ -55,9 +61,9 @@ class EmailOne extends EmailBase
 			}
 		} else {
 			$val = FALSE;
-			$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_an_email', $this->Name);
+			$this->ValidationMessage = $this->formdata->pwfmod->Lang('enter_an_email', $this->Name);
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 

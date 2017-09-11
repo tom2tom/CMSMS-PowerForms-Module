@@ -29,12 +29,12 @@ class wincache extends CacheBase implements CacheInterface
 		return TRUE; //TODO connect
 	}
 
-	public function _newsert($keyword, $value, $lifetime= FALSE)
+	public function _newsert($keyword, $value, $lifetime=FALSE)
 	{
 		return wincache_ucache_add($keyword, $value, (int)$lifetime);
 	}
 
-	public function _upsert($keyword, $value, $lifetime= FALSE)
+	public function _upsert($keyword, $value, $lifetime=FALSE)
 	{
 		$ret = wincache_ucache_add($keyword, $value, (int)$lifetime);
 		if (!$ret) {

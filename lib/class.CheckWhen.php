@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -16,6 +17,21 @@ class CheckWhen extends Checkbox
 		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
 		$this->Type = 'CheckWhen';
+	}
+
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'label' => 12,
+		'unchecked_value' => 12,
+		'dtfmt' => 12
+		];
+	}
+
+	public function GetSynopsis()
+	{
+		$fmt = $this->GetProperty('dtfmt');
+		return $this->formdata->pwfmod->Lang('checked_format', $fmt);
 	}
 
 	public function SetValue($newvalue)
@@ -43,16 +59,10 @@ class CheckWhen extends Checkbox
 		$this->Value = FALSE;
 	}
 
-	public function GetSynopsis()
-	{
-		$fmt = $this->GetProperty('dtfmt');
-		return $this->formdata->formsmodule->Lang('checked_format', $fmt);
-	}
-
 	public function AdminPopulate($id)
 	{
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
-		$mod = $this->formdata->formsmodule;
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE);
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_checkbox_label'),
 						$mod->CreateInputText($id, 'fp_label',
 							$this->GetProperty('label'), 25, 255)];
@@ -71,11 +81,11 @@ class CheckWhen extends Checkbox
 
 	public function Populate($id, &$params)
 	{
-		$hidden = $this->formdata->formsmodule->CreateInputHidden(
+		$hidden = $this->formdata->pwfmod->CreateInputHidden(
 			$id, $this->formdata->current_prefix.$this->Id, 0);
 		$val = ($this->Value) ? 't' : -1;
 		$tid = $this->GetInputId();
-		$tmp = $this->formdata->formsmodule->CreateInputCheckbox(
+		$tmp = $this->formdata->pwfmod->CreateInputCheckbox(
 			$id, $this->formdata->current_prefix.$this->Id, 't', $val,
 			'id="'.$tid.'"'.$this->GetScript());
 		$tmp = $this->SetClass($tmp);

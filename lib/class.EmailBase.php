@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -15,10 +16,23 @@ class EmailBase extends FieldBase
 		$this->IsDisposition = TRUE;
 		$this->IsEmailDisposition = TRUE;
 		$this->ValidationType = 'email';
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_email_address')=>'email'
+		];
+	}
+
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'email_subject' => 12,
+		'email_from_name' => 12,
+		'email_from_address' => 12,
+		'send_using' => 12,
+		'html_email' => 10,
+		'email_encoding' => 12,
+		'email_template' => 13,
 		];
 	}
 
@@ -27,7 +41,7 @@ class EmailBase extends FieldBase
 		if ($this->GetProperty('email_template')) {
 			return '';
 		}
-		return $this->formdata->formsmodule->Lang('email_template_not_set');
+		return $this->formdata->pwfmod->Lang('email_template_not_set');
 	}
 
 	/**
@@ -42,11 +56,11 @@ class EmailBase extends FieldBase
 	 [1] = (possibly empty) array of things for 'adv' tab
 	 [2] = something?? for upstream 'extra' parameter
 	*/
-	public function AdminPopulateCommonEmail($id, $except= FALSE, $totype= FALSE, $visible=TRUE)
+	public function AdminPopulateCommonEmail($id, $except=FALSE, $totype=FALSE, $visible=TRUE)
 	{
-		list($main, $adv) = $this->AdminPopulateCommon($id, $except, FALSE, $visible);
+		list($main, $adv) = $this->AdminPopulateCommon($id, $except, TRUE, $visible);
 
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$message = $this->GetProperty('email_template');
 
 		//additional main-tab items
@@ -125,9 +139,9 @@ EOS;
 			}
 		} else {
 			$val = FALSE;
-			$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_an_email', $this->Name);
+			$this->ValidationMessage = $this->formdata->pwfmod->Lang('enter_an_email', $this->Name);
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 
@@ -173,7 +187,7 @@ EOS;
 		if (isset($this->formdata->Jscript->jsincs['mailcheck'])) {
 			return;
 		}
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$baseurl = $mod->GetModuleURLPath();
 		$this->formdata->Jscript->jsincs['mailcheck'] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/lib/js/mailcheck.min.js"></script>
@@ -229,7 +243,7 @@ EOS;
 
 	public function validateEmailAddr($email)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$ret = TRUE;
 		$messages = [];
 		if (strpos($email, ',') !== FALSE) {
@@ -261,7 +275,7 @@ EOS;
 	*/
 	public function SendForm($destination_array, $subject, $tplvars=[])
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		if (!$subject) {
 			return [FALSE,$mod->Lang('missing_type', $mod->Lang('TODO'))];
 		}

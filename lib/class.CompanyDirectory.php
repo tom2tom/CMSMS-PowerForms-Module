@@ -1,16 +1,16 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
 /*
- A class by Jeremy Bass <jeremyBass@cableone.net>
- to provide a dynamic multiselect list to allow selecting one or more
- items from the CompanyDirectory module.
- The list is filtered by an array of options as specified in the admin.
- DEPRECATED - should be applied dynamically by CompanyDirectory module
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+
+This class (by Jeremy Bass <jeremyBass@cableone.net>) provides a dynamic
+multiselect list to allow selecting one or more items from the CompanyDirectory
+module. The list is filtered by an array of options as specified in the admin.
+DEPRECATED - should be applied dynamically by CompanyDirectory module
 */
+
 namespace PWForms;
 
 class CompanyDirectory extends FieldBase
@@ -27,12 +27,21 @@ class CompanyDirectory extends FieldBase
 		$this->mymodule = \cms_utils::get_module(self::MODNAME);
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'Category' => 12,
+		'FieldDefs' => 12,
+		'UserInput' => 12,
+		];
+	}
+
 	public function GetSynopsis()
 	{
-		if ($this->mymodule) {
+		if (!$this->mymodule) {
 			return '';
 		}
-		return $this->formdata->formsmodule->Lang('missing_module', self::MODNAME);
+		return $this->formdata->pwfmod->Lang('missing_module', self::MODNAME);
 	}
 
 	public function DisplayableValue($as_string=TRUE)
@@ -49,7 +58,7 @@ class CompanyDirectory extends FieldBase
 			$ret = $this->Value;
 		} else {
 			$ret = $this->GetFormProperty('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
+				$this->formdata->pwfmod->Lang('unspecified'));
 		}
 		if ($as_string) {
 			return $ret;
@@ -69,20 +78,17 @@ class CompanyDirectory extends FieldBase
 			return ['main'=>[$this->GetErrorMessage('err_module', self::MODNAME)]];
 		}
 
-		$mod = $this->formdata->formsmodule;
-		$Categories = ['All'=>$mod->Lang('all')];
+		$mod = $this->formdata->pwfmod;
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT name FROM '.$pre.'module_compdir_categories';
 		$db = \cmsms()->GetDb();
 		$all = $db->GetCol($sql);
 		if ($all) {
-			$Categories += array_combine($all, $all);
+			$Categories = ['All'=>$mod->Lang('all')] + array_combine($all, $all);
+		} else {
+			$Categories = ['none'=>$this->Lang('none')];
 		}
-		$CategorySelected = $this->GetProperty('Category');
-		//check and force the right type
-		if (!is_array($CategorySelected)) {
-			$CategorySelected = explode(',', $CategorySelected);
-		}
+		$CategorySelected = explode(',', $this->GetProperty('Category'));
 
 		$FieldDefs = ['none'=>$this->Lang('none')];
 		$sql = 'SELECT name FROM '.$pre.'module_compdir_fielddefs ORDER BY item_order';
@@ -90,10 +96,7 @@ class CompanyDirectory extends FieldBase
 		if ($all) {
 			$FieldDefs += array_combine($all, $all);
 		}
-		$FieldDefsSelected = $this->GetProperty('FieldDefs');
-		if (!is_array($FieldDefsSelected)) {
-			$FieldDefsSelected = explode(',', $FieldDefsSelected);
-		}
+		$FieldDefsSelected = explode(',', $this->GetProperty('FieldDefs'));
 
 		$choices = [
 			$mod->Lang('option_dropdown')=>'Dropdown',
@@ -102,23 +105,40 @@ class CompanyDirectory extends FieldBase
 			$mod->Lang('option_radiogroup')=>'Radio Group'
 		];
 
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE);
 		$main[] = ['','',$mod->Lang('help_company_field')];
 		$main[] = [$mod->Lang('title_pick_categories'),
-						$mod->CreateInputSelectList($id, 'fp_Category', $Categories, $CategorySelected,
-						5, '', TRUE)];
+					$mod->CreateInputSelectList($id, 'fp_Category', $Categories, $CategorySelected,
+					5, '', TRUE)];
 		$main[] = [$mod->Lang('title_pick_fielddef'),
-						$mod->CreateInputSelectList($id, 'fp_FieldDefs', $FieldDefs, $FieldDefsSelected,
-						5, '', FALSE)];
+					$mod->CreateInputSelectList($id, 'fp_FieldDefs', $FieldDefs, $FieldDefsSelected,
+					5, '', FALSE)];
 		$adv[] = [$mod->Lang('title_choose_user_input'),
-						$mod->CreateInputDropdown($id, 'fp_UserInput', $choices, '-1',
-							$this->GetProperty('UserInput'))];
+					$mod->CreateInputDropdown($id, 'fp_UserInput', $choices, '-1',
+						$this->GetProperty('UserInput'))];
 		return ['main'=>$main,'adv'=>$adv];
+	}
+
+	public function PostAdminAction(&$params)
+	{
+		if (is_array($params['fp_Category'])) {
+			$val = implode(',', $params['fp_Category']);
+		} else {
+			$val = $params['fp_Category'];
+		}
+		$this->SetProperty('Category', $val);
+
+		if (is_array($params['fp_FieldDefs'])) {
+			$val = implode(',', $params['fp_FieldDefs']);
+		} else {
+			$val = $params['fp_FieldDefs'];
+		}
+		$this->SetProperty('FieldDefs', $val);
 	}
 
 	public function Populate($id, &$params)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$CompanyDirectory = $this->mymodule;
 		if (!$CompanyDirectory) {
 			return $mod->Lang('err_module', self::MODNAME);

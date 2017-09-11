@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -20,6 +21,20 @@ class Computed extends FieldBase
 		$this->Type = 'Computed';
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'order' => 11,
+		'string_or_number_eval' => 12,
+		'value' => 12,
+		];
+	}
+
+/*	public function GetSynopsis()
+	{
+		return $this->formdata->pwfmod->Lang().': STUFF';
+	}
+*/
 	public function ComputeOrder()
 	{
 		return $this->GetProperty('order', 1); //user-supplied number
@@ -78,7 +93,7 @@ class Computed extends FieldBase
 			// this is vulnerable to an evil form designer, but not an evil form user
 			ob_start();
 			if (eval('function testcfield'.mt_rand(100, 200).'() {\$this->Value=$procstr;}') === FALSE) {
-				$this->Value = $this->formdata->formsmodule->Lang('title_bad_function', $procstr);
+				$this->Value = $this->formdata->pwfmod->Lang('title_bad_function', $procstr);
 			} else {
 				eval($val);
 			}
@@ -88,7 +103,7 @@ class Computed extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$help = Utils::FormFieldsHelp($this->formdata). //TODO Compute() expects $fld_N, not field alias
 			'<br /><br />'.$mod->Lang('help_operators');
 		$choices = [
@@ -97,7 +112,7 @@ class Computed extends FieldBase
 			$mod->Lang('title_string_unspaced')=>'unstring',
 			$mod->Lang('title_compute')=>'compute'];
 
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE);
 		$main[] = [$mod->Lang('title_compute_value'),
 						$mod->CreateInputText($id, 'fp_value', $this->GetProperty('value'), 35, 1024),
 						$help];
@@ -137,7 +152,7 @@ class Computed extends FieldBase
 			$ret = FALSE;
 			$messages[] = $mod->Lang('missing_type', $mod->Lang('TODO_eval'));
 		}
-		$val = $this->GetProperty('compute_order');
+		$val = $this->GetProperty('order');
 		if (!is_numeric($val) || $val < 1) {
 			$ret = FALSE;
 			$messages[] = $mod->Lang('err_typed', $mod->Lang('TODO_order'));

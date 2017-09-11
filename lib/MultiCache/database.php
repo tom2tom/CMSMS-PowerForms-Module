@@ -29,7 +29,7 @@ class database extends CacheBase implements CacheInterface
 		return FALSE;
 	}
 
-	public function _newsert($keyword, $value, $lifetime= FALSE)
+	public function _newsert($keyword, $value, $lifetime=FALSE)
 	{
 		$db = \cmsms()->GetDb();
 		$sql = 'SELECT cache_id FROM '.$this->table.' WHERE keyword=?';
@@ -47,7 +47,7 @@ class database extends CacheBase implements CacheInterface
 		return FALSE;
 	}
 
-	public function _upsert($keyword, $value, $lifetime= FALSE)
+	public function _upsert($keyword, $value, $lifetime=FALSE)
 	{
 		$db = \cmsms()->GetDb();
 		$sql = 'SELECT cache_id FROM '.$this->table.' WHERE keyword=?';

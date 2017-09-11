@@ -30,7 +30,7 @@ class xcache extends CacheBase implements CacheInterface
 		return TRUE;  //TODO connect
 	}
 
-	public function _newsert($keyword, $value, $lifetime= FALSE)
+	public function _newsert($keyword, $value, $lifetime=FALSE)
 	{
 		if (xcache_isset($keyword)) {
 			return FALSE;
@@ -43,7 +43,7 @@ class xcache extends CacheBase implements CacheInterface
 		return $ret;
 	}
 
-	public function _upsert($keyword, $value, $lifetime= FALSE)
+	public function _upsert($keyword, $value, $lifetime=FALSE)
 	{
 		if ($lifetime) {
 			$ret = xcache_set($keyword, serialize($value), (int)$lifetime);

@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 if (!$this->_CheckAccess('ModifyPFForms')) {
 	exit;
@@ -27,7 +28,7 @@ $this->Crash();
 //		$params['datakey'] = 'pwf'.md5($formdata->Id.session_id()); //must persist across requests
 		$this->Redirect($id, 'defaultadmin', '', ['message'=>$this->_PrettyMessage('err_data', FALSE)]);
 	}
-	$formdata->formsmodule = &$this;
+	$formdata->pwfmod = &$this;
 
 	if (!$newfield) {
 		$obfld = $formdata->Fields[$params['field_id']];

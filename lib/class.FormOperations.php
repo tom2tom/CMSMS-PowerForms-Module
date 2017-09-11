@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -135,9 +136,9 @@ EOS;
 		$sql = 'DELETE FROM '.$pre.'module_pwf_field WHERE form_id=?';
 		$db->Execute($sql, [$form_id]);
 		$res = $res && ($db->Affected_Rows() > 0);
-		$t = $db->GetOne('SELECT props FROM '.$pre.'module_pwf_form WHERE form_id=?',[$form_id]);
-		if ($t) {
-			$props = (array)json_decode($t);
+		$props = $db->GetOne('SELECT props FROM '.$pre.'module_pwf_form WHERE form_id=?',[$form_id]);
+		if ($props) {
+			$props = unserialize($props);
 			if ($props && !empty($props['css_file'])) {
 				Utils::DeleteUploadFile($mod, $props['css_file'], $form_id);
 			}
@@ -219,10 +220,17 @@ EOS;
 			}
 			$props['submission_template'] = 'pwf_sub_'.$newfid;
 		}
-		$props = json_encode($props, JSON_FORCE_OBJECT);
+
+		foreach ($props as &$val) {
+			if (is_bool($val)) {
+				$val = ($val) ? 1:0;
+			}
+		}
+		unset($val);
+		$val = serialize($props);
 
 		$sql = 'UPDATE '.$pre.'module_pwf_form SET props=? WHERE form_id='.$newfid;
-		$db->Execute($sql, [$props]);
+		$db->Execute($sql, [$val]);
 
 		$neworder = 1;
 		foreach ($formdata->Fields as &$one) {
@@ -258,37 +266,52 @@ EOS;
 		}
 
 		//aggregate form properties
+		$includes = $formdata->GetMutables();
 		$props = [];
 		foreach ($params as $key=>$val) {
 			if (strncmp($key, 'fp_', 3) == 0) {
 				$key = substr($key, 3);
-				if (($p = strpos($key, '_template')) !== FALSE) {
-					$type = substr($key, 0, $p);
-					switch ($type) {
-						case 'form':
+				if (array_key_exists($key, $includes)) {
+					switch ($includes[$key]) {
+					 case 10:
+						$val = ($val) ? 1:0;
+						break;
+					 case 11:
+						$val += 0;
+						break;
+					 case 13:
+						if (strncmp($key, 'form_', 5) == 0) {
 							$name = 'pwf_'.$form_id;
-							break;
-						case 'submission':
+						} elseif (strncmp($key, 'submission_', 11) == 0) {
 							$name = 'pwf_sub_'.$form_id;
-							break;
-						default:
+						} else {
 							break 2;
+						}
+						if ($mod->oldtemplates) {
+							$mod->SetTemplate($name, $val);
+						} elseif ($newform) {
+							self::SetTemplate($type, $form_id, $val);
+						} else {
+							$ob = \CmsLayoutTemplate::load($name);
+							$ob->set_content($val);
+							$ob->save();
+						}
+						$val = $name; //record a pointer
+						break;
+					 case 14:
+						if ($val === NULL || is_scalar($val)) {
+	//TODO check mixed value & process accordingly
+						} else {
+							$val = serialize($val);
+						}
+						//no break here
+					 default:
 					}
-					if ($mod->oldtemplates) {
-						$mod->SetTemplate($name, $val);
-					} elseif ($newform) {
-						self::SetTemplate($type, $form_id, $val);
-					} else {
-						$ob = \CmsLayoutTemplate::load($name);
-						$ob->set_content($val);
-						$ob->save();
-					}
-					$val = $name; //record a pointer
+					$props[$key] = $val;
 				}
-				$props[$key] = $val;
 			}
 		}
-		$val = json_encode($props, JSON_FORCE_OBJECT);
+		$val = serialize($props);
 
 		$db = \cmsms()->GetDb();
 		$pre = \cms_db_prefix();
@@ -360,7 +383,8 @@ EOS;
 		if (!$row) {
 			return FALSE;
 		}
-		$formdata = $mod->_GetFormData($params);
+
+		$formdata = new FormData($mod, $params);
 		//some form properties (if absent from $params) default to stored values
 		if (empty($params['form_name'])) {
 			$formdata->Name = $row['name'];
@@ -369,7 +393,7 @@ EOS;
 			$formdata->Alias = $row['alias']; //alias used only for admin
 		}
 
-		$formdata->XtraProps = (array)json_decode($row['props']);
+		$formdata->XtraProps = unserialize($row['props']);
 
 		if ($admin) {
 			if (!empty($formdata->XtraProps['form_template'])) {
@@ -498,22 +522,26 @@ EOS;
 		}
 
 		$count = count($formid);
-		$t = '<?xml version="1.0" standalone="yes"';
+		if ($dtd) {
+			$t = '<?xml version="1.0" standalone="yes"';
+		} else {
+			$t = '<?xml version="1.0"';
+		}
 		if ($charset) {
 			$t .= ' encoding="'.strtoupper($charset).'"';
 		}
 		$outxml = [$t.'?>'];
 		if ($dtd) {
-			$xml[] = <<<'EOS'
+			$outxml[] = <<<'EOS'
 <!DOCTYPE powerforms [
 <!ELEMENT powerforms (version,date,count,form)>
 <!ELEMENT version (#PCDATA)>
 <!ELEMENT date (#PCDATA)>
 <!ELEMENT count (#PCDATA)>
-<!ELEMENT form (properties,fields?)>
+<!ELEMENT form (properties,fields)>
 <!ELEMENT properties (#PCDATA)>
-<!ELEMENT fields (field)>
-<!ELEMENT field (properties?)>
+<!ELEMENT fields (field?)>
+<!ELEMENT field (#PCDATA)>
 ]>
 EOS;
 		}
@@ -523,47 +551,33 @@ EOS;
 \t<date>{$date}</date>
 \t<count>{$count}</count>
 EOS;
-		$sql = 'SELECT props FROM '.$pre.'module_pwf_form WHERE form_id=?';
-		$sql2 = 'SELECT field_id,name,alias,type,order_by,props FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
-		$formpropkeys = array_keys($properties);
+		$formdata = new FormData($mod);
+		$includes = $formdata->GetMutables(FALSE); //every form has same suite of mutable properties
+
+		$sql = 'SELECT name,alias,props FROM '.$pre.'module_pwf_form WHERE form_id=?';
+		$sql2 = 'SELECT field_id,type FROM '.$pre.'module_pwf_field WHERE form_id=? ORDER BY order_by';
 
 		foreach ($formid as $one) {
-			$t = $db->GetOne($sql, [$one]);
-			$formopts = (array)json_decode($t);
-			$formfields = $db->GetArray($sql2, [$one]);
-			if ($formfields) {
-				$fieldopts = (array)json_decode($formopts['props']);
-				$fieldkeys = array_keys($formfields[0]);
-				unset($fieldkeys['props']);
-			} else {
-				$fieldopts = [];
-				$fieldkeys = [];
-			}
 			$xml = [];
 			$xml[] =<<<EOS
 \t<form>
 \t\t<properties>
 EOS;
-			foreach ($formpropkeys as $name) {
-				$value = $properties[$name];
-				if ($value) {
-					$value = trim($value);
-					if ($value) {
-						$value = $this->xml_entities($value);
-					}
-				}
-				$name = $this->xml_entities($name);
-				$xml[] = "\t\t\t<$name>".$value."</$name>";
-			}
-			foreach ($formopts as $name=>$row) {
-				$value = $row['value'];
-				if ($value === null || $value === '') {
-					$value = $row['longvalue'];
-					if ($value === null || $value === '') {
-						continue;
-					}
-				}
-				if (strpos($name, 'template') !== FALSE) {
+			$formprops = $db->GetRow($sql, [$one]);
+			$formopts = array_intersect_key((['form_id' => $one] + $formprops + unserialize($formprops['props'])), $includes);
+
+			foreach ($formopts as $name=>$value) {
+				switch ($includes[$name]) {
+				 case 0:
+				 case 10:
+					$value = ($value) ? 1:0;
+					break;
+				 case 1:
+				 case 11:
+					$value += 0;
+					break;
+				 case 3:
+				 case 13:
 					switch ($name) {
 					 case 'form_template':
 					 case 'submission_template':
@@ -573,15 +587,22 @@ EOS;
 							$ob = \CmsLayoutTemplate::load($value);
 							$value = $ob->get_content();
 						}
-//					 default:
+//						 default:
 						break;
 					}
-				}
-				if ($value) {
-					$value = trim($value);
-					if ($value) {
-						$value = $this->xml_entities($value);
+					$value = $this->xml_entities($value);
+					break;
+				 case 4:
+				 case 14:
+					if ($value === NULL || is_scalar($value)) {
+//TODO check mixed value & process accordingly
+					} else {
+						$value = serialize($value);
 					}
+					//no break here
+				 default:
+					$value = $this->xml_entities(trim($value));
+					break;
 				}
 				$name = $this->xml_entities($name);
 				$xml[] = "\t\t\t<$name>".$value."</$name>";
@@ -590,50 +611,47 @@ EOS;
 \t\t</properties>
 \t\t<fields>
 EOS;
-			foreach ($formfields as $thisfield) {
+			$formfields = $db->GetAssoc($sql2, [$one]);
+			foreach ($formfields as $field_id => $type) {
+				//the-field::GetMutables() needs data from a loaded field
+				$classPath = 'PWForms\\'.$type;
+				$t = ['field_id' => $field_id];
+				$obfld = new $classPath($formdata, $t);
+				FieldOperations::Load($obfld);
+				$includes = $obfld->GetMutables(FALSE); //get 'base' identifiers too
+				$fieldopts = array_intersect_key(get_object_vars($obfld), $includes)
+					+ array_intersect_key($obfld->XtraProps, $includes);
+
 				$xml[] =<<<EOS
 \t\t\t<field>
-\t\t\t\t<properties>
 EOS;
-				foreach ($fieldkeys as $name) {
-					$value = $thisfield[$name];
-					if ($value) {
-						$value = trim($value);
-						if ($value) {
-							$value = $this->xml_entities($value);
+				foreach ($fieldopts as $name => $value) {
+					switch ($includes[$name]) {
+					 case 0:
+					 case 10:
+						$value = ($value) ? 1:0;
+						break;
+					 case 1:
+					 case 11:
+						$value += 0;
+						break;
+					 case 4:
+					 case 14:
+						if ($value === NULL || is_scalar($value)) {
+//TODO check mixed value & process accordingly
+						} else {
+							$value = serialize($value);
 						}
+						//no break here
+					 default:
+						$value = $this->xml_entities(trim($value));
+						break;
 					}
 					$name = $this->xml_entities($name);
-					$xml[] = "\t\t\t\t\t<$name>".$value."</$name>";
+					$xml[] = "\t\t\t\t<$name>".$value."</$name>";
 				}
-				//get $fieldopts[] for this field
-//				$myopts = array_filter($fieldopts,array(new IsFieldOption($thisfield['field_id']),'isMine'));
-				$fid = $thisfield['field_id'];
-				$myopts = array_filter($fieldopts, function ($fieldopt) use ($fid) {
-					return $fieldopt['field_id'] == $fid;
-				});
-				if ($myopts) {
-					foreach ($myopts as &$oneopt) {
-						$value = $oneopt['value'];
-						if ($value === null || $value === '') {
-							$value = $oneopt['longvalue'];
-							if ($value === null || $value === '') {
-								continue;
-							}
-						}
-						$name = $this->xml_entities($oneopt['name']);
-						if ($value) {
-							$value = trim($value);
-							if ($value) {
-								$value = $this->xml_entities($value);
-							}
-						}
-						$xml[] = "\t\t\t\t\t<$name>".$value."</$name>";
-					}
-					unset($oneopt);
-				}
+
 				$xml[] =<<<EOS
-\t\t\t\t</properties>
 \t\t\t</field>
 EOS;
 			}
@@ -817,7 +835,7 @@ EOS;
 
 			$props = [];
 			foreach ($fprops as $key=>&$one) {
-				$val = $this->xml_entity_decode($one); //TODO translate numbered fields in templates
+				$val = $this->xml_entity_decode($one); //TODO process field-types per GetMutables()
 				if ($key == 'form_template') {
 					if ($mod->oldtemplates) {
 						$mod->SetTemplate('pwf_'.$form_id, $val);
@@ -837,7 +855,7 @@ EOS;
 			}
 			unset($one);
 			unset($fprops);
-			$val = json_encode($props, JSON_FORCE_OBJECT);
+			$val = serialize($props);
 
 			$sql = 'UPDATE '.$pre.'module_pwf_form SET props=? WHERE form_id='.$form_id;
 			$db->Execute($sql, [$val]);
@@ -846,31 +864,31 @@ EOS;
 (form_id,name,alias,type,order_by,props) VALUES ('.$form_id.',?,?,?,?,?)';
 
 			foreach ($fdata['fields'] as &$fld) {
-				unset($fld['properties']['field_id']);
-				if (!empty($fld['properties']['name'])) {
-					$name = $this->xml_entity_decode($fld['properties']['name']);
-				} elseif (!empty($fld['properties']['alias'])) {
-					$name = '<'.$fld['properties']['alias'].'>';
+				unset($fld['Id']);
+				if (!empty($fld['Name'])) {
+					$name = $this->xml_entity_decode($fld['Name']);
+				} elseif (!empty($fld['Alias'])) {
+					$name = '<'.$fld['Alias'].'>';
 				} else {
 					$name = '<'.$mod->Lang('missing_type', $mod->Lang('name')).'>';
 				}
-				foreach (['alias', 'type', 'order_by'] as $key) {
-					if (isset($fld['properties'][$key])) {
-						$$key = $fld['properties'][$key];
-						unset($fld['properties'][$key]);
+				unset($fld['Name']);
+				foreach (['Alias', 'Type', 'OrderBy'] as $key) {
+					if (isset($fld[$key])) {
+						$$key = $fld[$key];
+						unset($fld[$key]);
 					} else {
 						$$key = NULL;
 					}
 				}
 				$props = [];
-				foreach ($fld['properties'] as $key=>&$one) {
-					$val = $this->xml_entity_decode($one); //TODO translate numbered fields in templates
-					$props[$key] = $val;
+				foreach ($fld as $key=>&$one) {
+					$props[$key] = $this->xml_entity_decode($one);
 				}
 				unset($one);
-				$val = json_encode($props, JSON_FORCE_OBJECT);
+				$val = serialize($props);
 
-				$db->Execute($sql, [$name, $alias, $type, $order_by, $val]);
+				$db->Execute($sql, [$name, $Alias, $Type, $OrderBy, $val]);
 			}
 			unset($fld);
 			unset($fdata);
@@ -973,7 +991,7 @@ EOS;
 
 	/* *
 	HasDisposition:
-	@formdata: reference to FormData form data object
+	@formdata: reference to FormData-class object
 	Returns: boolean, TRUE if a disposition field is found among the fields in @formdata
 	*/
 /*	public function HasDisposition(&$formdata)

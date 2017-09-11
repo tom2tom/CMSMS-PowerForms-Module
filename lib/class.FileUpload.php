@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -12,27 +13,33 @@ class FileUpload extends FieldBase
 	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata, $params);
+		$this->HasLabel = FALSE;
 		$this->IsDisposition = TRUE;
 //		$this->IsInput = TRUE; no need to preserve supplied value
 		$this->Type = 'FileUpload';
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 	}
 
-	public function DisplayableValue($as_string=TRUE)
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
 	{
-		if ($this->GetProperty('suppress_filename', 0)) {
-			return '';
-		}
-		if ($as_string && is_array($this->Value) && isset($this->Value[1])) {
-			return $this->Value[1];
-		} else {
-			return $this->Value;
-		}
+		return parent::GetMutables($nobase) + [
+		'max_size' => 11,
+		'file_rename' => 12,
+		'permitted_extensions' => 12,
+		'allow_overwrite' => 10,
+		'remove_file' => 10,
+		'show_details' => 10,
+		'suppress_filename' => 10,
+		'suppress_attachment' => 10,
+		'sendto_uploads' => 10, //int 0/1, treat as boolean
+		'uploads_category' => 12, //TODO CHECK type
+		'uploads_destpage' => 11, //TODO CHECK dropdown values are int page id's
+		];
 	}
 
 	public function GetSynopsis()
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		if (!Utils::GetUploadsPath($mod)) {
 			return $mod->Lang('err_uploads_dir');
 		}
@@ -57,6 +64,18 @@ class FileUpload extends FieldBase
 		return $ret;
 	}
 
+	public function DisplayableValue($as_string=TRUE)
+	{
+		if ($this->GetProperty('suppress_filename', 0)) {
+			return '';
+		}
+		if ($as_string && is_array($this->Value) && isset($this->Value[1])) {
+			return $this->Value[1];
+		} else {
+			return $this->Value;
+		}
+	}
+
 	public function AdminPopulate($id)
 	{
 		$ms = $this->GetProperty('max_size');
@@ -67,7 +86,7 @@ class FileUpload extends FieldBase
 		$uploads_destpage = $this->GetProperty('uploads_destpage');
 
 		list($main, $adv) = $this->AdminPopulateCommon($id);
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_maximum_size'),
 				$mod->CreateInputText($id, 'fp_max_size', $ms, 5, 5),
 				$mod->Lang('help_maximum_size')];
@@ -85,44 +104,44 @@ class FileUpload extends FieldBase
 				$mod->Lang('help_allow_overwrite')];
 
 		$uploads = \cms_utils::get_module('Uploads');
-		$sendto_uploads_list = [$mod->Lang('no')=>0,$mod->Lang('yes')=>1];
+		$sendto_uploads_list = [$mod->Lang('no') => 0, $mod->Lang('yes') => 1];
 
 		$help_file_rename = $mod->Lang('help_file_rename').
 		Utils::FormFieldsHelp($this->formdata, ['$ext'=>$mod->Lang('original_file_extension')]);
 
 		$adv[] = [$mod->Lang('title_file_rename'),
-						$mod->CreateInputText($id, 'fp_file_rename',
+					$mod->CreateInputText($id, 'fp_file_rename',
 						$this->GetProperty('file_rename'), 60, 255),
-						$help_file_rename];
+					$help_file_rename];
 		$adv[] = [$mod->Lang('title_suppress_filename'),
-						$mod->CreateInputHidden($id, 'fp_suppress_filename', 0).
-						$mod->CreateInputCheckbox($id, 'fp_suppress_filename', 1,
-							$this->GetProperty('suppress_filename', 0))];
+					$mod->CreateInputHidden($id, 'fp_suppress_filename', 0).
+					$mod->CreateInputCheckbox($id, 'fp_suppress_filename', 1,
+						$this->GetProperty('suppress_filename', 0))];
 		$adv[] = [$mod->Lang('title_suppress_attachment'),
-						$mod->CreateInputHidden($id, 'fp_suppress_attachment', 0).
-						$mod->CreateInputCheckbox($id, 'fp_suppress_attachment', 1,
-							$this->GetProperty('suppress_attachment', 1))];
+					$mod->CreateInputHidden($id, 'fp_suppress_attachment', 0).
+					$mod->CreateInputCheckbox($id, 'fp_suppress_attachment', 1,
+						$this->GetProperty('suppress_attachment', 1))];
 		$adv[] = [$mod->Lang('title_remove_file_from_server'),
-						$mod->CreateInputHidden($id, 'fp_remove_file', 0).
-						$mod->CreateInputCheckbox($id, 'fp_remove_file', 1,
-							$this->GetProperty('remove_file', 0)),
-						$mod->Lang('help_ignored_if_upload')];
+					$mod->CreateInputHidden($id, 'fp_remove_file', 0).
+					$mod->CreateInputCheckbox($id, 'fp_remove_file', 1,
+						$this->GetProperty('remove_file', 0)),
+					$mod->Lang('help_ignored_if_upload')];
 /*		$config = \cmsms()->GetConfig();
 		$adv[] = array($mod->Lang('title_file_destination'),
-							$mod->CreateInputText($id,'fp_file_destination',
-							$this->GetProperty('file_destination',$config['uploads_path']),60,255),
-							$mod->Lang('help_ignored_if_upload'));
+					$mod->CreateInputText($id,'fp_file_destination',
+						$this->GetProperty('file_destination',$config['uploads_path']),60,255),
+					$mod->Lang('help_ignored_if_upload'));
 */
 		if ($uploads) {
 			$categorylist = $uploads->getCategoryList();
 			$adv[] = [$mod->Lang('title_sendto_uploads'),
-							$mod->CreateInputDropdown($id, 'fp_sendto_uploads', $sendto_uploads_list,
-							$sendto_uploads)];
+					$mod->CreateInputDropdown($id, 'fp_sendto_uploads', $sendto_uploads_list,
+					$sendto_uploads)];
 			$adv[] = [$mod->Lang('title_uploads_category'),
-							$mod->CreateInputDropdown($id, 'fp_uploads_category', $categorylist, '',
-							$uploads_category)];
+					$mod->CreateInputDropdown($id, 'fp_uploads_category', $categorylist, '',
+					$uploads_category)];
 			$adv[] = [$mod->Lang('title_uploads_destpage'),
-							self::CreatePageDropdown($id, 'fp_uploads_destpage', $uploads_destpage)];
+					self::CreatePageDropdown($id, 'fp_uploads_destpage', $uploads_destpage)];
 		}
 
 		return ['main'=>$main,'adv'=>$adv];
@@ -165,12 +184,12 @@ class FileUpload extends FieldBase
 				$allpages = [$key.' (*)' => $defaultid] + $allpages;
 			}
 		}
-		return $this->formdata->formsmodule->CreateInputDropdown($id, $name, $allpages, -1, $current, $addtext);
+		return $this->formdata->pwfmod->CreateInputDropdown($id, $name, $allpages, -1, $current, $addtext);
 	}
 
 	public function Populate($id, &$params)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		if ($this->Value) {
 			$ret = $this->DisplayableValue().'<br />';
 		} // Value line
@@ -222,18 +241,18 @@ class FileUpload extends FieldBase
 		}
 		$val = TRUE;
 		$this->ValidationMessage = '';
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$_id = $id.$this->formdata->current_prefix.$this->Id;
 		if (empty($_FILES[$_id])) {
 			$_id = $id.$this->formdata->prior_prefix.$this->Id;
 		}
 		if (empty($_FILES[$_id])) {
-			$this->SetStatus('valid', FALSE);
+			$this->SetProperty('valid', FALSE);
 			$this->ValidationMessage = $mod->Lang('missing_type', $mod->Lang('file'));
 			return [FALSE, $this->ValidationMessage];
 		}
 		if ($_FILES[$_id]['size'] < 1 && ! $this->Required) {
-			$this->SetStatus('valid', TRUE);
+			$this->SetProperty('valid', TRUE);
 			$this->ValidationMessage = '';
 			return [TRUE, $this->ValidationMessage];
 		}
@@ -261,7 +280,7 @@ class FileUpload extends FieldBase
 				$val = FALSE;
 			}
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 
@@ -278,7 +297,7 @@ class FileUpload extends FieldBase
 		}
 		if (isset($_FILES[$_id]) && $_FILES[$_id]['size'] > 0) {
 			$config = \cmsms()->GetConfig();
-			$mod = $this->formdata->formsmodule;
+			$mod = $this->formdata->pwfmod;
 
 			$thisFile =& $_FILES[$_id];
 			$thisExt = substr($thisFile['name'], strrpos($thisFile['name'], '.'));

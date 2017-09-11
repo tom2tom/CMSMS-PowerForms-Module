@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -21,7 +22,6 @@ class FieldBase implements \Serializable
 	public $XtraProps; //container-array for other properties
 
 	public $Jscript = NULL;  //container-object for AdminPopulate() script accumulators (see action.open_field for init)
-	public $Stati; //container-array for status flags & codes
 
 	public function __construct(&$formdata, &$params)
 	{
@@ -30,7 +30,7 @@ class FieldBase implements \Serializable
 		'ChangeRequirement' => TRUE, //whether admin user may change 'Required' state
 		'DisplayInForm' => TRUE,
 		'DisplayInSubmission' => TRUE, //whether field value is shown in submission template (if used) (effectively ~ self::IsInput)
-//		'HasLabel' => TRUE,
+		'HasLabel' => TRUE,
 //		'HasUserAddOp' => FALSE, //whether Populate() supports component-addition
 //		'HasUserDeleteOp' => FALSE,//whether Populate() supports component-deletion
 		'HideLabel' => FALSE,
@@ -38,7 +38,7 @@ class FieldBase implements \Serializable
 		'IsDisposition' => FALSE,
 		'IsEmailDisposition' => FALSE,
 		'IsInput' => FALSE, //whether Populate() generates user-input control(s) AND their values are to be preserved e.g. for browsing
-		'LabelSubComponents' => TRUE, //if MultiComponent = TRUE, give each component its own label
+//only for relevant fields	'LabelSubComponents' => TRUE, //if MultiComponent = TRUE, give each component its own label
 		'MultiChoice' => FALSE, //whether the field comprises >1 value (some variant of Pulldown or Multiselect)
 		'MultiComponent' => FALSE, //whether the field generates (or can do so) an array of components for tabular editing
 		'MultiPopulate' => FALSE, //a form-display status, whether Populate() generated object(s) instead of xhtml
@@ -48,8 +48,7 @@ class FieldBase implements \Serializable
 		'ValidationMessage' => '', //post-validation error message, or ''
 		'ValidationType' => 'none', //chosen member of ValidationTypes
 		'ValidationTypes' => [], //array of label=>val suitable for populating a pulldown
-		];
-		$this->Stati = [
+		//status indicators
 		'loaded' => FALSE,
 		'valid' => TRUE, //TRUE unless validation has failed
 		'Disposable' => TRUE,
@@ -101,11 +100,7 @@ class FieldBase implements \Serializable
 
 	public function __set($name, $value)
 	{
-		if (0) { //TODO distinguish
-			$this->Stati[$name] = $value;
-		} else {
-			$this->XtraProps[$name] = $value;
-		}
+		$this->XtraProps[$name] = $value;
 	}
 
 	public function __get($name)
@@ -113,37 +108,60 @@ class FieldBase implements \Serializable
 		if (array_key_exists($name, $this->XtraProps)) {
 			return $this->XtraProps[$name];
 		}
-		if (array_key_exists($name, $this->Stati)) {
-			return $this->Stati[$name];
-		}
 		return NULL;
 	}
 
 	public function __isset($name)
 	{
-		return isset($this->XtraProps[$name]) || isset($this->Stati[$name]);
+		return isset($this->XtraProps[$name]);
 	}
 
 	public function __unset($name)
 	{
 		if (array_key_exists($name, $this->XtraProps)) {
 			unset($this->XtraProps[$name]);
-		} elseif (array_key_exists($name, $this->Stati)) {
-			unset($this->Stati[$name]);
 		}
 	}
 
-	public function SetStatus($propName, $propValue)
+	// Get array defining non-constant field properties (for e.g. export/save)
+	// $internal = FALSE to include non-ExtraProps names
+	// Returned keys may be intersected with class-property names and/or database-column names
+	// Values indicate property type:  0 bool; 1 number; 2 string, 3 template; 4 mixed; +10 for an XtraProp
+	// Subclass when there are also field-specific properties
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
 	{
-		$this->Stati[$propName] = $propValue;
+		$vars = ($nobase) ? [] : [
+		'Id' => 1,
+		'field_id' => 1,
+		'Name' => 2,
+		'name' => 2,
+		'Alias' => 2,
+		'alias' => 2,
+		'Type' => 2,
+		'type' => 2,
+		'inlime' => 0,
+		'OrderBy' => 1,
+		'order_by' => 1,
+		];
+		$vars += [
+		'HideLabel' => 10,
+		'LabelSubComponents' => 10,
+		'Required' => 10,
+		'SmartyEval' => 10,
+		'ValidationType' => 12,
+		'css_class' => 12,
+		'helptext' => 12,
+		'helptoggle' => 10,
+		'javascript' => 12,
+		'resources' => 12,
+		];
+		return $vars;
 	}
 
-	public function GetStatus($propName)
+	// Subclass this, normally
+	public function GetSynopsis()
 	{
-		if (isset($this->Stati[$propName])) {
-			return $this->Stati[$propName];
-		}
-		return NULL;
+		return '';
 	}
 
 	public function SetProperty($propName, $propValue)
@@ -277,7 +295,7 @@ class FieldBase implements \Serializable
 	// Returns array, 1st member is T/F, 2nd is '' or message
 	public function FieldIsNamed()
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		if ($this->Name || !$mod->GetPreference('require_fieldnames')) {
 			return [TRUE,''];
 		}
@@ -292,7 +310,7 @@ class FieldBase implements \Serializable
 			if ($one) { //not deleted
 				if ($one->Name == $this->Name && $one->Id != $this->Id) {
 					unset($one);
-					return [FALSE,$this->formdata->formsmodule->Lang('field_name_in_use', $this->Name)];
+					return [FALSE,$this->formdata->pwfmod->Lang('field_name_in_use', $this->Name)];
 				}
 			}
 		}
@@ -382,7 +400,7 @@ class FieldBase implements \Serializable
 
 	public function IsValid()
 	{
-		return $this->Stati['valid'];
+		return $this->XtraProps['valid'];
 	}
 
 	public function GetScript($prefix=' ')
@@ -416,13 +434,13 @@ class FieldBase implements \Serializable
 	// Set flag determining whether this disposition field is permitted to be disposed (i.e. not inhibited)
 	public function SetDisposable($state=TRUE)
 	{
-		$this->Stati['Disposable'] = $state;
+		$this->XtraProps['Disposable'] = $state;
 	}
 
 	// Get flag determining whether this disposition field is currently permitted to be disposed
 	public function IsDisposable()
 	{
-		return !empty($this->Stati['Disposable']);
+		return !empty($this->XtraProps['Disposable']);
 	}
 
 	public function IsInputField()
@@ -496,7 +514,7 @@ class FieldBase implements \Serializable
 
 	public function RequiresValidation()
 	{
-		return (!empty($this->XtraProps['ValidationType']) &&
+		return (isset($this->XtraProps['ValidationType']) &&
 			$this->XtraProps['ValidationType'] != 'none');
 	}
 
@@ -513,7 +531,7 @@ class FieldBase implements \Serializable
 
 	protected function GetErrorMessage()
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$ret = '<span style="color:red">'.$mod->Lang('error').'</span> ';
 		$args = func_get_args();
 		$ret .= call_user_func_array([$mod, 'Lang'], $args);
@@ -523,7 +541,7 @@ class FieldBase implements \Serializable
 	// Subclass this with a displayable type
 	public function GetDisplayType()
 	{
-		return $this->formdata->formsmodule->Lang('fieldlabel_'.$this->Type);
+		return $this->formdata->pwfmod->Lang('fieldlabel_'.$this->Type);
 	}
 
 	public function GetMultiPopulate()
@@ -535,7 +553,7 @@ class FieldBase implements \Serializable
 	public function LabelSubComponents()
 	{
 		return (isset($this->XtraProps['LabelSubComponents'])) ?
-			$this->XtraProps['LabelSubComponents'] : '';
+			$this->XtraProps['LabelSubComponents'] : TRUE;
 	}
 
 	public function ComputeOnSubmission()
@@ -567,7 +585,7 @@ class FieldBase implements \Serializable
 		if ($this->Required) {
 			$cls .= ' required';
 		}
-		if (!$this->Stati['valid']) {
+		if (!$this->XtraProps['valid']) {
 			$cls .= ' invalid_field';
 		}
 		if ($extra) {
@@ -607,7 +625,7 @@ class FieldBase implements \Serializable
 			}
 		} else {
 			$ret = $this->GetFormProperty('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
+				$this->formdata->pwfmod->Lang('unspecified'));
 		}
 		if ($as_string) {
 			return $ret;
@@ -727,14 +745,8 @@ class FieldBase implements \Serializable
 	{
 		if (!empty($this->XtraProps['field_logic'])) {
 			$code = $this->XtraProps['field_logic'];
-			return Utils::ProcessTemplateFromData($this->formdata->formsmodule, $code, []);
+			return Utils::ProcessTemplateFromData($this->formdata->pwfmod, $code, []);
 		}
-		return '';
-	}
-
-	// Subclass this with something to show in admin fields-list
-	public function GetSynopsis()
-	{
 		return '';
 	}
 
@@ -748,7 +760,7 @@ class FieldBase implements \Serializable
 	// Subclass this to generate appropriate add-button label
 	public function ComponentAddLabel()
 	{
-		return $this->formdata->formsmodule->Lang('add_options');
+		return $this->formdata->pwfmod->Lang('add_options');
 	}
 
 	// Subclass this when necessary or useful (often, just set a flag)
@@ -766,7 +778,7 @@ class FieldBase implements \Serializable
 	// Subclass this to generate appropriate delete-button label
 	public function ComponentDeleteLabel()
 	{
-		return $this->formdata->formsmodule->Lang('delete_options');
+		return $this->formdata->pwfmod->Lang('delete_options');
 	}
 
 	// Subclass this when necessary or useful to delete component-data
@@ -822,8 +834,8 @@ class FieldBase implements \Serializable
 	/**
 	AdminPopulateCommon:
 	@id: id given to the PWForms module on execution
-	@except: optional title-lang-key, or array of them, to be excluded from the setup, default FALSE
-	@boolean: whether to exclude some options irrelevant to boolean-fields, default=FALSE
+	@except: optional title-string lang-key, or array of them, to be excluded from the setup, default FALSE
+	@xtras: whether to include some options irrelevant to some (e.g. boolean, selected) fields, default=TRUE
 	@visible: whether to include some options irrelevant to non-displayed disposition-fields, default=TRUE
 
 	Generates 'base'/common content for editing a field.
@@ -833,9 +845,9 @@ class FieldBase implements \Serializable
 	 [0] = array of things for 'main' tab
 	 [1] = (possibly empty) array of things for 'adv' tab
 	*/
-	public function AdminPopulateCommon($id, $except=FALSE, $boolean=FALSE, $visible=TRUE)
+	public function AdminPopulateCommon($id, $except=FALSE, $xtras=TRUE, $visible=TRUE)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$displayable = !empty($this->XtraProps['DisplayInForm']);
 		if ($except && !is_array($except)) {
 			$except = is_array($except);
@@ -845,13 +857,13 @@ class FieldBase implements \Serializable
 		$key = 'title_field_name';
 		if (!$except || !in_array($key, $except)) {
 			$main[] = [$mod->Lang($key),
-							$mod->CreateInputText($id, 'field_Name', $this->GetName(), 50)];
+						$mod->CreateInputText($id, 'field_Name', $this->GetName(), 40, 50)];
 		}
 		$key = 'title_field_alias';
 		if (!$except || !in_array($key, $except)) {
 			$alias = $this->ForceAlias();
 			$main[] = [$mod->Lang($key),
-							$mod->CreateInputText($id, 'field_Alias', $alias, 30)]; //no 'fp_' prefix for maintable properties
+						$mod->CreateInputText($id, 'field_Alias', $alias, 30)]; //no 'fp_' prefix for maintable properties
 		}
 		$key = 'title_field_type';
 		if (!$except || !in_array($key, $except)) {
@@ -860,7 +872,7 @@ class FieldBase implements \Serializable
 						$this->GetDisplayType()];
 		}
 
-		if (!$boolean && $visible && !empty($this->XtraProps['ChangeRequirement'])) {
+		if ($xtras && $visible && !empty($this->XtraProps['ChangeRequirement'])) {
 			$key = 'title_field_required';
 			if (!$except || !in_array($key, $except)) {
 				$main[] = [$mod->Lang($key),
@@ -871,7 +883,7 @@ class FieldBase implements \Serializable
 			}
 		}
 
-		if (!$boolean) {
+		if ($xtras) {
 			$key = 'title_field_validation';
 			if (!$except || !in_array($key, $except)) {
 				//choice of validation type ?
@@ -1024,7 +1036,7 @@ class FieldBase implements \Serializable
 	*/
 	public function Validate($id)
 	{
-		$this->Stati['valid'] = TRUE;
+		$this->XtraProps['valid'] = TRUE;
 		$this->XtraProps['ValidationMessage'] = '';
 		return [TRUE,''];
 	}
@@ -1056,7 +1068,7 @@ class FieldBase implements \Serializable
 	protected function EnsureArray(&$val)
 	{
 		if (is_string($val)) {
-			$val = json_decode($val, TRUE);
+			$val = unserialize($val);
 		}
 	}
 */
@@ -1065,7 +1077,14 @@ class FieldBase implements \Serializable
 		//no need to fully-document our 'parent'
 		$ob = $this->formdata;
 		$this->formdata = NULL; //upstream must reinstate ref to relevant FormData-object when unserializing
-		$ret = json_encode(get_object_vars($this), JSON_NUMERIC_CHECK);
+		$props = get_object_vars($this);
+		foreach ($props as &$val) {
+			if (is_bool($val)) {
+				$val = ($val) ? 1:0;
+			}
+		}
+		unset($val);
+		$ret = serialize($props);
 		$this->formdata = $ob;
 		return $ret;
 	}
@@ -1079,7 +1098,7 @@ class FieldBase implements \Serializable
 	public function unserialize($serialized)
 	{
 		if ($serialized) {
-			$props = json_decode($serialized, TRUE);
+			$props = unserialize($serialized);
 			if ($props !== NULL) {
 				foreach ($props as $key=>$one) {
 					$this->$key = $one;

@@ -1,8 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 //get default template for a form (main or submission) or for a field
 //this action processes ajax-calls
 
@@ -76,7 +78,22 @@ switch ($params['type']) {
 	}
 	break;
  case 'file':
-	$tplstr = 'NOT YET SUPPORTED'; //TODO handle main/header/footer
+	$obfld = $formdata->Fields[$params['field_id']];
+	if ($obfld) {
+		if (empty($params['revert'])) {
+			$tplstr = 'NOT YET SUPPORTED';
+			//$tplstr = $obfld->CreateDefaultHeader();
+			//$tplstr = $obfld->CreateDefaultFooter();
+			//$tplstr = $obfld->CreateDefaultTemplate();
+		} else {
+			$tplstr = 'NOT YET SUPPORTED';
+			//$tplstr = $obfld->XtraProps['header_template'];
+			//$tplstr = $obfld->XtraProps['footer_template'];
+			//$tplstr = $obfld->XtraProps['file_template'];
+		}
+	} else {
+		$tplstr = '0';
+	}
 	break;
 }
 

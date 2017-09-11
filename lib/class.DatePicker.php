@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -17,7 +18,7 @@ class DatePicker extends FieldBase
 		$this->IsInput = TRUE;
 		$this->LabelSubComponents = FALSE;
 		$this->Type = 'DatePicker';
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		$months = explode(',', $mod->Lang('all_months'));
 		$this->Months = array_flip($months); //0-based
 		foreach ($this->Months as $name=>&$val) {
@@ -26,36 +27,30 @@ class DatePicker extends FieldBase
 		unset($val);
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'default_blank' => 10,
+		'date_format' => 12,
+		'date_order' => 12,
+		'start_year' => 11,
+		'end_year' => 11,
+		'default_year' => 11,
+		];
+	}
+
 	public function GetSynopsis()
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$today = getdate();
 		return $mod->Lang('date_range', [$this->GetProperty('start_year', ($today['year']-10)),
 		 $this->GetProperty('end_year', ($today['year']+10))]).
 		 ($this->GetProperty('default_year', '-1')!=='-1'?' ('.$this->GetProperty('default_year', '-1').')':'');
 	}
 
-	public function HasValue($deny_blank_responses= FALSE)
-	{
-		if (!$this->Value) {
-			return FALSE;
-		}
-		if (!is_array($this->Value)) {
-			return FALSE;
-		}
-
-		if ($this->GetArrayValue(1) == '' ||
-			$this->GetArrayValue(0) == '' ||
-			$this->GetArrayValue(2) == '') {
-			return FALSE;
-		}
-
-		return TRUE;
-	}
-
 	public function DisplayableValue($as_string=TRUE)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		if ($this->HasValue()) {
 			// Original:  Day,Month,Year
 			//$theDate = mktime (1,1,1,$this->GetArrayValue(1), $this->GetArrayValue(0),$this->GetArrayValue(2));
@@ -83,35 +78,53 @@ class DatePicker extends FieldBase
 		}
 	}
 
+	public function HasValue($deny_blank_response=FALSE)
+	{
+		if (!$this->Value) {
+			return FALSE;
+		}
+		if (!is_array($this->Value)) {
+			return FALSE;
+		}
+
+		if ($this->GetArrayValue(1) == '' ||
+			$this->GetArrayValue(0) == '' ||
+			$this->GetArrayValue(2) == '') {
+			return FALSE;
+		}
+
+		return TRUE;
+	}
+
 	public function AdminPopulate($id)
 	{
 		$today = getdate();
 
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
-		$mod = $this->formdata->formsmodule;
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE);
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_default_blank'),
-						$mod->CreateInputHidden($id, 'fp_default_blank', 0).
-						$mod->CreateInputCheckbox($id, 'fp_default_blank', 1,
-							$this->GetProperty('default_blank', 0)),
-						$mod->Lang('help_default_today')];
+					$mod->CreateInputHidden($id, 'fp_default_blank', 0).
+					$mod->CreateInputCheckbox($id, 'fp_default_blank', 1,
+						$this->GetProperty('default_blank', 0)),
+					$mod->Lang('help_default_today')];
 		$main[] = [$mod->Lang('title_start_year'),
-						$mod->CreateInputText($id, 'fp_start_year',
-							$this->GetProperty('start_year', ($today['year']-10)), 10, 10)];
+					$mod->CreateInputText($id, 'fp_start_year',
+						$this->GetProperty('start_year', ($today['year']-10)), 10, 10)];
 		$main[] = [$mod->Lang('title_end_year'),
-						$mod->CreateInputText($id, 'fp_end_year',
-							$this->GetProperty('end_year', ($today['year']+10)), 10, 10)];
+					$mod->CreateInputText($id, 'fp_end_year',
+						$this->GetProperty('end_year', ($today['year']+10)), 10, 10)];
 		$main[] = [$mod->Lang('title_default_year'),
-						$mod->CreateInputText($id, 'fp_default_year',
-							$this->GetProperty('default_year', '-1'), 10, 10),
-						$mod->Lang('help_default_year')];
+					$mod->CreateInputText($id, 'fp_default_year',
+						$this->GetProperty('default_year', '-1'), 10, 10),
+					$mod->Lang('help_default_year')];
 		$adv[] = [$mod->Lang('title_date_format'),
-						$mod->CreateInputText($id, 'fp_date_format',
-							$this->GetProperty('date_format', 'j F Y'), 25, 25),
-						$mod->Lang('help_date_format')];
+					$mod->CreateInputText($id, 'fp_date_format',
+						$this->GetProperty('date_format', 'j F Y'), 25, 25),
+					$mod->Lang('help_date_format')];
 		$adv[] = [$mod->Lang('title_date_order'),
-						$mod->CreateInputText($id, 'fp_date_order',
-							$this->GetProperty('date_order', 'd-m-y'), 5, 5),
-						$mod->Lang('help_date_order')];
+					$mod->CreateInputText($id, 'fp_date_order',
+						$this->GetProperty('date_order', 'd-m-y'), 5, 5),
+					$mod->Lang('help_date_order')];
 		return ['main'=>$main,'adv'=>$adv];
 	}
 
@@ -152,7 +165,7 @@ class DatePicker extends FieldBase
 			}
 		}
 
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$js = $this->GetScript();
 
 		$day = new \stdClass();

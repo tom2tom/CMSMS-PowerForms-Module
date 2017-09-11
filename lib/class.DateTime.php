@@ -1,8 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -22,12 +24,26 @@ class DateTime extends FieldBase
 		$this->IsInput = TRUE;
 		$this->Type = 'DateTime';
 		$this->ValidationType = 'none';
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_before')=>'before',
 			$mod->Lang('validation_after')=>'after',
 			$mod->Lang('validation_between')=>'between'
+		];
+	}
+
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'date_only' => 10,
+		'time_only' => 10,
+		'date_format' => 12,
+		'time_format' => 12,
+		'high_limit' => 10,
+		'low_limit' => 10,
+		'high_value' => 12,
+		'low_value' => 12,
 		];
 	}
 
@@ -64,7 +80,7 @@ class DateTime extends FieldBase
 			$fmt = $this->CurrentFormat();
 			$ret = $dt->format($fmt);
 		} else {
-			$ret = $this->formdata->formsmodule->Lang('none2');
+			$ret = $this->formdata->pwfmod->Lang('none2');
 		}
 		if ($as_string) {
 			return $ret;
@@ -93,7 +109,7 @@ class DateTime extends FieldBase
 			$val2 = FALSE;
 		}
 		if ($val1 && $val2) {
-			$ret = $this->formdata->formsmodule->Lang('validation_between').' '.$val1.','.$val2.', ';
+			$ret = $this->formdata->pwfmod->Lang('validation_between').' '.$val1.','.$val2.', ';
 		} elseif ($val1) {
 			$ret = '>= '.$val1.', ';
 		} elseif ($val2) {
@@ -108,7 +124,7 @@ class DateTime extends FieldBase
 	public function AdminPopulate($id)
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id);
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 
 		$main[] = [$mod->Lang('title_date_only'),
 				$mod->CreateInputHidden($id, 'fp_date_only', 0).
@@ -181,7 +197,7 @@ class DateTime extends FieldBase
 			error_reporting($lvl);
 			if (!$res) {
 				$ret = FALSE;
-				$messages[] = $this->formdata->formsmodule->Lang('err_format');
+				$messages[] = $this->formdata->pwfmod->Lang('err_format');
 			}
 		}
 		if (!$this->GetProperty('date_only')) {
@@ -191,7 +207,7 @@ class DateTime extends FieldBase
 			error_reporting($lvl);
 			if (!$res) {
 				$ret = FALSE;
-				$messages[] = $this->formdata->formsmodule->Lang('err_format');
+				$messages[] = $this->formdata->pwfmod->Lang('err_format');
 			}
 		}
 		if ($this->GetProperty('low_limit')) {
@@ -209,7 +225,7 @@ class DateTime extends FieldBase
 				$this->ValidationType = 'between';
 			} else {
 				$ret = FALSE;
-				$messages[] = $this->formdata->formsmodule->Lang('err_values');
+				$messages[] = $this->formdata->pwfmod->Lang('err_values');
 			}
 		} elseif ($val1) {
 			$this->ValidationType = 'after';
@@ -222,7 +238,7 @@ class DateTime extends FieldBase
 
 	public function Populate($id, &$params)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$baseurl = $mod->GetModuleURLPath();
 		$this->formdata->Jscript->jsincs[] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/lib/js/jquery.watermark.min.js"></script>
@@ -273,7 +289,7 @@ EOS;
 						$dt->setTimestamp($this->HighLimit);
 						$fmt = $this->CurrentFormat();
 						$t = $dt->format($fmt);
-						$msg = $this->formdata->formsmodule->Lang('when_before', $t);
+						$msg = $this->formdata->pwfmod->Lang('when_before', $t);
 					}
 					break;
 				 case 'after':
@@ -281,7 +297,7 @@ EOS;
 						$dt->setTimestamp($this->LowLimit);
 						$fmt = $this->CurrentFormat();
 						$t = $dt->format($fmt);
-						$msg = $this->formdata->formsmodule->Lang('when_after', $t);
+						$msg = $this->formdata->pwfmod->Lang('when_after', $t);
 					}
 					break;
 				 case 'between':
@@ -291,19 +307,19 @@ EOS;
 						$t = $dt->format($fmt);
 						$dt->setTimestamp($this->HighLimit);
 						$t2 = $dt->format($fmt);
-						$msg = $this->formdata->formsmodule->Lang('when_between', $t, $t2);
+						$msg = $this->formdata->pwfmod->Lang('when_between', $t, $t2);
 					}
 					break;
 				}
 			} else {
-				$msg = $this->formdata->formsmodule->Lang('err_format');
+				$msg = $this->formdata->pwfmod->Lang('err_format');
 			}
 			if ($msg) {
 				$val = FALSE;
 				$this->ValidationMessage = $msg;
 			}
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 }

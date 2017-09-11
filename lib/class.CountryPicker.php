@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -19,9 +20,17 @@ class CountryPicker extends FieldBase
 		$this->InitCountries();
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'default_country' => 12,
+		'select_label' => 12,
+		];
+	}
+
 	protected function InitCountries()
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$this->Countries = [
 			$mod->Lang('AF') =>'AF',$mod->Lang('AX') =>'AX',$mod->Lang('AL') =>'AL',
 			$mod->Lang('DZ') =>'DZ',$mod->Lang('AS') =>'AS',$mod->Lang('AD') =>'AD',
@@ -127,22 +136,22 @@ class CountryPicker extends FieldBase
 		if (!$this->Countries) {
 			$this->InitCountries();
 		}
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
-		$mod = $this->formdata->formsmodule;
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE);
+		$mod = $this->formdata->pwfmod;
 		$choices = array_merge([$mod->Lang('no_default')=>''], $this->Countries);
 		$main[] = [$mod->Lang('title_select_default_country'),
 						$mod->CreateInputDropdown($id, 'fp_default_country', $choices, -1,
 							$this->GetProperty('default_country'))];
 		$main[] = [$mod->Lang('title_select_one_message'),
-						$mod->CreateInputText($id, 'fp_select_one',
-							$this->GetProperty('select_one', $mod->Lang('select_one')))];
+						$mod->CreateInputText($id, 'fp_select_label',
+							$this->GetProperty('select_label', $mod->Lang('select_one')))];
 		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
 	{
-		$mod = $this->formdata->formsmodule;
-		$choices = array_merge([$this->GetProperty('select_one', $mod->Lang('select_one'))=>-1],
+		$mod = $this->formdata->pwfmod;
+		$choices = array_merge([$this->GetProperty('select_label', $mod->Lang('select_one'))=>-1],
 			$this->Countries);
 
 		if (!$this->HasValue() && $this->GetProperty('default_country')) {

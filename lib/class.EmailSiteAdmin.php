@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 //This class is for email to a specified admin user
 
@@ -14,10 +15,23 @@ class EmailSiteAdmin extends EmailBase
 	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata, $params);
+		$this->HasLabel = FALSE;
 		$this->IsDisposition = TRUE;
 //		$this->IsInput = TRUE; no need to preserve input value
 		$this->Required = TRUE;
 		$this->Type = 'EmailSiteAdmin';
+	}
+
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'group' => 11,
+		'select_label' => 12,
+		'restrict_to_group' =>10,
+		'show_userfirstname' => 10,
+		'show_userlastname' => 10,
+		'show_username' => 10,
+		];
 	}
 
 	public function GetSynopsis()
@@ -27,7 +41,7 @@ class EmailSiteAdmin extends EmailBase
 			$groupops = \cmsms()->GetGroupOperations();
 			$group = $groupops->LoadGroupByID($this->GetProperty('group'));
 			if ($group && isset($group->name)) {
-				$mod = $this->formdata->formsmodule;
+				$mod = $this->formdata->pwfmod;
 				$ret .= ','.$mod->Lang('restricted_to_group', $group->name);
 			}
 		}
@@ -54,7 +68,7 @@ class EmailSiteAdmin extends EmailBase
 			$ret = $userlist[$this->Value - 1]->firstname . ' '. $userlist[$this->Value - 1]->lastname;
 		} else {
 			$ret = $this->GetFormProperty('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
+				$this->formdata->pwfmod->Lang('unspecified'));
 		}
 
 		if ($as_string) {
@@ -72,13 +86,13 @@ class EmailSiteAdmin extends EmailBase
 			$choices[$one->name] = $one->id;
 		}
 
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 
-		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, FALSE, TRUE);
+		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id);
 		$waslast = array_pop($main); //keep the email to-type selector for later
 		$main[] = [$mod->Lang('title_select_one_message'),
-				$mod->CreateInputText($id, 'fp_select_one',
-				$this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128)];
+				$mod->CreateInputText($id, 'fp_select_label',
+				$this->GetProperty('select_label', $mod->Lang('select_one')), 25, 128)];
 		$main[] = [$mod->Lang('title_show_userfirstname'),
 				$mod->CreateInputHidden($id, 'fp_show_userfirstname', 0).
 				$mod->CreateInputCheckbox($id, 'fp_show_userfirstname', 1,
@@ -117,7 +131,7 @@ class EmailSiteAdmin extends EmailBase
 			}
 		} else {
 			$ret = FALSE;
-			$mod = $this->formdata->formsmodule;
+			$mod = $this->formdata->pwfmod;
 			$messages[] = $mod->Lang('missing_type', $mod->Lang('source'));
 		}
 		$msg = ($ret)?'':implode('<br />', $messages);
@@ -126,7 +140,7 @@ class EmailSiteAdmin extends EmailBase
 
 	public function Populate($id, &$params)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$userops = \cmsms()->GetUserOperations();
 		if ($this->GetProperty('restrict_to_group', 0)) {
 			$userlist = $userops->LoadUsersInGroup($this->GetProperty('group'));
@@ -139,7 +153,7 @@ class EmailSiteAdmin extends EmailBase
 			$l = $this->GetProperty('show_userlastname', 0);
 			$u = $this->GetProperty('show_username', 0);
 			$choices = [];
-			$choices[' '.$this->GetProperty('select_one', $mod->Lang('select_one'))]=-1;
+			$choices[' '.$this->GetProperty('select_label', $mod->Lang('select_one'))]=-1;
 			for ($i=0; $i<$c; $i++) {
 				$parts = [];
 				$v = $userlist[$i];
@@ -171,10 +185,10 @@ class EmailSiteAdmin extends EmailBase
 			$this->ValidationMessage = '';
 		} else {
 			$val = FALSE;
-			$mod = $this->formdata->formsmodule;
+			$mod = $this->formdata->pwfmod;
 			$this->ValidationMessage = $mod->Lang('missing_type', $mod->Lang('admin'));
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 

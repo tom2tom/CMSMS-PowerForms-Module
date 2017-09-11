@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 /*
 Property $approvedToGo - set FALSE in Validate(), set TRUE in ApproveToGo(),
 which is called from action.validate.php
@@ -29,11 +30,16 @@ class EmailConfirmation extends EmailBase
 		$this->Type = 'EmailConfirmation';
 	}
 
-	public function GetSynopsis()
+/*	public function GetMutables($nobase=TRUE, $actual=TRUE)
 	{
-		//TODO advice about ? return $this->TemplateStatus();
+		return parent::GetMutables($nobase) + [];
 	}
-
+*/
+/*	public function GetSynopsis()
+	{
+ 		return $this->formdata->pwfmod->Lang('').': STUFF';
+	}
+*/
 	public function ApproveToGo($sid)
 	{
 		$this->approvedToGo = TRUE;
@@ -51,7 +57,7 @@ class EmailConfirmation extends EmailBase
 	public function Populate($id, &$params)
 	{
 		$this->SetEmailJS();
-		$tmp = $this->formdata->formsmodule->CreateInputEmail(
+		$tmp = $this->formdata->pwfmod->CreateInputEmail(
 			$id, $this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($this->Value, ENT_QUOTES), 25, 128,
 			$this->GetScript());
@@ -76,11 +82,11 @@ class EmailConfirmation extends EmailBase
 				}
 			} else {
 				$val = FALSE;
-				$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_an_email', $this->Name);
+				$this->ValidationMessage = $this->formdata->pwfmod->Lang('enter_an_email', $this->Name);
 			}
 			break;
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 
@@ -111,7 +117,7 @@ class EmailConfirmation extends EmailBase
 	//only called when $this->approvedToGo is FALSE
 	public function Dispose($id, $returnid)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		//cache form data, pending confirmation
 		$pre = \cms_db_prefix();
 		$db = \cmsms()->GetDb();
@@ -128,12 +134,12 @@ class EmailConfirmation extends EmailBase
 		$cont = $cfuncs->encrypt_value(serialize($this->formdata), $pw);
 		$db->Execute('INSERT INTO '.$pre.'module_pwf_session (pubkey,submitted,contents) VALUES (?,?,?)', [$pub, $when, $cont]);
 		$sid = $db->Insert_Id();
-		$this->formdata->formsmodule = $mod; //reinstate
+		$this->formdata->pwfmod = $mod; //reinstate
 		//set url variable for email template
 		$tplvars = [];
 		$pref = $this->formdata->current_prefix;
 		$tplvars['confirm_url'] =
-			$this->formdata->formsmodule->CreateFrontendLink('', $returnid, 'validate', '',
+			$this->formdata->pwfmod->CreateFrontendLink('', $returnid, 'validate', '',
 			[$pref.'c'=>$pub,
 			 $pref.'d'=>$this->Id,
 //			 $pref.'f'=>$this->formdata->Id,

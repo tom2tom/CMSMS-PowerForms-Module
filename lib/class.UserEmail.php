@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 //This class allows the form user to initiate an email, with customised sender
 //and replyto, to a specified destination with optional copy to the form user
@@ -20,7 +21,21 @@ class UserEmail extends EmailBase
 		$this->Type = 'UserEmail';
 	}
 
-	public function HasValue($deny_blank_responses= FALSE)
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'send_user_copy' => 12,
+		'send_user_label' => 12,
+		'headers_to_modify' => 12,
+		];
+	}
+
+	public function GetSynopsis()
+	{
+		return $this->TemplateStatus();
+	}
+
+	public function HasValue($deny_blank_response=FALSE)
 	{
 		return !empty($this->Value[0]);
 	}
@@ -56,7 +71,7 @@ class UserEmail extends EmailBase
 			$ret = $this->Value;
 		} else {
 			$ret = $this->GetFormProperty('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
+				$this->formdata->pwfmod->Lang('unspecified'));
 		}
 
 		if ($as_string) {
@@ -66,15 +81,10 @@ class UserEmail extends EmailBase
 		}
 	}
 
-	public function GetSynopsis()
-	{
-		return $this->TemplateStatus();
-	}
-
 	public function AdminPopulate($id)
 	{
 		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, 'title_email_from_address');
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 
 		$choices = [
 			$mod->Lang('option_never')=>'n',
@@ -104,7 +114,7 @@ class UserEmail extends EmailBase
 //TODO check this logic
 		$sf = ($toself) ? '_1':'';
 //		$val = ($toself) ? $this->$this->Value[0] : $this->Value;
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 
 		//returned value always array, even if 1 member(i.e. not $toself)
 		$tmp = $mod->CreateInputEmail(
@@ -129,7 +139,7 @@ class UserEmail extends EmailBase
 		if ($this->ValidationType != 'none') {
 			return parent::Validate($id);
 		}
-		$this->SetStatus('valid', TRUE);
+		$this->SetProperty('valid', TRUE);
 		$this->ValidationMessage = '';
 		return [TRUE,$this->ValidationMessage];
 	}

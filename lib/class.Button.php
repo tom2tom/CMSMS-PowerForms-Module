@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -14,13 +15,24 @@ class Button extends FieldBase
 		parent::__construct($formdata, $params);
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInSubmission = FALSE;
+		$this->HasLabel = FALSE;
 		$this->Type = 'Button';
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + ['text' => 12];
+	}
+
+/*	public function GetSynopsis()
+	{
+ 		return $this->formdata->pwfmod->Lang('').': STUFF';
+	}
+*/
 	public function AdminPopulate($id)
 	{
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
-		$mod = $this->formdata->formsmodule;
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE);
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_button_text'),
 						$mod->CreateInputText($id, 'fp_text',
 							$this->GetProperty('text'), 40)];

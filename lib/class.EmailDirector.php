@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 //This class allows sending an email to a destination selected from a pulldown
 
@@ -22,14 +23,72 @@ class EmailDirector extends EmailBase
 		$this->Type = 'EmailDirector';
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		$ret = parent::GetMutables($nobase) + [
+		'select_label' => 12,
+		'subject_override' => 10,
+		];
+
+		$mkey1 = 'destination_address';
+		$mkey2 = 'destination_subject';
+		if ($actual) {
+			$opt = $this->GetPropArray($mkey1);
+			if ($opt) {
+				$suff = array_keys($opt);
+			} else {
+				return $ret;
+			}
+		} else {
+			$suff = range(1, 10);
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey1.$one] = 12;
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey2.$one] = 12;
+		}
+		return $ret;
+	}
+
+	public function GetSynopsis()
+	{
+		$opt = $this->GetPropArray('destination_address');
+		$num = ($opt) ? count($opt) : 0;
+
+		$mod = $this->formdata->pwfmod;
+		$ret = $mod->Lang('destination_count', $num);
+		$status = $this->TemplateStatus();
+		if ($status) {
+			$ret .= '<br />'.$status;
+		}
+		return $ret;
+	}
+
+	public function DisplayableValue($as_string=TRUE)
+	{
+		if ($this->HasValue()) {
+			$ret = $this->GetPropIndexed('destination_subject', $this->Value);
+		} else {
+			$ret = $this->GetFormProperty('unspecified',
+				$this->formdata->pwfmod->Lang('unspecified'));
+		}
+
+		if ($as_string) {
+			return $ret;
+		} else {
+			return [$ret];
+		}
+	}
+
 	public function ComponentAddLabel()
 	{
-		return $this->formdata->formsmodule->Lang('add_destination');
+		return $this->formdata->pwfmod->Lang('add_destination');
 	}
 
 	public function ComponentDeleteLabel()
 	{
-		return $this->formdata->formsmodule->Lang('delete_destination');
+		return $this->formdata->pwfmod->Lang('delete_destination');
 	}
 
 	public function HasComponentAdd()
@@ -57,45 +116,15 @@ class EmailDirector extends EmailBase
 		}
 	}
 
-	public function GetSynopsis()
-	{
-		$opt = $this->GetPropArray('destination_address');
-		$num = ($opt) ? count($opt) : 0;
-
-		$mod = $this->formdata->formsmodule;
-		$ret = $mod->Lang('destination_count', $num);
-		$status = $this->TemplateStatus();
-		if ($status) {
-			$ret .= '<br />'.$status;
-		}
-		return $ret;
-	}
-
-	public function DisplayableValue($as_string=TRUE)
-	{
-		if ($this->HasValue()) {
-			$ret = $this->GetPropIndexed('destination_subject', $this->Value);
-		} else {
-			$ret = $this->GetFormProperty('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
-		}
-
-		if ($as_string) {
-			return $ret;
-		} else {
-			return [$ret];
-		}
-	}
-
 	public function AdminPopulate($id)
 	{
 //		$this->SetEmailJS(); TODO
 		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, 'title_email_subject');
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		// remove the "email subject" field
 		$main[] = [$mod->Lang('title_select_one_message'),
-			$mod->CreateInputText($id, 'fp_select_one',
-			$this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128)];
+			$mod->CreateInputText($id, 'fp_select_label',
+			$this->GetProperty('select_label', $mod->Lang('select_one')), 25, 128)];
 		$main[] = [$mod->Lang('title_allow_subject_override'),
 			$mod->CreateInputHidden($id, 'fp_subject_override', 0).
 			$mod->CreateInputCheckbox($id, 'fp_subject_override', 1,
@@ -154,7 +183,7 @@ class EmailDirector extends EmailBase
 			$messages[] = $msg;
 		}
 
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		list($rv, $msg) = $this->validateEmailAddr($this->GetProperty('email_from_address'));
 		if (!$rv) {
 			$ret = FALSE;
@@ -182,8 +211,8 @@ class EmailDirector extends EmailBase
 	{
 		$subjects = $this->GetPropArray('destination_subject');
 		if ($subjects) {
-			$mod = $this->formdata->formsmodule;
-			$choices = [' '.$this->GetProperty('select_one', $mod->Lang('select_one'))=>-1]
+			$mod = $this->formdata->pwfmod;
+			$choices = [' '.$this->GetProperty('select_label', $mod->Lang('select_one'))=>-1]
 				+ array_flip($subjects);
 			$tmp = $mod->CreateInputDropdown(
 				$id, $this->formdata->current_prefix.$this->Id, $choices, -1, $this->Value,
@@ -200,10 +229,10 @@ class EmailDirector extends EmailBase
 			$this->ValidationMessage = '';
 		} else {
 			$val = FALSE;
-			$mod = $this->formdata->formsmodule;
+			$mod = $this->formdata->pwfmod;
 			$this->ValidationMessage = $mod->Lang('missing_type', $mod->Lang('destination'));
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 

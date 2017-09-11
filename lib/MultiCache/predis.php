@@ -75,7 +75,7 @@ class predis extends CacheBase implements CacheInterface
 		return $this->client !== NULL;
 	}
 
-	public function _newsert($keyword, $value, $lifetime= FALSE)
+	public function _newsert($keyword, $value, $lifetime=FALSE)
 	{
 		if (!$this->_has($keyword)) {
 			$ret = $this->client->set($keyword, $value, array('xx', 'ex' => $lifetime));
@@ -84,7 +84,7 @@ class predis extends CacheBase implements CacheInterface
 		return FALSE;
 	}
 
-	public function _upsert($keyword, $value, $lifetime= FALSE)
+	public function _upsert($keyword, $value, $lifetime=FALSE)
 	{
 		$ret = $this->client->set($keyword, $value, array('xx', 'ex' => $lifetime));
 		if ($ret === FALSE) {

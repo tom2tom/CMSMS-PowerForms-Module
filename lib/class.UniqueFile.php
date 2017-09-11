@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 //This class stores form data in a new/unique file
 
@@ -17,11 +18,31 @@ class UniqueFile extends FieldBase
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
+		$this->HasLabel = FALSE;
 		$this->IsDisposition = TRUE;
 		$this->Type = 'UniqueFile';
 	}
 
-	public function CreateSampleHeader()
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'filespec' => 12,
+		'header_template' => 13,
+		'file_template' => 13,
+		'footer_template' => 13,
+		];
+	}
+
+	public function GetSynopsis()
+	{
+		$mod = $this->formdata->pwfmod;
+		if (!Utils::GetUploadsPath($mod)) {
+			return $mod->Lang('err_uploads_dir');
+		}
+		return $this->GetProperty('filespec', $mod->Lang('unspecified'));
+	}
+
+	public function CreateDefaultHeader()
 	{
 		$fields = [];
 		foreach ($this->formdata->Fields as &$one) {
@@ -31,6 +52,11 @@ class UniqueFile extends FieldBase
 		}
 		unset($one);
 		return implode("\t", $fields);
+	}
+
+	public function CreateDefaultFooter()
+	{
+		return 'none'; //TODO
 	}
 
 	public function CreateDefaultTemplate()
@@ -45,23 +71,14 @@ class UniqueFile extends FieldBase
 		return implode("\t", $fields);
 	}
 
-	public function GetSynopsis()
-	{
-		$mod = $this->formdata->formsmodule;
-		if (!Utils::GetUploadsPath($mod)) {
-			return $mod->Lang('err_uploads_dir');
-		}
-		return $this->GetProperty('filespec', $mod->Lang('unspecified'));
-	}
-
 	public function AdminPopulate($id)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		if (!Utils::GetUploadsPath($mod)) {
 			return ['main'=>[$this->GetErrorMessage('err_uploads_dir')]];
 		}
 
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE, FALSE);
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE, FALSE);
 
 		$main[] = [$mod->Lang('title_file_name'),
 			$mod->CreateInputText($id, 'fp_filespec',
@@ -81,19 +98,19 @@ class UniqueFile extends FieldBase
 					'fp_file_template', 'pwf_shortarea', '', '', '', 45, 3),
 				$mod->Lang('help_unique_file_template').'<br />'.$button];
 
-		$button = Utils::SetTemplateButton('file_header',
+		$button = Utils::SetTemplateButton('header_template',
 			$mod->Lang('title_create_sample_header_template'));
 		$adv[] = [$mod->Lang('title_file_header'),
 				$mod->CreateTextArea(FALSE, $id,
-					htmlspecialchars($this->GetProperty('file_header')),
+					htmlspecialchars($this->GetProperty('header_template')),
 					'fp_file_header', 'pwf_shortarea', '', '', '', 45, 8),
 				$mod->Lang('help_file_header_template').'<br />'.$button];
 
-		$button = Utils::SetTemplateButton('file_footer',
+		$button = Utils::SetTemplateButton('footer_template',
 			$mod->Lang('title_create_sample_footer_template'));
 		$adv[] = [$mod->Lang('title_file_footer'),
 				$mod->CreateTextArea(FALSE, $id,
-					htmlspecialchars($this->GetProperty('file_footer')),
+					htmlspecialchars($this->GetProperty('footer_template')),
 					'fp_file_footer', 'pwf_shortarea', '', '', '', 45, 8),
 				$mod->Lang('help_file_footer_template').'<br />'.$button];
 		$this->Jscript->jsloads[] = <<<EOS
@@ -115,7 +132,7 @@ EOS;
 
 	public function Dispose($id, $returnid)
 	{
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		$ud = $Utils::GetUploadsPath($mod);
 		if (!$ud) {
 			return [FALSE,$mod->Lang('err_uploads_dir')];
@@ -143,9 +160,16 @@ EOS;
 */
 		$fp = $ud.DIRECTORY_SEPARATOR.$fn;
 
-		$footer = $this->GetProperty('file_footer');
-		if ($footer) {
-			$footer = Utils::ProcessTemplateFromData($mod, $footer, $tplvars);
+		$footer = $this->GetProperty('footer_template');
+		if ($footer != 'none') {
+			if (!$footer) {
+				$footer = $this->CreateDefaultFooter();
+			}
+			if ($footer) {
+				$footer = Utils::ProcessTemplateFromData($mod, $footer, $tplvars).PHP_EOL;
+			}
+		} else {
+			$footer = '';
 		}
 
 		$template = $this->GetProperty('file_template');
@@ -168,12 +192,18 @@ EOS;
 		$first = !file_exists($fp);
 		$fh = fopen($fp, 'w');
 		if ($first) {
-			$header = $this->GetProperty('file_header');
-			if (!$header) {
-				$header = $this->CreateSampleHeader();
+			$header = $this->GetProperty('header_template');
+			if ($header != 'none') {
+				if (!$header) {
+					$header = $this->CreateDefaultHeader();
+				}
+				if ($header) {
+					$header = Utils::ProcessTemplateFromData($mod, $header, $tplvars).PHP_EOL;
+				}
+			} else {
+				$header = '';
 			}
-			$header = Utils::ProcessTemplateFromData($mod, $header, $tplvars);
-			fwrite($fh, $header.PHP_EOL.$newline.$footer);
+			fwrite($fh, $header.$newline.$footer);
 		} else {
 			//seek to footer
 			if ($footer) {

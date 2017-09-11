@@ -45,7 +45,7 @@ class memcache extends CacheBase implements CacheInterface
 		return FALSE;
 	}
 
-	public function _newsert($keyword, $value, $lifetime= FALSE)
+	public function _newsert($keyword, $value, $lifetime=FALSE)
 	{
 		if ($this->_has($keyword)) {
 			return FALSE;
@@ -58,7 +58,7 @@ class memcache extends CacheBase implements CacheInterface
 		return $ret;
 	}
 
-	public function _upsert($keyword, $value, $lifetime= FALSE)
+	public function _upsert($keyword, $value, $lifetime=FALSE)
 	{
 		if ($lifetime) {
 			$expire = time() + (int)$lifetime;

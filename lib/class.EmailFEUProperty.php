@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2011 Robert Campbell <calguy1000@cmsmadesimple.org>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 /*
  This class sends a pre-defined message to a destination selected from addresses
@@ -28,22 +29,27 @@ class EmailFEUProperty extends EmailBase
 		$this->mymodule = \cms_utils::get_module(self::MODNAME);
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + ['feu_property' => 12];
+	}
+
 	public function GetSynopsis()
 	{
 		if ($this->mymodule) {
-			$ret = $this->formdata->formsmodule->Lang('title_feu_property').': '.$this->GetProperty('feu_property');
+			$ret = $this->formdata->pwfmod->Lang('title_feu_property').': '.$this->GetProperty('feu_property');
 			$status = $this->TemplateStatus();
 			if ($status) {
 				$ret .= '<br />'.$status;
 			}
 			return $ret;
 		}
-		return $this->formdata->formsmodule->Lang('missing_module', self::MODNAME);
+		return $this->formdata->pwfmod->Lang('missing_module', self::MODNAME);
 	}
 
 	public function DisplayableValue($as_string = TRUE)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$prop = $this->GetProperty('feu_property');
 		$ret = FALSE;
 		if ($prop) {
@@ -100,7 +106,7 @@ class EmailFEUProperty extends EmailBase
 		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, FALSE, TRUE);
 		$waslast = array_pop($ret['main']); //keep the email to-type selector for last
 		$keys = array_keys($opts);
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_feu_property'),
 				$mod->CreateInputDropdown($id, 'fp_feu_property', array_flip($opts), -1,
 					$this->GetProperty('feu_property', $keys[0])),
@@ -111,7 +117,7 @@ class EmailFEUProperty extends EmailBase
 
 	public function Populate($id, &$params)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$feu = $this->mymodule;
 		if (!$feu) {
 			return $mod->Lang('err_module', self::MODNAME);
@@ -149,7 +155,7 @@ class EmailFEUProperty extends EmailBase
 	{
 		$feu = $this->mymodule;
 		if (!$feu) {
-			return [FALSE,$this->formdata->formsmodule->Lang('err_module', self::MODNAME)];
+			return [FALSE,$this->formdata->pwfmod->Lang('err_module', self::MODNAME)];
 		}
 
 		// get the property name

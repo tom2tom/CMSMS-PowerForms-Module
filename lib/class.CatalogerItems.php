@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 /*
  This class provides a dynamic multiselect list to allow selecting one or more
@@ -27,12 +28,26 @@ class CatalogerItems extends FieldBase
 		$this->mymodule = \cms_utils::get_module(self::MODNAME);
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		$ret = parent::GetMutables($nobase) + ['lines' => 11, 'nameregex' => 12];
+		$attrs = \cmsms()->variables['catalog_attrs']; //TODO bad module behaviour
+		foreach ($attrs as &$one) {
+			if (!$one->is_text) {
+				$safeattr = strtolower(preg_replace('/\W/', '', $one->attr));
+				$ret['attr_'.$safeattr] = 12;
+			}
+		}
+		unset($one);
+		return $ret;
+	}
+
 	public function GetSynopsis()
 	{
 		if ($this->mymodule) {
 			return '';
 		}
-		return $this->formdata->formsmodule->Lang('missing_module', self::MODNAME);
+		return $this->formdata->pwfmod->Lang('missing_module', self::MODNAME);
 	}
 
 	public function DisplayableValue($as_string=TRUE)
@@ -49,7 +64,7 @@ class CatalogerItems extends FieldBase
 			$ret = $this->Value;
 		} else {
 			$ret = $this->GetFormProperty('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
+				$this->formdata->pwfmod->Lang('unspecified'));
 		}
 		if ($as_string) {
 			return $ret;
@@ -69,8 +84,8 @@ class CatalogerItems extends FieldBase
 			return ['main'=>[$this->GetErrorMessage('err_module', self::MODNAME)]];
 		}
 
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
-		$mod = $this->formdata->formsmodule;
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE);
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_field_height'),
 						$mod->CreateInputText($id, 'fp_lines', $this->GetProperty('lines', '5'), 3, 3),
 						$mod->Lang('help_field_height')];
@@ -94,7 +109,7 @@ class CatalogerItems extends FieldBase
 
 	public function Populate($id, &$params)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$cataloger = $this->mymodule;
 		if (!$cataloger) {
 			return $mod->Lang('err_module', self::MODNAME);

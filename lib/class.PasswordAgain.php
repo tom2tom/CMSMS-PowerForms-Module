@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -17,9 +18,19 @@ class PasswordAgain extends FieldBase
 		$this->Type = 'PasswordAgain';
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'field_to_validate' => 12,
+		'hide' => 10,
+		'length' => 11,
+		'min_length' => 11,
+		];
+	}
+
 	public function GetSynopsis()
 	{
-		return $this->formdata->formsmodule->Lang('title_field_id').
+		return $this->formdata->pwfmod->Lang('title_field_id').
 			': '.$this->GetProperty('field_to_validate');
 	}
 
@@ -34,7 +45,7 @@ class PasswordAgain extends FieldBase
 		}
 		unset($one);
 		list($main, $adv) = $this->AdminPopulateCommon($id);
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$main[] = [
 					$mod->Lang('title_field_to_validate'),
 					$mod->CreateInputDropdown($id, 'fp_field_to_validate', $choices, -1,
@@ -55,7 +66,7 @@ class PasswordAgain extends FieldBase
 
 	public function Populate($id, &$params)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$ln = $this->GetProperty('length', 16);
 		if ($this->GetProperty('hide', 1)) {
 			$tmp = $mod->CreateInputPassword($id, $this->formdata->current_prefix.$this->Id,
@@ -84,13 +95,13 @@ class PasswordAgain extends FieldBase
 				if ($one->Name == $field_to_validate) {
 					if ($one->GetValue() != $this->Value) {
 						$val = FALSE;
-						$this->ValidationMessage = $this->formdata->formsmodule->Lang('password_does_not_match', $field_to_validate);
+						$this->ValidationMessage = $this->formdata->pwfmod->Lang('password_does_not_match', $field_to_validate);
 					}
 				}
 			}
 			unset($one);
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 }

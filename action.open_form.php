@@ -1,8 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 if (!$this->_CheckAccess('ModifyPFForms')) {
 	exit;
@@ -28,7 +30,7 @@ if (isset($params['datakey'])) {
 		$formdata = $funcs->Load($this, $form_id, $id, $params, TRUE);
 		$params['datakey'] = 'pwf'.md5($form_id.session_id());
 	} else {
-		$formdata->formsmodule = &$this;
+		$formdata->pwfmod = &$this;
 	}
 } else { //first time
 	$formdata = $funcs->Load($this, $form_id, $id, $params, TRUE);

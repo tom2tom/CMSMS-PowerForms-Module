@@ -1,8 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 if (!$this->_CheckAccess('ModifyPFForms')) {
 	exit;
@@ -237,55 +239,49 @@ EOS;
 		}
 	}
 
-	function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, $oldtype, &$passdowns, &$passbacks)
+	function Get_FieldOpts(&$db, $pre, $oldfid, $newfid, $oldf, $newf, $type, &$includes, &$passdowns, &$passbacks)
 	{
-		$sql = 'SELECT name,value FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY name';
-		$data = $db->GetArray($sql, [$oldfid, $oldf]);
 		$props = [];
+		$data = [];
+		if ($passdowns) {
+			foreach ($passdowns as $name=>$value) {
+				$data[] = ['name'=>$name, 'value'=>$value];
+			}
+		}
+
+		$sql = 'SELECT name,value FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY name';
+		$data += $db->GetArray($sql, [$oldfid, $oldf]);
+
 		if ($data) {
-			//exclude some properties
-			$excludes = [
-			'crypt',
-			'crypt_lib',
-			'feu_bind',
-			'hash_sort',
-//			'modifiesOtherFields', ?
-			'searchable',
-			'sort',
-			'sortable',
-			'sortfield1',
-			'sortfield2',
-			'sortfield3',
-			'sortfield4',
-			'sortfield5',
-			'HasDeleteOp',
-			'HasUserAddOp',
-			'HasUserDeleteOp',
+			$renames = [
+			'hide_label'=>'HideLabel',
+			'required'=>'Required',
+			'smarty_eval'=>'SmartyEval',
+			'validation_type'=>'ValidationType',
+			'select_one'=>'select_label',
+			'field_logic'=>'resources',
+			'file_header'=>'header_template',
+			'file_footer'=>'footer_template',
 			];
-			$numbers = [
-			'clear_default',
-			'cols',
-			'html5',
-			'html_email',
-			'is_checked',
-			'length',
-			'readonly',
-			'rows',
-			'wysiwyg',
-			];
-			//some field-types simply repeat the same option-name (relying on save-order for any reconciliation!)
-			//we are more careful!
-			$multi = in_array($oldtype, [
-			'CheckboxGroupField',
-			'DispositionDirector',
-			'DispositionEmail',
-			'DispositionEmailBasedFrontendFields',
-			'DispositionFileDirector',
-			'DispositionMultiselectFileDirector',
-			'DispositionPageRedirector',
-			'MultiselectField',
-			'PulldownField',
-			'RadioGroupField',
+			/* Some fb-field-types simply repeat the same option-name
+			(relying on save-order for any reconciliation!)
+			We are more careful!
+			NB need each field-type that involves GetPropArray(), MultiComponent
+			and/or MultiChoice properties not sufficient (e.g. CustomEmail!)
+			*/
+			$multi = in_array($type, [
+			'CheckboxGroup',
+			'CustomEmail',
+			'EmailDirector',
+			'FileDirector',
+			'Multiselect',
+			'MultiselectFileDirector',
+			'PageRedirector',
+			'Pulldown',
+			'RadioGroup',
+			//'SubmitForm' stores actual suffixes, for field_id's ?
+			'SystemEmail',
+			'TextExpandable',
 			]);
 			if ($multi) {
 				$desc = '';
@@ -294,33 +290,11 @@ EOS;
 
 			$finds = NULL; //populate if/when needed
 			$repls = [];
-/* TODO
-			$obfld = new PWForms\XXX();
-			$populators = $obfld->AdminPopulate('FAKE');
-			$hasmain = (isset($populators['main']) && count($populators['main']) > 0);
-			$hasadv = (isset($populators['adv']) && count($populators['adv']) > 0);
-			$hastbl = (isset($populators['table']) && count($populators['table']) > 0);
-			//TODO get object names from xml, omit others in $data
-*/
+
 			foreach ($data as $fbrow) {
 				extract($fbrow);
-				if (!$name) {
-					$name = $this->Lang('none2');
-				}
-				if (in_array($name, $excludes)) {
-					continue;
-				}
-				$value = $value; //for DEBUG
-				if ($name == 'field_alias') {
-					if ($value) {
-						$passbacks['Alias'] = $value;
-					}
-					continue;
-				}
-				//existing option-value prevails
-				if (isset($passdowns[$name])) {
-					unset($passdowns[$name]);
-				}
+				$value = $value; //for DEBUGGER display ?
+
 				if ($multi) {
 					if ($name != $desc) {
 						$desc = $name;
@@ -332,14 +306,35 @@ EOS;
 						$indx++;
 					}
 				}
-				//rename some properties e.g. 'option_'* to 'indexed_'*
-				if (strncmp($name, 'option_', 7) == 0) {
+				//rename some properties
+				if (array_key_exists($name, $renames)) {
+					$name = $renames[$name];
+				} elseif (strncmp($name, 'option_', 7) == 0) {
 					$name = 'indexed_'.substr($name, 7);
 				}
+
+				if (!array_key_exists($name, $includes)) {
+					if ($name == 'field_alias') {
+						if ($value) {
+							$passbacks['alias'] = $value;
+						}
+					}
+					//CHECKME other passbacks ?
+					continue;
+				}
+
 				//revalue some properties
-				if (in_array($name, $numbers)) {
-					$value = $value + 0;
-				} elseif (strpos($name, 'template') !== FALSE) {
+				switch ($includes[$name]) {
+				 case 0:
+				 case 10:
+					$value = ($value) ? 1:0;
+					break;
+				 case 1:
+				 case 11:
+					$value += 0;
+					break;
+				 case 3:
+				 case 13:
 					if ($finds === NULL) {
 						$sql = 'SELECT * FROM '.$pre.'module_pwf_trans WHERE NOT isform ORDER BY old_id';
 						$trans = $db->GetAssoc($sql);
@@ -354,37 +349,31 @@ EOS;
 						}
 					}
 					$value = str_replace($finds, $repls, $value);
+					break;
+				 case 4:
+				 case 14:
+					if ($value === NULL || is_scalar($value)) {
+//TODO check mixed value & process accordingly
+					} else {
+						$value = serialize($value);
+					}
+					break;
 				}
 				$props[$name] = $value;
 			}
 			//supplementary property
-			if ($oldtype == 'TextField') {
+			if ($type == 'Text') {
 				$props['size'] = min($props['length'], 50);
 			}
-		}
-		if ($passdowns) {
-			foreach ($passdowns as $name => $value) {
-				if ($name) {
-					if (in_array($name, $excludes)) {
-						continue;
-					}
-					if ($name == 'alias') {
-						continue;
-					}
-				} else {
-					$name = '<'.$this->Lang('none2').'>';
-				}
-				$props[$name] = $value;
-			}
+			ksort($props);
 		}
 
-		ksort($props);
-		$value = json_encode($props, JSON_NUMERIC_CHECK);
+		$value = serialize($props);
 		$sql = 'UPDATE '.$pre.'module_pwf_field SET props=? WHERE field_id=?';
 		$db->Execute ($sql, [$value, $newf]);
 	}
 
-	function Get_Fields(&$db, $pre, $oldfid, $newfid)
+	function Get_Fields(&$db, $pre, $oldfid, $newfid, &$formdata)
 	{
 		$sql = 'SELECT * FROM '.$pre.'module_fb_field WHERE form_id=? ORDER BY field_id,order_by';
 		$data = $db->GetArray($sql, [$oldfid]);
@@ -400,9 +389,6 @@ EOS;
 			$pwfields = array_keys($pfrow);
 			$pfrow = array_fill_keys($pwfields, NULL); //default values
 
-			$namers = implode(',', $pwfields);
-			$fillers = str_repeat('?,', count($pwfields)-1);
-			$sql = 'INSERT INTO '.$pre.'module_pwf_field ('.$namers.') VALUES ('.$fillers.'?)';
 			$sql2 = 'INSERT INTO '.$pre.'module_pwf_trans (old_id,new_id,isform) VALUES (?,?,0)';
 			//these are used after type has been cleaned up and some duplicates done
 			$renames = [
@@ -436,14 +422,53 @@ EOS;
 				if (array_key_exists($type, $renames)) {
 					$type = $renames[$type];
 				}
-				$done = ['field_id'];
+				//the-field::GetMutables() needs data from a loaded field
+				//TODO constuct filepath and check existenct to prevent un-recoverable fatal error
+				if (0) {
+					continue;
+				}
+				$classPath = 'PWForms\\'.$type;
+				$t = [];
+				$obfld = new $classPath($formdata, $t);
+				PWForms\FieldOperations::Load($obfld);
+				$includes = $obfld->GetMutables(FALSE, FALSE); //get 'base' identifiers too
+
+				unset($includes['field_id']);
+				unset($includes['Id']);
+				$includes['form_id'] = 1;
+
+				$done = [];
 				$args = [];
 				foreach ($pwfields as $one) {
-					$done[] = $one;
-					if ($one != 'field_id') {
-						$args[] = $$one;
+					if (array_key_exists($one, $includes) && $includes[$one] < 10) {
+						$done[] = $one;
+						switch ($includes[$one]) {
+						 case 0:
+							$args[] = ($$one) ? 1:0;
+							break;
+						 case 1:
+							$args[] = $$one + 0;
+							break;
+// nothing special for	 case 3:
+//							break;
+						 case 4:
+							if ($$one === NULL || is_scalar($$one)) {
+	   //TODO check mixed value & process accordingly
+								$args[] = $$one;
+							} else {
+								$args[] = serialize($$one);
+							}
+							break;
+						 default:
+							$args[] = $$one;
+						}
+						unset($includes[$one]);
 					}
 				}
+
+				$namers = implode(',', $done);
+				$fillers = str_repeat('?,', count($done)-1);
+				$sql = 'INSERT INTO '.$pre.'module_pwf_field ('.$namers.') VALUES ('.$fillers.'?)';
 				$db->Execute($sql, $args);
 				$newf = $db->Insert_ID();
 				$db->Execute($sql2, [$oldf, $newf]);
@@ -455,67 +480,91 @@ EOS;
 						$more[$one] = $$one;
 					}
 				}
-				$back = []; //TODO missing keys to get from options
-				Get_FieldOpts($db, $pre, $oldfid, $newfid, $oldf, $newf, $oldtype, $more, $back);
-				//TODO handle passbacks
+				unset($more['field_id']); //ignore auto-inc field
+
+				$back = []; //for missing parameters (maybe) in options
+				Get_FieldOpts($db, $pre, $oldfid, $newfid, $oldf, $newf, $type, $includes, $more, $back);
+				if ($back) {
+					foreach ($back as $name => $value) {
+						$sql3 = 'UPDATE '.$pre.'module_pwf_field SET '.$name.'=? WHERE field_id='.$newf;
+						$db->Execute($sql3,[$value]);
+					}
+				}
 			}
 		}
 	}
 
-	function Get_FormOpts(&$mod, &$db, $pre, $oldfid, $newfid, &$passdowns, &$passbacks)
+	function Get_FormOpts(&$mod, &$db, $pre, $oldfid, $newfid, &$formincludes, &$passdowns, &$passbacks)
 	{
+		$data = [];
+		if ($passdowns) {
+			foreach ($passdowns as $name=>$value) {
+				if (!$name) {
+					$name = '<'.$this->Lang('none2').'>';
+				}
+				$data[$name] = $value;
+			}
+		}
 		$sql = 'SELECT * FROM '.$pre.'module_fb_form_attr WHERE form_id=? ORDER BY name';
-		$data = $db->GetArray($sql, [$oldfid]);
+		$data += $db->GetArray($sql, [$oldfid]);
+
 		$props = [];
 		if ($data) {
 			foreach ($data as $row) {
 				$name = $row['name'];
-				//ignore redundant properties
-				if (strpos($name, 'captcha') !== FALSE) {
+
+				if (!array_key_exists($name, $formincludes)) {
+	//TODO process passback if relevant
 					continue;
 				}
+
 				$value = $row['value'];
-				if (strpos($name, 'udt') !== FALSE && (!$value || $value == -1)) {
-					continue;
-				}
-				switch ($name) {
-				 case 'inline':
-				 case 'input_button_safety':
-					$value = $value + 0;
+				switch ($formincludes[$name]) {
+				 case 0:
+				 case 10:
+					$value = ($value) ? 1:0;
 					break;
-				 case 'form_template':
-					//TODO CHECK template arrangements used by newer FormBuilder
-					if ($mod->oldtemplates) {
-						$mod->SetTemplate('pwf_'.$newfid, $value);
-					} else {
-						MySetTemplate('form', $newfid, $value);
-					}
-					$value = 'pwf_'.$newfid;
+				 case 1:
+				 case 11:
+					$value += 0;
 					break;
-				 case 'submission_template':
-					if ($mod->oldtemplates) {
-						$mod->SetTemplate('pwf_sub_'.$newfid, $value);
-					} else {
-						MySetTemplate('submission', $newfid, $value);
+				 case 3:
+				 case 13:
+//TODO CHECK template arrangements used by newer FormBuilder
+					if ($name == 'form_template') {
+						if ($mod->oldtemplates) {
+							$mod->SetTemplate('pwf_'.$newfid, $value);
+						} else {
+							MySetTemplate('form', $newfid, $value);
+						}
+						$value = 'pwf_'.$newfid;
+					} elseif ($name == 'submission_template') {
+						if ($mod->oldtemplates) {
+							$mod->SetTemplate('pwf_sub_'.$newfid, $value);
+						} else {
+							MySetTemplate('submission', $newfid, $value);
+						}
+						$value = 'pwf_sub_'.$newfid;
 					}
-					$value = 'pwf_sub_'.$newfid;
+					break;
+				 case 4:
+				 case 14:
+					if ($value === NULL || is_scalar($value)) {
+//TODO check mixed value & process accordingly
+					} else {
+						$value = serialize($value);
+					}
+					break;
+				 default:
+				//TODO populate $passbacks as needed
 					break;
 				}
 				$props[$name] = $value;
 			}
-		}
-		//TODO handle $passbacks
-		if ($passdowns) {
-			foreach ($passdowns as $name=>$value) {
-				if (!$name) {
-					$name = '<'.this->Lang('none2').'>';
-				}
-				$props[$name] = $value;
-			}
+			ksort($props);
 		}
 
-		ksort($props);
-		$value = json_encode($props, JSON_NUMERIC_CHECK);
+		$value = serialize($props);
 		$sql = 'UPDATE '.$pre.'module_pwf_form SET props=? WHERE form_id=?';
 		$db->Execute ($sql, [$value, $newfid]);
 	}
@@ -565,8 +614,11 @@ if (isset($params['import'])) {
 		$sql = 'INSERT INTO '.$pre.'module_pwf_form ('.$namers.') VALUES ('.$fillers.'?)';
 		$sql2 = 'INSERT INTO '.$pre.'module_pwf_trans (old_id,new_id,isform) VALUES (?,?,1)';
 
+		$formdata = new PWForms\FormData($this);
+		$formincludes = $formdata->GetMutables(FALSE);
 		$funcs = new PWForms\FormOperations();
-//		$renums = array(); //keys = FormBuilder id, values = PowerForms id
+//		$renums = []; //keys = FormBuilder id, values = PWForms id
+
 		foreach ($oldforms as $fbrow) {
 			extract($pfrow); //default values
 			extract($fbrow);
@@ -605,10 +657,15 @@ if (isset($params['import'])) {
 					$more[$one] = $$one;
 				}
 			}
-			$back = []; //TODO missing keys to get from options
-			Get_FormOpts($this, $db, $pre, $form_id, $newfid, $more, $back);
-			//TODO handle passbacks
-			Get_Fields($db, $pre, $form_id, $newfid);
+			$back = []; //for missing parameters (maybe) in options
+			Get_FormOpts($this, $db, $pre, $form_id, $newfid, $formincludes, $more, $back);
+			if ($back) {
+				foreach ($back as $name => $value) {
+					$sql3 = 'UPDATE '.$pre.'module_pwf_form SET '.$name.'=? WHERE form_id='.$newfid;
+					$db->Execute($sql3, [$value]);
+				}
+			}
+			Get_Fields($db, $pre, $form_id, $newfid, $formdata);
 			Update_Templates($this, $db, $pre, $form_id, $newfid);
 			//data may've already been imported by the browser module
 			$rs = $db->SelectLimit('SELECT * FROM '.$pre.'module_pwbr_browser', 1);

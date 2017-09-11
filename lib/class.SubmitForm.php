@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -14,8 +15,46 @@ class SubmitForm extends FieldBase
 		parent::__construct($formdata, $params);
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
+		$this->HasLabel = FALSE;
 		$this->IsDisposition = TRUE;
 		$this->Type = 'SubmitForm';
+	}
+
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		$ret = parent::GetMutables($nobase) + [
+		'method' => 12,
+		'url' => 12,
+		'additional' => 12,
+		];
+
+		$mkey1 = 'fld_';
+		$mkey2 = 'sub_';
+		if ($actual) {
+			$opt = $this->GetPropArray($mkey1);
+			if ($opt) {
+				$suff = array_keys($opt);
+				foreach ($suff as $one) {
+					$ret[$mkey1.$one] = 10;
+				}
+			}
+			$opt = $this->GetPropArray($mkey2);
+			if ($opt) {
+				$suff = array_keys($opt);
+				foreach ($suff as $one) {
+					$ret[$mkey2.$one] = 10;
+				}
+			}
+		} else {
+			$opt = []; //TODO get all field-id's in form
+			foreach ($opt as $one) {
+				$ret[$mkey1.$one] = 10;
+			}
+			foreach ($opt as $one) {
+				$ret[$mkey2.$one] = 10;
+			}
+		}
+		return $ret;
 	}
 
 	public function GetSynopsis()
@@ -28,9 +67,9 @@ class SubmitForm extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE, FALSE);
-		$mod = $formdata->formsmodule;
-		
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE, FALSE);
+		$mod = $formdata->pwfmod;
+
 		if (function_exists('curl_init')) {
 			$formdata = $this->formdata;
 			$methods = ['POST'=>'POST','GET'=>'GET'];

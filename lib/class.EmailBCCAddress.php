@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 //This class is for an optional BCC-address input (single address, not ','-separated)
 
@@ -18,13 +19,18 @@ class EmailBCCAddress extends EmailBase
 		$this->Type = 'EmailBCCAddress';
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + ['field_to_modify' => 11];
+	}
+
 	public function GetSynopsis()
 	{
 		//TODO advice about email addr
 		$target = $this->GetProperty('field_to_modify');
 		foreach ($this->formdata->Fields as &$one) {
 			if ($one->GetId() == $target) {
-				$ret = $this->formdata->formsmodule->Lang('title_modifies', $one->GetName());
+				$ret = $this->formdata->pwfmod->Lang('title_modifies', $one->GetName());
 				unset($one);
 				return $ret;
 			}
@@ -46,17 +52,17 @@ class EmailBCCAddress extends EmailBase
 		unset($one);
 
 		list($main, $adv) = $this->AdminPopulateCommon($id);
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_field_to_modify2'),
-						$mod->CreateInputDropdown($id, 'fp_field_to_modify', $choices, -1,
-							$this->GetProperty('field_to_modify'))];
+					$mod->CreateInputDropdown($id, 'fp_field_to_modify', $choices, -1,
+						$this->GetProperty('field_to_modify'))];
 		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
 	{
 		$this->SetEmailJS();
-		$tmp = $this->formdata->formsmodule->CreateInputEmail(
+		$tmp = $this->formdata->pwfmod->CreateInputEmail(
 			$id, $this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($this->Value, ENT_QUOTES), 25, 128,
 			$this->GetScript());
@@ -73,7 +79,7 @@ class EmailBCCAddress extends EmailBase
 		$this->ValidationMessage = '';
 		switch ($this->ValidationType) {
 		 case 'email':
-			$mod = $this->formdata->formsmodule;
+			$mod = $this->formdata->pwfmod;
 			//no ','-separator support
 			if ($this->Value && !preg_match($mod->email_regex, $this->Value)) {
 				$val = FALSE;
@@ -81,7 +87,7 @@ class EmailBCCAddress extends EmailBase
 			}
 			break;
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 

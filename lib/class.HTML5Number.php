@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -16,19 +17,33 @@ class HTML5Number extends FieldBase
 		$this->Type = 'HTML5Number';
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'min_number'=>11,
+		'max_number'=>11,
+		'step_number'=>11,
+		];
+	}
+
+/*	public function GetSynopsis()
+	{
+ 		return $this->formdata->pwfmod->Lang('').': STUFF';
+	}
+*/
 	public function AdminPopulate($id)
 	{
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
-		$mod = $this->formdata->formsmodule;
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE);
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_min_number'),
-						$mod->CreateInputText($id, 'fp_min_number',
-							$this->GetProperty('min_number', 0))];
+					$mod->CreateInputText($id, 'fp_min_number',
+						$this->GetProperty('min_number', 0))];
 		$main[] = [$mod->Lang('title_max_number'),
-						$mod->CreateInputText($id, 'fp_max_number',
-							$this->GetProperty('max_number', 500))];
+					$mod->CreateInputText($id, 'fp_max_number',
+						$this->GetProperty('max_number', 500))];
 		$main[] = [$mod->Lang('title_step_number'),
-						$mod->CreateInputText($id, 'fp_step_number',
-							$this->GetProperty('step_number', 50))];
+					$mod->CreateInputText($id, 'fp_step_number',
+						$this->GetProperty('step_number', 50))];
 		return ['main'=>$main,'adv'=>$adv];
 	}
 
@@ -40,7 +55,7 @@ class HTML5Number extends FieldBase
 			$messages[] = $msg;
 		}
 
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$min = $this->GetProperty('min_number');
 		if (!$min || !is_numeric($min)) {
 			$ret = FALSE;

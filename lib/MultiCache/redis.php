@@ -56,7 +56,7 @@ class redis extends CacheBase implements CacheInterface
 		return TRUE;
 	}
 
-	public function _newsert($keyword, $value, $lifetime= FALSE)
+	public function _newsert($keyword, $value, $lifetime=FALSE)
 	{
 		if (!$this->_has($keyword)) {
 			$ret = $this->client->set($keyword, $value, array('xx', 'ex' => $lifetime));
@@ -65,7 +65,7 @@ class redis extends CacheBase implements CacheInterface
 		return FALSE;
 	}
 
-	public function _upsert($keyword, $value, $lifetime= FALSE)
+	public function _upsert($keyword, $value, $lifetime=FALSE)
 	{
 		$ret = $this->client->set($keyword, $value, array('xx', 'ex' => $lifetime));
 		if ($ret === FALSE) {

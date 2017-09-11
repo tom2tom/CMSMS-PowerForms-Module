@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -399,8 +400,8 @@ class Utils
 				if (is_file($fp)) {
 					include_once $fp;
 					$classpath = 'PWForms\\'.$classname;
+					$formdata = new FormData($mod);
 					$params = [];
-					$formdata = $mod->_GetFormData($params);
 					$obfld = new $classpath($formdata, $params);
 					if ($obfld) {
 						$menu[$classname] = $obfld->GetDisplayType();
@@ -423,9 +424,9 @@ class Utils
 	public static function Show_Field(&$mod, $classname, $sort=TRUE)
 	{
 		if ($mod->field_types) {
-			$params = [];
-			$formdata = $mod->_GetFormData($params);
+			$formdata = new PWForms\Formdata($mod);
 			$classpath = 'PWForms\\'.$classname;
+			$params = [];
 			$obfld = new $classpath($formdata, $params);
 			if ($obfld) {
 				if (!$obfld->IsInput) { //TODO check this
@@ -583,7 +584,7 @@ class Utils
 
 	/**
 	CreateDefaultTemplate:
-	@formdata: reference to FormData form data object
+	@formdata: reference to FormData-class object
 	@htmlish: whether the template is to include html tags like <h1>, default FALSE
 	@email:  whether the template is to begin with email-specific stuff, default TRUE
 	@oneline: whether the template is to NOT begin with a 'thanks' line, (irrelevant if @email = TRUE) default FALSE
@@ -593,7 +594,7 @@ class Utils
 	public static function CreateDefaultTemplate(&$formdata,
 		$htmlish=FALSE, $email=TRUE, $oneline=FALSE, $header=FALSE, $footer=FALSE)
 	{
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		$ret = '';
 
 		if ($email) {
@@ -733,7 +734,7 @@ EOS;
 	/**
 	AddTemplateVariable:
 	Adds a member to the $templateVariables array in @formdata (to be used for variables-help)
-	@formdata: reference to FormData object for form
+	@formdata: reference to FormData-class object
 	@name: variable name (excluding '$')
 	@langkey: lang-array key for variable description
 	*/
@@ -746,7 +747,7 @@ EOS;
 	FormFieldsHelp:
 	Document contents of Fields array in @formdata, and append the contents of
 	array @extras
-	@formdata: reference to FormData object for form
+	@formdata: reference to FormData-class object
 	@$extras: optional array of items to be appended to the output, each member
 		having key=id, value=name default = empty array
 	Returns: xhtml string which generates a tabular help description
@@ -770,7 +771,7 @@ EOS;
 			}
 		}
 
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		$tplvars = [
 			'title_variables' => $mod->Lang('title_variables_available'),
 			'title_name' => $mod->Lang('title_php_variable'),
@@ -786,7 +787,7 @@ EOS;
 	Setup variables-help for a form's submission-template. Essentially, it sets
 	smarty variable 'help_subtplvars' to the output from processing the template
 	varshelp.tpl
-	@formdata: reference to FormData object for form
+	@formdata: reference to FormData-class object
 	@mod: reference to current PowerBrowse module object
 	@tplvars: reference to template-variables array
 	*/
@@ -861,9 +862,9 @@ EOS;
 	@tplvars: reference to template-variables array
 	@htmlemail: optional boolean, whether processing a form for html email, default FALSE
 	*/
-	public static function SetupFormVars(&$formdata, &$tplvars, $htmlemail= FALSE)
+	public static function SetupFormVars(&$formdata, &$tplvars, $htmlemail=FALSE)
 	{
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		// general variables
 		$tplvars += [
 			'form_name' => $formdata->Name,
@@ -1160,7 +1161,7 @@ EOS;
 	@file: filename
 	@except: form enumerator default FALSE
 	*/
-	public static function DeleteUploadFile(&$mod, $file, $except= FALSE)
+	public static function DeleteUploadFile(&$mod, $file, $except=FALSE)
 	{
 		if ($except) {
 			$db = \cmsms()->GetDb();
@@ -1169,7 +1170,7 @@ EOS;
 			$props = $db->GetCol($sql, [$except]);
 			if ($props) {
 				foreach ($props as &$one) {
-					$t = json_decode($one, TRUE);
+					$t = unserialize($one);
 					if ($t && isset($t['css_file']) && $t['css_file'] == $file) {
 						unset($one);
 						return;

@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -17,15 +18,20 @@ class TimePicker extends FieldBase
 		$this->IsInput = TRUE;
 		$this->LabelSubComponents = FALSE;
 		$this->Type = 'TimePicker';
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		$this->flag12hour = [
 			$mod->Lang('title_before_noon')=>$mod->Lang('title_before_noon'),
 			$mod->Lang('title_after_noon')=>$mod->Lang('title_after_noon')];
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + ['24_hour' => 10];
+	}
+
 	public function GetSynopsis()
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		return ($this->GetProperty('24_hour', 0)?$mod->Lang('24_hour'):$mod->Lang('12_hour'));
 	}
 
@@ -42,7 +48,7 @@ class TimePicker extends FieldBase
 			}
 		} else {
 			$ret = $this->GetFormProperty('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
+				$this->formdata->pwfmod->Lang('unspecified'));
 		}
 
 		if ($as_string) {
@@ -54,18 +60,18 @@ class TimePicker extends FieldBase
 
 	public function AdminPopulate($id)
 	{
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
-		$mod = $this->formdata->formsmodule;
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE);
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_24_hour'),
-						$mod->CreateInputHidden($id, 'fp_24_hour', 0).
-						$mod->CreateInputCheckbox($id, 'fp_24_hour', 1,
-							$this->GetProperty('24_hour', 0))];
+					$mod->CreateInputHidden($id, 'fp_24_hour', 0).
+					$mod->CreateInputCheckbox($id, 'fp_24_hour', 1,
+						$this->GetProperty('24_hour', 0))];
 		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$js = $this->GetScript();
 
 		$now = localtime(time(), TRUE);

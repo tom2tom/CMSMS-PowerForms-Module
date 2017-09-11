@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 //This class is for system-generated emails (i.e. no interaction with the user or
 //form prior to its submission) to any number of destinations (as a combination of to,cc,bcc)
@@ -20,19 +21,72 @@ class SystemEmail extends EmailBase
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
+		$this->HasLabel = FALSE;
 		$this->IsDisposition = TRUE;
 		$this->MultiComponent = TRUE;
 		$this->Type = 'SystemEmail';
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		$ret = parent::GetMutables($nobase);
+		$mkey1 = 'destination_address';
+		$mkey2 = 'address_type';
+		if ($actual) {
+			$opt = $this->GetPropArray($mkey1);
+			if ($opt) {
+				$suff = array_keys($opt);
+			} else {
+				return $ret;
+			}
+		} else {
+			$suff = range(1, 10);
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey1.$one] = 12;
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey2.$one] = 12;
+		}
+		return $ret;
+	}
+
+	public function GetSynopsis()
+	{
+		$mod = $this->formdata->pwfmod;
+		$ret = $mod->Lang('to').': ';
+		$dests = $this->GetPropArray('destination_address');
+		if ($dests) {
+			$c = count($dests);
+			if ($c > 1) {
+				$ret .= $c.' '.$mod->Lang('recipients');
+			} else {
+				$type = $this->GetPropIndexed('address_type', 1, 'to');
+				if ($type == 'cc') {
+					$ret = $mod->Lang('cc').': ';
+				} elseif ($type == 'bc') {
+					$ret = $mod->Lang('bcc').': ';
+				}
+				$ret .= $dests[1];
+			}
+		} else {
+			$ret .= $mod->Lang('unspecified');
+		}
+		$status = $this->TemplateStatus();
+		if ($status) {
+			$ret .= '<br />'.$status;
+		}
+		return $ret;
+	}
+
 	public function ComponentAddLabel()
 	{
-		return $this->formdata->formsmodule->Lang('add_address');
+		return $this->formdata->pwfmod->Lang('add_address');
 	}
 
 	public function ComponentDeleteLabel()
 	{
-		return $this->formdata->formsmodule->Lang('delete_address');
+		return $this->formdata->pwfmod->Lang('delete_address');
 	}
 
 	public function HasComponentAdd()
@@ -60,37 +114,9 @@ class SystemEmail extends EmailBase
 		}
 	}
 
-	public function GetSynopsis()
-	{
-		$mod = $this->formdata->formsmodule;
-		$ret = $mod->Lang('to').': ';
-		$dests = $this->GetPropArray('destination_address');
-		if ($dests) {
-			$c = count($dests);
-			if ($c > 1) {
-				$ret .= $c.' '.$mod->Lang('recipients');
-			} else {
-				$type = $this->GetPropIndexed('address_type', 1, 'to');
-				if ($type == 'cc') {
-					$ret = $mod->Lang('cc').': ';
-				} elseif ($type == 'bc') {
-					$ret = $mod->Lang('bcc').': ';
-				}
-				$ret .= $dests[1];
-			}
-		} else {
-			$ret .= $mod->Lang('unspecified');
-		}
-		$status = $this->TemplateStatus();
-		if ($status) {
-			$ret .= '<br />'.$status;
-		}
-		return $ret;
-	}
-
 	public function AdminPopulate($id)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, FALSE, FALSE, FALSE);
 
 		if ($this->addressAdd) {
@@ -164,7 +190,7 @@ class SystemEmail extends EmailBase
 			$messages[] = $msg;
 		}
 
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$opt = $this->GetProperty('email_from_address');
 		if ($opt !== '') {
 			$opt = filter_var(trim($opt), FILTER_SANITIZE_EMAIL);

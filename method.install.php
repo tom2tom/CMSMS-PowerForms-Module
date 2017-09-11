@@ -1,10 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
-
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 /*QUEUE
 if (!function_exists('curl_init'))
 	return 'PWForms needs the PHP cURL extension';
@@ -153,7 +153,7 @@ $dir = opendir($path);
 while ($filespec = readdir($dir)) {
 	if (preg_match('/.xml$/', $filespec) > 0) {
 		$fp = cms_join_path($path, $filespec);
-//		list($state, $msg) = 
+//		list($state, $msg) =
 		$funcs->ImportXML($this, $fp);
 	}
 }

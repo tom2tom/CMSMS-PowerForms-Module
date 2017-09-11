@@ -1,8 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2015-2017 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2015-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -18,6 +20,25 @@ class SequenceEnd extends SequenceStart
 		}
 		$this->SetLast($this->LastBreak);
 		$this->Type = 'SequenceEnd';
+	}
+
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'change_count' => 10,
+		'delete_label' => 12,
+		'deletepre_label' => 12,
+		'insert_label' => 12,
+		'insertpre_label' => 12,
+		'privatename' => 12,
+		];
+	}
+
+	public function GetSynopsis()
+	{
+		$mod = $this->formdata->pwfmod;
+		$t = $this->GetProperty('privatename', $mod->Lang('none2'));
+		return $mod->Lang('identifier').': '.$t;
 	}
 
 	public function SetLast($state=TRUE)
@@ -43,13 +64,6 @@ class SequenceEnd extends SequenceStart
 		}
 	}
 
-	public function GetSynopsis()
-	{
-		$mod = $this->formdata->formsmodule;
-		$t = $this->GetProperty('privatename', $mod->Lang('none2'));
-		return $mod->Lang('identifier').': '.$t;
-	}
-
 	public function AdminPopulate($id)
 	{
 		$nm = $this->Name;
@@ -62,9 +76,10 @@ class SequenceEnd extends SequenceStart
 		'title_field_alias',
 		'title_field_javascript',
 		'title_field_resources',
-		'title_smarty_eval'];
-		list($main, $adv) = $this->AdminPopulateCommon($id, $except, TRUE);
-		$mod = $this->formdata->formsmodule;
+		'title_smarty_eval'
+		];
+		list($main, $adv) = $this->AdminPopulateCommon($id, $except, FALSE);
+		$mod = $this->formdata->pwfmod;
 		//name-help
 		$main[0][] = $mod->Lang('help_sequence_name2', '&#171;&#171;');
 
@@ -101,7 +116,7 @@ class SequenceEnd extends SequenceStart
 
 	public function AdminValidate($id)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$ret = TRUE;
 		$msg = '';
 		$ref = $this->GetProperty('privatename');
@@ -172,11 +187,11 @@ class SequenceEnd extends SequenceStart
 				$tmp .= ' &darr;"';
 			}
 			if ($i%2 == 0) {
-				$t = $this->formdata->formsmodule->Lang('tip_sequence_add');
+				$t = $this->formdata->pwfmod->Lang('tip_sequence_add');
 				$tmp .= ' title="'.$t.'" />';
 			} else {
-				$t = $this->formdata->formsmodule->Lang('tip_sequence_del');
-				$tmp .= ' title="'.$t.'" onclick="return confirm(\''.$this->formdata->formsmodule->Lang('confirm').'\');" />';
+				$t = $this->formdata->pwfmod->Lang('tip_sequence_del');
+				$tmp .= ' title="'.$t.'" onclick="return confirm(\''.$this->formdata->pwfmod->Lang('confirm').'\');" />';
 			}
 			if ($i == 0) {
 				$oneset->op = $pre.' '.$this->SetClass($tmp);

@@ -1,8 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -20,6 +22,25 @@ class Captcha extends FieldBase
 		$this->Type = 'Captcha';
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'aslabel' => 10,
+		'prompt' => 12,
+		'wrongtext' => 12,
+		'captcha_template' => 13,
+		];
+	}
+
+	public function GetSynopsis()
+	{
+		$captcha = \cms_utils::get_module('Captcha');
+		if ($captcha) {
+			return '';
+		}
+		return $this->formdata->pwfmod->Lang('missing_module', 'Captcha');
+	}
+
 	public function GetDefaultTemplate()
 	{
 		return $this->defaulttemplate;
@@ -33,15 +54,6 @@ class Captcha extends FieldBase
 		} else {
 			return [$ret];
 		}
-	}
-
-	public function GetSynopsis()
-	{
-		$captcha = \cms_utils::get_module('Captcha');
-		if ($captcha) {
-			return '';
-		}
-		return $this->formdata->formsmodule->Lang('missing_module', 'Captcha');
 	}
 
 	public function AdminPopulate($id)
@@ -61,7 +73,7 @@ class Captcha extends FieldBase
 		'title_hide_label'
 		];
 		list($main, $adv) = $this->AdminPopulateCommon($id, $except);
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_captcha_prompt'),
 					$mod->CreateInputText($id, 'fp_prompt',
 						$this->GetProperty('prompt', $mod->Lang('captcha_prompt')), 60, 120)];
@@ -97,7 +109,7 @@ EOS;
 		if (!$ret) {
 			$messages[] = $msg;
 		}
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$pt = $this->GetProperty('captcha_template');
 		if (!$pt) {
 			$ret = FALSE;
@@ -119,7 +131,7 @@ EOS;
 
 	public function Populate($id, &$params)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$captcha = \cms_utils::get_module('Captcha');
 		if (!$captcha) {
 			return $mod->Lang('err_module', 'Captcha');
@@ -162,7 +174,7 @@ EOS;
 			$this->RealName = FALSE;
 		}
 
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$captcha = \cms_utils::get_module('Captcha');
 		if (!$captcha) { //should never happen
 			$val = FALSE;
@@ -175,7 +187,7 @@ EOS;
 			$this->ValidationMessage = $this->GetProperty('wrongtext',
 				$mod->Lang('captcha_wrong'));
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 }

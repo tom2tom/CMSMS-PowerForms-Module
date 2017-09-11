@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -19,14 +20,48 @@ class Pulldown extends FieldBase
 		$this->Type = 'Pulldown';
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		$ret = parent::GetMutables($nobase) + [
+			'select_label' => 12,
+			'sort' => 10,
+		];
+		$mkey1 = 'indexed_name';
+		$mkey2 = 'indexed_value';
+		if ($actual) {
+			$opt = $this->GetPropArray($mkey1);
+			if ($opt) {
+				$suff = array_keys($opt);
+			} else {
+				return $ret;
+			}
+		} else {
+			$suff = range(1, 10);
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey1.$one] = 12;
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey2.$one] = 12;
+		}
+		return $ret;
+	}
+
+	public function GetSynopsis()
+	{
+		$opt = $this->GetPropArray('indexed_name');
+		$num = ($opt) ? count($opt) : 0;
+		return $this->formdata->pwfmod->Lang('options', $num);
+	}
+
 	public function ComponentAddLabel()
 	{
-		return $this->formdata->formsmodule->Lang('add_options');
+		return $this->formdata->pwfmod->Lang('add_options');
 	}
 
 	public function ComponentDeleteLabel()
 	{
-		return $this->formdata->formsmodule->Lang('delete_options');
+		return $this->formdata->pwfmod->Lang('delete_options');
 	}
 
 	public function HasComponentAdd()
@@ -60,7 +95,7 @@ class Pulldown extends FieldBase
 			$ret = $this->GetPropIndexed('indexed_value', $this->Value);
 		} else {
 			$ret = $this->GetFormProperty('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
+				$this->formdata->pwfmod->Lang('unspecified'));
 		}
 
 		if ($as_string) {
@@ -70,21 +105,14 @@ class Pulldown extends FieldBase
 		}
 	}
 
-	public function GetSynopsis()
-	{
-		$opt = $this->GetPropArray('indexed_name');
-		$num = ($opt) ? count($opt) : 0;
-		return $this->formdata->formsmodule->Lang('options', $num);
-	}
-
 	public function AdminPopulate($id)
 	{
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
-		$mod = $this->formdata->formsmodule;
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE);
+		$mod = $this->formdata->pwfmod;
 
 		$main[] = [$mod->Lang('title_select_one_message'),
-			$mod->CreateInputText($id, 'fp_select_one',
-			  $this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128)];
+			$mod->CreateInputText($id, 'fp_select_label',
+			  $this->GetProperty('select_label', $mod->Lang('select_one')), 25, 128)];
 		$main[] = [$mod->Lang('sort_options'),
 			$mod->CreateInputDropdown($id, 'fp_sort',
 			  [$mod->Lang('yes')=>1, $mod->Lang('no')=>0], -1,
@@ -143,8 +171,8 @@ class Pulldown extends FieldBase
 			if (count($choices) > 1 && $this->GetProperty('sort')) {
 				ksort($choices);
 			}
-			$mod = $this->formdata->formsmodule;
-			$choices = [' '.$this->GetProperty('select_one', $mod->Lang('select_one'))=>-1] + $choices;
+			$mod = $this->formdata->pwfmod;
+			$choices = [' '.$this->GetProperty('select_label', $mod->Lang('select_one'))=>-1] + $choices;
 
 			$tmp = $mod->CreateInputDropdown(
 				$id, $this->formdata->current_prefix.$this->Id, $choices, -1, $this->Value,

@@ -38,7 +38,7 @@ class apcu extends CacheBase implements CacheInterface
 		return TRUE;  //TODO connect
 	}
 
-	public function _newsert($keyword, $value, $lifetime= FALSE)
+	public function _newsert($keyword, $value, $lifetime=FALSE)
 	{
 		if ($this->_has($keyword)) {
 			return FALSE;
@@ -47,7 +47,7 @@ class apcu extends CacheBase implements CacheInterface
 		return $ret;
 	}
 
-	public function _upsert($keyword, $value, $lifetime= FALSE)
+	public function _upsert($keyword, $value, $lifetime=FALSE)
 	{
 		$lifetime = (int)$lifetime;
 		$ret = apcu_add($keyword, $value, $lifetime);

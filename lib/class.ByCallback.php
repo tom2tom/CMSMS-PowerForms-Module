@@ -1,8 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -25,11 +27,22 @@ class ByCallback extends FieldBase
 	public function __construct(&$formdata, &$params)
 	{
 		parent::__construct($formdata, $params);
+		$this->HasLabel = FALSE;
 		$this->Type = 'ByCallback';
 		$this->AddOverride('ExternValidate', function ($obj, $id) {
-			$obj->SetStatus('valid', TRUE);
+			$obj->SetProperty('valid', TRUE);
 			$obj->ValidationMessage = '';
 		});
+	}
+
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + ['handler' => 12];
+	}
+
+	public function GetSynopsis()
+	{
+		//TODO return $this->formdata->pwfmod->Lang(Callback: $this->handler);
 	}
 
 	//TODO namespace management for this
@@ -60,11 +73,6 @@ class ByCallback extends FieldBase
 		} else {
 			return [$ret];
 		}
-	}
-
-	public function GetSynopsis()
-	{
-		//Callback: $this->handler;
 	}
 
 	public function AdminPopulate($id)
@@ -119,7 +127,7 @@ class ByCallback extends FieldBase
 			$this->handler = $handler;
 			return [TRUE.''];
 		}
-		return [FALSE,$this->formdata->formsmodule->Lang('TODO')];
+		return [FALSE,$this->formdata->pwfmod->Lang('TODO')];
 	}
 
 	public function Populate($id, &$params)
@@ -152,7 +160,7 @@ class ByCallback extends FieldBase
 		$val = TRUE;
 		$this->ValidationMessage = '';
 		$this->ExternValidate(); //method to be populated by the callback
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 }

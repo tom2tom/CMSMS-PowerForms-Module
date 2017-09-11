@@ -1,8 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2015-2017 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2015-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -15,15 +17,27 @@ class SequenceStart extends FieldBase
 		parent::__construct($formdata, $params);
 		$this->DisplayInSubmission = FALSE;
 		$this->Alias = uniqid('start_'.$this->formdata->Id); //not user editable
-		$this->HasLabel = TRUE;
 		$this->LabelSubComponents = FALSE;
 		$this->NeedsDiv = FALSE;
 		$this->Type = 'SequenceStart';
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'change_count' => 10,
+		'maxcount' => 11,
+		'mincount' => 11,
+		'repeatcount' => 11,
+		'delete_label' => 12,
+		'insert_label' => 12,
+		'privatename' => 12,
+		];
+	}
+
 	public function GetSynopsis()
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$t = $this->GetProperty('privatename', $mod->Lang('none2'));
 		$ret = $mod->Lang('identifier').': '.$t;
 		$ret .= ','.$this->GetProperty('repeatcount').' time(s)'; //TODO lang
@@ -41,8 +55,8 @@ class SequenceStart extends FieldBase
 		'title_field_javascript',
 		'title_field_resources',
 		'title_smarty_eval'];
-		list($main, $adv) = $this->AdminPopulateCommon($id, $except, TRUE);
-		$mod = $this->formdata->formsmodule;
+		list($main, $adv) = $this->AdminPopulateCommon($id, $except, FALSE);
+		$mod = $this->formdata->pwfmod;
 		//name-help
 		$main[0][] = $mod->Lang('help_sequence_name', '&#187;&#187;');
 
@@ -85,7 +99,7 @@ class SequenceStart extends FieldBase
 	public function AdminValidate($id)
 	{
 		$messages = [];
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$ret = TRUE;
 		$ref = $this->GetProperty('privatename');
 		if ($ref) {
@@ -153,11 +167,11 @@ class SequenceStart extends FieldBase
 			$tmp = '<input type="submit" name="'.$bnm.$m.$this->Id.'" id="'.$bid.$m.
 			'" value="'.$this->GetProperty($key).' &darr;"';
 			if ($i == 0) {
-				$t = $this->formdata->formsmodule->Lang('tip_sequence_add');
+				$t = $this->formdata->pwfmod->Lang('tip_sequence_add');
 				$tmp .= ' title="'.$t.'" />';
 			} else {
-				$t = $this->formdata->formsmodule->Lang('tip_sequence_del');
-				$tmp .= ' title="'.$t.'" onclick="return confirm(\''.$this->formdata->formsmodule->Lang('confirm').'\');" />';
+				$t = $this->formdata->pwfmod->Lang('tip_sequence_del');
+				$tmp .= ' title="'.$t.'" onclick="return confirm(\''.$this->formdata->pwfmod->Lang('confirm').'\');" />';
 			}
 			$oneset->op = $this->SetClass($tmp);
 			if ($i == 1) {

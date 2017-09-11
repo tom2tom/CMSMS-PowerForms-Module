@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 //This class allows sending an email with subject, sender-name, sender-email
 //and receiver(s) taken from (specified) other fields
@@ -18,14 +19,39 @@ class CustomEmail extends EmailBase
 		$this->ChangeRequirement = FALSE;
 		$this->DisplayInForm = FALSE;
 		$this->DisplayInSubmission = FALSE;
-		$this->HideLabel = TRUE;
 		$this->IsDisposition = TRUE;
+//		$this->MultiChoice = TRUE;
 		$this->Type = 'CustomEmail';
+	}
+
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		$ret = parent::GetMutables($nobase) + [
+		'email_subject' => 12,
+		'email_from_name' => 12,
+		'email_from_address' => 12,
+		];
+
+		$mkey1 = 'destination_address';
+		if ($actual) {
+			$opt = $this->GetPropArray($mkey1);
+			if ($opt) {
+				$suff = array_keys($opt);
+			} else {
+				return $ret;
+			}
+		} else {
+			$suff = range(1, 10);
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey1.$one] = 12;
+		}
+		return $ret;
 	}
 
 	public function GetSynopsis()
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$opt = $this->GetPropArray('destination_address');
 		if ($opt) {
 			$ret = $mod->Lang('to').': '.count($opt).' '.$mod->Lang('fields');
@@ -57,24 +83,23 @@ class CustomEmail extends EmailBase
 				}
 			}
 		}
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$choices = [$mod->Lang('select_one') => ''] + $displayfields;
 
-		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, FALSE, TRUE, FALSE);
+		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, FALSE, FALSE, FALSE);
 		$waslast = array_pop($main); //keep only the default to-type selector
 		$main[] = [$mod->Lang('title_subject_field'),
-						$mod->CreateInputDropdown($id, 'fp_email_subject', $choices, -1,
-						$this->GetProperty('email_subject'))];
+					$mod->CreateInputDropdown($id, 'fp_email_subject', $choices, -1,
+					$this->GetProperty('email_subject'))];
 		$main[] = [$mod->Lang('title_from_field'),
-						$mod->CreateInputDropdown($id, 'fp_email_from_name', $choices, -1,
-						$this->GetProperty('email_from_name', $mod->Lang('friendly_name')))];
+					$mod->CreateInputDropdown($id, 'fp_email_from_name', $choices, -1,
+					$this->GetProperty('email_from_name', $mod->Lang('friendly_name')))];
 		$main[] = [$mod->Lang('title_from_address_field'),
-						$mod->CreateInputDropdown($id, 'fp_email_from_address', $choices, -1,
-						$this->GetProperty('email_from_address'))];
-//TODO what is $i ?
+					$mod->CreateInputDropdown($id, 'fp_email_from_address', $choices, -1,
+					$this->GetProperty('email_from_address'))];
 		$main[] = [$mod->Lang('title_destination_field'),
-						$mod->CreateInputSelectList($id, 'fp_destination_address'.$i, $displayfields,
-						$destfields, 5)];
+					$mod->CreateInputSelectList($id, 'fp_destination_address', $displayfields,
+					$destfields, 5)];
 		$main[] = $waslast;
 		return ['main'=>$main,'adv'=>$adv,'extra'=>$extra];
 	}
@@ -87,7 +112,7 @@ class CustomEmail extends EmailBase
 			$messages[] = $msg;
 		}
 
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		if (!$this->GetProperty('email_subject')) {
 			$ret = FALSE;
 			$messages[] = $mod->Lang('no_field_assigned', $mod->Lang('title_email_subject'));
@@ -168,6 +193,6 @@ class CustomEmail extends EmailBase
 
 			return $ret;
 		}
-		return [FALSE,$this->formdata->formsmodule->Lang('err_address', '')];
+		return [FALSE,$this->formdata->pwfmod->Lang('err_address', '')];
 	}
 }

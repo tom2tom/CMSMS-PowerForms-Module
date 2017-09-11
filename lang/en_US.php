@@ -1,8 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 $lang['AF'] = 'Afghanistan';
 $lang['AX'] = 'Aland Islands';
@@ -447,7 +449,7 @@ $lang['fieldlabel_field'] = 'Field Type Not Set';
 $lang['fieldlabel_Button'] = 'Button';
 $lang['fieldlabel_ByCallback'] = '-Field populated by a PHP callback';
 $lang['fieldlabel_ByTemplate'] = '-Field populated by processing a template';
-$lang['fieldlabel_Captcha'] = 'Captcha protection for form';
+$lang['fieldlabel_Captcha'] = 'Captcha match';
 $lang['fieldlabel_CatalogerItems'] = 'Select cataloger item(s)';
 $lang['fieldlabel_Checkbox'] = 'Checkbox';
 $lang['fieldlabel_CheckboxExtended'] = 'Checkbox extended'; // Need to remove
@@ -467,9 +469,9 @@ $lang['fieldlabel_EmailCCAddress'] = 'Email Carbon Copy (CC) address"';
 $lang['fieldlabel_EmailConfirmation'] = '*Validate-via-email address';
 $lang['fieldlabel_EmailFEUProperty'] = '*Email users matching an FEU property';
 $lang['fieldlabel_EmailOne'] = '*Email to user-supplied email address';
-$lang['fieldlabel_EmailSender'] = 'Email sender name"';
+$lang['fieldlabel_EmailSender'] = 'Email sender name';
 $lang['fieldlabel_EmailSiteAdmin'] = '*Email to CMS admin user';
-$lang['fieldlabel_EmailSubject'] = 'Email "Subject"';
+$lang['fieldlabel_EmailSubject'] = 'Email subject';
 $lang['fieldlabel_FieldsetEnd'] = '-Fieldset end';
 $lang['fieldlabel_FieldsetStart'] = '-Fieldset start';
 $lang['fieldlabel_FileDirector'] = '*Save submitted data in selected file';

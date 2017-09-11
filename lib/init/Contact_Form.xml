@@ -4,10 +4,10 @@
 <!ELEMENT version (#PCDATA)>
 <!ELEMENT date (#PCDATA)>
 <!ELEMENT count (#PCDATA)>
-<!ELEMENT form (properties,fields?)>
+<!ELEMENT form (properties,fields)>
 <!ELEMENT properties (#PCDATA)>
-<!ELEMENT fields (field)>
-<!ELEMENT field (properties?)>
+<!ELEMENT fields (field?)>
+<!ELEMENT field (#PCDATA)>
 ]>
 <powerforms>
 	<version>0.7</version>
@@ -19,8 +19,7 @@
 			<name>Contact Form</name>
 			<alias>contact</alias>
 			<css_class>contactform</css_class>
-			<form_id>1</form_id>
-			<form_template>{if $form_done}%0A	{* section for displaying submission errors *}%0A	{if !empty($submission_error)}%0A		%3Cdiv class=%22error_message%22%3E{$submission_error}%3C/div%3E%0A		{if !empty($show_submission_errors)}%0A			%3Cdiv class=%22error_list%22%3E%3Cul%3E%0A	{foreach $submission_error_list as $one}%3Cli%3E{$one}%3C/li%3E{/foreach}%0A			%3C/ul%3E%3C/div%3E%0A		{/if}%0A	{/if}%0A{else}%0A	{* section for displaying the form, starting with validation errors *}%0A	{if !empty($form_has_validation_errors)}%0A		%3Cdiv class=%22error_message%22%3E%3Cul%3E%0A	{foreach $form_validation_errors as $one}%3Cli%3E{$one}%3C/li%3E{/foreach}%0A		%3C/ul%3E%3C/div%3E%0A	{/if}%0A	{* and now the form itself *}%0A	{if $css_class}%3Cdiv class=%22{$css_class}%22%3E{/if}%0A	{if $total_pages %3E 1}%3Cspan%3E{$title_page_x_of_y}%3C/span%3E{/if}%0A	{foreach $fields as $one}%0A	{strip}%0A		{if $one-%3Edisplay}%0A			{if $one-%3Eneeds_div}%3Cdiv%3E{/if}%0A			{if !$one-%3Ehide_name}%0A				%3Clabel{if !$one-%3Emultiple_parts} for=%22{$one-%3Einput_id}%22{/if}%3E{$one-%3Ename}%0A				{if $one-%3Erequired_symbol}{$one-%3Erequired_symbol}{/if}%0A				%3C/label%3E%0A			{/if}%0A			{if $one-%3Emultiple_parts}%0A				{foreach $one-%3Einput as $part}%0A					{if $one-%3Elabel_parts}%0A						%3Cdiv%3E{$part-%3Einput}%26nbsp;{$part-%3Ename}%3C/div%3E%0A					{else}%0A						{$part-%3Einput}%0A					{/if}%0A					{if !empty($part-%3Eop)}{$part-%3Eop}{/if}%0A				{/foreach}%0A			{else}%0A				{if $one-%3Esmarty_eval}{eval var=$one-%3Einput}{else}{$one-%3Einput}{/if}%0A			{/if}%0A			{if !$one-%3Evalid} %26lt;--- {$one-%3Eerror}{/if}%0A			{if $one-%3Eneeds_div}%3C/div%3E{/if}%0A		{/if}%0A	{/strip}%0A	{/foreach}%0A	%3Cdiv class=%22submit_actions%22%3E{$prev} {$submit}%3C/div%3E%0A	{if $css_class}%3C/div%3E{/if}%0A{/if}</form_template>
+			<form_template>{if $form_done}%0A	{* section for displaying submission errors *}%0A	{if !empty($submission_error)}%0A		%3Cdiv class=%22error_message%22%3E{$submission_error}%3C/div%3E%0A		{if !empty($show_submission_errors)}%0A			%3Cdiv class=%22error_list%22%3E%3Cul%3E%0A	{foreach $submission_error_list as $one}%3Cli%3E{$one}%3C/li%3E{/foreach}%0A			%3C/ul%3E%3C/div%3E%0A		{/if}%0A	{/if}%0A{else}%0A	{* section for displaying the form, starting with validation errors *}%0A	{if !empty($form_has_validation_errors)}%0A		%3Cdiv class=%22error_message%22%3E%3Cul%3E%0A	{foreach $form_validation_errors as $one}%3Cli%3E{$one}%3C/li%3E{/foreach}%0A		%3C/ul%3E%3C/div%3E%0A	{/if}%0A	{* and now the form itself *}%0A	{if $css_class}%3Cdiv class=%22{$css_class}%22%3E{/if}%0A	{if $total_pages %3E 1}%3Cspan%3E{$title_page_x_of_y}%3C/span%3E{/if}%0A	{foreach $fields as $one}%0A	{strip}%0A		{if $one-%3Edisplay}%0A			{if $one-%3Eneeds_div}%3Cdiv%3E{/if}%0A			{if !$one-%3Ehide_name}%0A				%3Clabel{if !$one-%3Emultiple_parts} for=%22{$one-%3Einput_id}%22{/if}%3E{$one-%3Ename}%0A				{if $one-%3Erequired_symbol}{$one-%3Erequired_symbol}{/if}%0A				%3C/label%3E%0A			{/if}%0A			{if $one-%3Emultiple_parts}%0A				{foreach $one-%3Einput as $part}%0A				{if $one-%3Elabel_parts}%0A					%3Cdiv%3E{$part-%3Einput}%26nbsp;{$part-%3Ename}%3C/div%3E%0A				{else}%0A					{$part-%3Einput}%0A				{/if}%0A				{if !empty($part-%3Eop)}{$part-%3Eop}{/if}%0A				{/foreach}%0A			{else}%0A				{if $one-%3Esmarty_eval}{eval var=$one-%3Einput}{else}{$one-%3Einput}{/if}%0A			{/if}%0A			{if !$one-%3Evalid} %26lt;--- {$one-%3Eerror}{/if}%0A			{if $one-%3Eneeds_div}%3C/div%3E{/if}%0A		{/if}%0A	{/strip}%0A	{/foreach}%0A	%3Cdiv class=%22submit_actions%22%3E{$prev} {$submit}%3C/div%3E%0A	{if $css_class}%3C/div%3E{/if}%0A{/if}</form_template>
 			<list_delimiter>,</list_delimiter>
 			<next_button_text>Continue...</next_button_text>
 			<prev_button_text>Back...</prev_button_text>
@@ -33,108 +32,125 @@
 		</properties>
 		<fields>
 			<field>
-				<properties>
-					<field_id>1</field_id>
-					<name>Contact Fieldset</name>
-					<alias>contact_fiel</alias>
-					<type>FieldsetStart</type>
-					<order_by>1</order_by>
-					<legend>Contact</legend>
-				</properties>
+				<Alias>contact_fiel</Alias>
+				<Id>1</Id>
+				<Name>Contact Fieldset</Name>
+				<OrderBy>1</OrderBy>
+				<Type>FieldsetStart</Type>
+				<HideLabel>0</HideLabel>
+				<Required>0</Required>
+				<SmartyEval>0</SmartyEval>
+				<ValidationType>none</ValidationType>
+				<legend>Contact</legend>
 			</field>
 			<field>
-				<properties>
-					<field_id>2</field_id>
-					<name>Your Name</name>
-					<alias>your_name</alias>
-					<type>EmailSender</type>
-					<order_by>2</order_by>
-				</properties>
+				<Alias>your_name</Alias>
+				<Id>2</Id>
+				<Name>Your Name</Name>
+				<OrderBy>2</OrderBy>
+				<Type>EmailSender</Type>
+				<HideLabel>0</HideLabel>
+				<Required>0</Required>
+				<SmartyEval>0</SmartyEval>
+				<ValidationType>email</ValidationType>
 			</field>
 			<field>
-				<properties>
-					<field_id>3</field_id>
-					<name>Your Email Address</name>
-					<alias>your_email_a</alias>
-					<type>UserEmail</type>
-					<order_by>3</order_by>
-					<email_subject>Email from Site</email_subject>
-					<email_from_name>Power Forms</email_from_name>
-					<send_user_copy>c</send_user_copy>
-					<send_user_label>Send me a copy of form</send_user_label>
-					<email_template>PowerForms Submission%0ADate submitted: {$sub_date}%0AIP address from which the form was submitted: {$sub_source}%0AForm server: {$form_host}%0AURL of page containing form: {$form_url}%0AForm name: {$form_name}%0APowerForms version: {$version}%0A----------------------------------------------%0AYour name: {$your_name}%0AYour email address: {$your_email_a}%0ASubject: {$subject}%0AMessage: {$message}</email_template>
-					<email_encoding>utf-8</email_encoding>
-				</properties>
+				<Alias>your_email_a</Alias>
+				<Id>3</Id>
+				<Name>Your Email Address</Name>
+				<OrderBy>3</OrderBy>
+				<Type>UserEmail</Type>
+				<HideLabel>0</HideLabel>
+				<Required>0</Required>
+				<SmartyEval>0</SmartyEval>
+				<ValidationType>email</ValidationType>
+				<email_subject>Email from Site</email_subject>
+				<email_from_name>Power Forms</email_from_name>
+				<send_user_copy>c</send_user_copy>
+				<send_user_label>Send me a copy of form</send_user_label>
+				<email_template>PowerForms Submission%0ADate submitted: {$sub_date}%0AIP address from which the form was submitted: {$sub_source}%0AForm server: {$form_host}%0AURL of page containing form: {$form_url}%0AForm name: {$form_name}%0APowerForms version: {$version}%0A----------------------------------------------%0AYour name: {$your_name}%0AYour email address: {$your_email_a}%0ASubject: {$subject}%0AMessage: {$message}</email_template>
+				<email_encoding>utf-8</email_encoding>
 			</field>
 			<field>
-				<properties>
-					<field_id>4</field_id>
-					<name>Email Again</name>
-					<alias>email_again</alias>
-					<type>EmailAddressAgain</type>
-					<order_by>4</order_by>
-					<field_to_validate>Your Email Address</field_to_validate>
-				</properties>
+				<Alias>email_again</Alias>
+				<Id>4</Id>
+				<Name>Email Again</Name>
+				<OrderBy>4</OrderBy>
+				<Type>EmailAddressAgain</Type>
+				<HideLabel>0</HideLabel>
+				<Required>0</Required>
+				<SmartyEval>0</SmartyEval>
+				<ValidationType>email</ValidationType>
+				<field_to_validate>Your Email Address</field_to_validate>
 			</field>
 			<field>
-				<properties>
-					<field_id>5</field_id>
-					<name>Subject</name>
-					<alias>subject</alias>
-					<type>EmailSubject</type>
-					<order_by>5</order_by>
-				</properties>
+				<Alias>subject</Alias>
+				<Id>5</Id>
+				<Name>Subject</Name>
+				<OrderBy>5</OrderBy>
+				<Type>EmailSubject</Type>
+				<HideLabel>0</HideLabel>
+				<Required>0</Required>
+				<SmartyEval>0</SmartyEval>
+				<ValidationType>none</ValidationType>
 			</field>
 			<field>
-				<properties>
-					<field_id>6</field_id>
-					<name>Message</name>
-					<alias>message</alias>
-					<type>TextArea</type>
-					<order_by>6</order_by>
-					<rows>5</rows>
-					<cols>60</cols>
-					<default>Enter Your Message Here</default>
-					<clear_default>1</clear_default>
-					<required>1</required>
-				</properties>
+				<Alias>message</Alias>
+				<Id>6</Id>
+				<Name>Message</Name>
+				<OrderBy>6</OrderBy>
+				<Type>TextArea</Type>
+				<HideLabel>0</HideLabel>
+				<Required>0</Required>
+				<SmartyEval>0</SmartyEval>
+				<ValidationType>none</ValidationType>
+				<rows>5</rows>
+				<cols>60</cols>
+				<default>Enter Your Message Here</default>
+				<clear_default>1</clear_default>
 			</field>
 			<field>
-				<properties>
-					<field_id>7</field_id>
-					<name>Send To</name>
-					<alias>send_to</alias>
-					<type>SystemEmail</type>
-					<order_by>7</order_by>
-					<email_subject>Contact Form Submission</email_subject>
-					<email_from_name>Power Forms</email_from_name>
-					<email_from_address>me@overhere.com</email_from_address>
-					<destination_address>you@overthere.net</destination_address>
-					<html_email>1</html_email>
-					<email_encoding>utf-8</email_encoding>
-				</properties>
+				<Alias>send_to</Alias>
+				<Id>7</Id>
+				<Name>Send To</Name>
+				<OrderBy>7</OrderBy>
+				<Type>SystemEmail</Type>
+				<HideLabel>0</HideLabel>
+				<Required>0</Required>
+				<SmartyEval>0</SmartyEval>
+				<ValidationType>email</ValidationType>
+				<email_subject>Contact Form Submission</email_subject>
+				<email_from_name>Power Forms</email_from_name>
+				<email_from_address>me@overhere.com</email_from_address>
+				<html_email>1</html_email>
+				<email_encoding>utf-8</email_encoding>
+				<destination_address1>you@overthere.net</destination_address1>
 			</field>
 			<field>
-				<properties>
-					<field_id>8</field_id>
-					<name>fieldset end</name>
-					<alias>fieldset_end</alias>
-					<type>FieldsetEnd</type>
-					<order_by>8</order_by>
-				</properties>
+				<Alias>fieldset_end</Alias>
+				<Id>8</Id>
+				<Name>fieldset end</Name>
+				<OrderBy>8</OrderBy>
+				<Type>FieldsetEnd</Type>
+				<HideLabel>0</HideLabel>
+				<Required>0</Required>
+				<SmartyEval>0</SmartyEval>
+				<ValidationType>none</ValidationType>
 			</field>
 			<field>
-				<properties>
-					<field_id>9</field_id>
-					<name>Captcha</name>
-					<alias>captcha</alias>
-					<type>Captcha</type>
-					<order_by>9</order_by>
-					<aslabel>1</aslabel>
-					<prompt>Please enter the text from the image</prompt>
-					<wrongtext>The entered text was not correct</wrongtext>
-					<captcha_template>{$prompt}%3Cbr /%3E{$captcha_input}%3Cbr /%3E{$captcha}</captcha_template>
-				</properties>
+				<Alias>captcha</Alias>
+				<Id>9</Id>
+				<Name>Captcha</Name>
+				<OrderBy>9</OrderBy>
+				<Type>Captcha</Type>
+				<HideLabel>0</HideLabel>
+				<Required>1</Required>
+				<SmartyEval>0</SmartyEval>
+				<ValidationType>none</ValidationType>
+				<aslabel>1</aslabel>
+				<prompt>Please enter the text from the image</prompt>
+				<wrongtext>The entered text was not correct</wrongtext>
+				<captcha_template>{$prompt}%3Cbr /%3E{$captcha_input}%3Cbr /%3E{$captcha}</captcha_template>
 			</field>
 		</fields>
 	</form>

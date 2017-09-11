@@ -35,7 +35,7 @@ class yac extends CacheBase implements CacheInterface
 		return TRUE;
 	}
 
-	public function _newsert($keyword, $value, $lifetime= FALSE)
+	public function _newsert($keyword, $value, $lifetime=FALSE)
 	{
 		if ($this->_has($keyword)) {
 			return FALSE;
@@ -43,7 +43,7 @@ class yac extends CacheBase implements CacheInterface
 		return $this->client->set($keyword, serialize($value), (int)$lifetime);
 	}
 
-	public function _upsert($keyword, $value, $lifetime= FALSE)
+	public function _upsert($keyword, $value, $lifetime=FALSE)
 	{
 		return $this->client->set($keyword, serialize($value), (int)$lifetime);
 	}

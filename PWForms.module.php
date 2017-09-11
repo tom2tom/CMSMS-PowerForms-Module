@@ -1,21 +1,21 @@
 <?php
-#------------------------------------------------------------------------
-# This is CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <@>
-# Derived in part from FormBuilder module, copyright (C) 2005-2012, Samuel Goldstein <sjg@cmsmodules.com>
-# This project's forge-page is: http://dev.cmsmadesimple.org/projects/powerforms
-#
-# This module is free software. You can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, either version 3 of that License, or (at your option)
-# any later version.
-#
-# This module is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Affero General Public License for more details.
-# Read the License online: http://www.gnu.org/licenses/licenses.html#AGPL
-#-----------------------------------------------------------------------
+/*
+This is CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <@>
+Derived in part from FormBuilder module, copyright (C) 2005-2012, Samuel Goldstein <sjg@cmsmodules.com>
+This project's forge-page is: http://dev.cmsmadesimple.org/projects/powerforms
+
+This module is free software. You can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of that License, or (at your option)
+any later version.
+
+This module is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+Read the License online: http://www.gnu.org/licenses/licenses.html#AGPL
+*/
 
 class PWForms extends CMSModule
 {
@@ -356,26 +356,6 @@ class PWForms extends CMSModule
 		} else {
 			return 'maintab';
 		}
-	}
-
-	public function _GetFormData(&$params=NULL)
-	{
-		$fd = new PWForms\FormData();
-
-		$fd->formsmodule =& $this;
-		list($fd->current_prefix, $fd->prior_prefix) = $this->_GetTokens();
-
-		if ($params == NULL) {
-			return $fd;
-		}
-
-		if (isset($params['form_id'])) {
-			$fd->Id = (int)$params['form_id'];
-		}
-		if (isset($params['form_alias'])) {
-			$fd->Alias = trim($params['form_alias']);
-		}
-		return $fd;
 	}
 
 	/*

@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -15,11 +16,39 @@ class SiteAdmin extends FieldBase
 		$this->IsInput = TRUE;
 		$this->Type = 'SiteAdmin';
 //		$this->ValidationType = 'notempty';
+//		$this->ValidationTypes = [label=>'none', label=>'notempty'];
 	}
 
-	public function buildList($select= FALSE)
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
 	{
-		$mod = $this->formdata->formsmodule;
+		return parent::GetMutables($nobase) + [
+		'show_userfirstname' => 10,
+		'show_userlastname' => 10,
+		'show_username' => 10,
+		'group' => 12, //TODO CHECKME type
+		'select_label' => 12,
+		'active_only' => 10,
+		'restrict_to_group' => 10,
+		];
+	}
+
+	public function GetSynopsis()
+	{
+		$ret = '';
+		if ($this->GetProperty('restrict_to_group', 0)) {
+			$groupops = \cmsms()->GetGroupOperations();
+			$group = $groupops->LoadGroupByID($this->GetProperty('group'));
+			if ($group && isset($group->name)) {
+				$mod = $this->formdata->pwfmod;
+				$ret .= $mod->Lang('restricted_to_group', $group->name);
+			}
+		}
+		return $ret;
+	}
+
+	public function buildList($select=FALSE)
+	{
+		$mod = $this->formdata->pwfmod;
 		$userops = \cmsms()->GetUserOperations();
 		if ($this->GetProperty('restrict_to_group', 0)) {
 			$userlist = $userops->LoadUsersInGroup($this->GetProperty('group'));
@@ -33,7 +62,7 @@ class SiteAdmin extends FieldBase
 			$u = $this->GetProperty('show_username', 0);
 			$choices = [];
 			if ($select) {
-				$choices[' '.$this->GetProperty('select_one', $mod->Lang('select_one'))] = -1;
+				$choices[' '.$this->GetProperty('select_label', $mod->Lang('select_one'))] = -1;
 			}
 			$indx = 1;
 			for ($i=0; $i<$c; $i++) {
@@ -69,7 +98,7 @@ class SiteAdmin extends FieldBase
 		}
 		if (!$ret) {
 			$ret = $this->GetFormProperty('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
+				$this->formdata->pwfmod->Lang('unspecified'));
 		}
 
 		if ($as_string) {
@@ -77,20 +106,6 @@ class SiteAdmin extends FieldBase
 		} else {
 			return [$ret];
 		}
-	}
-
-	public function GetSynopsis()
-	{
-		$ret = '';
-		if ($this->GetProperty('restrict_to_group', 0)) {
-			$groupops = \cmsms()->GetGroupOperations();
-			$group = $groupops->LoadGroupByID($this->GetProperty('group'));
-			if ($group && isset($group->name)) {
-				$mod = $this->formdata->formsmodule;
-				$ret .= $mod->Lang('restricted_to_group', $group->name);
-			}
-		}
-		return $ret;
 	}
 
 	public function AdminPopulate($id)
@@ -102,10 +117,10 @@ class SiteAdmin extends FieldBase
 		}
 
 		list($main, $adv) = $this->AdminPopulateCommon($id);
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_select_one_message'),
-					$mod->CreateInputText($id, 'fp_select_one',
-					$this->GetProperty('select_one', $mod->Lang('select_one')), 25, 128)];
+					$mod->CreateInputText($id, 'fp_select_label',
+					$this->GetProperty('select_label', $mod->Lang('select_one')), 25, 128)];
 		$main[] = [$mod->Lang('title_show_userfirstname'),
 					$mod->CreateInputHidden($id, 'fp_show_userfirstname', 0).
 					$mod->CreateInputCheckbox($id, 'fp_show_userfirstname', 1,
@@ -135,7 +150,7 @@ class SiteAdmin extends FieldBase
 	{
 		$choices = $this->buildList(TRUE);
 		if ($choices) {
-			$mod = $this->formdata->formsmodule;
+			$mod = $this->formdata->pwfmod;
 			$tmp = $mod->CreateInputDropdown(
 				$id, $this->formdata->current_prefix.$this->Id, $choices, -1, $this->Value,
 				'id="'.$this->GetInputId().'"'.$this->GetScript());
@@ -151,9 +166,9 @@ class SiteAdmin extends FieldBase
 			$this->ValidationMessage = '';
 		} else {
 			$val = FALSE;
-			$this->ValidationMessage = $this->formdata->formsmodule->Lang('missing_type', $mod->Lang('admin'));
+			$this->ValidationMessage = $this->formdata->pwfmod->Lang('missing_type', $mod->Lang('admin'));
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 }

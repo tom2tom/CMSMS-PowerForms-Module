@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -16,16 +17,30 @@ class CheckboxExtended extends FieldBase
 		$this->IsInput = TRUE;
 		$this->Type = 'CheckboxExtended';
 		$this->ValidationType = 'none';
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_empty')=>'empty'];
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'is_checked' => 10,
+		'checked_value' => 14,
+		'unchecked_value' => 14,
+		'box_label' => 12,
+		'text_label' => 12,
+		'show_textfield' => 10,
+		];
+	}
+
 	public function GetSynopsis()
 	{
-		$mod = $this->formdata->formsmodule;
-		$ret = ($this->GetProperty('is_checked', 0)?$mod->Lang('checked_by_default'):$mod->Lang('unchecked_by_default'));
+		$mod = $this->formdata->pwfmod;
+		$ret = ($this->GetProperty('is_checked', 0) ?
+			$mod->Lang('checked_by_default'):
+			$mod->Lang('unchecked_by_default'));
 		if ($this->ValidationType) {
 //			$this->EnsureArray($this->ValidationTypes);
 			if (is_object($this->ValidationTypes)) {
@@ -38,7 +53,7 @@ class CheckboxExtended extends FieldBase
 
 	public function DisplayableValue($as_string=TRUE)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$val = $this->Value;
 
 		if ($val['box']) {
@@ -61,28 +76,28 @@ class CheckboxExtended extends FieldBase
 	public function AdminPopulate($id)
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id, 'title_field_required');
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 
 		$main[] = [$mod->Lang('title_checkbox_label'),
-						$mod->CreateInputText($id, 'fp_box_label',
-							$this->GetProperty('box_label'), 25, 255)];
+					$mod->CreateInputText($id, 'fp_box_label',
+						$this->GetProperty('box_label'), 25, 255)];
 		$main[] = [$mod->Lang('title_checked_value'),
-						$mod->CreateInputText($id, 'fp_checked_value',
-							$this->GetProperty('checked_value', $mod->Lang('yes')), 25, 255)];
+					$mod->CreateInputText($id, 'fp_checked_value',
+						$this->GetProperty('checked_value', $mod->Lang('yes')), 25, 255)];
 		$main[] = [$mod->Lang('title_unchecked_value'),
-						$mod->CreateInputText($id, 'fp_unchecked_value',
-							$this->GetProperty('unchecked_value', $mod->Lang('no')), 25, 255)];
+					$mod->CreateInputText($id, 'fp_unchecked_value',
+						$this->GetProperty('unchecked_value', $mod->Lang('no')), 25, 255)];
 		$main[] = [$mod->Lang('checked_by_default'),
-						$mod->CreateInputHidden($id, 'fp_is_checked', 0).
-						$mod->CreateInputCheckbox($id, 'fp_is_checked', 1,
-							$this->GetProperty('is_checked', 0))];
+					$mod->CreateInputHidden($id, 'fp_is_checked', 0).
+					$mod->CreateInputCheckbox($id, 'fp_is_checked', 1,
+						$this->GetProperty('is_checked', 0))];
 		$main[] = [$mod->Lang('title_textfield_label'),
-						$mod->CreateInputText($id, 'fp_text_label',
-							$this->GetProperty('text_label'), 25, 255)];
+					$mod->CreateInputText($id, 'fp_text_label',
+						$this->GetProperty('text_label'), 25, 255)];
 		$main[] = [$mod->Lang('title_show_textfield'),
-						$mod->CreateInputHidden($id, 'fp_show_textfield', 0).
-						$mod->CreateInputCheckbox($id, 'fp_show_textfield', 1,
-							$this->GetProperty('show_textfield', 0))];
+					$mod->CreateInputHidden($id, 'fp_show_textfield', 0).
+					$mod->CreateInputCheckbox($id, 'fp_show_textfield', 1,
+						$this->GetProperty('show_textfield', 0))];
 		return ['main'=>$main,'adv'=>$adv];
 	}
 
@@ -92,11 +107,11 @@ class CheckboxExtended extends FieldBase
 		$sf = ($show)?'_0':'';
 		$tid = $this->GetInputId($sf);
 
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$js = $this->GetScript();
 		$ret = [];
 
-		$hidden = $this->formdata->formsmodule->CreateInputHidden(
+		$hidden = $this->formdata->pwfmod->CreateInputHidden(
 			$id, $this->formdata->current_prefix.$this->Id, 0);
 
 		$oneset = new \stdClass();
@@ -171,11 +186,11 @@ class CheckboxExtended extends FieldBase
 		 case 'empty':
 			if (empty($this->Value['text'])) {
 				$val = FALSE;
-				$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_a_value', $this->GetProperty('text_label'));
+				$this->ValidationMessage = $this->formdata->pwfmod->Lang('enter_a_value', $this->GetProperty('text_label'));
 			}
 			break;
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 }

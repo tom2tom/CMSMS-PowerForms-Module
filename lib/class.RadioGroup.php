@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -21,14 +22,77 @@ class RadioGroup extends FieldBase
 		$this->Type = 'RadioGroup';
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		$ret = parent::GetMutables($nobase) + ['radio_separator' => 12];
+
+		$mkey1 = 'button_name';
+		$mkey2 = 'button_checked'; //aka value when checked
+		$mkey3 = 'button_is_set'; //aka initially checked
+		if ($actual) {
+			$opt = $this->GetPropArray($mkey1);
+			if ($opt) {
+				$suff = array_keys($opt);
+			} else {
+				return $ret;
+			}
+		} else {
+			$suff = range(1, 10);
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey1.$one] = 12;
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey2.$one] = 14;
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey3.$one] = 10;
+		}
+		return $ret;
+	}
+
+	public function GetSynopsis()
+	{
+		$def = '';
+		$opt = $this->GetPropArray('button_is_set');
+		if ($opt) {
+			$optionCount = count($opt);
+			foreach ($opt as $i=>$val) {
+				if ($val == 'y') {
+					$def = ',default value '.$this->GetPropIndexed('button_checked', $i); //TODO $lang[]
+					break;
+				}
+			}
+		} else {
+			$optionCount = 0;
+		}
+		$ret = $this->formdata->pwfmod->Lang('options', $optionCount).$def;
+		return $ret;
+	}
+
+	public function DisplayableValue($as_string=TRUE)
+	{
+		if ($this->Value) {
+			$ret = $this->GetPropIndexed('button_checked', $this->Value);
+		} else {
+			$ret = $this->GetFormProperty('unspecified',
+				$this->formdata->pwfmod->Lang('unspecified'));
+		}
+		if ($as_string) {
+			return $ret;
+		} else {
+			return [$ret];
+		}
+	}
+
 	public function ComponentAddLabel()
 	{
-		return $this->formdata->formsmodule->Lang('add_options');
+		return $this->formdata->pwfmod->Lang('add_options');
 	}
 
 	public function ComponentDeleteLabel()
 	{
-		return $this->formdata->formsmodule->Lang('delete_options');
+		return $this->formdata->pwfmod->Lang('delete_options');
 	}
 
 	public function HasComponentAdd()
@@ -77,44 +141,10 @@ class RadioGroup extends FieldBase
 		}
 	}
 
-	public function DisplayableValue($as_string=TRUE)
-	{
-		if ($this->Value) {
-			$ret = $this->GetPropIndexed('button_checked', $this->Value);
-		} else {
-			$ret = $this->GetFormProperty('unspecified',
-				$this->formdata->formsmodule->Lang('unspecified'));
-		}
-		if ($as_string) {
-			return $ret;
-		} else {
-			return [$ret];
-		}
-	}
-
-	public function GetSynopsis()
-	{
-		$def = '';
-		$opt = $this->GetPropArray('button_is_set');
-		if ($opt) {
-			$optionCount = count($opt);
-			foreach ($opt as $i=>$val) {
-				if ($val == 'y') {
-					$def = ',default value '.$this->GetPropIndexed('button_checked', $i); //TODO $lang[]
-					break;
-				}
-			}
-		} else {
-			$optionCount = 0;
-		}
-		$ret = $this->formdata->formsmodule->Lang('options', $optionCount).$def;
-		return $ret;
-	}
-
 	public function AdminPopulate($id)
 	{
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
-		$mod = $this->formdata->formsmodule;
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE);
+		$mod = $this->formdata->pwfmod;
 
 		$main[] = [$mod->Lang('title_radio_separator'),
 						$mod->CreateInputText($id, 'fp_radio_separator',
@@ -177,7 +207,7 @@ EOS;
 		if (!$ret) {
 			$messages[] = $msg;
 		}
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$sets = $this->GetPropArray('button_is_set');
 		if ($sets) {
 			foreach ($sets as $val) {
@@ -219,7 +249,7 @@ EOS;
 		$names = $this->GetPropArray('button_name');
 		if ($names) {
 			$ret = [];
-			$mod = $this->formdata->formsmodule;
+			$mod = $this->formdata->pwfmod;
 			$sep = $this->GetProperty('radio_separator', '&nbsp;&nbsp;');
 			$cnt = count($names);
 			$b = 1;

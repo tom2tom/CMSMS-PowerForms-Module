@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -16,7 +17,7 @@ class Passphrase extends FieldBase
 		$this->Required = TRUE;
 		$this->Type = 'Passphrase';
 		$this->ValidationType = 'none';
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_minlength')=>'length',
@@ -25,9 +26,23 @@ class Passphrase extends FieldBase
 		];
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'delay' => 11,
+		'rows' => 11,
+		'cols' => 11,
+		'length' => 11,
+		'min_length' => 11,
+		'style' => 12,
+		'masker' => 12,
+		'regex' => 12,
+		];
+	}
+
 	public function GetSynopsis()
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$ret = $mod->Lang('abbreviation_length', $this->GetProperty('min_length', '8'));
 		if ($this->ValidationType) {
 			//			$this->EnsureArray($this->ValidationTypes);
@@ -37,20 +52,20 @@ class Passphrase extends FieldBase
 			$ret .= ','.array_search($this->ValidationType, $this->ValidationTypes);
 		}
 		$ret .= ','.$mod->Lang('rows', $this->GetProperty('rows', 2)).
-		','.$mod->Lang('columns', $this->GetProperty('columns', 40));
+		','.$mod->Lang('columns', $this->GetProperty('cols', 40));
 		return $ret;
 	}
 
 	public function AdminPopulate($id)
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id);
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_minimum_length'),
-						$mod->CreateInputText($id, 'fp_min_length', $this->GetProperty('min_length', 8), 3, 3)];
+					$mod->CreateInputText($id, 'fp_min_length', $this->GetProperty('min_length', 8), 3, 3)];
 		$main[] = [$mod->Lang('title_textarea_rows'),
-						$mod->CreateInputText($id, 'fp_rows', $this->GetProperty('rows', 2), 2, 2)];
+					$mod->CreateInputText($id, 'fp_rows', $this->GetProperty('rows', 2), 2, 2)];
 		$main[] = [$mod->Lang('title_textarea_cols'),
-						$mod->CreateInputText($id, 'fp_columns', $this->GetProperty('columns', 40), 3, 3)];
+					$mod->CreateInputText($id, 'fp_columns', $this->GetProperty('cols', 40), 3, 3)];
 		$choices = [
 		'*****'=>'all',
 		'*1234'=>'credit',
@@ -59,18 +74,18 @@ class Passphrase extends FieldBase
 		'*******4'=>'see1'
 		];
 		$main[] = [$mod->Lang('title_cloak_type'),
-						$mod->CreateInputDropdown($id, 'fp_style', $choices, -1, $this->GetProperty('style', 'all'))];
+					$mod->CreateInputDropdown($id, 'fp_style', $choices, -1, $this->GetProperty('style', 'all'))];
 
 		$adv[] = [$mod->Lang('title_field_regex'),
-						$mod->CreateInputText($id, 'fp_regex',
+					$mod->CreateInputText($id, 'fp_regex',
 							$this->GetProperty('regex'), 25, 1024),
-						$mod->Lang('help_regex_use')];
+					$mod->Lang('help_regex_use')];
 		return ['main'=>$main,'adv'=>$adv];
 	}
 
 	public function Populate($id, &$params)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$baseurl = $mod->GetModuleURLPath();
 		$this->formdata->Jscript->jsincs['cloak'] = <<<EOS
 <script type="text/javascript" src="{$baseurl}/lib/js/jquery-inputCloak.min.js"></script>
@@ -87,7 +102,7 @@ EOS;
  });
 EOS;
 		$rows = $this->GetProperty('rows', 2) * 1.2;
-		$cols = $this->GetProperty('columns', 40);
+		$cols = $this->GetProperty('cols', 40);
 		$add = ' style="overflow:auto;height:'.$rows.'em;width:'.$cols.'em;"';
 
 		$tmp = $mod->CreateTextArea(FALSE, $id,
@@ -106,7 +121,7 @@ EOS;
 
 		$val = TRUE;
 		$this->ValidationMessage = '';
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		switch ($this->ValidationType) {
 		 case 'none':
 			break;
@@ -132,7 +147,7 @@ EOS;
 			}
 			break;
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 }

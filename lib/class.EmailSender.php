@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -16,27 +17,42 @@ class EmailSender extends EmailBase
 		$this->Type = 'EmailSender';
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'clear_default' => 10,
+		'default' => 12,
+		'headers_to_modify' => 12,
+		'html5' => 10,
+		];
+	}
+
+/*	public function GetSynopsis()
+	{
+ 		return $this->formdata->pwfmod->Lang('').': STUFF';
+	}
+*/
 	public function AdminPopulate($id)
 	{
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
-		$mod = $this->formdata->formsmodule;
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE);
+		$mod = $this->formdata->pwfmod;
 		$choices = [$mod->Lang('option_from')=>'f',$mod->Lang('option_reply')=>'r',$mod->Lang('option_both')=>'b'];
-		
+
+		$main[] = [$mod->Lang('title_field_default_value'),
+					$mod->CreateInputText($id, 'fp_default',
+						$this->GetProperty('default'), 30, 1024)];
+		$main[] = [$mod->Lang('title_clear_default'),
+					$mod->CreateInputHidden($id, 'fp_clear_default', 0).
+					$mod->CreateInputCheckbox($id, 'fp_clear_default', 1,
+						$this->GetProperty('clear_default', 0)),
+					$mod->Lang('help_clear_default')];
 		$main[] = [$mod->Lang('title_headers_to_modify'),
-						$mod->CreateInputDropdown($id, 'fp_headers_to_modify', $choices, -1,
-							$this->GetProperty('headers_to_modify', 'b'))];
-		$adv[] = [$mod->Lang('title_field_default_value'),
-						$mod->CreateInputText($id, 'fp_default',
-							$this->GetProperty('default'), 25, 1024)];
-		$adv[] = [$mod->Lang('title_clear_default'),
-						$mod->CreateInputHidden($id, 'fp_clear_default', 0).
-						$mod->CreateInputCheckbox($id, 'fp_clear_default', 1,
-							$this->GetProperty('clear_default', 0)),
-						$mod->Lang('help_clear_default')];
+					$mod->CreateInputDropdown($id, 'fp_headers_to_modify', $choices, -1,
+						$this->GetProperty('headers_to_modify', 'b'))];
 		$adv[] = [$mod->Lang('title_html5'),
-						$mod->CreateInputHidden($id, 'fp_html5', 0).
-						$mod->CreateInputCheckbox($id, 'fp_html5', 1,
-							$this->GetProperty('html5', 0))];
+					$mod->CreateInputHidden($id, 'fp_html5', 0).
+					$mod->CreateInputCheckbox($id, 'fp_html5', 1,
+						$this->GetProperty('html5', 0))];
 		return ['main'=>$main,'adv'=>$adv];
 	}
 
@@ -50,7 +66,7 @@ class EmailSender extends EmailBase
 			$addr = ($this->HasValue()) ? $this->Value : $this->GetProperty('default');
 			$place = '';
 		}
-		$tmp = $this->formdata->formsmodule->CreateInputEmail(
+		$tmp = $this->formdata->pwfmod->CreateInputEmail(
 			$id, $this->formdata->current_prefix.$this->Id,
 			htmlspecialchars($addr, ENT_QUOTES), 25, 128,
 			$place.$this->GetScript());

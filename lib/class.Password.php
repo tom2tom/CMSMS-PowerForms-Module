@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -16,7 +17,7 @@ class Password extends FieldBase
 		$this->Required = TRUE;
 		$this->Type = 'Password';
 		$this->ValidationType = 'none';
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_minlength')=>'length',
@@ -26,9 +27,21 @@ class Password extends FieldBase
 		];
 	}
 
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'hide' => 10,
+		'readonly' => 10,
+		'length' => 11,
+		'min_length' => 11,
+		'min_strength' => 11,
+		'regex' => 12,
+		];
+	}
+
 	public function GetSynopsis()
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$ret = $mod->Lang('abbreviation_length', $this->GetProperty('length', '80'));
 		if ($this->ValidationType) {
 //			$this->EnsureArray($this->ValidationTypes);
@@ -46,7 +59,7 @@ class Password extends FieldBase
 	public function AdminPopulate($id)
 	{
 		list($main, $adv) = $this->AdminPopulateCommon($id);
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_display_length'),
 						$mod->CreateInputText($id, 'fp_length',
 							$this->GetProperty('length', 12), 3, 3)];
@@ -76,7 +89,7 @@ class Password extends FieldBase
 
 	public function Populate($id, &$params)
 	{
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		if ($this->GetProperty('readonly', 0)) {
 			$ro = ' readonly="readonly"';
 		} else {
@@ -104,7 +117,7 @@ class Password extends FieldBase
 		}
 		$val = TRUE;
 		$this->ValidationMessage = '';
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		switch ($this->ValidationType) {
 		 case 'none':
 			break;
@@ -137,7 +150,7 @@ class Password extends FieldBase
 			}
 			break;
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 }

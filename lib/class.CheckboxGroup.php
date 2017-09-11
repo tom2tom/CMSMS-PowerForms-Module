@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -15,25 +16,71 @@ class CheckboxGroup extends FieldBase
 	{
 		parent::__construct($formdata, $params);
 		$this->IsInput = TRUE;
+		$this->LabelSubComponents = TRUE;
 		$this->MultiComponent = TRUE;
 		$this->Type = 'CheckboxGroup';
 		$this->ValidationType = 'none';
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
-			$mod->Lang('validation_empty')=>'empty'];
+			$mod->Lang('validation_empty')=>'empty'
+		];
+	}
+
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		$ret = parent::GetMutables($nobase) + [
+		'text_label' => 12, //TODO CHECK usage
+		'no_empty' => 10, // submit only the checked ones
+		'single_check' => 10, // 1-only checked
+		];
+
+		$mkey1 = 'box_name';
+		$mkey2 = 'box_checked'; //aka return-value when checked
+		$mkey3 = 'box_unchecked';//aka return-value when unchecked
+		$mkey4 = 'box_is_set'; //aka initially checked (not boolean)
+		if ($actual) {
+			$opt = $this->GetPropArray($mkey1);
+			if ($opt) {
+				$suff = array_keys($opt);
+			} else {
+				return $ret;
+			}
+		} else {
+			$suff = range(1, 10);
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey1.$one] = 12;
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey2.$one] = 12;
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey3.$one] = 12;
+		}
+		foreach ($suff as $one) {
+			$ret[$mkey4.$one] = 12;
+		}
+		return $ret;
+	}
+
+	public function GetSynopsis()
+	{
+		$opt = $this->GetPropArray('box_name');
+		$num = ($opt) ? count($opt) : 0;
+		return $this->formdata->pwfmod->Lang('boxes', $num);
 	}
 
 	// Get add-button label
 	public function ComponentAddLabel()
 	{
-		return $this->formdata->formsmodule->Lang('add_checkboxes');
+		return $this->formdata->pwfmod->Lang('add_checkboxes');
 	}
 
 	// Get delete-button label
 	public function ComponentDeleteLabel()
 	{
-		return $this->formdata->formsmodule->Lang('delete_checkboxes');
+		return $this->formdata->pwfmod->Lang('delete_checkboxes');
 	}
 
 	public function HasComponentAdd()
@@ -118,17 +165,10 @@ class CheckboxGroup extends FieldBase
 		return ''; //TODO upspecified
 	}
 
-	public function GetSynopsis()
-	{
-		$opt = $this->GetPropArray('box_name');
-		$num = ($opt) ? count($opt) : 0;
-		return $this->formdata->formsmodule->Lang('boxes', $num);
-	}
-
 	public function AdminPopulate($id)
 	{
-		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, TRUE);
-		$mod = $this->formdata->formsmodule;
+		list($main, $adv) = $this->AdminPopulateCommon($id, FALSE, FALSE);
+		$mod = $this->formdata->pwfmod;
 		$main[] = [$mod->Lang('title_no_empty'),
 						$mod->CreateInputHidden($id, 'fp_no_empty', 0).
 						$mod->CreateInputCheckbox($id, 'fp_no_empty', 1,
@@ -140,9 +180,9 @@ class CheckboxGroup extends FieldBase
 							$this->GetProperty('single_check', 0)),
 						$mod->Lang('help_single_check')];
 		$adv[] = [$mod->Lang('title_field_includelabels'),
-						$mod->CreateInputHidden($id, 'fp_include_labels', 0).
-						$mod->CreateInputCheckbox($id, 'fp_include_labels', 1,
-							$this->GetProperty('include_labels', 0)),
+						$mod->CreateInputHidden($id, 'fp_LabelSubComponents', 0).
+						$mod->CreateInputCheckbox($id, 'fp_LabelSubComponents', 1,
+							$this->LabelSubComponents),
 						$mod->Lang('help_field_includelabels')];
 
 		if ($this->boxAdd) {
@@ -199,6 +239,8 @@ EOS;
 
 	public function PostAdminAction(&$params)
 	{
+		$this->LabelSubComponents = $params['fp_LabelSubComponents'] + 0;
+
 		//cleanup empties
 		$names = $this->GetPropArray('box_name');
 		if ($names) {
@@ -218,7 +260,7 @@ EOS;
 	{
 		$names = $this->GetPropArray('box_name');
 		if ($names) {
-			$mod = $this->formdata->formsmodule;
+			$mod = $this->formdata->pwfmod;
 			$hidden = $mod->CreateInputHidden(
 				$id, $this->formdata->current_prefix.$this->Id, 0);
 
@@ -295,11 +337,11 @@ EOS;
 		 case 'empty':
 			if (0) { //TODO
 				$val = FALSE;
-				$this->ValidationMessage = $this->formdata->formsmodule->Lang('TODO', $this->GetProperty('text_label'));
+				$this->ValidationMessage = $this->formdata->pwfmod->Lang('TODO', $this->GetProperty('text_label'));
 			}
 			break;
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 }

@@ -1,9 +1,10 @@
 <?php
-# This file is part of CMS Made Simple module: PWForms
-# Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
-# Derived in part from FormBuilder-module file (C) 2005-2012 Samuel Goldstein <sjg@cmsmodules.com>
-# Refer to licence and other details at the top of file PWForms.module.php
-# More info at http://dev.cmsmadesimple.org/projects/powerforms
+/*
+This file is part of CMS Made Simple module: PWForms
+Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
+Refer to licence and other details at the top of file PWForms.module.php
+More info at http://dev.cmsmadesimple.org/projects/powerforms
+*/
 
 namespace PWForms;
 
@@ -15,10 +16,23 @@ class TextArea extends FieldBase
 		$this->IsInput = TRUE;
 		$this->Type = 'TextArea';
 		$this->ValidationType = 'none';
-		$mod = $formdata->formsmodule;
+		$mod = $formdata->pwfmod;
 		$this->ValidationTypes = [
 			$mod->Lang('validation_none')=>'none',
 			$mod->Lang('validation_length')=>'length'
+		];
+	}
+
+	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	{
+		return parent::GetMutables($nobase) + [
+		'cols' => 11,
+		'rows' => 11,
+		'length' => 11,
+		'default' => 12,
+		'clear_default' => 10,
+		'html5' => 10,
+		'wysiwyg' => 10,
 		];
 	}
 
@@ -40,7 +54,7 @@ class TextArea extends FieldBase
 			$ret .= ' non-wysiwyg';
 		}
 
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		$ret .= ','.$mod->Lang('rows', $this->GetProperty('rows', 15)).
 		','.$mod->Lang('cols', $this->GetProperty('cols', 80));
 
@@ -51,7 +65,7 @@ class TextArea extends FieldBase
 	{
 		//omit "javascript" TODO why ? maybe justified if we add our own (for autogrow)
 		list($main, $adv) = $this->AdminPopulateCommon($id, 'title_field_javascript');
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 
 		$main[] = [$mod->Lang('title_use_wysiwyg'),
 					$mod->CreateInputHidden($id, 'fp_wysiwyg', 0).
@@ -61,16 +75,16 @@ class TextArea extends FieldBase
 		$main[] = [$mod->Lang('title_textarea_cols'),
 					$mod->CreateInputText($id, 'fp_cols', $this->GetProperty('cols'), 5, 5),
 					$mod->Lang('help_textarea_cols')];
-		$main[] = [$mod->Lang('title_textarea_length'),
-					$mod->CreateInputText($id, 'fp_length', $this->GetProperty('length'), 5, 5),
-					$mod->Lang('help_limit_count')];
-		$adv[] = [$mod->Lang('title_field_default_value'),
+		$main[] = [$mod->Lang('title_field_default_value'),
 					$mod->CreateTextArea(FALSE, $id, $this->GetProperty('default'), 'fp_default',
-					'pwf_tallarea', '', '', '', 50, 15)];
+					'pwf_shortarea', '', '', '', 50, 8)];
 		$adv[] = [$mod->Lang('title_clear_default'),
 					$mod->CreateInputHidden($id, 'fp_clear_default', 0).
 					$mod->CreateInputCheckbox($id, 'fp_clear_default', 1, $this->GetProperty('clear_default', 0)),
 					$mod->Lang('help_clear_default')];
+		$main[] = [$mod->Lang('title_textarea_length'),
+					$mod->CreateInputText($id, 'fp_length', $this->GetProperty('length'), 5, 5),
+					$mod->Lang('help_limit_count')];
 		$adv[] = [$mod->Lang('title_html5'),
 					$mod->CreateInputHidden($id, 'fp_html5', 0).
 					$mod->CreateInputCheckbox($id, 'fp_html5', 1, $this->GetProperty('html5', 0))];
@@ -90,7 +104,7 @@ class TextArea extends FieldBase
 		$htmlid = $id.$this->GetInputId(); //html may get id="$id.$htmlid", or maybe not ...
 		$clear = $this->GetProperty('clear_default', 0);
 //TODO make this auto-grow see http://www.impressivewebs.com/textarea-auto-resize
-		$mod = $this->formdata->formsmodule;
+		$mod = $this->formdata->pwfmod;
 		if ($this->GetProperty('html5', 0)) {
 			$tmp = $mod->CreateTextArea($wysiwyg, $id,
 				$this->Value,
@@ -137,11 +151,11 @@ EOS;
 		if (is_numeric($length) && $length > 0) {
 			if ((strlen($this->Value)-1) > $length) {
 				$val = FALSE;
-				$this->ValidationMessage = $this->formdata->formsmodule->Lang('enter_no_longer', $length);
+				$this->ValidationMessage = $this->formdata->pwfmod->Lang('enter_no_longer', $length);
 			}
 			$this->Value = substr($this->Value, 0, $length+1);
 		}
-		$this->SetStatus('valid', $val);
+		$this->SetProperty('valid', $val);
 		return [$val, $this->ValidationMessage];
 	}
 }
