@@ -300,12 +300,12 @@ EOS;
 						break;
 					 case 14:
 						if ($val === NULL || is_scalar($val)) {
-	//TODO check mixed value & process accordingly
+							if (is_numeric($val)) {
+								$val += 0;
+							}
 						} else {
 							$val = serialize($val);
 						}
-						//no break here
-					 default:
 					}
 					$props[$key] = $val;
 				}
@@ -595,7 +595,9 @@ EOS;
 				 case 4:
 				 case 14:
 					if ($value === NULL || is_scalar($value)) {
-//TODO check mixed value & process accordingly
+						if (is_numeric($value)) {
+							$value += 0;
+						}
 					} else {
 						$value = serialize($value);
 					}
@@ -638,7 +640,9 @@ EOS;
 					 case 4:
 					 case 14:
 						if ($value === NULL || is_scalar($value)) {
-//TODO check mixed value & process accordingly
+							if (is_numeric($value)) {
+								$value += 0;
+							}
 						} else {
 							$value = serialize($value);
 						}

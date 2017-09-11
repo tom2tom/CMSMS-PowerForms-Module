@@ -211,12 +211,14 @@ $X = $CRASH; //TODO revise props for new field
 				 case 11:
 					$val += 0;
 					break;
-//				 case 3: no special case for templates ?
+//				 case 3: nothing special for templates
 //				 case 13:
 				 case 4:
 				 case 14:
 					if ($val === NULL || is_scalar($val)) {
-//TODO check mixed value & process accordingly
+						if (is_numeric($val)) {
+							$val += 0;
+						}
 					} else {
 						$val = serialize($val);
 					}
