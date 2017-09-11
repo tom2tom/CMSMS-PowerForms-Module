@@ -10,18 +10,17 @@ namespace PWForms;
 
 class FieldBase implements \Serializable
 {
-	public $formdata; //reference to FormData object for the form to which this field belongs
-	//field properties
+	public $Id = 0; //identifier
+	public $Name = 'Missing'; //default value
 	public $Alias = '';
-	public $FormId = 0;
-	public $Id = 0;
-	public $Name = '';
+	public $Type = 'FieldBase'; //class-name, default value
 	public $OrderBy = 0; //form display-order
-	public $Type = '';
 	public $Value; //when set, can be scalar or array, with all content processed by Utils::html_myentities_decode()
 	public $XtraProps; //container-array for other properties
 
-	public $Jscript = NULL;  //container-object for AdminPopulate() script accumulators (see action.open_field for init)
+	public $formdata; //reference to FormData object for the form to which this field belongs
+	public $FormId = 0; //related-form identifier
+	public $Jscript = NULL; //container-object for AdminPopulate() script accumulators (see action.open_field for init)
 
 	public function __construct(&$formdata, &$params)
 	{
