@@ -16,11 +16,11 @@ if (!function_exists('Match_Browses')) {
 		$sql = 'SELECT * FROM '.$pre.'module_pwf_trans ORDER BY isform,trans_id';
 		$data = $db->GetAssoc($sql);
 		if ($data) {
-			/*
-		UPDATE form_id IN module_pwbr_browser module_pwbr_record
-		UPDATE form_field IN module_pwbr_field
-		*/
-		$sql = 'UPDATE '.$pre.'module_pwbr_browser SET form_id=? WHERE form_id=?';
+/*
+			UPDATE form_id IN module_pwbr_browser module_pwbr_record
+			UPDATE form_field IN module_pwbr_field
+*/
+			$sql = 'UPDATE '.$pre.'module_pwbr_browser SET form_id=? WHERE form_id=?';
 			$sql2 = 'UPDATE '.$pre.'module_pwbr_record SET form_id=? WHERE form_id=?';
 			$sql3 = 'UPDATE '.$pre.'module_pwbr_field SET form_field=? WHERE form_field=?';
 			foreach ($data as &$row) {
@@ -353,7 +353,9 @@ EOS;
 				 case 4:
 				 case 14:
 					if ($value === NULL || is_scalar($value)) {
-//TODO check mixed value & process accordingly
+						if (is_numeric($value)) {
+							$value += 0;
+						}
 					} else {
 						$value = serialize($value);
 					}
@@ -389,6 +391,8 @@ EOS;
 			$pwfields = array_keys($pfrow);
 			$pfrow = array_fill_keys($pwfields, NULL); //default values
 
+			$bp = __DIR__.DIRECTORY_SEPARATOR.'lib'.DIRECTORY_SEPARATOR.'class.';
+
 			$sql2 = 'INSERT INTO '.$pre.'module_pwf_trans (old_id,new_id,isform) VALUES (?,?,0)';
 			//these are used after type has been cleaned up and some duplicates done
 			$renames = [
@@ -422,12 +426,15 @@ EOS;
 				if (array_key_exists($type, $renames)) {
 					$type = $renames[$type];
 				}
-				//the-field::GetMutables() needs data from a loaded field
-				//TODO constuct filepath and check existenct to prevent un-recoverable fatal error
-				if (0) {
-					continue;
+				//GetMutables() needs data from a loaded field
+				//check existence, to prevent un-recoverable fatal error upon attempted open
+				$fp = $bp.$type.'.php';
+				if (file_exists($fp)) {
+					include_once $fp;
+					$classPath = 'PWForms\\'.$type;
+				} else {
+					$classPath = 'PWForms\\FieldBase'; //revert to default
 				}
-				$classPath = 'PWForms\\'.$type;
 				$t = [];
 				$obfld = new $classPath($formdata, $t);
 				PWForms\FieldOperations::Load($obfld);
@@ -449,11 +456,13 @@ EOS;
 						 case 1:
 							$args[] = $$one + 0;
 							break;
-// nothing special for	 case 3:
+//						 case 3: nothing special for templates
 //							break;
 						 case 4:
 							if ($$one === NULL || is_scalar($$one)) {
-	   //TODO check mixed value & process accordingly
+								if (is_numeric($$one)) {
+									$$one += 0;
+								}
 								$args[] = $$one;
 							} else {
 								$args[] = serialize($$one);
@@ -550,7 +559,9 @@ EOS;
 				 case 4:
 				 case 14:
 					if ($value === NULL || is_scalar($value)) {
-//TODO check mixed value & process accordingly
+						if (is_numeric($value)) {
+							$value += 0;
+						}
 					} else {
 						$value = serialize($value);
 					}
