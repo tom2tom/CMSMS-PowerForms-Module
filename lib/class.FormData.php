@@ -30,12 +30,15 @@ class FormData implements \Serializable
 //	public $sampleTemplateCode = '';
 	public $templateVariables = []; //extra 'global' items for template-help, each like 'var_name'=>'help_lang_key'
 
-	public function __construct(&$mod=NULL, &$params=NULL)
+	public function __construct(&$mod=NULL, $params=NULL)
 	{
 		$this->pwfmod = $mod;
 		if ($params) {
 			if (isset($params['form_id'])) {
 				$this->Id = (int)$params['form_id'];
+			}
+			if (isset($params['form_name'])) {
+				$this->Name = trim($params['form_name']);
 			}
 			if (isset($params['form_alias'])) {
 				$this->Alias = trim($params['form_alias']);
@@ -48,7 +51,7 @@ class FormData implements \Serializable
 	// Returned keys may be intersected with class-property names and/or database-column names
 	// Values indicate property type:  0 bool; 1 number; 2 string, 3 template; 4 mixed; +10 for an XtraProp
 	// Subclass when there are also field-specific properties
-	public function GetMutables($nobase=TRUE, $actual=TRUE)
+	public function GetMutables($nobase=TRUE)
 	{
 		$vars = ($nobase) ? [] : [
 		'Id' => 1,
@@ -115,32 +118,13 @@ class FormData implements \Serializable
 
 	public function __toString()
 	{
-		$mod = $this->pwfmod;
-		$this->pwfmod = ($mod) ? $mod->GetName():'PWForms'; //no need to log all 'public' data
-		$saved = $this->Fields;
-		$afields = [];
-		foreach ($saved as $i=>$one) {
-			$afields[$i] = serialize($one);
-		}
-		$jf = serialize($afields);
-
-		$this->Fields = [];
+		$save = $this->pwfmod; //preserve object-reference
 		$props = get_object_vars($this);
-		foreach ($props as &$val) {
-			if (is_bool($val)) {
-				$val = ($val) ? 1:0;
-			}
-		}
-		$t = serialize($props);
-		$p = strpos($t, '"Fields";a:0:{}');
-$adbg1 = substr($t, 0, $p+9);
-$adbg2 = $jf;
-$adbg3 = substr($t, $p+15);
-$X = $CRASH;
-		$ret = substr($t, 0, $p + 9) . $jf . substr($t, $p + 15);
-		//reinstate
-		$this->pwfmod = $mod;
-		$this->Fields = $saved;
+		$props['pwfmod'] = NULL;
+		$props['Jscript'] = NULL;
+		$props['templateVariables'] = [];
+		$ret = serialize($props);
+		$this->pwfmod = $save;
 		return $ret;
 	}
 
@@ -154,47 +138,23 @@ $X = $CRASH;
 	public function unserialize($serialized)
 	{
 		if ($serialized) {
+			$this->pwfmod =& \cms_utils::get_module('PWForms');
 			$props = unserialize($serialized);
 			if ($props !== NULL) {
-				foreach ($props as $key=>$one) {
-					switch ($key) {
-					 case 'pwfmod':
-						$this->$key =& \cms_utils::get_module($one);
-						break;
-					 case 'Fields':
-						$members = [];
-						foreach ($one as $i=>$mdata) {
-							$i = (int)$i;
-							$members[$i] = unserialize($mdata);
-							if ($members[$i]) { //not marked for delete
-								$members[$i]->formdata =& $this;
-							}
+				foreach ($props as $key => $one) {
+					if ($key == 'Fields') {
+						foreach ($one as &$obfld) {
+							$obfld->formdata = &$this;
 						}
-						$this->$key = $members;
-						break;
-					 case 'FieldOrders':
-					 case 'templateVariables':
-					 case 'jsincs':
-					 case 'jsfuncs':
-					 case 'jsloads':
-						$this->$key = ($one) ? (array)$one : [];
-						break;
-					 case 'XtraProps':
-						$one = (array)$one;
-						$members = [];
-						foreach ($one as $subkey=>$mdata) {
-							if (is_object($mdata)) {
-								$mdata = [$mdata];
-							}
-							$members[$subkey] = $mdata;
-						}
-						$this->$key = $members;
-						break;
-					 default:
-						$this->$key = (is_object($one)) ? (array)$one : $one;
-						break;
+						unset($obfld);
+						$this->$key = $one;
+					} elseif (is_array($one) && is_array($this->$key)) {
+						$this->$key = array_merge_recursive($this->$key, $one);
+					} else {
+						$this->$key = $one;
 					}
 				}
+				$adbg = 1;
 			}
 		}
 	}
