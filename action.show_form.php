@@ -628,7 +628,7 @@ EOS;
 $tplvars['form_has_validation_errors'] = $validerr;
 $tplvars['show_submission_errors'] = 0;
 
-$udtonce = $firsttime && PWForms\Utils::GetFormProperty($formdata, 'predisplay_udt');
+$udtonce = ($firsttime) ? PWForms\Utils::GetFormProperty($formdata, 'predisplay_udt') : FALSE;
 $udtevery = PWForms\Utils::GetFormProperty($formdata, 'predisplay_each_udt');
 if ($udtonce || $udtevery) {
 	$parms = $params;
@@ -700,6 +700,7 @@ if (\$linklast.length) {
  \$head.append(linkadd);
 }
 EOS;
+
 $jsall = NULL;
 PWForms\Utils::MergeJS(FALSE, [$t], FALSE, $jsall);
 echo $jsall;
