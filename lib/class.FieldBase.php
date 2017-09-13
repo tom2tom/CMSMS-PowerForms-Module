@@ -11,9 +11,9 @@ namespace PWForms;
 class FieldBase implements \Serializable
 {
 	public $Id = 0; //identifier
-	public $Name = 'Missing'; //default value
+	public $Name = '';
 	public $Alias = '';
-	public $Type = 'FieldBase'; //class-name, default value
+	public $Type = 'FieldBase'; //non-namespaced class (default value)
 	public $OrderBy = 0; //form display-order
 	public $Value; //when set, can be scalar or array, with all content processed by Utils::html_myentities_decode()
 	public $XtraProps; //container-array for other properties
@@ -46,7 +46,7 @@ class FieldBase implements \Serializable
 		'SmartyEval' => FALSE, //whether to process Populate() output as a smarty-template (i.e. treat that output as a sub-template)
 		'ValidationMessage' => '', //post-validation error message, or ''
 		'ValidationType' => 'none', //chosen member of ValidationTypes
-		'ValidationTypes' => [], //array of label=>val suitable for populating a pulldown
+		'ValidationTypes' => [], //non-mutable array of label=>val suitable for populating a pulldown
 		//status indicators
 		'loaded' => FALSE,
 		'valid' => TRUE, //TRUE unless validation has failed
@@ -138,7 +138,7 @@ class FieldBase implements \Serializable
 		'alias' => 2,
 		'Type' => 2,
 		'type' => 2,
-		'inlime' => 0,
+//		'inline' => 0,
 		'OrderBy' => 1,
 		'order_by' => 1,
 		];
@@ -849,7 +849,7 @@ class FieldBase implements \Serializable
 		$mod = $this->formdata->pwfmod;
 		$displayable = !empty($this->XtraProps['DisplayInForm']);
 		if ($except && !is_array($except)) {
-			$except = is_array($except);
+			$except = [$except];
 		}
 		//init main tab content
 		$main = [];
@@ -1063,32 +1063,19 @@ class FieldBase implements \Serializable
 	{
 	}
 
-/*	// Cleanup after serialize()
-	protected function EnsureArray(&$val)
-	{
-		if (is_string($val)) {
-			$val = unserialize($val);
-		}
-	}
-*/
 	public function __toString()
 	{
-		//no need to fully-document our 'parent'
-		$ob = $this->formdata;
-		$this->formdata = NULL; //upstream must reinstate ref to relevant FormData-object when unserializing
+		$save = $this->formdata; //preserve object-reference
 		$props = get_object_vars($this);
-		foreach ($props as &$val) {
-			if (is_bool($val)) {
-				$val = ($val) ? 1:0;
-			}
-		}
-		unset($val);
+		$props['formdata'] = NULL;
+		$props['Jscript'] = NULL;
 		$ret = serialize($props);
-		$this->formdata = $ob;
+		$this->formdata = $save;
 		return $ret;
 	}
 
 	// Serializable interface methods
+
 	public function serialize()
 	{
 		return $this->__toString();
@@ -1097,10 +1084,15 @@ class FieldBase implements \Serializable
 	public function unserialize($serialized)
 	{
 		if ($serialized) {
+			//$this->formdata reinstated in form::unserialize CHECK ok?
 			$props = unserialize($serialized);
 			if ($props !== NULL) {
-				foreach ($props as $key=>$one) {
-					$this->$key = $one;
+				foreach ($props as $key => $one) {
+					if (is_array($one) && is_array($this->$key)) {
+						$this->$key = array_merge_recursive($this->$key, $one);
+					} else {
+						$this->$key = $one;
+					}
 				}
 			}
 		}
