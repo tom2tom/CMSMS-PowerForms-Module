@@ -856,13 +856,13 @@ class FieldBase implements \Serializable
 		$key = 'title_field_name';
 		if (!$except || !in_array($key, $except)) {
 			$main[] = [$mod->Lang($key),
-						$mod->CreateInputText($id, 'field_Name', $this->GetName(), 40, 50)];
+						$mod->CreateInputText($id, 'field_Name', $this->GetName(), 40, 96)];
 		}
 		$key = 'title_field_alias';
 		if (!$except || !in_array($key, $except)) {
 			$alias = $this->ForceAlias();
 			$main[] = [$mod->Lang($key),
-						$mod->CreateInputText($id, 'field_Alias', $alias, 30)]; //no 'fp_' prefix for maintable properties
+						$mod->CreateInputText($id, 'field_Alias', $alias, 30, 32)]; //no 'fp_' prefix for maintable properties
 		}
 		$key = 'title_field_type';
 		if (!$except || !in_array($key, $except)) {
