@@ -52,8 +52,6 @@ class PWForms extends CMSModule
 */
 		spl_autoload_register([$this, 'cmsms_spacedload']);
 
-		require_once cms_join_path(__DIR__, 'lib', 'class.FormData.php');
-
 		$this->RegisterModulePlugin(TRUE);
 	}
 
