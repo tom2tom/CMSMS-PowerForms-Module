@@ -12,7 +12,7 @@ class FieldOperations
 {
 	/**
 	Get:
-	@formdata: reference to FormData-class object to be set in the field
+	@formdata: reference to FormData-class object to be recorded as a field property
 	@params: reference to array of table-row fields and/or request parameters,
 	 should include 'field_id' (in which case, maybe 'type' too) or 'field_pick'
 	 @params representing wanted values may be present, with keys:
