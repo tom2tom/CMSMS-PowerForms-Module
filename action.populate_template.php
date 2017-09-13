@@ -20,6 +20,9 @@ if (isset($params['datakey'])) {
 		echo '0';
 		exit;
 	}
+	if (is_null($formdata->pwfmod)) {
+		$formdata->pwfmod = &$this;
+	}
 }
 
 switch ($params['type']) {
