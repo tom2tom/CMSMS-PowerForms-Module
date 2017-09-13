@@ -825,10 +825,12 @@ EOS;
 			foreach ($formdata->Fields as &$one) {
 				if ($one && $one->DisplayInSubmission()) {
 					$oneset = new \stdClass();
-					$oneset->title = $one->GetName();
-					$oneset->alias = $one->ForceAlias();
-					$oneset->name = $one->GetVariableName();
+					$oneset->name = $one->GetAlias(); //NOT ForceAlias()!
+					if (!$oneset->name) {
+						$oneset->name = $one->GetVariableName();
+					}
 					$oneset->id = $one->GetId();
+					$oneset->title = $one->GetName();
 					$oneset->escaped = str_replace("'", "\\'", $oneset->title);
 					$fieldvars[] = $oneset;
 				}
@@ -901,6 +903,7 @@ EOS;
 			$tplvars[$alias] = $replVal;
 			$id = $one->GetId();
 			$tplvars['fld_'.$id] = $replVal;
+$X = $CRASH;
 		}
 		unset($one);
 	}

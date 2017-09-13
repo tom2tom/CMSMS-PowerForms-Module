@@ -613,7 +613,11 @@ if ($formdata->Fields) {
 	foreach ($formdata->Fields as &$obfld) {
 		if ($obfld && $obfld->DisplayInSubmission()) {
 			$one = new stdClass();
-			$one->name = $obfld->GetVariableName().'} / {$fld_'.$obfld->GetId();
+			$t = $obfld->GetAlias(); //NOT ForceAlias()
+			if (!$t) {
+				$t = $obfld->GetVariableName();
+			}
+			$one->name = $t.'} / {$fld_'.$obfld->GetId();
 			$one->description = $this->Lang('field_named', $obfld->GetName());
 			$formvars[] = $one;
 		}
