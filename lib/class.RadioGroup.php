@@ -28,7 +28,7 @@ class RadioGroup extends FieldBase
 
 		$mkey1 = 'button_name';
 		$mkey2 = 'button_checked'; //aka value when checked
-		$mkey3 = 'button_is_set'; //aka initially checked
+		$mkey3 = 'button_is_set'; //aka initially checked (not boolean)
 		if ($actual) {
 			$opt = $this->GetPropArray($mkey1);
 			if ($opt) {
@@ -46,7 +46,7 @@ class RadioGroup extends FieldBase
 			$ret[$mkey2.$one] = 14;
 		}
 		foreach ($suff as $one) {
-			$ret[$mkey3.$one] = 10;
+			$ret[$mkey3.$one] = 12;
 		}
 		return $ret;
 	}
