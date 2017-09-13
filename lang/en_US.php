@@ -472,6 +472,7 @@ $lang['fieldlabel_EmailOne'] = '*Email to user-supplied email address';
 $lang['fieldlabel_EmailSender'] = 'Email sender name';
 $lang['fieldlabel_EmailSiteAdmin'] = '*Email to CMS admin user';
 $lang['fieldlabel_EmailSubject'] = 'Email subject';
+$lang['fieldlabel_FieldBase'] = 'Base (something is wrong!)';
 $lang['fieldlabel_FieldsetEnd'] = '-Fieldset end';
 $lang['fieldlabel_FieldsetStart'] = '-Fieldset start';
 $lang['fieldlabel_FileDirector'] = '*Save submitted data in selected file';
