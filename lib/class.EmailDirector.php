@@ -40,7 +40,7 @@ class EmailDirector extends EmailBase
 				return $ret;
 			}
 		} else {
-			$suff = range(1, 10);
+			$suff = ['*']; //any numeric suffix
 		}
 		foreach ($suff as $one) {
 			$ret[$mkey1.$one] = 12;

@@ -40,7 +40,7 @@ class SystemEmail extends EmailBase
 				return $ret;
 			}
 		} else {
-			$suff = range(1, 10);
+			$suff = ['*']; //range(1, 10); //'any' relevant match
 		}
 		foreach ($suff as $one) {
 			$ret[$mkey1.$one] = 12;
@@ -116,6 +116,7 @@ class SystemEmail extends EmailBase
 
 	public function AdminPopulate($id)
 	{
+$adbg = $this; //DEBUG
 		$mod = $this->formdata->pwfmod;
 		list($main, $adv, $extra) = $this->AdminPopulateCommonEmail($id, FALSE, FALSE, FALSE);
 
