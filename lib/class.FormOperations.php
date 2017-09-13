@@ -622,7 +622,7 @@ EOS;
 				FieldOperations::Load($obfld);
 				$includes = $obfld->GetMutables(FALSE); //get 'base' identifiers too
 				$fieldopts = array_intersect_key(get_object_vars($obfld), $includes)
-					+ array_intersect_key($obfld->XtraProps, $includes);
+						   + array_intersect_key($obfld->XtraProps, $includes);
 
 				$xml[] =<<<EOS
 \t\t\t<field>
