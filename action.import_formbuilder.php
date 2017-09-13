@@ -249,20 +249,10 @@ EOS;
 			}
 		}
 
-		$sql = 'SELECT name,value FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY name';
-		$data += $db->GetArray($sql, [$oldfid, $oldf]);
+		$sql = 'SELECT name,value FROM '.$pre.'module_fb_field_opt WHERE form_id=? AND field_id=? ORDER BY option_id';
+		$data = array_merge($data, $db->GetArray($sql, [$oldfid, $oldf]));
 
 		if ($data) {
-			$renames = [
-			'hide_label'=>'HideLabel',
-			'required'=>'Required',
-			'smarty_eval'=>'SmartyEval',
-			'validation_type'=>'ValidationType',
-			'select_one'=>'select_label',
-			'field_logic'=>'resources',
-			'file_header'=>'header_template',
-			'file_footer'=>'footer_template',
-			];
 			/* Some fb-field-types simply repeat the same option-name
 			(relying on save-order for any reconciliation!)
 			We are more careful!
@@ -284,9 +274,26 @@ EOS;
 			'TextExpandable',
 			]);
 			if ($multi) {
-				$desc = '';
-				$uses = array_count_values(array_column($data, 'name')); //TODO only for PHP 5.5+
+				$multers = [];
+				foreach ($includes as $key => $one) {
+					$len = strlen($key);
+					if ($key[$len-1] == '*') { //'*' suffix
+						$key = substr($key, 0, $len-1);
+						$multers[$key] = 1;
+					}
+				}
 			}
+
+			$renames = [
+			'hide_label'=>'HideLabel',
+			'required'=>'Required',
+			'smarty_eval'=>'SmartyEval',
+			'validation_type'=>'ValidationType',
+			'select_one'=>'select_label',
+			'field_logic'=>'resources',
+			'file_header'=>'header_template',
+			'file_footer'=>'footer_template',
+			];
 
 			$finds = NULL; //populate if/when needed
 			$repls = [];
@@ -295,25 +302,24 @@ EOS;
 				extract($fbrow);
 				$value = $value; //for DEBUGGER display ?
 
+				$check = TRUE;
+				//rename some properties
 				if ($multi) {
-					if ($name != $desc) {
-						$desc = $name;
-						$indx = 1;
+					if (strncmp($name, 'option_', 7) == 0) {
+						$name = 'indexed_'.substr($name, 7);
 					}
-					//not all field-properties are sequences (and some that are, are single-valued & handled in-field)
-					if ($uses[$name] > 1) {
-						$name .= $indx;
-						$indx++;
+ 					if (isset($multers[$name])) {
+						$i = $includes[$name.'*'];
+						$name .= $multers[$name]++;
+						$includes[$name] = $i;
+						$check = FALSE;
 					}
 				}
-				//rename some properties
 				if (array_key_exists($name, $renames)) {
 					$name = $renames[$name];
-				} elseif (strncmp($name, 'option_', 7) == 0) {
-					$name = 'indexed_'.substr($name, 7);
 				}
 
-				if (!array_key_exists($name, $includes)) {
+				if ($check && !array_key_exists($name, $includes)) {
 					if ($name == 'field_alias') {
 						if ($value) {
 							$passbacks['alias'] = $value;
@@ -515,7 +521,7 @@ EOS;
 			}
 		}
 		$sql = 'SELECT * FROM '.$pre.'module_fb_form_attr WHERE form_id=? ORDER BY name';
-		$data += $db->GetArray($sql, [$oldfid]);
+		$data = array_merge ($data, $db->GetArray($sql, [$oldfid]));
 
 		$props = [];
 		if ($data) {
