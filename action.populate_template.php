@@ -84,15 +84,25 @@ switch ($params['type']) {
 	$obfld = $formdata->Fields[$params['field_id']];
 	if ($obfld) {
 		if (empty($params['revert'])) {
-			$tplstr = 'NOT YET SUPPORTED';
-			//$tplstr = $obfld->CreateDefaultHeader();
-			//$tplstr = $obfld->CreateDefaultFooter();
-			//$tplstr = $obfld->CreateDefaultTemplate();
+			if (isset($params['main'])) {
+				$tplstr = $obfld->CreateDefaultTemplate();
+			} elseif (isset($params['header'])) {
+				$tplstr = $obfld->CreateDefaultHeader();
+			} elseif (isset($params['footer'])) {
+				$tplstr = $obfld->CreateDefaultFooter();
+			} else {
+				$tplstr = '0';
+			}
 		} else {
-			$tplstr = 'NOT YET SUPPORTED';
-			//$tplstr = $obfld->XtraProps['header_template'];
-			//$tplstr = $obfld->XtraProps['footer_template'];
-			//$tplstr = $obfld->XtraProps['file_template'];
+			if (isset($params['main'])) {
+				$tplstr = $obfld->XtraProps['file_template'];
+			} elseif (isset($params['header'])) {
+				$tplstr = $obfld->XtraProps['header_template'];
+			} elseif (isset($params['footer'])) {
+				$tplstr = $obfld->XtraProps['footer_template'];
+			} else {
+				$tplstr = '0';
+			}
 		}
 	} else {
 		$tplstr = '0';
