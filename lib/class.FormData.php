@@ -138,7 +138,7 @@ class FormData implements \Serializable
 	public function unserialize($serialized)
 	{
 		if ($serialized) {
-			$this->pwfmod =& \cms_utils::get_module('PWForms');
+			$this->pwfmod =& \cms_utils::get_module('PWForms'); //NB no 'forcing', so maybe NULL
 			$props = unserialize($serialized);
 			if ($props !== NULL) {
 				foreach ($props as $key => $one) {
@@ -154,7 +154,6 @@ class FormData implements \Serializable
 						$this->$key = $one;
 					}
 				}
-				$adbg = 1;
 			}
 		}
 	}
