@@ -323,7 +323,7 @@ EOS;
 			}
 			$form_id = $db->Insert_ID();
 		} else {
-			$sql = 'UPDATE '.$pre.'module_pwf_form SET name=?,alias=?,$props=? WHERE form_id=?';
+			$sql = 'UPDATE '.$pre.'module_pwf_form SET name=?,alias=?,props=? WHERE form_id=?';
 			$db->Execute($sql, [$params['form_Name'], $params['form_Alias'], $val, $form_id]);
 			//post-UPDATE $db->Affected_Rows() can't be relied on
 /*			if ($db->Affected_Rows() == -1) {
