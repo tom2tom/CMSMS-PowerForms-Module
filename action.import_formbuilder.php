@@ -534,6 +534,15 @@ EOS;
 				}
 
 				$value = $row['value'];
+				//revalue some properties
+				switch ($name) {
+				 case 'predisplay_each_udt':
+				 case 'predisplay_udt':
+				 case 'validate_udt':
+					if ($value == -1) {
+						$value = '';
+					}
+				}
 				switch ($formincludes[$name]) {
 				 case 0:
 				 case 10:
