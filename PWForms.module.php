@@ -176,14 +176,6 @@ class PWForms extends CMSModule
 		return $this->Lang('event_help_'.$eventname);
 	}
 
-	public function get_tasks()
-	{
-		return [
-			new PWForms\ClearcacheTask(),
-			new PWForms\ClearTablesTask()
-		];
-	}
-
 	public function MinimumCMSVersion()
 	{
 		return '1.11'; //need smarty 3
@@ -211,6 +203,16 @@ class PWForms extends CMSModule
 	public function IsPluginModule()
 	{
 		return TRUE;
+	}
+
+	public function HasCapability($capability, $params = [])
+	{
+		switch ($capability) {
+			case CmsCoreCapabilities::PLUGIN_MODULE:
+			case CmsCoreCapabilities::TASKS:
+				return TRUE;
+		}
+		return FALSE;
 	}
 
 	public function HasAdmin()
@@ -317,6 +319,14 @@ class PWForms extends CMSModule
 			break;
 		}
 		parent::DoAction($action, $id, $params, $returnid);
+	}
+
+	public function get_tasks()
+	{
+		return [
+			new PWForms\ClearcacheTask(),
+			new PWForms\ClearTablesTask(),
+		];
 	}
 
 // ~~~~~~~~~~~~~~~~~~~~~ NON-CMSModule METHODS ~~~~~~~~~~~~~~~~~~~~~
