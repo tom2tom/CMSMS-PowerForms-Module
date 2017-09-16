@@ -289,32 +289,39 @@ EOS;
 		if ($allvalid) {
 			$udt = PWForms\Utils::GetFormProperty($formdata, 'validate_udt');
 			if (!empty($udt)) {
-				$usertagops = cmsms()->GetUserTagOperations(); //TODO ok here ?
-				$unspec = PWForms\Utils::GetFormProperty($formdata, 'unspecified', $this->Lang('unspecified'));
+				$udtops = cmsms()->GetUserTagOperations(); //TODO ok here ?
+				if ($udtops->UserTagExists($udt)) {
+					$unspec = PWForms\Utils::GetFormProperty($formdata, 'unspecified', $this->Lang('unspecified'));
 
-				$parms = $params;
-				foreach ($formdata->FieldOrders as $field_id) {
-					$obfld = $formdata->Fields[$field_id];
-					if ($obfld->DisplayInSubmission()) {
-						$val = $obfld->DisplayableValue();
-						if ($val == '') {
-							$val = $unspec;
+					$parms = $params;
+					foreach ($formdata->FieldOrders as $field_id) {
+						$obfld = $formdata->Fields[$field_id];
+						if ($obfld->DisplayInSubmission()) {
+							$val = $obfld->DisplayableValue();
+							if ($val == '') {
+								$val = $unspec;
+							}
+						} else {
+							$val = '';
 						}
-					} else {
-						$val = '';
+						$name = $obfld->GetVariableName();
+						$parms[$name] = $val;
+						$alias = $obfld->ForceAlias();
+						$parms[$alias] = $val;
+						$id = $obfld->GetId();
+						$parms['fld_'.$id] = $val;
 					}
-					$name = $obfld->GetVariableName();
-					$parms[$name] = $val;
-					$alias = $obfld->ForceAlias();
-					$parms[$alias] = $val;
-					$id = $obfld->GetId();
-					$parms['fld_'.$id] = $val;
-				}
 
-				$res = $usertagops->CallUserTag($udt, $parms);
-				if (!$res[0]) {
-					$allvalid = FALSE;
-					$message[] = $res[1];
+					$res = $udtops->CallUserTag($udt, $parms); //mixed result
+					if (is_array($res)) {
+						if (!$res[0]) {
+							$allvalid = FALSE;
+							$message[] = $res[1];
+						}
+					} elseif (!$res) {
+						$allvalid = FALSE;
+						$message[] = $this->Lang('err_usertag');
+					}
 				}
 			}
 		}
@@ -633,15 +640,15 @@ $udtevery = PWForms\Utils::GetFormProperty($formdata, 'predisplay_each_udt');
 if ($udtonce || $udtevery) {
 	$parms = $params;
 	$parms['FORM'] =& $formdata;
-	$usertagops = cmsms()->GetUserTagOperations();
+	$udtops = cmsms()->GetUserTagOperations();
 	if ($udtonce) {
-		$usertagops->CallUserTag($udtonce, $parms);
+		$udtops->CallUserTag($udtonce, $parms);
 	}
 	if ($udtevery) {
-		$usertagops->CallUserTag($udtevery, $parms);
+		$udtops->CallUserTag($udtevery, $parms);
 	}
 	unset($parms);
-	unset($usertagops);
+	unset($udtops);
 }
 
 $this->SendEvent('OnFormDisplay', [
