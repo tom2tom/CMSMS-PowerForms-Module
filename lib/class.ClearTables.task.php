@@ -10,46 +10,46 @@ namespace PWForms;
 
 class ClearTablesTask implements \CmsRegularTask
 {
-	const MODNAME = 'PWForms';
-
 	public function get_name()
 	{
-		return get_class($this);
+		return get_class();
+	}
+
+	protected function &get_module()
+	{
+		return \ModuleOperations::get_instance()->get_module_instance('PWForms', '', TRUE);
 	}
 
 	public function get_description()
 	{
-		$module = \cms_utils::get_module(self::MODNAME);
-		return $module->Lang('taskdescription_cleartables');
+		return $this->get_module()->Lang('taskdescription_cleartables');
 	}
 
 	public function test($time = '')
 	{
-		$module = \cms_utils::get_module(self::MODNAME);
 		if (!$time) {
 			$time = time();
 		}
-		$last_cleared = $module->GetPreference('lastcleared', 0);
+		$last_cleared = $this->get_module()->GetPreference('lastcleared', 0);
 		return ($time >= $last_cleared + 1800);
 	}
 
 	public function execute($time = '')
 	{
-		$module = \cms_utils::get_module(self::MODNAME);
 		if (!$time) {
 			$time = time();
 		}
-		Utils::CleanTables($module, $time);
+		$mod = $this->get_module();
+		Utils::CleanTables($mod, $time);
 		return TRUE;
 	}
 
 	public function on_success($time = '')
 	{
-		$module = \cms_utils::get_module(self::MODNAME);
 		if (!$time) {
 			$time = time();
 		}
-		$module->SetPreference('lastcleared', $time);
+		$this->get_module()->SetPreference('lastcleared', $time);
 	}
 
 	public function on_failure($time = '')

@@ -10,25 +10,28 @@ namespace PWForms;
 
 class ClearcacheTask implements \CmsRegularTask
 {
-	const MODNAME = 'PWForms';
-
 	public function get_name()
 	{
-		return get_class($this);
+		return get_class();
+	}
+
+	protected function &get_module()
+	{
+		return \ModuleOperations::get_instance()->get_module_instance('PWForms', '', TRUE);
 	}
 
 	public function get_description()
 	{
-		$mod = \cms_utils::get_module(self::MODNAME);
+		$mod = $this->get_module();
 		return $mod->Lang('taskdescription_clearcache');
 	}
 
 	public function test($time='')
 	{
-		$mod = \cms_utils::get_module(self::MODNAME);
+		$mod = $this->get_module();
 		$dir = Utils::GetUploadsPath($mod);
 		if ($dir) {
-			foreach (new DirectoryIterator($dir) as $fInfo) {
+			foreach (new \DirectoryIterator($dir) as $fInfo) {
 				$fn = $fInfo->getFilename();
 				if (strncmp($fn, 'pwf', 3) == 0) {
 					return TRUE;
@@ -38,7 +41,7 @@ class ClearcacheTask implements \CmsRegularTask
 		//if file-cache N/A, check for database-cache
 		$pre = \cms_db_prefix();
 		$sql = 'SELECT cache_id FROM '.$pre.'module_pwf_cache';
-		$res = $mod->dbHandle->GetOne($sql);
+		$res = \cmsms()->GetDB()->GetOne($sql);
 		return ($res != FALSE);
 	}
 
@@ -48,10 +51,10 @@ class ClearcacheTask implements \CmsRegularTask
 			$time = time();
 		}
 		$time -= 43200; //half-day cache retention-period (as seconds)
-		$mod = \cms_utils::get_module(self::MODNAME);
+		$mod = $this->get_module();
 		$dir = Utils::GetUploadsPath($mod);
 		if ($dir) {
-			foreach (new DirectoryIterator($dir) as $fInfo) {
+			foreach (new \DirectoryIterator($dir) as $fInfo) {
 				if ($fInfo->isFile() && !$fInfo->isDot()) {
 					$fn = $fInfo->getFilename();
 					if (strncmp($fn, 'pwf', 3) == 0) {
@@ -64,8 +67,8 @@ class ClearcacheTask implements \CmsRegularTask
 			}
 		}
 		$pre = \cms_db_prefix();
-		$sql = 'DELETE FROM '.$pre.'module_pwf_cache WHERE savetime+lifetime <?';
-		$mod->dbHandle->Execute($sql, [$time]);
+		$sql = 'DELETE FROM '.$pre.'module_pwf_cache WHERE savetime+lifetime < '.$time;
+		\cmsms()->GetDB()->Execute($sql);
 		return TRUE;
 	}
 
