@@ -400,7 +400,7 @@ $lang['err_system'] = 'System error';
 $lang['err_typed'] = 'Invalid %s';
 $lang['err_upload'] = 'Failed to upload file: %s';
 $lang['err_uploads_dir'] = 'Error! There is no uploads directory.';
-$lang['err_usertag'] = 'User defined tag returned an error';
+$lang['err_usertag'] = 'User defined tag returned an error';  //'The form validation function reported an error'
 $lang['err_usertag_named'] = 'User defined tag %s returned an error.';
 $lang['err_values'] = 'Something is wrong with the values';
 
