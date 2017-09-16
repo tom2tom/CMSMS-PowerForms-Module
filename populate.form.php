@@ -668,8 +668,8 @@ $usertagops = cmsms()->GetUserTagOperations();
 $usertags = $usertagops->ListUserTags();
 $usertaglist = [];
 $usertaglist[$this->Lang('none2')] = '';
-foreach ($usertags as $key => $value) {
-	$usertaglist[$value] = $key;
+foreach ($usertags as $value) {
+	$usertaglist[$value] = $value;
 }
 
 $tplvars['title_form_predisplay_udt'] = $this->Lang('title_form_predisplay_udt');
