@@ -44,7 +44,7 @@ foreach ($formdata->FieldOrders as $field_id) {
 	$alias = $obfld->ForceAlias();
 
 	if ($type == 'PageBreak') {
-		$formPage++;
+		++$formPage;
 	}
 
 	if ($formPage == $formdata->Page) {

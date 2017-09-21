@@ -90,7 +90,7 @@ class SaferEval
 
 			$i = 0;
 			foreach ($this->tokens as $key => $token) {
-				$i++;
+				++$i;
 				if (is_array($token)) {
 					$id = token_name($token[0]);
 					switch ($id) {

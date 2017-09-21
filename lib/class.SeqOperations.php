@@ -84,7 +84,7 @@ class SeqOperations
 				$xords[$o++] = $i;
 			}
 			$xmembers[$x++] = $i; //interim, pending new FieldOrders[]
-			$times--;
+			--$times;
 		}
 
 		$pos = ($after) ? $ao+1:$ao;

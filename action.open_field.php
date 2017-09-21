@@ -83,7 +83,7 @@ if (isset($params['submit'])) {
 				$i = 1; //use custom-index, in case rows have been re-ordered
 				foreach ($val as $ival) {
 					$obfld->SetPropIndexed($key, $i, $ival);
-					$i++;
+					++$i;
 				}
 			} else {
 				$obfld->SetProperty($key, $val);

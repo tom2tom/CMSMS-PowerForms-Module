@@ -659,7 +659,7 @@ if (isset($params['import'])) {
 			$indx = 1;
 			while (!$funcs->NewID(FALSE, $ta)) {
 				$ta = $alias."[$indx]";
-				$indx++;
+				++$indx;
 			}
 			$alias = $ta;
 

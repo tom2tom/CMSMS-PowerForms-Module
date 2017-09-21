@@ -119,7 +119,7 @@ class FieldOperations
 			$sql = 'SELECT MAX(order_by) AS last FROM '.$pre.'module_pwf_field WHERE form_id=?';
 			$neworder = $db->GetOne($sql, [$form_id]);
 			if ($neworder) {
-				$neworder++;
+				++$neworder;
 			} else {
 				$neworder = 1;
 			}

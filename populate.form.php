@@ -97,7 +97,7 @@ $etotal = 0;
 if ($total > 0) {
 	foreach ($formdata->Fields as &$obfld) {
 		if ($obfld && $obfld->IsDisposition() && !$obfld->IsDisplayed()) {
-			$dtotal++;
+			++$dtotal;
 		}
 	}
 	unset($obfld);
@@ -168,7 +168,7 @@ foreach ($formdata->FieldOrders as $one) {
 		}
 
 		$dispositions[] = $oneset;
-		$dcount++;
+		++$dcount;
 	} else {
 		if (!$obfld->DisplayInForm() || !$obfld->GetChangeRequirement()) {
 			$oneset->required = '';
@@ -200,7 +200,7 @@ foreach ($formdata->FieldOrders as $one) {
 		}
 
 		$fields[] = $oneset;
-		$count++;
+		++$count;
 	}
 }
 

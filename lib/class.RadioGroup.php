@@ -283,7 +283,7 @@ EOS;
 				$tmp .= $this->GetScript().' />';
 				$oneset->input = $this->SetClass($tmp);
 				$ret[] = $oneset;
-				$b++;
+				++$b;
 			}
 			unset($one);
 			$this->MultiPopulate = TRUE;

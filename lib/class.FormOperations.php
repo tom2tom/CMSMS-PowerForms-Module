@@ -86,7 +86,7 @@ EOS;
 		while (!$this->NewID($name, $alias)) {
 			$name = $tn.'('.$i.')';
 			$alias = $ta.'_'.$i;
-			$i++;
+			++$i;
 		}
 		$params['form_name'] = $name;
 		$params['form_alias'] = $alias;
@@ -192,7 +192,7 @@ EOS;
 		while (!$this->NewID($name, $alias)) {
 			$name = $tn.'('.$i.')';
 			$alias = $ta.'_'.$i;
-			$i++;
+			++$i;
 		}
 		$params['form_name'] = $name;
 		$params['form_alias'] = $alias;
@@ -238,7 +238,7 @@ EOS;
 				$params['message'] = $mod->Lang('database_error');
 				$res = FALSE;
 			}
-			$neworder++;
+			++$neworder;
 		}
 		unset($one);
 
@@ -439,7 +439,7 @@ EOS;
 				if ($obfld) {
 					$formdata->Fields[$obfld->Id] = $obfld;
 					if ($obfld->Type == 'PageBreak') {
-						$formdata->PagesCount++;
+						++$formdata->PagesCount;
 					}
 				}
 			}
@@ -737,7 +737,7 @@ EOS;
 					$v = (!empty($val['value'])) ? $val['value'] : NULL; //default value is NULL
 					$value[$val['tag']] = $v;
 					if ($val['type'] == 'complete' && $lvl > 1) {
-						$opened[$lvl-1]++;
+						++$opened[$lvl-1];
 					}
 					break;
 				case 'close': //end of a level
@@ -825,7 +825,7 @@ EOS;
 			while (!$this->NewID($name, $val)) {
 				$name = $tn.'('.$i.')';
 				$val = $ta.'_'.$i;
-				$i++;
+				++$i;
 			}
 			$alias = $val;
 

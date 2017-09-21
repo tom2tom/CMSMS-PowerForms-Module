@@ -208,7 +208,7 @@ class Utils
 			if ($db->CompleteTrans()) {
 				return $ret;
 			} else {
-				$nt--;
+				--$nt;
 				usleep(50000);
 			}
 		}
@@ -239,7 +239,7 @@ class Utils
 			if ($db->CompleteTrans()) {
 				return TRUE;
 			} else {
-				$nt--;
+				--$nt;
 				usleep(50000);
 			}
 		}
@@ -903,7 +903,6 @@ EOS;
 			$tplvars[$alias] = $replVal;
 			$id = $one->GetId();
 			$tplvars['fld_'.$id] = $replVal;
-$X = $CRASH;
 		}
 		unset($one);
 	}

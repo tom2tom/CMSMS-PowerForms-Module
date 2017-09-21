@@ -80,7 +80,7 @@ class SiteAdmin extends FieldBase
 					}
 					$name = implode(' ', $parts);
 					$choices[$name] = $indx;
-					$indx++;
+					++$indx;
 				}
 			}
 			return $choices;

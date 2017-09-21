@@ -146,12 +146,12 @@ class TextExpandable extends FieldBase
 				if ($pts[2] == $this->Id || $pts[2] == $sibling_id) {
 					if ($pts[1] == 'X') { //add row
 						$this->Value[$vals] = '';
-						$vals++;
+						++$vals;
 					} else { //delete row
 						if (isset($this->Value[$pts[3]])) {
 							array_splice($this->Value, $pts[3], 1);
 						} //TODO check off-by-1
-						$vals--;
+						--$vals;
 					}
 				}
 			}
