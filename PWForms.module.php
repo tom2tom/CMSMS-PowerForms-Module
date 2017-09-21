@@ -208,8 +208,8 @@ class PWForms extends CMSModule
 	public function HasCapability($capability, $params = [])
 	{
 		switch ($capability) {
-			case CmsCoreCapabilities::PLUGIN_MODULE:
-			case CmsCoreCapabilities::TASKS:
+			case 'plugin':
+			case 'tasks':
 				return TRUE;
 		}
 		return FALSE;
@@ -323,10 +323,10 @@ class PWForms extends CMSModule
 
 	public function get_tasks()
 	{
-		return [
-			new PWForms\ClearcacheTask(),
-			new PWForms\ClearTablesTask(),
-		];
+//		return [
+//			new PWForms\ClearcacheTask(),
+//			new PWForms\ClearTablesTask(),
+//		];
 	}
 
 // ~~~~~~~~~~~~~~~~~~~~~ NON-CMSModule METHODS ~~~~~~~~~~~~~~~~~~~~~
