@@ -148,7 +148,8 @@ class CheckboxGroup extends FieldBase
 
 			if ($as_string) {
 				// Check if we should include labels
-				if ($this->GetProperty('include_labels', 0)) {
+
+				if ($this->LabelSubComponents) {
 					$output = '';
 					foreach ($ret as $key=>$value) {
 						$output .= $key.': '.$value.$this->GetFormProperty('list_delimiter', ',');
