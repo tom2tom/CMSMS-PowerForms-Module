@@ -69,7 +69,7 @@ if (!isset($params['form_id']) && isset($params['form'])) { // got the form by a
 if (empty($params['form_id']) || $params['form_id'] == -1) {
 	echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 		'title'=>$this->Lang('title_aborted'),
-		'message'=>$this->Lang('err_data'),
+		'message'=>$this->Lang('err_data') . ' (1)',
 		'error'=>1]);
 	return;
 }
@@ -138,10 +138,10 @@ if (isset($params[$prefix.'cancel'])) {
 try {
 	$mx = PWForms\Utils::GetMutex($this);
 } catch (Exception $e) {
-	echo PWForms\Utils::ProcessTemplate($this,'message.tpl',array(
+	echo PWForms\Utils::ProcessTemplate($this,'message.tpl', [
 		'title'=>$this->Lang('title_aborted'),
 		'message'=>$this->Lang('err_system').' NO MUTEX MECHANISM',
-		'error'=>1));
+		'error'=>1]);
 	return;
 }
 */
@@ -155,10 +155,10 @@ if (isset($params[$prefix.'datakey'])) {
 
 	$cache_key = $params[$prefix.'datakey'];
 	$formdata = $cache->get($cache_key);
-	if (is_null($formdata)) {
+	if (!$formdata) {
 		echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 			'title'=>$this->Lang('title_aborted'),
-			'message'=>$this->Lang('err_data'),
+			'message'=>$this->Lang('err_data') . ' (2)',
 			'error'=>1]);
 		return;
 	}
@@ -208,7 +208,7 @@ if (isset($params[$prefix.'datakey'])) {
 					if ($db->CompleteTrans()) {
 						break;
 					} else {
-						$nt--;
+						--$nt;
 						usleep(50000);
 					}
 				}
@@ -265,7 +265,7 @@ EOS;
 			$obfld = $formdata->Fields[$field_id];
 /*TODO multi-page-form field validation and feedback
 			if ($obfld->GetFieldType() == 'PageBreak')
-				$formPage++;
+				++$formPage;
 			if ($valPage != $formPage) {
 				continue;
 			}
@@ -469,9 +469,9 @@ EOS;
 			$formdata->Page--; //TODO why
 		}
 	} elseif (isset($params[$prefix.'continue'])) { //not submitted/done
-			$formdata->Page++;
+			++$formdata->Page;
 	} elseif (isset($params[$prefix.'previous'])) {
-		$formdata->Page--;
+		--$formdata->Page;
 		if ($formdata->Page < 1) {
 			$formdata->Page = 1;
 		}
@@ -531,7 +531,7 @@ EOS;
 		unset($funcs);
 		echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 			'title'=>$this->Lang('title_aborted'),
-			'message'=>$this->Lang('err_data'),
+			'message'=>$this->Lang('err_data') . ' (3)',
 			'error'=>1]);
 		return;
 	}
