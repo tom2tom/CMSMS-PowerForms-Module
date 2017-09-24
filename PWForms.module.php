@@ -323,10 +323,17 @@ class PWForms extends CMSModule
 
 	public function get_tasks()
 	{
-//		return [
-//			new PWForms\ClearcacheTask(),
-//			new PWForms\ClearTablesTask(),
-//		];
+		if ($this->before20) {
+			return array(
+			 new pwfClearcacheTask(),
+			 new pwfClearTablesTask(),
+			);
+		} else {
+			return [
+			 new PWForms\ClearcacheTask(),
+			 new PWForms\ClearTablesTask(),
+			];
+		}
 	}
 
 // ~~~~~~~~~~~~~~~~~~~~~ NON-CMSModule METHODS ~~~~~~~~~~~~~~~~~~~~~
