@@ -5,25 +5,6 @@ Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 Refer to licence and other details at the top of file PWForms.module.php
 More info at http://dev.cmsmadesimple.org/projects/powerforms
 */
-//NB caller must be very careful that top-level dir is valid!
-function delTree($dir)
-{
-	$files = array_diff(scandir($dir), ['.', '..']);
-	if ($files) {
-		foreach ($files as $file) {
-			$fp = cms_join_path($dir, $file);
-			if (is_dir($fp)) {
-				if (!delTree($fp)) {
-					return FALSE;
-				}
-			} else {
-				unlink($fp);
-			}
-		}
-		unset($files);
-	}
-	return rmdir($dir);
-}
 
 $pre = cms_db_prefix();
 $dict = NewDataDictionary($db);
@@ -72,9 +53,9 @@ $fp = $config['uploads_path'];
 if ($fp && is_dir($fp)) {
 	$ud = $this->GetPreference('uploads_dir');
 	if ($ud) {
-		$ud = $fp.DIRECTORY_SEPARATOR.$ud;
-		if (is_dir($ud)) {
-			delTree($ud);
+		$fp .= DIRECTORY_SEPARATOR.$ud;
+		if (is_dir($fp)) {
+			recursive_delete($fp);
 		}
 	}
 }
