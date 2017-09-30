@@ -5,16 +5,17 @@ namespace PWForms\MultiCache;
 abstract class CacheBase
 {
 	protected $config;	//array of runtime options, merged into driver-specific options (if any)
-	protected $keyspace; //string prepended to cache keys (kinda cache-namespace)
+	protected $keyspace; //string prepended to cache keys (effectively, a cache-namespace)
 
 	public function __construct($config=array())
 	{
 		$this->config = $config;
-		$name = (isset($config['namespace'])) ? $config['namespace'] : '';
-		$this->keyspace = $this->setKeySpace($name);
+		$name = (!empty($config['namespace'])) ? $config['namespace'] : ''; //ignore 'falsy' names
+		$this->setKeySpace($name);
 	}
 
 	/* Core Functions */
+
 	/**
 	set:
 	If @keyword not found in cache, add @keyword:@value to cache, otherwise update to @value
@@ -25,10 +26,7 @@ abstract class CacheBase
 	*/
 	public function set($keyword, $value, $lifetime=0)
 	{
-		if ((int)$lifetime < 0) {
-			$lifetime = 157680000; //3600*24*365*5
-		}
-		return $this->_upsert($this->getKey($keyword), $value, $lifetime);
+		return $this->_upsert($this->getKey($keyword), $value, $this->getLife($lifetime));
 	}
 
 	/**
@@ -41,10 +39,7 @@ abstract class CacheBase
 	*/
 	public function setnew($keyword, $value, $lifetime=0)
 	{
-		if ((int)$lifetime < 0) {
-			$lifetime = 157680000; //3600*24*365*5
-		}
-		return $this->_newsert($this->getKey($keyword), $value, $lifetime);
+		return $this->_newsert($this->getKey($keyword), $value, $this->getLife($lifetime));
 	}
 
 	/**
@@ -110,25 +105,39 @@ abstract class CacheBase
 	{
 		if ($name) {
 			$name = trim($name, '\\/ \t');
+			$name = strtr($name, '\\/ ', '___');
 		}
 		if (!$name) {
-			$name = __NAMESPACE__;
+			$name = substr(''.crc32(__CLASS__), 0, 8);
 		}
-		$this->keyspace = $name.'\\';
+		$this->keyspace = $name.'_';
 	}
 
 	/**
-	setKeySpace:
+	getKeySpace:
 	Returns: string keys namespace
 	*/
 	public function getKeySpace()
 	{
 		return substr($this->keyspace, 0, strlen($this->keyspace)-1);
 	}
+
 	/* Support */
+
 	protected function getKey($keyword)
 	{
 		return $this->keyspace.$keyword;
+	}
+
+	protected function getLife($lifetime)
+	{
+		if (!is_numeric($lifetime) || $lifetime < -0.001) {
+			return 157680000; //3600*24*365*5
+		} else if ($lifetime < 0.999) {
+			return PHP_INT_MAX;
+		} else {
+			return (int)($lifetime + 0.1);
+		}
 	}
 
 	/*
