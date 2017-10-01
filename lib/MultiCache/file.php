@@ -130,21 +130,21 @@ class file extends CacheBase implements CacheInterface
 	*/
 	private function filename($keyword)
 	{
-		return str_replace('\\', '|%|', $keyword);
+		return '_cache_'.str_replace('\\', '|%|', $keyword);
 	}
 
 	private function keyword($filepath)
 	{
-		return str_replace('|%|', '\\', basename($filepath));
+		return str_replace('|%|', '\\', substr(basename($filepath), 7));
 	}
 
 	private function readfile($filepath)
 	{
-		$h = @fopen($filepath, 'rb');
-		if ($h) {
+		$fh = @fopen($filepath, 'rb');
+		if ($fh) {
 			clearstatcache(TRUE, $filepath);
-			$content = @fread($h, filesize($filepath));
-			@fclose($h);
+			$content = @fread($fh, filesize($filepath));
+			@fclose($fh);
 			return unserialize($content);
 		}
 		return FALSE;
@@ -152,10 +152,10 @@ class file extends CacheBase implements CacheInterface
 
 	private function writefile($filepath, $content)
 	{
-		$h = @fopen($filepath, 'wb');
-		if ($h) {
-			$ret = @fwrite($h, serialize($content));
-			$ret = $ret && @fclose($h);
+		$fh = @fopen($filepath, 'wb');
+		if ($fh) {
+			$ret = @fwrite($fh, serialize($content));
+			$ret = $ret && @fclose($fh);
 			return $ret;
 		}
 		return FALSE;
