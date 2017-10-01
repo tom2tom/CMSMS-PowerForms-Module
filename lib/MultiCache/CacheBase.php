@@ -104,11 +104,12 @@ abstract class CacheBase
 	public function setKeySpace($name)
 	{
 		if ($name) {
+			//remove content that might interfere with a file-path
 			$name = trim($name, '\\/ \t');
 			$name = strtr($name, '\\/ ', '___');
 		}
 		if (!$name) {
-			$name = substr(''.crc32(__CLASS__), 0, 8);
+			$name = '|||';
 		}
 		$this->keyspace = $name.'_';
 	}
