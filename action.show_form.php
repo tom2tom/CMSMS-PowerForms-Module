@@ -397,7 +397,6 @@ EOS;
 				];
 			}
 			unset($parms);
-// end of synchronous processing
 		} else { // validation error(s)
 			$validerr = 1;
 			$tplvars['form_validation_errors'] = $message;

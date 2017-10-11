@@ -124,15 +124,11 @@ class RadioGroup extends FieldBase
 	public function SetValue($newvalue)
 	{
 		if (is_array($newvalue)) { //group-member selected in form
-			$this->Value = reset($newvalue); //1-based index?
+			$this->Value = reset($newvalue); //TODO CHECK must be 1-based index
 		} elseif ($newvalue) {
-			$all = $this->GetPropArray('button_checked');
-			if ($all) {
-				$i = array_search($newvalue, $all); //1-based index
-				if ($i === FALSE) {
-					$i = 0;
-				}
-			} else {
+			$i = (int)$newvalue;
+			$val = $this->GetPropArray('button_checked', $i, '|~/\\\\/~|');
+			if ($val == '|~/\\\\/~|') {
 				$i = 0; //unknown
 			}
 			$this->Value = $i;
@@ -268,7 +264,7 @@ EOS;
 				}
 
 				$tmp = '<input type="radio" id="'.$this->GetInputId('_'.$i).'" name="'.
-					$id.$this->formdata->current_prefix.$this->Id.'[]" value="'.$i.'"';
+					$id.$this->formdata->current_prefix.$this->Id.'" value="'.$i.'"';
 
 				if (($this->Value || is_numeric($this->Value)) && $i == $this->Value) {
 					$checked = TRUE;
