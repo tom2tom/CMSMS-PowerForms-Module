@@ -134,18 +134,6 @@ if (isset($params[$prefix.'cancel'])) {
 	}
 }
 
-/*QUEUE
-try {
-	$mx = PWForms\Utils::GetMutex($this);
-} catch (Exception $e) {
-	echo PWForms\Utils::ProcessTemplate($this,'message.tpl', [
-		'title'=>$this->Lang('title_aborted'),
-		'message'=>$this->Lang('err_system').' NO MUTEX MECHANISM',
-		'error'=>1]);
-	return;
-}
-*/
-
 $form_id = (int)$params['form_id'];
 $validerr = 0; //default no validation error
 
@@ -327,59 +315,6 @@ EOS;
 		}
 
 		if ($allvalid) {
-			/*QUEUE (php with async post-callback is bogus !?
-			$token = abs(crc32($this->GetName().'Qmutex')); //same token as in action.run_queue.php
-			if (!$mx->lock($token)) {
-				echo $this->Lang('err_lock');
-				exit;
-			}
-			$queue = $cache->get('pwfQarray');
-			if (!$queue)
-				$queue = array();
-			unset($formdata->pwfmod); //no need to cache this
-			$queue[] = array(
-				'data' => $formdata, //CHECKME encrypted?
-				'submitted' => time(),
-				'pageid' => $id);
-			$cache->set('pwfQarray',$queue,0); //no expiry
-			$formdata->pwfmod = &$this;
-			$mx->unlock($token);
-			if (!$cache->get('pwfQrunning')) {
-				//initiate async queue processing
-				if ($this->ch) {
-					while (curl_multi_info_read($this->mh))
-						usleep(20000);
-					curl_multi_remove_handle($this->mh,$this->ch);
-					curl_close($this->ch);
-					$this->ch = FALSE;
-				}
-
-				$ch = curl_init($this->Qurl);
-				curl_setopt_array($ch,array(
-				CURLOPT_FAILONERROR=>TRUE,
-				CURLOPT_FOLLOWLOCATION=>TRUE,
-				CURLOPT_FORBID_REUSE=>TRUE,
-				CURLOPT_FRESH_CONNECT=>TRUE,
-				CURLOPT_HEADER=>FALSE,
-				CURLOPT_RETURNTRANSFER=>TRUE,
-				CURLOPT_SSL_VERIFYPEER=>FALSE)	//in case ...
-				);
-
-				curl_multi_add_handle($this->mh,$ch);
-				$runcount = 0;
-				do
-				{
-					$mrc = curl_multi_exec($this->mh,$runcount);
-				} while ($mrc == CURLM_CALL_MULTI_PERFORM); //irrelevant for curl 7.20.0+ (2010-02-11)
-//					if ($mrc != CURLM_OK) i.e. CURLM_OUT_OF_MEMORY, CURLM_INTERNAL_ERROR
-				if ($runcount) {
-					$this->ch = $ch; //cache for later cleanup
-				} else {
-					curl_multi_remove_handle($this->mh,$ch);
-					curl_close($ch);
-				}
-			}
-*/
 			// run all field methods that modify other fields
 			$computes = [];
 			foreach ($formdata->FieldOrders as $field_id) {
