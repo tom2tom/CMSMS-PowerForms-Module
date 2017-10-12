@@ -8,16 +8,13 @@ More info at http://dev.cmsmadesimple.org/projects/powerforms
 
 if (isset($params['active_tab'])) {
 	//we've reached here via a request or redirect
-	try {
-		$cache = PWForms\Utils::GetCache($this);
-	} catch (Exception $e) {
-$TODO = $CRASH1;
+	$cache = PWForms\Utils::GetCache();
+	if (!$cache) {
 		echo 'system error';
 		return;
 	}
-	$formdata = $cache->get($params['datakey']);
+	$formdata = $cache->get(PWForms::CACHESPACE, $params['datakey']);
 	if (is_null($formdata) || !$formdata->Fields) {
-$TODO = $CRASH2;
 		echo 'system error';
 		return;
 	}
@@ -37,7 +34,7 @@ $TODO = $CRASH2;
 			}
 		}
 	}
-	$cache->set($params['datakey'], $formdata, 84600);
+	$cache->set(PWForms::CACHESPACE, $params['datakey'], $formdata, 84600);
 
 	$this->Redirect($id, 'open_form', $returnid, [
 		'form_id'=>$params['form_id'],
@@ -46,13 +43,12 @@ $TODO = $CRASH2;
 	]);
 } else {
 	//we've reached here via an ajax-call
-	try {
-		$cache = PWForms\Utils::GetCache($this);
-	} catch (Exception $e) {
+	$cache = PWForms\Utils::GetCache();
+	if (!$cache) {
 		echo '0';
 		exit;
 	}
-	$formdata = $cache->get($params['datakey']);
+	$formdata = $cache->get(PWForms::CACHESPACE, $params['datakey']);
 	if (is_null($formdata) || !$formdata->Fields) {
 		echo '0';
 		exit;
@@ -73,7 +69,7 @@ $TODO = $CRASH2;
 			}
 		}
 	}
-	$cache->set($params['datakey'], $formdata, 84600);
+	$cache->set(PWForms::CACHESPACE, $params['datakey'], $formdata, 84600);
 
 	echo '1';
 	exit;

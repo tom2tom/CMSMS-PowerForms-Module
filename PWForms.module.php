@@ -19,15 +19,11 @@ Read the License online: http://www.gnu.org/licenses/licenses.html#AGPL
 
 class PWForms extends CMSModule
 {
+	const CACHESPACE = 'PWFm';
 	const LENSHORTVAL = 64;
 
 	public $before20;
 	public $oldtemplates;
-/*QUEUE
-	private $mh = NULL; //curl_multi handle for async queue processing
-	private $ch = FALSE; //cached curl handle for unfinished process
-	private $Qurl;
-*/
 	//these are populated when first used
 	public $field_types = FALSE; //array of all usable field classnames
 	public $std_field_types = FALSE; //subset of $field_types, classes for use in 'fast-adder' simple mode
@@ -42,14 +38,7 @@ class PWForms extends CMSModule
 		global $CMS_VERSION;
 		$this->before20 = (version_compare($CMS_VERSION, '2.0') < 0);
 		$this->oldtemplates = $this->before20 || TRUE; //TODO
-/*QUEUE
-		$this->mh = curl_multi_init();
-		//bogus frontend link (i.e. no admin login needed)
-		$url = $this->CreateLink('_','run_queue',1,'',array(),'',TRUE);
-		//strip the (trailing) fake returnid, hence use the default
-		$sep = strpos($url,'&amp;');
-		$this->Qurl = substr($url,0,$sep);
-*/
+
 		spl_autoload_register([$this, 'cmsms_spacedload']);
 
 		$this->RegisterModulePlugin(TRUE);
@@ -57,13 +46,6 @@ class PWForms extends CMSModule
 
 	public function __destruct()
 	{
-		/*		if ($this->ch) {
-			curl_multi_remove_handle($this->mh,$this->ch);
-			curl_close($this->ch);
-		}
-		if ($this->mh)
-			curl_multi_close($this->mh);
-*/
 		spl_autoload_unregister([$this, 'cmsms_spacedload']);
 		if (function_exists('parent::__destruct')) {
 			parent::__destruct();

@@ -6,9 +6,8 @@ Refer to licence and other details at the top of file PWForms.module.php
 More info at http://dev.cmsmadesimple.org/projects/powerforms
 */
 
-try {
-	$cache = PWForms\Utils::GetCache($this);
-} catch (Exception $e) {
+$cache = PWForms\Utils::GetCache();
+if (!$cache) {
 	echo $this->Lang('err_system');
 	return;
 }
@@ -56,7 +55,7 @@ if (!empty($_SERVER['SERVER_ADDR'])) {
 }
 $token .= 'SERVER_ADDR'.uniqid().mt_rand(1100, 2099).reset($_SERVER).key($_SERVER).end($_SERVER).key($_SERVER);
 $cache_key = md5($token);
-$cache->set($cache_key, $formdata, 84600); //expiry ?
+$cache->set(PWForms::CACHESPACE, $cache_key, $formdata, 84600); //expiry ?
 
 $prefix = $formdata->current_prefix;
 $this->Redirect($id, 'default', $returnid, [

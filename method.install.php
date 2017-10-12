@@ -5,12 +5,6 @@ Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 Refer to licence and other details at the top of file PWForms.module.php
 More info at http://dev.cmsmadesimple.org/projects/powerforms
 */
-/*QUEUE
-if (!function_exists('curl_init'))
-	return 'PWForms needs the PHP cURL extension';
-TODO mutex check
-*/
-//TODO cache check
 
 $pre = cms_db_prefix();
 $taboptarray = ['mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
@@ -49,25 +43,6 @@ submitted I,
 content B(16384)
 ';
 $sqlarray = $dict->CreateTableSQL($pre.'module_pwf_session', $flds, $taboptarray);
-$dict->ExecuteSQLArray($sqlarray);
-
-/*MUTEX
-$flds = '
-flock_id I(8) KEY,
-flock T
-';
-$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_flock',$flds,$taboptarray);
-$dict->ExecuteSQLArray($sqlarray);
-*/
-
-$flds = '
-cache_id I(2) AUTO KEY,
-keyword C(48),
-value B(16384),
-savetime I(8),
-lifetime I(4)
-';
-$sqlarray = $dict->CreateTableSQL($pre.'module_pwf_cache', $flds, $taboptarray);
 $dict->ExecuteSQLArray($sqlarray);
 
 $flds = '

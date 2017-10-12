@@ -10,9 +10,8 @@ if (!$this->_CheckAccess('ModifyPFForms')) {
 	exit;
 }
 
-try {
-	$cache = PWForms\Utils::GetCache($this);
-} catch (Exception $e) {
+$cache = PWForms\Utils::GetCache();
+if (!$cache) {
 	echo $this->Lang('err_system');
 	exit;
 }
@@ -20,7 +19,7 @@ try {
 $newfield = ($params['field_id'] == 0);
 
 if (isset($params['datakey'])) {
-	$formdata = $cache->get($params['datakey']);
+	$formdata = $cache->get(PWForms::CACHESPACE, $params['datakey']);
 	if (is_null($formdata) || !$formdata->Fields) {
 		//probably the system has been shut down
 $this->Crash();
@@ -102,7 +101,7 @@ if (isset($params['submit'])) {
 			$formdata->FieldOrders = FALSE; //trigger re-sort
 		}
 		//update cache ready for next use
-		$cache->set($params['datakey'], $formdata, 84600);
+		$cache->set(PWForms::CACHESPACE, $params['datakey'], $formdata, 84600);
 
 		$t = ($newfield) ? 'added':'updated';
 		$message = $this->Lang('field_op', $this->Lang($t));
@@ -173,7 +172,7 @@ $ob->jsfuncs = NULL;
 $ob->jsloads = NULL;
 unset($obfld->Jscript);
 
-$cache->set($params['datakey'], $formdata, 84600);
+$cache->set(PWForms::CACHESPACE, $params['datakey'], $formdata, 84600);
 
 echo PWForms\Utils::ProcessTemplate($this, 'editfield.tpl', $tplvars);
 if ($jsall) {

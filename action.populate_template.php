@@ -9,13 +9,12 @@ More info at http://dev.cmsmadesimple.org/projects/powerforms
 //this action processes ajax-calls
 
 if (isset($params['datakey'])) {
-	try {
-		$cache = PWForms\Utils::GetCache($this);
-	} catch (Exception $e) {
+	$cache = PWForms\Utils::GetCache();
+	if (!$cache) {
 		echo '0';
 		exit;
 	}
-	$formdata = $cache->get($params['datakey']);
+	$formdata = $cache->get(PWForms::CACHESPACE, $params['datakey']);
 	if (is_null($formdata) || !$formdata->Fields) {
 		echo '0';
 		exit;
