@@ -6,9 +6,14 @@ Refer to licence and other details at the top of file PWForms.module.php
 More info at http://dev.cmsmadesimple.org/projects/powerforms
 */
 
+$fp = cms_join_path(dirname(__DIR__), 'Async', 'lib');
+if (!is_dir($fp)) {
+	return $this->Lang('err_module_async');
+}
+
 $pre = cms_db_prefix();
-$taboptarray = ['mysql' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci',
-'mysqli' => 'ENGINE MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci'];
+$taboptarray = ['mysql' => 'ENGINE InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci',
+'mysqli' => 'ENGINE InnoDB CHARACTER SET utf8 COLLATE utf8_general_ci'];
 $dict = NewDataDictionary($db);
 
 $flds = '
