@@ -390,6 +390,7 @@ $lang['err_form_import'] = 'Form import failed! There was a problem with the for
 $lang['err_format'] = 'Invalid format';
 $lang['err_large_file'] = 'Uploaded file is too large! Maximum size is:';
 $lang['err_module'] = 'The %s module is not available'; //see also 'missing_module'
+$lang['err_module_async']='The Async library is not available.';
 $lang['err_parm'] = 'Parameter error';
 $lang['err_perm'] = 'No permission';
 $lang['err_server'] = 'Server error';
