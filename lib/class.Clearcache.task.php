@@ -1,6 +1,6 @@
 <?php
 /*
-This file is part of CMS CMS Made Simple module: PWForms
+This file is part of CMS Made Simple module: PWForms
 Copyright (C) 2012-2017 Tom Phane <tpgww@onepost.net>
 Refer to licence and other details at the top of file PWForms.module.php
 More info at http://dev.cmsmadesimple.org/projects/powerforms
@@ -22,27 +22,16 @@ class ClearcacheTask implements \CmsRegularTask
 
 	public function get_description()
 	{
-		$mod = $this->get_module();
-		return $mod->Lang('taskdescription_clearcache');
+		return $this->get_module()->Lang('taskdescription_clearcache');
 	}
 
 	public function test($time='')
 	{
-		$mod = $this->get_module();
-		$dir = Utils::GetUploadsPath($mod);
-		if ($dir) {
-			foreach (new \DirectoryIterator($dir) as $fInfo) {
-				$fn = $fInfo->getFilename();
-				if (strncmp($fn, 'pwf', 3) == 0) {
-					return TRUE;
-				}
-			}
+		if (!$time) {
+			$time = time();
 		}
-		//if file-cache N/A, check for database-cache
-		$pre = \cms_db_prefix();
-		$sql = 'SELECT cache_id FROM '.$pre.'module_pwf_cache';
-		$res = \cmsms()->GetDB()->GetOne($sql);
-		return ($res != FALSE);
+		$last_cleared = $this->get_module()->GetPreference('lastclearcache');
+		return ($time >= $last_cleared + 43200);
 	}
 
 	public function execute($time='')
@@ -50,25 +39,27 @@ class ClearcacheTask implements \CmsRegularTask
 		if (!$time) {
 			$time = time();
 		}
-		$time -= 43200; //half-day cache retention-period (as seconds)
-		$mod = $this->get_module();
-		$dir = Utils::GetUploadsPath($mod);
-		if ($dir) {
-			foreach (new \DirectoryIterator($dir) as $fInfo) {
-				if ($fInfo->isFile() && !$fInfo->isDot()) {
-					$fn = $fInfo->getFilename();
-					if (strncmp($fn, 'pwf', 3) == 0) {
-						$mtime = $fInfo->getMTime();
-						if ($mtime < $time) {
-							@unlink($dir.DIRECTORY_SEPARATOR.$fn);
-						}
+		$funcs = new \Async\Cache();
+		$cache = $funcs->Get();
+		if ($cache instanceof \Async\MultiCache\FileCache) {
+			$arr = glob($cache->basepath.'_cache_'.PWForms::CACHESPACE.'*', GLOB_NOSORT);
+			if ($arr) {
+				$time -= 84600; //1-day cache retention-period (as seconds)
+				clearstatcache();
+				foreach ($arr as $fn) {
+					$fp = $cache->basepath.$fn;
+					if (filemtime($fp) < $time) {
+						@unlink $fp;
 					}
 				}
 			}
+		} elseif ($cache instanceof \Async\MultiCache\DbaseCache) {
+			$pre = \cms_db_prefix();
+			$sql = 'DELETE FROM '.$cache->table.' WHERE keyword LIKE \'_cache_'.PWForms::CACHESPACE.'%\' AND savetime+lifetime < '.$time;
+			\cmsms()->GetDB()->Execute($sql);
 		}
-		$pre = \cms_db_prefix();
-		$sql = 'DELETE FROM '.$pre.'module_pwf_cache WHERE savetime+lifetime < '.$time;
-		\cmsms()->GetDB()->Execute($sql);
+		//TODO maybe mutexes too e.g. flock files fopen files, db records
+		$this->get_module()->SetPreference('lastclearcache', $time + 84600);
 		return TRUE;
 	}
 
