@@ -555,14 +555,12 @@ EOS;
 
 	list($formdata->current_prefix, $formdata->prior_prefix) = $this->_GetTokens();
 
-	//construct cache key (more random than backend keys)
-	if (!empty($_SERVER['SERVER_ADDR'])) {
-		$token = $_SERVER['SERVER_ADDR'];
-	} else {
-		$token = mt_rand(0, 999999).'.'.mt_rand(0, 999999);
-	}
-	$token .= 'SERVER_ADDR'.uniqid().mt_rand(1100, 2099).reset($_SERVER).key($_SERVER).end($_SERVER).key($_SERVER);
-	$cache_key = 'pwf'.md5($token);
+	//construct cache key
+	$token = reset($_SERVER).key($_SERVER);
+	do {
+		$token .= microtime().mt_rand(1100, 2099);
+		$cache_key = hash('crc32b', $token);
+	} while (!$cache->setnew(PWForms::CACHESPACE, $cache_key, NULL));
 }
 
 $tplvars['form_has_validation_errors'] = $validerr;
