@@ -389,7 +389,6 @@ $lang['err_file_exists'] = 'File %s already exists, and cannot be overwritten.';
 $lang['err_form_import'] = 'Form import failed! There was a problem with the format of the XML file.';
 $lang['err_format'] = 'Invalid format';
 $lang['err_large_file'] = 'Uploaded file is too large! Maximum size is:';
-//QUEUE $lang['err_lock'] = 'Error. Unable to obtain exclusive access.';
 $lang['err_module'] = 'The %s module is not available'; //see also 'missing_module'
 $lang['err_parm'] = 'Parameter error';
 $lang['err_perm'] = 'No permission';
