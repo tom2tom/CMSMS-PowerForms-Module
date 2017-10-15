@@ -1,8 +1,8 @@
 <?php
 
-namespace ZxcvbnPhp;
+namespace PWForms\ZxcvbnPhp;
 
-use \PWForms\ZxcvbnPhp;
+use PWForms\ZxcvbnPhp;
 
 class Zxcvbn
 {

@@ -4,9 +4,7 @@
  *
  */
 
-namespace ZxcvbnPhp\Matchers;
-
-use \PWForms\ZxcvbnPhp;
+namespace PWForms\ZxcvbnPhp\Matchers;
 
 /**
  * Class Bruteforce

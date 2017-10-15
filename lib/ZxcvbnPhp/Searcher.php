@@ -1,8 +1,8 @@
 <?php
 
-namespace ZxcvbnPhp;
+namespace PWForms\ZxcvbnPhp;
 
-use \PWForms\ZxcvbnPhp\Matchers\Bruteforce;
+use PWForms\ZxcvbnPhp\Matchers\Bruteforce;
 
 class Searcher
 {

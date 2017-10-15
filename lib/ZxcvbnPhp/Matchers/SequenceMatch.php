@@ -1,8 +1,6 @@
 <?php
 
-namespace ZxcvbnPhp\Matchers;
-
-use \PWForms\ZxcvbnPhp;
+namespace PWForms\ZxcvbnPhp\Matchers;
 
 class SequenceMatch extends Match
 {

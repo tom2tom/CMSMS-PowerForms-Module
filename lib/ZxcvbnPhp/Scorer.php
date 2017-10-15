@@ -1,8 +1,6 @@
 <?php
 
-namespace ZxcvbnPhp;
-
-use \PWForms\ZxcvbnPhp;
+namespace PWForms\ZxcvbnPhp;
 
 class Scorer implements ScorerInterface
 {

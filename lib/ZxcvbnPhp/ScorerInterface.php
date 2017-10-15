@@ -1,6 +1,6 @@
 <?php
 
-namespace ZxcvbnPhp;
+namespace PWForms\ZxcvbnPhp;
 
 interface ScorerInterface
 {
