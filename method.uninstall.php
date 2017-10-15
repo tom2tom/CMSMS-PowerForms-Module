@@ -43,6 +43,16 @@ if ($this->oldtemplates) {
 	}
 }
 
+$cache = PWForms\Utils::GetCache();
+if ($cache) {
+	$cache->clearall(PWForms::ASYNCSPACE);
+}
+/*$mutex = ;
+if ($mutex) {
+	$mutex->cleanall(PWForms::ASYNCSPACE);
+}
+*/
+
 $fp = $config['uploads_path'];
 if ($fp && is_dir($fp)) {
 	$ud = $this->GetPreference('uploads_dir');
