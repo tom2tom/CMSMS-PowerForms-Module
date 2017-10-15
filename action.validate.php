@@ -55,7 +55,7 @@ if (!empty($_SERVER['SERVER_ADDR'])) {
 }
 $token .= 'SERVER_ADDR'.uniqid().mt_rand(1100, 2099).reset($_SERVER).key($_SERVER).end($_SERVER).key($_SERVER);
 $cache_key = md5($token);
-$cache->set(PWForms::CACHESPACE, $cache_key, $formdata, 84600); //expiry ?
+$cache->set(PWForms::ASYNCSPACE, $cache_key, $formdata, 84600); //expiry ?
 
 $prefix = $formdata->current_prefix;
 $this->Redirect($id, 'default', $returnid, [

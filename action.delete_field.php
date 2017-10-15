@@ -13,7 +13,7 @@ if (isset($params['active_tab'])) {
 		echo 'system error';
 		return;
 	}
-	$formdata = $cache->get(PWForms::CACHESPACE, $params['datakey']);
+	$formdata = $cache->get(PWForms::ASYNCSPACE, $params['datakey']);
 	if (is_null($formdata) || !$formdata->Fields) {
 		echo 'system error';
 		return;
@@ -34,7 +34,7 @@ if (isset($params['active_tab'])) {
 			}
 		}
 	}
-	$cache->set(PWForms::CACHESPACE, $params['datakey'], $formdata, 84600);
+	$cache->set(PWForms::ASYNCSPACE, $params['datakey'], $formdata, 84600);
 
 	$this->Redirect($id, 'open_form', $returnid, [
 		'form_id'=>$params['form_id'],
@@ -48,7 +48,7 @@ if (isset($params['active_tab'])) {
 		echo '0';
 		exit;
 	}
-	$formdata = $cache->get(PWForms::CACHESPACE, $params['datakey']);
+	$formdata = $cache->get(PWForms::ASYNCSPACE, $params['datakey']);
 	if (is_null($formdata) || !$formdata->Fields) {
 		echo '0';
 		exit;
@@ -69,7 +69,7 @@ if (isset($params['active_tab'])) {
 			}
 		}
 	}
-	$cache->set(PWForms::CACHESPACE, $params['datakey'], $formdata, 84600);
+	$cache->set(PWForms::ASYNCSPACE, $params['datakey'], $formdata, 84600);
 
 	echo '1';
 	exit;

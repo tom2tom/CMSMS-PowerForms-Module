@@ -19,7 +19,7 @@ Read the License online: http://www.gnu.org/licenses/licenses.html#AGPL
 
 class PWForms extends CMSModule
 {
-	const CACHESPACE = 'PWFm';
+	const ASYNCSPACE = 'PWFm';
 	const LENSHORTVAL = 64;
 
 	public $before20;

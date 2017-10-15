@@ -42,20 +42,19 @@ class ClearcacheTask implements \CmsRegularTask
 		$funcs = new \Async\Cache();
 		$cache = $funcs->Get();
 		if ($cache instanceof \Async\MultiCache\FileCache) {
-			$arr = glob($cache->basepath.'_cache_'.PWForms::CACHESPACE.'*', GLOB_NOSORT);
+			$arr = glob($cache->basepath.'_cache_'.PWForms::ASYNCSPACE.'*', GLOB_NOSORT);
 			if ($arr) {
 				$time -= 84600; //1-day cache retention-period (as seconds)
 				clearstatcache();
 				foreach ($arr as $fn) {
 					$fp = $cache->basepath.$fn;
 					if (filemtime($fp) < $time) {
-						@unlink $fp;
+						@unlink($fp);
 					}
 				}
 			}
 		} elseif ($cache instanceof \Async\MultiCache\DbaseCache) {
-			$pre = \cms_db_prefix();
-			$sql = 'DELETE FROM '.$cache->table.' WHERE keyword LIKE \'_cache_'.PWForms::CACHESPACE.'%\' AND savetime+lifetime < '.$time;
+			$sql = 'DELETE FROM '.$cache->table.' WHERE keyword LIKE \'_cache_'.PWForms::ASYNCSPACE.'%\' AND savetime+lifetime < '.$time;
 			\cmsms()->GetDB()->Execute($sql);
 		}
 		//TODO maybe mutexes too e.g. flock files fopen files, db records

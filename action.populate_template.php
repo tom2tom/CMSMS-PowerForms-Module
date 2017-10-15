@@ -14,7 +14,7 @@ if (isset($params['datakey'])) {
 		echo '0';
 		exit;
 	}
-	$formdata = $cache->get(PWForms::CACHESPACE, $params['datakey']);
+	$formdata = $cache->get(PWForms::ASYNCSPACE, $params['datakey']);
 	if (is_null($formdata) || !$formdata->Fields) {
 		echo '0';
 		exit;

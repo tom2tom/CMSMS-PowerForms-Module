@@ -16,7 +16,7 @@ if (!$cache) {
 	exit;
 }
 if (isset($params['cancel'])) {
-	$cache->delete(PWForms::CACHESPACE, $params['datakey']);
+	$cache->delete(PWForms::ASYNCSPACE, $params['datakey']);
 	$this->Redirect($id, 'defaultadmin');
 }
 
@@ -24,7 +24,7 @@ $form_id = (int)$params['form_id'];
 $funcs = new PWForms\FormOperations();
 
 if (isset($params['datakey'])) {
-	$formdata = $cache->get(PWForms::CACHESPACE, $params['datakey']);
+	$formdata = $cache->get(PWForms::ASYNCSPACE, $params['datakey']);
 	if (is_null($formdata) || !$formdata->Fields) {
 		$formdata = $funcs->Load($this, $form_id, $id, $params, TRUE);
 		$params['datakey'] = 'pwf'.md5($form_id.session_id());
@@ -43,20 +43,20 @@ if (isset($params['submit']) || isset($params['apply'])) {
 		$message = $this->Lang('form_op', $this->Lang('updated'));
 		$message = $this->_PrettyMessage($message, TRUE, FALSE);
 		if (isset($params['submit'])) {
-			$cache->delete(PWForms::CACHESPACE, $params['datakey']);
+			$cache->delete(PWForms::ASYNCSPACE, $params['datakey']);
 			$this->Redirect($id, 'defaultadmin', '', ['message'=> $message]);
 		}
 	} else {
 		$message = $this->_PrettyMessage($message, FALSE, FALSE);
 	}
-	$cache->delete(PWForms::CACHESPACE, $params['datakey']);
+	$cache->delete(PWForms::ASYNCSPACE, $params['datakey']);
 } elseif (isset($params['fieldcopy'])) {
 	$obfld = PWForms\FieldOperations::Replicate($formdata, $params['field_id']);
 	if ($obfld) {
 		$obfld->Store(TRUE);
 		$formdata->Fields[$obfld->Id] = $obfld;
 		//update cache ready for next use
-		$cache->set(PWForms::CACHESPACE, $params['datakey'], $formdata, 84600);
+		$cache->set(PWForms::ASYNCSPACE, $params['datakey'], $formdata, 84600);
 		$this->Redirect($id, 'open_field', $returnid,
 			['form_id'=>$form_id,
 			'datakey'=>$params['datakey'],
@@ -191,7 +191,7 @@ $tplvars = [];
 
 require __DIR__.DIRECTORY_SEPARATOR.'populate.form.php';
 
-$cache->set(PWForms::CACHESPACE, $params['datakey'], $formdata, 84600);
+$cache->set(PWForms::ASYNCSPACE, $params['datakey'], $formdata, 84600);
 
 $jsall = NULL;
 PWForms\Utils::MergeJS($jsincs, $jsfuncs, $jsloads, $jsall);

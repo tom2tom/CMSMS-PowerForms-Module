@@ -58,7 +58,7 @@ WHERE NOT EXISTS (SELECT 1 FROM '.$pre.'module_pwf_ip_log T WHERE T.src=?)';
 		$matches = preg_grep('/datakey$/', array_keys($params));
 		if ($matches) {
 			$cache_key = reset($matches);
-			$cache->delete(PWForms::CACHESPACE, $cache_key);
+			$cache->delete(PWForms::ASYNCSPACE, $cache_key);
 		}
 	}
 }
@@ -141,7 +141,7 @@ if (isset($params[$prefix.'datakey'])) {
 	$tplvars = []; //TODO members to preserve c.f. 1st-pass
 
 	$cache_key = $params[$prefix.'datakey'];
-	$formdata = $cache->get(PWForms::CACHESPACE, $cache_key);
+	$formdata = $cache->get(PWForms::ASYNCSPACE, $cache_key);
 	if (!$formdata) {
 		echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 			'title'=>$this->Lang('title_aborted'),
@@ -200,7 +200,7 @@ if (isset($params[$prefix.'datakey'])) {
 					}
 				}
 				if ($nt == 0) {
-					$cache->delete(PWForms::CACHESPACE, $cache_key);
+					$cache->delete(PWForms::ASYNCSPACE, $cache_key);
 					echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 						'title'=>$this->Lang('title_aborted'),
 						'message'=>$this->Lang('system_data'),
@@ -210,7 +210,7 @@ if (isset($params[$prefix.'datakey'])) {
 				if ($num) {
 					if ($num == 255) { //blocked due to expiry
 						BlockSource(); //again!
-						$cache->delete(PWForms::CACHESPACE, $cache_key);
+						$cache->delete(PWForms::ASYNCSPACE, $cache_key);
 						echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 							'title'=>$this->Lang('title_aborted'),
 							'message'=>$this->Lang('comeback_expired')]);
@@ -230,7 +230,7 @@ EOS;
 						$args[] = [$src,$t,$src];
 						PWForms\Utils::SafeExec($sql, $args);
 					} else {
-						$cache->delete(PWForms::CACHESPACE, $cache_key);
+						$cache->delete(PWForms::ASYNCSPACE, $cache_key);
 						echo PWForms\Utils::ProcessTemplate($this, 'message.tpl', [
 							'title'=>$this->Lang('title_aborted'),
 							'message'=>$this->Lang('comeback_toomany')]);
@@ -357,7 +357,7 @@ EOS;
 			$tplvars['form_done'] = 1;
 			if ($alldisposed) {
 				//TODO how to handle $params['resume'] c.f. cancellation
-				$cache->delete(PWForms::CACHESPACE, $cache_key);
+				$cache->delete(PWForms::ASYNCSPACE, $cache_key);
 				$act = PWForms\Utils::GetFormProperty($formdata, 'submit_action', 'text');
 				switch ($act) {
 				 case 'text':
@@ -560,7 +560,7 @@ EOS;
 	do {
 		$token .= microtime().mt_rand(1100, 2099);
 		$cache_key = hash('crc32b', $token);
-	} while (!$cache->setnew(PWForms::CACHESPACE, $cache_key, NULL));
+	} while (!$cache->setnew(PWForms::ASYNCSPACE, $cache_key, NULL));
 }
 
 $tplvars['form_has_validation_errors'] = $validerr;
@@ -617,7 +617,7 @@ if ($ob->jsloads) {
 }
 unset($formdata->Jscript);
 
-$cache->set(PWForms::CACHESPACE, $cache_key, $formdata, 84600);
+$cache->set(PWForms::ASYNCSPACE, $cache_key, $formdata, 84600);
 
 $styler = '<link rel="stylesheet" type="text/css" href="'.$baseurl.'/css/showform.css" />';
 $t = PWForms\Utils::GetFormProperty($formdata, 'css_file', '');

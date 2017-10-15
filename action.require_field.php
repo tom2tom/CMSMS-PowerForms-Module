@@ -14,7 +14,7 @@ if (isset($params['datakey'])) {
 		echo '0';
 		exit;
 	}
-	$formdata = $cache->get(PWForms::CACHESPACE, $params['datakey']);
+	$formdata = $cache->get(PWForms::ASYNCSPACE, $params['datakey']);
 	if (is_null($formdata) || !$formdata->Fields) {
 		echo '0';
 		exit;
@@ -25,7 +25,7 @@ $obfld = $formdata->Fields[$params['field_id']];
 if ($obfld !== FALSE) {
 	$obfld->SetRequired(($params['reqd']=='on'));
 
-	$cache->set(PWForms::CACHESPACE, $params['datakey'], $formdata, 84600);
+	$cache->set(PWForms::ASYNCSPACE, $params['datakey'], $formdata, 84600);
 }
 
 echo '1';
