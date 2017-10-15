@@ -39,8 +39,7 @@ class ClearTablesTask implements \CmsRegularTask
 		if (!$time) {
 			$time = time();
 		}
-		$mod = $this->get_module();
-		Utils::CleanTables($mod, $time);
+		Utils::CleanTables($time);
 		$this->get_module()->SetPreference('lastcleartables', $time);
 		return TRUE;
 	}
