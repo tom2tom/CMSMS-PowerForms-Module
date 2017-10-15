@@ -30,7 +30,7 @@ class ClearTablesTask implements \CmsRegularTask
 		if (!$time) {
 			$time = time();
 		}
-		$last_cleared = $this->get_module()->GetPreference('lastcleared', 0);
+		$last_cleared = $this->get_module()->GetPreference('lastcleartables', 0);
 		return ($time >= $last_cleared + 1800);
 	}
 
@@ -41,15 +41,12 @@ class ClearTablesTask implements \CmsRegularTask
 		}
 		$mod = $this->get_module();
 		Utils::CleanTables($mod, $time);
+		$this->get_module()->SetPreference('lastcleartables', $time);
 		return TRUE;
 	}
 
 	public function on_success($time = '')
 	{
-		if (!$time) {
-			$time = time();
-		}
-		$this->get_module()->SetPreference('lastcleared', $time);
 	}
 
 	public function on_failure($time = '')
